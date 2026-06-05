@@ -1,0 +1,48 @@
+# =============================================================================
+# docker-compose.yml — AI数字名片 (Digital Brochure API)
+# =============================================================================
+
+services:
+  digital-brochure:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digital-brochure
+    restart: always
+
+    # Port mapping: host:container
+    ports:
+      - "8003:8003"
+
+    # Volume mounts:
+    #   - Persist SQLite database outside the container
+    #   - Mount static/template directories for live development (optional)
+    volumes:
+      # Persist the SQLite database file(s)
+      - ./data:/app/data
+      # Persist the root-level SQLite database if used
+      - ./digital_brochure.db:/app/digital_brochure.db
+
+    # Environment variables (override as needed)
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - TZ=Asia/Shanghai
+
+    # Health check (matches Dockerfile)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # Resource limits
+    mem_limit: 512m
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="64" fill="url(#bg)"/>
+  <rect x="96" y="128" width="320" height="240" rx="16" fill="url(#card)" opacity="0.9"/>
+  <rect x="128" y="168" width="120" height="12" rx="6" fill="#fff" opacity="0.9"/>
+  <rect x="128" y="196" width="200" height="8" rx="4" fill="#fff" opacity="0.6"/>
+  <rect x="128" y="220" width="160" height="8" rx="4" fill="#fff" opacity="0.6"/>
+  <rect x="128" y="260" width="80" height="8" rx="4" fill="#fff" opacity="0.4"/>
+  <rect x="128" y="284" width="100" height="8" rx="4" fill="#fff" opacity="0.4"/>
+  <circle cx="360" cy="280" r="32" fill="#fff" opacity="0.2"/>
+  <path d="M348 280 L360 292 L376 268" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="192" y="384" width="128" height="32" rx="16" fill="#3b82f6" opacity="0.8"/>
+  <text x="256" y="406" font-family="Arial,sans-serif" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">名片</text>
+</svg>

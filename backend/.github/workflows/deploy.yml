@@ -1,0 +1,76 @@
+# ── AI数字名片 自动部署流水线 ──────────────────────────────────────────
+# 触发条件：push 到 main 分支
+#
+# 注意：以下部署步骤使用 SSH 占位符。
+# 向海容需要：
+#   1. 在 GitHub Secrets 中添加以下密钥：
+#      - DEPLOY_HOST     — 服务器 IP 或域名
+#      - DEPLOY_USER     — SSH 用户名
+#      - DEPLOY_SSH_KEY  — SSH 私钥（Base64 encoded）
+#      - DEPLOY_PATH     — 服务器上的部署路径
+#   2. 将服务器的公钥添加到 ~/.ssh/authorized_keys
+#
+# 部署方式：rsync 同步代码 + systemd 重启服务
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 🐍 设置 Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 📦 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔍 代码风格检查 (ruff)
+        run: |
+          python -m ruff check app/ tests/ main.py
+
+      - name: 🧪 运行测试 (pytest)
+        run: |
+          python -m pytest tests/ -v --tb=short -x
+
+      # ── 部署步骤（需要配置 GitHub Secrets）────
+      # 取消下方注释并配置 Secrets 后激活
+      #
+      # - name: 🚀 部署到服务器
+      #   uses: easingthemes/ssh-deploy@v4
+      #   with:
+      #     SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      #     ARGS: "-avz --delete --exclude='.env' --exclude='__pycache__' --exclude='.pytest_cache' --exclude='.git'"
+      #     SOURCE: "backend/"
+      #     REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+      #     REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+      #     TARGET: ${{ secrets.DEPLOY_PATH }}
+      #
+      # - name: 🔄 重启服务
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOST }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_SSH_KEY }}
+      #     script: |
+      #       cd ${{ secrets.DEPLOY_PATH }}
+      #       source venv/bin/activate
+      #       pip install -r requirements.txt
+      #       sudo systemctl restart digital-brochure

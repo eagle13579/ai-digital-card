@@ -1,0 +1,41 @@
+# =============================================================================
+# docker-compose.prod.yml — AI数字名片 生产环境覆盖配置
+# 使用方式: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# =============================================================================
+
+services:
+  digital-brochure:
+    # ── 重启策略 ──────────────────────────────────────────────
+    restart: always
+
+    # ── 资源限制 ──────────────────────────────────────────────
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 1.0
+    # 如使用 Docker swarm / Compose v3, 用 deploy.resources 替代:
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 512m
+    #       cpus: "1.0"
+    #     reservations:
+    #       memory: 256m
+
+    # ── 日志配置 ──────────────────────────────────────────────
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # ── 健康检查 (覆盖 Dockerfile 默认, 更精细的生产参数) ────
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    # ── 环境变量 (从 .env 文件加载) ──────────────────────────
+    env_file:
+      - .env

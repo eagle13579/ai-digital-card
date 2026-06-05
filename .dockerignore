@@ -1,0 +1,43 @@
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# ── IDE / Editor ─────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Project-specific ─────────────────────────────────────
+# Don't copy the existing SQLite DB into the image;
+# it will be mounted as a volume at runtime
+*.db
+/data/
+
+# ── Git / CI / Docs ─────────────────────────────────────
+.git/
+.gitignore
+.github/
+.pytest_cache/
+.benchmarks/
+*.md
+CHANGELOG.md
+PRD.md
+PRODUCT.md
+
+# ── Logs ─────────────────────────────────────────────────
+*.log
+_server_*.log

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Digital Card - Viewer</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/stpageflip@1.0.4/dist/stpageflip.min.js"></script>
+    <script src="/static/i18n.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 20px;
+        }
+        .page-container {
+            width: 100%;
+            max-width: 375px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #flipbook {
+            width: 100%;
+            max-width: 340px;
+            min-height: 460px;
+            margin: 8px auto;
+        }
+        .flip-page {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 20px;
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        }
+        .flip-page .page-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .flip-page h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .flip-page .page-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+            text-align: center;
+            white-space: pre-wrap;
+            width: 100%;
+        }
+        .flip-page .page-content .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        .flip-page img {
+            max-width: 180px;
+            border-radius: 16px;
+            margin: 12px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .flip-page .qrcode-placeholder {
+            width: 160px;
+            height: 160px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+            border: 2px dashed rgba(255,255,255,0.15);
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 20px 0 4px;
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+        }
+        .bottom-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 0 24px;
+        }
+        .action-btn {
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .action-btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-1px);
+        }
+        .action-btn.primary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+        }
+        .view-count {
+            color: rgba(255,255,255,0.30);
+            font-size: 12px;
+            padding-bottom: 12px;
+        }
+        .page-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 4px 0 8px;
+        }
+        .page-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        .page-dot.active {
+            background: #f5576c;
+            width: 18px;
+            border-radius: 3px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #f5576c;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 60px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Purpose badge styles */
+        .purpose-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 8px auto;
+        }
+        .purpose-badge.partner { background: rgba(245,87,108,0.15); color: #f5576c; border: 1px solid rgba(245,87,108,0.25); }
+        .purpose-badge.client { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+        .purpose-badge.investor { background: rgba(250,204,21,0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.25); }
+        .purpose-badge.supplier { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+        .purpose-highlight {
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin: 8px 0;
+            border-left: 3px solid currentColor;
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="app" x-data="i18nApp()">
+        <!-- Loading -->
+        <div id="loading" class="page-container" style="display:flex;">
+            <div class="loading-spinner"></div>
+            <div style="color:rgba(255,255,255,0.4);font-size:14px;text-align:center;" x-text="$t('loading_brochure')"></div>
+        </div>
+
+        <!-- 图册内容 -->
+        <div id="brochureContent" style="display:none;width:100%;">
+            <div class="header-title" id="brochureTitle">-</div>
+            <div class="text-center" id="purposeBadgeContainer" style="display:none;"></div>
+            <div class="page-container">
+                <div id="flipbook"></div>
+                <div class="page-nav" id="pageDots"></div>
+            </div>
+            <div class="bottom-bar">
+                <button class="action-btn" onclick="shareBrochure()" x-text="$t('btn_share')"></button>
+                <button class="action-btn primary" onclick="contactOwner()" x-text="$t('btn_contact')"></button>
+            </div>
+            <div class="view-count" id="viewCount" x-text="'👁️ ' + $t('views')"></div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="errorView" style="display:none;padding:60px 20px;text-align:center;color:rgba(255,255,255,0.5);">
+            <div style="font-size:48px;margin-bottom:16px;">📭</div>
+            <div style="font-size:16px;" x-text="$t('not_found')"></div>
+        </div>
+    </div>
+
+    <script>
+        // ─── Alpine.js 组件: i18n ───
+        function i18nApp() {
+            return {
+                i18nData: {},
+                async init() {
+                    this.i18nData = await initI18n(navigator.language);
+                    document.title = this.i18nData?.$t('app_name') || 'AI Digital Card';
+                },
+                $t(key) {
+                    return this.i18nData?.$t ? this.i18nData.$t(key) : key;
+                }
+            };
+        }
+
+        // ─── 获取 share_token ───
+        const pathParts = window.location.pathname.split('/');
+        const shareToken = pathParts[pathParts.length - 1] || '';
+        const API_BASE = '/api';
+
+        // ─── 加载图册 ───
+        async function loadBrochure() {
+            if (!shareToken || shareToken === 'brochure_viewer.html') {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorView').style.display = 'block';
+                return;
+            }
+
+            try {
+                const resp = await fetch(`${API_BASE}/brochures/share/${shareToken}`);
+                if (!resp.ok) throw new Error('Not found');
+                const data = await resp.json();
+                renderBrochure(data);
+            } catch (e) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorView').style.display = 'block';
+            }
+        }
+
+        // ─── 渲染图册 ───
+        function renderBrochure(data) {
+            const i18n = window.__i18n;
+            const $t = (key) => i18n?.$t(key) || key;
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('brochureContent').style.display = 'block';
+
+            document.getElementById('brochureTitle').textContent = data.title || $t('app_name');
+            document.getElementById('viewCount').textContent = `👁️ ${data.view_count || 0} ${$t('views')}`;
+
+            // Render purpose badge
+            renderPurposeBadge(data.purpose);
+
+            const flipbook = document.getElementById('flipbook');
+            flipbook.innerHTML = '';
+
+            const pages = data.pages || [];
+            if (pages.length === 0) {
+                flipbook.innerHTML = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">${$t('no_content')}</div>`;
+                return;
+            }
+
+            const pageIcons = ['📇', '📞', '🏢', '📱'];
+            pages.forEach((page, idx) => {
+                const div = document.createElement('div');
+                div.className = 'flip-page';
+                div.style.cssText = `width:100%;min-height:440px;`;
+                const icon = pageIcons[idx] || $t('page_icon_default');
+                const pageTitle = page.content_type === 'cover' ? $t('page_cover')
+                    : page.content_type === 'image' ? $t('page_qrcode')
+                    : page.content_type === 'text' ? (idx === 1 ? $t('page_contact') : idx === 2 ? $t('page_company') : $t('page_detail'))
+                    : $t('page_detail');
+                div.innerHTML = `
+                    <div class="page-icon">${icon}</div>
+                    <h2>${pageTitle}</h2>
+                    ${page.image_url ? `<img src="${page.image_url}" alt="page image" />` : ''}
+                    <div class="page-content">${renderPageContent(page, idx)}</div>
+                `;
+                flipbook.appendChild(div);
+            });
+
+            // 分页指示器
+            renderPageDots(pages.length);
+
+            // 初始化翻页引擎
+            if (typeof StPageFlip !== 'undefined') {
+                try {
+                    const flip = new StPageFlip(flipbook, {
+                        width: 320,
+                        height: 440,
+                        showCover: true,
+                        maxShadowOpacity: 0.5,
+                        flippingTime: 600,
+                        autoSize: true,
+                        swipeDistance: 30,
+                    });
+                    flip.loadFromHTML(document.querySelectorAll('.flip-page'));
+
+                    // 页码更新
+                    flip.on('flip', (e) => {
+                        const current = typeof e === 'number' ? e : (e.data || 0);
+                        updateActiveDot(current);
+                    });
+                } catch (e) {
+                    console.warn('StPageFlip init failed:', e);
+                }
+            }
+        }
+
+        const PURPOSE_BADGE_KEYS = {
+            partner: 'purpose_partner_badge',
+            client: 'purpose_client_badge',
+            investor: 'purpose_investor_badge',
+            supplier: 'purpose_supplier_badge',
+        };
+        const PURPOSE_HINT_KEYS = {
+            partner: 'purpose_partner_hint',
+            client: 'purpose_client_hint',
+            investor: 'purpose_investor_hint',
+            supplier: 'purpose_supplier_hint',
+        };
+
+        function renderPurposeBadge(purpose) {
+            const i18n = window.__i18n;
+            const $t = (key) => i18n?.$t(key) || key;
+
+            const container = document.getElementById('purposeBadgeContainer');
+            if (!purpose || !PURPOSE_BADGE_KEYS[purpose]) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div class="purpose-badge ${purpose}">${$t(PURPOSE_BADGE_KEYS[purpose])}</div>
+                <div class="purpose-highlight" style="border-color:${purpose === 'partner' ? '#f5576c' : purpose === 'client' ? '#4ade80' : purpose === 'investor' ? '#facc15' : '#60a5fa'}">
+                    ${$t(PURPOSE_HINT_KEYS[purpose])}
+                </div>
+            `;
+        }
+
+        function renderPageContent(page, idx) {
+            let content = page.content || '';
+            // 联系方式页特殊展示
+            if (idx === 1) {
+                const lines = content.split('\n').filter(l => l.trim());
+                return lines.map(l => `<div class="contact-item">${l}</div>`).join('');
+            }
+            return content;
+        }
+
+        function renderPageDots(count) {
+            const container = document.getElementById('pageDots');
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'page-dot' + (i === 0 ? ' active' : '');
+                dot.dataset.index = i;
+                container.appendChild(dot);
+            }
+        }
+
+        function updateActiveDot(index) {
+            document.querySelectorAll('.page-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === index);
+            });
+        }
+
+        // ─── 分享 ───
+        function shareBrochure() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({ title: document.getElementById('brochureTitle').textContent, url });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast(window.__i18n?.$t('copied_to_clipboard'));
+                });
+            }
+        }
+
+        // ─── 联系 ───
+        function contactOwner() {
+            showToast(window.__i18n?.$t('contact_requested'));
+        }
+
+        // ─── Toast ───
+        function showToast(msg) {
+            const div = document.createElement('div');
+            div.style.cssText = `
+                position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+                background:rgba(0,0,0,0.8);color:#fff;padding:10px 24px;
+                border-radius:24px;font-size:14px;z-index:9999;
+                backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);
+                animation:fadeIn 0.3s ease;
+            `;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => { div.style.opacity = '0'; div.style.transition = 'opacity 0.3s'; setTimeout(() => div.remove(), 300); }, 2000);
+        }
+
+        // ─── 启动 ───
+        document.addEventListener('DOMContentLoaded', loadBrochure);
+    </script>
+
+    <!-- ── PWA Service Worker Registration ── -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js').then((reg) => {
+                    console.log('✅ SW registered:', reg.scope);
+                }).catch((err) => {
+                    console.warn('⚠️ SW registration failed:', err);
+                });
+            });
+        }
+
+        window.addEventListener('offline', () => {
+            const banner = document.createElement('div');
+            banner.id = 'offline-banner';
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(245,87,108,0.95);color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;z-index:99999;backdrop-filter:blur(10px);';
+            banner.textContent = window.__i18n?.$t('offline_mode');
+            document.body.prepend(banner);
+        });
+        window.addEventListener('online', () => {
+            const banner = document.getElementById('offline-banner');
+            if (banner) banner.remove();
+        });
+    </script>
+</body>
+</html>
