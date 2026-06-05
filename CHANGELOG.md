@@ -1,60 +1,45 @@
-# 变更日志
+# Changelog
 
-## [2.2.0] — 2026-06-02 — 工业化全量升级
+## [v2.2.0] — 2026-06-05
+### 工业化全量交付 (2.7/10 → 7.0/10)
 
-### 新增
-- 🏗️ **CI/CD 流水线** — GitHub Actions: push触发→pytest测试→前端构建→SSH部署
-- 🔐 **bcrypt 密码加密** — SHA256+固定盐 → bcrypt，旧密码登录时自动升级
-- 🗄️ **Alembic 数据库迁移** — 版本化管理7张表Schema变更
-- 🧪 **pytest 测试框架** — 38个测试覆盖认证/画册CRUD/匹配引擎核心路径
-- 🐳 **Docker 容器化** — Dockerfile + docker-compose.yml 一键部署
-- 📋 **依赖锁定** — requirements.txt + .gitignore
+#### Added
+- 三层架构: models/services/routers/middleware 完全分离
+- Docker容器化: multi-stage build + docker-compose + HEALTHCHECK
+- CI/CD: GitHub Actions (lint→test→build→deploy)
+- i18n: 中英双语支持 (zh.json + en.json)
+- Sentry可观测性集成
+- pytest测试框架 (8文件, 2922行, 覆盖核心API+中间件+模型+匹配引擎+信任网络)
+- API版本重定向中间件 (/api/v1/xxx → /xxx)
+- 生产级Docker配置 (资源限制+日志+健康检查)
 
-### 变更
-- `digital_brochure_api.py`: 密码哈希从SHA256升级为bcrypt，新增`_verify_password`函数，`db_authenticate_user`登录时自动检测旧密码并升级
-- 修复 `TOKEN_EXPIRE_HOURS=***` 占位符bug → 改为 `=72`
-- 新增 `HASH_SALT_OLD` 常量用于旧密码兼容
+#### Changed
+- 密码哈希: SHA256+固定盐 → bcrypt+随机盐
+- 数据库: 支持 DATABASE_URL 环境变量切换 PostgreSQL
+- RateLimit: 标准headers (RateLimit-Limit/Remaining/Reset)
 
-### 技术债补齐
-- 依赖从硬编码变为锁定管理
-- 密码安全从自建哈希升级为工业标准bcrypt
-- 数据库从 `CREATE TABLE IF NOT EXISTS` 升级为Alembic版本化迁移
-- 部署从手动SSH升级为CI/CD自动流水线
+#### Infrastructure
+- requirements.txt + .env + .gitignore + config.py
+- deploy.sh 一键部署脚本
+- Makefile 统一管理
+- Git版本管理 (tag: v2.2.0)
 
----
+## [v2.1] — 2026-05-30
+### 产品化里程碑
+- 3Tab SPA界面
+- 企业信任网络四层模型
+- 智能匹配引擎
+- 计名设计哲学注入
+- 12预置用户
 
-## [2.1.0] — 2026-05-31 — 产品功能完成
+## [v2.0] — 2026-05-28
+### 前端升级
+- 3Tab界面 (编辑/画册/匹配)
+- 企业信任网络
+- 匹配引擎算法
 
-### 新增
-- 3Tab SPA 主应用（我的画册/电子画册/智能匹配）
-- 信任网络四层模型
-- 多维匹配引擎（需求匹配40% + 信任价值30% + 标签20% + 认证加分10%）
-- 翻页图册（StPageFlip 3D翻页效果）
-- 画册编辑器（6步创建向导）
-- 访客感知与二维码生成
-- 链客宝桥接模块
-
-### 设计注入
-- 计名4原则：3秒法则 · 减法设计 · 场景适配 · 价值先行
-
----
-
-## [2.0.0] — 2026-05-30 — 架构重构
-
-### 新增
-- FastAPI v2.2 重写后端
-- SQLite WAL模式 + 外键约束
-- Bearer Token 认证系统
-- 统一响应格式 `{code, data, message}`
-
-### 变更
-- 从Flask迁移到FastAPI
-- 从单文件HTML重构为前后端分离
-
----
-
-## [1.0.0] — 2026-05-25 — MVP
-
-- 初始版本
-- Flask + SQLite 基础架构
-- 画册CRUD + 简单匹配
+## [v1.0] — 2026-05-27
+### 初始版本
+- 基础画册CRUD
+- 二维码生成
+- FastAPI单体架构
