@@ -1,0 +1,272 @@
+"""AI数字名片 国际化(i18n) 模块
+
+中英文翻译映射表。
+所有 API 响应的 message/detail 字段通过此模块翻译。
+"""
+
+# ════════════════════════════════════════════════════════════
+# 翻译映射表: key -> { zh: ..., en: ..., ja: ..., ko: ..., es: ..., fr: ..., de: ..., pt: ..., ru: ..., ar: ..., th: ..., vi: ... }
+# 命名约定: {domain}_{action}_{descriptor}
+# ════════════════════════════════════════════════════════════
+
+# 所有支持的语言代码 (用于遍历填充默认值)
+ALL_LANGS = ["zh", "en", "ja", "ko", "es", "fr", "de", "pt", "ru", "ar", "th", "vi"]
+
+def _fill_langs(d: dict[str, str]) -> dict[str, str]:
+    """确保所有语言都有值，缺失的用 en 或 zh 兜底。"""
+    for lang in ALL_LANGS:
+        if lang not in d:
+            d[lang] = d.get("en", d.get("zh", ""))
+    return d
+
+TRANSLATIONS: dict[str, dict[str, str]] = {
+    # ── 通用 ──────────────────────────────────────────────
+    "success": _fill_langs({"zh": "操作成功", "en": "Success", "ja": "操作成功", "ko": "작업 성공", "es": "Operación exitosa", "fr": "Opération réussie", "de": "Erfolgreich", "pt": "Operação bem-sucedida", "ru": "Успешно", "ar": "عملية ناجحة", "th": "ดำเนินการสำเร็จ", "vi": "Thao tác thành công"}),
+    "internal_error": _fill_langs({"zh": "服务器内部错误", "en": "Internal Server Error", "ja": "サーバー内部エラー", "ko": "서버 내부 오류", "es": "Error interno del servidor", "fr": "Erreur interne du serveur", "de": "Interner Serverfehler", "pt": "Erro interno do servidor", "ru": "Внутренняя ошибка сервера", "ar": "خطأ داخلي في الخادم", "th": "ข้อผิดพลาดภายในเซิร์ฟเวอร์", "vi": "Lỗi máy chủ nội bộ"}),
+    "not_found": _fill_langs({"zh": "资源不存在", "en": "Resource not found", "ja": "リソースが見つかりません", "ko": "리소스를 찾을 수 없습니다", "es": "Recurso no encontrado", "fr": "Ressource introuvable", "de": "Ressource nicht gefunden", "pt": "Recurso não encontrado", "ru": "Ресурс не найден", "ar": "المورد غير موجود", "th": "ไม่พบทรัพยากร", "vi": "Không tìm thấy tài nguyên"}),
+    "too_many_requests": _fill_langs({"zh": "请求过于频繁，请稍后再试", "en": "Too Many Requests, please try again later", "ja": "リクエストが多すぎます。後でもう一度お試しください", "ko": "요청이 너무 많습니다. 나중에 다시 시도해주세요", "es": "Demasiadas solicitudes, inténtelo más tarde", "fr": "Trop de requêtes, veuillez réessayer plus tard", "de": "Zu viele Anfragen, bitte später erneut versuchen", "pt": "Muitas solicitações, tente novamente mais tarde", "ru": "Слишком много запросов, повторите попытку позже", "ar": "طلبات كثيرة جداً، يرجى المحاولة لاحقاً", "th": "คำขอมากเกินไป กรุณาลองใหม่ภายหลัง", "vi": "Quá nhiều yêu cầu, vui lòng thử lại sau"}),
+    "bad_request": _fill_langs({"zh": "请求参数错误", "en": "Bad request", "ja": "リクエストパラメータが不正です", "ko": "잘못된 요청입니다", "es": "Solicitud incorrecta", "fr": "Mauvaise requête", "de": "Ungültige Anfrage", "pt": "Solicitação inválida", "ru": "Неверный запрос", "ar": "طلب غير صالح", "th": "คำขอไม่ถูกต้อง", "vi": "Yêu cầu không hợp lệ"}),
+
+    # ── 画册 (brochure) ──────────────────────────────────
+    "brochure_created": _fill_langs({"zh": "画册创建成功", "en": "Brochure created successfully"}),
+    "brochure_updated": _fill_langs({"zh": "画册更新成功", "en": "Brochure updated successfully"}),
+    "brochure_deleted": _fill_langs({"zh": "画册已删除", "en": "Brochure deleted"}),
+    "brochure_not_found": _fill_langs({"zh": "画册不存在", "en": "Brochure not found"}),
+    "brochure_already_exists": _fill_langs({"zh": "该用户画册已存在", "en": "Brochure already exists for this user"}),
+    "brochure_no_permission_create": _fill_langs({"zh": "不能为其他用户创建画册", "en": "Cannot create brochure for another user"}),
+    "brochure_no_permission_update": _fill_langs({"zh": "无权修改此画册", "en": "No permission to update this brochure"}),
+    "brochure_no_permission_delete": _fill_langs({"zh": "无权删除此画册", "en": "No permission to delete this brochure"}),
+    "brochure_no_content": _fill_langs({"zh": "暂无内容", "en": "No content"}),
+    "brochure_publish_success": _fill_langs({"zh": "发布成功！", "en": "Published successfully!"}),
+    "brochure_publish_demo": _fill_langs({"zh": "发布成功！(演示模式)", "en": "Published successfully! (demo mode)"}),
+
+    # ── 用户认证 (auth) ──────────────────────────────────
+    "auth_missing_header": _fill_langs({"zh": "缺少 Authorization 头，请先登录", "en": "Missing Authorization header, please login first"}),
+    "auth_token_invalid": _fill_langs({"zh": "Token 无效或已过期，请重新登录", "en": "Token invalid or expired, please login again"}),
+    "auth_phone_exists": _fill_langs({"zh": "该手机号已注册", "en": "This phone number is already registered"}),
+    "auth_register_failed": _fill_langs({"zh": "注册失败，请稍后再试", "en": "Registration failed, please try again later"}),
+    "auth_token_create_failed": _fill_langs({"zh": "创建 token 失败", "en": "Failed to create token"}),
+    "auth_login_failed": _fill_langs({"zh": "手机号或密码错误", "en": "Incorrect phone number or password"}),
+    "auth_user_not_found": _fill_langs({"zh": "用户不存在", "en": "User not found"}),
+    "auth_logout_success": _fill_langs({"zh": "已退出登录", "en": "Logged out"}),
+    "auth_network_error": _fill_langs({"zh": "网络错误，请重试", "en": "Network error, please retry"}),
+    "auth_password_too_short": _fill_langs({"zh": "密码至少6位", "en": "Password must be at least 6 characters"}),
+
+    # ── 信任网络 (trust) ────────────────────────────────
+    "trust_added": _fill_langs({"zh": "信任关系添加成功", "en": "Trust relationship added successfully"}),
+    "trust_removed": _fill_langs({"zh": "信任关系已移除", "en": "Trust relationship removed"}),
+    "trust_add_failed": _fill_langs({"zh": "添加信任关系失败", "en": "Failed to add trust relationship"}),
+    "trust_remove_failed": _fill_langs({"zh": "移除信任关系失败", "en": "Failed to remove trust relationship"}),
+    "trust_no_permission": _fill_langs({"zh": "无权操作其他用户的信任网络", "en": "No permission to modify other user's trust network"}),
+    "trust_target_not_found": _fill_langs({"zh": "被信任用户画册不存在", "en": "Trusted user's brochure not found"}),
+
+    # ── 匹配 (match) ────────────────────────────────────
+    "match_source_not_found": _fill_langs({"zh": "源用户画册不存在", "en": "Source user brochure not found"}),
+    "match_no_results": _fill_langs({"zh": "暂无匹配结果，稍后再来看看", "en": "No matches found, check back later"}),
+    "match_engine_running": _fill_langs({"zh": "🤖 AI 正在提取信息...", "en": "🤖 AI is extracting information..."}),
+    "match_extract_complete": _fill_langs({"zh": "✅ AI 提取完成，请核对信息", "en": "✅ AI extraction complete, please verify"}),
+
+    # ── 批量导入 (batch) ────────────────────────────────
+    "batch_import_empty": _fill_langs({"zh": "导入列表不能为空", "en": "Import list cannot be empty"}),
+    "batch_import_result": _fill_langs({"zh": "成功导入 {success} 个用户，失败 {fail} 个", "en": "Successfully imported {success} users, {fail} failed"}),
+    "batch_import_db_error": _fill_langs({"zh": "写入数据库失败", "en": "Database write failed"}),
+
+    # ── 链客宝同步 (chainke) ────────────────────────────
+    "chainke_module_not_loaded": _fill_langs({"zh": "链客宝桥接模块未加载，同步跳过", "en": "Chainke bridge module not loaded, sync skipped"}),
+    "chainke_sync_complete": _fill_langs({"zh": "同步完成", "en": "Sync completed"}),
+
+    # ── 速率限制 ────────────────────────────────────────
+    "rate_limit_exceeded": _fill_langs({"zh": "请求过于频繁，请稍后再试", "en": "Too Many Requests"}),
+
+    # ── 访客 ────────────────────────────────────────────
+    "visitor_logged": _fill_langs({"zh": "访问已记录", "en": "Visit logged"}),
+    "brochure_expired": _fill_langs({"zh": "图册不存在或已失效", "en": "Brochure not found or expired"}),
+
+    # ── 前端 UI 文案 ────────────────────────────────────
+    "ui_app_name": _fill_langs({"zh": "AI数字名片", "en": "AI Digital Business Card"}),
+    "ui_subtitle": _fill_langs({"zh": "链客宝 · 企业家智能商务厅", "en": "Chainke · Smart Business Hall"}),
+    "ui_login": _fill_langs({"zh": "登录", "en": "Login"}),
+    "ui_register": _fill_langs({"zh": "注册", "en": "Register"}),
+    "ui_logout": _fill_langs({"zh": "退出", "en": "Logout"}),
+    "ui_phone": _fill_langs({"zh": "手机号", "en": "Phone Number"}),
+    "ui_password": _fill_langs({"zh": "密码", "en": "Password"}),
+    "ui_name": _fill_langs({"zh": "姓名", "en": "Name"}),
+    "ui_phone_placeholder": _fill_langs({"zh": "手机号", "en": "Phone Number"}),
+    "ui_password_placeholder": _fill_langs({"zh": "密码（至少6位）", "en": "Password (min 6 chars)"}),
+    "ui_name_placeholder": _fill_langs({"zh": "姓名", "en": "Your Name"}),
+    "ui_login_loading": _fill_langs({"zh": "登录中...", "en": "Logging in..."}),
+    "ui_register_loading": _fill_langs({"zh": "注册中...", "en": "Registering..."}),
+    "ui_switch_to_register": _fill_langs({"zh": "没有账号？去注册", "en": "No account? Register"}),
+    "ui_switch_to_login": _fill_langs({"zh": "已有账号？去登录", "en": "Already have an account? Login"}),
+    "ui_new_brochure": _fill_langs({"zh": "+ 新建名片", "en": "+ New Card"}),
+    "ui_loading": _fill_langs({"zh": "加载中...", "en": "Loading..."}),
+    "ui_no_brochures_title": _fill_langs({"zh": "还没有数字名片", "en": "No digital cards yet"}),
+    "ui_no_brochures_desc": _fill_langs({"zh": "创建你的第一张AI数字名片，开启商业连接", "en": "Create your first AI digital card and start business connections"}),
+    "ui_create_first": _fill_langs({"zh": "创建我的名片", "en": "Create My Card"}),
+    "ui_unnamed": _fill_langs({"zh": "未命名", "en": "Unnamed"}),
+    "ui_updated_prefix": _fill_langs({"zh": "更新: ", "en": "Updated: "}),
+    "ui_edit": _fill_langs({"zh": "编辑", "en": "Edit"}),
+    "ui_preview": _fill_langs({"zh": "预览", "en": "Preview"}),
+    "ui_share": _fill_langs({"zh": "分享", "en": "Share"}),
+    "ui_link_copied": _fill_langs({"zh": "链接已复制", "en": "Link copied"}),
+    "ui_share_title": _fill_langs({"zh": "我的数字名片", "en": "My Digital Card"}),
+    "ui_logging_out": _fill_langs({"zh": "退出中...", "en": "Logging out..."}),
+    "ui_offline_mode": _fill_langs({"zh": "📡 当前处于离线模式", "en": "📡 Currently offline"}),
+    "ui_network_disconnected": _fill_langs({"zh": "网络已断开", "en": "Network disconnected"}),
+    "ui_offline_hint": _fill_langs({"zh": "你正在查看已缓存的离线内容", "en": "You are viewing cached offline content"}),
+    "ui_cached_pages": _fill_langs({"zh": "已缓存页面：", "en": "Cached pages:"}),
+    "ui_cached_sync_hint": _fill_langs({"zh": "已缓存的内容将在恢复网络后同步更新", "en": "Cached content will sync when back online"}),
+    "ui_reconnect": _fill_langs({"zh": "重新连接", "en": "Reconnect"}),
+    "ui_editor_title": _fill_langs({"zh": "🪪 AI数字名片", "en": "🪪 AI Digital Card"}),
+    "ui_editor_subtitle": _fill_langs({"zh": "智能创建 · 一键分享", "en": "Smart Create · One-click Share"}),
+    "ui_upload_title": _fill_langs({"zh": "📤 上传名片", "en": "📤 Upload Card"}),
+    "ui_upload_hint": _fill_langs({"zh": "支持图片 (JPG/PNG) 或 PDF 格式", "en": "Supports images (JPG/PNG) or PDF"}),
+    "ui_upload_drag": _fill_langs({"zh": "拖拽文件到此处，或点击上传", "en": "Drag files here, or click to upload"}),
+    "ui_upload_supported": _fill_langs({"zh": "支持 JPG / PNG / PDF", "en": "Supports JPG / PNG / PDF"}),
+    "ui_purpose_title": _fill_langs({"zh": "🎯 你的名片用途是什么？", "en": "🎯 What's your card purpose?"}),
+    "ui_purpose_hint": _fill_langs({"zh": "选择后系统将帮你突出展示重点信息", "en": "Select to highlight key info"}),
+    "ui_ai_extract": _fill_langs({"zh": "🤖 AI 智能提取", "en": "🤖 AI Smart Extract"}),
+    "ui_review_title": _fill_langs({"zh": "✏️ 确认信息", "en": "✏️ Review Info"}),
+    "ui_review_hint": _fill_langs({"zh": "AI 已提取以下字段，请核对修改", "en": "AI extracted the fields below, please verify"}),
+    "ui_purpose_label": _fill_langs({"zh": "名片用途:", "en": "Card purpose:"}),
+    "ui_back": _fill_langs({"zh": "← 返回", "en": "← Back"}),
+    "ui_next": _fill_langs({"zh": "下一步 →", "en": "Next →"}),
+    "ui_preview_title_label": _fill_langs({"zh": "👀 预览图册", "en": "👀 Preview Album"}),
+    "ui_preview_hint": _fill_langs({"zh": "翻页效果预览", "en": "Flip effect preview"}),
+    "ui_edit_btn": _fill_langs({"zh": "← 编辑", "en": "← Edit"}),
+    "ui_publish": _fill_langs({"zh": "发布图册 →", "en": "Publish →"}),
+    "ui_publish_success": _fill_langs({"zh": "🎉 发布成功！", "en": "🎉 Published!"}),
+    "ui_publish_desc": _fill_langs({"zh": "您的AI数字名片已创建", "en": "Your AI digital card has been created"}),
+    "ui_share_link": _fill_langs({"zh": "分享链接", "en": "Share Link"}),
+    "ui_copy_link": _fill_langs({"zh": "📋 复制链接", "en": "📋 Copy Link"}),
+    "ui_match_results": _fill_langs({"zh": "🤝 供需匹配结果", "en": "🤝 Match Results"}),
+    "ui_home": _fill_langs({"zh": "🏠 首页", "en": "🏠 Home"}),
+    "ui_new": _fill_langs({"zh": "🔄 新建", "en": "🔄 New"}),
+    "ui_publishing": _fill_langs({"zh": "📤 正在发布...", "en": "📤 Publishing..."}),
+    "ui_publish_failed": _fill_langs({"zh": "❌ 发布失败: ", "en": "❌ Publish failed: "}),
+    "ui_contact_me": _fill_langs({"zh": "💬 联系我", "en": "💬 Contact Me"}),
+    "ui_views": _fill_langs({"zh": "次浏览", "en": "views"}),
+    "ui_loading_brochure": _fill_langs({"zh": "加载图册中...", "en": "Loading album..."}),
+    "ui_contact_request_sent": _fill_langs({"zh": "💬 联系方式已发送请求", "en": "💬 Contact request sent"}),
+    "ui_steps_upload": _fill_langs({"zh": "上传/用途", "en": "Upload"}),
+    "ui_steps_edit": _fill_langs({"zh": "编辑", "en": "Edit"}),
+    "ui_steps_preview": _fill_langs({"zh": "预览", "en": "Preview"}),
+    "ui_steps_match": _fill_langs({"zh": "匹配", "en": "Match"}),
+    "ui_purpose_partner": _fill_langs({"zh": "找合作伙伴", "en": "Find Partners"}),
+    "ui_purpose_partner_desc": _fill_langs({"zh": "寻找技术/业务合作方", "en": "Find tech/business partners"}),
+    "ui_purpose_client": _fill_langs({"zh": "找客户", "en": "Find Clients"}),
+    "ui_purpose_client_desc": _fill_langs({"zh": "展示产品或服务能力", "en": "Showcase products/services"}),
+    "ui_purpose_investor": _fill_langs({"zh": "找投资人", "en": "Find Investors"}),
+    "ui_purpose_investor_desc": _fill_langs({"zh": "突出团队与融资亮点", "en": "Highlight team & funding"}),
+    "ui_purpose_supplier": _fill_langs({"zh": "找供应商", "en": "Find Suppliers"}),
+    "ui_purpose_supplier_desc": _fill_langs({"zh": "展示采购需求与合作", "en": "Show procurement needs"}),
+    "ui_field_name": _fill_langs({"zh": "姓名", "en": "Name"}),
+    "ui_field_phone": _fill_langs({"zh": "手机", "en": "Phone"}),
+    "ui_field_email": _fill_langs({"zh": "邮箱", "en": "Email"}),
+    "ui_field_wechat": _fill_langs({"zh": "微信", "en": "WeChat"}),
+    "ui_field_company": _fill_langs({"zh": "公司", "en": "Company"}),
+    "ui_field_title": _fill_langs({"zh": "职位", "en": "Title"}),
+    "ui_field_name_ph": _fill_langs({"zh": "姓名", "en": "Name"}),
+    "ui_field_phone_ph": _fill_langs({"zh": "手机号", "en": "Phone"}),
+    "ui_field_email_ph": _fill_langs({"zh": "邮箱", "en": "Email"}),
+    "ui_field_wechat_ph": _fill_langs({"zh": "微信号", "en": "WeChat ID"}),
+    "ui_field_company_ph": _fill_langs({"zh": "公司名称", "en": "Company Name"}),
+    "ui_field_title_ph": _fill_langs({"zh": "职位", "en": "Title"}),
+    "ui_page_cover": _fill_langs({"zh": "个人封面", "en": "Cover"}),
+    "ui_page_contact": _fill_langs({"zh": "联系方式", "en": "Contact"}),
+    "ui_page_company": _fill_langs({"zh": "企业信息", "en": "Company"}),
+    "ui_page_qrcode": _fill_langs({"zh": "二维码", "en": "QR Code"}),
+    "ui_page_detail": _fill_langs({"zh": "详情", "en": "Details"}),
+    "ui_scan_qrcode": _fill_langs({"zh": "扫码添加好友", "en": "Scan to add friend"}),
+    "ui_purpose_hint_partner": _fill_langs({"zh": "致力于寻找技术/业务合作伙伴，欢迎洽谈合作", "en": "Looking for tech/business partners, welcome to discuss"}),
+    "ui_purpose_hint_client": _fill_langs({"zh": "致力于拓展客户资源，提供优质产品与服务", "en": "Looking for clients, offering quality products & services"}),
+    "ui_purpose_hint_investor": _fill_langs({"zh": "正在融资阶段，期待与投资人交流", "en": "Currently fundraising, looking forward to connecting with investors"}),
+    "ui_purpose_hint_supplier": _fill_langs({"zh": "寻求优质供应商合作伙伴，共建供应链", "en": "Seeking quality supplier partners"}),
+    "ui_brochure_title_suffix": _fill_langs({"zh": "的数字名片", "en": "'s Digital Card"}),
+    "ui_contact_item_phone": _fill_langs({"zh": "电话", "en": "Phone"}),
+    "ui_contact_item_email": _fill_langs({"zh": "邮箱", "en": "Email"}),
+    "ui_contact_item_wechat": _fill_langs({"zh": "微信", "en": "WeChat"}),
+    "ui_section_bio": _fill_langs({"zh": "📝 个人简介", "en": "📝 Bio"}),
+    "ui_section_contact": _fill_langs({"zh": "📞 联系方式", "en": "📞 Contact"}),
+    "ui_section_tags": _fill_langs({"zh": "🏷️ 标签", "en": "🏷️ Tags"}),
+    "ui_footer_version": _fill_langs({"zh": "AI数字名片 v2.1", "en": "AI Digital Card v2.1"}),
+    "ui_visited_count": _fill_langs({"zh": "👁️ 已被浏览 {count} 次", "en": "👁️ Viewed {count} times"}),
+    "ui_page_nav": _fill_langs({"zh": "第 {current}/{total} 页", "en": "Page {current}/{total}"}),
+
+    # ── 卡片编辑页 (Card Editor) ──────────────────────────
+    "card_editor_title": _fill_langs({"zh": "编辑名片", "en": "Edit Card"}),
+    "upload_brochure": _fill_langs({"zh": "上传名片", "en": "Upload Brochure"}),
+    "card_purpose": _fill_langs({"zh": "你的名片用途是什么", "en": "Purpose of your card"}),
+    "card_cover": _fill_langs({"zh": "个人封面", "en": "Personal Cover"}),
+    "company_info": _fill_langs({"zh": "企业信息", "en": "Company Info"}),
+    "company_name": _fill_langs({"zh": "公司名称", "en": "Company Name"}),
+    "position_title": _fill_langs({"zh": "职位", "en": "Position"}),
+    "contact_info": _fill_langs({"zh": "联系方式", "en": "Contact Info"}),
+    "share_link": _fill_langs({"zh": "分享链接", "en": "Share Link"}),
+    "step_company": _fill_langs({"zh": "企业信息", "en": "Company Info"}),
+    "step_contact": _fill_langs({"zh": "联系方式", "en": "Contact Info"}),
+    "step_preview": _fill_langs({"zh": "预览", "en": "Preview"}),
+    "purpose_business": _fill_langs({"zh": "业务合作方", "en": "Business Partner"}),
+    "purpose_supplier": _fill_langs({"zh": "优质供应商", "en": "Supplier"}),
+    "purpose_investor": _fill_langs({"zh": "投资方", "en": "Investor"}),
+    "purpose_employee": _fill_langs({"zh": "企业员工", "en": "Employee"}),
+    "purpose_personal": _fill_langs({"zh": "个人名片", "en": "Personal"}),
+    "find_partner": _fill_langs({"zh": "找合作伙伴", "en": "Find Partner"}),
+    "find_supplier": _fill_langs({"zh": "找供应商", "en": "Find Supplier"}),
+    "find_investor": _fill_langs({"zh": "找投资人", "en": "Find Investor"}),
+    "match_result": _fill_langs({"zh": "供需匹配结果", "en": "Match Results"}),
+
+    # ── 画册查看页 (Viewer) ──────────────────────────────
+    "viewer_title": _fill_langs({"zh": "数字名片", "en": "Digital Card"}),
+    "loading_brochure": _fill_langs({"zh": "加载图册中", "en": "Loading..."}),
+    "initialized": _fill_langs({"zh": "初始化翻页引擎", "en": "Initializing..."}),
+    "page_indicator": _fill_langs({"zh": "分页指示器", "en": "Page Indicator"}),
+    "supply_chain": _fill_langs({"zh": "共建供应链", "en": "Supply Chain"}),
+    "service_us": _fill_langs({"zh": "为您服务", "en": "Our Services"}),
+    "why_choose_us": _fill_langs({"zh": "为什么选择我们", "en": "Why Choose Us"}),
+    "main_category": _fill_langs({"zh": "主营品类", "en": "Main Category"}),
+    "product_manager": _fill_langs({"zh": "产品经理", "en": "Product Manager"}),
+    "professional_team": _fill_langs({"zh": "专业团队 · 品质保障 · 售后无忧", "en": "Professional Team"}),
+    "experience": _fill_langs({"zh": "丰富的行业经验与落地案例", "en": "Rich Experience"}),
+}
+
+
+def t(key: str, lang: str = "zh") -> str:
+    """根据 key 和语言代码返回翻译文本。
+
+    Args:
+        key: 翻译键名
+        lang: 语言代码 (zh / en / ja / ko / es / fr / de / pt / ru / ar / th / vi)
+
+    Returns:
+        翻译后的文本，找不到时返回 key 本身
+    """
+    entry = TRANSLATIONS.get(key)
+    if not entry:
+        return key
+    return entry.get(lang, entry.get("zh", key))
+
+
+def detect_lang(accept_language: str = "") -> str:
+    """从 Accept-Language 头中检测语言。
+
+    Args:
+        accept_language: Accept-Language 请求头值
+
+    Returns:
+        12种语言之一: zh / en / ja / ko / es / fr / de / pt / ru / ar / th / vi
+    """
+    if not accept_language:
+        return "zh"
+    accept_language = accept_language.lower()
+    # 语言检测优先级列表 (按常见度排序)
+    lang_map = [
+        ("zh", "zh"), ("en", "en"), ("ja", "ja"), ("ko", "ko"),
+        ("es", "es"), ("fr", "fr"), ("de", "de"), ("pt", "pt"),
+        ("ru", "ru"), ("ar", "ar"), ("th", "th"), ("vi", "vi"),
+    ]
+    for code, lang in lang_map:
+        if code in accept_language:
+            return lang
+    # 默认英文
+    return "en"

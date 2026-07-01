@@ -1,0 +1,136 @@
+/* 名片详情页样式 */
+
+.page-scroll {
+  height: 100vh;
+}
+
+/* 卡片头部英雄区 */
+.card-hero {
+  position: relative;
+  height: 260px;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+}
+
+.hero-bg image {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 16px 20px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: #fff;
+}
+
+.hero-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 36px;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  margin-bottom: 10px;
+}
+
+.hero-avatar image {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-name {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.hero-company {
+  font-size: 14px;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.hero-title {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* 信息卡片 */
+.info-card {
+  margin-top: 0 !important;
+}
+
+.info-body {
+  padding-bottom: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #999;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+/* 统计网格 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 0 16px 16px;
+}
+
+.stats-grid .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats-grid .stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.stats-grid .stat-label {
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  padding: 20px 16px;
+}
+
+.bottom-placeholder {
+  height: 60px;
+}

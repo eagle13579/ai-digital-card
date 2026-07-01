@@ -1,0 +1,168 @@
+# ──────────────────────────────────────────────
+# Lighthouse CI 性能预算门禁流水线
+# 在 main 分支推送或 PR 时自动触发
+# ──────────────────────────────────────────────
+name: Performance Budget
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: perf-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── 设置 Node 环境 ──────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      # ── 构建前端 ────────────────────────────
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+        env:
+          NODE_ENV: production
+
+      # ── 启动预览服务器 ──────────────────────
+      - name: Start preview server
+        run: |
+          cd frontend
+          npx vite preview --port 4173 --host 0.0.0.0 &
+        # wait-for 附带在下一步中
+
+      - name: Verify preview server readiness
+        run: |
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:4173 > /dev/null 2>&1; then
+              echo "✅ 预览服务器就绪 (port 4173)"
+              break
+            fi
+            echo "⏳ 等待预览服务器启动... ($i/15)"
+            sleep 2
+          done
+
+      # ── 安装 Lighthouse CI ──────────────────
+      - name: Install Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci --version
+
+      # ── 运行 Lighthouse CI ──────────────────
+      - name: Run Lighthouse CI audit
+        id: lhci
+        continue-on-error: true
+        working-directory: ./frontend
+        run: |
+          lhci autorun \
+            --config=.lighthouserc.js \
+            --collect.settings.chromeFlags="--no-sandbox --headless --disable-gpu" \
+            --upload.target=filesystem \
+            --upload.outputDir=./lhci-reports \
+            2>&1 | tee lhci-output.log
+
+      # ── 检查断言结果 ────────────────────────
+      - name: Check Lighthouse assertions
+        id: lhci-check
+        run: |
+          if grep -q "FAIL" frontend/lhci-output.log 2>/dev/null; then
+            echo "⚠️  Lighthouse 断言未通过 — 性能预算超限"
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+            echo "请查看详细报告 >"
+            grep -A 5 "FAIL\|ERROR" frontend/lhci-output.log || true
+          elif grep -q "assertion failed" frontend/lhci-output.log 2>/dev/null; then
+            echo "⚠️  Lighthouse 部分断言触发 warning"
+            echo "status=warn" >> "$GITHUB_OUTPUT"
+            grep -A 5 "warn\|WARNING" frontend/lhci-output.log || true
+          else
+            echo "✅ 所有 Lighthouse 断言通过"
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 上传全面报告 ────────────────────────
+      - name: Upload Lighthouse report artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lhci-reports-${{ github.sha }}
+          path: |
+            frontend/lhci-reports/
+            frontend/lhci-output.log
+          retention-days: 30
+
+      # ── PR 评论 ─────────────────────────────
+      - name: Comment PR with performance summary
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const status = '${{ steps.lhci-check.outputs.status }}';
+
+            let summary = '';
+            try {
+              const log = fs.readFileSync('frontend/lhci-output.log', 'utf8');
+              const scores = (log.match(/Lighthouse score:?\s*(\d+)/gi) || [])
+                .map(s => s.trim());
+              summary = scores.length
+                ? scores.join('\n')
+                : '（无法从日志中提取分数摘要）';
+            } catch {
+              summary = '（无法读取日志文件）';
+            }
+
+            const emoji = status === 'pass' ? '✅' : status === 'warn' ? '⚠️' : '❌';
+            const body = [
+              `## ${emoji} Lighthouse CI 性能审计`,
+              '',
+              `**状态**: ${status === 'pass' ? '全部通过' : status === 'warn' ? '部分警告' : '未通过'}`,
+              '',
+              '**指标要点**:',
+              '```',
+              summary,
+              '```',
+              '',
+              `**详细报告**: 见 Actions artifact \`lhci-reports-${{ github.sha }}\``,
+              '',
+              '---',
+              '_性能预算文档: [PERFORMANCE_BUDGET.md](../blob/main/docs/ops/PERFORMANCE_BUDGET.md)_',
+            ].join('\n');
+
+            const { data: comment } = await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+            console.log(`已发布 PR 评论: ${comment.html_url}`);
+
+      # ── 失败时阻断 CI ──────────────────────
+      - name: Fail workflow on budget violation
+        if: steps.lhci-check.outputs.status == 'fail'
+        run: |
+          echo "❌ 性能预算门禁未通过！请修复性能问题后再合并。"
+          echo "查看报告: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          exit 1

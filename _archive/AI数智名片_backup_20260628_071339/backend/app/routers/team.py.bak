@@ -1,0 +1,505 @@
+"""团队管理 API：CRUD + 成员管理 + 邀请管理 + 角色管理"""
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
+
+from app.database import get_db
+from app.models.user import User
+from app.models.team import Team, TeamRole, InviteStatus
+from app.routers.auth import get_current_user
+from app.services.team_service import TeamService
+
+router = APIRouter(prefix="/api/teams", tags=["团队管理"])
+
+# ─── Schemas ────────────────────────────────────────────────────
+
+
+class TeamCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=128)
+    slug: str = Field(..., min_length=2, max_length=64, pattern=r"^[a-z0-9\-]+$")
+    description: str = ""
+    logo: str = ""
+    website: str = ""
+    industry: str = ""
+    size: str = "1-10"
+    max_members: int = 50
+
+
+class TeamUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    logo: Optional[str] = None
+    website: Optional[str] = None
+    industry: Optional[str] = None
+    size: Optional[str] = None
+    max_members: Optional[int] = None
+
+
+class TeamResponse(BaseModel):
+    id: int
+    name: str
+    slug: str
+    description: str
+    logo: str
+    website: str
+    industry: str
+    size: str
+    owner_id: int
+    max_members: int
+    is_active: bool
+    created_at: str
+    updated_at: str
+
+    model_config = {"from_attributes": True}
+
+
+class MemberResponse(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    avatar: str
+    phone: str
+    company: str
+    title: str
+    role: str
+    title_in_team: str
+    joined_at: Optional[str] = None
+    invited_by: Optional[int] = None
+
+
+class RoleUpdate(BaseModel):
+    role: str = Field(..., pattern=r"^(owner|admin|member|viewer)$")
+
+
+class TitleUpdate(BaseModel):
+    title_in_team: str = Field(..., max_length=128)
+
+
+class InviteCreate(BaseModel):
+    email: str = ""
+    phone: str = ""
+    role: str = "member"
+    message: str = ""
+
+
+class InviteResponse(BaseModel):
+    id: int
+    team_id: int
+    inviter_id: int
+    invitee_email: str
+    invitee_phone: str
+    invitee_id: Optional[int] = None
+    role: str
+    status: str
+    token: str
+    message: str
+    expires_at: str
+    created_at: str
+
+    model_config = {"from_attributes": True}
+
+
+class TeamDetailResponse(BaseModel):
+    """团队详情，含成员数和邀请数"""
+    id: int
+    name: str
+    slug: str
+    description: str
+    logo: str
+    website: str
+    industry: str
+    size: str
+    owner_id: int
+    max_members: int
+    member_count: int
+    invite_count: int
+    is_active: bool
+    created_at: str
+    updated_at: str
+
+
+# ─── Helper ─────────────────────────────────────────────────────
+
+
+async def _get_team_or_404(db: AsyncSession, team_id: int) -> Team:
+    team = await TeamService.get_team_by_id(db, team_id)
+    if not team:
+        raise HTTPException(status_code=404, detail="团队不存在")
+    return team
+
+
+async def _require_admin(
+    db: AsyncSession, team_id: int, user_id: int,
+) -> None:
+    """要求用户是团队 owner 或 admin"""
+    if not await TeamService.is_owner_or_admin(db, team_id, user_id):
+        raise HTTPException(status_code=403, detail="权限不足，需要管理员或所有者权限")
+
+
+async def _require_owner(
+    db: AsyncSession, team_id: int, user_id: int,
+) -> None:
+    """要求用户是团队 owner"""
+    if not await TeamService.check_role(db, team_id, user_id, {TeamRole.OWNER}):
+        raise HTTPException(status_code=403, detail="权限不足，需要所有者权限")
+
+
+# ─── Team CRUD ──────────────────────────────────────────────────
+
+
+@router.post("", response_model=TeamResponse, status_code=201)
+async def create_team(
+    data: TeamCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """创建团队"""
+    try:
+        team = await TeamService.create_team(
+            db=db,
+            name=data.name,
+            slug=data.slug,
+            owner_id=current_user.id,
+            description=data.description,
+            logo=data.logo,
+            website=data.website,
+            industry=data.industry,
+            size=data.size,
+            max_members=data.max_members,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+    return TeamResponse(
+        id=team.id,
+        name=team.name,
+        slug=team.slug,
+        description=team.description,
+        logo=team.logo,
+        website=team.website,
+        industry=team.industry,
+        size=team.size,
+        owner_id=team.owner_id,
+        max_members=team.max_members,
+        is_active=team.is_active,
+        created_at=team.created_at.isoformat() if team.created_at else "",
+        updated_at=team.updated_at.isoformat() if team.updated_at else "",
+    )
+
+
+@router.get("", response_model=list[TeamDetailResponse])
+async def list_my_teams(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """获取当前用户加入的所有团队"""
+    teams = await TeamService.list_user_teams(db, current_user.id)
+    results = []
+    for team in teams:
+        member_count = await TeamService.get_member_count(db, team.id)
+        invites = await TeamService.get_invites_by_team(db, team.id)
+        pending_count = sum(1 for i in invites if i.status == InviteStatus.PENDING)
+        results.append(TeamDetailResponse(
+            id=team.id,
+            name=team.name,
+            slug=team.slug,
+            description=team.description,
+            logo=team.logo,
+            website=team.website,
+            industry=team.industry,
+            size=team.size,
+            owner_id=team.owner_id,
+            max_members=team.max_members,
+            member_count=member_count,
+            invite_count=pending_count,
+            is_active=team.is_active,
+            created_at=team.created_at.isoformat() if team.created_at else "",
+            updated_at=team.updated_at.isoformat() if team.updated_at else "",
+        ))
+    return results
+
+
+@router.get("/{team_id}", response_model=TeamDetailResponse)
+async def get_team(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """获取团队详情"""
+    team = await _get_team_or_404(db, team_id)
+    member_count = await TeamService.get_member_count(db, team.id)
+    invites = await TeamService.get_invites_by_team(db, team.id)
+    pending_count = sum(1 for i in invites if i.status == InviteStatus.PENDING)
+
+    return TeamDetailResponse(
+        id=team.id,
+        name=team.name,
+        slug=team.slug,
+        description=team.description,
+        logo=team.logo,
+        website=team.website,
+        industry=team.industry,
+        size=team.size,
+        owner_id=team.owner_id,
+        max_members=team.max_members,
+        member_count=member_count,
+        invite_count=pending_count,
+        is_active=team.is_active,
+        created_at=team.created_at.isoformat() if team.created_at else "",
+        updated_at=team.updated_at.isoformat() if team.updated_at else "",
+    )
+
+
+@router.put("/{team_id}", response_model=TeamResponse)
+async def update_team(
+    team_id: int,
+    data: TeamUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """更新团队信息（需 owner 或 admin）"""
+    team = await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    update_data = data.model_dump(exclude_unset=True)
+    team = await TeamService.update_team(db, team, **update_data)
+
+    return TeamResponse(
+        id=team.id,
+        name=team.name,
+        slug=team.slug,
+        description=team.description,
+        logo=team.logo,
+        website=team.website,
+        industry=team.industry,
+        size=team.size,
+        owner_id=team.owner_id,
+        max_members=team.max_members,
+        is_active=team.is_active,
+        created_at=team.created_at.isoformat() if team.created_at else "",
+        updated_at=team.updated_at.isoformat() if team.updated_at else "",
+    )
+
+
+@router.delete("/{team_id}", status_code=204)
+async def delete_team(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """删除团队（需 owner）"""
+    team = await _get_team_or_404(db, team_id)
+    await _require_owner(db, team_id, current_user.id)
+    await TeamService.delete_team(db, team)
+
+
+# ─── 成员管理 ──────────────────────────────────────────────────
+
+
+@router.get("/{team_id}/members", response_model=list[MemberResponse])
+async def list_members(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """获取团队成员列表"""
+    await _get_team_or_404(db, team_id)
+    members = await TeamService.get_members(db, team_id)
+    return [MemberResponse(**m) for m in members]
+
+
+@router.put("/{team_id}/members/{user_id}/role")
+async def update_member_role(
+    team_id: int,
+    user_id: int,
+    data: RoleUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """更新成员角色（需 owner 或 admin）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    # 只有 owner 才能设置为 admin
+    new_role = TeamRole(data.role)
+    if new_role == TeamRole.OWNER:
+        await _require_owner(db, team_id, current_user.id)
+
+    try:
+        member = await TeamService.update_member_role(
+            db, team_id, user_id, new_role
+        )
+        return {"message": "角色更新成功", "role": member.role.value}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.put("/{team_id}/members/{user_id}/title")
+async def update_member_title(
+    team_id: int,
+    user_id: int,
+    data: TitleUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """更新成员职位（需 admin）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    try:
+        member = await TeamService.update_member_title(
+            db, team_id, user_id, data.title_in_team
+        )
+        return {"message": "职位更新成功", "title_in_team": member.title_in_team}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.delete("/{team_id}/members/{user_id}", status_code=204)
+async def remove_member(
+    team_id: int,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """移除成员（需 admin，不能移除 owner）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    # 不能移除 owner
+    member = await TeamService.get_member(db, team_id, user_id)
+    if member and member.role == TeamRole.OWNER:
+        raise HTTPException(status_code=403, detail="不能移除团队所有者")
+
+    try:
+        await TeamService.remove_member(db, team_id, user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+# ─── 邀请管理 ──────────────────────────────────────────────────
+
+
+@router.post("/{team_id}/invites", response_model=InviteResponse, status_code=201)
+async def create_invite(
+    team_id: int,
+    data: InviteCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """邀请成员加入团队（需 admin）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    if not data.email and not data.phone:
+        raise HTTPException(status_code=400, detail="邮箱或手机号至少需要一项")
+
+    try:
+        invite = await TeamService.create_invite(
+            db=db,
+            team_id=team_id,
+            inviter_id=current_user.id,
+            invitee_email=data.email,
+            invitee_phone=data.phone,
+            role=TeamRole(data.role),
+            message=data.message,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+    return InviteResponse(
+        id=invite.id,
+        team_id=invite.team_id,
+        inviter_id=invite.inviter_id,
+        invitee_email=invite.invitee_email,
+        invitee_phone=invite.invitee_phone,
+        invitee_id=invite.invitee_id,
+        role=invite.role.value if hasattr(invite.role, 'value') else invite.role,
+        status=invite.status.value if hasattr(invite.status, 'value') else invite.status,
+        token=invite.token,
+        message=invite.message,
+        expires_at=invite.expires_at.isoformat() if invite.expires_at else "",
+        created_at=invite.created_at.isoformat() if invite.created_at else "",
+    )
+
+
+@router.get("/{team_id}/invites", response_model=list[InviteResponse])
+async def list_invites(
+    team_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """获取团队邀请列表（需 admin）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+
+    invites = await TeamService.get_invites_by_team(db, team_id)
+    result = []
+    for invite in invites:
+        result.append(InviteResponse(
+            id=invite.id,
+            team_id=invite.team_id,
+            inviter_id=invite.inviter_id,
+            invitee_email=invite.invitee_email,
+            invitee_phone=invite.invitee_phone,
+            invitee_id=invite.invitee_id,
+            role=invite.role.value if hasattr(invite.role, 'value') else invite.role,
+            status=invite.status.value if hasattr(invite.status, 'value') else invite.status,
+            token=invite.token,
+            message=invite.message,
+            expires_at=invite.expires_at.isoformat() if invite.expires_at else "",
+            created_at=invite.created_at.isoformat() if invite.created_at else "",
+        ))
+    return result
+
+
+@router.delete("/{team_id}/invites/{invite_id}", status_code=204)
+async def cancel_invite(
+    team_id: int,
+    invite_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """取消邀请（需 admin）"""
+    await _get_team_or_404(db, team_id)
+    await _require_admin(db, team_id, current_user.id)
+    await TeamService.cancel_invite(db, invite_id)
+
+
+# ─── 公开邀请处理 ──────────────────────────────────────────────
+
+
+@router.post("/invites/{token}/accept", response_model=MemberResponse)
+async def accept_invite(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """接受团队邀请"""
+    try:
+        member = await TeamService.accept_invite(db, token, current_user.id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # 获取用户信息
+    members = await TeamService.get_members(db, member.team_id)
+    for m in members:
+        if m["user_id"] == current_user.id:
+            return MemberResponse(**m)
+    raise HTTPException(status_code=500, detail="加入成功但获取成员信息失败")
+
+
+@router.post("/invites/{token}/decline")
+async def decline_invite(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """拒绝团队邀请"""
+    try:
+        await TeamService.decline_invite(db, token)
+        return {"message": "已拒绝邀请"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

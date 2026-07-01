@@ -1,0 +1,3674 @@
+openapi: 3.0.3
+info:
+  title: AI数字名片 API
+  description: AI数字名片后端服务 - 模块化架构
+  version: 2.0.0
+  contact:
+    name: AI数字名片团队
+servers:
+- url: http://localhost:8201
+  description: 本地开发
+- url: https://api.example.com
+  description: 生产环境
+paths:
+  /api/auth/register:
+    post:
+      summary: 手机号注册
+      tags:
+      - 认证
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+  /api/auth/login:
+    post:
+      summary: 手机号密码登录
+      tags:
+      - 认证
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+  /api/auth/wx-login:
+    post:
+      summary: 微信登录(Mock)
+      tags:
+      - 认证
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeChatLogin'
+  /api/auth/wx-mini-login:
+    post:
+      summary: 微信小程序登录
+      tags:
+      - 认证
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeChatMiniLogin'
+  /api/users/me:
+    get:
+      summary: 获取当前用户个人信息
+      tags:
+      - 用户
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+      - BearerAuth: []
+    put:
+      summary: 更新当前用户个人信息
+      tags:
+      - 用户
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+  /api/users:
+    get:
+      summary: 获取用户列表
+      tags:
+      - 用户
+      parameters:
+      - name: skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+      responses:
+        '200':
+          description: 用户列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+      security:
+      - BearerAuth: []
+  /api/users/{user_id}:
+    get:
+      summary: 获取指定用户信息
+      tags:
+      - 用户
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /api/brochures/template/{purpose}:
+    get:
+      summary: 获取用途推荐模板
+      tags:
+      - 画册
+      parameters:
+      - name: purpose
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - partner
+          - client
+          - investor
+          - supplier
+      responses:
+        '200':
+          description: Successful Response
+  /api/brochures:
+    post:
+      summary: 创建画册
+      tags:
+      - 画册
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrochureResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrochureCreate'
+    get:
+      summary: 获取画册列表
+      tags:
+      - 画册
+      parameters:
+      - name: user_id
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+      responses:
+        '200':
+          description: 画册列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BrochureResponse'
+  /api/brochures/{brochure_id}:
+    get:
+      summary: 获取画册详情
+      tags:
+      - 画册
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrochureResponse'
+    put:
+      summary: 更新画册
+      tags:
+      - 画册
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrochureResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrochureUpdate'
+    delete:
+      summary: 删除画册
+      tags:
+      - 画册
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '204':
+          description: 无内容
+      security:
+      - BearerAuth: []
+  /api/brochures/share/{share_token}:
+    get:
+      summary: 通过分享token获取画册(公开)
+      tags:
+      - 画册
+      parameters:
+      - name: share_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrochureResponse'
+  /api/brochures/{brochure_id}/publish:
+    post:
+      summary: 发布画册
+      tags:
+      - 画册
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrochureResponse'
+      security:
+      - BearerAuth: []
+  /api/brochures/{brochure_id}/refresh-token:
+    post:
+      summary: 刷新分享token
+      tags:
+      - 画册
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/brochures/smart-search:
+    post:
+      summary: 智能搜索名片
+      tags:
+      - 画册
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartSearchQuery'
+  /api/brochures/upload-video:
+    post:
+      summary: 上传视频文件
+      tags:
+      - 画册
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+  /api/brochures/batch-import:
+    post:
+      summary: 批量导入名片(CSV)
+      tags:
+      - 画册
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+  /api/brochures/batch-export:
+    post:
+      summary: 批量导出名片为CSV
+      tags:
+      - 画册
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/tags/me:
+    get:
+      summary: 获取我的标签
+      tags:
+      - 标签
+      parameters:
+      - name: tag_type
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    post:
+      summary: 批量添加标签
+      tags:
+      - 标签
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagBatchInput'
+  /api/tags/me/{tag_id}:
+    delete:
+      summary: 删除标签
+      tags:
+      - 标签
+      parameters:
+      - name: tag_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/tags/users/{user_id}:
+    get:
+      summary: 获取指定用户标签
+      tags:
+      - 标签
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+  /api/match/engine:
+    post:
+      summary: 匹配引擎
+      tags:
+      - 匹配
+      parameters:
+      - name: min_score
+        in: query
+        required: false
+        schema:
+          type: number
+          default: 0.3
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/match/records:
+    get:
+      summary: 获取匹配记录
+      tags:
+      - 匹配
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 匹配记录列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchResponse'
+      security:
+      - BearerAuth: []
+  /api/match/records/{record_id}/status:
+    put:
+      summary: 更新匹配记录状态
+      tags:
+      - 匹配
+      parameters:
+      - name: record_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchAction'
+  /api/match/semantic-search:
+    post:
+      summary: 语义搜索匹配用户
+      tags:
+      - 匹配
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartSearchQuery'
+  /api/match/rerank:
+    post:
+      summary: 语义重排序
+      tags:
+      - 匹配
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/match/{record_id}/unlock:
+    post:
+      summary: 付费解锁联系方式
+      tags:
+      - 匹配
+      parameters:
+      - name: record_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnlockResponse'
+      security:
+      - BearerAuth: []
+  /api/brochure/smart-search:
+    post:
+      summary: 智能搜索(别名路由)
+      tags:
+      - 画册别名
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartSearchQuery'
+  /api/brochure/template/{purpose}:
+    get:
+      summary: 获取模板(别名路由)
+      tags:
+      - 画册别名
+      parameters:
+      - name: purpose
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - partner
+          - client
+          - investor
+          - supplier
+      responses:
+        '200':
+          description: Successful Response
+  /api/visitors/{brochure_id}:
+    get:
+      summary: 获取画册访客记录
+      tags:
+      - 访客日志
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 30
+      responses:
+        '200':
+          description: 访客记录
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitorLogResponse'
+      security:
+      - BearerAuth: []
+  /api/visitors/{brochure_id}/log:
+    post:
+      summary: 记录访客访问(公开)
+      tags:
+      - 访客日志
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitorLogCreate'
+  /api/visitors/{brochure_id}/interest:
+    post:
+      summary: 访客表达兴趣(公开)
+      tags:
+      - 访客日志
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterestCreate'
+  /api/visitors/{brochure_id}/stats:
+    get:
+      summary: 获取画册访客统计
+      tags:
+      - 访客日志
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/trust/network:
+    get:
+      summary: 获取我的信任网络
+      tags:
+      - 信任网络
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    post:
+      summary: 添加信任关系
+      tags:
+      - 信任网络
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustCreate'
+  /api/trust/network/{trusted_user_id}:
+    delete:
+      summary: 移除信任关系
+      tags:
+      - 信任网络
+      parameters:
+      - name: trusted_user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/trust/network/{user_id}:
+    get:
+      summary: 获取指定用户信任网络
+      tags:
+      - 信任网络
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+  /api/i18n/translations:
+    get:
+      summary: 获取翻译字典
+      tags:
+      - i18n
+      parameters:
+      - name: locale
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - zh
+          - en
+      responses:
+        '200':
+          description: Successful Response
+  /u/{username}:
+    get:
+      summary: 公开用户Profile页面(SSR)
+      tags:
+      - 公开页面
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: HTML Profile页面
+  /api/payment/create:
+    post:
+      summary: 创建支付订单
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCreateOrderResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateOrderRequest'
+  /api/payment/notify/{channel}:
+    post:
+      summary: 支付渠道异步回调
+      tags:
+      - 支付
+      parameters:
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - wechat
+          - alipay
+      responses:
+        '200':
+          description: Successful Response
+  /api/payment/query/{order_no}:
+    get:
+      summary: 查询订单状态
+      tags:
+      - 支付
+      parameters:
+      - name: order_no
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrderStatusResponse'
+      security:
+      - BearerAuth: []
+  /api/payment/orders:
+    get:
+      summary: 查询我的订单列表
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentOrderStatusResponse'
+      security:
+      - BearerAuth: []
+  /api/payment/products:
+    get:
+      summary: 获取定价列表
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/payment/enterprise/plans:
+    get:
+      summary: 获取企业版定价列表
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: 企业版计划
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnterprisePlanResponse'
+  /api/payment/enterprise/subscribe:
+    post:
+      summary: 开通/升级企业版订阅
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseSubscriptionResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeEnterpriseRequest'
+  /api/payment/enterprise/subscription:
+    get:
+      summary: 查询企业版订阅
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseSubscriptionResponse'
+      security:
+      - BearerAuth: []
+  /api/payment/enterprise/cancel:
+    put:
+      summary: 取消企业版订阅
+      tags:
+      - 支付
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseSubscriptionResponse'
+      security:
+      - BearerAuth: []
+  /share/qr/{share_token}:
+    get:
+      summary: 获取分享二维码(PNG)
+      tags:
+      - 分享
+      parameters:
+      - name: share_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: QR码 PNG图片
+          content:
+            image/png: {}
+  /share/nfc/{share_token}:
+    get:
+      summary: 获取NFC配置(JSON)
+      tags:
+      - 分享
+      parameters:
+      - name: share_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+  /api/teams:
+    post:
+      summary: 创建团队
+      tags:
+      - 团队管理
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamCreate'
+    get:
+      summary: 获取我的团队列表
+      tags:
+      - 团队管理
+      parameters: []
+      responses:
+        '200':
+          description: 团队列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamResponse'
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}:
+    get:
+      summary: 获取团队详情
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+      security:
+      - BearerAuth: []
+    put:
+      summary: 更新团队信息
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamUpdate'
+    delete:
+      summary: 删除团队
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 删除成功
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/members:
+    get:
+      summary: 获取团队成员列表
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 成员列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberResponse'
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/members/{user_id}/role:
+    put:
+      summary: 更新成员角色
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+  /api/teams/{team_id}/members/{user_id}/title:
+    put:
+      summary: 更新成员职位
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/members/{user_id}:
+    delete:
+      summary: 移除成员
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 删除成功
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/invites:
+    post:
+      summary: 邀请成员
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteCreate'
+    get:
+      summary: 获取团队邀请列表
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 邀请列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InviteResponse'
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/invites/{invite_id}:
+    delete:
+      summary: 取消邀请
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: invite_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 取消成功
+      security:
+      - BearerAuth: []
+  /api/teams/invites/{token}/accept:
+    post:
+      summary: 接受团队邀请
+      tags:
+      - 团队管理
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberResponse'
+      security:
+      - BearerAuth: []
+  /api/teams/invites/{token}/decline:
+    post:
+      summary: 拒绝团队邀请
+      tags:
+      - 团队管理
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/approval-requests:
+    post:
+      summary: 提交审批请求
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    get:
+      summary: 查看审批请求列表
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/teams/{team_id}/approval-requests/{req_id}:
+    put:
+      summary: 审批请求
+      tags:
+      - 团队管理
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: req_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/integrations:
+    get:
+      summary: 获取集成列表
+      tags:
+      - 集成管理
+      parameters: []
+      responses:
+        '200':
+          description: 集成列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IntegrationResponse'
+      security:
+      - BearerAuth: []
+    post:
+      summary: 创建集成配置
+      tags:
+      - 集成管理
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationCreate'
+  /api/integrations/{integration_id}:
+    get:
+      summary: 获取单个集成详情
+      tags:
+      - 集成管理
+      parameters:
+      - name: integration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationResponse'
+      security:
+      - BearerAuth: []
+    put:
+      summary: 更新集成配置
+      tags:
+      - 集成管理
+      parameters:
+      - name: integration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationCreate'
+    delete:
+      summary: 删除集成配置
+      tags:
+      - 集成管理
+      parameters:
+      - name: integration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 删除成功
+      security:
+      - BearerAuth: []
+  /api/integrations/{integration_id}/test:
+    post:
+      summary: 测试集成连接
+      tags:
+      - 集成管理
+      parameters:
+      - name: integration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/integrations/{integration_id}/export:
+    post:
+      summary: 导出联系人到集成
+      tags:
+      - 集成管理
+      parameters:
+      - name: integration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/integrations/export-all:
+    post:
+      summary: 导出到所有已启用集成
+      tags:
+      - 集成管理
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/export/json:
+    get:
+      summary: 导出名片数据(JSON)
+      tags:
+      - 数据导出
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/export/csv:
+    get:
+      summary: 导出名片数据(CSV)
+      tags:
+      - 数据导出
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/webhooks:
+    get:
+      summary: 获取Webhook订阅列表
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: active
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Webhook列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookResponse'
+      security:
+      - BearerAuth: []
+    post:
+      summary: 创建Webhook订阅
+      tags:
+      - Webhook 订阅
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookCreate'
+  /api/webhooks/{webhook_id}:
+    get:
+      summary: 获取Webhook详情
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+      security:
+      - BearerAuth: []
+    put:
+      summary: 更新Webhook订阅
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookCreate'
+    delete:
+      summary: 删除Webhook订阅
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 删除成功
+      security:
+      - BearerAuth: []
+  /api/webhooks/{webhook_id}/test:
+    post:
+      summary: 发送测试事件
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/webhooks/trigger:
+    post:
+      summary: 手动触发事件
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: event_type
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/webhooks/events/list:
+    get:
+      summary: 获取支持的事件类型
+      tags:
+      - Webhook 订阅
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/webhooks/{webhook_id}/logs:
+    get:
+      summary: 获取投递日志
+      tags:
+      - Webhook 订阅
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments:
+    post:
+      summary: 创建实验
+      tags:
+      - A/B测试
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperimentCreate'
+    get:
+      summary: 列出实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}:
+    get:
+      summary: 获取实验详情
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    put:
+      summary: 更新实验配置
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    delete:
+      summary: 删除实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}/start:
+    post:
+      summary: 启动实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}/pause:
+    post:
+      summary: 暂停实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}/resume:
+    post:
+      summary: 恢复实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}/stop:
+    post:
+      summary: 停止实验
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/events:
+    post:
+      summary: 记录实验事件
+      tags:
+      - A/B测试
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRecord'
+  /api/ab-test/experiments/{experiment_id}/results:
+    get:
+      summary: 获取实验结果
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: method
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - chi_square
+          - bayesian
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/experiments/{experiment_id}/events:
+    get:
+      summary: 获取实验事件列表
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/{experiment_id}/auto-decision:
+    post:
+      summary: 自动决策
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/ab-test/{experiment_id}/decision-log:
+    get:
+      summary: 查看决策日志
+      tags:
+      - A/B测试
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/gdpr/data:
+    get:
+      summary: 导出我的所有数据
+      tags:
+      - GDPR 合规
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/gdpr/logs:
+    get:
+      summary: 查看我的审计日志
+      tags:
+      - GDPR 合规
+      parameters:
+      - name: skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/gdpr/account:
+    delete:
+      summary: 删除我的账户(被遗忘权)
+      tags:
+      - GDPR 合规
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/recommend/personal:
+    post:
+      summary: 个性化推荐
+      tags:
+      - 推荐
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperimentCreate'
+  /api/recommend/discover:
+    post:
+      summary: 发现推荐
+      tags:
+      - 推荐
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/recommend/similar:
+    post:
+      summary: 相似名片推荐
+      tags:
+      - 推荐
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/recommend/rag-query:
+    post:
+      summary: RAG智能问答
+      tags:
+      - 推荐
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RAGQueryResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RAGQueryRequest'
+  /api/recommend/graph-summary:
+    get:
+      summary: 获取关系图谱摘要
+      tags:
+      - 推荐
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/recommend/graph:
+    get:
+      summary: 获取完整关系图谱
+      tags:
+      - 推荐
+      parameters:
+      - name: depth
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/auth/sso/login:
+    get:
+      summary: 发起SSO登录(302重定向)
+      tags:
+      - SSO 认证
+      parameters:
+      - name: provider
+        in: query
+        required: false
+        schema:
+          type: string
+          default: google
+      - name: redirect_after
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+  /api/auth/sso/callback:
+    get:
+      summary: SSO回调
+      tags:
+      - SSO 认证
+      parameters:
+      - name: code
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+  /api/auth/sso/providers:
+    get:
+      summary: 列出SSO提供商
+      tags:
+      - SSO 认证
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/auth/sso/link:
+    post:
+      summary: 绑定SSO账号
+      tags:
+      - SSO 认证
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/api-keys:
+    post:
+      summary: 创建API Key
+      tags:
+      - API Key 管理
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyCreateResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyCreateRequest'
+    get:
+      summary: 列出API Keys
+      tags:
+      - API Key 管理
+      parameters: []
+      responses:
+        '200':
+          description: API Key列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKeyItem'
+      security:
+      - BearerAuth: []
+  /api/api-keys/{key_id}:
+    delete:
+      summary: 吊销API Key
+      tags:
+      - API Key 管理
+      parameters:
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 吊销成功
+      security:
+      - BearerAuth: []
+  /api/api-keys/usage:
+    get:
+      summary: API Key用量统计
+      tags:
+      - API Key 管理
+      parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 7
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/changelog:
+    get:
+      summary: API版本变更日志
+      tags:
+      - API 文档
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/metrics/web-vitals:
+    post:
+      summary: 接收Web Vitals批量数据
+      tags:
+      - 性能监控
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/metrics/web-vitals/single:
+    post:
+      summary: 接收单条Web Vital
+      tags:
+      - 性能监控
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/oauth/{provider}/login:
+    get:
+      summary: OAuth登录(302)
+      tags:
+      - OAuth2 SSO
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/oauth/{provider}/callback:
+    get:
+      summary: OAuth回调
+      tags:
+      - OAuth2 SSO
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: code
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/oauth/providers:
+    get:
+      summary: 列出OAuth提供商
+      tags:
+      - OAuth2 SSO
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/oauth/link:
+    post:
+      summary: 绑定OAuth账号
+      tags:
+      - OAuth2 SSO
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/users:
+    get:
+      summary: 管理员-用户列表
+      tags:
+      - Admin Panel
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/users/{user_id}:
+    get:
+      summary: 管理员-用户详情
+      tags:
+      - Admin Panel
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    patch:
+      summary: 管理员-更新用户状态
+      tags:
+      - Admin Panel
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: status
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - active
+          - disabled
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/brochures:
+    get:
+      summary: 管理员-名片列表
+      tags:
+      - Admin Panel
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/stats:
+    get:
+      summary: 管理员-系统统计
+      tags:
+      - Admin Panel
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/audit-log:
+    get:
+      summary: 管理员-审计日志
+      tags:
+      - Admin Panel
+      parameters:
+      - name: user_id
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: action
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/admin/tenants:
+    post:
+      summary: 创建租户(admin)
+      tags:
+      - Tenant 管理
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    get:
+      summary: 租户列表(admin)
+      tags:
+      - Tenant 管理
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/tenant/profile:
+    get:
+      summary: 当前租户信息
+      tags:
+      - Tenant 管理
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/developer/api-keys:
+    post:
+      summary: 创建开发者API Key
+      tags:
+      - Developer API
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    get:
+      summary: 列出开发者API Keys
+      tags:
+      - Developer API
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/developer/api-keys/{key_id}:
+    delete:
+      summary: 吊销开发者API Key
+      tags:
+      - Developer API
+      parameters:
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 吊销成功
+      security:
+      - BearerAuth: []
+  /api/v1/developer/usage:
+    get:
+      summary: 开发者用量统计
+      tags:
+      - Developer API
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/messages:
+    get:
+      summary: 消息列表(按会话分组)
+      tags:
+      - 消息
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+    post:
+      summary: 发送消息
+      tags:
+      - 消息
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+  /api/messages/conversations:
+    get:
+      summary: 会话列表
+      tags:
+      - 消息
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/messages/{conversation_id}:
+    get:
+      summary: 会话详细消息
+      tags:
+      - 消息
+      parameters:
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/messages/{conversation_id}/read:
+    post:
+      summary: 标记会话已读
+      tags:
+      - 消息
+      parameters:
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/messages/unread/count:
+    get:
+      summary: 未读消息数
+      tags:
+      - 消息
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /ai/assist/write:
+    post:
+      summary: 生成名片文案
+      tags:
+      - AI 助手
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WriteResponse'
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteRequest'
+  /ai/assist/write/all:
+    post:
+      summary: 一次性生成全部文案
+      tags:
+      - AI 助手
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /ai/assist/optimize/{brochure_id}:
+    get:
+      summary: 获取名片优化建议
+      tags:
+      - AI 助手
+      parameters:
+      - name: brochure_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: industry
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/business-card/cards:
+    get:
+      summary: 小程序-名片列表
+      tags:
+      - miniapp
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+    post:
+      summary: 小程序-创建名片
+      tags:
+      - miniapp
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/business-card/cards/{card_id}:
+    get:
+      summary: 小程序-名片详情
+      tags:
+      - miniapp
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+    put:
+      summary: 小程序-更新名片
+      tags:
+      - miniapp
+      parameters:
+      - name: card_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/business-card/cards/exchange:
+    post:
+      summary: 小程序-交换名片
+      tags:
+      - miniapp
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/business-card/exchange:
+    post:
+      summary: 小程序-交换名片(备用路径)
+      tags:
+      - miniapp
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/matching/recommendations:
+    get:
+      summary: 小程序-推荐名片
+      tags:
+      - miniapp
+      parameters:
+      - name: min_score
+        in: query
+        required: false
+        schema:
+          type: number
+          default: 0.3
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Successful Response
+      security:
+      - BearerAuth: []
+  /api/v1/personalization/interact:
+    post:
+      summary: 记录用户交互
+      tags:
+      - personalization
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/personalization/recommend:
+    get:
+      summary: 个性化推荐(轻量)
+      tags:
+      - personalization
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/personalization/trending:
+    get:
+      summary: 热门趋势
+      tags:
+      - personalization
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /api/v1/personalization/history:
+    get:
+      summary: 用户历史
+      tags:
+      - personalization
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /:
+    get:
+      summary: 首页
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: HTML首页
+  /card-editor:
+    get:
+      summary: 名片编辑器页面
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: HTML编辑器
+  /offline:
+    get:
+      summary: 离线页面
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: HTML离线页
+  /view/{share_token}:
+    get:
+      summary: 名片查看页
+      tags:
+      - 系统
+      parameters:
+      - name: share_token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: HTML查看页
+  /health:
+    get:
+      summary: 健康检查(文本)
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: OK
+  /api/health:
+    get:
+      summary: 健康检查(JSON)
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+  /metrics:
+    get:
+      summary: Prometheus指标
+      tags:
+      - 系统
+      parameters: []
+      responses:
+        '200':
+          description: 指标文本
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT令牌, 通过 /api/auth/login 获取
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key, 通过 /api/api-keys 创建
+  schemas:
+    UserCreate:
+      type: object
+      required:
+      - phone
+      - password
+      - name
+      properties:
+        phone:
+          type: string
+          example: '13800138000'
+        password:
+          type: string
+          minLength: 6
+        name:
+          type: string
+        username:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        intro:
+          type: string
+        avatar:
+          type: string
+    UserLogin:
+      type: object
+      required:
+      - phone
+      - password
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+    WeChatLogin:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          description: wx.login()返回的临时code
+    WeChatMiniLogin:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+        user_info:
+          type: object
+          description: 微信用户信息(可选)
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        phone:
+          type: string
+        name:
+          type: string
+        username:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        intro:
+          type: string
+        avatar:
+          type: string
+        role:
+          type: string
+        membership_tier:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        intro:
+          type: string
+        avatar:
+          type: string
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          default: bearer
+        user:
+          $ref: '#/components/schemas/UserResponse'
+    BrochureCreate:
+      type: object
+      required:
+      - title
+      - pages
+      properties:
+        title:
+          type: string
+        cover:
+          type: string
+        purpose:
+          type: string
+          enum:
+          - partner
+          - client
+          - investor
+          - supplier
+        album_meta:
+          type: object
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageSchema'
+    BrochureUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        cover:
+          type: string
+        purpose:
+          type: string
+        album_meta:
+          type: object
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageSchema'
+    BrochureResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        title:
+          type: string
+        cover:
+          type: string
+        purpose:
+          type: string
+        status:
+          type: string
+        share_token:
+          type: string
+        view_count:
+          type: integer
+        pages_count:
+          type: integer
+        album_meta:
+          type: object
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageSchema'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PageSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+        sort_order:
+          type: integer
+        content_type:
+          type: string
+        content:
+          type: string
+        image_url:
+          type: string
+        media_url:
+          type: string
+        ai_summary:
+          type: string
+    SmartSearchQuery:
+      type: object
+      required:
+      - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 500
+        top_k:
+          type: integer
+          default: 10
+        mode:
+          type: string
+          enum:
+          - hybrid
+          - vector
+          - keyword
+          default: hybrid
+        min_score:
+          type: number
+          default: 0.0
+    TagInput:
+      type: object
+      properties:
+        tag:
+          type: string
+        weight:
+          type: number
+          default: 1.0
+    TagBatchInput:
+      type: object
+      required:
+      - tag_type
+      - tags
+      properties:
+        tag_type:
+          type: string
+          enum:
+          - provide
+          - need
+        source:
+          type: string
+          default: manual
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagInput'
+    TagResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        tag_type:
+          type: string
+        tag:
+          type: string
+        weight:
+          type: number
+        source:
+          type: string
+    MatchAction:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - matched
+          - interested
+          - contacted
+          - archived
+    MatchResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_a_id:
+          type: integer
+        user_b_id:
+          type: integer
+        match_score:
+          type: number
+        status:
+          type: string
+        common_tags:
+          type: string
+        source:
+          type: string
+    UnlockRequest:
+      type: object
+      properties: {}
+    UnlockResponse:
+      type: object
+      properties:
+        unlocked:
+          type: boolean
+        name:
+          type: string
+        phone:
+          type: string
+        wechat:
+          type: string
+        company:
+          type: string
+        unlock_quota_remaining:
+          type: integer
+        message:
+          type: string
+    TrustCreate:
+      type: object
+      required:
+      - trusted_user_id
+      properties:
+        trusted_user_id:
+          type: integer
+    TrustResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        trusted_user_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    VisitorLogCreate:
+      type: object
+      properties:
+        visitor_id:
+          type: string
+        visitor_name:
+          type: string
+        visitor_ip:
+          type: string
+        source:
+          type: string
+        page_viewed:
+          type: string
+        duration:
+          type: integer
+    VisitorLogResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        brochure_id:
+          type: integer
+        visitor_name:
+          type: string
+        visitor_ip:
+          type: string
+        source:
+          type: string
+        page_viewed:
+          type: string
+        duration:
+          type: integer
+        interested:
+          type: boolean
+        visit_time:
+          type: string
+          format: date-time
+    InterestCreate:
+      type: object
+      required:
+      - visitor_name
+      properties:
+        visitor_name:
+          type: string
+        contact_msg:
+          type: string
+    PaymentCreateOrderRequest:
+      type: object
+      required:
+      - tier
+      - channel
+      properties:
+        tier:
+          type: string
+          enum:
+          - gold
+          - diamond
+          - board
+        channel:
+          type: string
+          enum:
+          - wechat
+          - alipay
+        openid:
+          type: string
+    PaymentCreateOrderResponse:
+      type: object
+      properties:
+        order_no:
+          type: string
+        pay_info:
+          type: object
+        status:
+          type: string
+        total_cents:
+          type: integer
+        total_formatted:
+          type: string
+    PaymentOrderStatusResponse:
+      type: object
+      properties:
+        order_no:
+          type: string
+        channel:
+          type: string
+        channel_order_no:
+          type: string
+        status:
+          type: string
+        total_cents:
+          type: integer
+        tier:
+          type: string
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+    TeamCreate:
+      type: object
+      required:
+      - name
+      - slug
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+          pattern: ^[a-z0-9\-]+$
+        description:
+          type: string
+        logo:
+          type: string
+        website:
+          type: string
+        industry:
+          type: string
+        size:
+          type: string
+        max_members:
+          type: integer
+          default: 50
+    TeamResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        owner_id:
+          type: integer
+        max_members:
+          type: integer
+        is_active:
+          type: boolean
+    TeamUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+        website:
+          type: string
+        industry:
+          type: string
+        size:
+          type: string
+        max_members:
+          type: integer
+    MemberResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        name:
+          type: string
+        avatar:
+          type: string
+        role:
+          type: string
+        title_in_team:
+          type: string
+    RoleUpdate:
+      type: object
+      required:
+      - role
+      properties:
+        role:
+          type: string
+          enum:
+          - owner
+          - admin
+          - member
+          - viewer
+    InviteCreate:
+      type: object
+      properties:
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          default: member
+        message:
+          type: string
+    InviteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        team_id:
+          type: integer
+        inviter_id:
+          type: integer
+        token:
+          type: string
+        status:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+    IntegrationCreate:
+      type: object
+      required:
+      - provider
+      properties:
+        provider:
+          type: string
+          enum:
+          - hubspot
+          - salesforce
+          - webhook
+        name:
+          type: string
+        config:
+          type: object
+        enabled:
+          type: boolean
+    IntegrationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        provider:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        config:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+    WebhookCreate:
+      type: object
+      required:
+      - url
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        secret:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+          default: true
+        retry_count:
+          type: integer
+          default: 3
+        timeout_seconds:
+          type: integer
+          default: 10
+    WebhookResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+    ApiKeyCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          default: 默认 Key
+        permissions:
+          type: array
+          items:
+            type: string
+          default:
+          - read
+        rate_limit:
+          type: integer
+          default: 1000
+    ApiKeyCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        key:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+    ApiKeyItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        masked_key:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        last_used_at:
+          type: string
+          format: date-time
+    SendMessageRequest:
+      type: object
+      required:
+      - receiver_id
+      - content
+      properties:
+        receiver_id:
+          type: integer
+        content:
+          type: string
+          minLength: 1
+          maxLength: 5000
+    WriteRequest:
+      type: object
+      required:
+      - purpose
+      properties:
+        purpose:
+          type: string
+          enum:
+          - bio
+          - company
+          - recommendation
+          - slogan
+        name:
+          type: string
+        position:
+          type: string
+        company:
+          type: string
+        industry:
+          type: string
+        skills:
+          type: string
+        description:
+          type: string
+    WriteResponse:
+      type: object
+      properties:
+        purpose:
+          type: string
+        content:
+          type: string
+        error:
+          type: string
+    RAGQueryRequest:
+      type: object
+      required:
+      - query
+      properties:
+        query:
+          type: string
+        top_k:
+          type: integer
+          default: 10
+        temperature:
+          type: number
+          default: 0.7
+        max_tokens:
+          type: integer
+          default: 2048
+    RAGQueryResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        sources:
+          type: array
+          items:
+            type: object
+        confidence:
+          type: number
+        model_used:
+          type: string
+        tokens_used:
+          type: integer
+    EnterprisePlanResponse:
+      type: object
+      properties:
+        tier:
+          type: string
+        name_cn:
+          type: string
+        price_yuan:
+          type: string
+        seats:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+    EnterpriseSubscriptionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        company_name:
+          type: string
+        seats:
+          type: integer
+        tier:
+          type: string
+        status:
+          type: string
+        auto_renew:
+          type: boolean
+    SubscribeEnterpriseRequest:
+      type: object
+      required:
+      - tier
+      - company_name
+      properties:
+        tier:
+          type: string
+          enum:
+          - starter
+          - business
+          - enterprise
+        company_name:
+          type: string
+        seats:
+          type: integer
+          default: 5
+        auto_renew:
+          type: boolean
+          default: true
+    ExperimentCreate:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        traffic_fraction:
+          type: number
+          default: 1.0
+        metric:
+          type: string
+          default: click_rate
+        variants:
+          type: array
+          items:
+            type: object
+    EventRecord:
+      type: object
+      required:
+      - experiment_id
+      - variant_id
+      properties:
+        experiment_id:
+          type: integer
+        variant_id:
+          type: integer
+        visitor_id:
+          type: string
+        event_type:
+          type: string
+          default: impression
+        metadata:
+          type: object

@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-digital-card
+  namespace: default
+  labels:
+    app: ai-digital-card
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ai-digital-card
+  template:
+    metadata:
+      labels:
+        app: ai-digital-card
+        tier: backend
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: ai-digital-card
+          image: registry.digital-card.ai/ai-digital-card:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8201
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ai-digital-card-config
+            - secretRef:
+                name: ai-digital-card-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8201
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8201
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: uploads
+              mountPath: /app/uploads
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ai-digital-card-data
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: ai-digital-card-uploads
+      restartPolicy: Always

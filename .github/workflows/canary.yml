@@ -1,0 +1,143 @@
+# ─────────────────────────────────────────────────────
+# AI数智名片 - Canary 金丝雀发布工作流
+# ─────────────────────────────────────────────────────
+name: Canary Release
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "镜像标签(留空=git sha)"
+        required: false
+        type: string
+      monitor_minutes:
+        description: "监控时长(分钟)"
+        required: false
+        default: "5"
+        type: string
+      error_threshold:
+        description: "错误率阈值(%)"
+        required: false
+        default: "1.0"
+        type: string
+concurrency:
+  group: canary-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+  K8S_NAMESPACE: default
+  MONITOR_INTERVAL: 60
+
+jobs:
+  build:
+    name: Build & Push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.tag.outputs.tag }}
+      image_full: ${{ steps.tag.outputs.full }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: tag
+        run: |
+          TAG="${{ inputs.image_tag }}"
+          [[ -z "$TAG" ]] && TAG="${GITHUB_SHA::7}-canary-$(date +%s)"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "full=${REGISTRY}/${IMAGE_NAME}:${TAG}" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.tag.outputs.full }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-canary:
+    name: Deploy Canary
+    needs: build
+    runs-on: ubuntu-latest
+    environment: canary
+    steps:
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+      - run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config" 2>/dev/null || true
+      - run: |
+          IMAGE="${{ needs.build.outputs.image_full }}"
+          kubectl delete deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --ignore-not-found --wait=true
+          kubectl create deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --image="${IMAGE}" --port=8201 --replicas=1
+          kubectl label deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} app=ai-digital-card version=canary --overwrite
+          kubectl set env deployment/ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --from=configmap/ai-digital-card-config 2>/dev/null || true
+          kubectl set env deployment/ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --from=secret/ai-digital-card-secret 2>/dev/null || true
+          kubectl patch deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} -p '{"spec":{"template":{"spec":{"containers":[{"name":"ai-digital-card","resources":{"requests":{"cpu":"200m","memory":"256Mi"},"limits":{"cpu":"500m","memory":"512Mi"}},"livenessProbe":{"httpGet":{"path":"/health","port":8201},"initialDelaySeconds":10,"periodSeconds":15},"readinessProbe":{"httpGet":{"path":"/ready","port":8201},"initialDelaySeconds":5,"periodSeconds":10}}]}}}}'
+      - run: |
+          kubectl wait --for=condition=available --timeout=120s -n ${{ env.K8S_NAMESPACE }} deployment/ai-digital-card-canary
+          echo "✅ Canary 就绪"
+
+  integration-test:
+    name: Integration Test
+    needs: deploy-canary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - id: get-pod
+        run: |
+          POD=$(kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=ai-digital-card,version=canary -o jsonpath='{.items[0].metadata.name}')
+          echo "pod=${POD}" >> "$GITHUB_OUTPUT"
+      - run: |
+          POD="${{ steps.get-pod.outputs.pod }}"
+          [[ -z "$POD" ]] && { echo "❌ 无 Canary Pod"; exit 1; }
+          kubectl port-forward -n ${{ env.K8S_NAMESPACE }} "pod/${POD}" 18201:8201 & sleep 3
+          cd backend
+          pip install pytest httpx --quiet 2>/dev/null || true
+          pytest tests/ -x -v --timeout=30
+          EXIT=$?
+          kill %1 2>/dev/null
+          exit $EXIT
+
+  monitor-and-decide:
+    name: Monitor & Decide
+    needs: [build, integration-test]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/setup-kubectl@v4
+      - id: monitor
+        run: |
+          END=$(( $(date +%s) + ${{ (inputs.monitor_minutes | default('5')) * 60 }} ))
+          THRESH=${{ inputs.error_threshold | default('1.0') }}
+          echo "📊 监控开始 (阈值: ${THRESH}%)"
+          while [[ $(date +%s) -lt $END ]]; do
+            M=$(kubectl exec -n ${{ env.K8S_NAMESPACE }} deployment/ai-digital-card-canary -- curl -sf http://localhost:8201/metrics 2>/dev/null)
+            ERR=$(echo "$M" | grep -E "http_requests_total.*status=\"(5|4)[0-9]{2}\"" | awk '{s+=$2}END{print s+0}' || echo 0)
+            TOT=$(echo "$M" | grep -E "^http_requests_total" | awk '{s+=$2}END{print s+0}' || echo 0)
+            PCT=0
+            [[ "$TOT" -gt 0 ]] && PCT=$(echo "scale=2; $ERR*100/$TOT" | bc)
+            echo "  错误=$ERR 总数=$TOT 错误率=${PCT}%"
+            (( $(echo "$PCT >= $THRESH" | bc -l) )) && { echo "❌ 超阈值"; echo "decision=rollback" >> "$GITHUB_OUTPUT"; exit 0; }
+            sleep ${{ env.MONITOR_INTERVAL }}
+          done
+          echo "decision=promote" >> "$GITHUB_OUTPUT"
+      - if: steps.monitor.outputs.decision == 'promote'
+        run: |
+          IMAGE="${{ needs.build.outputs.image_full }}"
+          kubectl set image deployment/ai-digital-card -n ${{ env.K8S_NAMESPACE }} ai-digital-card="${IMAGE}"
+          kubectl rollout status deployment/ai-digital-card -n ${{ env.K8S_NAMESPACE }} --timeout=180s
+          kubectl delete deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
+          echo "🎉 全量发布成功"
+      - if: steps.monitor.outputs.decision == 'rollback'
+        run: |
+          kubectl delete deployment ai-digital-card-canary -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
+          PREV="${{ secrets.PREVIOUS_STABLE_IMAGE }}"
+          [[ -n "$PREV" ]] && kubectl set image deployment/ai-digital-card -n ${{ env.K8S_NAMESPACE }} ai-digital-card="${PREV}" && kubectl rollout status deployment/ai-digital-card -n ${{ env.K8S_NAMESPACE }} --timeout=180s
+          echo "❌ Canary 已回滚"

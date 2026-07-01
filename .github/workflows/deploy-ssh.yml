@@ -1,0 +1,151 @@
+# ──────────────────────────────────────────────
+# Deploy SSH Key 版 — 使用 SSH 私钥认证
+# ──────────────────────────────────────────────
+# 使用方式:
+#   1. 生成 ed25519 密钥对:
+#      ssh-keygen -t ed25519 -f deploy-key -C "ci-deploy@ai-digital-card"
+#   2. 添加公钥到服务器:
+#      ssh-copy-id -i deploy-key.pub <user>@<host>
+#   3. 设置 GitHub Secrets:
+#      gh secret set DEPLOY_SSH_KEY < deploy-key
+#      gh secret set DEPLOY_HOST --body "<服务器IP>"
+#      gh secret set DEPLOY_USER --body "deploy"
+#   4. 安全删除本地私钥文件
+# ──────────────────────────────────────────────
+name: Deploy (SSH Key)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "部署目标环境"
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - staging
+
+concurrency:
+  group: deploy-ssh-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACKEND: ${{ github.repository }}/backend
+  IMAGE_NGINX: ${{ github.repository }}/nginx
+  DOCKER_COMPOSE_FILE: docker-compose.yml
+  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Docker image tags
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set Docker image tags (nginx)
+        id: meta-nginx
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NGINX }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/nginx.Dockerfile
+          push: true
+          tags: ${{ steps.meta-nginx.outputs.tags }}
+          labels: ${{ steps.meta-nginx.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Server via SSH Key
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH Agent with deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Deploy via SSH (Key-based auth)
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            "${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}" << 'SSH_SCRIPT'
+            set -e
+
+            cd /opt/ai-digital-card
+
+            # 拉取最新镜像
+            docker compose pull
+
+            # 用新镜像重启服务
+            docker compose up -d --remove-orphans
+
+            # 清理旧镜像
+            docker image prune -f
+
+            # 健康检查
+            sleep 5
+            if curl -sf http://localhost:8201/health > /dev/null 2>&1; then
+              echo "✅ 后端健康检查通过"
+            else
+              echo "❌ 后端健康检查失败"
+              exit 1
+            fi
+          SSH_SCRIPT
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            "${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}" << 'SSH_ROLLBACK'
+            cd /opt/ai-digital-card
+            docker compose up -d --remove-orphans
+            echo "⚠️ 回滚完成：使用上一次镜像"
+          SSH_ROLLBACK

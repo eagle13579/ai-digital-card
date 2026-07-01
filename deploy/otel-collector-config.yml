@@ -1,0 +1,135 @@
+# ══════════════════════════════════════════════════════════════════════
+# OpenTelemetry Collector 配置 — AI 数智名片
+# ══════════════════════════════════════════════════════════════════════
+#
+# 用途:
+#   接收后端应用的 OTLP traces/metrics，处理后转发给 Prometheus、
+#   Logging 导出器和可选的 Jaeger。
+#
+# 接收器 (Receivers):
+#   - otlp (gRPC + HTTP)    ← 后端应用通过 SDK 发送 spans/metrics
+#   - prometheus (自抓取)    ← 抓取后端 /metrics 端点 (prometheus_client)
+#
+# 处理器 (Processors):
+#   - batch                  ← 批量聚合减少 IO
+#   - memory_limiter         ← 防止 OOM
+#
+# 导出器 (Exporters):
+#   - prometheus (exporter)  ← 暴露合并后的指标供 Grafana 拉取
+#   - logging                ← 控制台日志 (调试用)
+#   - otlp/jaeger (可选)     ← 转发到 Jaeger 做分布式追踪可视化
+#
+# 启动:
+#   docker run --rm -v $(pwd)/otel-collector-config.yml:/etc/otel/config.yaml \
+#     -p 4317:4317 -p 4318:4318 -p 8889:8889 \
+#     otel/opentelemetry-collector-contrib:0.108.0
+#
+# 验证:
+#   curl -s http://localhost:8889/metrics | head
+# ══════════════════════════════════════════════════════════════════════
+
+receivers:
+  # ── OTLP 接收器 (gRPC + HTTP) ──────────────────────────────────────
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:*"
+            - "http://127.0.0.1:*"
+            - "https://liankebao.top"
+            - "https://*.liankebao.top"
+          allowed_headers:
+            - "content-type"
+            - "x-request-id"
+
+  # ── Prometheus 自抓取接收器 ─────────────────────────────────────────
+  # 从后端应用的 /metrics 端点拉取 prometheus_client 指标
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "ai-card-backend"
+          scrape_interval: 10s
+          static_configs:
+            - targets: ["host.docker.internal:8000"]
+              labels:
+                service: "ai-digital-business-card"
+                env: "production"
+
+processors:
+  # ── 批量处理器 ──────────────────────────────────────────────────────
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  # ── 内存限制处理器 ─────────────────────────────────────────────────
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512          # 硬限制: Collector 内存上限 512MB
+    spike_limit_mib: 64     # 峰值容忍: 短时突增 64MB
+    limit_percentage: 0     # 0 = 禁用百分比模式
+    spike_limit_percentage: 0
+
+exporters:
+  # ── Prometheus 导出器 ───────────────────────────────────────────────
+  # 在 :8889 暴露合并后的指标，供 Grafana 作为 Prometheus 数据源拉取
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: "otel"
+    resource_to_telemetry_conversion:
+      enabled: true
+    enable_open_metrics: true
+    add_metric_suffixes: false
+
+  # ── Logging 导出器 (调试用) ────────────────────────────────────────
+  logging:
+    verbosity: detailed     # normal | detailed
+    sampling_initial: 5
+    sampling_thereafter: 1
+
+  # ── Jaeger 导出器 (可选) ────────────────────────────────────────────
+  # 取消注释以启用 Jaeger 分布式追踪可视化
+  # otlp/jaeger:
+  #   endpoint: jaeger:4317   # Jaeger 的 OTLP gRPC 接收端口
+  #   tls:
+  #     insecure: true
+
+  # ── Debug 导出器 (otel-collector-contrib >= 0.87) ──────────────────
+  # debug:
+  #   verbosity: detailed
+
+service:
+  pipelines:
+    # ── Traces 流水线 ────────────────────────────────────────────────
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [logging]
+      # exporters: [logging, otlp/jaeger]   # 启用 Jaeger 时取消注释
+
+    # ── Metrics 流水线 ───────────────────────────────────────────────
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus, logging]
+
+    # ── Logs 流水线 (可选) ───────────────────────────────────────────
+    # logs:
+    #   receivers: [otlp]
+    #   processors: [memory_limiter, batch]
+    #   exporters: [logging]
+
+# ══════════════════════════════════════════════════════════════════════
+# 扩展配置 (可选)
+# ══════════════════════════════════════════════════════════════════════
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  pprof:
+    endpoint: 0.0.0.0:1888
+  zpages:
+    endpoint: 0.0.0.0:55679

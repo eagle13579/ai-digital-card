@@ -1,0 +1,235 @@
+# ───────────────────────────────────────────────────────
+# AI数智名片 — 金丝雀 CI 配置
+# 在 CI 成功通过后调用金丝雀发布工作流
+# ───────────────────────────────────────────────────────
+name: Canary CI
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, release/*]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Docker 镜像标签 (留空=自动)"
+        required: false
+        type: string
+      canary_weight:
+        description: "金丝雀流量百分比 (1-50)"
+        required: false
+        default: "10"
+        type: string
+      monitor_minutes:
+        description: "监控时长 (分钟)"
+        required: false
+        default: "30"
+        type: string
+      auto_promote:
+        description: "通过后自动全量发布"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: canary-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+  CANARY_WEIGHT: ${{ inputs.canary_weight || '10' }}
+  MONITOR_MINUTES: ${{ inputs.monitor_minutes || '30' }}
+  ERROR_THRESHOLD: "1.0"
+
+jobs:
+  # ────────────────────────────────────────────────────
+  # Job 1: 构建金丝雀镜像
+  # ────────────────────────────────────────────────────
+  build-canary:
+    name: Build Canary Image
+    runs-on: ubuntu-latest
+    # 仅 workflow_dispatch 或 CI 成功时运行
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.tag.outputs.tag }}
+      image_full: ${{ steps.tag.outputs.full }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: tag
+        run: |
+          TAG="${{ inputs.image_tag }}"
+          if [[ -z "$TAG" ]]; then
+            TAG="${GITHUB_SHA::7}-canary-$(date +%s)"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "full=${REGISTRY}/${IMAGE_NAME}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push canary image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.tag.outputs.full }}
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=canary
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ────────────────────────────────────────────────────
+  # Job 2: 部署金丝雀实例并更新 Nginx 分流
+  # ────────────────────────────────────────────────────
+  deploy-canary:
+    name: Deploy Canary Instance
+    needs: build-canary
+    runs-on: ubuntu-latest
+    environment: canary
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Deploy canary to server
+        run: |
+          IMAGE="${{ needs.build-canary.outputs.image_full }}"
+          WEIGHT="${{ env.CANARY_WEIGHT }}"
+          HOST="${{ secrets.DEPLOY_HOST }}"
+          USER="${{ secrets.DEPLOY_USER }}"
+
+          # 远程部署：启动 canary 容器 + 更新 Nginx 配置
+          ssh -o StrictHostKeyChecking=no "${USER}@${HOST}" << 'SSH_SCRIPT'
+            set -e
+            cd /opt/ai-digital-card
+
+            # 部署金丝雀后端 (port 8204)
+            docker pull "${IMAGE}"
+            docker rm -f ai-card-canary 2>/dev/null || true
+            docker run -d --name ai-card-canary \
+              --network ai-digital-card_default \
+              --restart unless-stopped \
+              -p 127.0.0.1:8204:8201 \
+              -e ENV=canary \
+              "${IMAGE}"
+
+            # 生成金丝雀 Nginx 配置（替换权重）
+            sed "s/10%/${WEIGHT}%/" deploy/canary/nginx-canary.conf \
+              > /etc/nginx/sites-enabled/canary.conf
+
+            # 重载 Nginx
+            nginx -s reload
+            echo "✅ Canary 部署完成 (权重=${WEIGHT}%)"
+          SSH_SCRIPT
+
+      - name: Verify canary health
+        run: |
+          sleep 10
+          curl -sf http://${{ secrets.DEPLOY_HOST }}/canary/health || {
+            echo "❌ 金丝雀健康检查失败"
+            exit 1
+          }
+          echo "✅ 金丝雀服务健康"
+
+  # ────────────────────────────────────────────────────
+  # Job 3: 金丝雀监控 + 自动推进/回滚
+  # ────────────────────────────────────────────────────
+  monitor-and-decide:
+    name: Monitor & Decide
+    needs: [build-canary, deploy-canary]
+    if: success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Monitor canary metrics
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          MONITOR_MINUTES: ${{ env.MONITOR_MINUTES }}
+          ERROR_THRESHOLD: ${{ env.ERROR_THRESHOLD }}
+        run: |
+          END=$(( $(date +%s) + MONITOR_MINUTES * 60 ))
+          echo "📊 金丝雀监控开始 (${MONITOR_MINUTES}分钟, 错误率阈值=${ERROR_THRESHOLD}%)"
+
+          while [[ $(date +%s) -lt $END ]]; do
+            # 从 canary metrics 获取指标
+            METRICS=$(curl -sf "http://${HOST}:8204/metrics" 2>/dev/null || echo "")
+            ERR=$(echo "$METRICS" | grep -cE 'http_request.*status="(5[0-9]{2})"' || echo 0)
+            TOT=$(echo "$METRICS" | grep -cE '^http_request' || echo 0)
+            PCT=0
+            [[ "$TOT" -gt 0 ]] && PCT=$(echo "scale=2; $ERR*100/$TOT" | bc 2>/dev/null || echo 0)
+
+            echo "  错误=$ERR 总数=$TOT 错误率=${PCT}%"
+
+            # 检查是否超阈值
+            if (( $(echo "$PCT >= $ERROR_THRESHOLD" | bc -l 2>/dev/null || echo 0) )); then
+              echo "❌ 错误率超阈值 (${PCT}% >= ${ERROR_THRESHOLD}%)"
+              echo "decision=rollback" >> "$GITHUB_ENV"
+              exit 0
+            fi
+
+            sleep 60
+          done
+
+          echo "✅ 监控通过"
+          echo "decision=promote" >> "$GITHUB_ENV"
+
+      - name: Promote to production
+        if: env.decision == 'promote'
+        run: |
+          echo "🎉 金丝雀通过，推进全量发布..."
+          # 调用 deploy.yml 完成全量发布
+          # 或者通过 SSH 滚动升级
+          ssh -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" << 'SSH_PROMOTE'
+            set -e
+            cd /opt/ai-digital-card
+
+            # 更新稳定版到金丝雀镜像
+            IMAGE=$(docker inspect ai-card-canary --format '{{.Config.Image}}')
+            docker rm -f ai-card-canary 2>/dev/null || true
+
+            # 切换 Nginx 指向稳定版
+            rm -f /etc/nginx/sites-enabled/canary.conf
+            nginx -s reload
+
+            # 用新镜像重启后端
+            export TAG=$(echo "${IMAGE}" | awk -F':' '{print $2}')
+            docker compose up -d backend
+            echo "✅ 全量发布完成"
+          SSH_PROMOTE
+
+      - name: Rollback canary
+        if: env.decision == 'rollback' || failure()
+        run: |
+          echo "❌ 金丝雀回滚中..."
+          ssh -o StrictHostKeyChecking=no "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" << 'SSH_ROLLBACK'
+            set -e
+            cd /opt/ai-digital-card
+
+            # 移除金丝雀容器
+            docker rm -f ai-card-canary 2>/dev/null || true
+
+            # 恢复 Nginx 配置（移除 canary 分流）
+            rm -f /etc/nginx/sites-enabled/canary.conf
+            nginx -s reload
+
+            echo "✅ 回滚完成：已切换回稳定版本"
+          SSH_ROLLBACK

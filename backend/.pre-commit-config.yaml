@@ -1,0 +1,153 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# pre-commit 配置 — AI 数智名片
+# 安装: pip install pre-commit && pre-commit install
+# 手动运行: pre-commit run --all-files
+# 跳过: SKIP=ruff,ruff-format git commit -m "..."
+# ──────────────────────────────────────────────────────────────────────────────
+
+repos:
+
+  # ── Ruff: Python lint + auto-fix + format ─────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.0
+    hooks:
+      - id: ruff
+        name: ruff lint
+        description: "Run Ruff linter — Python code quality & style checks"
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+          - --line-length=100
+        types_or: [python, pyi]
+
+      - id: ruff-format
+        name: ruff format
+        description: "Run Ruff formatter — auto-format Python code"
+        args: [--line-length=100]
+        types_or: [python, pyi]
+
+  # ── pre-commit-hooks: 通用文件级检查 ──────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+
+      - id: end-of-file-fixer
+        name: fix end-of-file
+
+      - id: check-yaml
+        name: check YAML syntax
+        args: [--allow-multiple-documents]
+        exclude: deploy/helm/
+
+      - id: check-json
+        name: check JSON syntax
+
+      - id: check-toml
+        name: check TOML syntax
+
+      - id: check-added-large-files
+        name: check for large files
+        args: [--maxkb=500]
+
+      - id: check-merge-conflict
+        name: check merge conflicts
+
+      - id: detect-private-key
+        name: detect private keys
+
+      - id: detect-aws-credentials
+        name: detect AWS credentials
+        args: [--allow-missing-credentials]
+
+      - id: forbid-submodules
+        name: forbid submodules
+        stages: [commit]
+
+      - id: check-ast
+        name: check Python AST
+
+      - id: check-docstring-first
+        name: check docstring first
+
+      - id: debug-statements
+        name: check debug statements
+
+      - id: check-shebang-scripts-are-executable
+        name: check shebang executable
+
+      - id: mixed-line-ending
+        name: fix mixed line endings
+        args: [--fix=lf]
+
+      - id: check-case-conflict
+        name: check case conflict
+
+  # ── 安全检查: Bandit ──────────────────────────────────────────────────────
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        name: bandit security scan
+        description: "Security linting for Python — finds common issues"
+        args:
+          - -s
+          - B101,B311,B303
+          - --confidence-level=medium
+          - --severity-level=medium
+        additional_dependencies: ["bandit[toml]"]
+        exclude: >
+          (?x)^(
+            backend/tests/.*|
+            backend/tests_bak/.*|
+            backend/ai_service/.*\.py
+          )$
+
+  # ── Dockerfile 检查: hadolint ─────────────────────────────────────────────
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        name: hadolint Dockerfile lint
+        description: "Lint Dockerfiles for best practices"
+        args: [--ignore, DL3008, --ignore, DL3013]
+        exclude: deploy/nginx\.Dockerfile
+
+  # ── 机密扫描: Gitleaks ────────────────────────────────────────────────────
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.1
+    hooks:
+      - id: gitleaks
+        name: gitleaks secrets scan
+        description: "Detect hardcoded secrets in git history"
+        args: [--no-git, --verbose]
+
+# ── 全局配置 ────────────────────────────────────────────────────────────────
+default_language_version:
+  python: python3.12
+
+default_stages:
+  - pre-commit
+  - pre-push
+
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+
+exclude: >
+  (?x)^(
+    \.env\.bak|
+    \.env\.example|
+    data/.*\.db|
+    backups/.*|
+    \.gitkeep
+  )$
+
+ci:
+  autofix_commit_msg: "chore(pre-commit): auto-fix ruff issues"
+  autoupdate_commit_msg: "chore(pre-commit): auto-update hook revisions"
+  autoupdate_schedule: monthly
+  skip: []
+  submodules: false

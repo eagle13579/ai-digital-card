@@ -1,0 +1,95 @@
+---
+# Istio ServiceMesh 配置参考
+# 前提: 集群已安装 Istio，且 target namespace 已启用 sidecar 注入
+# 该配置实现:
+#   - 蓝绿/canary 流量分割 (v1 90% / v2 10%)
+#   - 请求超时 (3 秒)
+#   - 自动重试 (最多 2 次)
+#   - 熔断器 (连接池 + 异常检测)
+
+# ───────── 1. 目标规则 ─────────
+# 定义服务的子集 (subset) 和熔断策略
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: ai-digital-card-dr
+  namespace: default
+spec:
+  host: ai-digital-card-service     # 对应 K8s Service 名
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 10
+    outlierDetection:               # 熔断器: 连续 5 次错误将 Pod 弹出 30s
+      consecutive5xxErrors: 5
+      interval: 10s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+---
+# ───────── 2. 虚拟服务 ─────────
+# 定义路由规则: 流量分割 + 超时 + 重试
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ai-digital-card-vs
+  namespace: default
+spec:
+  hosts:
+    - ai-digital-card-service       # 匹配的目标服务
+  http:
+    - match:                        # 精准匹配路径
+        - uri:
+            prefix: /api/v1/card
+        - uri:
+            prefix: /api/v1/health
+        - uri:
+            prefix: /api/v1/ready
+      route:
+        - destination:
+            host: ai-digital-card-service
+            subset: v1
+          weight: 90
+        - destination:
+            host: ai-digital-card-service
+            subset: v2
+          weight: 10
+      timeout: 3s                   # 请求超时 3 秒
+      retries:
+        attempts: 2                 # 最多重试 2 次
+        perTryTimeout: 1.5s         # 每次重试超时 1.5 秒
+        retryOn: gateway-error,connect-failure,refused-stream
+      corsPolicy:                   # 跨域配置
+        allowOrigins:
+          - regex: ".*"
+        allowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+        allowHeaders:
+          - "*"
+        maxAge: "24h"
+    - match:                        # 兜底路由（所有其他路径）
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: ai-digital-card-service
+            subset: v1
+          weight: 100
+      timeout: 10s
+      retries:
+        attempts: 1
+        perTryTimeout: 5s
+        retryOn: gateway-error

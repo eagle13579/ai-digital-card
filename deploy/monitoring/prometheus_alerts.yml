@@ -1,0 +1,134 @@
+groups:
+  - name: ai-card-slos
+    interval: 30s
+    rules:
+      # ---- SLI: Error Rate (SLO target: >= 99.95% availability) ----
+      - alert: HighErrorRate
+        expr: |
+          rate(ncard_http_requests_total{status=~"5.."}[5m])
+          /
+          rate(ncard_http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "5xx错误率超过5%"
+          description: |
+            API 5xx错误率 {{ $value | humanizePercentage }} 在最近5分钟内超过了5%阈值。
+            历史: {{ $labels.instance }}
+
+      # ---- SLI: Latency (SLO target: 99% of requests < 3s, alert on p99 > 5s) ----
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99,
+            rate(ncard_http_request_duration_seconds_bucket[5m])
+          ) > 5
+        for: 5m
+        labels:
+          severity: critical
+          slo: latency
+        annotations:
+          summary: "P99延迟超过5秒"
+          description: |
+            P99请求延迟 {{ $value | humanizeDuration }}，超过5秒阈值。
+            服务: {{ $labels.job }}
+
+      # ---- SLI: Service Availability (SLO target: 100% uptime) ----
+      - alert: ServiceDown
+        expr: up{job="ai-card-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          slo: uptime
+        annotations:
+          summary: "AI名片后端服务宕机"
+          description: |
+            服务实例 {{ $labels.instance }} 已宕机超过1分钟。
+            请立即检查。
+
+      # ---- SLI: Cache Hit Rate (SLO target: >= 85%) ----
+      - alert: LowCacheHitRate
+        expr: |
+          rate(ncard_cache_operations_total{type="hit"}[5m])
+          /
+          (
+            rate(ncard_cache_operations_total{type="hit"}[5m])
+            +
+            rate(ncard_cache_operations_total{type="miss"}[5m])
+          ) < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          slo: cache_efficiency
+        annotations:
+          summary: "缓存命中率低于80%"
+          description: |
+            缓存命中率 {{ $value | humanizePercentage }} 在最近10分钟内低于80%阈值。
+            服务: {{ $labels.job }}
+
+      # ---- SLI: Database Query Latency (SLO target: p95 < 500ms) ----
+      - alert: DBQuerySlow
+        expr: |
+          histogram_quantile(0.95,
+            rate(ncard_db_query_duration_seconds_bucket[5m])
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          slo: db_performance
+        annotations:
+          summary: "数据库P95查询延迟超过1秒"
+          description: |
+            数据库P95查询延迟 {{ $value | humanizeDuration }}，超过1秒阈值。
+            服务: {{ $labels.job }}
+
+      # ---- SLI: AI Inference Latency (SLO target: p95 < 5s) ----
+      - alert: AIInferenceSlow
+        expr: |
+          histogram_quantile(0.95,
+            rate(ncard_ai_inference_duration_seconds_bucket[5m])
+          ) > 10
+        for: 5m
+        labels:
+          severity: warning
+          slo: ai_performance
+        annotations:
+          summary: "AI推理P95延迟超过10秒"
+          description: |
+            AI推理P95延迟 {{ $value | humanizeDuration }}，超过10秒阈值。
+            服务: {{ $labels.job }}
+
+      # ---- SLI: Request Rate Drop (SLO target: no sudden traffic loss > 50%) ----
+      - alert: TrafficDrop
+        expr: |
+          rate(ncard_http_requests_total[5m])
+          /
+          rate(ncard_http_requests_total[30m] offset 5m) < 0.5
+        for: 5m
+        labels:
+          severity: warning
+          slo: traffic_volume
+        annotations:
+          summary: "请求量骤降超过50%"
+          description: |
+            当前请求速率较30分钟前下降超过50%（{{ $value | humanizePercentage }}）。
+            可能原因: 上游路由变更或DNS问题。
+
+      # ---- Burn Rate: 5x burn (error budget consumed in < 7h) ----
+      - alert: ErrorBudgetBurnCritical
+        expr: |
+          (
+            rate(ncard_http_requests_total{status=~"5.."}[1m])
+            /
+            rate(ncard_http_requests_total[1m])
+          ) > 0.05 * 5
+        for: 3m
+        labels:
+          severity: critical
+          slo: error_budget
+        annotations:
+          summary: "错误预算快速燃烧(5x)"
+          description: |
+            错误率 {{ $value | humanizePercentage }}，超过SLO阈值的5倍。
+            按此速率，错误预算将在约7小时内耗尽。

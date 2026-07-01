@@ -1,0 +1,98 @@
+# ============================================================
+# Global Ingress — AI Digital Card
+# Features:   Geo-based DNS routing via ExternalDNS
+#             Fallback to nearest available region
+#             TLS termination at edge (Let's Encrypt)
+# ============================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-digital-card-global
+  namespace: default
+  annotations:
+    # ---- Geo-aware DNS via ExternalDNS -----------------------
+    external-dns.alpha.kubernetes.io/hostname: api.digital-card.ai
+    external-dns.alpha.kubernetes.io/geo-location: "*"
+    # ---- Region-specific DNS routing -------------------------
+    external-dns.alpha.kubernetes.io/geo-location-us: us-east-1
+    external-dns.alpha.kubernetes.io/geo-location-eu: eu-west-1
+    external-dns.alpha.kubernetes.io/geo-location-ap: ap-southeast-1
+    # ---- TLS at edge -----------------------------------------
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # ---- Fallback strategy -----------------------------------
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_500 http_502 http_503"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "3"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "5"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.digital-card.ai
+      secretName: ai-digital-card-global-tls
+  rules:
+    # ---- Primary: us-east-1 (NA default) --------------------
+    - host: api.digital-card.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-digital-card-svc-us-east
+                port:
+                  number: 8201
+    # ---- eu-west-1 (Europe) ----------------------------------
+    - host: eu.api.digital-card.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-digital-card-svc-eu-west
+                port:
+                  number: 8201
+    # ---- ap-southeast-1 (Asia-Pacific) -----------------------
+    - host: ap.api.digital-card.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-digital-card-svc-ap-southeast
+                port:
+                  number: 8201
+---
+# ---- Fallback endpoints: cross-region routing ----------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-digital-card-fallback
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_500 http_502 http_503"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "5"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "10"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - fallback.api.digital-card.ai
+      secretName: ai-digital-card-fallback-tls
+  rules:
+    - host: fallback.api.digital-card.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-digital-card-svc-us-east
+                port:
+                  number: 8201

@@ -1,0 +1,50 @@
+{
+  "name": "ai-digital-business-card",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts",
+    "test:a11y": "playwright test --config=e2e/playwright.config.ts e2e/a11y.spec.ts",
+    "lint": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^5.0.4",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.14.2",
+    "vite": "^6.2.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-actions": "^9.0.8",
+    "@storybook/addon-controls": "^9.0.8",
+    "@storybook/addon-viewport": "^9.0.8",
+    "@storybook/react": "^10.4.6",
+    "@storybook/react-vite": "^10.4.6",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^26.1.0",
+    "storybook": "^10.4.6",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.8.2",
+    "vitest": "^4.1.9"
+  }
+}

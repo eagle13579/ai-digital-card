@@ -1,0 +1,163 @@
+# ──────────────────────────────────────────────
+# Deploy 流水线 — Docker 构建 + 推送 + 部署
+# 手动触发 / CI 通过后自动触发
+# ──────────────────────────────────────────────
+# DEPLOY_SSH_KEY: SSH 私钥 (GitHub Secret)，推荐 ed25519 格式
+#                 用于 appleboy/ssh-action 的 key 参数
+# 安全要求:
+#   1. 禁止使用密码/sshpass 认证
+#   2. 私钥权限应为 600，公钥添加至服务器的 ~/.ssh/authorized_keys
+#   3. 每 180 天轮换密钥对
+# ──────────────────────────────────────────────
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "部署目标环境"
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - staging
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACKEND: ${{ github.repository }}/backend
+  IMAGE_NGINX: ${{ github.repository }}/nginx
+  DOCKER_COMPOSE_FILE: docker-compose.yml
+  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+  # SSH 私钥认证 — 替代已弃用的 sshpass 密码认证
+  DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    # 仅 workflow_dispatch 或 CI 成功时运行
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Docker image tags
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set Docker image tags (nginx)
+        id: meta-nginx
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NGINX }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/nginx.Dockerfile
+          push: true
+          tags: ${{ steps.meta-nginx.outputs.tags }}
+          labels: ${{ steps.meta-nginx.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Server
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare deploy files
+        run: |
+          mkdir -p deploy-tmp
+          cp docker-compose.yml deploy-tmp/
+          cp -r deploy/ deploy-tmp/deploy/
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+
+            cd /opt/ai-digital-card
+
+            # 拉取最新镜像
+            docker compose pull
+
+            # 用新镜像重启服务
+            docker compose up -d --remove-orphans
+
+            # 清理旧镜像
+            docker image prune -f
+
+            # 健康检查
+            sleep 5
+            if curl -sf http://localhost:8201/health > /dev/null 2>&1; then
+              echo "✅ 后端健康检查通过"
+            else
+              echo "❌ 后端健康检查失败"
+              exit 1
+            fi
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            cd /opt/ai-digital-card
+            docker compose up -d --remove-orphans
+            echo "⚠️ 回滚完成：使用上一次镜像"

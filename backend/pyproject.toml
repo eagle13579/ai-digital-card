@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short --strict-markers -p no:warnings"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/__init__.py",
+    "*/migrations/*",
+    "*/tests/*",
+    "*/test_*.py",
+    "*/.pytype/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+# Fail if total coverage is below this threshold
+fail_under = 80
+show_missing = true
+skip_covered = false
+skip_empty = true
+sort = "Cover"
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "raise AssertionError",
+    "pass",
+    "return NotImplemented",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+title = "AI数字名片 Coverage Report"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.mutmut]
+paths_to_mutate = [
+    "app/services/",
+    "app/utils/",
+    "app/routers/",
+    "app/models/",
+    "app/middleware/",
+    "app/schemas/",
+    "app/cache.py",
+    "app/database.py",
+    "app/i18n.py",
+]
+tests_dir = "tests"
+test_pattern = "test_*.py"
+mutant_timeout = 30
+dict_synonyms = true
+backup_source = false
+max_mutations = 0
+pytest_cmd = "python -m pytest -x --timeout=30 -p no:warnings"

@@ -1,0 +1,80 @@
+# Multi-Region: us-east-1, eu-west-1, ap-southeast-1
+# Topology Spread Constraints + Pod Anti-Affinity + isolation
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: ai-digital-card-us-east, labels: {app: ai-digital-card, region: us-east-1}}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: ai-digital-card, region: us-east-1}}
+  template:
+    metadata: {labels: {app: ai-digital-card, region: us-east-1}}
+    spec:
+      topologySpreadConstraints:
+        - {maxSkew: 1, topologyKey: topology.kubernetes.io/zone, whenUnsatisfiable: DoNotSchedule, labelSelector: {matchLabels: {app: ai-digital-card, region: us-east-1}}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - {weight: 100, podAffinityTerm: {labelSelector: {matchLabels: {app: ai-digital-card, region: us-east-1}}, topologyKey: kubernetes.io/hostname}}
+      containers:
+        - {name: app, image: registry.digital-card.ai/ai-digital-card:latest, ports: [{containerPort: 8201}], env: [{name: REGION, value: us-east-1}], resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: ai-digital-card-svc-us-east, labels: {app: ai-digital-card, region: us-east-1}}
+spec:
+  selector: {app: ai-digital-card, region: us-east-1}
+  ports:
+    - {port: 8201, targetPort: 8201}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: ai-digital-card-eu-west, labels: {app: ai-digital-card, region: eu-west-1}}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: ai-digital-card, region: eu-west-1}}
+  template:
+    metadata: {labels: {app: ai-digital-card, region: eu-west-1}}
+    spec:
+      topologySpreadConstraints:
+        - {maxSkew: 1, topologyKey: topology.kubernetes.io/zone, whenUnsatisfiable: DoNotSchedule, labelSelector: {matchLabels: {app: ai-digital-card, region: eu-west-1}}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - {weight: 100, podAffinityTerm: {labelSelector: {matchLabels: {app: ai-digital-card, region: eu-west-1}}, topologyKey: kubernetes.io/hostname}}
+      containers:
+        - {name: app, image: registry.digital-card.ai/ai-digital-card:latest, ports: [{containerPort: 8201}], env: [{name: REGION, value: eu-west-1}], resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: ai-digital-card-svc-eu-west, labels: {app: ai-digital-card, region: eu-west-1}}
+spec:
+  selector: {app: ai-digital-card, region: eu-west-1}
+  ports:
+    - {port: 8201, targetPort: 8201}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: ai-digital-card-ap-southeast, labels: {app: ai-digital-card, region: ap-southeast-1}}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: ai-digital-card, region: ap-southeast-1}}
+  template:
+    metadata: {labels: {app: ai-digital-card, region: ap-southeast-1}}
+    spec:
+      topologySpreadConstraints:
+        - {maxSkew: 1, topologyKey: topology.kubernetes.io/zone, whenUnsatisfiable: DoNotSchedule, labelSelector: {matchLabels: {app: ai-digital-card, region: ap-southeast-1}}}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - {weight: 100, podAffinityTerm: {labelSelector: {matchLabels: {app: ai-digital-card, region: ap-southeast-1}}, topologyKey: kubernetes.io/hostname}}
+      containers:
+        - {name: app, image: registry.digital-card.ai/ai-digital-card:latest, ports: [{containerPort: 8201}], env: [{name: REGION, value: ap-southeast-1}], resources: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: ai-digital-card-svc-ap-southeast, labels: {app: ai-digital-card, region: ap-southeast-1}}
+spec:
+  selector: {app: ai-digital-card, region: ap-southeast-1}
+  ports:
+    - {port: 8201, targetPort: 8201}

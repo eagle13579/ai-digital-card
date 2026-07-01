@@ -1,0 +1,383 @@
+/* ============================================================
+   RTL 布局支持 (Right-to-Left)
+   用于阿拉伯语 (ar) 和希伯来语 (he)
+   ============================================================ */
+
+/* 全局文本对齐与方向 */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* 浮动反转 */
+[dir="rtl"] .float-left {
+  float: right;
+}
+
+[dir="rtl"] .float-right {
+  float: left;
+}
+
+/* Flex 布局反转 */
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row;
+}
+
+/* Space 方向 — Tailwind 的 space-x 系列 */
+[dir="rtl"] .space-x-1 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .space-x-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* 内边距反转 — 仅针对显式单边 padding */
+[dir="rtl"] .pl-0 { padding-left: 0; padding-right: 0; }
+[dir="rtl"] .pr-0 { padding-right: 0; padding-left: 0; }
+[dir="rtl"] .pl-1 { padding-left: 0; padding-right: 0.25rem; }
+[dir="rtl"] .pr-1 { padding-right: 0; padding-left: 0.25rem; }
+[dir="rtl"] .pl-2 { padding-left: 0; padding-right: 0.5rem; }
+[dir="rtl"] .pr-2 { padding-right: 0; padding-left: 0.5rem; }
+[dir="rtl"] .pl-3 { padding-left: 0; padding-right: 0.75rem; }
+[dir="rtl"] .pr-3 { padding-right: 0; padding-left: 0.75rem; }
+[dir="rtl"] .pl-4 { padding-left: 0; padding-right: 1rem; }
+[dir="rtl"] .pr-4 { padding-right: 0; padding-left: 1rem; }
+[dir="rtl"] .pl-5 { padding-left: 0; padding-right: 1.25rem; }
+[dir="rtl"] .pr-5 { padding-right: 0; padding-left: 1.25rem; }
+[dir="rtl"] .pl-6 { padding-left: 0; padding-right: 1.5rem; }
+[dir="rtl"] .pr-6 { padding-right: 0; padding-left: 1.5rem; }
+[dir="rtl"] .pl-8 { padding-left: 0; padding-right: 2rem; }
+[dir="rtl"] .pr-8 { padding-right: 0; padding-left: 2rem; }
+[dir="rtl"] .pl-10 { padding-left: 0; padding-right: 2.5rem; }
+[dir="rtl"] .pr-10 { padding-right: 0; padding-left: 2.5rem; }
+
+/* 外边距反转 */
+[dir="rtl"] .ml-0 { margin-left: 0; margin-right: 0; }
+[dir="rtl"] .mr-0 { margin-right: 0; margin-left: 0; }
+[dir="rtl"] .ml-1 { margin-left: 0; margin-right: 0.25rem; }
+[dir="rtl"] .mr-1 { margin-right: 0; margin-left: 0.25rem; }
+[dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
+[dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
+[dir="rtl"] .ml-3 { margin-left: 0; margin-right: 0.75rem; }
+[dir="rtl"] .mr-3 { margin-right: 0; margin-left: 0.75rem; }
+[dir="rtl"] .ml-4 { margin-left: 0; margin-right: 1rem; }
+[dir="rtl"] .mr-4 { margin-right: 0; margin-left: 1rem; }
+[dir="rtl"] .ml-5 { margin-left: 0; margin-right: 1.25rem; }
+[dir="rtl"] .mr-5 { margin-right: 0; margin-left: 1.25rem; }
+[dir="rtl"] .ml-6 { margin-left: 0; margin-right: 1.5rem; }
+[dir="rtl"] .mr-6 { margin-right: 0; margin-left: 1.5rem; }
+[dir="rtl"] .ml-8 { margin-left: 0; margin-right: 2rem; }
+[dir="rtl"] .mr-8 { margin-right: 0; margin-left: 2rem; }
+[dir="rtl"] .ml-10 { margin-left: 0; margin-right: 2.5rem; }
+[dir="rtl"] .mr-10 { margin-right: 0; margin-left: 2.5rem; }
+[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+
+/* 边框圆角反转 */
+[dir="rtl"] .rounded-l { border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem; }
+[dir="rtl"] .rounded-r { border-top-right-radius: 0; border-bottom-right-radius: 0; border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem; }
+[dir="rtl"] .rounded-l-lg { border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
+[dir="rtl"] .rounded-r-lg { border-top-right-radius: 0; border-bottom-right-radius: 0; border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; }
+[dir="rtl"] .rounded-l-xl { border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0.75rem; border-bottom-right-radius: 0.75rem; }
+[dir="rtl"] .rounded-r-xl { border-top-right-radius: 0; border-bottom-right-radius: 0; border-top-left-radius: 0.75rem; border-bottom-left-radius: 0.75rem; }
+[dir="rtl"] .rounded-l-2xl { border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 1rem; border-bottom-right-radius: 1rem; }
+[dir="rtl"] .rounded-r-2xl { border-top-right-radius: 0; border-bottom-right-radius: 0; border-top-left-radius: 1rem; border-bottom-left-radius: 1rem; }
+
+/* 文本对齐辅助类 */
+[dir="rtl"] .text-start {
+  text-align: right;
+}
+
+[dir="rtl"] .text-end {
+  text-align: left;
+}
+
+/* 图标 / 带图标的按钮 — 图标与文字顺序 */
+[dir="rtl"] .icon-left {
+  margin-right: 0;
+  margin-left: 0.375rem;
+}
+
+[dir="rtl"] .icon-right {
+  margin-left: 0;
+  margin-right: 0.375rem;
+}
+
+/* 箭头 / 方向性图标 */
+[dir="rtl"] .chevron-right,
+[dir="rtl"] .arrow-right,
+[dir="rtl"] .i-arrow-right {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .chevron-left,
+[dir="rtl"] .arrow-left,
+[dir="rtl"] .i-arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Transform 原始值辅助 — 需要保留原始方向的元素 */
+[dir="rtl"] .rtl-no-flip {
+  transform: none !important;
+}
+
+/* Grid — 保持从左到右的网格项不受影响 */
+/* 部分布局如评分星级需要保持 LTR 显示 */
+[dir="rtl"] .ltr-inside {
+  direction: ltr;
+}
+
+/* 输入框内文字方向 */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+}
+
+/* 数字 / 电话输入保持 LTR */
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="number"],
+[dir="rtl"] input[type="email"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* 列表样式 */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+/* Table 对齐 */
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+[dir="rtl"] th.text-left,
+[dir="rtl"] td.text-left {
+  text-align: right;
+}
+
+[dir="rtl"] th.text-right,
+[dir="rtl"] td.text-right {
+  text-align: left;
+}
+
+/* 绝对/固定定位工具类反转 */
+[dir="rtl"] .right-0 { right: auto; left: 0; }
+[dir="rtl"] .left-0 { left: auto; right: 0; }
+[dir="rtl"] .right-1 { right: auto; left: 0.25rem; }
+[dir="rtl"] .left-1 { left: auto; right: 0.25rem; }
+[dir="rtl"] .right-2 { right: auto; left: 0.5rem; }
+[dir="rtl"] .left-2 { left: auto; right: 0.5rem; }
+[dir="rtl"] .right-3 { right: auto; left: 0.75rem; }
+[dir="rtl"] .left-3 { left: auto; right: 0.75rem; }
+[dir="rtl"] .right-4 { right: auto; left: 1rem; }
+[dir="rtl"] .left-4 { left: auto; right: 1rem; }
+[dir="rtl"] .right-5 { right: auto; left: 1.25rem; }
+[dir="rtl"] .left-5 { left: auto; right: 1.25rem; }
+
+/* 平移转换反转 */
+[dir="rtl"] .translate-x-1\/2 {
+  --tw-translate-x: -50%;
+}
+[dir="rtl"] .-translate-x-1\/2 {
+  --tw-translate-x: 50%;
+}
+
+/* Border 反转 */
+[dir="rtl"] .border-l {
+  border-left-width: 0;
+  border-right-width: 1px;
+}
+[dir="rtl"] .border-r {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
+[dir="rtl"] .border-l-2 {
+  border-left-width: 0;
+  border-right-width: 2px;
+}
+[dir="rtl"] .border-r-2 {
+  border-right-width: 0;
+  border-left-width: 2px;
+}
+[dir="rtl"] .border-l-4 {
+  border-left-width: 0;
+  border-right-width: 4px;
+}
+[dir="rtl"] .border-r-4 {
+  border-right-width: 0;
+  border-left-width: 4px;
+}
+
+/* 进度条 / 线性指示器 */
+[dir="rtl"] .progress-fill {
+  transform-origin: right center;
+}
+
+/* 滑动条 */
+[dir="rtl"] input[type="range"] {
+  direction: rtl;
+}
+
+/* 面包屑导航分隔符 */
+[dir="rtl"] .breadcrumb-sep {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* 下拉菜单定位 */
+[dir="rtl"] .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+[dir="rtl"] .dropdown-menu-left {
+  left: 0;
+  right: auto;
+}
+
+/* 步骤条 */
+[dir="rtl"] .steps {
+  direction: rtl;
+}
+
+/* 抽屉/侧边栏动画方向 */
+[dir="rtl"] .drawer-right {
+  right: auto;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+/* Toast / 通知定位 */
+[dir="rtl"] .toast-right {
+  right: auto;
+  left: 1rem;
+}
+
+/* ============================================================
+   Tailwind v4 RTL 辅助类
+   可在 JSX 中直接使用的语义类名
+   ============================================================ */
+
+/* 方向感知的 margin-start / margin-end */
+@utility ms-* {
+  [dir="rtl"] & {
+    margin-right: --value([length]);
+    margin-left: 0;
+  }
+  [dir="ltr"] & {
+    margin-left: --value([length]);
+    margin-right: 0;
+  }
+}
+
+@utility me-* {
+  [dir="rtl"] & {
+    margin-left: --value([length]);
+    margin-right: 0;
+  }
+  [dir="ltr"] & {
+    margin-right: --value([length]);
+    margin-left: 0;
+  }
+}
+
+/* 方向感知的 padding-start / padding-end */
+@utility ps-* {
+  [dir="rtl"] & {
+    padding-right: --value([length]);
+    padding-left: 0;
+  }
+  [dir="ltr"] & {
+    padding-left: --value([length]);
+    padding-right: 0;
+  }
+}
+
+@utility pe-* {
+  [dir="rtl"] & {
+    padding-left: --value([length]);
+    padding-right: 0;
+  }
+  [dir="ltr"] & {
+    padding-right: --value([length]);
+    padding-left: 0;
+  }
+}
+
+/* 方向感知的 start / end 文本对齐 */
+@utility text-start {
+  [dir="rtl"] & {
+    text-align: right;
+  }
+  [dir="ltr"] & {
+    text-align: left;
+  }
+}
+
+@utility text-end {
+  [dir="rtl"] & {
+    text-align: left;
+  }
+  [dir="ltr"] & {
+    text-align: right;
+  }
+}
+
+/* 方向感知的定位 */
+.inset-start-0 {
+  [dir="rtl"] & { right: 0; left: auto; }
+  [dir="ltr"] & { left: 0; right: auto; }
+}
+
+.inset-end-0 {
+  [dir="rtl"] & { left: 0; right: auto; }
+  [dir="ltr"] & { right: 0; left: auto; }
+}
+
+/* RTL 敏感的 flex 容器 */
+@utility rtl-flex-row {
+  [dir="rtl"] & {
+    flex-direction: row-reverse;
+  }
+  [dir="ltr"] & {
+    flex-direction: row;
+  }
+}

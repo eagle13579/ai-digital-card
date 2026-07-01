@@ -1,0 +1,23 @@
+groups:
+- name: slo_alerts
+  rules:
+  - alert: HighErrorRate
+    expr: rate(ncard_http_requests_total{status=~"5.."}[5m]) / rate(ncard_http_requests_total[5m]) > 0.01
+    for: 5m
+    labels: { severity: critical }
+    annotations: { summary: "错误率超过1%" }
+  - alert: SlowResponses
+    expr: histogram_quantile(0.95, rate(ncard_http_request_duration_seconds_bucket[5m])) > 1
+    for: 5m
+    labels: { severity: warning }
+    annotations: { summary: "P95延迟超过1秒" }
+  - alert: LowAvailability
+    expr: (1 - rate(ncard_http_requests_total{status=~"5.."}[1h]) / rate(ncard_http_requests_total[1h])) < 0.999
+    for: 10m
+    labels: { severity: critical }
+    annotations: { summary: "可用性低于99.9%" }
+  - alert: BudgetBurnRate2x
+    expr: (1 - rate(ncard_http_requests_total{status=~"5.."}[1h]) / rate(ncard_http_requests_total[1h])) < 0.999
+    for: 30m
+    labels: { severity: warning, burn_rate: "2x" }
+    annotations: { summary: "2x燃烧速率告警" }

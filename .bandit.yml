@@ -1,0 +1,3 @@
+
+skips: ['B101']
+exclude_dirs: ['tests', '.git', '__pycache__', 'venv', 'node_modules', '_archive', 'backups']

@@ -1,0 +1,22 @@
+# AI 微服务依赖 — 从现有 backend/app/ai/ 模块推导
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# 向量搜索 (vector_search.py)
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# OCR (ocr.py)
+Pillow>=10.0.0
+# paddlepaddle       # 可选：外部 OCR 引擎
+# paddleocr          # 可选：外部 OCR 引擎
+
+# PDF 提取 (extractor.py)
+pdfplumber>=0.10.0
+
+# HTTP 客户端 (writing_assistant.py, extractor.py, rag_pipeline.py)
+httpx>=0.25.0
+
+# 数据访问 — 运行时需与主应用共享
+# SQLAlchemy, redis... 由主应用提供，非此微服务直接持有

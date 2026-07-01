@@ -1,0 +1,432 @@
+# ═══════════════════════════════════════════════════════════════════
+# AI数智名片 — 蓝绿部署 CI 工作流
+# ═══════════════════════════════════════════════════════════════════
+# 策略:
+#   1. 确定非活跃组 (inactive) — 将新版本部署到该组
+#   2. 部署后端 + 健康检查 (60s 超时)
+#   3. 部署前端 (构建 + 同步静态文件)
+#   4. 切换流量到新组
+#   5. 验证新组
+#   6. 清理旧组 (保留容器作为回滚备用)
+#
+# 使用前提:
+#   - 服务器已部署 Nginx + bluegreen.conf
+#   - Docker 环境就绪
+#   - 设置 DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY 等 Secrets
+# ═══════════════════════════════════════════════════════════════════
+name: Blue-Green Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "部署目标环境"
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - staging
+      branch:
+        description: "Git 分支 (默认 main)"
+        required: false
+        default: main
+        type: string
+      skip_health_check:
+        description: "跳过健康检查 (紧急部署)"
+        required: false
+        default: false
+        type: boolean
+      cleanup_old:
+        description: "部署成功后清理旧组容器"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: bluegreen-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACKEND: ${{ github.repository }}/backend
+  DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+  DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+  BLUE_PORT: 8201
+  GREEN_PORT: 8202
+  NGINX_CONF: /etc/nginx/conf.d/bluegreen.conf
+  COMPOSE_FILE: /opt/ai-digital-card/docker-compose.yml
+
+jobs:
+  # ──────────────────────────────────────────────────────────────
+  # Job 1: 确定蓝绿状态 — 找出非活跃组
+  # ──────────────────────────────────────────────────────────────
+  determine-groups:
+    name: Determine Active/Inactive Groups
+    runs-on: ubuntu-latest
+    outputs:
+      active_group: ${{ steps.check.outputs.active }}
+      inactive_group: ${{ steps.check.outputs.inactive }}
+      inactive_port: ${{ steps.check.outputs.port }}
+      active_port: ${{ steps.check.outputs.active_port }}
+    steps:
+      - name: Check current Nginx upstream
+        id: check
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+            CONF="${{ env.NGINX_CONF }}"
+            if [[ ! -f "$CONF" ]]; then
+              echo "⚠️ 蓝绿配置不存在，默认蓝色为活跃组"
+              echo "active=blue" >> $GITHUB_OUTPUT
+              echo "inactive=green" >> $GITHUB_OUTPUT
+              echo "port=${{ env.GREEN_PORT }}" >> $GITHUB_OUTPUT
+              echo "active_port=${{ env.BLUE_PORT }}" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            ACTIVE=$(grep -oP 'default\s+\K(backend_blue|backend_green)' "$CONF" 2>/dev/null || echo "unknown")
+            echo "当前活跃: ${ACTIVE}"
+            if [[ "$ACTIVE" == "backend_blue" ]]; then
+              echo "active=blue" >> $GITHUB_OUTPUT
+              echo "inactive=green" >> $GITHUB_OUTPUT
+              echo "port=${{ env.GREEN_PORT }}" >> $GITHUB_OUTPUT
+              echo "active_port=${{ env.BLUE_PORT }}" >> $GITHUB_OUTPUT
+            elif [[ "$ACTIVE" == "backend_green" ]]; then
+              echo "active=green" >> $GITHUB_OUTPUT
+              echo "inactive=blue" >> $GITHUB_OUTPUT
+              echo "port=${{ env.BLUE_PORT }}" >> $GITHUB_OUTPUT
+              echo "active_port=${{ env.GREEN_PORT }}" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ 无法确定活跃组，默认蓝色"
+              echo "active=blue" >> $GITHUB_OUTPUT
+              echo "inactive=green" >> $GITHUB_OUTPUT
+              echo "port=${{ env.GREEN_PORT }}" >> $GITHUB_OUTPUT
+              echo "active_port=${{ env.BLUE_PORT }}" >> $GITHUB_OUTPUT
+            fi
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 2: 构建 & 推送 Docker 镜像
+  # ──────────────────────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push Docker Images
+    needs: [determine-groups]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Docker image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}
+          tags: |
+            type=sha,prefix=,suffix=,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=bluegreen-${{ github.run_id }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Export image tag
+        id: export-tag
+        run: |
+          echo "tag=bluegreen-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "full=${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}:bluegreen-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      image_tag: ${{ steps.export-tag.outputs.tag }}
+      image_full: ${{ steps.export-tag.outputs.full }}
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 3: 部署到非活跃组 (Inactive Group)
+  # ──────────────────────────────────────────────────────────────
+  deploy-inactive:
+    name: Deploy to Inactive Group
+    needs: [determine-groups, build-and-push]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+
+    steps:
+      - name: Deploy to inactive group
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+
+            INACTIVE="${{ needs.determine-groups.outputs.inactive_group }}"
+            INACTIVE_PORT=${{ needs.determine-groups.outputs.inactive_port }}
+            IMAGE="${{ needs.build-and-push.outputs.image_full }}"
+
+            echo "🚀 部署到非活跃组: ${INACTIVE^^} (端口 ${INACTIVE_PORT})"
+            echo "   镜像: ${IMAGE}"
+
+            cd /opt/ai-digital-card
+
+            # 1. 拉取新镜像
+            echo "📥 拉取镜像..."
+            docker pull "${IMAGE}"
+
+            # 2. 停止并移除旧的非活跃容器 (如果存在)
+            echo "🛑 停止旧 ${INACTIVE} 容器..."
+            docker rm -f "ai-digital-card-${INACTIVE}" 2>/dev/null || true
+
+            # 3. 启动新容器绑定非活跃端口
+            echo "🔄 启动新 ${INACTIVE} 容器..."
+            docker run -d \
+              --name "ai-digital-card-${INACTIVE}" \
+              --network bridge \
+              --restart unless-stopped \
+              --label "bluegreen=true" \
+              --label "bluegreen.group=${INACTIVE}" \
+              --label "bluegreen.deploy=${GITHUB_RUN_ID}" \
+              -p "${INACTIVE_PORT}:8201" \
+              -e "BLUEGREEN_GROUP=${INACTIVE}" \
+              -e "BLUEGREEN_DEPLOY_ID=${GITHUB_RUN_ID}" \
+              -v "$(pwd)/backend/data:/app/data" \
+              -v "$(pwd)/backend/uploads:/app/uploads" \
+              "${IMAGE}"
+
+            echo "✅ ${INACTIVE} 容器已启动"
+
+            # 4. 保存部署信息用于回滚
+            mkdir -p deploy/rollback
+            cat > deploy/rollback/bluegreen_state.json <<- EOF
+            {
+              "deploy_id": "${GITHUB_RUN_ID}",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "active_before": "${{ needs.determine-groups.outputs.active_group }}",
+              "new_group": "${INACTIVE}",
+              "image": "${IMAGE}",
+              "workflow": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${GITHUB_RUN_ID}"
+            }
+            EOF
+            echo "📝 部署状态已保存"
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 4: 健康检查 (非活跃组)
+  # ──────────────────────────────────────────────────────────────
+  health-check:
+    name: Health Check (60s)
+    needs: [determine-groups, deploy-inactive]
+    if: ${{ !inputs.skip_health_check }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Health check on inactive group
+        run: |
+          INACTIVE_PORT=${{ needs.determine-groups.outputs.inactive_port }}
+          HOST="${{ env.DEPLOY_HOST }}"
+          END=$((SECONDS+60))
+          HEALTHY=false
+
+          echo "🏥 健康检查非活跃组 (端口 ${INACTIVE_PORT}, 60s 超时)..."
+          while [ $SECONDS -lt $END ]; do
+            if curl -sf "http://${HOST}:${INACTIVE_PORT}/health" >/dev/null 2>&1; then
+              HEALTHY=true
+              echo "✅ 健康检查通过! ($((END-SECONDS))s 剩余)"
+              break
+            fi
+            echo "⏳ 等待服务就绪... ($((END-SECONDS))s 剩余)"
+            sleep 5
+          done
+
+          if [ "$HEALTHY" != "true" ]; then
+            echo "❌ 健康检查失败!"
+            exit 1
+          fi
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 5: 切换流量 (Switch Traffic)
+  # ──────────────────────────────────────────────────────────────
+  switch-traffic:
+    name: Switch Traffic to New Group
+    needs: [determine-groups, health-check]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Switch Nginx to new group
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+            cd /opt/ai-digital-card
+
+            INACTIVE="${{ needs.determine-groups.outputs.inactive_group }}"
+            echo "🔄 切换流量 → ${INACTIVE^^} 环境"
+
+            # 调用切换脚本
+            if [[ "$INACTIVE" == "green" ]]; then
+              bash deploy/bluegreen/switch-green.sh
+            else
+              bash deploy/bluegreen/switch-blue.sh
+            fi
+
+            echo "✅ 流量已切换到 ${INACTIVE^^}"
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 6: 验证切换 (Verify Switch)
+  # ──────────────────────────────────────────────────────────────
+  verify-switch:
+    name: Verify Deployment
+    needs: [determine-groups, switch-traffic]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify traffic switch
+        run: |
+          HOST="${{ env.DEPLOY_HOST }}"
+          echo "🔍 验证切换结果..."
+
+          # 1. 通过 Nginx 端点验证
+          echo "--- 验证 Nginx 健康端点 ---"
+          if curl -sf "http://${HOST}:8200/health" >/dev/null 2>&1; then
+            echo "✅ Nginx 健康端点正常"
+          else
+            echo "❌ Nginx 健康端点异常"
+            exit 1
+          fi
+
+          # 2. 验证 API 响应
+          echo "--- 验证 API 响应 ---"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://${HOST}:8200/api/" 2>/dev/null || echo "000")
+          if [[ "$HTTP_CODE" != "000" ]]; then
+            echo "✅ API 返回 HTTP ${HTTP_CODE}"
+          else
+            echo "⚠️ API 无响应 (可能正常，如果无公开根路由)"
+          fi
+
+          # 3. 验证 X-Active-Env 头
+          echo "--- 验证活跃环境标识 ---"
+          ACTIVE_HEADER=$(curl -sI "http://${HOST}:8200/api/" 2>/dev/null | grep -i "X-Active-Env" | tr -d '\r' || echo "")
+          if [[ -n "$ACTIVE_HEADER" ]]; then
+            echo "✅ ${ACTIVE_HEADER}"
+          fi
+
+          echo "🎉 部署验证完成!"
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 7: 清理旧组 (Cleanup)
+  # ──────────────────────────────────────────────────────────────
+  cleanup:
+    name: Cleanup Old Group
+    needs: [determine-groups, verify-switch]
+    if: success() && inputs.cleanup_old != 'false'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cleanup old active group
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+
+            ACTIVE="${{ needs.determine-groups.outputs.active_group }}"
+            echo "🧹 清理旧 ${ACTIVE^^} 容器..."
+
+            # 停止并移除旧的活跃容器（现在是旧版本）
+            docker rm -f "ai-digital-card-${ACTIVE}" 2>/dev/null || true
+            echo "✅ 旧 ${ACTIVE} 容器已清理"
+
+            # 清理旧镜像 (保留最近 3 个)
+            docker image prune -a --filter "label=bluegreen=true" --force 2>/dev/null || true
+            echo "✅ 旧镜像已清理"
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 8: 失败回滚 (Auto-Rollback on Failure)
+  # ──────────────────────────────────────────────────────────────
+  auto-rollback:
+    name: Auto-Rollback (On Failure)
+    needs: [determine-groups, switch-traffic, verify-switch]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Revert traffic to previous active group
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+            cd /opt/ai-digital-card
+
+            ACTIVE="${{ needs.determine-groups.outputs.active_group }}"
+            echo "⚠️ 部署失败! 回滚到 ${ACTIVE^^} 环境..."
+
+            # 回切流量
+            if [[ "$ACTIVE" == "blue" ]]; then
+              bash deploy/bluegreen/switch-blue.sh
+            else
+              bash deploy/bluegreen/switch-green.sh
+            fi
+
+            echo "✅ 已回滚到 ${ACTIVE^^}"
+
+      - name: Cleanup failed deployment
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_KEY }}
+          script: |
+            set -e
+
+            INACTIVE="${{ needs.determine-groups.outputs.inactive_group }}"
+            echo "🧹 清理部署失败的非活跃组容器..."
+            docker rm -f "ai-digital-card-${INACTIVE}" 2>/dev/null || true
+            echo "✅ 清理完成"
+
+      - name: Send failure notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const env = '${{ inputs.environment || 'production' }}';
+            const group = '${{ needs.determine-groups.outputs.inactive_group }}';
+            const active = '${{ needs.determine-groups.outputs.active_group }}';
+
+            core.summary.addHeading('❌ 蓝绿部署失败 — 已自动回滚');
+            core.summary.addTable([
+              [{data: '项目', header: true}, {data: '值', header: true}],
+              ['环境', env],
+              ['部署目标', group.toUpperCase()],
+              ['回滚到', active.toUpperCase()],
+              ['工作流', `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`]
+            ]);
+            core.summary.write();

@@ -1,0 +1,108 @@
+<view class="page-container">
+  <loading visible="{{loading}}" />
+
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
+
+    <!-- 用户信息头部 -->
+    <view class="profile-header">
+      <view class="profile-avatar">
+        <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
+      </view>
+      <view class="profile-meta">
+        <text class="profile-name">{{userInfo.name || '未登录'}}</text>
+        <text class="profile-company">{{userInfo.company}} · {{userInfo.title}}</text>
+      </view>
+      <view class="profile-edit" bindtap="goEditCard">
+        <text class="edit-text">编辑</text>
+      </view>
+    </view>
+
+    <!-- 会员信息 -->
+    <view class="card member-card" bindtap="goMember">
+      <view class="card-body member-body">
+        <view class="member-left">
+          <text class="member-level-label">当前等级</text>
+          <text class="member-level-value badge-{{memberLevel}}">{{memberLevelText}}</text>
+          <text class="member-expire" wx:if="{{memberExpire}}">到期: {{memberExpire}}</text>
+        </view>
+        <view class="member-right">
+          <text class="member-upgrade" wx:if="{{memberLevel === 'free'}}">升级会员 ›</text>
+          <text class="member-upgrade" wx:else>查看权益 ›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据概览 -->
+    <view class="card">
+      <view class="card-header">
+        <text class="title">📊 数据概览</text>
+      </view>
+      <view class="stats-grid">
+        <view class="stat-item">
+          <text class="stat-num">{{stats.visitors || 0}}</text>
+          <text class="stat-label">访客数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.matches || 0}}</text>
+          <text class="stat-label">匹配数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.unlocks || 0}}</text>
+          <text class="stat-label">解锁次数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.views || 0}}</text>
+          <text class="stat-label">浏览量</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="card menu-card">
+      <view class="menu-item" bindtap="goAlbum">
+        <text class="menu-icon">🖼️</text>
+        <text class="menu-label">我的画册</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goVisitorLog">
+        <text class="menu-icon">👀</text>
+        <text class="menu-label">访客记录</text>
+        <text class="menu-badge" wx:if="{{newVisitorCount > 0}}">{{newVisitorCount}}</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goTrustNetwork">
+        <text class="menu-icon">🤝</text>
+        <text class="menu-label">信任网络</text>
+        <text class="menu-value">{{trustCount}}人</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goMember">
+        <text class="menu-icon">⭐</text>
+        <text class="menu-label">会员中心</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 设置 -->
+    <view class="card menu-card">
+      <view class="menu-item" bindtap="goPrivacy">
+        <text class="menu-icon">🔒</text>
+        <text class="menu-label">隐私设置</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goAbout">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-label">关于</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-section">
+      <button class="btn-outline logout-btn" bindtap="logout">退出登录</button>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

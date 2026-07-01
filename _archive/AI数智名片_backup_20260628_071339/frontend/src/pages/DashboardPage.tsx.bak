@@ -1,0 +1,244 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Loader2, User, Clock, Eye, Plus, ChevronRight,
+  FileText, CreditCard, Sparkles, Users, Eye as EyeIcon,
+} from 'lucide-react';
+import { api } from '../api/client';
+import { useT } from '../i18n';
+
+// ============================================================
+// 类型定义
+// ============================================================
+interface CardFields {
+  name?: string;
+  position?: string;
+  company?: string;
+  phone?: string;
+  email?: string;
+  wechat?: string;
+  address?: string;
+  website?: string;
+  cover_image?: string;
+}
+
+interface CardListItem {
+  id: number;
+  name: string;
+  fields: CardFields;
+  cover_image?: string;
+  created_at: string;
+  view_count: number;
+}
+
+// ============================================================
+// 辅助函数
+// ============================================================
+function formatDate(dateStr: string | undefined, t: (key: string, vars?: Record<string, string | number>) => string): string {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return t('刚刚');
+    if (minutes < 60) return t('{n}分钟前', { n: minutes });
+    if (hours < 24) return t('{n}小时前', { n: hours });
+    if (days < 30) return t('{n}天前', { n: days });
+
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  } catch {
+    return dateStr || '';
+  }
+}
+
+// ============================================================
+// 仪表盘主页
+// ============================================================
+export default function DashboardPage() {
+  const navigate = useNavigate();
+  const t = useT();
+
+  const [cardList, setCardList] = useState<CardListItem[]>([]);
+  const [listLoading, setListLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  // ============================================================
+  // 列表加载
+  // ============================================================
+  const fetchCardList = useCallback(async () => {
+    setListLoading(true);
+    setError('');
+    try {
+      const res = await api.get('/api/v1/brochure/list');
+      if (res.code === 200 && Array.isArray(res.data)) {
+        setCardList(res.data as CardListItem[]);
+      } else if (res.code === 200 && (res.data as any)?.items) {
+        setCardList((res.data as any).items as CardListItem[]);
+      } else {
+        setCardList([]);
+      }
+    } catch (e: any) {
+      console.error('获取名片列表失败:', e);
+      setCardList([]);
+    } finally {
+      setListLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCardList();
+  }, [fetchCardList]);
+
+  // ============================================================
+  // 统计数据
+  // ============================================================
+  const totalCards = cardList.length;
+  const totalViews = cardList.reduce((sum, c) => sum + (c.view_count || 0), 0);
+
+  // ============================================================
+  // 渲染
+  // ============================================================
+  return (
+    <div className="space-y-6">
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`rounded-xl p-3 text-xs flex items-center justify-between ${
+            toast.type === 'success'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+              : 'bg-rose-50 border border-rose-200 text-rose-700'
+          }`}
+        >
+          <span>{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-2 underline">{t('button.close')}</button>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-700 flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="ml-2 underline">{t('button.close')}</button>
+        </div>
+      )}
+
+      {/* 欢迎横幅 */}
+      <div className="bg-gradient-to-br from-primary to-purple-600 rounded-2xl p-6 text-white">
+        <h2 className="text-xl font-bold">{t('欢迎使用AI数智名片')}</h2>
+        <p className="text-sm text-white/80 mt-1">{t('智能名片生成与管理平台')}</p>
+        <div className="flex gap-4 mt-4">
+          <div className="bg-white/15 rounded-xl px-4 py-2.5 text-center">
+            <p className="text-2xl font-bold">{totalCards}</p>
+            <p className="text-[10px] text-white/70">{t('名片总数')}</p>
+          </div>
+          <div className="bg-white/15 rounded-xl px-4 py-2.5 text-center">
+            <p className="text-2xl font-bold">{totalViews}</p>
+            <p className="text-[10px] text-white/70">{t('累计浏览')}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 快捷操作 */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => navigate('/cards/new')}
+          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-primary to-purple-600 flex items-center justify-center mb-3">
+            <Plus className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-sm font-bold text-on-surface">{t('card.createNew')}</p>
+          <p className="text-xs text-text-muted mt-0.5">{t('AI自动识别生成')}</p>
+        </button>
+        <button
+          onClick={() => navigate('/matching')}
+          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center mb-3">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-sm font-bold text-on-surface">{t('供需匹配')}</p>
+          <p className="text-xs text-text-muted mt-0.5">{t('AI智能匹配商机')}</p>
+        </button>
+      </div>
+
+      {/* 名片列表 */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-primary" />
+            {t('我的名片')}
+          </h3>
+          {totalCards > 0 && (
+            <span className="text-xs text-text-muted">{t('共{n}张', { n: totalCards })}</span>
+          )}
+        </div>
+
+        {listLoading ? (
+          <div className="flex flex-col items-center py-12 gap-3">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <p className="text-sm text-text-muted">{t('加载名片列表...')}</p>
+          </div>
+        ) : cardList.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 border border-border-light text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+              <User className="w-8 h-8 text-text-muted" />
+            </div>
+            <p className="text-sm font-medium text-on-surface">{t('暂无名片')}</p>
+            <p className="text-xs text-text-muted mt-1">{t('点击上方按钮创建您的第一张名片')}</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {cardList.map((card) => (
+              <div
+                key={card.id}
+                onClick={() => navigate(`/cards/${card.id}`)}
+                className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer"
+              >
+                <div className="flex items-start gap-3">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
+                    {(card.fields?.name || card.name || '?')[0]}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-on-surface truncate">
+                      {card.fields?.name || card.name || t('未命名')}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-text-muted">
+                      {card.fields?.position && <span className="truncate">{card.fields.position}</span>}
+                      {card.fields?.position && card.fields?.company && <span>·</span>}
+                      {card.fields?.company && <span className="truncate">{card.fields.company}</span>}
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 text-[11px] text-text-muted">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatDate(card.created_at, t)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {t('card.viewCount', { n: card.view_count ?? 0 })}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-text-muted shrink-0 mt-2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

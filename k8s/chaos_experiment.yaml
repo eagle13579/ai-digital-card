@@ -1,0 +1,70 @@
+---
+# Chaos Mesh 实验配置
+# 前提: 集群已安装 Chaos Mesh (https://chaos-mesh.org)
+# namespace: chaos-mesh 是 Chaos Mesh 控制面所在命名空间
+# target: ai-digital-card deployment（namespace: default）
+
+# ───────── 实验 1: Pod 故障 ─────────
+# 随机杀死 1 个 Pod，验证 Deployment 自愈 & 优雅关闭
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: ai-digital-card-pod-kill
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one                        # 每次只杀 1 个 Pod
+  selector:
+    namespaces:
+      - default
+    labelSelectors:
+      app: ai-digital-card
+  duration: "60s"                  # 持续注入 60 秒（每 30 秒杀一个）
+  scheduler:
+    cron: "@every 30s"
+  gracePeriod: 30                  # 给 Pod 30 秒优雅关闭时间
+---
+# ───────── 实验 2: 网络延迟 ─────────
+# 对目标 Pod 注入 50ms 网络延迟 (jitter ±10ms)，验证超时重试
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: ai-digital-card-network-delay
+  namespace: default
+spec:
+  action: delay
+  mode: all                        # 影响所有匹配 Pod
+  selector:
+    namespaces:
+      - default
+    labelSelectors:
+      app: ai-digital-card
+  delay:
+    latency: "50ms"
+    correlation: "50"
+    jitter: "10ms"
+  duration: "120s"                 # 持续 2 分钟
+  scheduler:
+    cron: "@every 300s"            # 每 5 分钟触发一轮
+---
+# ───────── 实验 3: CPU 压力 ─────────
+# 对目标 Pod 施压 CPU，验证 HPA 自动扩缩容
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: ai-digital-card-cpu-stress
+  namespace: default
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - default
+    labelSelectors:
+      app: ai-digital-card
+  stressors:
+    cpu:
+      workers: 2
+      load: 80                     # 占用 80% CPU
+  duration: "180s"
+  scheduler:
+    cron: "@every 600s"            # 每 10 分钟执行一次

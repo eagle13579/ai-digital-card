@@ -1,0 +1,286 @@
+import React, { useEffect, useState } from 'react';
+import { api } from '../api/client';
+import { useT } from '../i18n';
+
+interface Product {
+  tier: string;
+  name_cn: string;
+  name_en: string;
+  price_cents: number;
+  price_yuan: string;
+  duration_days: number;
+  description_cn: string;
+  description_en: string;
+  quota: number;
+}
+
+const TIER_ICONS: Record<string, string> = {
+  free: '⭐',
+  gold: '🥇',
+  diamond: '💎',
+  board: '👑',
+};
+
+const TIER_COLORS: Record<string, string> = {
+  free: 'from-gray-500 to-gray-600',
+  gold: 'from-yellow-500 to-yellow-700',
+  diamond: 'from-cyan-500 to-blue-600',
+  board: 'from-purple-500 to-purple-700',
+};
+
+const TIER_BORDER: Record<string, string> = {
+  free: 'border-gray-300',
+  gold: 'border-yellow-400',
+  diamond: 'border-cyan-400',
+  board: 'border-purple-400',
+};
+
+const FREE_FEATURES = [
+  '基础名片创建与展示',
+  '基础匹配推荐',
+  '每日3次浏览',
+];
+
+const GOLD_FEATURES = [
+  '每月20次解锁联系人',
+  '高级匹配算法',
+  '无限制名片创建',
+  '访客数据分析',
+];
+
+const DIAMOND_FEATURES = [
+  '每月60次解锁联系人',
+  'AI智能匹配推荐',
+  '详细访客行为分析',
+  '置顶名片展示',
+  '专属客服支持',
+];
+
+const BOARD_FEATURES = [
+  '每月200次解锁联系人',
+  '董事会圈子优先推荐',
+  '全量数据分析报告',
+  '品牌认证标识',
+  '1对1专属顾问',
+  '企业级API接入',
+];
+
+const FEATURES_MAP: Record<string, string[]> = {
+  free: FREE_FEATURES,
+  gold: GOLD_FEATURES,
+  diamond: DIAMOND_FEATURES,
+  board: BOARD_FEATURES,
+};
+
+export default function PricingPage() {
+  const t = useT();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
+  const [payChannel, setPayChannel] = useState<'wechat' | 'alipay'>('wechat');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  async function loadProducts() {
+    try {
+      const res = await api.get<{ products: Product[] }>('/api/payment/products');
+      if (res.code === 200 && res.data) {
+        setProducts(res.data.products);
+      }
+    } catch (e: any) {
+      setError(t('加载定价信息失败'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handlePurchase(tier: string) {
+    setSelectedTier(tier);
+    setError('');
+    setPaying(true);
+
+    try {
+      const res = await api.post<{ order_no: string; pay_info: any }>('/api/payment/create', {
+        tier,
+        channel: payChannel,
+        openid: localStorage.getItem('wechat_openid') || '',
+      });
+
+      if (res.code === 200 && res.data) {
+        const { order_no, pay_info } = res.data;
+        // 跳转到支付
+        if (payChannel === 'alipay' && pay_info.redirect_url) {
+          window.location.href = pay_info.redirect_url;
+        } else {
+          // 微信支付：显示支付信息或调起小程序支付
+          alert(t('订单创建成功！订单号: ') + order_no + '\n' + t('请使用微信完成支付。'));
+          // 实际项目中，小程序内调起 wx.requestPayment
+        }
+      } else {
+        setError(res.message || t('下单失败'));
+      }
+    } catch (e: any) {
+      setError(e.message || t('网络错误'));
+    } finally {
+      setPaying(false);
+      setSelectedTier(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const freeProduct: Product = {
+    tier: 'free',
+    name_cn: '免费版',
+    name_en: 'Free',
+    price_cents: 0,
+    price_yuan: '0.00',
+    duration_days: 99999,
+    description_cn: '基础功能，免费使用',
+    description_en: 'Basic features, free to use',
+    quota: 0,
+  };
+
+  return (
+    <div className="min-h-screen bg-neutral-bg py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-on-surface mb-3">{t('会员定价')}</h1>
+          <p className="text-on-surface-muted max-w-lg mx-auto">
+            {t('选择适合您的会员计划，解锁更多商务人脉机会')}
+          </p>
+        </div>
+
+        {/* Channel Toggle */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-surface rounded-lg p-1 shadow-sm border border-border">
+            <button
+              className={`px-5 py-2 rounded-md text-sm font-medium transition-colors ${
+                payChannel === 'wechat'
+                  ? 'bg-green-500 text-white shadow'
+                  : 'text-on-surface-muted hover:text-on-surface'
+              }`}
+              onClick={() => setPayChannel('wechat')}
+            >
+              {t('微信支付')}
+            </button>
+            <button
+              className={`px-5 py-2 rounded-md text-sm font-medium transition-colors ${
+                payChannel === 'alipay'
+                  ? 'bg-blue-500 text-white shadow'
+                  : 'text-on-surface-muted hover:text-on-surface'
+              }`}
+              onClick={() => setPayChannel('alipay')}
+            >
+              {t('支付宝')}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="max-w-md mx-auto mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Free Card */}
+          <div className="relative bg-surface rounded-xl border border-border p-6 flex flex-col">
+            <div className="text-center mb-4">
+              <span className="text-4xl">{TIER_ICONS.free}</span>
+              <h3 className="text-lg font-bold text-on-surface mt-2">{t('免费版')}</h3>
+              <p className="text-sm text-on-surface-muted">{t('Free')}</p>
+            </div>
+            <div className="text-center mb-4">
+              <span className="text-3xl font-bold text-on-surface">¥0</span>
+              <span className="text-on-surface-muted text-sm">{t(' / 永久')}</span>
+            </div>
+            <div className="flex-grow">
+              <ul className="space-y-2">
+                {FREE_FEATURES.map((f, i) => (
+                  <li key={i} className="flex items-start text-sm text-on-surface">
+                    <span className="text-green-500 mr-2">✓</span>
+                    {t(f)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button
+              disabled
+              className="mt-6 w-full py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+            >
+              {t('当前使用中')}
+            </button>
+          </div>
+
+          {/* Paid Cards */}
+          {products.map((product) => {
+            const features = FEATURES_MAP[product.tier] || [];
+            return (
+              <div
+                key={product.tier}
+                className={`relative bg-surface rounded-xl border-2 ${TIER_BORDER[product.tier] || 'border-border'} p-6 flex flex-col hover:shadow-lg transition-shadow`}
+              >
+                {/* Highlight for Board */}
+                {product.tier === 'board' && (
+                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r ${TIER_COLORS[product.tier]} text-white text-xs font-bold px-4 py-1 rounded-full`}>
+                    {t('最受欢迎')}
+                  </div>
+                )}
+                <div className="text-center mb-4">
+                  <span className="text-4xl">{TIER_ICONS[product.tier] || '🏷️'}</span>
+                  <h3 className="text-lg font-bold text-on-surface mt-2">{product.name_cn}</h3>
+                  <p className="text-sm text-on-surface-muted">{product.name_en}</p>
+                </div>
+                <div className="text-center mb-4">
+                  <span className="text-3xl font-bold text-on-surface">¥{product.price_yuan}</span>
+                  <span className="text-on-surface-muted text-sm">{t(' / ') + product.duration_days + t('天')}</span>
+                </div>
+                <div className="text-center mb-3">
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                    {t('每月 ') + product.quota + t(' 次解锁')}
+                  </span>
+                </div>
+                <div className="flex-grow">
+                  <ul className="space-y-2">
+                    {features.map((f, i) => (
+                      <li key={i} className="flex items-start text-sm text-on-surface">
+                        <span className="text-green-500 mr-2">✓</span>
+                        {t(f)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => handlePurchase(product.tier)}
+                  disabled={paying && selectedTier === product.tier}
+                  className={`mt-6 w-full py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r ${TIER_COLORS[product.tier] || 'from-primary to-primary-dark'} hover:opacity-90 transition-opacity disabled:opacity-50`}
+                >
+                  {paying && selectedTier === product.tier ? t('处理中...') : t('立即开通')}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-12 text-center text-xs text-on-surface-muted">
+          <p>{t('支付即表示您同意我们的服务条款和隐私政策')}</p>
+          <p className="mt-1">{t('会员到期后自动降级为免费版，已使用的配额不重置')}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

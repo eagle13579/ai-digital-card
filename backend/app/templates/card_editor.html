@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Digital Card - Editor</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/stpageflip@1.0.4/dist/stpageflip.min.js"></script>
+    <script src="/static/i18n.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 16px;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            padding: 20px 16px 12px;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+        .step-item.active { color: #f5576c; }
+        .step-item.done { color: #4ade80; }
+        .step-num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        .step-item.active .step-num {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-color: transparent;
+        }
+        .step-item.done .step-num {
+            background: #4ade80;
+            border-color: transparent;
+        }
+        .step-label { margin: 0 4px; }
+        .step-connector {
+            width: 32px; height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 6px;
+        }
+        .step-connector.done { background: #4ade80; }
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #f5576c;
+            background: rgba(245,87,108,0.05);
+        }
+        .field-input {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field-input:focus {
+            border-color: #f5576c;
+        }
+        .field-input::placeholder { color: rgba(255,255,255,0.3); }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,87,108,0.3); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .flip-preview {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            min-height: 400px;
+        }
+        .flip-preview .preview-page {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .match-card {
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 14px;
+            margin: 8px 0;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .tag-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            background: rgba(245,87,108,0.15);
+            color: #f5576c;
+            margin: 2px;
+        }
+        .tag-badge.provide { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #fff; padding: 10px 24px;
+            border-radius: 24px; font-size: 14px; z-index: 9999;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        /* Purpose selector styles */
+        .purpose-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.10);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            flex: 1;
+            min-width: 0;
+        }
+        .purpose-card:hover {
+            background: rgba(255,255,255,0.10);
+            border-color: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+        .purpose-card.selected {
+            background: rgba(245,87,108,0.15);
+            border-color: #f5576c;
+            box-shadow: 0 0 20px rgba(245,87,108,0.15);
+        }
+        .purpose-card .purpose-icon { font-size: 28px; margin-bottom: 6px; }
+        .purpose-card .purpose-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+        .purpose-card .purpose-desc { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+        .purpose-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .purpose-badge.partner { background: rgba(245,87,108,0.15); color: #f5576c; }
+        .purpose-badge.client { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .purpose-badge.investor { background: rgba(250,204,21,0.15); color: #facc15; }
+        .purpose-badge.supplier { background: rgba(96,165,250,0.15); color: #60a5fa; }
+        :root {
+            --theme-primary: #f5576c;
+            --theme-secondary: #f093fb;
+            --theme-gradient: linear-gradient(90deg, #f093fb, #f5576c);
+            --theme-bg-start: #0f0c29;
+            --theme-bg-mid: #302b63;
+            --theme-bg-end: #24243e;
+            --theme-accent: rgba(245,87,108,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div x-data="cardEditor()" class="max-w-lg mx-auto px-4 pb-8">
+        <!-- Header -->
+        <div class="text-center py-4">
+            <div class="text-lg font-bold" style="background:linear-gradient(90deg,#f093fb,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                <span x-text="$t('editor_title')"></span>
+            </div>
+            <div class="text-xs text-white/30 mt-1" x-text="$t('editor_subtitle')"></div>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <template x-for="(s, i) in steps" :key="i">
+                <div style="display:flex;align-items:center;">
+                    <div class="step-item" :class="{'active': step === i, 'done': step > i}">
+                        <div class="step-num" x-text="i + 1"></div>
+                        <span class="step-label hidden sm:inline" x-text="$t(s)"></span>
+                    </div>
+                    <div class="step-connector" :class="{'done': step > i}" x-show="i < steps.length - 1"></div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Step 0: Upload + Purpose -->
+        <div x-show="step === 0" class="glass p-6">
+            <h3 class="text-lg font-semibold mb-4" x-text="$t('upload_title')"></h3>
+            <p class="text-sm text-white/50 mb-4" x-text="$t('upload_hint')"></p>
+            <div class="upload-zone"
+                 @dragover.prevent="dragover = true"
+                 @dragleave="dragover = false"
+                 @drop.prevent="handleDrop($event)"
+                 @click="document.getElementById('fileInput').click()"
+                 :class="{'dragover': dragover}">
+                <div style="font-size:48px;margin-bottom:12px;">📇</div>
+                <div class="text-sm text-white/60" x-text="$t('upload_drag')"></div>
+                <div class="text-xs text-white/30 mt-2" x-text="$t('upload_format')"></div>
+                <input type="file" id="fileInput" accept="image/*,.pdf" class="hidden"
+                       @change="handleFileSelect($event)">
+            </div>
+            <div x-show="uploadedFileName" class="mt-4 p-3 rounded-xl" style="background:rgba(255,255,255,0.05);">
+                <div class="flex items-center gap-3">
+                    <span style="font-size:24px;">📄</span>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium" x-text="uploadedFileName"></div>
+                        <div class="text-xs text-white/40" x-text="uploadedFileSize"></div>
+                    </div>
+                    <span class="text-green-400 text-sm">✅</span>
+                </div>
+            </div>
+
+            <!-- Purpose Selector -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-3" x-text="$t('purpose_title')"></h3>
+                <p class="text-sm text-white/50 mb-4" x-text="$t('purpose_hint')"></p>
+                <div class="grid grid-cols-2 gap-3">
+                    <template x-for="(p, key) in purposeOptions" :key="key">
+                        <div class="purpose-card" :class="{'selected': purpose === key}"
+                             @click="purpose = purpose === key ? '' : key; fetchTemplate(purpose)">
+                            <div class="purpose-icon" x-text="p.icon"></div>
+                            <div class="purpose-label" x-text="$t(p.labelKey)"></div>
+                            <div class="purpose-desc" x-text="$t(p.descKey)"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-full mt-5" @click="step1Extract()" :disabled="!uploadedFileName">
+                <span x-text="$t('ai_extract')"></span>
+            </button>
+        </div>
+
+        <!-- Step 1: Review & Edit -->
+        <div x-show="step === 1" class="glass p-6">
+            <h3 class="text-lg font-semibold mb-4" x-text="$t('review_title')"></h3>
+            <p class="text-sm text-white/50 mb-4" x-text="$t('review_hint')"></p>
+
+            <!-- Purpose badge -->
+            <div x-show="purpose" class="mb-4 flex items-center gap-2">
+                <span class="text-xs text-white/40" x-text="$t('purpose_label')"></span>
+                <span class="purpose-badge" :class="purpose" x-text="$t(purposeOptions[purpose]?.labelKey || purpose)"></span>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_name')"></label>
+                    <input class="field-input" x-model="fields.name" :placeholder="$t('label_name')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_phone')"></label>
+                    <input class="field-input" x-model="fields.phone" :placeholder="$t('phone_placeholder')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_email')"></label>
+                    <input class="field-input" x-model="fields.email" :placeholder="$t('label_email')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_wechat')"></label>
+                    <input class="field-input" x-model="fields.wechat" :placeholder="$t('label_wechat')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_bio')"></label>
+                    <textarea class="field-input" x-model="fields.bio" :placeholder="$t('bio_placeholder')" rows="3"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_company')"></label>
+                    <input class="field-input" x-model="fields.company" :placeholder="$t('label_company')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_title')"></label>
+                    <input class="field-input" x-model="fields.title" :placeholder="$t('label_title')" />
+                </div>
+                <div>
+                    <label class="text-xs text-white/40 mb-1 block" x-text="$t('label_company_intro')"></label>
+                    <textarea class="field-input" x-model="fields.company_intro" :placeholder="$t('company_intro_placeholder')" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button class="btn btn-secondary flex-1" @click="step = 0"><span x-text="$t('btn_back')"></span></button>
+                <button class="btn btn-primary flex-1" @click="step2AutoLayout()"><span x-text="$t('btn_next')"></span></button>
+            </div>
+        </div>
+
+        <!-- Step 2: Preview -->
+        <div x-show="step === 2" class="glass p-6">
+            <h3 class="text-lg font-semibold mb-4" x-text="$t('preview_title')"></h3>
+            <p class="text-sm text-white/50 mb-4" x-text="$t('preview_hint')"></p>
+
+            <div class="flip-preview" id="previewFlipbook">
+                <template x-for="(page, idx) in previewPages" :key="idx">
+                    <div class="preview-page">
+                        <div style="font-size:32px;margin-bottom:8px;" x-text="pageIcons[idx]"></div>
+                        <div style="font-size:15px;font-weight:600;margin-bottom:8px;color:rgba(255,255,255,0.9);"
+                             x-text="$t(pageTitles[idx])"></div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);white-space:pre-wrap;line-height:1.6;"
+                             x-text="page.content"></div>
+                        <img x-show="page.image_url" :src="page.image_url" style="max-width:150px;margin:8px auto;border-radius:12px;" />
+                    </div>
+                </template>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button class="btn btn-secondary flex-1" @click="step = 1"><span x-text="$t('btn_edit')"></span></button>
+                <button class="btn btn-primary flex-1" @click="step3Publish()"><span x-text="$t('btn_publish')"></span></button>
+            </div>
+        </div>
+
+        <!-- Step 3: Matched -->
+        <div x-show="step === 3" class="glass p-6">
+            <div class="text-center mb-4">
+                <div style="font-size:48px;">🎉</div>
+                <h3 class="text-lg font-semibold mt-2" x-text="$t('publish_success')"></h3>
+                <p class="text-sm text-white/50 mt-1" x-text="$t('publish_desc')"></p>
+            </div>
+
+            <div class="glass" style="padding:12px;margin:12px 0;text-align:center;">
+                <div class="text-xs text-white/40 mb-1" x-text="$t('share_link')"></div>
+                <div class="text-sm text-white/80 truncate" x-text="shareUrl"></div>
+                <button class="btn btn-primary text-sm mt-2" style="padding:8px 20px;" @click="copyShareUrl()">
+                    <span x-text="$t('copy_link')"></span>
+                </button>
+            </div>
+
+            <h4 class="text-sm font-semibold mt-4 mb-2" x-text="$t('match_title')"></h4>
+            <div x-show="matches.length === 0" class="text-sm text-white/40 py-4 text-center" x-text="$t('no_match')">
+            </div>
+            <template x-for="m in matches" :key="m.user_id">
+                <div class="match-card">
+                    <div class="flex items-center gap-3">
+                        <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">
+                            👤
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium" x-text="m.user_name"></div>
+                            <div class="text-xs text-white/40" x-text="m.user_company + ' · ' + m.user_title"></div>
+                        </div>
+                        <div class="text-sm font-bold" style="color:#f5576c;" x-text="(m.score * 100).toFixed(0) + '%'"></div>
+                    </div>
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        <template x-for="ct in (m.common_tags || [])" :key="ct.tag">
+                            <span class="tag-badge" :class="ct.direction?.includes('提供') ? 'provide' : ''" x-text="ct.tag"></span>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <div class="flex gap-3 mt-6">
+                <button class="btn btn-secondary flex-1" @click="goHome()"><span x-text="$t('btn_home')"></span></button>
+                <button class="btn btn-primary flex-1" @click="window.location.reload()"><span x-text="$t('btn_new')"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cardEditor() {
+            return {
+                step: 0,
+                steps: ['step_upload', 'step_edit', 'step_preview', 'step_match'],
+                i18nData: {},
+                dragover: false,
+                uploadedFileName: '',
+                uploadedFileSize: '',
+                uploadedFile: null,
+                purpose: '',
+                templateData: null,
+                purposeOptions: {
+                    partner: { icon: '🤝', labelKey: 'purpose_partner', descKey: 'purpose_partner_desc', label: '找合作伙伴', desc: '寻找技术/业务合作方' },
+                    client: { icon: '💰', labelKey: 'purpose_client', descKey: 'purpose_client_desc', label: '找客户', desc: '展示产品或服务能力' },
+                    investor: { icon: '📈', labelKey: 'purpose_investor', descKey: 'purpose_investor_desc', label: '找投资人', desc: '突出团队与融资亮点' },
+                    supplier: { icon: '🔧', labelKey: 'purpose_supplier', descKey: 'purpose_supplier_desc', label: '找供应商', desc: '展示采购需求与合作' },
+                },
+                fields: {
+                    name: '', phone: '', email: '', wechat: '', bio: '', company: '', title: '', company_intro: ''
+                },
+                previewPages: [],
+                pageIcons: ['📇', '📞', '🏢', '📱'],
+                pageTitles: ['page_cover', 'page_contact', 'page_company', 'page_qrcode'],
+                shareUrl: '',
+                matches: [],
+                token: localStorage.getItem('access_token') || '',
+
+                $t(key) { return this.i18nData?.$t(key) || key; },
+
+                async init() {
+                    this.i18nData = await initI18n(navigator.language);
+                    if (!this.token) {
+                        this.mockLogin();
+                    }
+                },
+
+                async fetchTemplate(purpose) {
+                    if (!purpose) return;
+                    try {
+                        const resp = await fetch(`/api/brochures/template/${purpose}`);
+                        if (resp.ok) {
+                            this.templateData = await resp.json();
+                            this.applyTemplateTheme();
+                        }
+                    } catch (e) {
+                        console.warn('获取模板配置失败:', e);
+                    }
+                },
+
+                applyTemplateTheme() {
+                    if (!this.templateData) return;
+                    const theme = this.templateData.theme;
+                    const root = document.documentElement;
+                    root.style.setProperty('--theme-primary', theme.primary);
+                    root.style.setProperty('--theme-secondary', theme.secondary);
+                    root.style.setProperty('--theme-gradient', theme.gradient);
+                    root.style.setProperty('--theme-bg-start', theme.bg_start);
+                    root.style.setProperty('--theme-bg-mid', theme.bg_mid);
+                    root.style.setProperty('--theme-bg-end', theme.bg_end);
+                    root.style.setProperty('--theme-accent', theme.accent);
+
+                    document.body.style.background = `linear-gradient(135deg, ${theme.bg_start}, ${theme.bg_mid}, ${theme.bg_end})`;
+                },
+
+                async mockLogin() {
+                    try {
+                        const resp = await fetch('/api/auth/wx-login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: 'editor_' + Date.now().toString().slice(-4) })
+                        });
+                        if (resp.ok) {
+                            const data = await resp.json();
+                            this.token = data.access_token;
+                            localStorage.setItem('access_token', data.access_token);
+                        }
+                    } catch (e) {
+                        console.warn('Auto-login failed:', e);
+                    }
+                },
+
+                handleDrop(e) {
+                    this.dragover = false;
+                    const file = e.dataTransfer.files[0];
+                    if (file) this.setFile(file);
+                },
+
+                handleFileSelect(e) {
+                    const file = e.target.files[0];
+                    if (file) this.setFile(file);
+                },
+
+                setFile(file) {
+                    this.uploadedFile = file;
+                    this.uploadedFileName = file.name;
+                    this.uploadedFileSize = (file.size / 1024).toFixed(1) + ' KB';
+                },
+
+                async step1Extract() {
+                    if (!this.uploadedFile) return;
+                    this.showToast(this.$t('publishing'));
+
+                    const nameGuess = this.uploadedFileName.replace(/\.(jpg|png|pdf)$/i, '');
+                    this.fields = {
+                        name: nameGuess || '张三',
+                        phone: '13800138000',
+                        email: 'zhang@example.com',
+                        wechat: 'zhangsan_wx',
+                        bio: '',
+                        company: '示例科技有限公司',
+                        title: '产品经理',
+                        company_intro: '',
+                    };
+                    this.step = 1;
+                    this.showToast(this.$t('ai_complete'));
+                },
+
+                async step2AutoLayout() {
+                    const p = this.purpose;
+                    const name = this.fields.name || this.$t('label_name');
+                    const title = this.fields.title || '';
+                    const company = this.fields.company || this.$t('label_company');
+                    const phone = this.fields.phone || this.$t('none');
+                    const email = this.fields.email || this.$t('none');
+                    const wechat = this.fields.wechat || this.$t('none');
+
+                    let coverContent = `${name}\n${title}`;
+                    let contactContent = `📞 ${phone}\n✉️ ${email}\n💬 ${wechat}`;
+                    let companyContent = `🏢 ${company}\n📌 ${title}`;
+                    let extraContent = this.$t('page_scan_qrcode');
+
+                    if (p === 'partner') {
+                        coverContent = `${this.$t('purpose_partner_badge')}\n${name}\n${title}`;
+                        companyContent = `🏢 ${company}\n\n🔗 ${this.$t('page_partner_coop')}\n\n📌 ${this.$t('page_partner_advantage')}`;
+                        extraContent = this.$t('page_partner_cta');
+                    } else if (p === 'client') {
+                        coverContent = `${this.$t('purpose_client_badge')}\n${name}\n${title}`;
+                        companyContent = `🏢 ${company}\n\n🛎️ ${this.$t('page_client_service')}\n\n⭐ ${this.$t('page_client_why')}`;
+                        extraContent = this.$t('page_client_cta');
+                    } else if (p === 'investor') {
+                        coverContent = `${this.$t('purpose_investor_badge')}\n${name}\n${title}`;
+                        companyContent = `🏢 ${company}\n\n👥 ${this.$t('page_investor_team')}\n\n💰 ${this.$t('page_investor_stage')}\n🏆 ${this.$t('page_investor_milestones')}\n\n📊 ${this.$t('page_investor_market')}`;
+                        extraContent = this.$t('page_investor_cta');
+                        this.pageIcons = ['📈', '📞', '👥', '📱'];
+                        this.pageTitles = ['page_cover_investor', 'page_contact', 'page_title_investor_team', 'page_title_investor_qrcode'];
+                    } else if (p === 'supplier') {
+                        coverContent = `${this.$t('purpose_supplier_badge')}\n${name}\n${title}`;
+                        companyContent = `🏢 ${company}\n\n📦 ${this.$t('page_supplier_category')}\n\n✅ ${this.$t('page_supplier_advantage')}\n\n📋 ${this.$t('page_supplier_cases')}`;
+                        extraContent = this.$t('page_supplier_cta');
+                    }
+
+                    this.previewPages = [
+                        { content_type: 'cover', content: coverContent, image_url: '' },
+                        { content_type: 'text', content: contactContent, image_url: '' },
+                        { content_type: 'text', content: companyContent, image_url: '' },
+                        { content_type: 'image', content: extraContent, image_url: '' },
+                    ];
+                    this.step = 2;
+
+                    setTimeout(() => {
+                        if (typeof StPageFlip !== 'undefined') {
+                            const el = document.getElementById('previewFlipbook');
+                            if (el && el.querySelectorAll('.preview-page').length > 0) {
+                                try {
+                                    new StPageFlip(el, {
+                                        width: 280, height: 380, showCover: true,
+                                        maxShadowOpacity: 0.4, flippingTime: 500,
+                                        autoSize: true, swipeDistance: 30,
+                                    }).loadFromHTML(el.querySelectorAll('.preview-page'));
+                                } catch(e) {}
+                            }
+                        }
+                    }, 200);
+                },
+
+                async step3Publish() {
+                    this.showToast(this.$t('publishing'));
+                    try {
+                        const resp = await fetch('/api/brochures', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${this.token}`,
+                            },
+                            body: JSON.stringify({
+                                title: `${this.fields.name}${this.$t('brochure_title_suffix')}`,
+                                cover: '',
+                                purpose: this.purpose,
+                                bio: this.fields.bio,
+                                company_intro: this.fields.company_intro,
+                                pages: this.previewPages.map((p, i) => ({
+                                    sort_order: i,
+                                    content_type: p.content_type,
+                                    content: p.content,
+                                    image_url: p.image_url,
+                                    ai_summary: '',
+                                })),
+                            }),
+                        });
+
+                        if (!resp.ok) {
+                            this.shareUrl = `${window.location.origin}/share/demo_${Date.now().toString(36)}`;
+                            this.matches = this.getDemoMatches();
+                            this.step = 3;
+                            this.showToast(this.$t('publish_demo'));
+                            return;
+                        }
+
+                        const brochure = await resp.json();
+
+                        await fetch(`/api/brochures/${brochure.id}/publish`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${this.token}` },
+                        });
+
+                        this.shareUrl = `${window.location.origin}/api/brochures/share/${brochure.share_token}`;
+
+                        try {
+                            const matchResp = await fetch(`/api/match/engine?min_score=0.1`, {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${this.token}` },
+                            });
+                            if (matchResp.ok) {
+                                const matchData = await matchResp.json();
+                                this.matches = matchData.matches || [];
+                            }
+                        } catch(e) {}
+
+                        this.step = 3;
+                        this.showToast(this.$t('publish_done'));
+                    } catch (e) {
+                        this.showToast(this.$t('error_occurred') + e.message);
+                    }
+                },
+
+                getDemoMatches() {
+                    return [
+                        { user_id: 2, user_name: '李四', user_company: '数据科技公司', user_title: 'CTO', score: 0.85, common_tags: [{tag: 'AI开发', direction: '我提供→对方需要'}, {tag: '云计算', direction: '我需要→对方提供'}] },
+                        { user_id: 3, user_name: '王五', user_company: '创新工场', user_title: '投资经理', score: 0.72, common_tags: [{tag: '创业投资', direction: '我需要→对方提供'}] },
+                    ];
+                },
+
+                copyShareUrl() {
+                    navigator.clipboard.writeText(this.shareUrl).then(() => {
+                        this.showToast(this.$t('link_copied'));
+                    });
+                },
+
+                goHome() {
+                    window.location.href = '/';
+                },
+
+                showToast(msg) {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast';
+                    toast.textContent = msg;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.3s';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 2000);
+                },
+            };
+        }
+    </script>
+
+    <!-- ── PWA Service Worker Registration ── -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js').then((reg) => {
+                    console.log('✅ SW registered:', reg.scope);
+                }).catch((err) => {
+                    console.warn('⚠️ SW registration failed:', err);
+                });
+            });
+        }
+
+        window.addEventListener('offline', () => {
+            const banner = document.createElement('div');
+            banner.id = 'offline-banner';
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:rgba(245,87,108,0.95);color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;z-index:99999;backdrop-filter:blur(10px);';
+            banner.textContent = (window.__i18n && window.__i18n.$t('offline_mode')) || '📡 当前处于离线模式';
+            document.body.prepend(banner);
+        });
+        window.addEventListener('online', () => {
+            const banner = document.getElementById('offline-banner');
+            if (banner) banner.remove();
+        });
+    </script>
+</body>
+</html>

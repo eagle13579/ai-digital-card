@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+addopts = "-v --cov=app --cov-report=term-missing --cov-report=html:coverage_html"
+asyncio_mode = "auto"

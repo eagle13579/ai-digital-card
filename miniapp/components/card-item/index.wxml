@@ -1,0 +1,25 @@
+<view class="card-item" data-id="{{card.id}}" bindtap="onTap">
+  <view class="card-avatar">
+    <image src="{{card.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+    <view class="member-badge badge-{{card.memberLevel || 'free'}}">
+      {{memberLevelText}}
+    </view>
+  </view>
+  <view class="card-info">
+    <view class="card-name">{{card.name}}</view>
+    <view class="card-company">{{card.company}}</view>
+    <view class="card-title">{{card.title}}</view>
+    <view class="card-tags" wx:if="{{card.tags && card.tags.length > 0}}">
+      <view class="tag" wx:for="{{card.tags.slice(0, 3)}}" wx:key="index">{{item}}</view>
+    </view>
+  </view>
+  <view class="card-extra" wx:if="{{showMatch}}">
+    <view class="match-score" wx:if="{{card.matchScore !== undefined}}">
+      <text class="score-value">{{card.matchScore}}%</text>
+      <text class="score-label">匹配度</text>
+    </view>
+    <button class="btn-primary small unlock-btn" wx:if="{{showUnlock}}" bindtap="onUnlock" data-id="{{card.id}}">
+      解锁
+    </button>
+  </view>
+</view>

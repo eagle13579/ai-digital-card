@@ -1,0 +1,36 @@
+# 金丝雀部署配置
+# AI数智名片 - 渐进式发布策略
+# 通过流量权重逐步放量，配合 metrics 指标自动判定是否继续推进
+
+version: '1.0'
+service: ai-card-backend
+
+stages:
+  canary:
+    weight: 10%   # 首批10%流量验证
+    duration: 30m  # 观察窗口30分钟
+    metrics:
+      - error_rate < 1%    # 错误率<1%
+      - p99_latency < 3s   # P99延迟<3秒
+  staging:
+    weight: 50%   # 放大到50%流量
+    duration: 1h   # 观察1小时
+    metrics:
+      - error_rate < 0.5%  # 错误率<0.5%
+      - p99_latency < 2s   # P99延迟<2秒
+  production:
+    weight: 100%  # 全量发布
+    duration: permanent
+
+rollback:
+  trigger: error_rate > 2% for 5m   # 错误率超2%持续5分钟
+  action: revert to previous version # 自动回滚到上一版本
+
+notifications:
+  - channel: wecom     # 企业微信通知
+    events:
+      - stage_passed
+      - rollback_triggered
+  - channel: email     # 邮件通知
+    events:
+      - rollback_triggered

@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-digital-card-read-replica
+  namespace: default
+  labels:
+    app: ai-digital-card
+    tier: read-replica
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-digital-card
+      tier: read-replica
+  template:
+    metadata:
+      labels:
+        app: ai-digital-card
+        tier: read-replica
+    spec:
+      containers:
+        - name: postgres-read
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: "app_read"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-digital-card-secret
+                  key: db-read-password
+            - name: POSTGRES_DB
+              value: "digital_brochure"
+            - name: PGREPL_MODE
+              value: "replica"
+            - name: PGREPL_PRIMARY_HOST
+              value: "ai-digital-card-db-primary"
+            - name: PGREPL_PRIMARY_PORT
+              value: "5432"
+            - name: PGREPL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-digital-card-secret
+                  key: db-repl-password
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - app_read
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ai-digital-card-read-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-digital-card-db-read
+  namespace: default
+  labels:
+    app: ai-digital-card
+    tier: read-replica
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: ai-digital-card
+    tier: read-replica
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-digital-card-app-read
+  namespace: default
+  labels:
+    app: ai-digital-card
+    tier: app-read
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-digital-card
+      tier: app-read
+  template:
+    metadata:
+      labels:
+        app: ai-digital-card
+        tier: app-read
+    spec:
+      containers:
+        - name: ai-digital-card
+          image: registry.digital-card.ai/ai-digital-card:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8201
+              protocol: TCP
+          env:
+            - name: DATABASE_READ_URL
+              value: "postgresql+asyncpg://app_read:$(DB_READ_PASSWORD)@ai-digital-card-db-read:5432/digital_brochure"
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-digital-card-config
+                  key: database-url
+          envFrom:
+            - configMapRef:
+                name: ai-digital-card-config
+            - secretRef:
+                name: ai-digital-card-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "400m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-digital-card-svc-read
+  namespace: default
+  labels:
+    app: ai-digital-card
+    tier: app-read
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8201
+      targetPort: 8201
+  selector:
+    app: ai-digital-card
+    tier: app-read

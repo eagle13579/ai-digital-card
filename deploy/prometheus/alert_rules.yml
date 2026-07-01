@@ -1,0 +1,65 @@
+groups:
+  - name: ai-card-critical
+    interval: 30s
+    rules:
+      # 告警1: 高错误率 — error_rate > 5% for 5min
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(ncard_http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(ncard_http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "API错误率超过5%"
+          description: |
+            最近5分钟内错误率 {{ $value | humanizePercentage }} > 5%阈值。
+            请立即检查后端服务健康状况。
+
+      # 告警2: 高延迟 — p99 > 2s for 5min
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(ncard_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: critical
+          slo: latency
+        annotations:
+          summary: "P99请求延迟超过2秒"
+          description: |
+            最近5分钟内P99延迟 {{ $value | humanizeDuration }} > 2s阈值。
+            可能需要扩容或排查慢调用。
+
+      # 告警3: 慢查询 — slow_query_count > 10 in 5min
+      - alert: SlowQueries
+        expr: |
+          increase(ncard_db_slow_queries_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          slo: db_performance
+        annotations:
+          summary: "数据库慢查询超过10次/5min"
+          description: |
+            最近5分钟内慢查询次数 {{ $value }} > 10次阈值。
+            请检查数据库索引和查询性能。
+
+      # 告警4: 服务离线 — up == 0 for 1min
+      - alert: ServiceDown
+        expr: |
+          up{job="ai-card-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          slo: uptime
+        annotations:
+          summary: "AI名片后端服务离线"
+          description: |
+            服务 {{ $labels.instance }} 已离线超过1分钟。
+            立即响应！检查服务进程或容器状态。

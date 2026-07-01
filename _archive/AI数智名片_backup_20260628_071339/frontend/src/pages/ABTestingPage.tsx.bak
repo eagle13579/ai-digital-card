@@ -1,0 +1,516 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  FlaskConical, Plus, Play, Pause, Square, Trash2,
+  BarChart3, Loader2, CheckCircle, XCircle,
+  ArrowUp, ArrowDown, Minus, AlertTriangle,
+  Eye, MousePointerClick, TrendingUp, RefreshCw,
+} from 'lucide-react';
+import { api } from '../api/client';
+
+// ─── 类型定义 ──────────────────────────────────────────
+
+interface VariantItem {
+  id: number;
+  name: string;
+  description: string;
+  sort_order: number;
+  is_control: boolean;
+  config: Record<string, any> | null;
+  weight: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  views: number;
+}
+
+interface ExperimentItem {
+  id: number;
+  user_id: number;
+  name: string;
+  description: string;
+  status: string;
+  traffic_fraction: number;
+  min_sample_size: number;
+  significance_level: number;
+  metric: string;
+  target_brochure_id: number | null;
+  variants: VariantItem[];
+  cached_results: any;
+  created_at: string;
+  updated_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+}
+
+interface ExperimentListData {
+  items: ExperimentItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+// ─── 工具函数 ──────────────────────────────────────────
+
+function statusLabel(status: string): string {
+  const map: Record<string, string> = {
+    draft: '草稿',
+    running: '运行中',
+    paused: '已暂停',
+    completed: '已完成',
+  };
+  return map[status] || status;
+}
+
+function statusColor(status: string): string {
+  const map: Record<string, string> = {
+    draft: 'text-gray-400 bg-gray-100',
+    running: 'text-green-600 bg-green-50',
+    paused: 'text-amber-600 bg-amber-50',
+    completed: 'text-blue-600 bg-blue-50',
+  };
+  return map[status] || 'text-gray-400 bg-gray-100';
+}
+
+function metricLabel(m: string): string {
+  const map: Record<string, string> = {
+    click_rate: '点击率',
+    view_count: '浏览数',
+    conversion: '转化率',
+  };
+  return map[m] || m;
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleString('zh-CN');
+}
+
+function formatPct(v: number): string {
+  return (v * 100).toFixed(2) + '%';
+}
+
+// ─── 新建实验弹窗 ─────────────────────────────────────
+
+function CreateExperimentModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [metric, setMetric] = useState('click_rate');
+  const [trafficFraction, setTrafficFraction] = useState(1.0);
+  const [minSampleSize, setMinSampleSize] = useState(100);
+  const [significanceLevel, setSignificanceLevel] = useState(0.05);
+  const [variantInputs, setVariantInputs] = useState([
+    { name: '对照组 A', is_control: true },
+    { name: '变体 B', is_control: false },
+  ]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const addVariant = () => {
+    setVariantInputs([...variantInputs, { name: `变体 ${String.fromCharCode(65 + variantInputs.length)}`, is_control: false }]);
+  };
+
+  const removeVariant = (idx: number) => {
+    if (variantInputs.length <= 2) return;
+    setVariantInputs(variantInputs.filter((_, i) => i !== idx));
+  };
+
+  const updateVariant = (idx: number, field: string, value: any) => {
+    const updated = [...variantInputs];
+    (updated[idx] as any)[field] = value;
+    setVariantInputs(updated);
+  };
+
+  const handleSubmit = async () => {
+    if (!name.trim()) { setError('请输入实验名称'); return; }
+    setSubmitting(true);
+    setError('');
+    try {
+      const res = await api.post('/api/ab-test/experiments', {
+        name: name.trim(),
+        description,
+        traffic_fraction: trafficFraction,
+        min_sample_size: minSampleSize,
+        significance_level: significanceLevel,
+        metric,
+        variants: variantInputs.map(v => ({
+          name: v.name,
+          is_control: v.is_control,
+          config: {},
+          weight: 1.0,
+        })),
+      });
+      if (res.code === 200) {
+        onCreated();
+        onClose();
+      } else {
+        setError(res.message || '创建失败');
+      }
+    } catch (e: any) {
+      setError(e.message || '网络错误');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4" onClick={e => e.stopPropagation()}>
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900">创建 A/B 测试实验</h2>
+        </div>
+        <div className="p-6 space-y-4">
+          {error && <div className="text-red-500 text-sm bg-red-50 p-2 rounded">{error}</div>}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">实验名称 *</label>
+            <input className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value={name} onChange={e => setName(e.target.value)} placeholder="例如：首页封面风格测试" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <textarea className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="实验目的说明..." />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">指标</label>
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={metric} onChange={e => setMetric(e.target.value)}>
+                <option value="click_rate">点击率</option>
+                <option value="view_count">浏览数</option>
+                <option value="conversion">转化率</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">流量比例</label>
+              <input type="number" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={trafficFraction} onChange={e => setTrafficFraction(Number(e.target.value))} min={0.01} max={1} step={0.05} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">最小样本量</label>
+              <input type="number" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={minSampleSize} onChange={e => setMinSampleSize(Number(e.target.value))} min={10} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">显著性水平 (α)</label>
+              <input type="number" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={significanceLevel} onChange={e => setSignificanceLevel(Number(e.target.value))} min={0.001} max={0.5} step={0.01} />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">实验版本</label>
+              <button className="text-xs text-blue-600 hover:text-blue-800" onClick={addVariant}>+ 添加变体</button>
+            </div>
+            {variantInputs.map((v, i) => (
+              <div key={i} className="flex items-center gap-2 mb-2">
+                <input
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={v.name}
+                  onChange={e => updateVariant(i, 'name', e.target.value)}
+                  placeholder={`版本 ${i + 1}`}
+                />
+                <label className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
+                  <input type="checkbox" checked={v.is_control} onChange={e => {
+                    const updated = variantInputs.map((vi, idx) => ({ ...vi, is_control: idx === i }));
+                    setVariantInputs(updated);
+                  }} />
+                  控制组
+                </label>
+                {variantInputs.length > 2 && (
+                  <button className="text-red-400 hover:text-red-600" onClick={() => removeVariant(i)}>
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
+          <button className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800" onClick={onClose}>取消</button>
+          <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2" onClick={handleSubmit} disabled={submitting}>
+            {submitting && <Loader2 size={14} className="animate-spin" />}
+            创建实验
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── 实验卡片 ──────────────────────────────────────────
+
+function ExperimentCard({ exp, onAction }: { exp: ExperimentItem; onAction: () => void }) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const doAction = async (action: string) => {
+    setLoading(action);
+    try {
+      const res = await api.post(`/api/ab-test/experiments/${exp.id}/${action}`, {});
+      if (res.code === 200) onAction();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const getResultIcon = () => {
+    const r = exp.cached_results;
+    if (!r || !r.variants || r.variants.length === 0) return null;
+    const best = r.variants.reduce((a: any, b: any) => (a.rate || 0) > (b.rate || 0) ? a : b);
+    if (!best) return null;
+    const test = best.test_result;
+    if (!test) return null;
+    if (test.is_significant) {
+      const lift = test.relative_lift_pct || 0;
+      return (
+        <div className="flex items-center gap-1 text-green-600 text-xs">
+          <ArrowUp size={12} />
+          <span>显著提升 {lift > 0 ? '+' : ''}{lift.toFixed(1)}%</span>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-1 text-gray-400 text-xs">
+        <Minus size={12} />
+        <span>无显著差异</span>
+      </div>
+    );
+  };
+
+  const totalEvents = exp.variants.reduce((s, v) => s + v.impressions + v.clicks + v.views, 0);
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-gray-900 truncate">{exp.name}</h3>
+          {exp.description && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{exp.description}</p>}
+        </div>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(exp.status)}`}>
+          {statusLabel(exp.status)}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+        <span className="flex items-center gap-1"><BarChart3 size={12} />{metricLabel(exp.metric)}</span>
+        <span className="flex items-center gap-1"><Eye size={12} />{totalEvents} 事件</span>
+        <span className="flex items-center gap-1"><TrendingUp size={12} />{exp.variants.length} 版本</span>
+      </div>
+
+      {exp.status === 'completed' && getResultIcon()}
+
+      {/* 变体概览 */}
+      <div className="mt-3 space-y-1">
+        {exp.variants.map(v => (
+          <div key={v.id} className="flex items-center justify-between text-xs">
+            <span className="text-gray-600 truncate max-w-[140px]">
+              {v.is_control ? '🔄 ' : '🔬 '}{v.name}
+            </span>
+            <span className="text-gray-400">{v.impressions} 曝 · {v.clicks} 点</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 操作按钮 */}
+      <div className="mt-4 flex items-center gap-2 border-t border-gray-50 pt-3">
+        {exp.status === 'draft' && (
+          <>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 disabled:opacity-50" onClick={() => doAction('start')} disabled={loading !== null}>
+              {loading === 'start' ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />} 启动
+            </button>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100" onClick={() => navigate(`/ab-testing/${exp.id}`)}>
+              编辑
+            </button>
+          </>
+        )}
+        {exp.status === 'running' && (
+          <>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 disabled:opacity-50" onClick={() => doAction('pause')} disabled={loading !== null}>
+              {loading === 'pause' ? <Loader2 size={12} className="animate-spin" /> : <Pause size={12} />} 暂停
+            </button>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50" onClick={() => doAction('stop')} disabled={loading !== null}>
+              {loading === 'stop' ? <Loader2 size={12} className="animate-spin" /> : <Square size={12} />} 结束
+            </button>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 text-gray-500 rounded-lg hover:bg-gray-50" onClick={() => navigate(`/ab-testing/${exp.id}`)}>
+              详情
+            </button>
+          </>
+        )}
+        {exp.status === 'paused' && (
+          <>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 disabled:opacity-50" onClick={() => doAction('resume')} disabled={loading !== null}>
+              {loading === 'resume' ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />} 恢复
+            </button>
+            <button className="flex items-center gap-1 text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50" onClick={() => doAction('stop')} disabled={loading !== null}>
+              {loading === 'stop' ? <Loader2 size={12} className="animate-spin" /> : <Square size={12} />} 结束
+            </button>
+          </>
+        )}
+        {exp.status === 'completed' && (
+          <button className="flex items-center gap-1 text-xs px-3 py-1.5 text-gray-600 rounded-lg hover:bg-gray-50" onClick={() => navigate(`/ab-testing/${exp.id}`)}>
+            查看结果
+          </button>
+        )}
+        {exp.status === 'draft' && (
+          <button className="flex items-center gap-1 text-xs px-3 py-1.5 text-red-400 hover:text-red-600 ml-auto disabled:opacity-50" onClick={async () => {
+            if (!confirm('确定删除该实验？')) return;
+            const res = await api.request(`/api/ab-test/experiments/${exp.id}`, { method: 'DELETE' });
+            if (res.code === 200) onAction();
+          }}>
+            <Trash2 size={12} /> 删除
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── 主要页面组件 ───────────────────────────────────────
+
+export default function ABTestingPage() {
+  const [experiments, setExperiments] = useState<ExperimentItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [filter, setFilter] = useState<string>('all');
+
+  const fetchExperiments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get<ExperimentListData>(`/api/ab-test/experiments?page=${page}&page_size=${pageSize}`);
+      if (res.data) {
+        let items = res.data.items || [];
+        if (filter !== 'all') {
+          items = items.filter(e => e.status === filter);
+        }
+        setExperiments(items);
+        setTotal(res.data.total || 0);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, pageSize, filter]);
+
+  useEffect(() => { fetchExperiments(); }, [fetchExperiments]);
+
+  const tabs = [
+    { key: 'all', label: '全部' },
+    { key: 'running', label: '运行中' },
+    { key: 'draft', label: '草稿' },
+    { key: 'completed', label: '已完成' },
+    { key: 'paused', label: '已暂停' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 顶部导航 */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FlaskConical size={22} className="text-blue-600" />
+            <h1 className="text-lg font-semibold text-gray-900">A/B 测试</h1>
+          </div>
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+            onClick={() => setShowCreate(true)}
+          >
+            <Plus size={16} />
+            创建实验
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* 过滤器 */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              className={`px-4 py-1.5 text-sm rounded-full whitespace-nowrap transition-colors ${
+                filter === tab.key
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              }`}
+              onClick={() => { setFilter(tab.key); setPage(1); }}
+            >
+              {tab.label}
+              {tab.key === 'all' && total > 0 && ` (${total})`}
+            </button>
+          ))}
+        </div>
+
+        {/* 加载状态 */}
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 size={28} className="animate-spin text-blue-500" />
+          </div>
+        )}
+
+        {/* 空状态 */}
+        {!loading && experiments.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+            <FlaskConical size={48} className="mb-4 opacity-40" />
+            <p className="text-lg font-medium mb-1">还没有 A/B 测试实验</p>
+            <p className="text-sm mb-4">创建实验来优化你的名片设计吧</p>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+              onClick={() => setShowCreate(true)}
+            >
+              <Plus size={16} />
+              创建首个实验
+            </button>
+          </div>
+        )}
+
+        {/* 实验列表 */}
+        {!loading && experiments.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {experiments.map(exp => (
+                <ExperimentCard key={exp.id} exp={exp} onAction={fetchExperiments} />
+              ))}
+            </div>
+
+            {/* 分页 */}
+            {total > pageSize && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30"
+                  disabled={page <= 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  上一页
+                </button>
+                <span className="text-sm text-gray-500">第 {page} / {Math.ceil(total / pageSize)} 页</span>
+                <button
+                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30"
+                  disabled={page >= Math.ceil(total / pageSize)}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  下一页
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* 创建弹窗 */}
+      {showCreate && (
+        <CreateExperimentModal
+          onClose={() => setShowCreate(false)}
+          onCreated={fetchExperiments}
+        />
+      )}
+    </div>
+  );
+}

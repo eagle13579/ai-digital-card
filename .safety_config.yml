@@ -1,0 +1,24 @@
+# .safety_config.yml — 依赖漏洞扫描配置 (Safety 2.x format)
+# 使用: safety check --file backend/requirements.txt --policy-file .safety_config.yml
+
+security:
+  ## 忽略已知误报（确认不影响项目使用的 CVE）
+  ignore:
+    # 示例: aiohttp < 3.8.6 的 CVE-2024-23334（若已固定版本）
+    # - "CVE-2024-23334"
+
+  ## 最低严重级别阈值: critical / high / medium / low
+  threshold: high
+
+  ## Python 版本适配
+  python_version: "3.11"
+
+  ## 数据库来源
+  db: "https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure_full.json"
+
+  ## 报告格式: json / text / screen
+  output: screen
+
+  ## 仅扫描生产依赖（排除 dev/tests）
+  groups:
+    - prod

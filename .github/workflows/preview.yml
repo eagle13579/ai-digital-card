@@ -1,0 +1,250 @@
+# ───────────────────────────────────────────────────────
+# AI数智名片 — Preview Deploy (PR预览部署) CI 工作流
+# 当 PR 打开/同步/重新打开时触发，自动构建并部署到预览环境
+# 预览地址: https://preview-{PR_NUMBER}.ai-card.com
+# ───────────────────────────────────────────────────────
+# 所需 Secrets:
+#   DOCKER_USERNAME       — 镜像仓库用户名
+#   DOCKER_PASSWORD       — 镜像仓库密码/Token
+#   PREVIEW_SSH_HOST      — 预览服务器主机名或 IP
+#   PREVIEW_SSH_USER      — 预览服务器 SSH 用户
+#   PREVIEW_SSH_KEY       — 预览服务器 SSH 私钥
+#   PREVIEW_DOMAIN_SUFFIX — 预览域名后缀（如 .ai-card.com）
+#   GITHUB_TOKEN          — 自动提供，用于 PR 评论
+# ───────────────────────────────────────────────────────
+name: Preview Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BACKEND: ${{ github.repository }}/backend
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  PREVIEW_HOST: preview-${{ github.event.pull_request.number }}.ai-card.com
+
+jobs:
+  # ────────────────────────────────────────────────────
+  # Job 1: 构建前端
+  # ────────────────────────────────────────────────────
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend (preview)
+        run: |
+          echo "VITE_API_BASE_URL=https://api-preview-${{ env.PR_NUMBER }}.ai-card.com" > .env.preview
+          npm run build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-pr-${{ env.PR_NUMBER }}
+          path: frontend/dist
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────
+  # Job 2: 构建后端 Docker 镜像 (标记 PR-{number})
+  # ────────────────────────────────────────────────────
+  build-backend:
+    name: Build Backend Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.tag.outputs.tag }}
+      image_full: ${{ steps.tag.outputs.full }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: tag
+        run: |
+          TAG="pr-${{ env.PR_NUMBER }}-${GITHUB_SHA::7}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "full=${REGISTRY}/${IMAGE_BACKEND}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ steps.tag.outputs.full }}
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=preview-pr-${{ env.PR_NUMBER }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify image exists
+        run: |
+          echo "✅ 后端镜像构建完成: ${{ steps.tag.outputs.full }}"
+
+  # ────────────────────────────────────────────────────
+  # Job 3: 部署到预览服务器
+  # ────────────────────────────────────────────────────
+  deploy-preview:
+    name: Deploy to Preview Environment
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    environment:
+      name: preview-pr-${{ env.PR_NUMBER }}
+      url: https://${{ env.PREVIEW_HOST }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-pr-${{ env.PR_NUMBER }}
+          path: frontend/dist
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PREVIEW_SSH_KEY }}
+
+      - name: Run preview deploy script
+        run: |
+          chmod +x deploy/preview.sh
+          bash deploy/preview.sh \
+            --pr-number "${{ env.PR_NUMBER }}" \
+            --image "${{ needs.build-backend.outputs.image_full }}" \
+            --domain "${{ env.PREVIEW_HOST }}" \
+            --ssh-host "${{ secrets.PREVIEW_SSH_HOST }}" \
+            --ssh-user "${{ secrets.PREVIEW_SSH_USER }}" \
+            --repo "${{ github.repository }}"
+
+      - name: Health check
+        run: |
+          echo "🏥 预览环境健康检查中..."
+          sleep 10
+          HEALTH_URL="https://${{ env.PREVIEW_HOST }}/health"
+          for i in $(seq 1 12); do
+            if curl -sf "$HEALTH_URL" > /dev/null 2>&1; then
+              echo "✅ 预览环境健康检查通过 (第 ${i} 次)"
+              exit 0
+            fi
+            echo "⏳ 等待服务就绪... ($((12 - i)) 次剩余)"
+            sleep 5
+          done
+          echo "❌ 预览环境健康检查失败"
+          exit 1
+
+  # ────────────────────────────────────────────────────
+  # Job 4: 在 PR 上添加评论（预览链接 + 构建状态）
+  # ────────────────────────────────────────────────────
+  add-pr-comment:
+    name: Add Preview Comment to PR
+    needs: [build-frontend, build-backend, deploy-preview]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const prNumberEnv = '${{ env.PR_NUMBER }}';
+            const previewHost = 'https://preview-' + prNumberEnv + '.ai-card.com';
+            const backendImage = '${{ needs.build-backend.outputs.image_full }}';
+            const sha = context.sha.slice(0, 7);
+            const success = '${{ needs.deploy-preview.result }}' === 'success';
+
+            const statusEmoji = success ? '\u2705' : '\u274C';
+            const statusText = success ? '\u90E8\u7F72\u6210\u529F' : '\u90E8\u7F72\u5931\u8D25';
+            const statusColor = success ? 'brightgreen' : 'red';
+
+            // Build comment body without YAML-unfriendly markdown table pipes
+            const lines = [];
+            lines.push('## ' + statusEmoji + ' Preview Deploy - PR #' + prNumberEnv);
+            lines.push('');
+            lines.push('| Item | Value |');
+            lines.push('|------|-------|');
+            lines.push('| **Preview URL** | [' + previewHost + '](' + previewHost + ') |');
+            lines.push('| **Backend Image** | `' + backendImage + '` |');
+            lines.push('| **Commit** | ' + sha + ' |');
+            lines.push('| **Status** | ![](https://img.shields.io/badge/status-' + encodeURIComponent(statusText) + '-' + statusColor + ') |');
+            lines.push('| **Triggered By** | ' + context.actor + ' |');
+            lines.push('| **Workflow Run** | [View Logs](' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ') |');
+            lines.push('');
+            lines.push('---');
+            lines.push('');
+            lines.push('### Quick Links');
+            lines.push('');
+            lines.push('| Service | URL |');
+            lines.push('|---------|-----|');
+            lines.push('| Frontend | [' + previewHost + '](' + previewHost + ') |');
+            lines.push('| API Docs | https://api-preview-' + prNumberEnv + '.ai-card.com/docs |');
+            lines.push('| Health   | ' + previewHost + '/health |');
+            lines.push('');
+            lines.push('> Preview environment will be automatically destroyed when PR is closed.');
+            lines.push('');
+
+            const body = lines.join('\n');
+
+            // Find existing comment to avoid duplicates
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const previewComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Preview Deploy')
+            );
+
+            if (previewComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previewComment.id,
+                body: body,
+              });
+              console.log('Updated existing PR comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+              console.log('Created new PR comment');
+            }

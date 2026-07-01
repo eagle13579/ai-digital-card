@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- ── 基础 meta ── -->
+    <title>{PAGE_TITLE}</title>
+    <meta name="description" content="{SEO_DESCRIPTION}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{OG_URL}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- ── OpenGraph / Facebook / LinkedIn ── -->
+    <meta property="og:type" content="{OG_TYPE}">
+    <meta property="og:title" content="{OG_TITLE}">
+    <meta property="og:description" content="{OG_DESCRIPTION}">
+    <meta property="og:url" content="{OG_URL}">
+    <meta property="og:image" content="{OG_IMAGE}">
+    <meta property="og:image:width" content="400">
+    <meta property="og:image:height" content="400">
+    <meta property="og:site_name" content="AI数智名片">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- ── Twitter Card ── -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{OG_TITLE}">
+    <meta name="twitter:description" content="{OG_DESCRIPTION}">
+    <meta name="twitter:image" content="{OG_IMAGE}">
+
+    <!-- ── Schema.org JSON-LD ── -->
+    <script type="application/ld+json">
+{SCHEMA_JSON}
+    </script>
+
+    <!-- ── Styles ── -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(160deg, #0f0c29 0%, #302b63 40%, #24243e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e0e0e0;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+        }
+        .profile-avatar {
+            width: 96px; height: 96px; border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.15);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; font-weight: 700; color: white;
+        }
+        .profile-name {
+            font-size: 24px; font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .profile-title {
+            font-size: 15px; color: rgba(255,255,255,0.6);
+        }
+        .profile-intro {
+            font-size: 14px; color: rgba(255,255,255,0.5);
+            line-height: 1.6; max-width: 600px; margin: 0 auto;
+        }
+        .section-title {
+            font-size: 18px; font-weight: 600; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .brochure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .brochure-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .brochure-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(102,126,234,0.15);
+        }
+        .card-cover {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea33, #764ba233);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .card-cover-fallback {
+            font-size: 32px;
+            opacity: 0.5;
+        }
+        .card-body {
+            padding: 14px 16px 16px;
+        }
+        .card-body h3 {
+            font-size: 16px; font-weight: 600; margin-bottom: 4px;
+        }
+        .card-body p {
+            font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px;
+        }
+        .card-date {
+            font-size: 12px; color: rgba(255,255,255,0.3);
+        }
+        .empty-state {
+            text-align: center; padding: 40px 20px;
+            color: rgba(255,255,255,0.4); font-size: 14px;
+        }
+        .empty-state svg {
+            width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.3;
+        }
+        .contact-bar {
+            display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+        }
+        .contact-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 20px; border-radius: 20px;
+            font-size: 14px; font-weight: 500; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #c0c0c0;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .contact-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: white;
+        }
+        .contact-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+        }
+        .contact-btn.primary:hover {
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+        .footer {
+            text-align: center; padding: 24px; font-size: 12px; color: rgba(255,255,255,0.25);
+        }
+        .footer a { color: rgba(255,255,255,0.35); text-decoration: none; }
+        .footer a:hover { color: rgba(255,255,255,0.6); }
+    </style>
+</head>
+<body>
+
+    <!-- ══════════ 主容器 ══════════ -->
+    <div style="max-width: 960px; margin: 0 auto; padding: 24px 16px;">
+
+        <!-- ── Profile 卡片 ── -->
+        <div class="glass-card" style="padding: 32px 24px; text-align: center; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <!-- 头像 -->
+                <img class="profile-avatar"
+                     src="{USER_AVATAR}"
+                     alt="{USER_NAME}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div class="profile-avatar" style="display:none;">{USER_INITIAL}</div>
+
+                <!-- 名称 -->
+                <h1 class="profile-name">{USER_NAME}</h1>
+
+                <!-- 职位 · 公司 -->
+                <div class="profile-title">{USER_TITLE_AND_COMPANY}</div>
+
+                <!-- 简介 -->
+                <div class="profile-intro">{USER_INTRO}</div>
+
+                <!-- 联系按钮 -->
+                <div class="contact-bar">
+                    <a href="/u/{USERNAME}" class="contact-btn primary">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        查看名片
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 名片画册 ── -->
+        <div style="margin-bottom: 24px;">
+            <div class="section-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                公开名片
+            </div>
+            <div class="brochure-grid">
+                {BROCHURE_CARDS}
+            </div>
+        </div>
+
+        <!-- ── Footer ── -->
+        <div class="footer">
+            <p>由 <a href="{OG_URL}">AI数智名片</a> 提供技术支持</p>
+        </div>
+
+    </div>
+
+</body>
+</html>

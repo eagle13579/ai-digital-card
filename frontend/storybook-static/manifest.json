@@ -1,0 +1,50 @@
+{
+  "name": "AI数智名片 | 智能名片生成与管理平台",
+  "short_name": "AI数智名片",
+  "description": "AI驱动的智能名片生成与管理平台 — 上传名片照片，AI自动提取信息，一键生成精美数字画册，智能供需匹配",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "scope": "/",
+  "categories": ["business", "productivity", "utilities"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "创建新名片",
+      "short_name": "新建",
+      "description": "使用AI扫描创建新名片",
+      "url": "/cards/new?mode=new"
+    },
+    {
+      "name": "匹配中心",
+      "short_name": "匹配",
+      "description": "AI智能供需匹配",
+      "url": "/matching"
+    },
+    {
+      "name": "信任网络",
+      "short_name": "网络",
+      "description": "管理人脉与访客",
+      "url": "/network"
+    }
+  ]
+}

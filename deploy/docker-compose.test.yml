@@ -1,0 +1,181 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# docker-compose.test.yml — AI 数智名片 测试环境
+#
+# 用途: 在隔离的 Docker 环境中运行后端 pytest 测试套件
+# 包含 PostgreSQL + Redis 真实依赖，避免 mock 导致的漏测
+#
+# 使用方式:
+#   cd D:\AI数智名片
+#   docker compose -f deploy/docker-compose.test.yml up --abort-on-container-exit
+#   docker compose -f deploy/docker-compose.test.yml down -v
+#
+# 注意:
+#   - test-runner 会自动等待 test-db 和 test-redis 就绪
+#   - 测试完成后容器自动退出（exit code = pytest 结果）
+#   - 覆写覆盖报告到 ./coverage-reports/ 目录
+# ──────────────────────────────────────────────────────────────────────────────
+
+version: "3.8"
+
+services:
+
+  # ── 测试用 PostgreSQL ─────────────────────────────────────────────────────
+  test-db:
+    image: postgres:16-alpine
+    container_name: ai-digital-card-test-db
+    profiles: ["test"]
+    restart: "no"
+    environment:
+      POSTGRES_DB: digital_brochure_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass_123
+      # 禁用同步提交以提升测试速度
+      POSTGRES_SYNCHRONOUS_COMMIT: "off"
+      PG_CONFIG: |
+        max_connections = 50
+        shared_buffers = 256MB
+    ports:
+      # 暴露到宿主机便于调试：docker compose ... up 时可用
+      - "15432:5432"
+    volumes:
+      # 临时数据卷，测试结束后自动销毁
+      - test_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d digital_brochure_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - test-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── 测试用 Redis ──────────────────────────────────────────────────────────
+  test-redis:
+    image: redis:7-alpine
+    container_name: ai-digital-card-test-redis
+    profiles: ["test"]
+    restart: "no"
+    command:
+      # 禁用持久化，提升测试速度
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+      - --loglevel
+      - warning
+      - --maxmemory
+      - 128mb
+      - --maxmemory-policy
+      - allkeys-lru
+    ports:
+      - "16379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    networks:
+      - test-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── 测试运行器 ────────────────────────────────────────────────────────────
+  test-runner:
+    container_name: ai-digital-card-test-runner
+    profiles: ["test"]
+    restart: "no"
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      # 多阶段构建：测试阶段在基础镜像上安装测试依赖
+      target: development
+    # 覆写默认 CMD，执行测试
+    command: >
+      sh -c "
+        echo '=== Waiting for PostgreSQL...' &&
+        until pg_isready -h test-db -U test_user -d digital_brochure_test 2>/dev/null; do
+          sleep 2;
+        done &&
+        echo 'PostgreSQL is ready.' &&
+        echo '=== Waiting for Redis...' &&
+        until redis-cli -h test-redis ping 2>/dev/null | grep -q PONG; do
+          sleep 1;
+        done &&
+        echo 'Redis is ready.' &&
+        echo '=== All dependencies ready, running tests ===' &&
+        python -m pytest tests/ \
+          -v \
+          --tb=short \
+          --cov=app \
+          --cov-report=term-missing \
+          --cov-report=xml:/app/test-reports/coverage.xml \
+          --cov-report=html:/app/test-reports/htmlcov \
+          --junitxml=/app/test-reports/pytest.xml \
+          -o testpaths=tests
+      "
+    environment:
+      # ── 数据库 ──
+      DATABASE_URL: postgresql+asyncpg://test_user:test_pass_123@test-db:5432/digital_brochure_test
+      # ── Redis ──
+      REDIS_HOST: test-redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      REDIS_PASSWORD: ""
+      # ── 认证 ──
+      JWT_SECRET: test-jwt-secret-key-for-ci-32chars-minimum!!
+      # ── AI 服务（测试中禁用外部调用）──
+      DEEPSEEK_API_KEY: ""
+      USE_VECTOR_SEARCH: "false"
+      EMBEDDING_PROVIDER: "numpy"
+      # ── 外部集成（测试中禁用）──
+      CHAINKE_API_URL: ""
+      SENTRY_DSN: ""
+      # ── 文件上传 ──
+      UPLOAD_DIR: /app/test-uploads
+      # ── 日志 ──
+      LOG_LEVEL: WARNING
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # 挂载测试报告输出
+      - ../coverage-reports:/app/test-reports
+      # 挂载测试代码（用于热重载调试）
+      - ../backend/tests:/app/tests:ro
+      - ../backend/app:/app/app:ro
+    depends_on:
+      test-db:
+        condition: service_healthy
+      test-redis:
+        condition: service_healthy
+    networks:
+      - test-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ── 持久卷（测试结束后可用 down -v 清理）─────────────────────────────────
+volumes:
+  test_pgdata:
+    driver: local
+    name: ai-digital-card-test-pgdata
+
+# ── 网络 ────────────────────────────────────────────────────────────────────
+networks:
+  test-net:
+    name: ai-digital-card-test-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
