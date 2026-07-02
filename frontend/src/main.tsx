@@ -2,6 +2,7 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import './styles/global.css';
 import {initWebVitals} from './utils/performance.ts';
 import {registerSW} from './registerSW.ts';
 
