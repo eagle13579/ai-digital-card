@@ -266,3 +266,46 @@
 .bottom-placeholder {
   height: 80px;
 }
+
+/* 创建资源平台入口卡片 */
+.platform-entry {
+  overflow: hidden;
+  padding: 0 !important;
+  margin-top: 4px;
+}
+.platform-entry-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--radius-md);
+}
+.platform-entry-content {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+.platform-entry-icon {
+  font-size: 32px;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+.platform-entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.platform-entry-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  display: block;
+}
+.platform-entry-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 2px;
+  display: block;
+}
+.platform-entry-arrow {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+  margin-left: 8px;
+}

@@ -49,11 +49,6 @@
         <text class="action-icon">📤</text>
         <text class="action-label">分享名片</text>
       </view>
-      <!-- 创建资源平台入口 -->
-      <view class="action-item" bindtap="goCreatePlatform">
-        <text class="action-icon">🏗️</text>
-        <text class="action-label">资源平台</text>
-      </view>
     </view>
 
     <!-- 我的名片卡片 -->
@@ -67,6 +62,20 @@
         <view class="brochure-info">
           <text class="brochure-name">{{brochure.title || '我的AI数智名片'}}</text>
           <text class="brochure-stats">{{brochure.viewCount || 0}}次浏览 · {{brochure.pageCount || 0}}页</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 创建资源平台入口 -->
+    <view class="card platform-entry" bindtap="goCreatePlatform">
+      <view class="platform-entry-bg">
+        <view class="platform-entry-content">
+          <text class="platform-entry-icon">🏗️</text>
+          <view class="platform-entry-text">
+            <text class="platform-entry-title">创建资源平台</text>
+            <text class="platform-entry-desc">发布资源供需 · AI智能匹配</text>
+          </view>
+          <text class="platform-entry-arrow">›</text>
         </view>
       </view>
     </view>
