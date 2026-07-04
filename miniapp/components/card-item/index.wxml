@@ -1,6 +1,6 @@
 <view class="card-item" data-id="{{card.id}}" bindtap="onTap">
   <view class="card-avatar">
-    <image src="{{card.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+    <image class="card-avatar-img" src="{{card.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
     <view class="member-badge badge-{{card.memberLevel || 'free'}}">
       {{memberLevelText}}
     </view>

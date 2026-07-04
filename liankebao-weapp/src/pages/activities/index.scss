@@ -1,0 +1,311 @@
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  Activities page — 活动中心                                                  */
+/* ========================================================================== */
+
+.activities {
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+/* ========================================================================== */
+/*  页面头部                                                                   */
+/* ========================================================================== */
+
+.activities__header {
+  padding: $spacing-xl $page-padding $spacing-md;
+
+  &-title {
+    display: block;
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  状态筛选                                                                   */
+/* ========================================================================== */
+
+.activities__filters {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0 $page-padding $spacing-md;
+}
+
+.activities__filter-tab {
+  height: 56px;
+  padding: 0 $spacing-lg;
+  border-radius: 28px;
+  background: $color-bg-white;
+  border: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &--active {
+    background: $color-primary;
+    border-color: $color-primary;
+
+    .activities__filter-label {
+      color: #fff;
+    }
+  }
+}
+
+.activities__filter-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: 500;
+}
+
+/* ========================================================================== */
+/*  统计信息                                                                   */
+/* ========================================================================== */
+
+.activities__stats {
+  padding: 0 $page-padding $spacing-sm;
+
+  &-text {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  滚动区域                                                                   */
+/* ========================================================================== */
+
+.activities__scroll {
+  height: calc(100vh - 200px);
+  padding: 0 $page-padding;
+}
+
+/* ========================================================================== */
+/*  活动卡片                                                                   */
+/* ========================================================================== */
+
+.activities__list {
+  padding-bottom: $spacing-md;
+}
+
+.activities__card {
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+
+  &-cover-wrap {
+    position: relative;
+  }
+
+  &-cover {
+    width: 100%;
+    height: 300px;
+    background: $color-border-light;
+  }
+
+  &-body {
+    padding: $spacing-md;
+  }
+
+  &-title {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+    line-height: 1.4;
+  }
+
+  &-meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: 6px;
+  }
+
+  &-desc {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    margin-bottom: $spacing-sm;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-md;
+  }
+
+  &-tag {
+    font-size: 18px;
+    color: $color-primary;
+    background: $color-primary-light;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+}
+
+/* ========================================================================== */
+/*  元信息                                                                     */
+/* ========================================================================== */
+
+.activities__meta-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.activities__meta-text {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========================================================================== */
+/*  操作按钮                                                                   */
+/* ========================================================================== */
+
+.activities__card-btn {
+  width: 100%;
+  height: 64px;
+  line-height: 64px;
+  font-size: $font-size-sm;
+  border-radius: 32px;
+  text-align: center;
+  border: none;
+  margin: 0;
+  font-weight: 500;
+
+  &::after {
+    display: none;
+  }
+
+  &--primary {
+    background: $color-gradient-primary;
+    color: #fff;
+  }
+
+  &--disabled {
+    background: $color-border-light;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  状态标签 (叠加在封面上)                                                     */
+/* ========================================================================== */
+
+.activities__status-tag {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 $spacing-sm;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 500;
+
+  &--ongoing {
+    background: rgba(82, 196, 26, 0.9);
+    color: #fff;
+  }
+
+  &--ended {
+    background: rgba(140, 140, 140, 0.85);
+    color: #fff;
+  }
+}
+
+.activities__status-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
+
+  .activities__status-tag--ongoing & {
+    animation: pulse 2s infinite;
+  }
+}
+
+.activities__status-label {
+  font-size: 18px;
+}
+
+/* ========================================================================== */
+/*  空状态                                                                     */
+/* ========================================================================== */
+
+.activities__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-3xl 0;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-md;
+  }
+
+  &-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    text-align: center;
+    line-height: 1.5;
+  }
+}
+
+/* ========================================================================== */
+/*  底部间距                                                                   */
+/* ========================================================================== */
+
+.activities__bottom-spacer {
+  height: calc(60px + env(safe-area-inset-bottom));
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

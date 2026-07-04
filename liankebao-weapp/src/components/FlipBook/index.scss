@@ -1,0 +1,250 @@
+/* ===== FlipBook 名片翻转组件 ===== */
+
+.flipbook {
+  width: 100%;
+  height: 420px;
+  perspective: 1200px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 20px;
+
+    &--loading {
+      transform: none;
+    }
+  }
+
+  /* ===== 翻转状态 ===== */
+  &--flipped &__inner {
+    transform: rotateY(180deg);
+  }
+
+  /* ===== 正反面通用 ===== */
+  &__face {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  &__face--front {
+    z-index: 2;
+  }
+
+  &__face--back {
+    transform: rotateY(180deg);
+    z-index: 1;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  &__hint {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 2px;
+  }
+
+  /* ===== 正面内容 ===== */
+  &__front-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  &__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+  }
+
+  &__name {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  &__company {
+    font-size: 26px;
+    opacity: 0.85;
+    margin-bottom: 16px;
+  }
+
+  &__divider {
+    width: 60px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.4);
+    margin-bottom: 16px;
+  }
+
+  &__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__contact-item {
+    font-size: 24px;
+    opacity: 0.8;
+  }
+
+  /* ===== 背面内容 ===== */
+  &__back-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+    color: #fff;
+  }
+
+  &__back-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    opacity: 0.9;
+  }
+
+  &__qrcode {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 8px;
+  }
+
+  &__qrcode-placeholder {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+
+    &-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+
+    &-text {
+      font-size: 24px;
+      opacity: 0.5;
+    }
+  }
+
+  &__back-hint {
+    font-size: 22px;
+    opacity: 0.5;
+    margin-top: 16px;
+  }
+
+  /* ===== 骨架屏 ===== */
+  &__skeleton {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%);
+    border-radius: 20px;
+    padding: 40px;
+  }
+
+  &__skeleton-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #d9d9d9 25%, #e8e8e8 50%, #d9d9d9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &__skeleton-line {
+    height: 24px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #d9d9d9 25%, #e8e8e8 50%, #d9d9d9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+
+    &--short {
+      width: 120px;
+    }
+
+    &--medium {
+      width: 200px;
+    }
+
+    &--long {
+      width: 280px;
+    }
+  }
+
+  /* ===== 空状态 ===== */
+  &__empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    border-radius: 20px;
+    gap: 8px;
+
+    &-icon {
+      font-size: 64px;
+      margin-bottom: 8px;
+    }
+
+    &-text {
+      font-size: 32px;
+      color: #8c8c8c;
+      font-weight: 500;
+    }
+
+    &-hint {
+      font-size: 24px;
+      color: #bfbfbf;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

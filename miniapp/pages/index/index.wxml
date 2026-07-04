@@ -60,7 +60,7 @@
       <view class="brochure-cover">
         <image src="{{brochure.cover || '/images/default-cover.png'}}" mode="aspectFill" />
         <view class="brochure-info">
-          <text class="brochure-name">{{brochure.title || '我的AI数字名片'}}</text>
+          <text class="brochure-name">{{brochure.title || '我的AI数智名片'}}</text>
           <text class="brochure-stats">{{brochure.viewCount || 0}}次浏览 · {{brochure.pageCount || 0}}页</text>
         </view>
       </view>

@@ -1,4 +1,5 @@
 import { User, Briefcase, Building2, Phone, Mail, MapPin, Globe } from 'lucide-react';
+import { colors, cardTemplates, glass } from '../styles/design-tokens';
 
 export interface CardFields {
   name?: string;
@@ -42,31 +43,31 @@ export default function CardPreview({ fields, template = 'default', compact = fa
       className={`rounded-2xl overflow-hidden shadow-lg ${tpl.bg} ${tpl.text} ${compact ? 'w-64' : 'w-80'}`}
     >
       {/* Avatar area */}
-      <div className="flex flex-col items-center pt-6 pb-4 px-4">
-        <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-3" aria-hidden="true">
-          <User className="w-8 h-8 text-white/80" />
+      <div className="glass-card flex flex-col items-center pt-6 pb-4 px-4">
+        <div className="glass-card w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-3" aria-hidden="true">
+          <User className="glass-card w-8 h-8 text-white/80" />
         </div>
         {name ? (
-          <h3 className="text-lg font-bold text-center">{name}</h3>
+          <h3 className="glass-card text-lg font-bold text-center">{name}</h3>
         ) : (
-          <h3 className="text-lg font-bold text-center text-white/50">未命名名片</h3>
+          <h3 className="glass-card text-lg font-bold text-center text-white/50">未命名名片</h3>
         )}
       </div>
 
       {/* Info fields */}
       {!compact && items.length > 0 && (
-        <div className="px-4 pb-5 space-y-2">
+        <div className="glass-card px-4 pb-5 space-y-2">
           {items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm text-white/90">
-              <item.icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{item.label}</span>
+            <div key={idx} className="glass-card flex items-center gap-2 text-sm text-white/90">
+              <item.icon className="glass-card w-4 h-4 shrink-0" aria-hidden="true" />
+              <span className="glass-card truncate">{item.label}</span>
             </div>
           ))}
         </div>
       )}
 
       {!compact && items.length === 0 && (
-        <div className="px-4 pb-5 text-center text-sm text-white/50">
+        <div className="glass-card px-4 pb-5 text-center text-sm text-white/50">
           暂无资料
         </div>
       )}

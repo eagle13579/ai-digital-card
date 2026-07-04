@@ -68,10 +68,6 @@ from app.models.user import User
 
 router = APIRouter(prefix="/api/crm", tags=["CRM"])
 
-# 延迟导入 get_current_user 以避免循环依赖:
-# crm_router → app.routers.auth → app.routers.__init__ → crm_router(尚未完全加载)
-from app.routers.auth import get_current_user
-
 from app.crm.crm_models import (
     CrmContact,
     CrmDeal,
@@ -377,14 +373,14 @@ class DashboardResponse(BaseModel):
 
 def _get_crm_service(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
 ) -> CrmService:
     return CrmService(db, current_user.id)
 
 
 def _get_analytics_service(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
 ) -> CrmAnalyticsService:
     return CrmAnalyticsService(db, current_user.id)
 
@@ -902,7 +898,7 @@ class WorkflowTestResult(BaseModel):
 
 def _get_workflow_engine(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
 ) -> WorkflowEngine:
     return WorkflowEngine(db, current_user.id)
 
@@ -916,7 +912,7 @@ def _get_workflow_engine(
 async def create_workflow_rule(
     data: WorkflowRuleCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """创建一条新的工作流自动化规则。"""
@@ -933,7 +929,7 @@ async def create_workflow_rule(
 )
 async def list_workflow_rules(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """获取当前用户的所有工作流规则。"""
@@ -950,7 +946,7 @@ async def toggle_workflow_rule(
     rule_id: int,
     enabled: bool | None = Query(None, description="指定 true/false 切换，不传则取反"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """启用或禁用一条工作流规则。"""
@@ -976,7 +972,7 @@ async def toggle_workflow_rule(
 async def delete_workflow_rule(
     rule_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """删除一条工作流规则。"""
@@ -994,7 +990,7 @@ async def test_workflow_rule(
     rule_id: int,
     context: dict | None = Body(None, description="模拟触发时的上下文数据"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """测试一条已有的规则（不操作数据库）。"""
@@ -1057,7 +1053,7 @@ async def test_custom_rule(
 )
 async def init_preset_rules(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """为用户初始化 3 条预置工作流规则（无规则时创建，已有则返回现有）。"""
@@ -1075,7 +1071,7 @@ async def get_workflow_logs(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(WORKFLOW_MANAGE)),
 ):
     """获取工作流执行日志。"""
@@ -1150,7 +1146,7 @@ class MyPermissionsResponse(BaseModel):
 async def create_rbac_role(
     data: RoleCreateRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(PERMISSIONS_MANAGE)),
 ):
     """创建或同步一个 CRM 角色到数据库（需要 permissions.manage 权限）。"""
@@ -1209,7 +1205,7 @@ async def list_rbac_roles(
 async def assign_role_to_user(
     data: RoleAssignRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
     _: None = Depends(require_permission(PERMISSIONS_MANAGE)),
 ):
     """为指定用户分配 CRM 角色（需要 permissions.manage 权限）。"""
@@ -1238,7 +1234,7 @@ async def assign_role_to_user(
 )
 async def get_my_permissions(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(lambda: __import__('app.routers.auth', fromlist=['get_current_user']).get_current_user),
 ):
     """返回当前用户的 CRM 角色和所有权限。"""
     perms = await get_user_crm_permissions(db, current_user.id)

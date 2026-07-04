@@ -1,8 +1,7 @@
 /**
  * 我的 - 个人中心/会员信息/设置
- * API调用指向 http://localhost:8003
  */
-const { userApi, brochureApi, visitorApi, trustApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
@@ -29,10 +28,11 @@ Page({
   async loadProfile() {
     this.setData({ loading: true })
     try {
-      const [profile, brochures, trustNet] = await Promise.all([
-        userApi.getProfile().catch(() => ({})),
-        brochureApi.list().catch(() => []),
-        trustApi.getNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
+      const [profile, brochures, trustNet, visitorStats] = await Promise.all([
+        MockService.getProfile(),
+        MockService.getBrochures(),
+        MockService.getTrustNetwork(),
+        MockService.getVisitorStats(),
       ])
 
       const brochureList = Array.isArray(brochures) ? brochures : (brochures.data || [])
@@ -41,15 +41,7 @@ Page({
       const memberLevel = profile.member_level || 'free'
       const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
 
-      // 获取访客统计
-      let stats = { visitors: 0, matches: 0, unlocks: 0, views: 0 }
-      if (brochure) {
-        const vStats = await visitorApi.getStats(brochure.id).catch(() => null)
-        if (vStats) {
-          stats.visitors = vStats.total_visits || 0
-          stats.views = vStats.view_count || 0
-        }
-      }
+      let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
 
       const trustCount = (trustNet.trusting || []).length
 
@@ -69,7 +61,6 @@ Page({
         loading: false,
       })
 
-      // 更新全局
       const app = getApp()
       app.updateUserInfo(this.data.userInfo)
       app.updateMemberLevel(memberLevel)
@@ -81,12 +72,12 @@ Page({
 
   // 编辑名片
   goEditCard() {
-    wx.navigateTo({ url: '/pages/my-card/index' })
+    wx.navigateTo({ url: '/pages/brochure/create/index' })
   },
 
   // 画册管理
   goAlbum() {
-    wx.navigateTo({ url: '/pages/my-card/index' })
+    wx.navigateTo({ url: '/pages/brochure/create/index' })
   },
 
   // 会员中心
@@ -111,7 +102,7 @@ Page({
 
   // 关于
   goAbout() {
-    wx.showToast({ title: 'AI数字名片 v1.0.0', icon: 'none' })
+    wx.showToast({ title: 'AI数智名片 v1.0.0', icon: 'none' })
   },
 
   // 退出登录

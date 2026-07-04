@@ -1,0 +1,386 @@
+/* ========================================================================== */
+/*  Membership page — 会员中心                                                 */
+/*  设计系统色值: 参考 tokens.scss                                               */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  页面容器                                                                   */
+/* ========================================================================== */
+
+.membership {
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+  &__scroll {
+    height: 100vh;
+  }
+
+  &__bottom-spacer {
+    height: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ========================================================================== */
+/*  骨架屏                                                                     */
+/* ========================================================================== */
+
+.membership__skeleton {
+  padding: $page-padding;
+  animation: fadeIn 0.3s ease;
+
+  &-header {
+    height: 120px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-xl;
+  }
+
+  &-card {
+    height: 340px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-md;
+  }
+
+  &-usage {
+    height: 160px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* ========================================================================== */
+/*  错误状态                                                                   */
+/* ========================================================================== */
+
+.membership__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-message {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xl;
+  }
+
+  &-btn {
+    width: 320px;
+    height: 80px;
+    line-height: 80px;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-lg;
+    border-radius: 40px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  会员等级头部                                                                */
+/* ========================================================================== */
+
+.membership__level-header {
+  padding: $spacing-2xl $page-padding $spacing-lg;
+  text-align: center;
+}
+
+.membership__level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-xl;
+  border-radius: 40px;
+  margin-bottom: $spacing-sm;
+}
+
+.membership__level-icon {
+  font-size: 36px;
+}
+
+.membership__level-name {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: #fff;
+}
+
+.membership__level-desc {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+/* ========================================================================== */
+/*  定价卡片                                                                   */
+/* ========================================================================== */
+
+.membership__plans {
+  padding: 0 $page-padding;
+}
+
+.membership__plan-card {
+  position: relative;
+  background: $color-bg-white;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &--current {
+    border-color: $color-primary;
+    box-shadow: $shadow-md;
+  }
+
+  &--enterprise {
+    background: linear-gradient(135deg, #f9f0ff 0%, #ffffff 100%);
+  }
+}
+
+.membership__plan-tag {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: $color-gradient-warm;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.membership__plan-tag-text {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.membership__plan-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+}
+
+.membership__plan-name {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text-primary;
+}
+
+.membership__plan-label {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  font-weight: 400;
+}
+
+.membership__plan-price {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: $spacing-xs;
+}
+
+.membership__plan-price-value {
+  font-size: $font-size-4xl;
+  font-weight: 800;
+  color: $color-text-primary;
+  line-height: 1;
+}
+
+.membership__plan-price-unit {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  margin-left: 4px;
+}
+
+.membership__plan-yearly {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: 500;
+  margin-bottom: $spacing-md;
+}
+
+.membership__plan-benefits {
+  margin-bottom: $spacing-lg;
+}
+
+.membership__plan-benefit {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-xs;
+}
+
+.membership__plan-benefit-icon {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: 700;
+}
+
+.membership__plan-benefit-text {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+/* 操作按钮 */
+.membership__plan-btn {
+  width: 100%;
+  height: 80px;
+  line-height: 80px;
+  border-radius: 40px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+
+  &::after {
+    display: none;
+  }
+
+  &--current {
+    background: $color-primary-light;
+  }
+
+  &--current &-text {
+    color: $color-primary;
+  }
+
+  &--free {
+    background: $color-bg;
+  }
+
+  &--free &-text {
+    color: $color-text-tertiary;
+  }
+
+  &--upgrade {
+    background: $color-gradient-primary;
+  }
+
+  &--upgrade &-text {
+    color: #fff;
+  }
+}
+
+.membership__plan-btn-text {
+  font-size: $font-size-md;
+  font-weight: 600;
+}
+
+/* ========================================================================== */
+/*  用量进度                                                                   */
+/* ========================================================================== */
+
+.membership__usage {
+  margin: $spacing-lg $page-padding;
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+
+.membership__usage-title {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.membership__usage-item {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.membership__usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.membership__usage-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.membership__usage-count {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-text-primary;
+
+  &--warn {
+    color: $color-warning;
+  }
+
+  &--over {
+    color: $color-error;
+  }
+}
+
+.membership__usage-bar {
+  width: 100%;
+  height: 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.membership__usage-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: $color-gradient-primary;
+  transition: width 0.5s ease;
+
+  &--warn {
+    background: linear-gradient(135deg, #faad14 0%, #f5222d 100%);
+  }
+
+  &--over {
+    background: $color-error;
+  }
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

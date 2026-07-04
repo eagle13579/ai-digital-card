@@ -201,6 +201,78 @@ class GaiaTrainingRun(Base):
         )
 
 
+class KnowledgeModel(Base):
+    """心智模型库 — 存储注入的心智模型(mental models)，支持模型训练"""
+
+    __tablename__ = "knowledge_models"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    model_id: Mapped[str] = mapped_column(
+        String(32), nullable=False, index=True, unique=True,
+        comment="模型编码，如 FD-M01 (Frontend Design Mental Model 01)",
+    )
+    category: Mapped[str] = mapped_column(
+        String(32), nullable=False, index=True,
+        comment="分类: design_system | ui_principle | ux_interaction | visual_design | process_methodology | domain_specific",
+    )
+    name: Mapped[str] = mapped_column(
+        String(128), nullable=False,
+        comment="模型名称",
+    )
+    source: Mapped[str] = mapped_column(
+        String(64), nullable=False, default="manual",
+        comment="来源: manual | ai_distilled | design_system | training | feedback",
+    )
+    source_ref: Mapped[str | None] = mapped_column(
+        String(256), nullable=True, default=None,
+        comment="来源引用（文件路径、URL、论文引用等）",
+    )
+    content: Mapped[str] = mapped_column(
+        Text, nullable=False,
+        comment="模型内容 — 详细描述、定义和应用场景",
+    )
+    tags: Mapped[dict | None] = mapped_column(
+        JSON, nullable=True, default=None,
+        comment="标签（JSON数组）",
+    )
+    confidence: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0.8,
+        comment="置信度 0.0 ~ 1.0",
+    )
+    version: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="1.0.0",
+        comment="模型版本号",
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True,
+        comment="是否激活",
+    )
+    vector_embedded: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False,
+        comment="是否已向量化",
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False,
+        comment="创建时间",
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False,
+        comment="更新时间",
+    )
+
+    __table_args__ = (
+        Index("idx_km_category", "category", "confidence"),
+        Index("idx_km_active", "is_active", "created_at"),
+        Index("idx_km_model_id", "model_id"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<KnowledgeModel id={self.id} model_id={self.model_id!r} "
+            f"name={self.name!r} category={self.category!r}>"
+        )
+
+
 class GaiaModelWeights(Base):
     """当前进化后的模型参数 — 供其他服务查询进化后的权重"""
 

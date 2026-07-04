@@ -1,0 +1,160 @@
+# ═══════════════════════════════════════════════════════════════════
+# 链客宝 — 定价方案配置 (pricing.yaml)
+# ═══════════════════════════════════════════════════════════════════
+# 定价引擎(PricingEngine) 启动时读取本文件。
+# 修改后需重启服务生效，或通过 /api/v1/pricing/reload 热加载。
+# 注意：此文件是权威源，DB t_subscription_plans 表与之双向同步。
+# ═══════════════════════════════════════════════════════════════════
+
+# ── 通用设置 ──────────────────────────────────────────────────────
+currency: CNY
+tax_rate: 0.06                      # 增值税 6%
+yearly_discount_rate: 0.1667        # 年付 ≈ 省1个月 (16.67%)
+
+# ── 定价层定义 ────────────────────────────────────────────────────
+tiers:
+  free:
+    id: free
+    name: 免费版
+    description: 适合个人体验 AI 名片推荐与基础匹配
+    price_monthly: 0
+    price_yearly: 0
+    sort_order: 0
+    badge: 免费
+    recommended: false
+    features:
+      business_cards: 5                    # 名片数量上限
+      matches_per_month: 10                # 每月匹配次数
+      ai_chat_per_month: 20                # AI 聊天次数
+      nfc_write: false                     # NFC 写入
+      api_access: false                    # API 访问
+      crm_export: false                    # CRM 导出
+      custom_branding: false               # 自定义品牌
+      priority_support: false              # 优先支持
+      dedicated_manager: false             # 专属客户经理
+      max_team_members: 1                  # 团队成员数
+      storage_mb: 50                       # 存储空间(MB)
+      match_quality: basic                 # 匹配质量: basic/enhanced/premium/elite
+
+  pro:
+    id: pro
+    name: 专业版
+    description: 面向独立创业者与小型团队，AI 获客提效
+    price_monthly: 99
+    price_yearly: 990
+    sort_order: 1
+    badge: 热门
+    recommended: true
+    features:
+      business_cards: 100
+      matches_per_month: 500
+      ai_chat_per_month: 1000
+      nfc_write: true
+      api_access: false
+      crm_export: true
+      crm_export_limit: 500                # 月导出行数上限
+      custom_branding: false
+      priority_support: false
+      dedicated_manager: false
+      max_team_members: 3
+      storage_mb: 500
+      match_quality: enhanced
+
+  enterprise:
+    id: enterprise
+    name: 企业版
+    description: 大型组织全栈方案，无限制使用与定制化服务
+    price_monthly: 499
+    price_yearly: 4990
+    sort_order: 2
+    badge: 旗舰
+    recommended: false
+    features:
+      business_cards: 1000                 # 0 = 无限制, 这里设1000合理上限
+      matches_per_month: 0                 # 0 = 无限制
+      ai_chat_per_month: 0                 # 0 = 无限制
+      nfc_write: true
+      api_access: true
+      crm_export: true
+      crm_export_limit: 0                  # 0 = 无限制
+      custom_branding: true
+      priority_support: true
+      dedicated_manager: true
+      max_team_members: 0                  # 0 = 无限制
+      storage_mb: 10240                    # 10 GB
+      match_quality: premium
+
+# ── 附加包 (Add-on) — 可在任何层级叠加 ────────────────────────────
+addons:
+  additional_business_cards:
+    id: additional_business_cards
+    name: 额外名片包
+    description: 增加可创建的名片数量
+    unit_price: 5.0                        # 每张单价(元)，适用于免费版超额
+    unit: 张
+    bundle_size: 10                        # 最小购买单位
+    bundle_price: 30.0                     # 10张 ¥30
+
+  additional_matches:
+    id: additional_matches
+    name: 额外匹配包
+    description: 增加智能匹配次数
+    unit_price: 1.0                        # 每次单价(元)
+    unit: 次
+    bundle_size: 50
+    bundle_price: 30.0                     # 50次 ¥30
+
+  additional_storage:
+    id: additional_storage
+    name: 扩容存储包
+    description: 增加云存储空间
+    unit_price: 0.1                        # 每MB单价(元)
+    unit: MB
+    bundle_size: 1024                      # 1GB
+    bundle_price: 50.0                     # 1GB ¥50
+
+  ai_chat_topup:
+    id: ai_chat_topup
+    name: AI 聊天充值包
+    description: 增加 AI 对话次数
+    unit_price: 0.3                        # 每次单价(元)
+    unit: 次
+    bundle_size: 100
+    bundle_price: 20.0                     # 100次 ¥20
+
+# ── 优惠券定义 ────────────────────────────────────────────────────
+coupons:
+  CHAINKEWELCOME:
+    type: fixed                           # fixed / percentage
+    amount: 50.0                          # ¥50
+    label: 新用户欢迎券 ¥50
+    min_subtotal: 99.0                    # 最低消费 ¥99
+    max_uses_per_user: 1
+
+  STARTUP50:
+    type: percentage
+    amount: 0.5                           # 5折
+    label: 创业半价优惠
+    min_subtotal: 99.0
+    max_uses_per_user: 1
+
+  BETA100:
+    type: fixed
+    amount: 100.0                         # ¥100
+    label: Beta 用户回馈 ¥100
+    min_subtotal: 199.0
+    max_uses_per_user: 1
+
+# ── 首月优惠 ──────────────────────────────────────────────────────
+first_month_discount:
+  enabled: true
+  description: 首月特惠，仅需 ¥9.9 体验专业版
+  tier: pro
+  discount_price: 9.9
+  valid_days: 30                          # 新用户注册后30天内有效
+
+# ── 推荐奖励 ──────────────────────────────────────────────────────
+referral_reward:
+  referrer_credit: 50.0                   # 推荐人获 ¥50 余额
+  referee_discount: 0.85                  # 被推荐人首单 85 折
+  max_referrals_per_user: 20

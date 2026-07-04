@@ -18,6 +18,7 @@ Available agents:
     - DataAgent: Data Engineer — schema migration, ETL, data quality.
     - SREAgent: Site Reliability Engineer — monitors, remediates, forecasts.
     - SupportAgent: User Technical Support — handles tickets, searches knowledge.
+    - DesignQAAgent: Design QA Engineer — design critique, accessibility audits, anti-patterns.
     - AgentRuntime: Orchestrator managing all AI employee lifecycles.
     - LegionEmployee: Adapter wrapping 记忆宫殿 employees with soul + memory.
     - create_legion_agent: Factory pairing a legion employee with an agent.
@@ -36,13 +37,14 @@ from app.agents.architecture_agent import ArchitectureAgent
 from app.agents.data_agent import DataAgent
 from app.agents.sre_agent import SREAgent
 from app.agents.support_agent import SupportAgent
+from app.agents.design_qa_agent import DesignQAAgent
 
 # ── Runtime ───────────────────────────────────────────────────────
 from app.agents.agent_runtime import AgentRuntime
 
 # ── Legion Employee integration ───────────────────────────────────
 from app.agents.legion_employee import LegionEmployee
-from app.agents.employee_profiles import create_legion_agent, create_all_legion_agents, EMPLOYEE_AGENT_MAP
+from app.agents.employee_profiles import create_legion_agent, create_all_legion_agents, EMPLOYEE_AGENT_MAP, EXTENDED_AGENT_MAP
 
 __all__ = [
     # Base
@@ -61,6 +63,7 @@ __all__ = [
     "DataAgent",
     "SREAgent",
     "SupportAgent",
+    "DesignQAAgent",
     # Runtime
     "AgentRuntime",
     # Legion integration
@@ -68,4 +71,5 @@ __all__ = [
     "create_legion_agent",
     "create_all_legion_agents",
     "EMPLOYEE_AGENT_MAP",
+    "EXTENDED_AGENT_MAP",
 ]

@@ -47,6 +47,7 @@ from app.agents.architecture_agent import ArchitectureAgent
 from app.agents.data_agent import DataAgent
 from app.agents.sre_agent import SREAgent
 from app.agents.support_agent import SupportAgent
+from app.agents.design_qa_agent import DesignQAAgent
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +101,18 @@ EMPLOYEE_AGENT_MAP: dict[str, dict[str, Any]] = {
         "employee_id": "emp-白泽",
         "agent_class": SupportAgent,
         "role_description": "Support Engineer — ticket handling, FAQ, resolution learning",
+    },
+}
+
+
+# ── Extended Agent Map (DesignQA, does not modify original) ─────
+
+EXTENDED_AGENT_MAP: dict[str, dict[str, Any]] = {
+    **EMPLOYEE_AGENT_MAP,
+    "design_qa": {
+        "employee_id": "emp-狴犴",
+        "agent_class": DesignQAAgent,
+        "role_description": "Design QA Engineer — design critique, accessibility audits, performance checks, anti-pattern detection, pre-launch polish verification",
     },
 }
 

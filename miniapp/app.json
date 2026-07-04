@@ -3,11 +3,13 @@
     "pages/index/index",
     "pages/card/card",
     "pages/login/index",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/brochure/create/index",
+    "pages/brochure/preview/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "AI数字名片",
+    "navigationBarTitleText": "AI数智名片",
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#f5f6fa"
   },

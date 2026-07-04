@@ -1,0 +1,45 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px;
+  box-sizing: border-box;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  &__icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+
+  &__message {
+    font-size: 28px;
+    color: #999;
+    margin-bottom: 48px;
+    line-height: 1.5;
+  }
+
+  &__btn {
+    width: 320px;
+    height: 88px;
+    line-height: 88px;
+    background: #1677ff;
+    color: #fff;
+    font-size: 32px;
+    border-radius: 44px;
+    text-align: center;
+  }
+}

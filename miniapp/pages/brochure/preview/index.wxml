@@ -1,0 +1,164 @@
+<view class="preview-container">
+  <view class="preview-header" wx:if="{{totalPages > 0}}">
+    <view class="back-btn" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <text class="page-indicator">{{currentPage + 1}}/{{totalPages}}</text>
+    <view class="share-btn" bindtap="shareBrochure">
+      <text class="share-icon">⋮</text>
+    </view>
+  </view>
+
+  <view wx:if="{{totalPages === 0}}" class="empty-state">
+    <view class="empty-icon">📄</view>
+    <text class="empty-title">暂无画册内容</text>
+    <text class="empty-desc">请先创建您的AI数智名片</text>
+    <view class="empty-btn" bindtap="goCreate">
+      <text class="empty-btn-text">立即创建</text>
+    </view>
+  </view>
+
+  <swiper wx:elif="{{totalPages > 0}}" 
+    class="brochure-swiper"
+    current="{{currentPage}}"
+    bindchange="onSwiperChange"
+    circular="false"
+    duration="300"
+    previous-margin="40rpx"
+    next-margin="40rpx"
+    easing-function="easeOutQuad"
+  >
+    <swiper-item wx:for="{{pages}}" wx:key="index">
+      <view class="brochure-page {{pageType === 'cover' ? 'cover-page' : ''}}" style="background: {{pageBackground}}">
+        <view wx:if="{{page.type === 'cover'}}" class="cover-content">
+          <view class="cover-avatar-wrap">
+            <image wx:if="{{page.avatar}}" src="{{page.avatar}}" class="cover-avatar" mode="aspectFill" />
+            <view wx:else class="cover-avatar-placeholder">
+              <text class="cover-avatar-emoji">👤</text>
+            </view>
+          </view>
+          <text class="cover-title">{{page.title}}</text>
+          <text class="cover-subtitle">{{page.subtitle}}</text>
+          <view class="cover-badge-wrap">
+            <text class="cover-badge">AI数智名片</text>
+          </view>
+        </view>
+
+        <view wx:elif="{{page.type === 'profile'}}" class="profile-content">
+          <view class="profile-header">
+            <view class="profile-avatar">
+              <image wx:if="{{pages[0] && pages[0].avatar}}" src="{{pages[0].avatar}}" mode="aspectFill" />
+              <view wx:else class="profile-avatar-placeholder">
+                <text class="avatar-emoji">👤</text>
+              </view>
+            </view>
+            <view class="profile-info">
+              <text class="profile-name">{{page.name}}</text>
+              <text class="profile-title">{{page.title}}</text>
+              <text class="profile-company">{{page.company}}</text>
+            </view>
+          </view>
+          <view class="profile-bio">
+            <text class="bio-title">个人简介</text>
+            <text class="bio-content">{{page.bio}}</text>
+          </view>
+          <view class="profile-contact">
+            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.phone}}">
+              <text class="contact-icon">📞</text>
+              <text class="contact-text">{{page.contact.phone}}</text>
+            </view>
+            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.email}}">
+              <text class="contact-icon">✉️</text>
+              <text class="contact-text">{{page.contact.email}}</text>
+            </view>
+            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.wechat}}">
+              <text class="contact-icon">💬</text>
+              <text class="contact-text">{{page.contact.wechat}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view wx:elif="{{page.type === 'resources'}}" class="resources-content">
+          <text class="section-title-text">资源对接</text>
+          <view class="resources-section">
+            <text class="resources-label provides-label">我能提供</text>
+            <view class="tags-wrap">
+              <text wx:for="{{page.provides}}" wx:key="index" class="tag provides-tag">{{item}}</text>
+            </view>
+          </view>
+          <view class="resources-section">
+            <text class="resources-label needs-label">我需要</text>
+            <view class="tags-wrap">
+              <text wx:for="{{page.needs}}" wx:key="index" class="tag needs-tag">{{item}}</text>
+            </view>
+          </view>
+          <view class="purpose-badge">
+            <text class="purpose-icon">🎯</text>
+            <text class="purpose-text">{{purposeMap[page.purpose] || '合作意向'}}</text>
+          </view>
+        </view>
+
+        <view wx:elif="{{page.type === 'company'}}" class="company-content">
+          <text class="section-title-text">公司介绍</text>
+          <view class="company-header">
+            <text class="company-name">{{page.name}}</text>
+            <view class="company-meta">
+              <text class="meta-item">{{page.industry}}</text>
+              <text class="meta-divider">·</text>
+              <text class="meta-item">{{page.size}}</text>
+            </view>
+          </view>
+          <text class="company-desc">{{page.desc}}</text>
+          <view wx:if="{{page.development}}" class="development-section">
+            <text class="development-title">发展历程</text>
+            <text class="development-content">{{page.development}}</text>
+          </view>
+          <view wx:if="{{page.images && page.images.length > 0}}" class="company-images">
+            <image wx:for="{{page.images}}" wx:key="index" src="{{item}}" class="company-image" mode="aspectFill" />
+          </view>
+        </view>
+
+        <view wx:elif="{{page.type === 'case'}}" class="case-content">
+          <text class="section-title-text">案例{{page.index}}</text>
+          <text class="case-name">{{page.name}}</text>
+          <text class="case-date">{{page.date}}</text>
+          <text class="case-desc">{{page.desc}}</text>
+          <view wx:if="{{page.images && page.images.length > 0}}" class="case-images">
+            <image wx:for="{{page.images}}" wx:key="index" src="{{item}}" class="case-image" mode="aspectFill" />
+          </view>
+        </view>
+
+        <view wx:elif="{{page.type === 'contact'}}" class="contact-content">
+          <text class="section-title-text">联系我</text>
+          <view class="contact-card">
+            <text class="contact-card-name">{{page.name}}</text>
+            <text class="contact-card-company">{{page.company}}</text>
+          </view>
+          <view class="contact-list">
+            <view class="contact-list-item" bindtap="copyText" data-text="{{page.phone}}">
+              <text class="contact-list-icon">📞</text>
+              <text class="contact-list-label">电话</text>
+              <text class="contact-list-value">{{page.phone}}</text>
+            </view>
+            <view class="contact-list-item" bindtap="copyText" data-text="{{page.email}}">
+              <text class="contact-list-icon">✉️</text>
+              <text class="contact-list-label">邮箱</text>
+              <text class="contact-list-value">{{page.email}}</text>
+            </view>
+            <view class="contact-list-item" bindtap="copyText" data-text="{{page.wechat}}">
+              <text class="contact-list-icon">💬</text>
+              <text class="contact-list-label">微信</text>
+              <text class="contact-list-value">{{page.wechat}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view wx:if="{{totalPages > 0}}" class="preview-footer">
+    <view class="dots-wrap">
+      <view wx:for="{{pages}}" wx:key="index" class="dot {{currentPage === index ? 'active' : ''}}" bindtap="jumpToPage" data-index="{{index}}" />
+    </view>
+  </view>
+</view>

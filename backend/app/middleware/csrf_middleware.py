@@ -36,6 +36,8 @@ CSRF_TOKEN_PATH = "/api/csrf/token"
 EXCLUDED_PATHS = (
     "/api/auth/login",
     "/api/auth/register",
+    "/api/auth/wx-mini-login",
+    "/api/auth/wx-login",
     "/api/payments/webhook",
     "/api/webhooks/",
 )

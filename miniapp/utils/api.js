@@ -77,6 +77,9 @@ const tagApi = {
     const params = tagType ? { tag_type: tagType } : {}
     return get('/api/tags/me', params)
   },
+  list() {
+    return get('/api/tags')
+  },
   addTags(data) {
     return post('/api/tags/me', data)
   },
@@ -92,6 +95,12 @@ const tagApi = {
 const matchApi = {
   getRecommend(params) {
     return get('/api/match/recommend', params)
+  },
+  getRecommendList(page, size) {
+    return get('/api/match/recommend', { page, size })
+  },
+  getMatchDetail(id) {
+    return get(`/api/match/${id}`)
   },
   unlock(matchId) {
     return post(`/api/match/${matchId}/unlock`)
@@ -130,6 +139,16 @@ const visitorApi = {
   },
 }
 
+// ===== AI模块 =====
+const aiApi = {
+  write(data) {
+    return post('/api/ai/write', data)
+  },
+  generate(data) {
+    return post('/api/ai/generate', data)
+  },
+}
+
 module.exports = {
   miniappApi,
   authApi,
@@ -139,4 +158,5 @@ module.exports = {
   matchApi,
   trustApi,
   visitorApi,
+  aiApi,
 }

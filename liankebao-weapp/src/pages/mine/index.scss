@@ -1,0 +1,435 @@
+/* ========================================================================== */
+/*  Mine page — 个人中心                                                       */
+/*  设计系统色值: 参考 tokens.scss                                               */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  页面容器                                                                   */
+/* ========================================================================== */
+
+.mine {
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+  &__scroll {
+    height: 100vh;
+  }
+
+  &__bottom-spacer {
+    height: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ========================================================================== */
+/*  骨架屏                                                                     */
+/* ========================================================================== */
+
+.mine__skeleton {
+  padding: $page-padding;
+  animation: fadeIn 0.3s ease;
+
+  &-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing-2xl;
+  }
+
+  &-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: $radius-round;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-right: $spacing-md;
+  }
+
+  &-info {
+    flex: 1;
+  }
+
+  &-line {
+    height: 24px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+
+    &--name {
+      width: 140px;
+      margin-bottom: $spacing-xs;
+    }
+
+    &--company {
+      width: 200px;
+    }
+  }
+
+  &-cards {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  &-card-item {
+    flex: 1;
+    height: 100px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &-menu-item {
+    height: 90px;
+    border-radius: $radius-sm;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-xs;
+  }
+}
+
+/* ========================================================================== */
+/*  错误状态                                                                   */
+/* ========================================================================== */
+
+.mine__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-message {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xl;
+  }
+
+  &-btn {
+    width: 320px;
+    height: 80px;
+    line-height: 80px;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-lg;
+    border-radius: 40px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  顶部用户信息栏                                                              */
+/* ========================================================================== */
+
+.mine__header {
+  position: relative;
+  padding: $spacing-lg $page-padding;
+  margin-bottom: $spacing-md;
+
+  &-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $color-gradient-primary;
+    opacity: 0.08;
+    border-radius: 0 0 $radius-xl $radius-xl;
+  }
+
+  &-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+  }
+
+  &-info {
+    flex: 1;
+    margin-left: $spacing-md;
+  }
+
+  &-right {
+    padding: $spacing-xs;
+  }
+}
+
+.mine__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: $radius-round;
+  border: 3px solid #fff;
+  box-shadow: $shadow-sm;
+}
+
+.mine__name-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: 6px;
+}
+
+.mine__user-name {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text-primary;
+}
+
+.mine__vip-badge {
+  padding: 2px 12px;
+  background: $color-gradient-warm;
+  border-radius: 20px;
+}
+
+.mine__vip-text {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.mine__user-company {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.mine__edit-icon {
+  font-size: $font-size-2xl;
+  color: $color-text-tertiary;
+}
+
+/* ========================================================================== */
+/*  数据卡片                                                                   */
+/* ========================================================================== */
+
+.mine__metrics {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.mine__metric-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $color-bg-white;
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-xs;
+  box-shadow: $shadow-sm;
+}
+
+.mine__metric-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.mine__metric-value {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 2px;
+}
+
+.mine__metric-label {
+  font-size: 18px;
+  color: $color-text-tertiary;
+}
+
+/* ========================================================================== */
+/*  AI 名片扫描入口                                                            */
+/* ========================================================================== */
+
+.mine__ai-section {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.mine__ai-btn {
+  position: relative;
+  height: 104px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  cursor: pointer;
+
+  &-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $color-gradient-ai;
+    opacity: 0.95;
+  }
+
+  &-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 $spacing-xl;
+    z-index: 1;
+  }
+
+  &-icon {
+    font-size: 44px;
+    margin-right: $spacing-md;
+  }
+
+  &-text {
+    flex: 1;
+  }
+
+  &-title {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  &-desc {
+    display: block;
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  &-arrow {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 300;
+  }
+}
+
+/* ========================================================================== */
+/*  功能菜单                                                                   */
+/* ========================================================================== */
+
+.mine__menu {
+  margin: 0 $page-padding $spacing-lg;
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+}
+
+.mine__menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-md;
+  border-bottom: 1px solid $color-divider;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &-left {
+    display: flex;
+    align-items: center;
+  }
+
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+}
+
+.mine__menu-icon {
+  font-size: 36px;
+  margin-right: $spacing-md;
+}
+
+.mine__menu-title {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: 500;
+}
+
+.mine__menu-arrow {
+  font-size: 36px;
+  color: $color-text-placeholder;
+  font-weight: 300;
+}
+
+/* 未读消息角标 */
+.mine__badge {
+  min-width: 32px;
+  height: 32px;
+  background: $color-error;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+.mine__badge-text {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ========================================================================== */
+/*  退出登录                                                                   */
+/* ========================================================================== */
+
+.mine__logout-section {
+  padding: 0 $page-padding $spacing-xl;
+}
+
+.mine__logout-btn {
+  width: 100%;
+  height: 88px;
+  line-height: 88px;
+  background: $color-bg-white;
+  color: $color-error;
+  font-size: $font-size-lg;
+  border-radius: 44px;
+  text-align: center;
+  border: 1px solid $color-border;
+
+  &::after {
+    display: none;
+  }
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

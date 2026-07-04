@@ -1,6 +1,6 @@
 /**
  * 统一API请求封装
- * AI数字名片 - 微信小程序
+ * AI数智名片 - 微信小程序
  */
 
 // API baseURL
@@ -10,7 +10,7 @@ const API_BASE_URL = (function() {
   // 微信开发者工具中可以用 localhost 或本机IP
   // 真机/预览时必须用实际IP或域名
   const DEV_IP = '192.168.7.48'   // 后端服务器IP
-  const DEV_PORT = '8201'          // AI数字名片后端端口
+  const DEV_PORT = '8201'          // AI数智名片后端端口
   
   // __wxConfig 是微信开发者工具注入的全局变量
   try {

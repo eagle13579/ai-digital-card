@@ -29,3 +29,36 @@ _service_logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Node
+node_modules/
+.taro-cache/
+.package-lock.json
+
+# Build output
+dist/
+build/
+*.zip
+
+# Archive / backups
+_archive/
+backups/
+miniapp_bak/
+liankebao-weapp/dist/
+
+# Training data (large binaries)
+training_data/
+
+# Logs
+logs/
+*.log
+_service_logs/
+
+# IDE
+.vscode/
+.idea/
+
+# Certificates
+*.pem
+*.key
+certs/

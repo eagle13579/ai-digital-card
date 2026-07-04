@@ -2,7 +2,7 @@
   <view class="login-card">
     <view class="logo-area">
       <image class="logo" src="/images/logo.png" mode="aspectFit" />
-      <text class="title">AI数字名片</text>
+      <text class="title">AI数智名片</text>
       <text class="subtitle">让每一次连接都有价值</text>
     </view>
 

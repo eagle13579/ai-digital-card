@@ -1,7 +1,19 @@
 /**
  * 工具函数集合
- * AI数字名片 - 微信小程序
+ * AI数智名片 - 微信小程序
  */
+
+const Logger = {
+  info(tag, message, data) {
+    console.log(`[${tag}] ${message}`, data || '')
+  },
+  error(tag, message, error) {
+    console.error(`[${tag}] ${message}`, error || '')
+  },
+  warn(tag, message, data) {
+    console.warn(`[${tag}] ${message}`, data || '')
+  },
+}
 
 /**
  * 格式化日期
@@ -130,6 +142,7 @@ function throttle(fn, interval = 500) {
 }
 
 module.exports = {
+  Logger,
   formatDate,
   formatRelativeTime,
   maskPhone,

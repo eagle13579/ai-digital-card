@@ -2,7 +2,7 @@
  * 名片详情页
  * 展示单张名片的详细信息与统计数据
  */
-const { miniappApi, brochureApi, visitorApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
@@ -25,29 +25,23 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
-      // 尝试从 miniapp cards 接口获取
-      const listResp = await miniappApi.getCards({ limit: 100 }).catch(() => ({ cards: [] }))
-      const cards = listResp.cards || []
-      const card = cards.find(c => c.id == cardId)
-
-      if (!card) {
-        // 降级：从 brochure API 获取
-        const brochure = await brochureApi.getById(cardId)
-        if (brochure) {
-          card = {
-            id: brochure.id,
-            user_id: brochure.user_id,
-            title: brochure.title,
-            cover: brochure.cover,
-            purpose: brochure.purpose,
-            status: brochure.status,
-            share_token: brochure.share_token,
-            view_count: brochure.view_count || 0,
-            user_name: brochure.user_name || '',
-            user_company: brochure.user_company || '',
-            user_title: brochure.user_title || '',
-            user_avatar: brochure.user_avatar || '',
-          }
+      const brochure = await MockService.getBrochureById(cardId)
+      
+      let card = null
+      if (brochure) {
+        card = {
+          id: brochure.id,
+          user_id: brochure.user_id,
+          title: brochure.title,
+          cover: brochure.cover,
+          purpose: brochure.purpose,
+          status: brochure.status,
+          share_token: brochure.share_token,
+          view_count: brochure.view_count || 0,
+          user_name: brochure.user_name || brochure.name || '',
+          user_company: brochure.user_company || brochure.company || '',
+          user_title: brochure.user_title || brochure.title || '',
+          user_avatar: brochure.user_avatar || brochure.avatar || '',
         }
       }
 
@@ -57,16 +51,13 @@ Page({
         employee: '寻找人才',
         client: '寻找客户',
         friend: '社交交友',
-      }[card?.purpose] || card?.purpose || ''
+      }[card && card.purpose] || (card && card.purpose) || ''
 
-      // 获取统计数据
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await visitorApi.getStats(card.id).catch(() => null)
-        if (vStats) {
-          stats.views = vStats.view_count || 0
-          stats.visitors = vStats.total_visits || 0
-        }
+        const vStats = await MockService.getVisitorStats(cardId)
+        stats.views = vStats.view_count || 0
+        stats.visitors = vStats.total_visits || 0
       }
 
       this.setData({
@@ -135,7 +126,7 @@ Page({
   onShareAppMessage() {
     const card = this.data.card
     return {
-      title: card?.title || 'AI数字名片',
+      title: card?.title || 'AI数智名片',
       path: card ? `/pages/preview/index?id=${card.id}` : '/pages/index/index',
     }
   },

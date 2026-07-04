@@ -1,0 +1,384 @@
+/* ========================================================================== */
+/*  Product page — 产品池                                                      */
+/*  设计系统色值: 参考 tokens.scss                                               */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  页面容器                                                                   */
+/* ========================================================================== */
+
+.product {
+  position: relative;
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+  &__scroll {
+    height: calc(100vh - 100px);
+    padding-top: 0;
+  }
+
+  &__bottom-spacer {
+    height: calc(140px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ========================================================================== */
+/*  骨架屏                                                                     */
+/* ========================================================================== */
+
+.product__skeleton {
+  padding: $page-padding;
+  animation: fadeIn 0.3s ease;
+
+  &-search {
+    height: 72px;
+    border-radius: 36px;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-categories {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  &-cat {
+    width: 100px;
+    height: 60px;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &-item {
+    width: 100%;
+    height: 360px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-md;
+  }
+}
+
+/* ========================================================================== */
+/*  错误状态                                                                   */
+/* ========================================================================== */
+
+.product__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-message {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xl;
+  }
+
+  &-btn {
+    width: 320px;
+    height: 80px;
+    line-height: 80px;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-lg;
+    border-radius: 40px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  搜索栏                                                                     */
+/* ========================================================================== */
+
+.product__search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: $spacing-md $page-padding;
+  background: $color-bg;
+}
+
+.product__search-input-wrap {
+  display: flex;
+  align-items: center;
+  height: 72px;
+  background: $color-bg-white;
+  border-radius: 36px;
+  padding: 0 $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+
+.product__search-icon {
+  font-size: 28px;
+  margin-right: $spacing-sm;
+}
+
+.product__search-input {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+
+  &::placeholder {
+    color: $color-text-placeholder;
+  }
+}
+
+.product__search-clear {
+  font-size: 28px;
+  color: $color-text-tertiary;
+  padding: $spacing-xs;
+}
+
+/* ========================================================================== */
+/*  分类筛选                                                                   */
+/* ========================================================================== */
+
+.product__categories {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-md;
+}
+
+.product__categories-scroll {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  padding-bottom: $spacing-xs;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.product__category-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 0 $spacing-lg;
+  border-radius: 30px;
+  background: $color-bg-white;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+  border: 1px solid $color-border;
+  cursor: pointer;
+
+  &--active {
+    background: $color-primary;
+    border-color: $color-primary;
+
+    .product__category-label {
+      color: #fff;
+    }
+  }
+}
+
+.product__category-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: 500;
+}
+
+/* ========================================================================== */
+/*  产品列表                                                                   */
+/* ========================================================================== */
+
+.product__list {
+  padding: 0 $page-padding;
+}
+
+.product__card {
+  display: flex;
+  flex-direction: column;
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+
+  &-cover {
+    width: 100%;
+    height: 320px;
+    background: $color-border-light;
+  }
+
+  &-info {
+    padding: $spacing-md;
+  }
+
+  &-name {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-price {
+    display: inline-block;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-error;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-supplier {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    margin-bottom: $spacing-sm;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-md;
+  }
+
+  &-tag {
+    font-size: 18px;
+    color: $color-primary;
+    background: $color-primary-light;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  &-contact-btn {
+    width: 100%;
+    height: 64px;
+    line-height: 64px;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-sm;
+    border-radius: 32px;
+    text-align: center;
+    border: none;
+    margin: 0;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  空状态                                                                     */
+/* ========================================================================== */
+
+.product__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-md;
+  }
+
+  &-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  发布产品悬浮按钮                                                           */
+/* ========================================================================== */
+
+.product__fab {
+  position: fixed;
+  right: $page-padding;
+  bottom: calc(120px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  background: $color-gradient-primary;
+  border-radius: 60px;
+  box-shadow: $shadow-lg;
+  z-index: 100;
+  cursor: pointer;
+
+  &-icon {
+    font-size: 36px;
+    color: #fff;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  &-label {
+    font-size: 18px;
+    color: #fff;
+    font-weight: 500;
+  }
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

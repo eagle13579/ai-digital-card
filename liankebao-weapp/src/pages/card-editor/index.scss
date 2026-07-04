@@ -1,0 +1,578 @@
+/* ========================================================================== */
+/*  AI名片创建页面样式                                                        */
+/*  设计令牌参考: src/styles/tokens.scss                                      */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* -------------------------------------------------------------------------- */
+/*  页面容器                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.card-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $color-bg;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  顶部栏                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__header {
+  padding: $spacing-3xl $spacing-xl $spacing-xl;
+  background: $color-gradient-ai;
+  text-align: center;
+}
+
+.card-editor__header-title {
+  display: block;
+  font-size: $font-size-3xl;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: $spacing-xs;
+}
+
+.card-editor__header-subtitle {
+  display: block;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  方式选择                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__select {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+  margin-top: -$spacing-xl;
+}
+
+.card-editor__select-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-2xl $spacing-xl;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &--active {
+    transform: scale(0.97);
+    box-shadow: $shadow-md;
+  }
+}
+
+.card-editor__select-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-md;
+}
+
+.card-editor__select-icon--scan {
+  background: $color-primary-light;
+}
+
+.card-editor__select-icon--manual {
+  background: linear-gradient(135deg, #fff7e6 0%, #fff1f0 100%);
+}
+
+.card-editor__select-emoji {
+  font-size: $font-size-4xl;
+}
+
+.card-editor__select-label {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.card-editor__select-desc {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  扫描中                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__scanning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl $spacing-xl;
+  flex: 1;
+}
+
+.card-editor__scanning-image {
+  width: 280px;
+  height: 200px;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-xl;
+  object-fit: cover;
+  box-shadow: $shadow-sm;
+}
+
+.card-editor__scanning-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.card-editor__scanning-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: $radius-round;
+  animation: card-editor-spin 0.8s linear infinite;
+}
+
+@keyframes card-editor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card-editor__scanning-text {
+  font-size: $font-size-lg;
+  font-weight: 500;
+  color: $color-text-primary;
+}
+
+.card-editor__scanning-hint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  错误页                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl $spacing-xl;
+  flex: 1;
+}
+
+.card-editor__error-icon {
+  font-size: 72px;
+  margin-bottom: $spacing-md;
+}
+
+.card-editor__error-title {
+  font-size: $font-size-2xl;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.card-editor__error-msg {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  margin-bottom: $spacing-2xl;
+  line-height: 1.5;
+}
+
+.card-editor__error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  顶部操作栏（编辑态）                                                      */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-xl;
+  background: $color-bg-card;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.card-editor__topbar-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.card-editor__topbar-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+}
+
+.card-editor__topbar-title {
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.card-editor__topbar-rescan {
+  font-size: $font-size-xs !important;
+  padding: $spacing-2xs $spacing-sm !important;
+  background: $color-primary-light !important;
+  color: $color-primary !important;
+  border: none !important;
+  border-radius: $radius-sm !important;
+  line-height: 1.4 !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  可滚动区域                                                                */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__scroll {
+  flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  表单                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__form {
+  padding: $spacing-md $spacing-xl;
+}
+
+.card-editor__field {
+  margin-bottom: $spacing-lg;
+}
+
+.card-editor__field-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2xs;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.card-editor__field-required {
+  color: $color-error;
+  font-weight: 700;
+}
+
+.card-editor__field-input {
+  width: 100%;
+  height: 88px;
+  padding: 0 $spacing-md;
+  background: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  box-sizing: border-box;
+
+  &--error {
+    border-color: $color-error;
+  }
+
+  &::placeholder {
+    color: $color-text-placeholder;
+  }
+}
+
+.card-editor__field-error {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-top: $spacing-2xs;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  提交错误                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__submit-error {
+  margin: 0 $spacing-xl $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-error;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  预览卡片                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__preview {
+  padding: 0 $spacing-xl $spacing-xl;
+}
+
+.card-editor__preview-title {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.card-editor__preview-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  box-shadow: $shadow-md;
+}
+
+.card-editor__preview-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.card-editor__preview-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.card-editor__preview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-editor__preview-name {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: $spacing-2xs;
+}
+
+.card-editor__preview-position {
+  display: block;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.card-editor__preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.card-editor__preview-item {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  提交按钮                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__submit {
+  padding: 0 $spacing-xl $spacing-md;
+}
+
+.card-editor__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88px;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &--primary {
+    background: $color-gradient-primary;
+    color: #fff;
+
+    &:active {
+      opacity: 0.85;
+    }
+  }
+
+  &--outline {
+    background: $color-bg-card;
+    color: $color-primary;
+    border: 1px solid $color-primary !important;
+
+    &:active {
+      background: $color-primary-light;
+    }
+  }
+
+  &--large {
+    height: 96px;
+    font-size: $font-size-lg;
+    border-radius: $radius-lg;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  成功页                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-3xl $spacing-xl;
+  flex: 1;
+}
+
+.card-editor__success-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: $radius-round;
+  background: $color-gradient-success;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-4xl;
+  color: #fff;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 4px 20px rgba(82, 196, 26, 0.35);
+}
+
+.card-editor__success-title {
+  display: block;
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.card-editor__success-desc {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  margin-bottom: $spacing-2xl;
+  line-height: 1.5;
+}
+
+.card-editor__success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  AI推荐匹配                                                                */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__recommend {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: $spacing-xl;
+}
+
+.card-editor__recommend-title {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  text-align: center;
+}
+
+.card-editor__recommend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+  box-shadow: $shadow-sm;
+}
+
+.card-editor__recommend-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  background: $color-bg;
+}
+
+.card-editor__recommend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-editor__recommend-name {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.card-editor__recommend-detail {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 2px;
+}
+
+.card-editor__recommend-score {
+  display: inline-block;
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: 500;
+  margin-top: $spacing-2xs;
+}
+
+.card-editor__recommend-reason {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-2xs;
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  底部安全区                                                                */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__safe-area {
+  height: env(safe-area-inset-bottom, 32px);
+}

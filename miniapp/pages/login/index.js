@@ -2,7 +2,7 @@
  * 微信授权登录页
  * 使用 wx.login() 获取临时 code → 后端换取 session
  */
-const { miniappApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
@@ -26,26 +26,11 @@ Page({
     wx.login({
       success: (res) => {
         if (res.code) {
-          // 将 code 发给后端
-          miniappApi.login({ code: res.code })
+          MockService.login({ code: res.code })
             .then(result => {
               if (result.token) {
-                // 获取用户信息
-                wx.getUserProfile({
-                  desc: '用于展示名片信息',
-                  success: (profile) => {
-                    app.setLogin(result.token, {
-                      name: profile.userInfo.nickName,
-                      avatar: profile.userInfo.avatarUrl,
-                    })
-                    wx.switchTab({ url: '/pages/index/index' })
-                  },
-                  fail: () => {
-                    // 用户拒绝授权也能登录（只是没头像昵称）
-                    app.setLogin(result.token, { name: '用户' })
-                    wx.switchTab({ url: '/pages/index/index' })
-                  }
-                })
+                app.setLogin(result.token, result.userInfo)
+                wx.switchTab({ url: '/pages/index/index' })
               } else {
                 wx.showToast({ title: '登录失败', icon: 'none' })
                 this.setData({ loading: false })

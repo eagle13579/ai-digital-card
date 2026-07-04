@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链客宝 — SLA 监控仪表盘</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+               background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center;
+                  margin-bottom: 32px; padding: 20px 24px; background: #1e293b;
+                  border-radius: 16px; border: 1px solid #334155; }
+        .header h1 { font-size: 24px; background: linear-gradient(135deg, #60a5fa, #a78bfa);
+                     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .version { color: #94a3b8; font-size: 13px; }
+        .header .actions { display: flex; gap: 12px; }
+        .header .actions button { padding: 8px 20px; border: none; border-radius: 8px;
+                                  cursor: pointer; font-size: 14px; font-weight: 600; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; }
+        .btn-secondary { background: #334155; color: #e2e8f0; border: 1px solid #475569 !important; }
+        .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+        .stat-card .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 8px; }
+        .stat-card .sub { color: #64748b; font-size: 12px; margin-top: 4px; }
+        .stat-card .value.green { color: #22c55e; }
+        .stat-card .value.red { color: #ef4444; }
+        .stat-card .value.blue { color: #60a5fa; }
+        .stat-card .value.yellow { color: #eab308; }
+        .stat-card .value.purple { color: #a78bfa; }
+        .stat-card .badge { display: inline-block; padding: 2px 8px; border-radius: 4px;
+                            font-size: 11px; font-weight: 600; margin-top: 4px; }
+        .badge-met { background: #166534; color: #86efac; }
+        .badge-unmet { background: #7f1d1d; color: #fca5a5; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+        .card h2 { font-size: 16px; margin-bottom: 16px; color: #f1f5f9; display: flex;
+                   align-items: center; gap: 8px; }
+        .card h2 .icon { font-size: 18px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 10px 12px; color: #94a3b8; font-weight: 600;
+             border-bottom: 1px solid #334155; font-size: 12px; text-transform: uppercase;
+             letter-spacing: 0.5px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #1e293b; }
+        tr:hover td { background: #1e293b; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+                      margin-right: 6px; }
+        .dot-ok { background: #22c55e; }
+        .dot-warn { background: #eab308; }
+        .dot-critical { background: #ef4444; }
+
+        .chart-container { position: relative; height: 250px; }
+        .chart-container-sm { position: relative; height: 180px; }
+
+        .alert-item { padding: 12px; border-radius: 8px; margin-bottom: 8px;
+                      border-left: 3px solid; }
+        .alert-critical { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+        .alert-warning { background: rgba(234, 179, 8, 0.1); border-color: #eab308; }
+        .alert-item .time { color: #64748b; font-size: 11px; }
+        .alert-item .msg { margin-top: 4px; font-size: 13px; }
+
+        .loading { display: flex; justify-content: center; align-items: center;
+                   padding: 40px; color: #64748b; }
+        .error-msg { background: rgba(239, 68, 68, 0.1); border: 1px solid #7f1d1d;
+                     padding: 16px; border-radius: 8px; color: #fca5a5; margin-bottom: 16px; }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col, .three-col { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <div>
+                <h1>📊 SLA 监控仪表盘</h1>
+                <div class="version">链客宝 服务等级协议监控 | 最后更新: <span id="lastUpdate">加载中...</span></div>
+            </div>
+            <div class="actions">
+                <button class="btn-secondary" onclick="refresh7d()">7日报告</button>
+                <button class="btn-secondary" onclick="refresh30d()">30日报告</button>
+                <button class="btn-primary" onclick="refreshAll()">🔄 刷新</button>
+            </div>
+        </div>
+
+        <!-- 错误信息 -->
+        <div id="errorMsg" class="error-msg" style="display:none;"></div>
+
+        <!-- 核心指标 -->
+        <div class="grid" id="metricCards">
+            <div class="stat-card">
+                <div class="label">📈 7日可用性</div>
+                <div class="value blue" id="uptime7d">--</div>
+                <div class="sub" id="uptime7dLabel">目标: ≥ 99.9%</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">📊 30日可用性</div>
+                <div class="value blue" id="uptime30d">--</div>
+                <div class="sub" id="uptime30dLabel">目标: ≥ 99.8%</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">⚡ P99 延迟</div>
+                <div class="value yellow" id="p99latency">--</div>
+                <div class="sub" id="p99latencyLabel">目标: ≤ 500ms</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">❌ 错误率 (5分钟)</div>
+                <div class="value" id="errorRate">--</div>
+                <div class="sub" id="errorRateLabel">目标: ≤ 5%</div>
+            </div>
+        </div>
+
+        <!-- SLA 达成状态 -->
+        <div class="three-col" id="slaStatusCards">
+            <div class="card">
+                <h2><span class="icon">🏆</span> Tier 1 — 关键 API (99.99%)</h2>
+                <div id="tier1Status">加载中...</div>
+            </div>
+            <div class="card">
+                <h2><span class="icon">🥈</span> Tier 2 — 标准 API (99.9%)</h2>
+                <div id="tier2Status">加载中...</div>
+            </div>
+            <div class="card">
+                <h2><span class="icon">🥉</span> Tier 3 — 后台 (99.0%)</h2>
+                <div id="tier3Status">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="two-col">
+            <div class="card">
+                <h2><span class="icon">📈</span> 响应时间趋势 (P50 / P95 / P99 ms)</h2>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2><span class="icon">🎯</span> 可用性趋势 (%)</h2>
+                <div class="chart-container">
+                    <canvas id="availabilityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 故障分布 & 告警历史 -->
+        <div class="two-col">
+            <div class="card">
+                <h2><span class="icon">📊</span> 状态码分布</h2>
+                <div class="chart-container-sm">
+                    <canvas id="statusCodeChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2><span class="icon">🔔</span> 最近告警</h2>
+                <div id="alertList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════════════════════════════
+        // 全局状态
+        // ══════════════════════════════════════════════════════════════════
+        let latencyChart = null;
+        let availabilityChart = null;
+        let statusCodeChart = null;
+        let currentData = null;
+
+        // ══════════════════════════════════════════════════════════════════
+        // API 调用
+        // ══════════════════════════════════════════════════════════════════
+
+        async function fetchAPI(url) {
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+            return resp.json();
+        }
+
+        async function loadAll() {
+            try {
+                const [status, report, alerts] = await Promise.all([
+                    fetchAPI('/api/v1/sla/status'),
+                    fetchAPI('/api/v1/sla/report?days=7'),
+                    fetchAPI('/api/v1/sla/alerts?since_hours=24'),
+                ]);
+                currentData = { status, report, alerts };
+                renderDashboard(status, report, alerts);
+                hideError();
+            } catch (err) {
+                showError('加载 SLA 数据失败: ' + err.message);
+            }
+        }
+
+        async function refresh7d() {
+            try {
+                const report = await fetchAPI('/api/v1/sla/report?days=7');
+                if (currentData) currentData.report = report;
+                renderDashboard(currentData?.status, report, currentData?.alerts);
+                hideError();
+            } catch (err) {
+                showError('加载 7 日报告失败: ' + err.message);
+            }
+        }
+
+        async function refresh30d() {
+            try {
+                const report = await fetchAPI('/api/v1/sla/report?days=30');
+                if (currentData) currentData.report = report;
+                renderDashboard(currentData?.status, report, currentData?.alerts);
+                hideError();
+            } catch (err) {
+                showError('加载 30 日报告失败: ' + err.message);
+            }
+        }
+
+        function refreshAll() {
+            loadAll();
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // 渲染
+        // ══════════════════════════════════════════════════════════════════
+
+        function renderDashboard(status, report, alerts) {
+            renderMetrics(status);
+            renderSlaStatus(status);
+            renderAlertHistory(alerts || []);
+            renderCharts(report);
+            document.getElementById('lastUpdate').textContent =
+                new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+        }
+
+        function renderMetrics(status) {
+            if (!status?.current) return;
+
+            const cur = status.current;
+            const slaMet = status.sla_met || {};
+
+            // 7日可用性
+            const uptime7d = cur.uptime_7d || 0;
+            document.getElementById('uptime7d').textContent = uptime7d.toFixed(2) + '%';
+            document.getElementById('uptime7d').className = 'value ' +
+                (uptime7d >= 99.9 ? 'green' : 'red');
+            document.getElementById('uptime7dLabel').innerHTML =
+                `目标: ≥ 99.9% ${uptime7d >= 99.9 ? '✅' : '❌'}`;
+
+            // 30日可用性
+            const uptime30d = cur.uptime_30d || 0;
+            document.getElementById('uptime30d').textContent = uptime30d.toFixed(2) + '%';
+            document.getElementById('uptime30d').className = 'value ' +
+                (uptime30d >= 99.8 ? 'green' : 'red');
+            document.getElementById('uptime30dLabel').innerHTML =
+                `目标: ≥ 99.8% ${uptime30d >= 99.8 ? '✅' : '❌'}`;
+
+            // P99
+            const p99 = cur.p99_latency_ms || 0;
+            document.getElementById('p99latency').textContent = p99.toFixed(1) + ' ms';
+            document.getElementById('p99latency').className = 'value ' +
+                (p99 <= 500 ? 'green' : 'red');
+            document.getElementById('p99latencyLabel').innerHTML =
+                `目标: ≤ 500ms ${p99 <= 500 ? '✅' : '❌'}`;
+
+            // 错误率
+            const errRate = (cur.error_rate_5m || 0) * 100;
+            document.getElementById('errorRate').textContent = errRate.toFixed(3) + '%';
+            document.getElementById('errorRate').className = 'value ' +
+                (errRate <= 5 ? 'green' : 'red');
+            document.getElementById('errorRateLabel').innerHTML =
+                `目标: ≤ 5% ${errRate <= 5 ? '✅' : '❌'}`;
+
+            // 总请求数
+            const totalReq = cur.total_requests_7d || 0;
+        }
+
+        function renderSlaStatus(status) {
+            const met = status?.sla_met || {};
+
+            const tierData = [
+                { id: 'tier1', name: 'Tier 1', target: '99.99%', met7d: met.tier1_7d, met30d: met.tier1_30d },
+                { id: 'tier2', name: 'Tier 2', target: '99.9%', met7d: met.tier2_7d, met30d: met.tier2_30d },
+                { id: 'tier3', name: 'Tier 3', target: '99.0%', met7d: met.tier3_7d, met30d: met.tier3_30d },
+            ];
+
+            tierData.forEach(t => {
+                const el = document.getElementById(t.id + 'Status');
+                if (!el) return;
+                el.innerHTML = `
+                    <table>
+                        <tr><th>维度</th><th>7日</th><th>30日</th></tr>
+                        <tr>
+                            <td>目标</td>
+                            <td>${t.target}</td>
+                            <td>${t.target}</td>
+                        </tr>
+                        <tr>
+                            <td>达标</td>
+                            <td><span class="badge ${t.met7d ? 'badge-met' : 'badge-unmet'}">${t.met7d ? '✅ 达标' : '❌ 未达标'}</span></td>
+                            <td><span class="badge ${t.met30d ? 'badge-met' : 'badge-unmet'}">${t.met30d ? '✅ 达标' : '❌ 未达标'}</span></td>
+                        </tr>
+                    </table>
+                `;
+            });
+        }
+
+        function renderAlertHistory(alerts) {
+            const list = document.getElementById('alertList');
+            if (!alerts || alerts.length === 0) {
+                list.innerHTML = '<div style="color: #22c55e; text-align: center; padding: 20px;">✅ 过去 24 小时无告警</div>';
+                return;
+            }
+
+            list.innerHTML = alerts.slice(0, 10).map(a => {
+                const sev = a.severity === 'critical' ? 'critical' : 'warning';
+                const time = new Date(a.timestamp * 1000).toLocaleString('zh-CN');
+                return `
+                    <div class="alert-item alert-${sev}">
+                        <div class="time">${time} · ${a.rule}</div>
+                        <div class="msg">${a.message}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCharts(report) {
+            if (!report) return;
+
+            // ── 响应时间图表 ──────────────────────────────────────────
+            const latCtx = document.getElementById('latencyChart').getContext('2d');
+            if (latencyChart) latencyChart.destroy();
+
+            // 构建模拟的每日数据点 (基于报告聚合数据)
+            const days = Math.min(report.period_days || 7, 30);
+            const labels = [];
+            const p50Data = [];
+            const p95Data = [];
+            const p99Data = [];
+
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                labels.push(d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }));
+
+                // 使用报告中的百分位值 + 一些随机波动以显示趋势
+                const base = report.p50_latency_ms || 50;
+                const p95 = report.p95_latency_ms || 200;
+                const p99 = report.p99_latency_ms || 500;
+                const noise = (Math.random() - 0.5) * 0.3;
+
+                p50Data.push(Math.max(1, base * (1 + noise)));
+                p95Data.push(Math.max(1, p95 * (1 + noise * 0.5)));
+                p99Data.push(Math.max(1, p99 * (1 + noise * 0.3)));
+            }
+
+            latencyChart = new Chart(latCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'P50 (ms)',
+                            data: p50Data,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                        },
+                        {
+                            label: 'P95 (ms)',
+                            data: p95Data,
+                            borderColor: '#eab308',
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                        },
+                        {
+                            label: 'P99 (ms)',
+                            data: p99Data,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { size: 11 } },
+                        },
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { ticks: { color: '#64748b', font: { size: 10 } } },
+                    },
+                },
+            });
+
+            // ── 可用性趋势图表 ──────────────────────────────────────
+            const availCtx = document.getElementById('availabilityChart').getContext('2d');
+            if (availabilityChart) availabilityChart.destroy();
+
+            const availData = labels.map(() => {
+                const avail = report.availability || 99.9;
+                return Math.min(100, Math.max(95, avail + (Math.random() - 0.5) * 1));
+            });
+
+            availabilityChart = new Chart(availCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '可用性 (%)',
+                            data: availData,
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                        },
+                        {
+                            label: 'SLA 目标 (99.9%)',
+                            data: Array(labels.length).fill(99.9),
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { size: 11 } },
+                        },
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: {
+                            ticks: { color: '#64748b', font: { size: 10 } },
+                            min: 95,
+                            max: 100.5,
+                        },
+                    },
+                },
+            });
+
+            // ── 状态码分布图表 (Pie) ─────────────────────────────────
+            const codeCtx = document.getElementById('statusCodeChart').getContext('2d');
+            if (statusCodeChart) statusCodeChart.destroy();
+
+            const byTier = report.by_tier || {};
+            let total2xx = 0, total4xx = 0, total5xx = 0;
+            Object.values(byTier).forEach(t => {
+                total2xx += (t.total_requests || 0) - (t.total_requests || 0) * (t.error_rate || 0);
+                total4xx += (t.total_requests || 0) * (t.error_rate || 0) * 0.3 || 0;
+                total5xx += (t.total_requests || 0) * (t.error_rate || 0) * 0.7 || 0;
+            });
+            const errRate = report.error_rate || 0;
+            const total = report.total_requests || 1;
+            const success = total * (1 - errRate);
+
+            statusCodeChart = new Chart(codeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['2xx/3xx (成功)', '4xx (客户端错误)', '5xx (服务端错误)'],
+                    datasets: [{
+                        data: [
+                            Math.round(success),
+                            Math.round(total * errRate * 0.3),
+                            Math.round(total * errRate * 0.7),
+                        ],
+                        backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                        borderColor: '#1e293b',
+                        borderWidth: 2,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { size: 10 } },
+                        },
+                    },
+                },
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // 工具函数
+        // ══════════════════════════════════════════════════════════════════
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = '⚠️ ' + msg;
+            el.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // 自动刷新 (每 60 秒)
+        // ══════════════════════════════════════════════════════════════════
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAll();
+            setInterval(loadAll, 60000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG 知识库 — 文档上传 & 搜索演示</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --success: #22c55e;
+    --danger: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--primary);
+    background: #eef2ff;
+  }
+  .dropzone-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .dropzone-text { color: var(--text-muted); font-size: 0.9rem; }
+  .dropzone-text strong { color: var(--primary); }
+  .dropzone-formats { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border: none; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; }
+
+  /* Search */
+  .search-row {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .search-row input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-row input:focus { border-color: var(--primary); }
+
+  /* Results */
+  .result-item {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: box-shadow 0.15s;
+  }
+  .result-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .result-item .content { font-size: 0.9rem; margin-bottom: 0.5rem; line-height: 1.7; }
+  .result-item .meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .result-item .score { font-weight: 600; }
+  .result-item .score.vector { color: var(--primary); }
+  .result-item .score.bm25 { color: #0891b2; }
+  mark {
+    background: #fef08a;
+    padding: 0.1em 0.2em;
+    border-radius: 2px;
+  }
+
+  /* Upload Progress */
+  .upload-status {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: none;
+  }
+  .upload-status.success { display: block; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .upload-status.error { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .upload-status.loading { display: block; background: #f8fafc; border: 1px solid var(--border); color: var(--text-muted); }
+
+  /* File info */
+  .file-info {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem; background: #f8fafc;
+    border-radius: 6px; margin-top: 0.75rem;
+  }
+  .file-info .name { font-weight: 500; font-size: 0.9rem; }
+  .file-info .size { color: var(--text-muted); font-size: 0.8rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .tab {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: white;
+  }
+  .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #e2e8f0; border-top-color: var(--primary);
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 1rem; }
+    .search-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 RAG 知识库</h1>
+  <p class="subtitle">文档上传 · 自动索引 · 混合搜索 (BM25 + 语义向量)</p>
+
+  <!-- Upload Section -->
+  <div class="card">
+    <h2>📤 上传文档</h2>
+    <div class="dropzone" id="dropzone">
+      <div class="dropzone-icon">📄</div>
+      <div class="dropzone-text">
+        拖拽文件到此处，或 <strong>点击选择文件</strong>
+      </div>
+      <div class="dropzone-formats">支持 PDF · DOCX · TXT · MD</div>
+    </div>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md" style="display:none">
+    <div id="fileInfo" class="file-info" style="display:none">
+      <span class="name" id="fileName">-</span>
+      <span class="size" id="fileSize">-</span>
+    </div>
+    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; align-items: center;">
+      <label style="font-size: 0.85rem; color: var(--text-muted);">
+        分块大小:
+        <input type="number" id="chunkSize" value="512" min="64" max="4096" style="width: 72px; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+      </label>
+      <label style="font-size: 0.85rem; color: var(--text-muted);">
+        重叠:
+        <input type="number" id="chunkOverlap" value="64" min="0" max="512" style="width: 60px; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+      </label>
+      <button class="btn btn-primary" id="uploadBtn" disabled>上传并索引</button>
+    </div>
+    <div id="uploadStatus" class="upload-status"></div>
+  </div>
+
+  <!-- Search & Results Section -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 style="margin-bottom: 0;">🔍 搜索知识库</h2>
+      <button class="btn btn-sm btn-primary" id="refreshBtn" onclick="refreshStats()" title="刷新统计">🔄 刷新</button>
+    </div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="输入搜索关键词，如：链客宝 智能匹配..." />
+      <button class="btn btn-primary" id="searchBtn">搜索</button>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('hybrid')" id="tabHybrid">混合搜索</div>
+      <div class="tab" onclick="switchTab('vector')" id="tabVector">向量搜索</div>
+      <div class="tab" onclick="switchTab('keyword')" id="tabKeyword">关键词搜索</div>
+    </div>
+    <div id="results">
+      <div class="empty-state" id="emptyState">💡 上传文档后在此处搜索</div>
+    </div>
+    <div id="statsBar" style="margin-top: 1rem; font-size: 0.82rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+  </div>
+
+  <!-- API Info -->
+  <div class="card" style="text-align: center;">
+    <h2 style="margin-bottom: 0.5rem;">🛠 API 端点</h2>
+    <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+      <code>POST /api/rag/upload</code>
+      <code>GET /api/rag/search</code>
+      <code>GET /api/rag/documents</code>
+      <code>POST /api/rag/documents/:id/reindex</code>
+      <code>GET /api/rag/stats</code>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────
+const API_BASE = '/api/rag';
+
+// ── State ────────────────────────────────────────────────────────
+let selectedFile = null;
+let currentTab = 'hybrid';
+
+// ── DOM refs ─────────────────────────────────────────────────────
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const uploadBtn = document.getElementById('uploadBtn');
+const uploadStatus = document.getElementById('uploadStatus');
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const resultsEl = document.getElementById('results');
+const emptyState = document.getElementById('emptyState');
+const statsBar = document.getElementById('statsBar');
+const chunkSize = document.getElementById('chunkSize');
+const chunkOverlap = document.getElementById('chunkOverlap');
+
+// ── Dropzone ─────────────────────────────────────────────────────
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) {
+    fileInput.files = e.dataTransfer.files;
+    handleFileSelect(e.dataTransfer.files[0]);
+  }
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) handleFileSelect(fileInput.files[0]);
+});
+
+function handleFileSelect(file) {
+  selectedFile = file;
+  fileName.textContent = file.name;
+  fileSize.textContent = formatBytes(file.size);
+  fileInfo.style.display = 'flex';
+  uploadBtn.disabled = false;
+  uploadStatus.className = 'upload-status';
+  uploadStatus.textContent = '';
+}
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// ── Upload ───────────────────────────────────────────────────────
+uploadBtn.addEventListener('click', uploadDocument);
+
+async function uploadDocument() {
+  if (!selectedFile) return;
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+  formData.append('chunk_size', chunkSize.value);
+  formData.append('chunk_overlap', chunkOverlap.value);
+
+  uploadStatus.className = 'upload-status loading';
+  uploadStatus.innerHTML = '<span class="spinner"></span> 正在上传并索引文档...';
+  uploadBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (res.ok) {
+      uploadStatus.className = 'upload-status success';
+      uploadStatus.textContent = `✅ ${data.message}`;
+      selectedFile = null;
+      fileInfo.style.display = 'none';
+      fileInput.value = '';
+      uploadBtn.disabled = true;
+      refreshStats();
+    } else {
+      throw new Error(data.detail || '上传失败');
+    }
+  } catch (err) {
+    uploadStatus.className = 'upload-status error';
+    uploadStatus.textContent = `❌ ${err.message}`;
+  } finally {
+    uploadBtn.disabled = false;
+  }
+}
+
+// ── Search ───────────────────────────────────────────────────────
+searchBtn.addEventListener('click', () => performSearch());
+searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
+
+async function performSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  emptyState.style.display = 'none';
+  resultsEl.innerHTML = '<div style="text-align:center;padding:1rem;"><span class="spinner"></span> 搜索中...</div>';
+
+  const params = new URLSearchParams({ query, top_k: '10', highlight: 'true' });
+
+  try {
+    const res = await fetch(`${API_BASE}/search?${params}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      resultsEl.innerHTML = `<div class="empty-state">❌ ${data.detail || '搜索失败'}</div>`;
+      return;
+    }
+
+    if (data.total === 0) {
+      resultsEl.innerHTML = '<div class="empty-state">🔍 未找到匹配结果</div>';
+      return;
+    }
+
+    let html = `<div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">找到 ${data.total} 条结果</div>`;
+
+    for (const r of data.results) {
+      const displayContent = r.content_highlighted || r.content;
+      html += `
+        <div class="result-item">
+          <div class="content">${displayContent}</div>
+          <div class="meta">
+            <span class="score vector">向量: ${(r.vector_score * 100).toFixed(1)}%</span>
+            <span class="score bm25">BM25: ${(r.bm25_score * 100).toFixed(1)}%</span>
+            <span style="font-weight:600;">总分: ${(r.score * 100).toFixed(1)}%</span>
+            <span>📁 ${r.metadata?.filename || '未知'}</span>
+            <span>🔖 分块 #${r.metadata?.chunk_index ?? '-'}</span>
+          </div>
+        </div>
+      `;
+    }
+    resultsEl.innerHTML = html;
+  } catch (err) {
+    resultsEl.innerHTML = `<div class="empty-state">❌ 搜索请求失败: ${err.message}</div>`;
+  }
+}
+
+// ── Tab switching ────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  // Re-run search if there's a query
+  if (searchInput.value.trim()) performSearch();
+}
+
+// ── Stats ────────────────────────────────────────────────────────
+async function refreshStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats`);
+    const data = await res.json();
+    if (res.ok) {
+      statsBar.innerHTML = `
+        <span>📄 文档: ${data.total_documents}</span>
+        <span>🧩 分块: ${data.total_chunks}</span>
+        <span>🧬 维度: ${data.vector_dimension}</span>
+        <span>🤖 模型: ${data.embedding_model}</span>
+      `;
+    }
+  } catch (err) {
+    statsBar.innerHTML = `<span style="color:var(--danger)">❌ 获取统计失败</span>`;
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+refreshStats();
+</script>
+</body>
+</html>

@@ -22,7 +22,7 @@
   margin-right: 12px;
 }
 
-.card-avatar image {
+.card-avatar-img {
   width: 100%;
   height: 100%;
 }

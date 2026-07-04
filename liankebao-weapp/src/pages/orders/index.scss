@@ -1,0 +1,284 @@
+/* ========================================================================== */
+/*  订单管理页样式                                                               */
+/* ========================================================================== */
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f5f5;
+  box-sizing: border-box;
+}
+
+/* ---- Tab 栏 ---- */
+.orders__tabs {
+  background: #fff;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.orders__tabs-scroll {
+  display: flex;
+  white-space: nowrap;
+  padding: 16px 0;
+}
+
+.orders__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  margin-right: 8px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.orders__tab--active {
+  background: #1677ff;
+}
+
+.orders__tab-label {
+  font-size: 26px;
+  color: #666;
+  font-weight: 500;
+}
+
+.orders__tab--active .orders__tab-label {
+  color: #fff;
+}
+
+/* ---- 滚动区域 ---- */
+.orders__scroll {
+  flex: 1;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+/* ---- 订单卡片 ---- */
+.orders__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orders__card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 卡片头部：订单号 + 状态 */
+.orders__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.orders__order-no {
+  font-size: 24px;
+  color: #999;
+}
+
+.orders__order-status {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* 卡片主体：商品名 + 金额 */
+.orders__card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.orders__card-info {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.orders__product-name {
+  display: block;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.orders__order-time {
+  display: block;
+  font-size: 22px;
+  color: #999;
+}
+
+.orders__amount {
+  font-size: 30px;
+  font-weight: 700;
+  color: #e4393c;
+  flex-shrink: 0;
+}
+
+/* 卡片底部：操作按钮 */
+.orders__card-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.orders__action-btn {
+  height: 56px;
+  line-height: 56px;
+  padding: 0 24px;
+  border-radius: 28px;
+  font-size: 24px;
+  font-weight: 500;
+  border: none;
+  margin-left: 0;
+}
+
+.orders__action-btn::after {
+  border: none;
+}
+
+.orders__action-btn--pay {
+  background: linear-gradient(135deg, #fa8c16 0%, #e67e22 100%);
+  color: #fff;
+}
+
+.orders__action-btn--rebuy {
+  background: #fff;
+  color: #1677ff;
+  border: 2px solid #1677ff;
+}
+
+.orders__action-hint {
+  font-size: 24px;
+  color: #999;
+}
+
+/* ---- Loading 骨架屏 ---- */
+.orders__skeleton {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orders__skeleton-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orders__skeleton-line {
+  height: 24px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.orders__skeleton-line--wide {
+  width: 80%;
+}
+
+.orders__skeleton-line--narrow {
+  width: 50%;
+}
+
+.orders__skeleton-line--medium {
+  width: 65%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- 错误状态 ---- */
+.orders__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 40px;
+}
+
+.orders__error-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+}
+
+.orders__error-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.orders__error-message {
+  font-size: 26px;
+  color: #999;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.orders__error-btn {
+  width: 200px;
+  height: 72px;
+  line-height: 72px;
+  background: #1677ff;
+  border-radius: 36px;
+  color: #fff;
+  font-size: 28px;
+  border: none;
+}
+
+.orders__error-btn::after {
+  border: none;
+}
+
+/* ---- 空状态 ---- */
+.orders__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120px 40px;
+}
+
+.orders__empty-icon {
+  font-size: 100px;
+  margin-bottom: 24px;
+}
+
+.orders__empty-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.orders__empty-desc {
+  font-size: 26px;
+  color: #999;
+}
+
+/* ---- 底部间距 ---- */
+.orders__bottom-spacer {
+  height: 40px;
+}

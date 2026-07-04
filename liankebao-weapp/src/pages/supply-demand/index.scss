@@ -1,0 +1,518 @@
+/* ========================================================================== */
+/*  Supply-Demand — 供需大厅：AI智能匹配+推荐                                    */
+/*  设计系统色值: 参考 tokens.scss                                               */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  页面容器                                                                   */
+/* ========================================================================== */
+
+.supply-demand {
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+
+  &__bottom-spacer {
+    height: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ========================================================================== */
+/*  Tab 切换栏                                                                  */
+/* ========================================================================== */
+
+.supply-demand__tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: $color-bg-white;
+  padding: 0 $page-padding;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid $color-divider;
+}
+
+.supply-demand__tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md 0;
+  cursor: pointer;
+  flex: 1;
+
+  &-label {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+    transition: color 0.2s ease;
+  }
+
+  &--active &-label {
+    color: $color-primary;
+    font-weight: 600;
+  }
+
+  &-indicator {
+    position: absolute;
+    bottom: 0;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: $color-primary;
+    animation: tabSlideIn 0.25s ease;
+  }
+}
+
+@keyframes tabSlideIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ========================================================================== */
+/*  AI推荐顶部说明                                                              */
+/* ========================================================================== */
+
+.supply-demand__ai-header {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $page-padding;
+  background: $color-primary-light;
+  margin: 0 0 $spacing-xs;
+
+  &-icon {
+    font-size: $font-size-lg;
+    margin-right: $spacing-xs;
+  }
+
+  &-text {
+    font-size: $font-size-sm;
+    color: $color-primary-dark;
+    line-height: 1.4;
+  }
+}
+
+/* ========================================================================== */
+/*  发布按钮栏                                                                 */
+/* ========================================================================== */
+
+.supply-demand__publish-bar {
+  padding: $spacing-md $page-padding;
+  background: $color-bg-white;
+  margin-bottom: $spacing-xs;
+}
+
+.supply-demand__publish-btn {
+  width: 100%;
+  height: 80px;
+  line-height: 80px;
+  background: $color-gradient-primary;
+  color: #fff;
+  font-size: $font-size-md;
+  font-weight: 600;
+  border-radius: 40px;
+  text-align: center;
+  border: none;
+
+  &::after {
+    display: none;
+  }
+}
+
+/* ========================================================================== */
+/*  列表滚动容器                                                               */
+/* ========================================================================== */
+
+.supply-demand__scroll {
+  height: calc(100vh - 88px - 80px);
+}
+
+.supply-demand__list {
+  padding: 0 $page-padding;
+}
+
+/* ========================================================================== */
+/*  供需卡片                                                                   */
+/* ========================================================================== */
+
+.supply-demand__card {
+  background: $color-bg-white;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &--active {
+    transform: scale(0.98);
+    box-shadow: none;
+  }
+
+  /* ---- 头部：标题 + 匹配度 ---- */
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-title {
+    flex: 1;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: $spacing-sm;
+  }
+
+  /* ---- 公司 + 行业 ---- */
+  &-meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-company,
+  &-industry {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 50%;
+  }
+
+  /* ---- 描述 ---- */
+  &-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    line-height: 1.5;
+    margin-bottom: $spacing-xs;
+  }
+
+  /* ---- AI推荐理由 ---- */
+  &-reason {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    padding: $spacing-xs;
+    background: $color-primary-light;
+    border-radius: $radius-sm;
+    margin-bottom: $spacing-xs;
+
+    &-icon {
+      font-size: $font-size-sm;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    &-text {
+      font-size: $font-size-xs;
+      color: $color-primary-dark;
+      line-height: 1.4;
+      flex: 1;
+    }
+  }
+
+  /* ---- 底部 ---- */
+  &-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: $spacing-xs;
+  }
+
+  &-time {
+    font-size: $font-size-xs;
+    color: $color-text-placeholder;
+  }
+
+  &-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &-action {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    padding: 4px $spacing-sm;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    line-height: 1.4;
+
+    &--primary {
+      color: $color-primary;
+      border-color: $color-primary;
+      background: $color-primary-light;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  匹配度徽章                                                                 */
+/* ========================================================================== */
+
+.supply-demand__match-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 56px;
+
+  &--sm {
+    flex-direction: row;
+    gap: 2px;
+  }
+}
+
+.supply-demand__match-value {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  line-height: 1;
+
+  &--high {
+    color: #52c41a;
+  }
+
+  &--mid {
+    color: #fa8c16;
+  }
+
+  &--low {
+    color: $color-text-tertiary;
+  }
+}
+
+.supply-demand__match-label {
+  font-size: 18px;
+  color: $color-text-tertiary;
+  margin-top: 2px;
+}
+
+/* ========================================================================== */
+/*  加载更多指示器                                                              */
+/* ========================================================================== */
+
+.supply-demand__loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md 0;
+  gap: $spacing-xs;
+}
+
+.supply-demand__loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.supply-demand__loading-text {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.supply-demand__no-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg 0;
+
+  &-text {
+    font-size: $font-size-sm;
+    color: $color-text-placeholder;
+  }
+}
+
+/* ========================================================================== */
+/*  骨架屏                                                                     */
+/* ========================================================================== */
+
+.supply-demand__skeleton {
+  padding: $page-padding;
+  animation: fadeIn 0.3s ease;
+
+  &-item {
+    background: $color-bg-white;
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-line {
+    height: 24px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: $spacing-xs;
+
+    &--title {
+      width: 60%;
+      height: 32px;
+    }
+
+    &--company {
+      width: 40%;
+    }
+
+    &--tag {
+      width: 25%;
+      height: 20px;
+    }
+
+    &--score {
+      width: 20%;
+      height: 20px;
+    }
+  }
+
+  &-row {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-xs;
+  }
+}
+
+/* ========================================================================== */
+/*  空状态                                                                     */
+/* ========================================================================== */
+
+.supply-demand__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-desc {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xl;
+    text-align: center;
+  }
+
+  &-btn {
+    width: 280px;
+    height: 80px;
+    line-height: 80px;
+    background: $color-gradient-primary;
+    color: #fff;
+    font-size: $font-size-md;
+    border-radius: 40px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  错误状态                                                                   */
+/* ========================================================================== */
+
+.supply-demand__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: $page-padding;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-msg {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-2xl;
+    text-align: center;
+  }
+
+  &-btn {
+    width: 280px;
+    height: 80px;
+    line-height: 80px;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-md;
+    border-radius: 40px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

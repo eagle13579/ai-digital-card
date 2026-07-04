@@ -13,4 +13,5 @@ from app import create_app
 app = create_app()
 
 if __name__ == "__main__":
+    print("[HTTP] 使用HTTP模式（微信开发者工具兼容性更好）")
     uvicorn.run("main:app", host="0.0.0.0", port=8201, reload=False, log_level="info")

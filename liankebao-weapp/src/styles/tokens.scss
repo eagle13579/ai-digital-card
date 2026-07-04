@@ -1,0 +1,65 @@
+// ===== Design Tokens =====
+// 颜色系统
+$color-primary: #1677ff;
+$color-primary-light: #e6f4ff;
+$color-primary-dark: #0958d9;
+
+$color-success: #52c41a;
+$color-warning: #faad14;
+$color-error: #ff4d4f;
+
+// 中性色
+$color-bg: #f5f5f5;
+$color-bg-white: #ffffff;
+$color-bg-card: #ffffff;
+
+$color-text-primary: #262626;
+$color-text-secondary: #595959;
+$color-text-tertiary: #8c8c8c;
+$color-text-placeholder: #bfbfbf;
+
+$color-border: #e8e8e8;
+$color-border-light: #f0f0f0;
+$color-divider: #f0f0f0;
+
+// 品牌梯度色
+$color-gradient-primary: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
+$color-gradient-ai: linear-gradient(135deg, #1677ff 0%, #722ed1 100%);
+$color-gradient-warm: linear-gradient(135deg, #fa8c16 0%, #f5222d 100%);
+$color-gradient-success: linear-gradient(135deg, #52c41a 0%, #13c2c2 100%);
+
+// 间距
+$spacing-2xs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 20px;
+$spacing-xl: 24px;
+$spacing-2xl: 32px;
+$spacing-3xl: 40px;
+
+// 字体大小
+$font-size-xs: 20px;
+$font-size-sm: 24px;
+$font-size-md: 28px;
+$font-size-lg: 32px;
+$font-size-xl: 36px;
+$font-size-2xl: 40px;
+$font-size-3xl: 48px;
+$font-size-4xl: 56px;
+
+// 圆角
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-round: 50%;
+
+// 阴影
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+$shadow-ai: 0 4px 20px rgba(22, 119, 255, 0.25);
+
+// 页面标准宽
+$page-padding: 32px;

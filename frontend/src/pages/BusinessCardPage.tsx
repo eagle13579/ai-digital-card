@@ -10,6 +10,7 @@ import {
 import { api } from '../api/client';
 import ShareSheet from '../components/ShareSheet';
 import AIAssistant from '../components/AIAssistant';
+import { colors, spacing, radius, shadows, motion, glass, cardTemplates } from '../styles/design-tokens';
 
 // ============================================================
 // 模板定义（8套）

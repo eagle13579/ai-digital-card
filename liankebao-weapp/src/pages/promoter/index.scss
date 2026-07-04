@@ -1,0 +1,603 @@
+@import '../../styles/tokens';
+
+/* ========================================================================== */
+/*  推广中心 — 页面容器                                                        */
+/* ========================================================================== */
+
+.promoter {
+  min-height: 100vh;
+  background: $color-bg;
+
+  &__scroll {
+    height: 100vh;
+  }
+
+  /* ================================================================ */
+  /*  Loading / Error 占位                                              */
+  /* ================================================================ */
+
+  &__loading {
+    padding: $spacing-xl $page-padding;
+  }
+
+  &__skeleton-card {
+    height: 160px;
+    background: linear-gradient(90deg, $color-border-light 25%, #e8e8e8 50%, $color-border-light 75%);
+    background-size: 200% 100%;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-md;
+    animation: skeleton-loading 1.4s ease infinite;
+  }
+
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px $page-padding;
+  }
+
+  &__error-icon {
+    font-size: 72px;
+    margin-bottom: $spacing-md;
+  }
+
+  &__error-msg {
+    font-size: $font-size-md;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__error-btn {
+    width: 240px;
+    height: 72px;
+    line-height: 72px;
+    text-align: center;
+    background: $color-gradient-primary;
+    color: #ffffff;
+    font-size: $font-size-md;
+    border-radius: $radius-lg;
+  }
+
+  /* ================================================================ */
+  /*  收益概览卡片                                                       */
+  /* ================================================================ */
+
+  &__overview {
+    position: relative;
+    margin: $spacing-md $page-padding 0;
+    border-radius: $radius-lg;
+    overflow: hidden;
+  }
+
+  &__overview-bg {
+    position: absolute;
+    inset: 0;
+    background: $color-gradient-primary;
+    opacity: 0.95;
+  }
+
+  &__overview-content {
+    position: relative;
+    padding: $spacing-lg $spacing-md;
+    z-index: 1;
+  }
+
+  &__overview-title {
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: $spacing-md;
+  }
+
+  &__overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+  }
+
+  &__overview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__overview-value {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  &__overview-label {
+    font-size: $font-size-xs;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: $spacing-2xs;
+  }
+
+  /* ================================================================ */
+  /*  柱状图（纯 CSS）                                                   */
+  /* ================================================================ */
+
+  &__chart {
+    margin: $spacing-md $page-padding 0;
+    background: $color-bg-card;
+    border-radius: $radius-lg;
+    padding: $spacing-md $spacing-sm;
+  }
+
+  &__chart-title {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-md;
+    padding-left: $spacing-xs;
+  }
+
+  &__chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 180px;
+  }
+
+  &__chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 60px;
+  }
+
+  &__chart-bar-wrap {
+    width: 32px;
+    height: 120px;
+    background: $color-border-light;
+    border-radius: 16px 16px 4px 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__chart-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: $color-gradient-primary;
+    border-radius: 16px 16px 4px 4px;
+    transition: height 0.6s ease;
+    min-height: 2px;
+  }
+
+  &__chart-label {
+    font-size: 18px;
+    color: $color-text-tertiary;
+    margin-top: $spacing-2xs;
+  }
+
+  &__chart-value {
+    font-size: 18px;
+    color: $color-text-secondary;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* ================================================================ */
+  /*  推广码                                                             */
+  /* ================================================================ */
+
+  &__promo-code {
+    margin: $spacing-md $page-padding 0;
+    background: $color-bg-card;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+  }
+
+  &__promo-code-header {
+    margin-bottom: $spacing-sm;
+  }
+
+  &__promo-code-title {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__promo-code-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $color-primary-light;
+    border-radius: $radius-md;
+    padding: $spacing-sm $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__promo-code-value {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-primary;
+    letter-spacing: 2px;
+  }
+
+  &__promo-code-btn {
+    height: 56px;
+    line-height: 56px;
+    padding: 0 $spacing-md;
+    background: $color-primary;
+    color: #ffffff;
+    font-size: $font-size-xs;
+    border-radius: $radius-md;
+    white-space: nowrap;
+  }
+
+  &__poster-btn {
+    width: 100%;
+    height: 72px;
+    line-height: 72px;
+    text-align: center;
+    background: $color-gradient-warm;
+    color: #ffffff;
+    font-size: $font-size-sm;
+    border-radius: $radius-md;
+  }
+
+  /* Canvas 隐藏（用于生成海报） */
+  &__canvas {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 300px;
+    height: 480px;
+  }
+
+  /* ================================================================ */
+  /*  团队简介                                                           */
+  /* ================================================================ */
+
+  &__team-summary {
+    margin: $spacing-md $page-padding 0;
+    background: $color-bg-card;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  &__team-summary-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__team-summary-value {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__team-summary-label {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: $spacing-2xs;
+  }
+
+  &__team-summary-divider {
+    width: 1px;
+    height: 48px;
+    background: $color-divider;
+  }
+
+  /* ================================================================ */
+  /*  Tab 切换区                                                        */
+  /* ================================================================ */
+
+  &__content {
+    margin: $spacing-md $page-padding 0;
+  }
+
+  &__tabs {
+    display: flex;
+    background: $color-bg-card;
+    border-radius: $radius-lg $radius-lg 0 0;
+    overflow: hidden;
+  }
+
+  &__tab {
+    flex: 1;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+  }
+
+  &__tab-label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    transition: color 0.2s;
+  }
+
+  &__tab--active {
+    .promoter__tab-label {
+      color: $color-primary;
+      font-weight: 600;
+    }
+  }
+
+  &__tab-indicator {
+    position: absolute;
+    bottom: 0;
+    width: 40px;
+    height: 4px;
+    background: $color-primary;
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* ================================================================ */
+  /*  空状态                                                             */
+  /* ================================================================ */
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 0;
+  }
+
+  &__empty-icon {
+    font-size: 64px;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__empty-text {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+
+  /* ================================================================ */
+  /*  推广商品列表                                                       */
+  /* ================================================================ */
+
+  &__product-list {
+    background: $color-bg-card;
+    border-radius: 0 0 $radius-lg $radius-lg;
+    padding: $spacing-xs $spacing-md $spacing-md;
+  }
+
+  &__product-card {
+    padding: $spacing-md 0;
+    border-bottom: 1px solid $color-border-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__product-info {
+    display: flex;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__product-cover {
+    width: 120px;
+    height: 120px;
+    border-radius: $radius-sm;
+    margin-right: $spacing-sm;
+    background: $color-border-light;
+    flex-shrink: 0;
+  }
+
+  &__product-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  &__product-name {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__product-desc {
+    font-size: 20px;
+    color: $color-text-tertiary;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__product-commission {
+    font-size: $font-size-xs;
+    color: $color-error;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  &__product-sales {
+    font-size: 18px;
+    color: $color-text-tertiary;
+    margin-top: 2px;
+  }
+
+  &__product-actions {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: flex-end;
+  }
+
+  &__product-btn {
+    height: 52px;
+    line-height: 52px;
+    padding: 0 $spacing-md;
+    font-size: $font-size-xs;
+    border-radius: $radius-md;
+    white-space: nowrap;
+
+    &--copy {
+      background: $color-primary-light;
+      color: $color-primary;
+      border: 1px solid $color-primary;
+    }
+
+    &--share {
+      background: $color-primary;
+      color: #ffffff;
+    }
+  }
+
+  /* ================================================================ */
+  /*  推广员列表                                                         */
+  /* ================================================================ */
+
+  &__promoter-list {
+    background: $color-bg-card;
+    border-radius: 0 0 $radius-lg $radius-lg;
+    padding: $spacing-xs $spacing-md $spacing-md;
+  }
+
+  &__promoter-card {
+    display: flex;
+    align-items: center;
+    padding: $spacing-sm 0;
+    border-bottom: 1px solid $color-border-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__promoter-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: $radius-round;
+    margin-right: $spacing-sm;
+    background: $color-border-light;
+    flex-shrink: 0;
+  }
+
+  &__promoter-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__promoter-name {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__promoter-stats {
+    font-size: 18px;
+    color: $color-text-tertiary;
+    margin-top: 4px;
+  }
+
+  &__promoter-earnings {
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $color-error;
+    flex-shrink: 0;
+  }
+
+  /* ================================================================ */
+  /*  收益明细                                                           */
+  /* ================================================================ */
+
+  &__detail-list {
+    background: $color-bg-card;
+    border-radius: 0 0 $radius-lg $radius-lg;
+    padding: $spacing-xs $spacing-md $spacing-md;
+  }
+
+  &__detail-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm 0;
+    border-bottom: 1px solid $color-border-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__detail-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__detail-type {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__detail-product {
+    font-size: 18px;
+    color: $color-text-tertiary;
+    margin-top: 2px;
+  }
+
+  &__detail-date {
+    font-size: 18px;
+    color: $color-text-placeholder;
+    margin-top: 2px;
+  }
+
+  &__detail-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  &__detail-amount {
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: $color-success;
+
+    &--out {
+      color: $color-error;
+    }
+  }
+
+  &__detail-status {
+    font-size: 18px;
+    margin-top: 4px;
+
+    &--settled {
+      color: $color-success;
+    }
+
+    &--pending {
+      color: $color-warning;
+    }
+
+    &--failed {
+      color: $color-error;
+    }
+  }
+
+  /* ================================================================ */
+  /*  底部间距                                                           */
+  /* ================================================================ */
+
+  &__bottom-spacer {
+    height: 120px;
+  }
+}

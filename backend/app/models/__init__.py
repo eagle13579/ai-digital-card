@@ -16,6 +16,7 @@ from app.models.gaia import (
     GaiaEvolutionEvent,
     GaiaTrainingRun,
     GaiaModelWeights,
+    KnowledgeModel,
 )
 # Lazy import to avoid circular chain:
 # models.__init__ → crm.crm_models → crm.__init__ → crm_router → routers.auth → services → ai → vector_search → models.tag (loop!)
@@ -38,6 +39,7 @@ __all__ = [
     "Message",
     "Invoice",
     "GaiaKnowledge", "GaiaEvolutionEvent", "GaiaTrainingRun", "GaiaModelWeights",
+    "KnowledgeModel",
     # CRM
     "CrmContact", "CrmDeal", "CrmPipelineStage", "CrmActivity", "CrmNote",
 ]

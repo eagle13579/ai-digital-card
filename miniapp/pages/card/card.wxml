@@ -14,7 +14,7 @@
         </view>
         <text class="hero-name">{{card.user_name || '未知用户'}}</text>
         <text class="hero-company">{{card.user_company}} · {{card.user_title}}</text>
-        <text class="hero-title">{{card.title || 'AI数字名片'}}</text>
+        <text class="hero-title">{{card.title || 'AI数智名片'}}</text>
       </view>
     </view>
 

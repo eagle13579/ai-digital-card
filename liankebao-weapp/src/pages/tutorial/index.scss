@@ -1,0 +1,315 @@
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  Tutorial page — 教程页面                                                   */
+/* ========================================================================== */
+
+.tutorial {
+  min-height: 100vh;
+  background: $color-bg;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+/* ========================================================================== */
+/*  页面头部                                                                   */
+/* ========================================================================== */
+
+.tutorial__header {
+  padding: $spacing-xl $page-padding $spacing-md;
+
+  &-title {
+    display: block;
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  分类筛选                                                                   */
+/* ========================================================================== */
+
+.tutorial__categories {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 0 $page-padding $spacing-sm;
+  background: $color-bg;
+}
+
+.tutorial__categories-scroll {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  padding-bottom: $spacing-xs;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tutorial__category-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 0 $spacing-lg;
+  border-radius: 28px;
+  background: $color-bg-white;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+  border: 1px solid $color-border;
+  cursor: pointer;
+
+  &--active {
+    background: $color-primary;
+    border-color: $color-primary;
+
+    .tutorial__category-label {
+      color: #fff;
+    }
+  }
+}
+
+.tutorial__category-label {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: 500;
+}
+
+/* ========================================================================== */
+/*  滚动区域                                                                   */
+/* ========================================================================== */
+
+.tutorial__scroll {
+  height: calc(100vh - 200px);
+  padding: 0 $page-padding;
+}
+
+/* ========================================================================== */
+/*  教程卡片                                                                   */
+/* ========================================================================== */
+
+.tutorial__list {
+  padding-bottom: $spacing-md;
+}
+
+.tutorial__card {
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+  transition: all 0.3s ease;
+
+  &--expanded {
+    box-shadow: $shadow-md;
+  }
+
+  &-cover {
+    width: 100%;
+    height: 320px;
+    background: $color-border-light;
+    cursor: pointer;
+  }
+
+  &-summary {
+    padding: $spacing-md;
+    cursor: pointer;
+  }
+
+  &-top {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-category {
+    font-size: 18px;
+    color: $color-primary;
+    background: $color-primary-light;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  &-title {
+    display: block;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+    line-height: 1.4;
+  }
+
+  &-summary-text {
+    display: block;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &-expand-hint {
+    margin-top: $spacing-sm;
+  }
+
+  &-expand-icon {
+    font-size: $font-size-sm;
+    color: $color-primary;
+    font-weight: 500;
+  }
+}
+
+/* ========================================================================== */
+/*  展开详情                                                                   */
+/* ========================================================================== */
+
+.tutorial__card-detail {
+  padding: 0 $spacing-md $spacing-md;
+  animation: fadeIn 0.3s ease;
+}
+
+.tutorial__card-divider {
+  height: 1px;
+  background: $color-divider;
+  margin-bottom: $spacing-md;
+}
+
+.tutorial__content-spacer {
+  height: $spacing-sm;
+}
+
+.tutorial__content-line {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  padding: 2px 0;
+
+  &--title {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-top: $spacing-sm;
+    padding-bottom: $spacing-xs;
+  }
+
+  &--subtitle {
+    color: $color-text-secondary;
+    padding-left: $spacing-md;
+  }
+}
+
+/* ========================================================================== */
+/*  相关教程                                                                   */
+/* ========================================================================== */
+
+.tutorial__related {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $color-divider;
+}
+
+.tutorial__related-title {
+  font-size: $font-size-md;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.tutorial__related-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.tutorial__related-item {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg;
+  border-radius: $radius-md;
+  cursor: pointer;
+  gap: $spacing-sm;
+}
+
+.tutorial__related-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.tutorial__related-text {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: 500;
+}
+
+.tutorial__related-arrow {
+  font-size: 28px;
+  color: $color-text-placeholder;
+}
+
+/* ========================================================================== */
+/*  空状态                                                                     */
+/* ========================================================================== */
+
+.tutorial__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-3xl 0;
+
+  &-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-md;
+  }
+
+  &-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &-desc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+/* ========================================================================== */
+/*  底部间距                                                                   */
+/* ========================================================================== */
+
+.tutorial__bottom-spacer {
+  height: calc(60px + env(safe-area-inset-bottom));
+}
+
+/* ========================================================================== */
+/*  动画                                                                       */
+/* ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -17,6 +17,7 @@
 import json
 import logging
 import time
+import datetime
 from contextvars import ContextVar
 
 # ── 日志记录器 ────────────────────────────────────────────────────
@@ -27,8 +28,11 @@ class JSONFormatter(logging.Formatter):
     """将日志记录格式化为 JSON 行，包含结构化字段。"""
 
     def format(self, record: logging.LogRecord) -> str:
+        timestamp = datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+        timestamp += f".{int(record.msecs * 1000):06d}Z"
+        
         log_entry = {
-            "timestamp": self.formatTime(record, self.datefmt or "%Y-%m-%dT%H:%M:%S.%fZ"),
+            "timestamp": timestamp,
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
