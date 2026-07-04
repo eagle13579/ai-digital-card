@@ -96,20 +96,6 @@
       </view>
     </view>
 
-    <!-- 平台推荐 -->
-    <view class="card platform-entry" bindtap="goCreatePlatform">
-      <view class="platform-entry-bg" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
-        <view class="platform-entry-content">
-          <text class="platform-entry-icon">🌟</text>
-          <view class="platform-entry-text">
-            <text class="platform-entry-title">平台推荐</text>
-            <text class="platform-entry-desc">发现优质资源平台，拓展商业合作</text>
-          </view>
-          <text class="platform-entry-arrow">›</text>
-        </view>
-      </view>
-    </view>
-
     <!-- 匹配推荐区 -->
     <view class="card" wx:if="{{recommendList.length > 0}}">
       <view class="card-header">
