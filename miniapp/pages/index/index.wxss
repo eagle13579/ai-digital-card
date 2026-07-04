@@ -309,3 +309,45 @@
   flex-shrink: 0;
   margin-left: 8px;
 }
+
+/* 平台推荐 */
+.platform-recommend {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 16px 16px;
+  gap: 12px;
+  scrollbar-width: none;
+}
+.platform-recommend::-webkit-scrollbar {
+  display: none;
+}
+.platform-card {
+  flex: 0 0 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.platform-card-top {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.platform-card-emoji {
+  font-size: 32px;
+}
+.platform-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  padding: 8px 10px 2px;
+}
+.platform-card-desc {
+  font-size: 11px;
+  color: #999;
+  display: block;
+  padding: 0 10px 10px;
+  line-height: 1.4;
+}

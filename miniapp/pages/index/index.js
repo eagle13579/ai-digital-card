@@ -17,6 +17,14 @@ Page({
     trustList: [],
     recommendList: [],
     visitorList: [],
+
+    // 平台推荐
+    platformRecommend: [
+      { id: 1, name: 'AI技术合作平台', desc: 'AI技术开发·模型训练·数据标注', icon: '🤖', bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
+      { id: 2, name: '供应链资源平台', desc: '供应商对接·物流配送·仓储服务', icon: '🚚', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+      { id: 3, name: '投融资对接平台', desc: '天使投资·VC融资·并购重组', icon: '💰', bg: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
+      { id: 4, name: '市场营销平台', desc: '品牌推广·渠道拓展·流量获客', icon: '📢', bg: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
+    ],
   },
 
   onLoad(options) {
@@ -136,6 +144,12 @@ Page({
   // 创建资源平台
   goCreatePlatform() {
     wx.navigateTo({ url: '/pages/platform/create/index' })
+  },
+
+  // 平台推荐详情
+  goPlatformDetail(e) {
+    const name = e.currentTarget.dataset.url || e.currentTarget.dataset.item
+    wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
   onShareAppMessage() {

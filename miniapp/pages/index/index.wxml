@@ -96,6 +96,23 @@
       </view>
     </view>
 
+    <!-- 平台推荐 -->
+    <view class="card">
+      <view class="card-header">
+        <text class="title">🌟 平台推荐</text>
+        <text class="more" bindtap="goCreatePlatform">查看全部 ›</text>
+      </view>
+      <view class="platform-recommend">
+        <view class="platform-card" wx:for="{{platformRecommend}}" wx:key="id" data-url="{{item.url}}" bindtap="goPlatformDetail">
+          <view class="platform-card-top" style="background: {{item.bg}}">
+            <text class="platform-card-emoji">{{item.icon}}</text>
+          </view>
+          <text class="platform-card-name">{{item.name}}</text>
+          <text class="platform-card-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 匹配推荐区 -->
     <view class="card" wx:if="{{recommendList.length > 0}}">
       <view class="card-header">
