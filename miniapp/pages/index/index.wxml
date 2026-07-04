@@ -72,7 +72,7 @@
         <view class="platform-entry-content">
           <text class="platform-entry-icon">🏗️</text>
           <view class="platform-entry-text">
-            <text class="platform-entry-title">创建资源平台</text>
+            <text class="platform-entry-title">创建资源平台申请</text>
             <text class="platform-entry-desc">发布资源供需 · AI智能匹配</text>
           </view>
           <text class="platform-entry-arrow">›</text>
