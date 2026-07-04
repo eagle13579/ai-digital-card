@@ -49,6 +49,11 @@
         <text class="action-icon">📤</text>
         <text class="action-label">分享名片</text>
       </view>
+      <!-- 创建资源平台入口 -->
+      <view class="action-item" bindtap="goCreatePlatform">
+        <text class="action-icon">🏗️</text>
+        <text class="action-label">资源平台</text>
+      </view>
     </view>
 
     <!-- 我的名片卡片 -->

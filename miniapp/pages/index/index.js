@@ -133,6 +133,11 @@ Page({
     wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
+  // 创建资源平台
+  goCreatePlatform() {
+    wx.navigateTo({ url: '/pages/platform/create/index' })
+  },
+
   onShareAppMessage() {
     const brochure = this.data.brochure
     return {

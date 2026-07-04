@@ -256,6 +256,18 @@ const MockService = {
     }
     return aiApi.generate({ type, input })
   },
+
+  // ====== 资源平台 ======
+  async createResource(formData) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(800, 1200)
+      Logger.info('资源平台', 'Mock发布资源', formData)
+      return { success: true, message: '发布成功，等待审核', data: { id: Date.now(), ...formData } }
+    }
+    // TODO: 对接真实API
+    const { api } = require('./api')
+    return api.post('/api/v1/resources', formData)
+  },
 }
 
 module.exports = { MockService }

@@ -5,7 +5,8 @@
     "pages/login/index",
     "pages/profile/profile",
     "pages/brochure/create/index",
-    "pages/brochure/preview/index"
+    "pages/brochure/preview/index",
+    "pages/platform/create/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
