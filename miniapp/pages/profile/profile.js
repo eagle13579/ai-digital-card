@@ -177,7 +177,7 @@ Page({
 
   // 跳转修改资料页面
   goEditProfile() {
-    wx.navigateTo({ url: '/pages/profile/edit/index' })
+    wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
   // 保存资料（API调用）

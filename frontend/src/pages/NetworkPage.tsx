@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api/client';
 import { useT } from '../i18n';
+import KnowledgeGraphEmbed from '../components/KnowledgeGraphEmbed';
 
 // ============================================================
 // 类型定义
@@ -277,6 +278,13 @@ export default function NetworkPage() {
           </div>
         )}
       </div>
+
+      {/* ═══ 知识图谱（产品标配） ═══ */}
+      <KnowledgeGraphEmbed
+        userName={cardList.find(c => c.id === selectedCardId)?.name || ''}
+        contacts={trustNetwork}
+        companyName=""
+      />
     </div>
   );
 }

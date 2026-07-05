@@ -94,18 +94,19 @@ Page({
     // 调用后端 AI assist/write 接口，传图片描述分析名片
     // 由于小程序不能直接传二进制给AI接口，用base64或描述方式
     // 实际场景：先用wx.getFileSystemManager读取为base64，或直接上传图片
-    // 这里使用wx.getImageInfo获取图片后，调用aiApi.write描述分析
+    // 这里使用wx.getImageInfo获取图片后，调用aiApi.getChat进行OCR识别
     const fm = wx.getFileSystemManager()
     fm.readFile({
       filePath: imagePath,
       encoding: 'base64',
       success(fileRes) {
         const base64Data = fileRes.data
-        // 通过AI分析接口传图片base64，让后端做OCR识别
-        aiApi.write({
-          prompt: '请识别这张名片上的信息，提取姓名(name)、职位(title)、公司(company)、手机号(phone)、邮箱(email)、地址(address)。以JSON格式返回。',
-          image_base64: base64Data,
-          image_mime: 'image/jpeg'
+        // 通过AI对话接口传图片base64，让后端做OCR识别
+        aiApi.getChat({
+          messages: [
+            { role: 'system', content: '你是一个名片OCR识别专家。请识别图片中的名片信息，提取姓名(name)、职位(title)、公司(company)、手机号(phone)、邮箱(email)、地址(address)。只返回JSON格式，不要其他文字。' },
+            { role: 'user', content: '请识别这张名片上的信息。', image_base64: base64Data, image_mime: 'image/jpeg' }
+          ]
         })
           .then(res => {
             wx.hideLoading()

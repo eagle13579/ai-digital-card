@@ -17,6 +17,7 @@ const DashboardPageLazy = lazy(() => import('./pages/DashboardPage'));
 const CardEditorPageLazy = lazy(() => import('./pages/CardEditorPage'));
 const SettingsPageLazy = lazy(() => import('./pages/SettingsPage'));
 const NetworkPageLazy = lazy(() => import('./pages/NetworkPage'));
+const NetworkGraphPageLazy = lazy(() => import('./pages/NetworkGraphPage'));
 const MatchingPageLazy = lazy(() => import('./pages/MatchingPage'));
 const ApiKeysPageLazy = lazy(() => import('./pages/ApiKeysPage'));
 const CrmListPageLazy = lazy(() => import('./pages/crm/CrmListPage'));
@@ -96,6 +97,14 @@ export default function AppRoutes() {
         element={
           <LazyPage skeletonMode="card" skeletonCount={3}>
             <Layout><NetworkPageLazy /></Layout>
+          </LazyPage>
+        }
+      />
+      <Route
+        path="/network/graph"
+        element={
+          <LazyPage skeletonMode="detail">
+            <Layout><NetworkGraphPageLazy /></Layout>
           </LazyPage>
         }
       />

@@ -2,7 +2,7 @@
   <!-- 顶部导航 -->
   <view class="config-header">
     <view class="back-btn" bindtap="goBack">
-      <image class="icon" src="/images/icon-back.png" mode="aspectFit" />
+      <text class="icon">‹</text>
     </view>
     <view class="header-title">
       <text class="title">客服配置</text>

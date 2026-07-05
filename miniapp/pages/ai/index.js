@@ -24,7 +24,7 @@ const features = [
     icon: '📷',
     title: 'AI名片扫描分析',
     desc: '智能识别名片信息，自动提取联系方式',
-    path: '/pages/ai/chat/index',
+    path: '/pages/ai/scan/index',
     color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
   },
   {
@@ -32,7 +32,7 @@ const features = [
     icon: '🤝',
     title: '智能人脉匹配',
     desc: '基于AI分析推荐最佳人脉连接',
-    path: '/pages/ai/chat/index',
+    path: '/pages/ai/match/index',
     color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
   },
   {
@@ -40,7 +40,7 @@ const features = [
     icon: '📊',
     title: 'AI数据洞察',
     desc: '深度分析名片数据，发现商业趋势',
-    path: '/pages/ai/chat/index',
+    path: '/pages/ai/insight/index',
     color: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
   },
   {
@@ -48,7 +48,7 @@ const features = [
     icon: '⚙️',
     title: 'AI客服配置',
     desc: '自定义智能客服回复规则与风格',
-    path: '/pages/ai/chat/index',
+    path: '/pages/ai/config/index',
     color: 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)',
   },
 ]

@@ -2,7 +2,7 @@
   <!-- 自定义导航栏 -->
   <view class="page-header">
     <view class="back-btn" bindtap="goBack">
-      <image class="icon" src="/images/icons/back.svg" mode="aspectFit" />
+      <text class="icon">‹</text>
     </view>
     <view class="header-title">
       <text class="title">AI 生成</text>
