@@ -1,0 +1,121 @@
+/* 人脉图谱页 — 深色科技感 */
+.graph-page {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a18;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部栏 */
+.graph-header {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: rgba(10,10,24,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1rpx solid rgba(255,255,255,0.06);
+  z-index: 10;
+  flex-shrink: 0;
+}
+.header-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.back-icon {
+  font-size: 44rpx;
+  color: #8b8b9e;
+  line-height: 1;
+}
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+.header-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e4e4ed;
+  letter-spacing: -0.3rpx;
+}
+.header-subtitle {
+  font-size: 20rpx;
+  color: #6b6b8a;
+  display: block;
+  margin-top: 2rpx;
+}
+.header-right {
+  width: 80rpx;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  justify-content: flex-end;
+}
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  box-shadow: 0 0 12rpx rgba(6,182,212,0.3);
+}
+.legend-text {
+  font-size: 20rpx;
+  color: #8b8b9e;
+}
+
+/* 加载状态 */
+.loading-layer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid rgba(255,255,255,0.06);
+  border-top: 4rpx solid #06b6d4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20rpx;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loading-text {
+  font-size: 24rpx;
+  color: #6b6b8a;
+}
+
+/* Canvas 画布 */
+.graph-canvas {
+  flex: 1;
+  width: 100%;
+  display: block;
+}
+
+/* 底部栏 */
+.graph-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 28rpx;
+  background: rgba(10,10,24,0.8);
+  backdrop-filter: blur(8px);
+  border-top: 1rpx solid rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+.footer-hint {
+  font-size: 20rpx;
+  color: rgba(255,255,255,0.2);
+}
+.footer-count {
+  font-size: 22rpx;
+  color: #6b6b8a;
+  font-weight: 500;
+}

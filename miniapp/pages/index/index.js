@@ -76,11 +76,13 @@ Page({
           Logger.warn('首页', '获取用户信息失败，使用默认值', err)
           return null
         }),
-        // 2. 名片/画册列表
-        brochureApi.list({ page: 1, size: 10 }).catch(err => {
-          Logger.warn('首页', '获取画册列表失败', err)
-          return null
-        }),
+        // 2. 名片/画册列表（延迟50ms避免并发阻塞）
+        new Promise(r => setTimeout(r, 50)).then(() =>
+          brochureApi.list({ page: 1, size: 10 }).catch(err => {
+            Logger.warn('首页', '获取画册列表失败', err)
+            return null
+          })
+        ),
         // 3. 信任网络
         trustApi.getNetwork().catch(err => {
           Logger.warn('首页', '获取信任网络失败', err)

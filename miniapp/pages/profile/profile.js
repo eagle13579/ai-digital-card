@@ -145,9 +145,9 @@ Page({
     wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
-  // 信任网络
+  // 信任网络 → 人脉图谱
   goTrustNetwork() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/network/graph/index' })
   },
 
   // 隐私设置

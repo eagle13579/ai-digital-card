@@ -20,45 +20,44 @@ Page({
         price: '¥0',
         period: '永续',
         color: '#999',
-        features: ['1张名片', 'OCR 3次/月', '基础访客统计', '标准模板'],
+        features: ['1张名片', 'OCR 3次/月', '5位访客追踪', '基础模板'],
         highlighted: false,
         badge: '',
       },
       {
         id: 'pro',
         name: 'Pro',
-        price: '¥49',
+        price: '¥99',
         period: '/月',
-        originalPrice: '¥99',
+        originalPrice: '¥199',
         color: '#f5a623',
-        features: ['10张名片', 'OCR 100次/月', '高级访客分析', 'AI智能写作', 'Pro专属模板', '去水印'],
+        features: ['无限名片', 'OCR 1000次/月', '实时访客Push', 'AI分析仪表盘', '智能人脉匹配', '去水印'],
         highlighted: true,
         badge: '推荐',
       },
       {
         id: 'enterprise',
         name: 'Enterprise',
-        price: '¥199',
+        price: '¥499',
         period: '/月',
         color: '#667eea',
-        features: ['不限名片', 'OCR不限次数', '批量导入(≤50人)', '团队协作', '专属客服', 'API接入', '自定义品牌'],
+        features: ['无限名片+OCR', '批量导入(≤50人)', 'SSO+RBAC', '团队协作', '专属客服', 'API接入', '自定义品牌'],
         highlighted: false,
         badge: '',
       },
     ],
     // 功能对比表
     featureComparison: [
-      { feature: '名片创建数量', free: '1张', pro: '10张', enterprise: '不限' },
-      { feature: 'OCR识别', free: '3次/月', pro: '100次/月', enterprise: '不限' },
-      { feature: '批量导入', free: '—', pro: '—', enterprise: '≤50人' },
-      { feature: '访客统计', free: '基础', pro: '高级分析', enterprise: '完整分析' },
-      { feature: 'AI智能写作', free: '—', pro: '✓', enterprise: '✓' },
-      { feature: 'Pro专属模板', free: '—', pro: '✓', enterprise: '✓' },
-      { feature: '去水印', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: '名片创建', free: '1张', pro: '无限', enterprise: '无限' },
+      { feature: 'OCR识别', free: '3次/月', pro: '1000次/月', enterprise: '无限' },
+      { feature: '访客追踪', free: '5位', pro: '无限', enterprise: '无限' },
+      { feature: '实时Push通知', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: 'AI分析仪表盘', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: '智能人脉匹配', free: '—', pro: '✓', enterprise: '✓' },
+      { feature: '批量导入', free: '—', pro: '500人', enterprise: '无限' },
       { feature: '团队协作', free: '—', pro: '—', enterprise: '✓' },
-      { feature: '专属客服', free: '—', pro: '—', enterprise: '✓' },
-      { feature: 'API接入', free: '—', pro: '—', enterprise: '✓' },
-      { feature: '自定义品牌', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'SSO+RBAC', free: '—', pro: '—', enterprise: '✓' },
+      { feature: 'API接入', free: '100次/月', pro: '5000次/月', enterprise: '无限' },
     ],
     // 使用额度
     usage: {
@@ -144,14 +143,35 @@ Page({
       const res = await membershipApi.upgrade(planId, 'monthly')
       wx.hideLoading()
       if (res && res.pay_params) {
-        // 需要支付
-        wx.showToast({ title: '跳转支付...', icon: 'none' })
-        // 实际项目中调用微信支付
-        console.log('支付参数:', res.pay_params)
+        // 微信支付 — 调起支付界面
+        const pay = res.pay_params
+        const app = getApp()
+        wx.requestPayment({
+          timeStamp: pay.timeStamp || String(Math.floor(Date.now() / 1000)),
+          nonceStr: pay.nonceStr || 'mock_nonce',
+          package: pay.package || 'prepay_id=mock',
+          signType: pay.signType || 'MD5',
+          paySign: pay.paySign || 'mock_sign',
+          success: () => {
+            wx.showToast({ title: '支付成功', icon: 'success' })
+            this.loadMembershipData()
+            if (typeof app.updateMemberLevel === 'function') {
+              app.updateMemberLevel(planId)
+            }
+          },
+          fail: (err) => {
+            if (err.errMsg && err.errMsg.indexOf('cancel') > -1) {
+              wx.showToast({ title: '已取消支付', icon: 'none' })
+            } else {
+              wx.showToast({ title: '支付失败，请重试', icon: 'none' })
+              console.error('支付失败:', err)
+            }
+          },
+        })
       } else {
+        // 开发模式/自动升级
         wx.showToast({ title: '升级成功', icon: 'success' })
         this.loadMembershipData()
-        // 更新全局会员等级
         const app = getApp()
         if (typeof app.updateMemberLevel === 'function') {
           app.updateMemberLevel(planId)

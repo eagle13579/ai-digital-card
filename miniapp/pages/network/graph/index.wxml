@@ -1,0 +1,40 @@
+<!-- 人脉图谱 — Canvas 2D 力导向图 -->
+<view class="graph-page">
+  <!-- 顶部信息栏 -->
+  <view class="graph-header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-center">
+      <text class="header-title">人脉网络图谱</text>
+      <text class="header-subtitle">{{nodeCount}}个联系人 · {{edgeCount}}条关系</text>
+    </view>
+    <view class="header-right">
+      <view class="legend-dot"></view>
+      <text class="legend-text">我</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-layer" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载人脉数据...</text>
+  </view>
+
+  <!-- Canvas 画布 -->
+  <canvas
+    wx:if="{{!loading}}"
+    class="graph-canvas"
+    type="2d"
+    id="graphCanvas"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  />
+
+  <!-- 底部操作提示 -->
+  <view class="graph-footer" wx:if="{{!loading}}">
+    <text class="footer-hint">👆 拖拽移动节点 · 双指缩放</text>
+    <text class="footer-count">{{nodeCount}} 人</text>
+  </view>
+</view>

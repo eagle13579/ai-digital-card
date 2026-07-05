@@ -16,7 +16,8 @@
     "pages/ai/match/index",
     "pages/ai/insight/index",
     "pages/ai/config/index",
-    "pages/membership/membership"
+    "pages/membership/membership",
+    "pages/network/graph/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -56,6 +57,5 @@
     "empty-state": "/components/empty-state/index"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "sitemapLocation": "sitemap.json"
 }
