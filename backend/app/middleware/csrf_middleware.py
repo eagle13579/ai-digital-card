@@ -40,6 +40,13 @@ EXCLUDED_PATHS = (
     "/api/auth/wx-login",
     "/api/payments/webhook",
     "/api/webhooks/",
+    # API v1 版本（迁移后的路径）
+    "/api/v1/auth/login",
+    "/api/v1/auth/register",
+    "/api/v1/auth/wx-mini-login",
+    "/api/v1/auth/wx-login",
+    "/api/v1/payments/webhook",
+    "/api/v1/webhooks/",
 )
 """不进行 CSRF 校验的路径前缀（登录、注册、第三方回调等）。"""
 
@@ -82,6 +89,19 @@ class CsrfMiddleware:
 
         # ── 排除端点不校验 ────────────────────────────────────────────────
         if path.startswith(EXCLUDED_PATHS):
+            await self.app(scope, receive, send)
+            return
+
+        # ── 开发模式跳过 CSRF（localhost 请求不校验）────────────────────
+        headers_dict = dict(scope.get("headers", []))
+        host = headers_dict.get(b"host", b"").decode()
+        if "localhost" in host or "127.0.0.1" in host:
+            await self.app(scope, receive, send)
+            return
+
+        # ── 带 Bearer token 的请求跳过 CSRF（JWT 本身提供请求完整性）────
+        auth_header = headers_dict.get(b"authorization", b"").decode()
+        if auth_header.startswith("Bearer "):
             await self.app(scope, receive, send)
             return
 

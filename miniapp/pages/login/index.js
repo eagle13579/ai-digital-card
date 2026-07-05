@@ -23,6 +23,19 @@ Page({
     const app = getApp()
     this.setData({ loading: true })
 
+    // 先获取 CSRF token（后端中间件要求）
+    const request = require('../../utils/request')
+    request.get('/api/csrf/token').then(() => {
+      // CSRF cookie 已设置，继续登录
+      return this._doLogin()
+    }).catch(() => {
+      // CSRF 端点不可用时直接登录（开发模式降级）
+      return this._doLogin()
+    })
+  },
+
+  _doLogin() {
+    const app = getApp()
     wx.login({
       success: (res) => {
         if (res.code) {
