@@ -36,13 +36,9 @@ Page({
     const app = getApp()
     // 未登录时跳转登录页
     if (!app.globalData.token) {
-      if (app.globalData.__DEV_MODE__) {
-        Logger.info('首页', '开发模式: 未登录, 显示空白状态')
-        this.setData({ loading: false })
-      } else {
-        wx.navigateTo({ url: '/pages/login/index' })
-        return
-      }
+      Logger.info('首页', '未登录, 跳转登录页')
+      wx.reLaunch({ url: '/pages/login/index' })
+      return
     } else {
       Logger.info('首页', '页面加载')
       this.loadPageData()
