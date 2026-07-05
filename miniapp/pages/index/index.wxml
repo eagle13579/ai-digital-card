@@ -109,11 +109,11 @@
       </view>
     </view>
 
-    <!-- 信任网络摘要 -->
-    <view class="card">
+    <!-- 信任网络 → 图谱入口 -->
+    <view class="card" bindtap="goTrust" style="cursor:pointer;">
       <view class="card-header">
         <text class="title">🤝 信任网络</text>
-        <text class="more" bindtap="goTrust">查看全部 ›</text>
+        <text class="more">图谱模式 ›</text>
       </view>
       <view class="trust-summary">
         <text class="trust-count">{{trustCount}} 位信任伙伴</text>

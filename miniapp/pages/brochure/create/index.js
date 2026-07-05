@@ -378,6 +378,14 @@ Page({
     if (this.validateForm() === false) return
     if (this.data.submitting) return
 
+    // 检查登录态
+    const app = getApp()
+    if (!app.globalData.token) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      setTimeout(() => wx.navigateTo({ url: '/pages/login/index' }), 800)
+      return
+    }
+
     this.setData({ submitting: true })
     wx.showLoading({ title: '生成中...', mask: true })
 

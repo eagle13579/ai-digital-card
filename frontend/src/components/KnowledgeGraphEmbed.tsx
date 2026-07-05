@@ -102,7 +102,7 @@ export default function KnowledgeGraphEmbed({
   userName,
   contacts,
   companyName,
-  graphServerUrl = 'http://localhost:5060',
+  graphServerUrl = '',
 }: Props) {
   const [showGraph, setShowGraph] = useState(false);
 

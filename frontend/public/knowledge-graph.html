@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D知识图谱</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body:not(.embed-mode) { background: #0a0a10; color: #e4e4ed; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+  body.embed-mode { background: transparent; color: #e4e4ed; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+  
+  /* ── 头部信息 ── */
+  #info {
+    position: absolute; top: 16px; left: 16px; z-index: 10;
+    background: rgba(10,10,16,0.85); backdrop-filter: blur(12px);
+    padding: 14px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px; pointer-events: none;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+  }
+  #info h1 { font-size: 16px; font-weight: 600; color: #e4e4ed; margin-bottom: 6px; }
+  #info .meta { color: #6b6b8a; font-size: 12px; }
+  #info .meta span { color: #7c7ce0; font-weight: 500; }
+
+  /* ── 搜索框 ── */
+  #search-box {
+    position: absolute; top: 16px; right: 16px; z-index: 10;
+    background: rgba(16,16,24,0.88); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 8px 14px; width: 220px;
+    color: #e4e4ed; font-size: 13px; outline: none;
+    transition: border-color 0.2s;
+  }
+  #search-box:focus { border-color: rgba(108,108,208,0.4); }
+  #search-box::placeholder { color: #4a4a6a; }
+
+  /* ── 搜索建议 ── */
+  #search-results {
+    position: absolute; top: 52px; right: 16px; z-index: 10;
+    background: rgba(16,16,24,0.92); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
+    width: 220px; max-height: 300px; overflow-y: auto; display: none;
+  }
+  #search-results .item {
+    padding: 10px 14px; font-size: 13px; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.15s;
+  }
+  #search-results .item:last-child { border-bottom: none; }
+  #search-results .item:hover { background: rgba(108,108,208,0.15); }
+  #search-results .item .cat { color: #6b6b8a; font-size: 11px; margin-top: 2px; }
+  #search-results .noresult { padding: 20px; text-align: center; color: #4a4a6a; font-size: 12px; }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: absolute; display: none; z-index: 20;
+    background: rgba(16,16,24,0.94); backdrop-filter: blur(16px);
+    padding: 12px 18px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px; max-width: 280px; pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  #tooltip .name { color: #e4e4ed; font-weight: 600; font-size: 15px; }
+  #tooltip .tag { color: #6b6b8a; font-size: 12px; margin-top: 3px; }
+  #tooltip .desc { color: #a0a0b8; font-size: 12px; margin-top: 6px; line-height: 1.4; }
+  #tooltip .edges-hint { color: #4a4a6a; font-size: 11px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); }
+
+  /* ── 图例 ── */
+  #legend {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 10;
+    background: rgba(10,10,16,0.75); backdrop-filter: blur(8px);
+    padding: 8px 18px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    display: none; gap: 14px; font-size: 12px; color: #6b6b8a; pointer-events: none;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+
+  /* ── Loading ── */
+  #loading {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 5;
+    color: #6c6cd0; font-size: 14px; opacity: 0.8;
+  }
+  #loading .spin { display: inline-block; animation: spin 1.5s infinite linear; margin-right: 8px; }
+  @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+
+  #controls-hint {
+    position: absolute; bottom: 62px; left: 50%; transform: translateX(-50%); z-index: 10;
+    color: rgba(255,255,255,0.12); font-size: 11px; letter-spacing: 0.5px;
+    pointer-events: none; transition: opacity 1.5s;
+  }
+
+  /* ── 详情面板 (点击节点展开) ── */
+  #detail-panel {
+    position: absolute; right: -360px; top: 80px; z-index: 15;
+    width: 320px; max-height: calc(100vh - 120px);
+    background: rgba(16,16,24,0.92); backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+    padding: 0; overflow: hidden;
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -4px 0 32px rgba(0,0,0,0.3);
+  }
+  #detail-panel.open { right: 16px; }
+  #detail-panel .header {
+    padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #detail-panel .header h2 { font-size: 15px; font-weight: 600; color: #e4e4ed; }
+  #detail-panel .close {
+    width: 28px; height: 28px; border-radius: 6px; border: none;
+    background: rgba(255,255,255,0.04); color: #6b6b8a; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  #detail-panel .close:hover { background: rgba(255,255,255,0.1); }
+  #detail-panel .body { padding: 16px 20px; overflow-y: auto; max-height: calc(100vh - 200px); }
+  #detail-panel .body .field { margin-bottom: 12px; }
+  #detail-panel .body .label { color: #4a4a6a; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  #detail-panel .body .value { color: #c0c0d0; font-size: 13px; }
+  #detail-panel .body .relations { margin-top: 12px; }
+  #detail-panel .body .rel-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    font-size: 12px; color: #8b8b9e; border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  #detail-panel .body .rel-item .rel-type {
+    background: rgba(108,108,208,0.15); color: #8b8be0;
+    padding: 1px 8px; border-radius: 4px; font-size: 10px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="loading"><span class="spin">✦</span> 计算力导向布局...</div>
+
+<div id="info">
+  <h1 id="graph-title">知识图谱</h1>
+  <div class="meta"><span id="node-count">0</span> 节点 · <span id="edge-count">0</span> 关系</div>
+</div>
+
+<div id="toolbar" style="position:absolute;top:16px;right:16px;z-index:10;display:flex;gap:8px;">
+  <input id="search-box" type="text" placeholder="🔍 搜索节点..." autocomplete="off"
+         style="background:rgba(16,16,24,0.88);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 14px;width:200px;color:#e4e4ed;font-size:13px;outline:none;">
+  <button id="export-btn" title="导出为图片"
+    style="background:rgba(16,16,24,0.88);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;color:#8b8b9e;cursor:pointer;font-size:16px;transition:all 0.2s;"
+    onmouseover="this.style.color='#e4e4ed';this.style.borderColor='rgba(108,108,208,0.4)'"
+    onmouseout="this.style.color='#8b8b9e';this.style.borderColor='rgba(255,255,255,0.08)'"
+    onclick="handleExport()">📷</button>
+</div>
+
+<div id="detail-panel">
+  <div class="header">
+    <h2 id="detail-title">节点详情</h2>
+    <button class="close" id="detail-close">✕</button>
+  </div>
+  <div class="body" id="detail-body"></div>
+</div>
+
+<div id="tooltip"></div>
+<div id="legend"></div>
+<div id="controls-hint">🖱 拖拽旋转 · 滚轮缩放 · 点击节点查看详情</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ═══ L3 可配置主题 ═══════════════════════════════════
+// 用户可在加载前设置 window.__GRAPH_THEME 覆盖默认配色
+const USER_THEME = window.__GRAPH_THEME || {};
+
+// ═══ 配置 ════════════════════════════════════════════
+const CFG = Object.assign({
+  bgColor: 0x0a0a10,
+  nodeMinSize: 4, nodeMaxSize: 24,
+  edgeOpacity: 0.2, edgeHoverOpacity: 0.5,
+  autoRotateDelay: 60000,
+  layoutIters: 80, repulsion: 600, attraction: 0.015, spring: 130, gravity: 0.015,
+}, USER_THEME);
+
+const NODE_COLORS = Object.assign({
+  person: 0x6c6cd0, company: 0x4caf7f, stock: 0xf0c040,
+  industry: 0x4fc3f7, event: 0xff6b6b, product: 0xab6cd0,
+  concept: 0xff8a65, news: 0x4fc3f7, ipo: 0xff6b6b,
+}, USER_THEME.nodeColors || {});
+
+const EDGE_COLORS = Object.assign({
+  relation: 0x3a3a6a, invest: 0x4caf7f, supply: 0x4fc3f7,
+  hold: 0xf0c040, partner: 0x6c6cd0, upstream: 0x4fc3f7,
+  downstream: 0xff8a65, compete: 0xff6b6b,
+}, USER_THEME.edgeColors || {});
+const CAT_NAMES = { person:'人物', company:'公司', stock:'股票', industry:'行业',
+  event:'事件', product:'产品', concept:'概念', news:'新闻', ipo:'上市' };
+const CAT_ICONS = { person:'👤', company:'🏢', stock:'📈', industry:'🏭',
+  event:'⚡', product:'📦', concept:'💡', news:'📰', ipo:'🚀' };
+
+// ═══ 力导向布局 ═══════════════════════════════════════
+function forceLayout(nodes, edges, iters) {
+  const n = nodes.length;
+  if (n === 0) return [];
+  const p = nodes.map(() => ({
+    x: (Math.random() - 0.5) * 400,
+    y: (Math.random() - 0.5) * 400,
+    z: (Math.random() - 0.5) * 400,
+    vx: 0, vy: 0, vz: 0,
+  }));
+
+  const adj = new Map();
+  for (const e of edges) {
+    if (!adj.has(e.s)) adj.set(e.s, new Set());
+    if (!adj.has(e.t)) adj.set(e.t, new Set());
+    adj.get(e.s).add(e.t); adj.get(e.t).add(e.s);
+  }
+
+  for (let iter = 0; iter < iters; iter++) {
+    const cool = 1 - iter / iters;
+    const step = 0.4 * cool;
+    for (let i = 0; i < n; i++) p[i].fx = p[i].fy = p[i].fz = 0;
+
+    // Repulsion
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        let dx = p[i].x - p[j].x, dy = p[i].y - p[j].y, dz = p[i].z - p[j].z;
+        let dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 1;
+        const f = CFG.repulsion / dist;
+        const fx = dx/dist*f, fy = dy/dist*f, fz = dz/dist*f;
+        p[i].fx += fx; p[i].fy += fy; p[i].fz += fz;
+        p[j].fx -= fx; p[j].fy -= fy; p[j].fz -= fz;
+      }
+    }
+
+    // Attraction along edges
+    for (const e of edges) {
+      const i = nodes.findIndex(n => n.id === e.s);
+      const j = nodes.findIndex(n => n.id === e.t);
+      if (i < 0 || j < 0) continue;
+      let dx = p[j].x - p[i].x, dy = p[j].y - p[i].y, dz = p[j].z - p[i].z;
+      let dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 1;
+      const f = (dist - CFG.spring) * CFG.attraction;
+      const fx = dx/dist*f, fy = dy/dist*f, fz = dz/dist*f;
+      p[i].fx += fx; p[i].fy += fy; p[i].fz += fz;
+      p[j].fx -= fx; p[j].fy -= fy; p[j].fz -= fz;
+    }
+
+    // Gravity to center
+    for (let i = 0; i < n; i++) {
+      p[i].fx -= p[i].x * CFG.gravity;
+      p[i].fy -= p[i].y * CFG.gravity;
+      p[i].fz -= p[i].z * CFG.gravity;
+    }
+
+    for (let i = 0; i < n; i++) {
+      p[i].vx = (p[i].vx + p[i].fx * step) * 0.85;
+      p[i].vy = (p[i].vy + p[i].fy * step) * 0.85;
+      p[i].vz = (p[i].vz + p[i].fz * step) * 0.85;
+      p[i].x += p[i].vx; p[i].y += p[i].vy; p[i].z += p[i].vz;
+    }
+  }
+
+  // Normalize
+  let maxR = 1;
+  for (const pt of p) { const r = Math.sqrt(pt.x**2+pt.y**2+pt.z**2); if (r > maxR) maxR = r; }
+  const scale = maxR > 350 ? 350 / maxR : 1;
+  for (const pt of p) { pt.x *= scale; pt.y *= scale; pt.z *= scale; }
+  return p;
+}
+
+// ═══ 主渲染 ═══════════════════════════════════════════
+function createGraph(data) {
+  document.getElementById('loading').style.display = 'none';
+  const { nodes, edges } = data;
+  if (!nodes || nodes.length === 0) { document.getElementById('loading').innerHTML = '⚠️ 无数据'; return; }
+
+  // Stats
+  document.getElementById('node-count').textContent = nodes.length;
+  document.getElementById('edge-count').textContent = edges.length;
+  document.getElementById('graph-title').textContent = data.title || '知识图谱';
+
+  // Legend
+  const cats = [...new Set(nodes.map(n => n.c || 'default').filter(Boolean))];
+  const legendEl = document.getElementById('legend');
+  legendEl.style.display = 'flex';
+  legendEl.innerHTML = cats.slice(0, 8).map(c => {
+    const col = NODE_COLORS[c] || 0x8888aa;
+    return `<div class="legend-item"><span class="legend-dot" style="background:#${col.toString(16).padStart(6,'0')}"></span>${CAT_NAMES[c]||c}</div>`;
+  }).join('');
+
+  // --- Three.js setup ---
+  const w = window.innerWidth, h = window.innerHeight;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(CFG.bgColor);
+  const camera = new THREE.PerspectiveCamera(45, w/h, 1, 3000);
+  camera.position.set(0, 180, 380);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(w, h); renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
+  document.body.prepend(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 50; controls.maxDistance = 1200;
+  controls.autoRotate = false; controls.autoRotateSpeed = 0.6;
+  controls.target.set(0, 0, 0);
+
+  // --- Layout ---
+  const positions = forceLayout(nodes, edges, CFG.layoutIters);
+  const nodeById = {}; nodes.forEach((n,i) => nodeById[n.id] = i);
+
+  // --- Node sprites with glow ---
+  const spriteTexture = (() => {
+    const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(64,64,0, 64,64,64);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.15, 'rgba(255,255,255,0.85)');
+    g.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,128,128);
+    return new THREE.CanvasTexture(c);
+  })();
+
+  const nodeGroup = new THREE.Group();
+  const nodeMeshes = [];
+  const nodeData = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    const nd = nodes[i], pos = positions[i];
+    const color = NODE_COLORS[nd.c] || 0x8888aa;
+    const sz = (nd.sz || 1) * 10;
+    const mat = new THREE.SpriteMaterial({
+      map: spriteTexture, color, transparent: true,
+      opacity: 0.85, sizeAttenuation: true, depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const sprite = new THREE.Sprite(mat);
+    sprite.position.set(pos.x, pos.y, pos.z);
+    sprite.scale.set(sz + 4, sz + 4, 1);
+    sprite.userData = { idx: i, id: nd.id };
+    nodeGroup.add(sprite);
+    nodeMeshes.push(sprite);
+    nodeData.push({ nd, pos, color, sz });
+  }
+  scene.add(nodeGroup);
+
+  // --- Edges (lines with glow) ---
+  const edgeGroup = new THREE.Group();
+  const edgeMap = []; // { line, source, target, type:nd }
+
+  for (const e of edges) {
+    const si = nodeById[e.s], ti = nodeById[e.t];
+    if (si === undefined || ti === undefined) continue;
+    const p1 = positions[si], p2 = positions[ti];
+    const edgeColor = EDGE_COLORS[e.tp] || 0x3a3a6a;
+
+    // Main line
+    const pts = [new THREE.Vector3(p1.x,p1.y,p1.z), new THREE.Vector3(p2.x,p2.y,p2.z)];
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({
+      color: edgeColor, transparent: true, opacity: CFG.edgeOpacity, depthWrite: false,
+    });
+    const line = new THREE.Line(geo, mat);
+    edgeGroup.add(line);
+
+    // Glow line (thicker, additive)
+    const glowMat = new THREE.LineBasicMaterial({
+      color: edgeColor, transparent: true, opacity: 0.05,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const glowLine = new THREE.Line(geo.clone(), glowMat);
+    edgeGroup.add(glowLine);
+
+    edgeMap.push({ line, glowLine, si, ti, type: e.tp || 'relation' });
+  }
+  scene.add(edgeGroup);
+
+  // --- Background stars ---
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 600;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i++) starPos[i] = (Math.random() - 0.5) * 2000;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({ color: 0x333355, size: 0.8, transparent: true, opacity: 0.4 });
+  scene.add(new THREE.Points(starGeo, starMat));
+
+  // --- Lights ---
+  scene.add(new THREE.AmbientLight(0x404060, 0.6));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.3);
+  dl.position.set(1, 1, 1); scene.add(dl);
+
+  // --- Interaction ---
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const tooltip = document.getElementById('tooltip');
+  let hoveredNode = null;
+
+  // Search
+  const searchBox = document.getElementById('search-box');
+  const searchResults = document.getElementById('search-results');
+  let filteredResults = [];
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.toLowerCase().trim();
+    if (!q) { searchResults.style.display = 'none'; return; }
+    filteredResults = [];
+    for (const nd of nodes) {
+      if ((nd.n||'').toLowerCase().includes(q) || (nd.sub||'').toLowerCase().includes(q)) {
+        filteredResults.push(nd);
+      }
+    }
+    searchResults.style.display = 'block';
+    if (filteredResults.length === 0) {
+      searchResults.innerHTML = '<div class="noresult">未找到匹配节点</div>';
+      return;
+    }
+    searchResults.innerHTML = filteredResults.slice(0, 15).map(nd => {
+      const icon = CAT_ICONS[nd.c] || '○';
+      return `<div class="item" data-id="${nd.id}">${icon} ${nd.n}<div class="cat">${CAT_NAMES[nd.c]||nd.c||''}${nd.sub ? ' · '+nd.sub : ''}</div></div>`;
+    }).join('');
+    searchResults.querySelectorAll('.item').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        const idx = nodes.findIndex(n => n.id === id);
+        if (idx >= 0 && positions[idx]) {
+          const p = positions[idx];
+          controls.target.lerp(new THREE.Vector3(p.x,p.y,p.z), 0.5);
+          camera.position.lerp(new THREE.Vector3(p.x,p.y,p.z+250), 0.3);
+          searchBox.value = ''; searchResults.style.display = 'none';
+          showDetail(nodes[idx], edges, nodeById, nodes);
+        }
+      });
+    });
+  });
+
+  searchBox.addEventListener('blur', () => setTimeout(() => { searchResults.style.display = 'none'; }, 200));
+
+  // Detail panel
+  const detailPanel = document.getElementById('detail-panel');
+  const detailClose = document.getElementById('detail-close');
+  detailClose.addEventListener('click', () => detailPanel.classList.remove('open'));
+
+  function showDetail(nd, edgeList, nById, allNodes) {
+    document.getElementById('detail-title').textContent = `${CAT_ICONS[nd.c]||'○'} ${nd.n}`;
+    const catName = CAT_NAMES[nd.c] || nd.c || '';
+    // Find connected nodes
+    const connected = [];
+    for (const e of edgeList) {
+      let otherId = null;
+      if (e.s === nd.id) otherId = e.t;
+      if (e.t === nd.id) otherId = e.s;
+      if (otherId) {
+        const otherIdx = nById[otherId];
+        if (otherIdx !== undefined) {
+          connected.push({ node: allNodes[otherIdx], type: e.tp || 'relation' });
+        }
+      }
+    }
+
+    // ═══ 图分析：中心度计算 ═══
+    function computeCentrality(nodes, edges) {
+      const degree = {};
+      nodes.forEach(n => degree[n.id] = 0);
+      edges.forEach(e => { degree[e.s] = (degree[e.s]||0)+1; degree[e.t] = (degree[e.t]||0)+1; });
+      const sorted = Object.entries(degree).sort((a,b) => b[1]-a[1]);
+      const maxDeg = sorted[0]?.[1] || 1;
+      return { degree, sorted, maxDeg };
+    }
+
+    const centrality = computeCentrality(allNodes, edgeList);
+    const nodeDegree = centrality.degree[nd.id] || 0;
+    const rank = centrality.sorted.findIndex(([id]) => id === nd.id) + 1;
+    const isHub = rank <= 3 && nodeDegree >= 3;
+
+    // ═══ 图分析：集群检测（连通分量） ═══
+    function findCommunities(nodes, edges) {
+      const adj = {};
+      nodes.forEach(n => adj[n.id] = new Set());
+      edges.forEach(e => { adj[e.s]?.add(e.t); adj[e.t]?.add(e.s); });
+      const visited = new Set(); const communities = [];
+      for (const n of nodes) {
+        if (visited.has(n.id)) continue;
+        const cluster = []; const queue = [n.id];
+        while (queue.length > 0) {
+          const id = queue.shift();
+          if (visited.has(id)) continue;
+          visited.add(id); cluster.push(id);
+          adj[id]?.forEach(nei => { if (!visited.has(nei)) queue.push(nei); });
+        }
+        if (cluster.length > 0) communities.push(cluster);
+      }
+      return communities.sort((a,b) => b.length - a.length);
+    }
+    const communities = findCommunities(allNodes, edgeList);
+    const myCommunity = communities.find(c => c.includes(nd.id));
+    const communitySize = myCommunity?.length || 0;
+
+    document.getElementById('detail-body').innerHTML = `
+      <div class="field"><div class="label">类型</div><div class="value">${catName}</div></div>
+      ${nd.sub ? `<div class="field"><div class="label">标签</div><div class="value">${nd.sub}</div></div>` : ''}
+      ${nd.desc ? `<div class="field"><div class="label">描述</div><div class="value">${nd.desc}</div></div>` : ''}
+      <div style="margin:12px 0;padding:8px 12px;background:rgba(108,108,208,0.08);border-radius:8px;border:1px solid rgba(108,108,208,0.15);">
+        <div style="font-size:11px;color:#6b6b8a;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">📊 图分析</div>
+        <div style="display:flex;gap:12px;font-size:12px;">
+          <div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;">
+            <div style="color:#7c7ce0;font-size:16px;font-weight:700;">${nodeDegree}</div>
+            <div style="color:#6b6b8a;font-size:10px;">连接数</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;">
+            <div style="color:#7c7ce0;font-size:16px;font-weight:700;">#${rank}</div>
+            <div style="color:#6b6b8a;font-size:10px;">中心度排名</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:6px;">
+            <div style="color:#7c7ce0;font-size:16px;font-weight:700;">${communitySize}</div>
+            <div style="color:#6b6b8a;font-size:10px;">集群大小</div>
+          </div>
+        </div>
+        ${isHub ? '<div style="margin-top:6px;font-size:11px;color:#f0c040;">👑 枢纽节点 — 关系网络的核心连接者</div>' : ''}
+        ${nodeDegree <= 1 ? '<div style="margin-top:6px;font-size:11px;color:#ff6b6b;">⚠️ 边缘节点 — 仅1个连接</div>' : ''}
+      </div>
+      <div class="field" style="margin-top:8px;"><div class="label">关联 (${connected.length})</div>
+        ${connected.slice(0, 20).map(c => 
+          `<div class="rel-item"><span class="rel-type">${c.type}</span>${c.node.n}</div>`
+        ).join('')}
+        ${connected.length > 20 ? `<div style="color:#4a4a6a;font-size:11px;margin-top:4px">还有 ${connected.length-20} 个...</div>` : ''}
+      </div>
+    `;
+    detailPanel.classList.add('open');
+  }
+
+  function onPointerMove(event) {
+    pointer.x = (event.clientX / w) * 2 - 1;
+    pointer.y = -(event.clientY / h) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(nodeGroup.children);
+
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      const idx = hit.userData.idx;
+      const nd = nodeData[idx];
+
+      tooltip.style.display = 'block';
+      tooltip.style.left = (event.clientX + 16) + 'px';
+      tooltip.style.top = (event.clientY - 12) + 'px';
+
+      const edgeCount = edges.filter(e => e.s === nd.nd.id || e.t === nd.nd.id).length;
+      const icon = CAT_ICONS[nd.nd.c] || '';
+      tooltip.innerHTML = `
+        <div class="name">${icon} ${nd.nd.n}</div>
+        ${nd.nd.sub ? `<div class="tag">${nd.nd.sub}</div>` : ''}
+        ${nd.nd.desc ? `<div class="desc">${nd.nd.desc}</div>` : ''}
+        <div class="edges-hint">${edgeCount} 个关联 · 点击查看详情</div>
+      `;
+
+      if (hoveredNode !== hit) {
+        if (hoveredNode) { hoveredNode.material.opacity = 0.85; }
+        hit.material.opacity = 1.0;
+        hit.scale.set(nd.sz*14+8, nd.sz*14+8, 1);
+        hoveredNode = hit;
+
+        // Highlight edges
+        for (const em of edgeMap) {
+          const isConnected = (em.si === idx || em.ti === idx);
+          em.line.material.opacity = isConnected ? CFG.edgeHoverOpacity : 0.04;
+          em.glowLine.material.opacity = isConnected ? 0.15 : 0.01;
+        }
+      }
+    } else {
+      tooltip.style.display = 'none';
+      if (hoveredNode) {
+        hoveredNode.material.opacity = 0.85;
+        const sz = nodeData[hoveredNode.userData.idx]?.sz || 1;
+        hoveredNode.scale.set(sz*10+4, sz*10+4, 1);
+        hoveredNode = null;
+        for (const em of edgeMap) {
+          em.line.material.opacity = CFG.edgeOpacity;
+          em.glowLine.material.opacity = 0.05;
+        }
+      }
+    }
+  }
+
+  // Click to show detail
+  function onClick(event) {
+    pointer.x = (event.clientX / w) * 2 - 1;
+    pointer.y = -(event.clientY / h) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(nodeGroup.children);
+    if (intersects.length > 0) {
+      const idx = intersects[0].object.userData.idx;
+      showDetail(nodes[idx], edges, nodeById, nodes);
+    }
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('click', onClick);
+
+  // Auto-rotate after idle
+  let lastInteraction = Date.now();
+  renderer.domElement.addEventListener('pointerdown', () => { lastInteraction = Date.now(); controls.autoRotate = false; });
+  renderer.domElement.addEventListener('wheel', () => { lastInteraction = Date.now(); controls.autoRotate = false; });
+
+  // --- Animate ---
+  function animate() {
+    requestAnimationFrame(animate);
+    if (Date.now() - lastInteraction > CFG.autoRotateDelay) controls.autoRotate = true;
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const w2 = window.innerWidth, h2 = window.innerHeight;
+    camera.aspect = w2/h2; camera.updateProjectionMatrix();
+    renderer.setSize(w2, h2);
+  });
+
+  // 导出用
+  window.__renderer = renderer;
+  window.__scene = scene;
+  window.__camera = camera;
+
+  // L4 自进化反馈
+  try {
+    const fb = { node_count: nodes.length, edge_count: edges.length, product: data.product || 'unknown' };
+    fetch('/api/kg/feedback', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(fb) }).catch(()=>{});
+  } catch(e) {}
+
+  setTimeout(() => { document.getElementById('controls-hint').style.opacity = '0'; }, 6000);
+
+  return { scene, camera, renderer, controls };
+}
+
+// ═══ 判断嵌入模式 ═══════════════════════════════════
+const IS_EMBEDDED = window.__GRAPH_EMBED || document.body.classList.contains('embed-mode');
+if (IS_EMBEDDED) document.body.classList.add('embed-mode');
+
+// ═══ 导出为图片 ══════════════════════════════════════
+window.handleExport = function() {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+  // 高分辨率导出 (2x)
+  const origW = canvas.width, origH = canvas.height;
+  const scale = 2;
+  canvas.width = origW * scale;
+  canvas.height = origH * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  // 渲染一帧
+  if (window.__renderer && window.__scene && window.__camera) {
+    window.__renderer.render(window.__scene, window.__camera);
+  }
+  const link = document.createElement('a');
+  link.download = (window.__GRAPH_DATA?.title || '知识图谱') + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  // 恢复原尺寸
+  canvas.width = origW;
+  canvas.height = origH;
+};
+
+// ═══ 启动 ════════════════════════════════════════════
+(function init() {
+  // 嵌入模式：通过 data-container 指定挂载的 div
+  const script = document.currentScript;
+  const containerId = script?.getAttribute('data-container');
+  if (containerId) {
+    document.body.classList.add('embed-mode');
+  }
+  if (window.__GRAPH_DATA) { createGraph(window.__GRAPH_DATA); return; }
+  const script = document.currentScript;
+  const url = script?.getAttribute('data-url');
+  if (url) { fetch(url).then(r=>r.json()).then(createGraph).catch(e=>{ document.getElementById('loading').innerHTML=`⚠️ ${e.message}`; }); return; }
+  document.getElementById('loading').innerHTML = '⚠️ 请设置 window.__GRAPH_DATA 或 data-url';
+})();
+</script>
+</body>
+</html>

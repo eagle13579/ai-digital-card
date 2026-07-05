@@ -11,13 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
 import { api } from '../api/client';
 
-const GRAPH_SERVER = 'http://localhost:5060';
+const GRAPH_SERVER = '';
 
 interface TrustNetworkUser {
   id: number;
   name: string;
   company?: string;
-  position?: string;
+  title?: string;
+  avatar?: string;
 }
 
 export default function NetworkGraphPage() {
@@ -67,7 +68,7 @@ export default function NetworkGraphPage() {
         n: c.name,
         c: 'person',
         sz: 1.2,
-        sub: [c.position, c.company].filter(Boolean).join(' · '),
+        sub: [c.title, c.company].filter(Boolean).join(' · '),
       });
       edges.push({ s: 'me', t: `c-${c.id}`, tp: 'relation' });
     });

@@ -78,9 +78,12 @@ function request(method, url, data = {}, options = {}) {
         if (statusCode >= 200 && statusCode < 300) {
           resolve(resData)
         } else if (statusCode === 401) {
-          // token过期，清除登录态
+          // token过期，清除登录态并跳转登录页
           app.clearLogin()
           wx.showToast({ title: '登录已过期', icon: 'none' })
+          setTimeout(() => {
+            wx.reLaunch({ url: '/pages/login/index' })
+          }, 1000)
           reject(resData)
         } else {
           const errorMsg = ERROR_MAP[statusCode] || resData?.detail || '请求失败'

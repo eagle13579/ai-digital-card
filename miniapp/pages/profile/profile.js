@@ -169,7 +169,7 @@ Page({
         if (res.confirm) {
           const app = getApp()
           app.clearLogin()
-          wx.reLaunch({ url: '/pages/index/index' })
+          wx.reLaunch({ url: '/pages/login/index' })
         }
       },
     })

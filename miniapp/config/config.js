@@ -27,6 +27,12 @@ const CONFIGS = {
     // 是否启用 Mock（无后端时可打开）
     enableMock: false,
   },
+  lan: {
+    name: '局域网测试',
+    apiBaseUrl: 'http://192.168.1.246:8002',
+    debug: true,
+    enableMock: false,
+  },
   production: {
     name: '生产环境',
     apiBaseUrl: 'https://api.liankebao.top',

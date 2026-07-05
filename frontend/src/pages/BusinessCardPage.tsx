@@ -10,6 +10,7 @@ import {
 import { api } from '../api/client';
 import ShareSheet from '../components/ShareSheet';
 import AIAssistant from '../components/AIAssistant';
+import CardNetworkGraph from '../components/CardNetworkGraph';
 import { colors, spacing, radius, shadows, motion, glass, cardTemplates } from '../styles/design-tokens';
 
 // ============================================================
@@ -1782,6 +1783,11 @@ export default function BusinessCardPage() {
           onClose={() => setShowAIAssistant(false)}
           onApplyCopy={handleApplyCopy}
         />
+      )}
+
+      {/* 🌐 名片人际关系图谱 — 查看名片时自动展示该联系人的关系网络 */}
+      {detailCardId && step === 'detail' && (
+        <CardNetworkGraph cardId={detailCardId} userName={fields.name || ''} />
       )}
     </div>
   );

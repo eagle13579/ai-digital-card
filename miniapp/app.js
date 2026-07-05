@@ -27,6 +27,26 @@ App({
     if (token) {
       this.globalData.token = token
       this.globalData.userInfo = userInfo
+      // 异步验证token是否有效
+      wx.request({
+        url: this.globalData.apiBaseUrl + '/api/v1/users/me',
+        header: { 'Authorization': 'Bearer ' + token },
+        fail: () => {
+          // 网络错误不处理（可能只是离线）
+        },
+        complete: (res) => {
+          if (res.statusCode === 401) {
+            // token已过期，清除缓存
+            this.clearLogin()
+            // 强制跳登录页
+            const pages = getCurrentPages()
+            const currentPage = pages[pages.length - 1]
+            if (currentPage && currentPage.route !== 'pages/login/index') {
+              wx.reLaunch({ url: '/pages/login/index' })
+            }
+          }
+        }
+      })
     }
   },
 
