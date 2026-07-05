@@ -23,6 +23,17 @@ ALLOWED_MAP: dict[str, str] = {
     ".webm": "video/webm",
 }
 
+# 允许的图片扩展名和 MIME 类型映射
+ALLOWED_IMAGE_MAP: dict[str, str] = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
+
+# 图片最大大小（5MB）
+MAX_IMAGE_SIZE: int = 5 * 1024 * 1024
+
 # 转码预设（ffmpeg 参数）
 TRANSCODE_PRESETS = {
     "mp4": {
@@ -110,6 +121,140 @@ class MediaService:
         """生成安全的唯一文件名，保留原始扩展名"""
         ext = Path(original_filename).suffix.lower() or ".mp4"
         return f"{uuid.uuid4().hex}{ext}"
+
+    # ── 图片上传验证 ──────────────────────────────────────────────────────
+
+    @staticmethod
+    def validate_image(file: UploadFile) -> None:
+        """验证上传的图片文件格式和大小。
+
+        检查:
+        - 文件扩展名在允许列表中 (jpg/jpeg/png/webp)
+        - MIME 类型匹配
+        - 文件大小 ≤ 5MB
+        """
+        filename = file.filename or ""
+        ext = Path(filename).suffix.lower()
+        if ext not in ALLOWED_IMAGE_MAP:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的图片格式: {ext}，允许格式: {', '.join(ALLOWED_IMAGE_MAP.keys())}",
+            )
+
+        # 验证 MIME 类型
+        content_type = file.content_type or ""
+        expected_mime = ALLOWED_IMAGE_MAP[ext]
+        if content_type and content_type != expected_mime:
+            raise HTTPException(
+                status_code=400,
+                detail=f"MIME 类型不匹配: {content_type}，期望: {expected_mime}",
+            )
+
+        logger.info(
+            "图片格式验证通过: name=%s, ext=%s, mime=%s",
+            filename, ext, content_type,
+        )
+
+    @staticmethod
+    async def check_image_size(file: UploadFile) -> None:
+        """检查上传图片大小是否 ≤ 5MB"""
+        max_size = MAX_IMAGE_SIZE
+        if hasattr(file, "size") and file.size is not None:
+            if file.size > max_size:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"图片文件过大（{file.size / 1024 / 1024:.1f}MB），"
+                    f"最大允许 {max_size / 1024 / 1024:.0f}MB",
+                )
+            return
+
+        chunk = await file.read(max_size + 1)
+        if len(chunk) > max_size:
+            raise HTTPException(
+                status_code=400,
+                detail=f"图片文件超过大小限制（最大 {max_size / 1024 / 1024:.0f}MB）",
+            )
+        await file.seek(0)
+
+    @staticmethod
+    async def save_image(
+        file: UploadFile,
+        sub_dir: str | None = None,
+    ) -> str:
+        """保存上传的图片文件到磁盘，返回相对路径。
+
+        Args:
+            file: 上传文件对象
+            sub_dir: 子目录名（如用户ID），可选
+
+        Returns:
+            相对路径字符串（如 'uploads/images/abc123.jpg'）
+        """
+        upload_base = Path(settings.UPLOAD_DIR) / "images"
+        if sub_dir:
+            upload_base = upload_base / sub_dir
+        upload_base.mkdir(parents=True, exist_ok=True)
+
+        safe_name = MediaService.generate_filename(file.filename or "image.jpg")
+        dest_path = upload_base / safe_name
+
+        content = await file.read()
+        dest_path.write_bytes(content)
+
+        relative_path = f"uploads/images/{sub_dir}/{safe_name}" if sub_dir else f"uploads/images/{safe_name}"
+
+        logger.info(
+            "图片文件已保存: orig=%s, saved=%s, size=%d",
+            file.filename, relative_path, len(content),
+        )
+        return relative_path
+
+    @staticmethod
+    async def handle_image_upload(
+        file: UploadFile,
+        user_id: int | None = None,
+    ) -> dict:
+        """完整的图片上传处理流程：
+        1. 验证格式 (jpg/png/webp)
+        2. 检查大小 (≤5MB)
+        3. 保存文件
+
+        Args:
+            file: 上传文件
+            user_id: 用户ID（用于子目录）
+
+        Returns:
+            {
+                "url": "uploads/images/xxx.jpg",
+                "original_name": "原始文件名.jpg",
+                "size": 123456,
+            }
+        """
+        # 1. 格式验证
+        MediaService.validate_image(file)
+
+        # 2. 大小检查
+        await MediaService.check_image_size(file)
+
+        # 3. 保存
+        sub_dir = str(user_id) if user_id is not None else None
+        saved_path = await MediaService.save_image(file, sub_dir=sub_dir)
+
+        result = {
+            "url": saved_path,
+            "original_name": file.filename or "",
+            "size": 0,
+        }
+
+        # 获取实际文件大小
+        upload_base = Path(settings.UPLOAD_DIR) / "images"
+        if sub_dir:
+            upload_base = upload_base / sub_dir
+        full_path = upload_base / Path(saved_path).name
+        if full_path.exists():
+            result["size"] = full_path.stat().st_size
+
+        return result
 
     @staticmethod
     async def save_upload(

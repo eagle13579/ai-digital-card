@@ -1,3 +1,4 @@
+import asyncio
 import json
 import uuid
 from typing import Optional
@@ -217,6 +218,10 @@ async def create_brochure(
     await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
+
+    # 创建画册后自动触发匹配池（异步执行，不阻塞响应）
+    asyncio.create_task(_trigger_matching_pool(db, current_user.id))
+
     return resp
 
 
@@ -365,6 +370,10 @@ async def publish_brochure(
     await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
+
+    # 发布画册后自动触发匹配池
+    asyncio.create_task(_trigger_matching_pool(db, current_user.id))
+
     return resp
 
 
@@ -385,6 +394,31 @@ async def refresh_share_token(
     brochure.share_token = uuid.uuid4().hex[:16]
     await db.commit()
     return {"share_token": brochure.share_token}
+
+
+# ── 匹配池自动触发 ──────────────────────────────────
+
+
+async def _trigger_matching_pool(db: AsyncSession, user_id: int) -> None:
+    """创建/发布画册后自动触发匹配池：计算该用户与其他用户的匹配度。
+
+    异步执行，不阻塞 API 响应。
+    使用独立会话以避免跨任务共享会话。
+    """
+    try:
+        from app.database import AsyncSessionLocal
+        from app.services.matching_engine import MatchEngine
+
+        async with AsyncSessionLocal() as session:
+            await MatchEngine.get_daily_recommendations(
+                db=session,
+                user_id=user_id,
+                limit=20,
+                min_score=0.1,
+            )
+            logger.info("匹配池已触发: user_id=%s", user_id)
+    except Exception as exc:
+        logger.warning("匹配池触发失败（降级）: user_id=%s, error=%s", user_id, exc)
 
 
 # ── 智能搜索（自然语言搜索名片）─────────────────────────────────────────
@@ -528,6 +562,28 @@ async def upload_video(
         transcode=True,
     )
     return VideoUploadResponse(**result)
+
+
+# ── 图片上传 ──────────────────────────────────────────────────
+
+
+class ImageUploadResponse(BaseModel):
+    url: str
+    original_name: str
+    size: int
+
+
+@router.post("/upload-image", response_model=ImageUploadResponse)
+async def upload_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """上传图片文件（jpg/png/webp，≤5MB），返回可访问的图片 URL"""
+    result = await MediaService.handle_image_upload(
+        file=file,
+        user_id=current_user.id,
+    )
+    return ImageUploadResponse(**result)
 
 
 @router.post("/batch-import")

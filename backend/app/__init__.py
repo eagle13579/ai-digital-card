@@ -251,9 +251,35 @@ def create_app():
             return HTMLResponse(f.read())
 
     @app.get("/view/{share_token}", response_class=HTMLResponse)
-    def brochure_viewer(share_token: str):
-        with open(os.path.join(templates_dir, "brochure_viewer.html"), encoding="utf-8") as f:
-            return HTMLResponse(f.read())
+    async def brochure_viewer(share_token: str):
+        """公开画册翻页查看页 — StPageFlip 渲染 + 小程序引导"""
+        from app.database import AsyncSessionLocal
+        from app.services.brochure_viewer import render_public_brochure_html
+
+        async with AsyncSessionLocal() as db:
+            try:
+                html = await render_public_brochure_html(db, share_token)
+                return HTMLResponse(content=html)
+            except ValueError:
+                from fastapi.responses import HTMLResponse as _HTMLResponse
+                return _HTMLResponse(
+                    content="""<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>画册不存在 - AI数字名片</title>
+<style>body{font-family:-apple-system,sans-serif;background:#0f0c29;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px}
+h1{font-size:24px;margin-bottom:12px;background:linear-gradient(90deg,#f093fb,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+p{color:rgba(255,255,255,0.6);margin-bottom:20px}
+.btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:10px 28px;border-radius:24px;text-decoration:none;font-size:14px}</style>
+</head>
+<body>
+<h1>😕 画册不存在</h1>
+<p>该画册链接已失效或已被删除</p>
+<a href="/" class="btn">返回首页</a>
+</body>
+</html>""",
+                    status_code=404,
+                )
 
     # API endpoints
     @app.get("/health", response_class=PlainTextResponse)
