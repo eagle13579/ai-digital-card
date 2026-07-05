@@ -138,6 +138,10 @@ const brochureApi = {
   uploadMedia(filePath, formData) {
     return uploadFile('/api/v1/brochures/media/upload', filePath, formData)
   },
+  /** 获取画册分享链接 */
+  getShareLink(id) {
+    return get(`/api/v1/brochures/${id}/share-link`)
+  },
 }
 
 // =============================================================================
@@ -190,6 +194,10 @@ const matchApi = {
   /** AI 混合推荐 */
   getHybridRecommend(cardId, params) {
     return post(`/api/v1/ai/recommend/hybrid/${cardId}`, params)
+  },
+  /** 触发匹配引擎（画册创建后调用，将当前用户加入匹配池） */
+  triggerMatching(minScore = 0.3) {
+    return post(`/api/v1/match/engine?min_score=${minScore}`)
   },
 }
 

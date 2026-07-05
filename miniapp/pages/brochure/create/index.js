@@ -1,9 +1,9 @@
 /**
  * 画册创建页面
- * 用户可以上传身份信息、资源供需、公司介绍、产品案例等信息
- * 自动生成可翻页的AI数智名片画册
+ * 连接后端 brochureApi + matchApi
+ * 提交表单 → 上传图片 → 创建画册 → 触发匹配 → 跳转预览
  */
-const { MockService } = require('../../../utils/mockService')
+const { brochureApi, matchApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 
 Page({
@@ -33,9 +33,9 @@ Page({
     newNeed: '',
     purposeOptions: [
       { value: 'partner', label: '寻找合作伙伴', icon: '🤝' },
-      { value: 'investor', label: '寻找投资', icon: '💰' },
-      { value: 'employee', label: '寻找人才', icon: '👥' },
       { value: 'client', label: '寻找客户', icon: '🎯' },
+      { value: 'investor', label: '寻找投资', icon: '💰' },
+      { value: 'supplier', label: '寻找供应商', icon: '🔧' },
     ],
     styleOptions: [
       { value: 'professional', name: '商务专业', desc: '适合商务场合', preview: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' },
@@ -43,6 +43,7 @@ Page({
       { value: 'minimal', name: '极简简约', desc: '适合科技行业', preview: 'linear-gradient(135deg, #64748B 0%, #1E293B 100%)' },
     ],
     sizeOptions: ['1-10人', '11-50人', '51-100人', '101-500人', '501-1000人', '1000人以上'],
+    submitting: false,
   },
 
   onLoad() {
@@ -145,7 +146,8 @@ Page({
   },
 
   chooseCompanyImage() {
-    const currentCount = this.data.formData.companyImages && this.data.formData.companyImages.length ? this.data.formData.companyImages.length : 0
+    const currentCount = this.data.formData.companyImages && this.data.formData.companyImages.length
+      ? this.data.formData.companyImages.length : 0
     wx.chooseImage({
       count: 3 - currentCount,
       sizeType: ['compressed'],
@@ -187,7 +189,7 @@ Page({
     const caseData = this.data.formData.cases[caseIndex] || { images: [] }
     const imageCount = caseData.images && caseData.images.length ? caseData.images.length : 0
     const remaining = 3 - imageCount
-    
+
     wx.chooseImage({
       count: remaining,
       sizeType: ['compressed'],
@@ -231,85 +233,236 @@ Page({
   },
 
   validateForm() {
-    Logger.info('画册创建页', '开始表单验证', { 
-      formData: JSON.stringify(this.data.formData),
-      name: this.data.formData.name,
-      title: this.data.formData.title,
-      company: this.data.formData.company,
-      bio: this.data.formData.bio ? this.data.formData.bio.slice(0, 30) + '...' : '',
-    })
-    
-    const { name, title, company, bio } = this.data.formData
-    
-    Logger.info('画册创建页', '表单字段值', {
-      nameValue: name,
-      nameLength: name ? name.length : 0,
-      nameTrimmed: name ? name.trim() : '',
-      titleValue: title,
-      companyValue: company,
-      bioValue: bio ? bio.slice(0, 50) : '',
-      bioLength: bio ? bio.length : 0,
-    })
-    
+    const { name, title, company, bio, phone, email } = this.data.formData
+
     if (!name || !name.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'name', value: name, reason: '姓名为空' })
       wx.showToast({ title: '请输入姓名', icon: 'none' })
       return false
     }
     if (!title || !title.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'title', value: title, reason: '职位为空' })
       wx.showToast({ title: '请输入职位', icon: 'none' })
       return false
     }
     if (!company || !company.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'company', value: company, reason: '公司名称为空' })
       wx.showToast({ title: '请输入公司名称', icon: 'none' })
       return false
     }
-    if (bio && bio.length < 50) {
-      Logger.warn('画册创建页', '个人简介建议至少50字', { bioLength: bio.length })
-    }
-    
-    Logger.info('画册创建页', '表单验证通过')
     return true
   },
 
-  async submitForm() {
-    if (!this.validateForm()) {
-      return
+  /**
+   * 上传单张图片，返回上传后的 URL
+   * @param {string} filePath 本地临时文件路径
+   * @returns {Promise<string>} 上传后的图片 URL
+   */
+  async uploadImage(filePath) {
+    if (!filePath) return ''
+    try {
+      const res = await brochureApi.uploadMedia(filePath, { type: 'image' })
+      return res.url || res.data?.url || filePath
+    } catch (err) {
+      Logger.error('画册创建页', '图片上传失败', err)
+      return ''
+    }
+  },
+
+  /**
+   * 批量上传图片
+   */
+  async uploadImages(filePaths) {
+    if (!filePaths || filePaths.length === 0) return []
+    const urls = []
+    for (const fp of filePaths) {
+      const url = await this.uploadImage(fp)
+      if (url) urls.push(url)
+    }
+    return urls
+  },
+
+  /**
+   * 将表单数据转换为后端 pages 数组
+   */
+  buildPages(avatarUrl, companyImageUrls, caseImageUrlsMap) {
+    const { name, title, company, phone, email, wechat, bio, provides, needs,
+      purpose, companyName, companyDesc, development, cases } = this.data.formData
+
+    const displayCompany = companyName || company
+    const contactContent = [
+      phone ? `📞 ${phone}` : '',
+      email ? `✉️ ${email}` : '',
+      wechat ? `💬 ${wechat}` : '',
+    ].filter(Boolean).join('\n')
+
+    const providesText = provides.length > 0
+      ? '我能提供：\n' + provides.map(p => `• ${p}`).join('\n')
+      : ''
+    const needsText = needs.length > 0
+      ? '我需要的：\n' + needs.map(n => `• ${n}`).join('\n')
+      : ''
+    const resourcesText = [providesText, needsText].filter(Boolean).join('\n\n')
+
+    const bioText = `姓名：${name}\n职位：${title}\n公司：${displayCompany}\n\n${bio || ''}`
+
+    const pages = []
+
+    // 第0页：封面
+    pages.push({
+      sort_order: 0,
+      content_type: 'cover',
+      content: `${name}\n${title}\n${displayCompany}`,
+      image_url: avatarUrl || '',
+    })
+
+    // 第1页：个人简介
+    pages.push({
+      sort_order: 1,
+      content_type: 'text',
+      content: bioText,
+      image_url: '',
+    })
+
+    // 第2页：资源供需
+    if (resourcesText) {
+      pages.push({
+        sort_order: 2,
+        content_type: 'text',
+        content: resourcesText,
+        image_url: '',
+      })
     }
 
-    wx.showLoading({ title: '生成中...' })
-    try {
-      const data = { ...this.data.formData }
-      Logger.info('画册创建页', '开始生成画册', { 
-        name: data.name,
-        company: data.company,
-        title: data.title,
-        providesCount: data.provides && data.provides.length ? data.provides.length : 0,
-        needsCount: data.needs && data.needs.length ? data.needs.length : 0,
-        casesCount: data.cases && data.cases.length ? data.cases.length : 0,
+    // 第3页：公司介绍
+    const companyText = [
+      companyDesc ? `公司简介：\n${companyDesc}` : '',
+      development ? `发展历程：\n${development}` : '',
+    ].filter(Boolean).join('\n\n')
+
+    if (companyText) {
+      pages.push({
+        sort_order: pages.length,
+        content_type: 'text',
+        content: companyText,
+        image_url: companyImageUrls[0] || '',
       })
-      
-      const result = await MockService.createBrochure(data)
-      Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
-      
-      if (result.id) {
-        wx.hideLoading()
-        wx.showToast({ title: '生成成功', icon: 'success' })
-        setTimeout(() => {
-          wx.navigateTo({
-            url: `/pages/brochure/preview/index?id=${result.id}`,
-          })
-        }, 1500)
-      } else {
-        wx.hideLoading()
-        wx.showToast({ title: '生成失败', icon: 'none' })
+    }
+
+    // 案例页
+    for (let i = 0; i < cases.length; i++) {
+      const c = cases[i]
+      if (!c.name && !c.desc) continue
+      const caseContent = [
+        c.name ? `案例名称：${c.name}` : '',
+        c.date ? `时间：${c.date}` : '',
+        c.desc ? `\n${c.desc}` : '',
+      ].filter(Boolean).join('\n')
+      pages.push({
+        sort_order: pages.length,
+        content_type: 'text',
+        content: caseContent,
+        image_url: (caseImageUrlsMap[i] && caseImageUrlsMap[i][0]) || '',
+      })
+    }
+
+    // 最后一页：联系方式
+    pages.push({
+      sort_order: pages.length,
+      content_type: 'image',
+      content: contactContent || `📞 ${phone || '未填写'}`,
+      image_url: '',
+    })
+
+    return pages
+  },
+
+  async submitForm() {
+    if (this.validateForm() === false) return
+    if (this.data.submitting) return
+
+    this.setData({ submitting: true })
+    wx.showLoading({ title: '生成中...', mask: true })
+
+    try {
+      const { name, title, company, purpose, provides, needs } = this.data.formData
+
+      // Step 1: 上传头像（如果有）
+      let avatarUrl = ''
+      if (this.data.formData.avatar) {
+        avatarUrl = await this.uploadImage(this.data.formData.avatar)
       }
+
+      // Step 2: 上传公司图片
+      const companyImageUrls = await this.uploadImages(this.data.formData.companyImages)
+
+      // Step 3: 上传案例图片
+      const caseImagesMap = {}
+      for (let i = 0; i < this.data.formData.cases.length; i++) {
+        const c = this.data.formData.cases[i]
+        if (c.images && c.images.length > 0) {
+          caseImagesMap[i] = await this.uploadImages(c.images)
+        }
+      }
+
+      // Step 4: 构建 pages 并创建画册
+      const pages = this.buildPages(avatarUrl, companyImageUrls, caseImagesMap)
+
+      const titleStr = `${name}的${company}名片`
+
+      const brochureData = {
+        title: titleStr,
+        cover: avatarUrl || '',
+        purpose: purpose,
+        pages: pages,
+      }
+
+      Logger.info('画册创建页', '调用 brochureApi.create', {
+        title: titleStr,
+        purpose: purpose,
+        pagesCount: pages.length,
+      })
+
+      const result = await brochureApi.create(brochureData)
+      Logger.info('画册创建页', '画册创建成功', { id: result.id })
+
+      // Step 5: 发布画册（生成分享 token）
+      let brochureId = result.id
+      try {
+        const published = await brochureApi.publish(brochureId)
+        Logger.info('画册创建页', '画册发布成功', { shareToken: published.share_token })
+      } catch (pubErr) {
+        Logger.warn('画册创建页', '发布失败，使用未发布状态', pubErr)
+      }
+
+      wx.hideLoading()
+
+      // Step 6: 触发匹配引擎（异步，不阻塞跳转）
+      this.triggerMatchingAsync(brochureId)
+
+      // Step 7: 跳转到预览页
+      wx.showToast({ title: '生成成功', icon: 'success', duration: 1500 })
+      setTimeout(() => {
+        wx.redirectTo({
+          url: `/pages/brochure/preview/index?id=${brochureId}`,
+        })
+      }, 1500)
+
     } catch (err) {
       wx.hideLoading()
+      this.setData({ submitting: false })
       Logger.error('画册创建页', '提交失败', err)
-      wx.showToast({ title: '提交失败', icon: 'none' })
+      const errMsg = (err && (err.detail || err.errMsg || err.message)) || '提交失败，请重试'
+      wx.showToast({ title: errMsg, icon: 'none', duration: 3000 })
+    }
+  },
+
+  /**
+   * 异步触发匹配引擎（不影响跳转流程）
+   */
+  async triggerMatchingAsync(brochureId) {
+    try {
+      await matchApi.triggerMatching(0.3)
+      Logger.info('画册创建页', '匹配引擎触发成功', { brochureId })
+    } catch (err) {
+      Logger.warn('画册创建页', '匹配引擎触发失败（不影响画册创建）', err)
     }
   },
 })

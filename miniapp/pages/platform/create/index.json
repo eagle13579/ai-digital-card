@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "创建资源平台",
+  "navigationStyle": "custom",
   "usingComponents": {}
 }
