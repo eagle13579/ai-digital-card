@@ -6,7 +6,11 @@
     "pages/profile/profile",
     "pages/brochure/create/index",
     "pages/brochure/preview/index",
-    "pages/platform/create/index"
+    "pages/platform/create/index",
+    "pages/agreement/user",
+    "pages/agreement/privacy/privacy",
+    "pages/ai/chat/index",
+    "pages/ai/generate/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

@@ -142,10 +142,10 @@ const visitorApi = {
 // ===== AI模块 =====
 const aiApi = {
   write(data) {
-    return post('/api/ai/write', data)
+    return post('/api/ai/assist/write', data)
   },
   generate(data) {
-    return post('/api/ai/generate', data)
+    return post('/api/ai/assist/generate', data)
   },
 }
 

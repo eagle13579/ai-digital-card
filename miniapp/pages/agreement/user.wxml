@@ -1,0 +1,101 @@
+<scroll-view class="agreement-container" scroll-y>
+  <view class="agreement-header">
+    <text class="agreement-title">用户协议</text>
+    <text class="agreement-subtitle">请仔细阅读以下条款</text>
+  </view>
+
+  <view class="agreement-content">
+    <view class="article">
+      <text class="article-title">一、总则</text>
+      <text class="article-text">
+        欢迎使用AI数智名片（以下简称"本服务"）。本服务由AI数智名片团队提供。请您仔细阅读以下全部条款（特别是以粗体标注的内容）。
+      </text>
+      <text class="article-text">
+        您使用本服务即表示您已充分阅读、理解并同意本协议的全部内容。如您不同意本协议的任何条款，请立即停止注册或使用本服务。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">二、账号注册与使用</text>
+      <text class="article-text">
+        1. 您在注册账号时应当提供真实、准确、完整的个人信息，并在信息变更后及时更新。若您提供的资料不合法、不真实、不准确，您需承担因此引起的相应责任及后果。
+      </text>
+      <text class="article-text">
+        2. 您注册的账号仅供您本人使用，不得以任何形式转让、出借、出租或授权第三方使用。因您保管不当导致账号被盗用的，由您自行承担责任。
+      </text>
+      <text class="article-text">
+        3. 您应当对以您账号进行的所有活动和事件承担全部法律责任。如发现任何未经授权使用您账号的情况，请立即通知我们。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">三、服务内容</text>
+      <text class="article-text">
+        1. 本服务为用户提供电子名片创建、展示、交换与管理功能，包括但不限于个人信息展示、联系方式管理、名片模板选择等基础功能。
+      </text>
+      <text class="article-text">
+        2. 我们保留根据业务发展需要调整、变更、中断或终止部分或全部服务的权利，但会提前通过合理方式通知用户。
+      </text>
+      <text class="article-text">
+        3. 我们尽力保障服务的稳定性和可用性，但不对因不可抗力、系统维护或第三方原因导致的服务中断承担责任。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">四、用户行为规范</text>
+      <text class="article-text">
+        1. 您承诺遵守国家法律法规，不得利用本服务从事任何违法违规活动。
+      </text>
+      <text class="article-text">
+        2. 您不得利用本服务发布、传播违法信息、虚假信息或侵犯他人合法权益的内容。
+      </text>
+      <text class="article-text">
+        3. 您不得对本服务进行反向工程、反编译、破解或试图获取源代码。
+      </text>
+      <text class="article-text">
+        4. 如您违反上述约定，我们有权采取警告、限制功能、暂停服务或永久封禁账号等措施。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">五、隐私保护</text>
+      <text class="article-text">
+        我们高度重视您的个人隐私保护。具体隐私保护政策请参阅《隐私政策》相关条款。我们采用业界通行的安全技术和措施保护您的个人信息安全。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">六、知识产权</text>
+      <text class="article-text">
+        1. 本服务所涉及的软件、技术、界面设计、商标、Logo等知识产权归我们所有，受知识产权法律法规保护。
+      </text>
+      <text class="article-text">
+        2. 您在使用本服务过程中创建的名片内容的知识产权归您所有。您授予我们为提供服务所必需的、全球范围内的使用许可。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">七、免责声明</text>
+      <text class="article-text">
+        1. 在法律允许的最大范围内，我们不承担因使用或无法使用本服务而产生的任何直接或间接损失的责任。
+      </text>
+      <text class="article-text">
+        2. 本服务可能包含第三方链接或内容，我们对第三方提供的服务或内容不承担责任。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">八、协议修改</text>
+      <text class="article-text">
+        我们有权根据需要修改本协议。修改后的协议会在本页面公布。如您不同意修改内容，应停止使用本服务；继续使用则视为接受修改后的协议。
+      </text>
+    </view>
+
+    <view class="article">
+      <text class="article-title">九、法律适用与争议解决</text>
+      <text class="article-text">
+        本协议的成立、生效、履行和解释均适用中华人民共和国法律。因本协议引起的争议，双方应友好协商解决；协商不成的，提交被告住所地有管辖权的人民法院诉讼解决。
+      </text>
+    </view>
+  </view>
+</scroll-view>

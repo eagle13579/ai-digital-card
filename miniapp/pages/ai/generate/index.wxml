@@ -1,0 +1,113 @@
+<view class="page">
+  <!-- 自定义导航栏 -->
+  <view class="page-header">
+    <view class="back-btn" bindtap="goBack">
+      <image class="icon" src="/images/icons/back.svg" mode="aspectFit" />
+    </view>
+    <view class="header-title">
+      <text class="title">AI 生成</text>
+      <text class="subtitle">智能内容创作助手</text>
+    </view>
+    <view class="ai-badge">
+      <view class="ai-dot"></view>
+      <text>AI</text>
+    </view>
+  </view>
+
+  <scroll-view class="page-content" scroll-y enhanced>
+    <!-- 模式切换 Tabs -->
+    <view class="tabs-container">
+      <view
+        class="tab-item {{currentTab === 0 ? 'active' : ''}}"
+        data-tab="0"
+        bindtap="switchTab"
+      >
+        <view class="tab-icon">
+          <text class="icon">✍️</text>
+        </view>
+        <text class="tab-label">写作</text>
+      </view>
+      <view
+        class="tab-item {{currentTab === 1 ? 'active' : ''}}"
+        data-tab="1"
+        bindtap="switchTab"
+      >
+        <view class="tab-icon">
+          <text class="icon">📝</text>
+        </view>
+        <text class="tab-label">摘要</text>
+      </view>
+      <view
+        class="tab-item {{currentTab === 2 ? 'active' : ''}}"
+        data-tab="2"
+        bindtap="switchTab"
+      >
+        <view class="tab-icon">
+          <text class="icon">🔄</text>
+        </view>
+        <text class="tab-label">改写</text>
+      </view>
+    </view>
+
+    <!-- 输入区域 -->
+    <view class="input-section">
+      <text class="section-title">输入提示</text>
+      <input
+        class="input-field"
+        placeholder="请输入主题或关键词，例如：产品介绍、新闻稿..."
+        model:value="{{prompt}}"
+        maxlength="500"
+      />
+      <button
+        class="generate-btn"
+        type="primary"
+        size="default"
+        loading="{{isGenerating}}"
+        disabled="{{!prompt.trim() || isGenerating}}"
+        bindtap="onGenerate"
+      >
+        {{isGenerating ? 'AI生成中...' : '开始生成'}}
+      </button>
+    </view>
+
+    <!-- 快捷模板 -->
+    <view class="templates-section" wx:if="{{templates.length > 0}}">
+      <text class="section-title">快捷模板</text>
+      <view class="templates-list">
+        <view
+          class="template-item"
+          wx:for="{{templates}}"
+          wx:key="id"
+          data-template="{{item}}"
+          bindtap="onSelectTemplate"
+        >
+          <text class="template-title">{{item.title}}</text>
+          <text class="template-desc">{{item.desc}}</text>
+          <view class="template-arrow">
+            <text class="icon">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 生成结果 -->
+    <view class="result-section" wx:if="{{resultContent}}">
+      <view class="result-header">
+        <text class="section-title">生成结果</text>
+        <view class="result-actions">
+          <view class="action-btn" bindtap="onCopy">
+            <text class="icon">📋</text>
+            <text>复制</text>
+          </view>
+          <view class="action-btn primary" bindtap="onReuse">
+            <text class="icon">🔄</text>
+            <text>换一批</text>
+          </view>
+        </view>
+      </view>
+      <view class="result-content">{{resultContent}}</view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

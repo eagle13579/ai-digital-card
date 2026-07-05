@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "AI助手",
+  "navigationStyle": "custom",
+  "usingComponents": {},
+  "componentPlaceholder": {
+    "loading": "view"
+  }
+}
