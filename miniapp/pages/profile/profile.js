@@ -1,7 +1,8 @@
 /**
  * 我的 - 个人中心/会员信息/设置
+ * 连接后端真实API，替换所有mock数据
  */
-const { MockService } = require('../../utils/mockService')
+const { userApi, subscriptionApi, messageApi, visitorApi, trustApi, brochureApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -28,42 +29,74 @@ Page({
   async loadProfile() {
     this.setData({ loading: true })
     try {
-      const [profile, brochures, trustNet, visitorStats] = await Promise.all([
-        MockService.getProfile(),
-        MockService.getBrochures(),
-        MockService.getTrustNetwork(),
-        MockService.getVisitorStats(),
+      // 并发请求：用户信息、订阅信息、信任网络、未读消息
+      const [profileRes, subscriptionRes, trustRes, unreadRes] = await Promise.all([
+        userApi.getProfile(),
+        subscriptionApi.getCurrent(),
+        trustApi.getNetwork(),
+        messageApi.getUnreadCount(),
       ])
 
-      const brochureList = Array.isArray(brochures) ? brochures : (brochures.data || [])
-      const brochure = brochureList[0]
+      // 兼容 { data: ... } 包裹和直接返回两种格式
+      const profile = profileRes.data ?? profileRes
+      const subscription = subscriptionRes.data ?? subscriptionRes
+      const trustNet = trustRes.data ?? trustRes
+      const unread = unreadRes.data ?? unreadRes
 
-      const memberLevel = profile.member_level || 'free'
+      // 会员等级（优先从profile取，其次subscription）
+      const memberLevel = profile.member_level || subscription?.plan || 'free'
       const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
 
-      let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
-
+      // 信任网络人数
       const trustCount = (trustNet.trusting || []).length
 
+      // 未读消息数（兼容不同字段名）
+      const newVisitorCount = unread?.count ?? unread?.unread_count ?? 0
+
+      // 获取画册列表 → 取第一个画册的访客统计
+      let stats = { visitors: 0, matches: 0, unlocks: 0, views: 0 }
+      try {
+        const brochuresRes = await brochureApi.list({ page: 1, page_size: 5 })
+        const brochures = brochuresRes.data ?? brochuresRes?.list ?? brochuresRes?.items ?? []
+        if (brochures.length > 0) {
+          const brochureId = brochures[0].id || brochures[0]._id
+          const statsRes = await visitorApi.getStats(brochureId)
+          const statsData = statsRes.data ?? statsRes
+          stats = {
+            visitors: statsData.total_visits ?? statsData.visitors ?? 0,
+            matches: statsData.matches ?? statsData.match_count ?? 0,
+            unlocks: statsData.unlocks ?? statsData.unlock_count ?? 0,
+            views: statsData.views ?? statsData.view_count ?? statsData.total_views ?? 0,
+          }
+        }
+      } catch (e) {
+        console.warn('获取画册/访客数据失败:', e)
+      }
+
+      // 组装用户信息
+      const userInfo = {
+        id: profile.id || profile._id,
+        name: profile.name || profile.nickname || '',
+        avatar: profile.avatar || profile.avatar_url || '',
+        company: profile.company || '',
+        title: profile.title || profile.position || '',
+      }
+
       this.setData({
-        userInfo: {
-          id: profile.id,
-          name: profile.name || '',
-          avatar: profile.avatar || '',
-          company: profile.company || '',
-          title: profile.title || '',
-        },
+        userInfo,
         memberLevel,
         memberLevelText,
-        memberExpire: profile.member_expire || '',
+        memberExpire: profile.member_expire || subscription?.expire_at || subscription?.expire_date || '',
         trustCount,
+        newVisitorCount,
         stats,
         loading: false,
       })
 
+      // 同步到全局
       const app = getApp()
-      app.updateUserInfo(this.data.userInfo)
-      app.updateMemberLevel(memberLevel)
+      if (typeof app.updateUserInfo === 'function') app.updateUserInfo(userInfo)
+      if (typeof app.updateMemberLevel === 'function') app.updateMemberLevel(memberLevel)
     } catch (err) {
       console.error('加载个人数据失败:', err)
       this.setData({ loading: false })
@@ -118,5 +151,24 @@ Page({
         }
       },
     })
+  },
+
+  // 跳转修改资料页面
+  goEditProfile() {
+    wx.navigateTo({ url: '/pages/profile/edit/index' })
+  },
+
+  // 保存资料（API调用）
+  async saveProfile(data) {
+    try {
+      const res = await userApi.updateProfile(data)
+      wx.showToast({ title: '保存成功', icon: 'success' })
+      this.loadProfile()
+      return res
+    } catch (err) {
+      console.error('保存资料失败:', err)
+      wx.showToast({ title: '保存失败', icon: 'none' })
+      throw err
+    }
   },
 })

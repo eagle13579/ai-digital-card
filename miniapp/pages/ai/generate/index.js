@@ -1,8 +1,9 @@
 /**
  * pages/ai/generate/index.js
  * AI内容生成页面 — 输入提示词 => 调用API生成内容 => 展示结果 => 历史记录
- * 后端 API: 桥接 POST /api/ai/assist/write (WritingAssistant)
- * Mock模式: 当前 USE_MOCK=true (通过 MockService 统一切换)
+ * 后端 API: POST /api/v1/ai/assist/generate
+ * 使用 aiApi.generate() — 支持 write / summary / rewrite 三种模式
+ * Mock模式: USE_MOCK=true 走 MockService 伪数据（便于测试），设为 false 即连接真实API
  */
 const { MockService } = require('../../../utils/mockService')
 
@@ -153,7 +154,7 @@ Page({
     wx.showLoading({ title: 'AI生成中...' })
     const { aiApi } = require('../../../utils/api')
     aiApi
-      .write({ prompt: prompt.trim(), mode })
+      .generate({ prompt: prompt.trim(), mode, type: TAB_MODES[this.data.currentTab] })
       .then((res) => {
         const content = res.data?.content || res.content || ''
         this.setData({ resultContent: content })

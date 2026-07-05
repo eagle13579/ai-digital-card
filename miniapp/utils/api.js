@@ -241,17 +241,21 @@ const trustApi = {
 //  AI 助手模块 (ai) — /ai/assist
 // =============================================================================
 const aiApi = {
+  /** AI 对话聊天 (RAG会话) — 流式或非流式 */
+  getChat(data) {
+    return post('/api/v1/ai/chat', data)
+  },
   /** AI 文案写作 */
   write(data) {
-    return post('/ai/assist/write', data)
+    return post('/api/v1/ai/assist/write', data)
   },
-  /** AI 生成内容 */
+  /** AI 生成内容（名片、文案等） */
   generate(data) {
-    return post('/ai/assist/generate', data)
+    return post('/api/v1/ai/assist/generate', data)
   },
   /** AI 优化建议 */
   optimize(data) {
-    return post('/ai/assist/optimize', data)
+    return post('/api/v1/ai/assist/optimize', data)
   },
 }
 
