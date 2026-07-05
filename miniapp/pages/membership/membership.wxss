@@ -5,7 +5,7 @@
 
 /* ===== 当前层级卡片 ===== */
 .current-level-card {
-  margin: 16px;
+  margin: 32rpx;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
@@ -25,34 +25,34 @@
 }
 
 .level-content {
-  padding: 20px 20px 12px;
+  padding: 40rpx 20px 12px;
   position: relative;
   z-index: 1;
 }
 
 .level-label {
-  font-size: 12px;
+  font-size: 24rpx;
   opacity: 0.8;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 12rpx;
 }
 
 .level-name-row {
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .level-name {
-  font-size: 28px;
+  font-size: 56rpx;
   font-weight: 700;
-  margin-right: 10px;
+  margin-right: 20rpx;
 }
 
 .level-badge {
-  padding: 2px 10px;
-  border-radius: 10px;
-  font-size: 11px;
+  padding: 4rpx 10px;
+  border-radius: 20rpx;
+  font-size: 22rpx;
   font-weight: 600;
 }
 
@@ -62,21 +62,21 @@
 }
 
 .level-expire {
-  font-size: 13px;
+  font-size: 26rpx;
   opacity: 0.75;
   display: block;
 }
 
 /* 使用额度 */
 .usage-section {
-  padding: 12px 20px 20px;
+  padding: 24rpx 20px 20px;
   background: rgba(255,255,255,0.12);
   position: relative;
   z-index: 1;
 }
 
 .usage-item {
-  margin-bottom: 10px;
+  margin-bottom: 20rpx;
 }
 
 .usage-item:last-child {
@@ -87,40 +87,40 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .usage-label {
-  font-size: 12px;
+  font-size: 24rpx;
   opacity: 0.85;
 }
 
 .usage-value {
-  font-size: 12px;
+  font-size: 24rpx;
   font-weight: 600;
   opacity: 0.95;
 }
 
 .progress-bar {
-  height: 6px;
+  height: 12rpx;
   background: rgba(255,255,255,0.2);
-  border-radius: 3px;
+  border-radius: 6rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   background: rgba(255,255,255,0.7);
-  border-radius: 3px;
+  border-radius: 6rpx;
   transition: width 0.3s ease;
 }
 
 /* ===== 段落标题 ===== */
 .section-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: var(--text-primary);
-  padding: 16px 16px 8px;
+  padding: 32rpx 16px 8px;
 }
 
 /* ===== 套餐卡片 ===== */
@@ -128,7 +128,7 @@
   display: flex;
   overflow-x: auto;
   padding: 0 12px 8px;
-  gap: 12px;
+  gap: 24rpx;
   scrollbar-width: none;
 }
 
@@ -141,7 +141,7 @@
   background: var(--bg-card);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  padding: 20px 16px;
+  padding: 40rpx 16px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -160,27 +160,27 @@
 
 .plan-badge {
   position: absolute;
-  top: -1px;
-  right: 16px;
+  top: -2rpx;
+  right: 32rpx;
   background: #f5a623;
   color: #fff;
-  font-size: 10px;
+  font-size: 20rpx;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 6rpx 10px;
   border-radius: 0 0 8px 8px;
 }
 
 .plan-header {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .plan-name {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 700;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .plan-price-row {
@@ -190,52 +190,52 @@
 }
 
 .plan-price {
-  font-size: 28px;
+  font-size: 56rpx;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .plan-period {
-  font-size: 13px;
+  font-size: 26rpx;
   color: var(--text-hint);
-  margin-left: 4px;
+  margin-left: 8rpx;
 }
 
 .plan-original {
   display: block;
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-hint);
   text-decoration: line-through;
-  margin-top: 2px;
+  margin-top: 4rpx;
 }
 
 .plan-features {
   flex: 1;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .plan-feature {
   display: flex;
   align-items: center;
-  padding: 5px 0;
+  padding: 10rpx 0;
 }
 
 .feature-icon {
-  width: 18px;
-  height: 18px;
+  width: 36rpx;
+  height: 36rpx;
   background: var(--success);
   color: #fff;
-  border-radius: 9px;
-  font-size: 11px;
+  border-radius: 18rpx;
+  font-size: 22rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 
 .feature-text {
-  font-size: 13px;
+  font-size: 26rpx;
   color: var(--text-secondary);
 }
 
@@ -255,16 +255,16 @@
 .comparison-header {
   display: flex;
   background: var(--surface-2);
-  padding: 12px 10px;
+  padding: 24rpx 10px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 26rpx;
   border-bottom: 1px solid var(--border-color);
 }
 
 .comparison-row {
   display: flex;
-  padding: 12px 10px;
-  font-size: 13px;
+  padding: 24rpx 10px;
+  font-size: 26rpx;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -300,5 +300,5 @@
 
 /* 底部 */
 .bottom-placeholder {
-  height: 60px;
+  height: 120rpx;
 }

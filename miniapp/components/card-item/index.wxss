@@ -1,11 +1,11 @@
 .card-item {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 32rpx;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 24rpx;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .card-item:active {
@@ -14,12 +14,12 @@
 
 .card-avatar {
   position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 56rpx;
   overflow: hidden;
   flex-shrink: 0;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .card-avatar-img {
@@ -29,12 +29,12 @@
 
 .member-badge {
   position: absolute;
-  bottom: -2px;
+  bottom: -4rpx;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 9px;
-  padding: 1px 6px;
-  border-radius: 8px;
+  font-size: 18rpx;
+  padding: 2rpx 6px;
+  border-radius: 16rpx;
   white-space: nowrap;
   border: 1.5px solid #fff;
 }
@@ -45,22 +45,22 @@
 }
 
 .card-name {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: #1a1a1a;
-  margin-bottom: 2px;
+  margin-bottom: 4rpx;
 }
 
 .card-company {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #666;
-  margin-bottom: 1px;
+  margin-bottom: 2rpx;
 }
 
 .card-title {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .card-tags {
@@ -69,8 +69,8 @@
 }
 
 .card-tags .tag {
-  font-size: 11px;
-  padding: 2px 8px;
+  font-size: 22rpx;
+  padding: 4rpx 8px;
   margin: 0 4px 4px 0;
 }
 
@@ -79,30 +79,30 @@
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: 16rpx;
 }
 
 .match-score {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .score-value {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 700;
   color: #07c160;
 }
 
 .score-label {
-  font-size: 10px;
+  font-size: 20rpx;
   color: #999;
 }
 
 .unlock-btn {
-  font-size: 12px !important;
-  height: 28px !important;
+  font-size: 24rpx !important;
+  height: 56rpx !important;
   padding: 0 12px !important;
-  min-width: 56px;
+  min-width: 112rpx;
 }

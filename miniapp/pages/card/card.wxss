@@ -7,7 +7,7 @@
 /* 卡片头部英雄区 */
 .card-hero {
   position: relative;
-  height: 260px;
+  height: 520rpx;
 }
 
 .hero-bg {
@@ -31,18 +31,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 16px 20px;
+  padding: 120rpx 16px 20px;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
   color: #fff;
 }
 
 .hero-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 36px;
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: 72rpx;
   overflow: hidden;
   border: 3px solid rgba(255, 255, 255, 0.6);
-  margin-bottom: 10px;
+  margin-bottom: 20rpx;
 }
 
 .hero-avatar image {
@@ -51,19 +51,19 @@
 }
 
 .hero-name {
-  font-size: 22px;
+  font-size: 44rpx;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .hero-company {
-  font-size: 14px;
+  font-size: 28rpx;
   opacity: 0.85;
-  margin-bottom: 2px;
+  margin-bottom: 4rpx;
 }
 
 .hero-title {
-  font-size: 13px;
+  font-size: 26rpx;
   opacity: 0.7;
 }
 
@@ -73,13 +73,13 @@
 }
 
 .info-body {
-  padding-bottom: 8px;
+  padding-bottom: 16rpx;
 }
 
 .info-row {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 20rpx 0;
   border-bottom: 1px solid #f5f5f5;
 }
 
@@ -88,14 +88,14 @@
 }
 
 .info-label {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #999;
-  width: 80px;
+  width: 160rpx;
   flex-shrink: 0;
 }
 
 .info-value {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #1a1a1a;
   flex: 1;
 }
@@ -115,22 +115,22 @@
 }
 
 .stats-grid .stat-num {
-  font-size: 22px;
+  font-size: 44rpx;
   font-weight: 700;
   color: #1a1a1a;
 }
 
 .stats-grid .stat-label {
-  font-size: 11px;
+  font-size: 22rpx;
   color: #999;
-  margin-top: 2px;
+  margin-top: 4rpx;
 }
 
 /* 操作按钮 */
 .action-buttons {
-  padding: 20px 16px;
+  padding: 40rpx 16px;
 }
 
 .bottom-placeholder {
-  height: 60px;
+  height: 120rpx;
 }

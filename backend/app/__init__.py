@@ -176,6 +176,7 @@ def create_app():
     from app.routers.document import router as document_router
     from app.routers.analytics import router as analytics_router
     from app.routers.health import router as health_router
+    from app.routers.ai_config import router as ai_config_router
 
     # ── AI助手路由 ──────────────────────────────────────────
     # ai_assist_router 已在 routers/__init__.py 中导入，直接注册

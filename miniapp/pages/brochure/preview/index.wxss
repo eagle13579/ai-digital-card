@@ -13,14 +13,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 44px 20px 16px;
+  padding: 88rpx 20px 16px;
   z-index: 100;
   background: linear-gradient(to bottom, rgba(26, 26, 46, 0.95), transparent);
 }
 
 .back-btn {
-  width: 44px;
-  height: 44px;
+  width: 88rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,20 +30,20 @@
 }
 
 .back-icon {
-  font-size: 32px;
+  font-size: 64rpx;
   color: #fff;
   font-weight: 300;
 }
 
 .page-indicator {
-  font-size: 14px;
+  font-size: 28rpx;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
 }
 
 .share-btn {
-  width: 44px;
-  height: 44px;
+  width: 88rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,26 +53,26 @@
 }
 
 .share-icon {
-  font-size: 24px;
+  font-size: 48rpx;
   color: #fff;
 }
 
 .brochure-swiper {
   flex: 1;
-  padding-top: 80px;
-  padding-bottom: 80px;
+  padding-top: 160rpx;
+  padding-bottom: 160rpx;
 }
 
 .brochure-page {
   width: 90%;
   height: calc(100vh - 160px);
   margin: 0 auto;
-  border-radius: 20px;
+  border-radius: 40rpx;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
-  padding: 32px;
+  padding: 64rpx;
   box-sizing: border-box;
 }
 
@@ -88,21 +88,21 @@
 }
 
 .cover-avatar-wrap {
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .cover-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 70px;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 140rpx;
   border: 4px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .cover-avatar-placeholder {
-  width: 140px;
-  height: 140px;
-  border-radius: 70px;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 140rpx;
   background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
@@ -110,21 +110,21 @@
 }
 
 .cover-avatar-emoji {
-  font-size: 56px;
+  font-size: 112rpx;
 }
 
 .cover-title {
-  font-size: 32px;
+  font-size: 64rpx;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .cover-subtitle {
-  font-size: 16px;
+  font-size: 32rpx;
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .cover-badge-wrap {
@@ -133,10 +133,10 @@
 
 .cover-badge {
   display: inline-block;
-  padding: 8px 24px;
+  padding: 16rpx 24px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  font-size: 12px;
+  border-radius: 40rpx;
+  font-size: 24rpx;
   color: #fff;
   backdrop-filter: blur(10px);
 }
@@ -152,16 +152,16 @@
 .profile-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 80rpx;
   overflow: hidden;
   border: 3px solid #EEF2FF;
-  margin-right: 16px;
+  margin-right: 32rpx;
 }
 
 .profile-avatar-placeholder {
@@ -174,7 +174,7 @@
 }
 
 .avatar-emoji {
-  font-size: 32px;
+  font-size: 64rpx;
 }
 
 .profile-info {
@@ -182,41 +182,41 @@
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: #1E293B;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .profile-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: #4F46E5;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .profile-company {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #64748B;
   display: block;
 }
 
 .profile-bio {
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
 .bio-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: #1E293B;
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .bio-content {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #475569;
   line-height: 1.6;
 }
@@ -224,24 +224,24 @@
 .profile-contact {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 24rpx 16px;
   background: #EEF2FF;
-  border-radius: 10px;
+  border-radius: 20rpx;
 }
 
 .contact-icon {
-  font-size: 18px;
-  margin-right: 8px;
+  font-size: 36rpx;
+  margin-right: 16rpx;
 }
 
 .contact-text {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #4F46E5;
 }
 
@@ -254,22 +254,22 @@
 }
 
 .section-title-text {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: #1E293B;
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
 .resources-section {
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
 .resources-label {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .provides-label {
@@ -283,13 +283,13 @@
 .tags-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20rpx;
 }
 
 .tag {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 16rpx 16px;
+  border-radius: 16rpx;
+  font-size: 26rpx;
 }
 
 .provides-tag {
@@ -306,19 +306,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 32rpx;
   background: #F8FAFC;
-  border-radius: 12px;
-  margin-top: 12px;
+  border-radius: 24rpx;
+  margin-top: 24rpx;
 }
 
 .purpose-icon {
-  font-size: 20px;
-  margin-right: 8px;
+  font-size: 40rpx;
+  margin-right: 16rpx;
 }
 
 .purpose-text {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 600;
   color: #4F46E5;
 }
@@ -332,15 +332,15 @@
 }
 
 .company-header {
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .company-name {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: #1E293B;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .company-meta {
@@ -349,7 +349,7 @@
 }
 
 .meta-item {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #64748B;
 }
 
@@ -359,29 +359,29 @@
 }
 
 .company-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #475569;
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .development-section {
   background: #FEF3C7;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
+  padding: 32rpx;
+  border-radius: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .development-title {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   color: #92400E;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .development-content {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #78350F;
   line-height: 1.6;
   white-space: pre-line;
@@ -389,13 +389,13 @@
 
 .company-images {
   display: flex;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .company-image {
   flex: 1;
-  height: 100px;
-  border-radius: 8px;
+  height: 200rpx;
+  border-radius: 16rpx;
 }
 
 .case-content {
@@ -407,36 +407,36 @@
 }
 
 .case-name {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 700;
   color: #1E293B;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .case-date {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #94A3B8;
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .case-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #475569;
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .case-images {
   display: flex;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .case-image {
   flex: 1;
-  height: 100px;
-  border-radius: 8px;
+  height: 200rpx;
+  border-radius: 16rpx;
 }
 
 .contact-content {
@@ -450,23 +450,23 @@
 
 .contact-card {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 32rpx;
+  padding: 40rpx;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
   backdrop-filter: blur(10px);
 }
 
 .contact-card-name {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: #fff;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .contact-card-company {
-  font-size: 14px;
+  font-size: 28rpx;
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -477,25 +477,25 @@
 .contact-list-item {
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 32rpx;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  margin-bottom: 12px;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
 }
 
 .contact-list-icon {
-  font-size: 20px;
-  margin-right: 12px;
+  font-size: 40rpx;
+  margin-right: 24rpx;
 }
 
 .contact-list-label {
-  font-size: 12px;
+  font-size: 24rpx;
   color: rgba(255, 255, 255, 0.7);
   flex: 1;
 }
 
 .contact-list-value {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   color: #fff;
 }
@@ -505,7 +505,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 20px;
+  padding: 32rpx 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
   background: linear-gradient(to top, rgba(26, 26, 46, 0.95), transparent);
   z-index: 100;
@@ -514,19 +514,19 @@
 .dots-wrap {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 16rpx;
+  height: 16rpx;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  border-radius: 8rpx;
   transition: all 0.3s;
 }
 
 .dot.active {
-  width: 24px;
+  width: 48rpx;
   background: #fff;
 }
 

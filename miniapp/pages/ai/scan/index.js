@@ -180,20 +180,26 @@ Page({
 
     wx.showLoading({ title: '保存中...', mask: true })
 
-    brochureApi.create({
-      name: card.name,
-      title: card.title,
-      company: card.company,
-      phone: card.phone,
-      email: card.email,
-      address: card.address,
-      source: 'scan',
-      // 如果有图片路径，传缩略图
-      ...(this.data.imagePath ? { cover_image: this.data.imagePath } : {})
-    })
+    // 构建后端期望的字段映射
+    const brochureData = {
+      title: card.name || '未命名名片',
+      cover: this.data.imagePath || '',
+      purpose: '从OCR扫描创建',
+      pages: [{
+        type: 'contact',
+        name: card.name || '',
+        title: card.title || '',
+        company: card.company || '',
+        phone: card.phone || '',
+        email: card.email || '',
+        address: card.address || ''
+      }]
+    }
+
+    brochureApi.create(brochureData)
       .then(res => {
         wx.hideLoading()
-        wx.showToast({ title: '已保存到名片夹', icon: 'success' })
+        wx.showToast({ title: '已保存到名片夹', icon: 'success', duration: 1500 })
 
         // 记录扫描历史
         this.saveHistory({
@@ -201,6 +207,13 @@ Page({
           company: card.company || '',
           time: '刚刚'
         })
+
+        // 跳转到预览页
+        setTimeout(() => {
+          wx.redirectTo({
+            url: `/pages/brochure/preview/index?id=${res.id}`,
+          })
+        }, 1500)
 
         // 重置，准备下一次扫描
         this.setData({

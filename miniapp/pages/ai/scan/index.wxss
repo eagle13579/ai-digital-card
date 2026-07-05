@@ -1,7 +1,7 @@
 .scan-header {
   display: flex;
   align-items: center;
-  padding: 20px 16px;
+  padding: 40rpx 16px;
   background: linear-gradient(135deg, #059669 0%, #34D399 100%);
   color: #fff;
   position: sticky;
@@ -10,17 +10,17 @@
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .back-btn .icon {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: #fff;
 }
 
@@ -29,39 +29,39 @@
 }
 
 .header-title .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: var(--font-weight-bold);
   display: block;
 }
 
 .header-title .subtitle {
-  font-size: 12px;
+  font-size: 24rpx;
   opacity: 0.8;
-  margin-top: 2px;
+  margin-top: 4rpx;
   display: block;
 }
 
 .scan-badge {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8rpx;
   background: rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 12rpx 12px;
+  border-radius: 40rpx;
+  font-size: 24rpx;
   font-weight: var(--font-weight-bold);
 }
 
 .scan-area {
-  padding: 32px 24px;
+  padding: 64rpx 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .scan-frame {
-  width: 280px;
-  height: 200px;
+  width: 560rpx;
+  height: 400rpx;
   border: 2px dashed #059669;
   border-radius: var(--radius-lg);
   display: flex;
@@ -69,29 +69,29 @@
   align-items: center;
   justify-content: center;
   background: rgba(5, 150, 105, 0.05);
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .scan-camera-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
 }
 
 .scan-hint {
-  font-size: 13px;
+  font-size: 26rpx;
   color: var(--text-muted);
 }
 
 .scan-btn {
   background: linear-gradient(135deg, #059669, #34D399);
-  padding: 14px 48px;
+  padding: 28rpx 48px;
   border-radius: var(--radius-full);
   box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35);
 }
 
 .scan-btn-text {
   color: #fff;
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: var(--font-weight-bold);
 }
 
@@ -102,20 +102,20 @@
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16rpx;
   padding: 0 16px;
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin-bottom: 24rpx;
+  font-size: 32rpx;
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
 }
 
 .section-tag {
-  font-size: 10px;
+  font-size: 20rpx;
   color: #fff;
   background: #059669;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 4rpx 8px;
+  border-radius: 20rpx;
   font-weight: normal;
 }
 
@@ -123,14 +123,14 @@
   margin: 0 16px 16px;
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 32rpx;
   box-shadow: var(--shadow-sm);
 }
 
 .card-field {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 20rpx 0;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -139,31 +139,31 @@
 }
 
 .field-label {
-  width: 60px;
-  font-size: 13px;
+  width: 120rpx;
+  font-size: 26rpx;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .field-value {
   flex: 1;
-  font-size: 14px;
+  font-size: 28rpx;
   color: var(--text-primary);
   font-weight: 500;
 }
 
 .result-actions {
   display: flex;
-  gap: 12px;
+  gap: 24rpx;
   padding: 0 16px 24px;
 }
 
 .action-btn {
   flex: 1;
   text-align: center;
-  padding: 12px;
+  padding: 24rpx;
   border-radius: var(--radius-lg);
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: var(--font-weight-bold);
 }
 
@@ -180,7 +180,7 @@
 }
 
 .history-section {
-  padding-bottom: 24px;
+  padding-bottom: 48rpx;
 }
 
 .history-list {
@@ -194,7 +194,7 @@
 .history-item {
   display: flex;
   align-items: center;
-  padding: 14px 16px;
+  padding: 28rpx 16px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -203,8 +203,8 @@
 }
 
 .history-icon {
-  font-size: 24px;
-  margin-right: 12px;
+  font-size: 48rpx;
+  margin-right: 24rpx;
 }
 
 .history-info {
@@ -212,21 +212,21 @@
 }
 
 .history-name {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 500;
   color: var(--text-primary);
   display: block;
 }
 
 .history-company {
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4rpx;
   display: block;
 }
 
 .history-time {
-  font-size: 11px;
+  font-size: 22rpx;
   color: var(--text-muted);
   flex-shrink: 0;
 }

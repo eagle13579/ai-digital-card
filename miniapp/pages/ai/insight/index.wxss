@@ -1,7 +1,7 @@
 .insight-header {
   display: flex;
   align-items: center;
-  padding: 20px 16px;
+  padding: 40rpx 16px;
   background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
   color: #fff;
   position: sticky;
@@ -10,17 +10,17 @@
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .back-btn .icon {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: #fff;
 }
 
@@ -29,40 +29,40 @@
 }
 
 .header-title .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: var(--font-weight-bold);
   display: block;
 }
 
 .header-title .subtitle {
-  font-size: 12px;
+  font-size: 24rpx;
   opacity: 0.8;
-  margin-top: 2px;
+  margin-top: 4rpx;
   display: block;
 }
 
 .insight-badge {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8rpx;
   background: rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 12rpx 12px;
+  border-radius: 40rpx;
+  font-size: 24rpx;
   font-weight: var(--font-weight-bold);
 }
 
 .stats-overview {
   display: flex;
-  gap: 10px;
-  padding: 20px 16px;
+  gap: 20rpx;
+  padding: 40rpx 16px;
 }
 
 .stat-card {
   flex: 1;
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  padding: 16px 12px;
+  padding: 32rpx 12px;
   text-align: center;
   box-shadow: var(--shadow-sm);
   border-top: 3px solid #6366F1;
@@ -77,21 +77,21 @@
 }
 
 .stat-icon {
-  font-size: 24px;
-  margin-bottom: 6px;
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
   display: block;
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: 22rpx;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 8rpx;
   display: block;
 }
 
@@ -99,7 +99,7 @@
   margin: 0 16px 20px;
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 32rpx;
   box-shadow: var(--shadow-sm);
 }
 
@@ -107,17 +107,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 40rpx;
 }
 
 .chart-title {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
 }
 
 .chart-unit {
-  font-size: 11px;
+  font-size: 22rpx;
   color: var(--text-muted);
 }
 
@@ -125,8 +125,8 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  height: 180px;
-  padding-top: 8px;
+  height: 360rpx;
+  padding-top: 16rpx;
 }
 
 .chart-bar-group {
@@ -139,28 +139,28 @@
 }
 
 .chart-bar {
-  width: 28px;
+  width: 56rpx;
   background: linear-gradient(180deg, #6366F1, #8B5CF6);
-  border-radius: 6px 6px 2px 2px;
+  border-radius: 12rpx 6px 2px 2px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 4px;
-  min-height: 20px;
+  padding-top: 8rpx;
+  min-height: 40rpx;
   transition: height 0.3s ease;
   position: relative;
 }
 
 .chart-bar-value {
-  font-size: 10px;
+  font-size: 20rpx;
   color: #fff;
   font-weight: 500;
 }
 
 .chart-bar-label {
-  font-size: 10px;
+  font-size: 20rpx;
   color: var(--text-muted);
-  margin-top: 6px;
+  margin-top: 12rpx;
   text-align: center;
 }
 
@@ -169,38 +169,38 @@
 }
 
 .insight-list-section .section-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
   display: block;
-  margin-bottom: 14px;
+  margin-bottom: 28rpx;
 }
 
 .insight-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .insight-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 24rpx;
   background: var(--surface-1);
   border-radius: var(--radius-lg);
-  padding: 14px;
+  padding: 28rpx;
   box-shadow: var(--shadow-sm);
 }
 
 .insight-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 36rpx;
   flex-shrink: 0;
 }
 
@@ -209,24 +209,24 @@
 }
 
 .insight-title {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .insight-desc {
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-secondary);
   line-height: 1.5;
   display: block;
 }
 
 .insight-tag {
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 10px;
+  font-size: 20rpx;
+  padding: 6rpx 8px;
+  border-radius: 20rpx;
   flex-shrink: 0;
   font-weight: 500;
 }
@@ -245,7 +245,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 0;
-  font-size: 14px;
+  padding: 80rpx 0;
+  font-size: 28rpx;
   color: var(--text-muted);
 }

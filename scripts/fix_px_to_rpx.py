@@ -33,7 +33,7 @@ def convert_px_to_rpx(css_text):
     def replace_px(match):
         prop = match.group(1).strip()
         value = match.group(2)
-        num_str = match.group(3)
+        num_str = match.group(2)
         
         # Skip non-convertible properties
         if prop in KEEP_PROPS:
@@ -65,21 +65,21 @@ def convert_px_to_rpx(css_text):
 def convert_wxml_inline_styles(wxml_text):
     """Convert inline style px values in wxml"""
     
-    def fix_style_value(match):
-        full = match.group(0)
+    def fix_style_value(style_text):
+        full = style_text
         # Don't touch styles that contain border/box-shadow/transform
         if 'border' in full and 'border-radius' not in full:
             return full
         if 'box-shadow' in full or 'text-shadow' in full:
             return full
-        
+    
         def replace_num(m):
             try:
                 num = float(m.group(1))
                 return f"{int(num * 2)}rpx" if num * 2 == int(num * 2) else f"{num * 2:.1f}rpx"
             except:
                 return m.group(0)
-        
+    
         return re.sub(r'(\d+(?:\.\d+)?)(?=px)', replace_num, full)
     
     # Match style="..." attributes

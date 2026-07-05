@@ -140,7 +140,7 @@
     <view class="picker-body">
       <picker-view class="region-picker-view" value="{{region}}"
                    bindchange="onRegionChange" bindpickstart="onRegionColumnChange"
-                   indicator-style="height: 40px;">
+                   indicator-style="height: 80rpxpx;">
         <picker-view-column>
           <view wx:for="{{regionColumns[0]}}" wx:key="item" class="picker-col-item">{{item}}</view>
         </picker-view-column>

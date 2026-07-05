@@ -1,57 +1,57 @@
 .section-header {
-  padding: 20px 16px 16px;
+  padding: 40rpx 16px 16px;
   display: flex;
   flex-direction: column;
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
+  width: 72rpx;
+  height: 72rpx;
   background: var(--surface-2);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .back-btn .icon {
-  width: 18px;
-  height: 18px;
+  width: 36rpx;
+  height: 36rpx;
   color: var(--text-primary);
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: var(--text-primary);
   display: block;
 }
 
 .section-title-sm {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .section-subtitle {
-  font-size: 14px;
+  font-size: 28rpx;
   color: var(--text-muted);
   display: block;
-  margin-top: 4px;
+  margin-top: 8rpx;
 }
 
 .brain-status {
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .status-card {
   background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 40rpx;
   position: relative;
   overflow: hidden;
 }
@@ -60,8 +60,8 @@
   position: absolute;
   top: -50%;
   right: -20%;
-  width: 100px;
-  height: 100px;
+  width: 200rpx;
+  height: 200rpx;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
   animation: pulseGlow 2s ease-in-out infinite;
 }
@@ -74,12 +74,12 @@
 .status-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .status-indicator {
-  width: 12px;
-  height: 12px;
+  width: 24rpx;
+  height: 24rpx;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
 }
@@ -96,7 +96,7 @@
 }
 
 .status-text {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: #fff;
 }
@@ -104,9 +104,9 @@
 .evolution-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 24rpx;
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .metric-card {
@@ -114,16 +114,16 @@
   min-width: calc(50% - 6px);
   background: #fff;
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 32rpx;
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .metric-icon-wrap {
-  width: 40px;
-  height: 40px;
+  width: 80rpx;
+  height: 80rpx;
   background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
   border-radius: var(--radius-md);
   display: flex;
@@ -133,17 +133,17 @@
 }
 
 .metric-icon-wrap .icon {
-  width: 20px;
-  height: 20px;
+  width: 40rpx;
+  height: 40rpx;
   color: #fff;
 }
 
 .metric-pulse {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 10px;
-  height: 10px;
+  top: -8rpx;
+  right: -8rpx;
+  width: 20rpx;
+  height: 20rpx;
   background: #22C55E;
   border-radius: 50%;
   animation: metricPulse 2s infinite;
@@ -155,30 +155,30 @@
 }
 
 .metric-trend {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 16rpx;
+  right: 16rpx;
 }
 
 .metric-trend.up { color: #22C55E; }
-.metric-trend.stable { color: #F59E0B; font-size: 8px; }
+.metric-trend.stable { color: #F59E0B; font-size: 16rpx; }
 
 .data-flow-section {
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .flow-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .flow-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -186,7 +186,7 @@
 .flow-status {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12rpx;
 }
 
 .flow-status.active {
@@ -194,12 +194,12 @@
 }
 
 .flow-status text {
-  font-size: 12px;
+  font-size: 24rpx;
 }
 
 .flow-dot {
-  width: 8px;
-  height: 8px;
+  width: 16rpx;
+  height: 16rpx;
   background: #22C55E;
   border-radius: 50%;
   animation: flowDotPulse 1.5s infinite;
@@ -214,16 +214,16 @@
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(56, 189, 248, 0.05) 100%);
   border: 1px solid rgba(14, 165, 233, 0.1);
   border-radius: var(--radius-md);
-  height: 60px;
+  height: 120rpx;
   position: relative;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .flow-particle {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 16rpx;
+  height: 16rpx;
   background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
   border-radius: 50%;
   opacity: 0;
@@ -259,14 +259,14 @@
 }
 
 @keyframes flowMove1 {
-  0% { left: -10px; opacity: 0; }
+  0% { left: -20rpx; opacity: 0; }
   10% { opacity: 1; }
   90% { opacity: 1; }
   100% { left: 100%; opacity: 0; }
 }
 
 @keyframes flowMove2 {
-  0% { right: -10px; opacity: 0; }
+  0% { right: -20rpx; opacity: 0; }
   10% { opacity: 1; }
   90% { opacity: 1; }
   100% { right: 100%; opacity: 0; }
@@ -274,30 +274,30 @@
 
 .flow-stats {
   display: flex;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .flow-stat {
   flex: 1;
   background: #fff;
   border-radius: var(--radius-sm);
-  padding: 12px;
+  padding: 24rpx;
   text-align: center;
   box-shadow: var(--shadow-sm);
 }
 
 .flow-stat-num {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 700;
   color: #0EA5E9;
   display: block;
 }
 
 .flow-stat-label {
-  font-size: 11px;
+  font-size: 22rpx;
   color: var(--text-muted);
   display: block;
-  margin-top: 4px;
+  margin-top: 8rpx;
 }
 
 .metric-info {
@@ -306,33 +306,33 @@
 }
 
 .metric-value {
-  font-size: 24px;
+  font-size: 48rpx;
   font-weight: 700;
   color: #0EA5E9;
 }
 
 .metric-label {
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4rpx;
 }
 
 .agent-section {
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .agent-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .agent-card {
   width: calc(50% - 6px);
   background: #fff;
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 32rpx;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -340,102 +340,102 @@
 }
 
 .agent-avatar {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .agent-emoji {
-  font-size: 24px;
+  font-size: 48rpx;
 }
 
 .agent-name {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .agent-role {
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .agent-status {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8rpx;
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 12rpx;
+  height: 12rpx;
   border-radius: 50%;
   background: #22C55E;
 }
 
 .status-text-sm {
-  font-size: 11px;
+  font-size: 22rpx;
   color: #22C55E;
 }
 
 .knowledge-section {
   padding: 0 16px;
-  margin-bottom: 24px;
+  margin-bottom: 48rpx;
 }
 
 .section-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .view-all {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #0EA5E9;
 }
 
 .knowledge-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .knowledge-item {
   background: #fff;
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 32rpx;
   box-shadow: var(--shadow-sm);
 }
 
 .knowledge-type-tag {
-  font-size: 11px;
-  padding: 3px 8px;
+  font-size: 22rpx;
+  padding: 6rpx 8px;
   border-radius: var(--radius-full);
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .knowledge-content {
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .knowledge-title {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .knowledge-desc {
-  font-size: 13px;
+  font-size: 26rpx;
   color: var(--text-secondary);
   line-height: 1.4;
 }
@@ -446,12 +446,12 @@
 }
 
 .knowledge-source {
-  font-size: 12px;
+  font-size: 24rpx;
   color: var(--text-muted);
 }
 
 .knowledge-confidence {
-  font-size: 12px;
+  font-size: 24rpx;
   font-weight: 600;
   color: #22C55E;
 }
@@ -460,7 +460,7 @@
   margin: 0 16px;
   background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 32rpx;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -485,7 +485,7 @@
 }
 
 .button-text {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 600;
   color: #fff;
   position: relative;
@@ -493,5 +493,5 @@
 }
 
 .bottom-placeholder {
-  height: 80px;
+  height: 160rpx;
 }
