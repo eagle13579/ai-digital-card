@@ -1,8 +1,9 @@
 /**
  * 我的 - 个人中心/会员信息/设置
  * 连接后端真实API，替换所有mock数据
+ * 增加：会员层级显示、使用额度(OCR/名片数)、Pro金色徽章、升级按钮
  */
-const { userApi, subscriptionApi, messageApi, visitorApi, trustApi, brochureApi } = require('../../utils/api')
+const { userApi, subscriptionApi, messageApi, visitorApi, trustApi, brochureApi, membershipApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -14,6 +15,14 @@ Page({
     trustCount: 0,
     newVisitorCount: 0,
     stats: { visitors: 0, matches: 0, unlocks: 0, views: 0 },
+    // 使用额度
+    usage: {
+      card_count: 0,
+      card_limit: 1,
+      ocr_count: 0,
+      ocr_limit: 3,
+    },
+    isPro: false,
   },
 
   onLoad() {
@@ -29,10 +38,11 @@ Page({
   async loadProfile() {
     this.setData({ loading: true })
     try {
-      // 并发请求：用户信息、订阅信息、信任网络、未读消息
-      const [profileRes, subscriptionRes, trustRes, unreadRes] = await Promise.all([
+      // 并发请求：用户信息、订阅信息、会员状态、信任网络、未读消息
+      const [profileRes, subscriptionRes, membershipRes, trustRes, unreadRes] = await Promise.all([
         userApi.getProfile(),
         subscriptionApi.getCurrent(),
+        membershipApi.getStatus().catch(() => null),
         trustApi.getNetwork(),
         messageApi.getUnreadCount(),
       ])
@@ -40,12 +50,22 @@ Page({
       // 兼容 { data: ... } 包裹和直接返回两种格式
       const profile = profileRes.data ?? profileRes
       const subscription = subscriptionRes.data ?? subscriptionRes
+      const membership = membershipRes?.data ?? membershipRes ?? {}
       const trustNet = trustRes.data ?? trustRes
       const unread = unreadRes.data ?? unreadRes
 
-      // 会员等级（优先从profile取，其次subscription）
-      const memberLevel = profile.member_level || subscription?.plan || 'free'
-      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
+      // 会员等级（优先级: membership > profile > subscription）
+      const memberLevel = membership.tier || membership.level || profile.member_level || subscription?.plan || 'free'
+      const memberLevelText = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memberLevel] || 'Free'
+      const isPro = memberLevel === 'pro' || memberLevel === 'enterprise'
+
+      // 使用额度（从会员状态获取）
+      const usage = {
+        card_count: membership.card_count ?? membership.cardCount ?? 0,
+        card_limit: membership.card_limit ?? membership.cardLimit ?? (memberLevel === 'free' ? 1 : 10),
+        ocr_count: membership.ocr_count ?? membership.ocrCount ?? 0,
+        ocr_limit: membership.ocr_limit ?? membership.ocrLimit ?? (memberLevel === 'free' ? 3 : 100),
+      }
 
       // 信任网络人数
       const trustCount = (trustNet.trusting || []).length
@@ -86,10 +106,12 @@ Page({
         userInfo,
         memberLevel,
         memberLevelText,
-        memberExpire: profile.member_expire || subscription?.expire_at || subscription?.expire_date || '',
+        memberExpire: membership.expire_at || membership.expire_date || profile.member_expire || subscription?.expire_at || subscription?.expire_date || '',
         trustCount,
         newVisitorCount,
         stats,
+        usage,
+        isPro,
         loading: false,
       })
 
@@ -115,7 +137,7 @@ Page({
 
   // 会员中心
   goMember() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/membership/membership' })
   },
 
   // 访客记录

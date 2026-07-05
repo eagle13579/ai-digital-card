@@ -7,7 +7,9 @@
     <view class="profile-header">
       <view class="profile-avatar">
         <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
-        <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
+        <view class="member-badge badge-{{memberLevel}}">
+          {{isPro ? '⭐' + memberLevelText : memberLevelText}}
+        </view>
       </view>
       <view class="profile-meta">
         <text class="profile-name">{{userInfo.name || '未登录'}}</text>
@@ -18,31 +20,79 @@
       </view>
     </view>
 
-    <!-- 会员信息 -->
-    <view class="card member-card" bindtap="goMember">
+    <!-- 会员信息 + 使用额度 -->
+    <view class="card member-card">
       <view class="card-body member-body">
-        <view class="member-left">
+        <view class="member-left" bindtap="goMember">
           <text class="member-level-label">当前等级</text>
-          <text class="member-level-value badge-{{memberLevel}}">{{memberLevelText}}</text>
+          <text class="member-level-value badge-{{memberLevel}}">
+            {{isPro ? '⭐ ' + memberLevelText : memberLevelText}}
+          </text>
           <text class="member-expire" wx:if="{{memberExpire}}">到期: {{memberExpire}}</text>
         </view>
-        <view class="member-right">
-          <text class="member-upgrade" wx:if="{{memberLevel === 'free'}}">升级会员 ›</text>
-          <text class="member-upgrade" wx:else>查看权益 ›</text>
+        <view class="member-right" bindtap="goMember">
+          <!-- Free用户显示升级按钮 -->
+          <view wx:if="{{memberLevel === 'free'}}" class="upgrade-btn" bindtap="goMember">
+            <text class="upgrade-btn-text">升级Pro</text>
+          </view>
+          <text wx:else class="member-upgrade">查看权益 ›</text>
+        </view>
+      </view>
+
+      <!-- 使用额度进度 -->
+      <view class="usage-section" wx:if="{{memberLevel === 'free'}}">
+        <view class="usage-item">
+          <text class="usage-label">名片</text>
+          <view class="usage-bar-wrap">
+            <view class="usage-bar">
+              <view class="usage-fill" style="width: {{usage.card_limit > 0 ? (usage.card_count / usage.card_limit * 100) : 0}}%"></view>
+            </view>
+            <text class="usage-text">{{usage.card_count}}/{{usage.card_limit}}</text>
+          </view>
+        </view>
+        <view class="usage-item">
+          <text class="usage-label">OCR</text>
+          <view class="usage-bar-wrap">
+            <view class="usage-bar">
+              <view class="usage-fill" style="width: {{usage.ocr_limit > 0 ? (usage.ocr_count / usage.ocr_limit * 100) : 0}}%"></view>
+            </view>
+            <text class="usage-text">{{usage.ocr_count}}/{{usage.ocr_limit}}</text>
+          </view>
         </view>
       </view>
     </view>
 
-    <!-- 数据概览 -->
+    <!-- 使用统计 -->
     <view class="card">
       <view class="card-header">
-        <text class="title">📊 数据概览</text>
+        <text class="title">📊 使用统计</text>
       </view>
       <view class="stats-grid">
+        <view class="stat-item">
+          <text class="stat-num">{{usage.card_count || 0}}</text>
+          <text class="stat-label">名片数量</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{usage.ocr_count || 0}}</text>
+          <text class="stat-label">OCR次数</text>
+        </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.visitors || 0}}</text>
           <text class="stat-label">访客数</text>
         </view>
+        <view class="stat-item">
+          <text class="stat-num">{{stats.views || 0}}</text>
+          <text class="stat-label">浏览量</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据概览（原有） -->
+    <view class="card">
+      <view class="card-header">
+        <text class="title">📈 数据概览</text>
+      </view>
+      <view class="stats-grid">
         <view class="stat-item">
           <text class="stat-num">{{stats.matches || 0}}</text>
           <text class="stat-label">匹配数</text>
@@ -52,8 +102,12 @@
           <text class="stat-label">解锁次数</text>
         </view>
         <view class="stat-item">
-          <text class="stat-num">{{stats.views || 0}}</text>
-          <text class="stat-label">浏览量</text>
+          <text class="stat-num">{{trustCount || 0}}</text>
+          <text class="stat-label">信任人数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{newVisitorCount || 0}}</text>
+          <text class="stat-label">新访客</text>
         </view>
       </view>
     </view>

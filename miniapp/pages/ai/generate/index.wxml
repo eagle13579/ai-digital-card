@@ -49,6 +49,29 @@
       </view>
     </view>
 
+    <!-- AI 引擎模式切换: 标准模式 vs DeepSeek深度生成 -->
+    <view class="engine-switch">
+      <text class="engine-label">生成引擎</text>
+      <view class="engine-options">
+        <view
+          class="engine-option {{!useDeepSeek ? 'active' : ''}}"
+          data-mode="standard"
+          bindtap="switchDeepSeek"
+        >
+          <text class="engine-option-icon">🧠</text>
+          <text class="engine-option-text">标准模式</text>
+        </view>
+        <view
+          class="engine-option {{useDeepSeek ? 'active' : ''}}"
+          data-mode="deepseek"
+          bindtap="switchDeepSeek"
+        >
+          <text class="engine-option-icon">🔥</text>
+          <text class="engine-option-text">DeepSeek深度生成</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 输入区域 -->
     <view class="input-section">
       <text class="section-title">输入提示</text>

@@ -99,6 +99,7 @@ def create_app():
         LoggingMiddleware,
         SecurityHeadersMiddleware,
         CsrfMiddleware,
+        UsageLimitMiddleware,
         get_metrics_instance,
         init_otel,
     )
@@ -132,6 +133,7 @@ def create_app():
     )
     app.add_middleware(CsrfMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(UsageLimitMiddleware)
 
     # FastAPI 集成 (OpenTelemetry) — instrument_app 会在内部跳过若未初始化
     try:
@@ -162,6 +164,7 @@ def create_app():
     from app.routers.invoice import router as invoice_router
     from app.routers.knowledge_graph import router as knowledge_graph_router
     from app.routers.subscription_router import router as subscription_router
+    from app.routers.membership import router as membership_router
     from app.routers.gaia_router import router as gaia_router
     from app.crm.crm_router import router as crm_router
     from app.crm.campaign_router import router as campaign_router
@@ -172,6 +175,32 @@ def create_app():
     from app.crm.form_capture_router import router as form_capture_router
     from app.routers.document import router as document_router
     from app.routers.analytics import router as analytics_router
+    from app.routers.health import router as health_router
+
+    # ── AI助手路由 ──────────────────────────────────────────
+    # ai_assist_router 已在 routers/__init__.py 中导入，直接注册
+    try:
+        from app.routers.ai_assist import router as ai_assist_router
+        app.include_router(ai_assist_router)
+        logger.info("AI助手路由已注册: /api/v1/ai/assist/*")
+    except Exception as e:
+        logger.warning("AI助手路由注册失败（可降级运行）: %s", e)
+
+    # ── AI对话路由 ──────────────────────────────────────────
+    try:
+        from app.routers.ai_chat import router as ai_chat_router
+        app.include_router(ai_chat_router)
+        logger.info("AI对话路由已注册: /api/v1/ai/chat")
+    except Exception as e:
+        logger.warning("AI对话路由注册失败（可降级运行）: %s", e)
+
+    # ── DeepSeek 代理路由 ──────────────────────────────────────────
+    try:
+        from app.routers.ai_deepseek import router as ai_deepseek_router
+        app.include_router(ai_deepseek_router)
+        logger.info("DeepSeek代理路由已注册: /api/v1/ai/deepseek/*")
+    except Exception as e:
+        logger.warning("DeepSeek代理路由注册失败（可降级运行）: %s", e)
 
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -185,6 +214,7 @@ def create_app():
     app.include_router(form_capture_router)
     app.include_router(document_router)
     app.include_router(analytics_router)
+    app.include_router(health_router)
     from app.routers.design_qa_router import router as design_qa_router
     _register_knowledge_models(app)  # 惰性注册，避免 routers/__init__.py 循环依赖
     app.include_router(design_qa_router)
@@ -226,6 +256,7 @@ def create_app():
     app.include_router(invoice_router)
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
+    app.include_router(membership_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -289,7 +320,7 @@ p{color:rgba(255,255,255,0.6);margin-bottom:20px}
     @app.get("/api/health")
     def api_health():
         from fastapi.responses import JSONResponse
-        return JSONResponse({"status": "ok", "service": "digital_brochure"})
+        return JSONResponse({"status": "ok", "service": "ai-digital-brochure", "version": "3.4.0"})
 
     @app.get("/metrics", response_class=PlainTextResponse)
     def metrics():

@@ -1,0 +1,97 @@
+<view class="scan-page">
+  <!-- 顶部导航 -->
+  <view class="scan-header">
+    <view class="back-btn" bindtap="goBack">
+      <image class="icon" src="/images/icon-back.png" mode="aspectFit" />
+    </view>
+    <view class="header-title">
+      <text class="title">名片扫描</text>
+      <text class="subtitle">AI智能识别 · 一键录入</text>
+    </view>
+    <view class="scan-badge">
+      <text>📷 拍照</text>
+    </view>
+  </view>
+
+  <!-- 扫描区域（未识别时显示） -->
+  <view class="scan-area" wx:if="{{!showResult && !analyzing}}">
+    <view class="scan-frame" bindtap="onScan">
+      <view class="scan-camera-icon">📸</view>
+      <text class="scan-hint">点击选择名片照片</text>
+      <text class="scan-sub-hint">支持拍照或从相册选取</text>
+    </view>
+    <view class="scan-btn" bindtap="onScan">
+      <text class="scan-btn-text">选择名片照片</text>
+    </view>
+  </view>
+
+  <!-- 识别中加载动画 -->
+  <view class="analyzing-section" wx:if="{{analyzing}}">
+    <view class="analyzing-animation">
+      <view class="analyzing-spinner"></view>
+      <text class="analyzing-text">正在识别...</text>
+      <text class="analyzing-hint">AI智能分析名片信息中</text>
+    </view>
+  </view>
+
+  <!-- AI识别结果 -->
+  <view class="result-section" wx:if="{{showResult}}">
+    <view class="section-title">
+      <text>AI识别结果</text>
+    </view>
+    <view class="card-preview">
+      <view class="card-field">
+        <text class="field-label">姓名</text>
+        <text class="field-value {{!cardData.name ? 'field-empty' : ''}}">{{cardData.name || '未识别'}}</text>
+      </view>
+      <view class="card-field">
+        <text class="field-label">职位</text>
+        <text class="field-value {{!cardData.title ? 'field-empty' : ''}}">{{cardData.title || '未识别'}}</text>
+      </view>
+      <view class="card-field">
+        <text class="field-label">公司</text>
+        <text class="field-value {{!cardData.company ? 'field-empty' : ''}}">{{cardData.company || '未识别'}}</text>
+      </view>
+      <view class="card-field">
+        <text class="field-label">手机</text>
+        <text class="field-value {{!cardData.phone ? 'field-empty' : ''}}">{{cardData.phone || '未识别'}}</text>
+      </view>
+      <view class="card-field">
+        <text class="field-label">邮箱</text>
+        <text class="field-value {{!cardData.email ? 'field-empty' : ''}}">{{cardData.email || '未识别'}}</text>
+      </view>
+      <view class="card-field">
+        <text class="field-label">地址</text>
+        <text class="field-value {{!cardData.address ? 'field-empty' : ''}}">{{cardData.address || '未识别'}}</text>
+      </view>
+    </view>
+    <view class="result-actions">
+      <view class="action-btn save-btn" bindtap="onSave">
+        <text>保存到名片夹</text>
+      </view>
+      <view class="action-btn retry-btn" bindtap="onRetry">
+        <text>重新扫描</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 扫描历史 -->
+  <view class="history-section" wx:if="{{!showResult && !analyzing}}">
+    <view class="section-title">
+      <text>最近扫描</text>
+    </view>
+    <view class="history-list" wx:if="{{scanHistory.length > 0}}">
+      <view class="history-item" wx:for="{{scanHistory}}" wx:key="index">
+        <view class="history-icon">📇</view>
+        <view class="history-info">
+          <text class="history-name">{{item.name}}</text>
+          <text class="history-company" wx:if="{{item.company}}">{{item.company}}</text>
+        </view>
+        <text class="history-time">{{item.time}}</text>
+      </view>
+    </view>
+    <view class="history-empty" wx:else>
+      <text class="empty-text">暂无扫描记录，点击上方按钮开始扫描</text>
+    </view>
+  </view>
+</view>

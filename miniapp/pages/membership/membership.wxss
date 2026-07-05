@@ -1,0 +1,304 @@
+/* 会员中心样式 */
+.page-scroll {
+  height: 100vh;
+}
+
+/* ===== 当前层级卡片 ===== */
+.current-level-card {
+  margin: 16px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  color: #fff;
+}
+
+.current-level-card.level-free {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.current-level-card.level-pro {
+  background: linear-gradient(135deg, #f5a623 0%, #f7d94c 100%);
+}
+
+.current-level-card.level-enterprise {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.level-content {
+  padding: 20px 20px 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.level-label {
+  font-size: 12px;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.level-name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.level-name {
+  font-size: 28px;
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.level-badge {
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.level-badge.badge-pro {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+.level-expire {
+  font-size: 13px;
+  opacity: 0.75;
+  display: block;
+}
+
+/* 使用额度 */
+.usage-section {
+  padding: 12px 20px 20px;
+  background: rgba(255,255,255,0.12);
+  position: relative;
+  z-index: 1;
+}
+
+.usage-item {
+  margin-bottom: 10px;
+}
+
+.usage-item:last-child {
+  margin-bottom: 0;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.usage-label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.usage-value {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.7);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ===== 段落标题 ===== */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 16px 16px 8px;
+}
+
+/* ===== 套餐卡片 ===== */
+.plans-container {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 12px 8px;
+  gap: 12px;
+  scrollbar-width: none;
+}
+
+.plans-container::-webkit-scrollbar {
+  display: none;
+}
+
+.plan-card {
+  flex: 0 0 220px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.plan-highlighted {
+  border-color: #f5a623;
+  box-shadow: 0 4px 20px rgba(245, 166, 35, 0.15);
+}
+
+.plan-free .plan-highlighted {
+  border-color: #667eea;
+}
+
+.plan-badge {
+  position: absolute;
+  top: -1px;
+  right: 16px;
+  background: #f5a623;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 0 0 8px 8px;
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.plan-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.plan-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.plan-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.plan-period {
+  font-size: 13px;
+  color: var(--text-hint);
+  margin-left: 4px;
+}
+
+.plan-original {
+  display: block;
+  font-size: 12px;
+  color: var(--text-hint);
+  text-decoration: line-through;
+  margin-top: 2px;
+}
+
+.plan-features {
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.plan-feature {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.feature-icon {
+  width: 18px;
+  height: 18px;
+  background: var(--success);
+  color: #fff;
+  border-radius: 9px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.plan-btn {
+  margin-top: auto;
+}
+
+/* ===== 功能对比表 ===== */
+.comparison-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin: 0 16px 16px;
+  overflow: hidden;
+}
+
+.comparison-header {
+  display: flex;
+  background: var(--surface-2);
+  padding: 12px 10px;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-row {
+  display: flex;
+  padding: 12px 10px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.comparison-row:last-child {
+  border-bottom: none;
+}
+
+.comp-col {
+  flex: 1;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.comp-feature {
+  flex: 1.5;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.comp-disabled {
+  color: var(--text-hint);
+}
+
+.comp-pro {
+  color: #f5a623;
+  font-weight: 500;
+}
+
+.comp-enterprise {
+  color: #667eea;
+  font-weight: 500;
+}
+
+/* 底部 */
+.bottom-placeholder {
+  height: 60px;
+}

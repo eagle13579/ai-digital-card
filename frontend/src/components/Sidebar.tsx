@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/', labelKey: '仪表盘', icon: <LayoutDashboard className="w-5 h-5" /> },
   { path: '/cards', labelKey: '名片编辑', icon: <CreditCard className="w-5 h-5" /> },
   { path: '/matching', labelKey: '匹配中心', icon: <Sparkles className="w-5 h-5" /> },
+  { path: '/ai-analytics', labelKey: 'AI智能分析', icon: <BarChart3 className="w-5 h-5" /> },
   { path: '/network', labelKey: '信任网络', icon: <Users className="w-5 h-5" /> },
   { path: '/ocr/review', labelKey: 'OCR校正', icon: <ScanLine className="w-5 h-5" /> },
   { path: '/crm', labelKey: '联系人管理', icon: <ContactRound className="w-5 h-5" /> },

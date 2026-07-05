@@ -24,6 +24,7 @@ const CrmContactDetailPageLazy = lazy(() => import('./pages/crm/CrmContactDetail
 const CrmPipelinePageLazy = lazy(() => import('./pages/crm/CrmPipelinePage'));
 const CrmDashboardPageLazy = lazy(() => import('./pages/crm/CrmDashboardPage'));
 const OcrReviewPageLazy = lazy(() => import('./pages/ocr/OcrReviewPage'));
+const AiAnalyticsPageLazy = lazy(() => import('./pages/AIAnalyticsPage'));
 
 /**
  * 带骨架屏的懒加载包装
@@ -151,6 +152,14 @@ export default function AppRoutes() {
         element={
           <LazyPage skeletonMode="card" skeletonCount={3}>
             <Layout><OcrReviewPageLazy /></Layout>
+          </LazyPage>
+        }
+      />
+      <Route
+        path="/ai-analytics"
+        element={
+          <LazyPage skeletonMode="card" skeletonCount={3}>
+            <Layout><AiAnalyticsPageLazy /></Layout>
           </LazyPage>
         }
       />

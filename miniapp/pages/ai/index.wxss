@@ -520,3 +520,141 @@
 .bottom-placeholder {
   height: 120px;
 }
+
+/* ===== Section layout for AI index ===== */
+
+.feature-section {
+  padding: 0 20px;
+  margin-bottom: 32px;
+}
+
+.feature-section:last-child {
+  margin-bottom: 40px;
+}
+
+.feature-section .section-header {
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+.feature-section .section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  position: relative;
+  padding-left: 14px;
+}
+
+.feature-section .section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--primary), var(--primary-light));
+}
+
+.feature-section .section-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 4px;
+  padding-left: 18px;
+}
+
+/* Feature card list */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.feature-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.card-icon {
+  font-size: 32px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  margin-right: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-arrow {
+  font-size: 24px;
+  color: var(--text-muted);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Section divider accent */
+.feature-section + .feature-section {
+  position: relative;
+}
+
+.feature-section + .feature-section::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--surface-3), transparent);
+  margin: 0 20px 32px;
+}

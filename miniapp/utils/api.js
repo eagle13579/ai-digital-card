@@ -274,6 +274,10 @@ const aiApi = {
   optimize(data) {
     return post('/api/v1/ai/assist/optimize', data)
   },
+  /** DeepSeek 纯对话（非RAG，直接调用DeepSeek API） */
+  deepseekChat(data) {
+    return post('/api/v1/ai/deepseek/chat', data)
+  },
 }
 
 // =============================================================================
@@ -475,6 +479,54 @@ const integrationApi = {
   /** 测试集成连接 */
   testConnection(id) {
     return post(`/api/v1/integrations/${id}/test`)
+  },
+}
+
+// =============================================================================
+//  会员 / 订阅模块 (membership) — /api/v1/membership
+// =============================================================================
+const membershipApi = {
+  /** 获取当前用户会员层级与使用额度 */
+  getStatus() {
+    return get('/api/v1/membership/status')
+  },
+  /** 获取所有套餐方案 */
+  getPlans() {
+    return get('/api/v1/membership/plans')
+  },
+  /** 获取套餐定价列表 */
+  getPricing() {
+    return get('/api/v1/membership/pricing')
+  },
+  /** 升级套餐（按 planId + 周期） */
+  upgrade(planId, period) {
+    return post('/api/v1/membership/upgrade', { plan_id: planId, period })
+  },
+  /** 升级套餐（按 tier 等级，简化版） */
+  upgradeByTier(tier) {
+    return post('/api/v1/membership/upgrade', { tier })
+  },
+  /** 获取使用统计（名片数量、OCR次数、访客数等） */
+  getUsageStats() {
+    return get('/api/v1/membership/usage-stats')
+  },
+}
+
+// =============================================================================
+//  DeepSeek AI 专属模块 (deepseek) — /api/v1/ai/deepseek
+// =============================================================================
+const deepseekApi = {
+  /** DeepSeek 多轮对话 */
+  chat(messages) {
+    return post('/api/v1/ai/deepseek/chat', { messages })
+  },
+  /** DeepSeek 深度生成（单次提示词） */
+  generate(prompt) {
+    return post('/api/v1/ai/deepseek/generate', { prompt, temperature: 0.7, max_tokens: 2048 })
+  },
+  /** DeepSeek 服务状态 */
+  status() {
+    return get('/api/v1/ai/deepseek/status')
   },
 }
 
@@ -1040,6 +1092,9 @@ module.exports = {
   // AI 助手
   aiApi,
 
+  // DeepSeek AI 专属
+  deepseekApi,
+
   // 推荐
   recommendApi,
 
@@ -1051,6 +1106,9 @@ module.exports = {
 
   // 订阅
   subscriptionApi,
+
+  // 会员
+  membershipApi,
 
   // 消息
   messageApi,

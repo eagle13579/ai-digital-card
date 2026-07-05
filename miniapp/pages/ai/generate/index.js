@@ -15,6 +15,8 @@ Page({
     prompt: '',
     isGenerating: false,
     resultContent: '',
+    /** 是否使用 DeepSeek 深度生成模式 */
+    useDeepSeek: false,
     templates: [
       { id: 1, title: '产品介绍', desc: '生成产品发布文案', mode: 'write' },
       { id: 2, title: '个人简介', desc: '专业自我介绍', mode: 'write' },
@@ -41,6 +43,11 @@ Page({
     this.setData({ currentTab: tab, resultContent: '' })
   },
 
+  /** 切换 AI 生成模式: 标准模式 ↔ DeepSeek 深度生成 */
+  switchDeepSeek() {
+    this.setData({ useDeepSeek: !this.data.useDeepSeek, resultContent: '' })
+  },
+
   onSelectTemplate(e) {
     const template = e.currentTarget.dataset.template
     this.setData({ prompt: template.title + ' — ' })
@@ -54,12 +61,37 @@ Page({
   // ===== AI 生成 =====
 
   onGenerate() {
-    const { prompt, isGenerating } = this.data
+    const { prompt, isGenerating, useDeepSeek } = this.data
     if (!prompt.trim() || isGenerating) return
 
     this.setData({ isGenerating: true, resultContent: '' })
 
     const mode = TAB_MODES[this.data.currentTab]
+
+    // ---- DeepSeek 深度生成模式 ----
+    if (useDeepSeek) {
+      wx.showLoading({ title: 'DeepSeek生成中...' })
+      const { deepseekApi } = require('../../../utils/api')
+      deepseekApi
+        .generate(prompt.trim())
+        .then((res) => {
+          const content = res.data?.content || res.content || ''
+          this.setData({ resultContent: content })
+          if (content) {
+            this.saveToHistory(prompt.trim(), content)
+            wx.showToast({ title: '生成完成', icon: 'success' })
+          }
+        })
+        .catch((err) => {
+          console.error('[DeepSeek生成] 请求失败:', err)
+          wx.showToast({ title: 'DeepSeek请求失败，请重试', icon: 'none' })
+        })
+        .finally(() => {
+          wx.hideLoading()
+          this.setData({ isGenerating: false })
+        })
+      return
+    }
 
     if (MockService.USE_MOCK) {
       // ---- Mock 模式 ----

@@ -4,6 +4,61 @@
   height: 100vh;
 }
 
+/* 升级提示条 */
+.upgrade-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f5a623 0%, #f7d94c 100%);
+  padding: 10px 16px;
+  position: relative;
+}
+
+.hint-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.hint-text {
+  flex: 1;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.hint-action {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.hint-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.hint-close text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
 /* 用户头部 */
 .user-header {
   display: flex;

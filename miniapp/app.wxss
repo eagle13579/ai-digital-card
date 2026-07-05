@@ -223,6 +223,16 @@ page {
   color: #fff;
 }
 
+.badge-pro {
+  background: linear-gradient(135deg, #f5a623, #f7d94c);
+  color: #fff;
+}
+
+.badge-enterprise {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: #fff;
+}
+
 /* 标签 */
 .tag {
   display: inline-flex;

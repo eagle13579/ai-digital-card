@@ -1,8 +1,9 @@
 /**
  * 名片详情页
  * 展示单张名片的详细信息与统计数据
+ * 增加：Free用户创建名片限制检查
  */
-const { brochureApi, visitorApi, miniappApi } = require('../../utils/api')
+const { brochureApi, visitorApi, miniappApi, membershipApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -17,8 +18,48 @@ Page({
     if (cardId) {
       this.loadCardDetail(cardId)
     } else {
-      wx.showToast({ title: '参数错误', icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 1500)
+      // 无ID时检查会员限制
+      this.checkCreateLimit()
+    }
+  },
+
+  /**
+   * 检查名片创建限制
+   * Free用户最多创建1张名片，超出提示升级Pro
+   */
+  async checkCreateLimit() {
+    this.setData({ loading: true })
+    try {
+      const membershipRes = await membershipApi.getStatus()
+      const membership = membershipRes.data ?? membershipRes ?? {}
+      const memberLevel = membership.tier || membership.level || 'free'
+      const cardCount = membership.card_count ?? membership.cardCount ?? 0
+      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memberLevel === 'free' ? 1 : 10)
+
+      if (memberLevel === 'free' && cardCount >= cardLimit) {
+        // 超出限制，弹窗提示升级
+        wx.showModal({
+          title: '升级Pro',
+          content: `免费版仅支持${cardLimit}张名片，您已达到上限。升级Pro可创建最多10张名片！`,
+          confirmText: '升级Pro',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/membership/membership' })
+            } else {
+              wx.navigateBack()
+            }
+          },
+        })
+        this.setData({ loading: false })
+      } else {
+        // 未超限，跳转到创建页面
+        wx.redirectTo({ url: '/pages/brochure/create/index' })
+      }
+    } catch (err) {
+      console.error('检查创建限制失败:', err)
+      // 降级：允许创建
+      wx.redirectTo({ url: '/pages/brochure/create/index' })
     }
   },
 

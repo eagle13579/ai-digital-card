@@ -1,8 +1,9 @@
 /**
  * 首页 - 名片列表 + 推荐
  * 连接后端真实API（/api/v1/ 前缀）
+ * 增加：Free用户使用接近上限时显示智能升级提示条
  */
-const { userApi, brochureApi, trustApi, matchApi, visitorApi } = require('../../utils/api')
+const { userApi, brochureApi, trustApi, matchApi, visitorApi, membershipApi } = require('../../utils/api')
 const { Logger } = require('../../utils/util')
 
 Page({
@@ -17,6 +18,10 @@ Page({
     trustList: [],
     recommendList: [],
     visitorList: [],
+
+    // 升级提示
+    showUpgradeHint: false,
+    upgradeHintText: '',
 
     // 平台推荐（静态UI数据，非后端数据）
     platformRecommend: [
@@ -53,8 +58,7 @@ Page({
 
   /**
    * 加载首页全部数据
-   * 并行请求：用户信息、名片、信任网络、推荐列表
-   * 每个请求独立降级，互不影响
+   * 并行请求：用户信息、名片、信任网络、推荐列表、会员状态
    */
   async loadPageData() {
     this.setData({ loading: true })
@@ -65,6 +69,7 @@ Page({
         brochuresRes,
         trustNetRes,
         recommendRes,
+        membershipRes,
       ] = await Promise.all([
         // 1. 用户信息
         userApi.getProfile().catch(err => {
@@ -86,10 +91,14 @@ Page({
           Logger.warn('首页', '获取推荐列表失败', err)
           return null
         }),
+        // 5. 会员状态（用于升级提示）
+        membershipApi.getStatus().catch(err => {
+          Logger.warn('首页', '获取会员状态失败', err)
+          return null
+        }),
       ])
 
       // ===== 1. 解析用户信息 =====
-      // 后端可能直接返回对象或包装在 { data: ... } 中
       const profileData = profileRes?.data !== undefined ? profileRes.data : profileRes
       const userInfoData = profileData?.userInfo || profileData || {}
 
@@ -101,14 +110,13 @@ Page({
       }
 
       const memberLevel = profileData?.memberLevel || userInfoData.memberLevel || 'free'
-      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
+      const memberLevelText = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memberLevel] || 'Free'
 
       const app = getApp()
       app.updateUserInfo(userInfo)
       app.updateMemberLevel(memberLevel)
 
       // ===== 2. 解析名片/画册 =====
-      // 后端可能返回 { items: [], total: ... } 或直接数组或 { data: [] }
       let brochuresList = []
       if (Array.isArray(brochuresRes)) {
         brochuresList = brochuresRes
@@ -122,13 +130,11 @@ Page({
       const brochure = brochuresList.length > 0 ? brochuresList[0] : null
 
       // ===== 3. 解析信任网络 =====
-      // 后端可能返回 { trusting: [], trusted_by: [] } 或 { data: { trusting: [], ... } }
       const trustData = trustNetRes?.data !== undefined ? trustNetRes.data : (trustNetRes || {})
       const trustList = trustData.trusting || []
       const trustCount = trustList.length
 
       // ===== 4. 解析推荐列表 =====
-      // 后端可能返回数组或 { items: [], ... } 或 { data: [] }
       let recommendData = []
       if (Array.isArray(recommendRes)) {
         recommendData = recommendRes
@@ -152,18 +158,48 @@ Page({
         }
       }
 
-      // ===== 6. 组装统计数据 =====
+      // ===== 6. 解析会员状态 → 升级提示 =====
+      const membership = membershipRes?.data ?? membershipRes ?? {}
+      const memLevel = membership.tier || membership.level || memberLevel
+      const ocrCount = membership.ocr_count ?? membership.ocrCount ?? 0
+      const ocrLimit = membership.ocr_limit ?? membership.ocrLimit ?? (memLevel === 'free' ? 3 : 100)
+      const cardCount = membership.card_count ?? membership.cardCount ?? (brochuresList.length || 0)
+      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memLevel === 'free' ? 1 : 10)
+
+      let showUpgradeHint = false
+      let upgradeHintText = ''
+
+      if (memLevel === 'free') {
+        // Free用户：检查使用是否接近上限
+        const ocrRatio = ocrLimit > 0 ? ocrCount / ocrLimit : 0
+        const cardRatio = cardLimit > 0 ? cardCount / cardLimit : 0
+        const maxRatio = Math.max(ocrRatio, cardRatio)
+
+        if (maxRatio >= 0.8) {
+          showUpgradeHint = true
+          if (ocrRatio >= 0.8) {
+            const remaining = ocrLimit - ocrCount
+            upgradeHintText = `您本月OCR还剩${remaining}次，升级Pro享100次/月`
+          } else if (cardRatio >= 0.8) {
+            upgradeHintText = `名片已达${cardCount}/${cardLimit}张，升级Pro可创建更多`
+          } else {
+            upgradeHintText = '使用接近上限，升级Pro解锁更多权益'
+          }
+        }
+      }
+
+      // ===== 7. 组装统计数据 =====
       const stats = {
         visitors: visitors,
         matches: recommendData.length,
         trust: trustCount,
       }
 
-      // ===== 7. 更新页面数据 =====
+      // ===== 8. 更新页面数据 =====
       this.setData({
         userInfo,
-        memberLevel,
-        memberLevelText,
+        memberLevel: memLevel,
+        memberLevelText: { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memLevel] || 'Free',
         stats,
         brochure: brochure ? {
           id: brochure.id,
@@ -176,6 +212,8 @@ Page({
         trustList: trustList.slice(0, 10),
         recommendList: recommendData.slice(0, 3),
         visitorList: [],
+        showUpgradeHint,
+        upgradeHintText,
         loading: false,
       })
 
@@ -229,6 +267,16 @@ Page({
   goPlatformDetail(e) {
     const name = e.currentTarget.dataset.url || e.currentTarget.dataset.item
     wx.showToast({ title: '功能开发中', icon: 'none' })
+  },
+
+  // 跳转会员中心
+  goUpgrade() {
+    wx.navigateTo({ url: '/pages/membership/membership' })
+  },
+
+  // 关闭升级提示
+  closeUpgradeHint() {
+    this.setData({ showUpgradeHint: false })
   },
 
   onShareAppMessage() {

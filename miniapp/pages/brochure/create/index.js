@@ -3,7 +3,7 @@
  * 连接后端 brochureApi + matchApi
  * 提交表单 → 上传图片 → 创建画册 → 触发匹配 → 跳转预览
  */
-const { brochureApi, matchApi } = require('../../../utils/api')
+const { brochureApi, matchApi, membershipApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 
 Page({
@@ -382,6 +382,50 @@ Page({
     wx.showLoading({ title: '生成中...', mask: true })
 
     try {
+      // ===== 检查会员创建限制 =====
+      const membershipRes = await membershipApi.getStatus().catch(() => null)
+      const membership = membershipRes?.data ?? membershipRes ?? {}
+      const memberLevel = membership.tier || membership.level || 'free'
+      const cardCount = membership.card_count ?? membership.cardCount ?? 0
+      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memberLevel === 'free' ? 1 : 10)
+
+      if (memberLevel === 'free' && cardCount >= cardLimit) {
+        wx.hideLoading()
+        this.setData({ submitting: false })
+        wx.showModal({
+          title: '升级Pro',
+          content: `免费版仅支持${cardLimit}张名片，您已达到上限。升级Pro可创建最多10张名片！`,
+          confirmText: '升级Pro',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/membership/membership' })
+            }
+          },
+        })
+        return
+      }
+
+      // ===== 检查批量导入限制（Enterprise功能） =====
+      // 批量导入超过10条资源/需求时提示升级Enterprise
+      const providesCount = this.data.formData.provides ? this.data.formData.provides.length : 0
+      const needsCount = this.data.formData.needs ? this.data.formData.needs.length : 0
+      const totalImportItems = providesCount + needsCount
+      if (totalImportItems > 10 && memberLevel !== 'enterprise') {
+        wx.hideLoading()
+        this.setData({ submitting: false })
+        wx.showModal({
+          title: '升级Enterprise',
+          content: `批量导入超过10人需要Enterprise版，当前${memberLevel === 'free' ? 'Free' : 'Pro'}版不支持。升级Enterprise以继续。`,
+          confirmText: '升级Enterprise',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/membership/membership' })
+            }
+          },
+        })
+        return
+      }
+
       const { name, title, company, purpose, provides, needs } = this.data.formData
 
       // Step 1: 上传头像（如果有）

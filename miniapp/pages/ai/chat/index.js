@@ -1,6 +1,6 @@
 // pages/ai/chat/index.js — AI对话聊天页 (连接后端真实API)
-// 后端API: POST /api/v1/ai/chat (RAG会话)
-// 使用 aiApi.getChat() 进行对话
+// 后端API: POST /api/v1/ai/chat (RAG会话) | POST /api/v1/ai/deepseek/chat (DeepSeek纯对话)
+// 支持模式切换: rag (智能对话) / deepseek (深度推理)
 const STORAGE_KEY = 'ai_chat_history';
 const MAX_HISTORY = 100;
 
@@ -13,12 +13,21 @@ Page({
     scrollToId: '',
     userAvatar: '',
     sessionId: '',
-    quickQuestions: [
-      '如何创建智能名片？',
-      '企业知识库怎么用？',
-      'AI能帮我做什么？',
-      '如何分享我的名片？'
-    ]
+    aiMode: 'rag', // 'rag' | 'deepseek'
+    quickQuestions: {
+      rag: [
+        '如何创建智能名片？',
+        '企业知识库怎么用？',
+        'AI能帮我做什么？',
+        '如何分享我的名片？'
+      ],
+      deepseek: [
+        '分析当前AI行业趋势',
+        '用SWOT分析我的商业模式',
+        '写一段Python代码',
+        '解释什么是向量数据库'
+      ]
+    }
   },
 
   onLoad() {
@@ -52,6 +61,33 @@ Page({
     if (userInfo.avatarUrl) {
       this.setData({ userAvatar: userInfo.avatarUrl });
     }
+  },
+
+  // ==================== 模式切换 ====================
+
+  onModeSwitch(e) {
+    const mode = e.currentTarget.dataset.mode;
+    if (mode === this.data.aiMode) return;
+
+    this.setData({ aiMode: mode }, () => {
+      // 切换模式时加一条系统提示
+      const hint = mode === 'deepseek'
+        ? '已切换至深度推理模式，您可以咨询复杂问题、代码编写、数据分析等。'
+        : '已切换至智能对话模式，我将从企业知识库中为您解答产品相关问题。';
+
+      const sysMsg = {
+        id: this.genId(),
+        role: 'ai',
+        content: hint,
+        time: this.getTimeStr()
+      };
+
+      const newMessages = [...this.data.messages, sysMsg];
+      this.setData({ messages: newMessages }, () => {
+        this.scrollToBottom();
+        this.saveHistory(newMessages);
+      });
+    });
   },
 
   // ==================== 输入事件 ====================
@@ -100,32 +136,57 @@ Page({
 
   callAiApi(question, history) {
     const startTime = Date.now();
-
-    // 调用后端真实API — POST /api/v1/ai/chat (RAG会话)
     const { aiApi } = require('../../../utils/api');
+    const mode = this.data.aiMode;
 
-    // 将历史消息转换为后端需要的格式 (history[{role, content}])
+    // 将历史消息转换为后端需要的格式
     const historyMessages = history
       .filter(m => m.role === 'user' || m.role === 'ai')
       .map(m => ({ role: m.role, content: m.content }));
 
-    aiApi
-      .getChat({
+    // 根据模式选择不同API
+    let apiPromise;
+    if (mode === 'deepseek') {
+      // DeepSeek模式: POST /api/v1/ai/deepseek/chat
+      apiPromise = aiApi.deepseekChat({
+        messages: [
+          {
+            role: 'system',
+            content: '你是一个专业的AI数智名片助手。请用中文回答，回答简洁、准确、有帮助。可以解答各类技术问题、商业分析、代码编写等。'
+          },
+          ...historyMessages.slice(-20) // 最近20轮上下文
+        ],
+        temperature: 0.7
+      });
+    } else {
+      // RAG模式: POST /api/v1/ai/chat (原有逻辑)
+      apiPromise = aiApi.getChat({
         question: question,
         history: historyMessages,
         session_id: this.data.sessionId || '',
-      })
+      });
+    }
+
+    apiPromise
       .then(res => {
         const elapsed = Date.now() - startTime;
-        const reply = res.data?.reply || res.data?.content || res.content || res.reply || '';
+        let reply = '';
+
+        if (mode === 'deepseek') {
+          // DeepSeek返回格式: { reply: '...', model: 'deepseek-chat', usage: {...} }
+          reply = res.reply || res.data?.reply || res.content || res.data?.content || '';
+        } else {
+          // RAG返回格式
+          reply = res.data?.reply || res.data?.content || res.content || res.reply || '';
+        }
 
         // 至少展示 800ms 的 typing 效果以增强体验
         const minDelay = 800;
         const delay = Math.max(0, minDelay - elapsed);
 
         setTimeout(() => {
-          // 保存会话ID用于后续轮次
-          if (res.data?.session_id) {
+          // 保存会话ID (仅RAG模式)
+          if (mode === 'rag' && res.data?.session_id) {
             this.setData({ sessionId: res.data.session_id });
           }
 
@@ -133,7 +194,8 @@ Page({
             id: this.genId(),
             role: 'ai',
             content: reply,
-            time: this.getTimeStr()
+            time: this.getTimeStr(),
+            mode: mode  // 标记消息来源模式
           };
 
           const finalMessages = [...this.data.messages, aiMsg];

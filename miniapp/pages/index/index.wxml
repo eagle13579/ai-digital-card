@@ -5,6 +5,18 @@
   <!-- 页面内容 -->
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
 
+    <!-- 升级提示条 -->
+    <view class="upgrade-hint" wx:if="{{showUpgradeHint}}" bindtap="goUpgrade">
+      <view class="hint-content">
+        <text class="hint-icon">⭐</text>
+        <text class="hint-text">{{upgradeHintText}}</text>
+        <text class="hint-action">去升级 ›</text>
+      </view>
+      <view class="hint-close" catchtap="closeUpgradeHint">
+        <text>✕</text>
+      </view>
+    </view>
+
     <!-- 用户信息头部 -->
     <view class="user-header">
       <view class="user-avatar">

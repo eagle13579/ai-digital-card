@@ -14,6 +14,20 @@
     </view>
   </view>
 
+  <!-- 模式切换栏 -->
+  <view class="mode-switch">
+    <view class="mode-tab {{aiMode === 'rag' ? 'active rag' : ''}}" data-mode="rag" bindtap="onModeSwitch">
+      <text class="mode-icon">🧠</text>
+      <text class="mode-label">智能对话</text>
+      <text class="mode-desc">知识库问答</text>
+    </view>
+    <view class="mode-tab {{aiMode === 'deepseek' ? 'active deepseek' : ''}}" data-mode="deepseek" bindtap="onModeSwitch">
+      <text class="mode-icon">🔮</text>
+      <text class="mode-label">深度推理</text>
+      <text class="mode-desc">复杂分析/代码</text>
+    </view>
+  </view>
+
   <!-- 聊天内容区 -->
   <scroll-view class="chat-content" scroll-y="true" scroll-with-animation="{{true}}" scroll-into-view="{{scrollToId}}" lower-threshold="50" bindscrolltolower="loadMore">
     <view class="message-list">
@@ -21,7 +35,7 @@
         <view class="message-item {{item.role}}" id="msg-{{item.id}}">
           <!-- AI 头像 -->
           <view class="message-avatar ai-avatar" wx:if="{{item.role === 'ai'}}">
-            <text class="ai-icon">🤖</text>
+            <text class="ai-icon">{{item.mode === 'deepseek' ? '🔮' : '🤖'}}</text>
           </view>
           <!-- 用户头像 -->
           <view class="message-avatar user-avatar" wx:if="{{item.role === 'user'}}">
@@ -38,7 +52,7 @@
       <!-- 打字中指示器 -->
       <view class="message-item ai" wx:if="{{isTyping}}">
         <view class="message-avatar ai-avatar">
-          <text class="ai-icon">🤖</text>
+          <text class="ai-icon">{{aiMode === 'deepseek' ? '🔮' : '🤖'}}</text>
         </view>
         <view class="message-content">
           <view class="typing-indicator">
@@ -58,7 +72,7 @@
   <view class="quick-questions" wx:if="{{showQuickQuestions && messages.length <= 1}}">
     <text class="quick-title">💡 试试这些问题</text>
     <view class="quick-list">
-      <view class="quick-item" wx:for="{{quickQuestions}}" wx:key="index" bindtap="onQuickQuestion" data-question="{{item}}">
+      <view class="quick-item" wx:for="{{quickQuestions[aiMode]}}" wx:key="index" bindtap="onQuickQuestion" data-question="{{item}}">
         <text>{{item}}</text>
       </view>
     </view>
@@ -66,7 +80,7 @@
 
   <!-- 底部输入区 -->
   <view class="input-area">
-    <input class="chat-input" type="text" placeholder="输入您的问题..." value="{{inputValue}}" bindinput="onInputChange" bindconfirm="sendMessage" disabled="{{isTyping}}" maxlength="500" confirm-type="send" />
+    <input class="chat-input" type="text" placeholder="{{aiMode === 'deepseek' ? '输入问题（深度推理）...' : '输入您的问题...'}}" value="{{inputValue}}" bindinput="onInputChange" bindconfirm="sendMessage" disabled="{{isTyping}}" maxlength="500" confirm-type="send" />
     <view class="send-btn {{inputValue.trim() ? '' : 'disabled'}}" bindtap="sendMessage">
       <image class="icon" src="/images/icon-send.png" mode="aspectFit" />
     </view>

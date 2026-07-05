@@ -118,6 +118,72 @@
   font-weight: 500;
 }
 
+/* 升级按钮 */
+.upgrade-btn {
+  background: linear-gradient(135deg, #f5a623, #f7d94c);
+  padding: 6px 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(245, 166, 35, 0.3);
+}
+
+.upgrade-btn-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* 使用额度进度条 */
+.usage-section {
+  padding: 0 16px 16px;
+}
+
+.usage-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.usage-item:last-child {
+  margin-bottom: 0;
+}
+
+.usage-label {
+  font-size: 12px;
+  color: #999;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.usage-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usage-bar {
+  flex: 1;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.usage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1657ff, #4a7aff);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.usage-text {
+  font-size: 11px;
+  color: #999;
+  width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
 /* 数据概览 */
 .stats-grid {
   display: grid;
