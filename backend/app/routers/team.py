@@ -19,7 +19,7 @@ from app.models.team import (
 from app.routers.auth import get_current_user
 from app.services.team_service import TeamService
 
-router = APIRouter(prefix="/api/teams", tags=["团队管理"])
+router = APIRouter(prefix="/api/v1/teams", tags=["团队管理"])
 
 # ─── Schemas ────────────────────────────────────────────────────
 

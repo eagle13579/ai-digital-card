@@ -15,7 +15,7 @@ from app.services.crm_bridge import crm_bridge
 from app.services.crm_hubspot import HubSpotProvider
 from app.services.crm_salesforce import SalesforceProvider
 
-router = APIRouter(prefix="/api/integrations", tags=["集成管理"])
+router = APIRouter(prefix="/api/v1/integrations", tags=["集成管理"])
 
 # ── Schemas ──────────────────────────────────────────────────────────────────────
 

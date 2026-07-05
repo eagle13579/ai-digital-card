@@ -8,7 +8,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas import TagInput, TagBatchInput, TagResponse
 
-router = APIRouter(prefix="/api/tags", tags=["标签"])
+router = APIRouter(prefix="/api/v1/tags", tags=["标签"])
 
 
 @router.get("/me", response_model=dict)

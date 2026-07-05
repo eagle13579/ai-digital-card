@@ -56,6 +56,18 @@ async def startup_handler() -> None:
     try:
         await init_all()
         logger.info("All system dependencies initialized and runtime started")
+
+        # 初始化异步任务队列
+        try:
+            from task_queue import init_task_queue
+            from app.config import settings as cfg
+            await init_task_queue(
+                max_workers=cfg.TASK_QUEUE_MAX_WORKERS,
+                max_queue_size=cfg.TASK_QUEUE_MAX_SIZE,
+            )
+        except Exception as e:
+            logger.warning("任务队列初始化失败（降级运行）: %s", e)
+
     except Exception as exc:
         logger.exception(
             "FATAL: Failed to initialize system dependencies: %s", exc
@@ -81,6 +93,14 @@ async def shutdown_handler() -> None:
     try:
         await shutdown_all()
         logger.info("All system dependencies shut down gracefully")
+
+        # 关闭异步任务队列
+        try:
+            from task_queue import shutdown_task_queue
+            await shutdown_task_queue()
+        except Exception as e:
+            logger.exception("任务队列关闭异常: %s", e)
+
     except Exception as exc:
         logger.exception("Error during system shutdown: %s", exc)
 
@@ -118,6 +138,17 @@ async def agent_lifespan(app: object) -> AsyncIterator[None]:
         yield
         return
 
+    # 1b. Initialize the async task queue
+    try:
+        from task_queue import init_task_queue
+        from app.config import settings as cfg
+        await init_task_queue(
+            max_workers=cfg.TASK_QUEUE_MAX_WORKERS,
+            max_queue_size=cfg.TASK_QUEUE_MAX_SIZE,
+        )
+    except Exception as exc:
+        logger.warning("Task queue init failed (degraded operation): %s", exc)
+
     # 2. Start the runtime (starts all registered agents, cron, event listener)
     try:
         await runtime.start()
@@ -135,6 +166,14 @@ async def agent_lifespan(app: object) -> AsyncIterator[None]:
         # ── Shutdown ──────────────────────────────────────────────────
         logger.info("Agent lifespan context manager shutting down...")
         await _safe_stop(runtime)
+
+        # Shutdown task queue
+        try:
+            from task_queue import shutdown_task_queue
+            await shutdown_task_queue()
+        except Exception as exc:
+            logger.exception("Task queue shutdown error: %s", exc)
+
         logger.info("Agent lifespan context manager shut down complete")
 
 

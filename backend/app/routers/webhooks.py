@@ -38,7 +38,7 @@ from app.models.webhook import WebhookSubscription
 from app.routers.auth import get_current_user
 from app.services.webhook_dispatcher import webhook_dispatcher
 
-router = APIRouter(prefix="/api/webhooks", tags=["Webhook 订阅"])
+router = APIRouter(prefix="/api/v1/webhooks", tags=["Webhook 订阅"])
 
 # ── Schemas ──────────────────────────────────────────────────────────────
 

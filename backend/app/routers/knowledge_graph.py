@@ -20,7 +20,7 @@ from app.services.knowledge_graph import KnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/knowledge-graph", tags=["知识图谱"])
+router = APIRouter(prefix="/api/v1/knowledge-graph", tags=["知识图谱"])
 
 
 @router.get("/network/{user_id}")

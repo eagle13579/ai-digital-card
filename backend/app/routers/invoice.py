@@ -17,7 +17,7 @@ from app.models.payment import PaymentOrder
 from app.services.invoice_service import InvoiceService
 from app.routers.auth import get_current_user
 
-router = APIRouter(prefix="/api/invoices", tags=["发票"])
+router = APIRouter(prefix="/api/v1/invoices", tags=["发票"])
 
 
 # ── Schemas ─────────────────────────────────────────────────────────

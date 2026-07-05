@@ -25,7 +25,7 @@ from app.services.bot_dingtalk import dingtalk_bot
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/bot", tags=["IM 机器人"])
+router = APIRouter(prefix="/api/v1/bot", tags=["IM 机器人"])
 
 
 # ── 工具函数 ─────────────────────────────────────────────────────────────────

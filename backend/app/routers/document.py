@@ -27,7 +27,7 @@ from app.crm.crm_models import CrmContact, CrmDeal
 from app.routers.auth import get_current_user
 from app.services.document_gen import DocumentGenService
 
-router = APIRouter(prefix="/api/crm/documents", tags=["CRM 文档"])
+router = APIRouter(prefix="/api/v1/crm/documents", tags=["CRM 文档"])
 
 
 # ── Schemas ─────────────────────────────────────────────────────────────

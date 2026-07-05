@@ -21,7 +21,7 @@ from app.ai.knowledge_model_service import get_knowledge_model_service
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/knowledge-models", tags=["心智模型"])
+router = APIRouter(prefix="/api/v1/knowledge-models", tags=["心智模型"])
 
 
 # ======================================================================

@@ -31,7 +31,7 @@ from app.services.auto_ab_testing import (
 
 logger = logging.getLogger("chainke.ab_test_router")
 
-router = APIRouter(prefix="/api/ab-tests", tags=["A/B 测试 (自进化)"])
+router = APIRouter(prefix="/api/v1/ab-tests", tags=["A/B 测试 (自进化)"])
 
 
 # ===================================================================

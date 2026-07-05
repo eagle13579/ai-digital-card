@@ -10,6 +10,10 @@ App({
     matchCount: 0,
     visitorCount: 0,
     trustCount: 0,
+    // API 基础地址 — 通过此变量配置，开发/生产切换
+    // 本地开发: 'http://localhost:8001' 或 'http://192.168.x.x:8201'
+    // 生产环境: 'https://api.liankebao.top'
+    apiBaseUrl: 'http://localhost:8001',
   },
 
   onLaunch() {

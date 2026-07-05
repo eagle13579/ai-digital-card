@@ -13,7 +13,7 @@ from app.models.api_key import ApiKey, ApiKeyUsage
 from app.models.user import User
 from app.routers.auth import get_current_user
 
-router = APIRouter(prefix="/api/api-keys", tags=["API Key 管理"])
+router = APIRouter(prefix="/api/v1/api-keys", tags=["API Key 管理"])
 
 
 # ── Schemas ────────────────────────────────────────────────────────────────────

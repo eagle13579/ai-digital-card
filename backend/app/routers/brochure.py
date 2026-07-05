@@ -19,7 +19,7 @@ from app.services.brochure import BrochureService
 from app.ai.vector_search import VectorSearchEngine
 from app.services.media_service import MediaService
 
-router = APIRouter(prefix="/api/brochures", tags=["画册"])
+router = APIRouter(prefix="/api/v1/brochures", tags=["画册"])
 
 
 # ── 用途推荐模板配置 ──────────────────────────────────

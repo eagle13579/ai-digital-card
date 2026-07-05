@@ -26,7 +26,7 @@ from app.services.recommend_service import FeedbackRecommendation, RecommendServ
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/recommend", tags=["推荐"])
+router = APIRouter(prefix="/api/v1/recommend", tags=["推荐"])
 
 
 # ======================================================================

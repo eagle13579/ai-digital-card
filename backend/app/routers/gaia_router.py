@@ -18,7 +18,7 @@ from app.ai.gaia_trainer import get_gaia_trainer, GaiaTrainer
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/gaia", tags=["盖娅进化大脑"])
+router = APIRouter(prefix="/api/v1/gaia", tags=["盖娅进化大脑"])
 
 
 # ======================================================================

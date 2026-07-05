@@ -21,10 +21,10 @@ from app.schemas import (
 )
 from app.services.chainke_bridge import sync_membership
 
-router = APIRouter(prefix="/api/auth", tags=["认证"])
+router = APIRouter(prefix="/api/v1/auth", tags=["认证"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 # ── 密码强度验证 ──────────────────────────────────────────────────────────

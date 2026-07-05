@@ -15,7 +15,7 @@ from app.i18n.localization import (
     get_supported_locales,
 )
 
-router = APIRouter(prefix="/api/i18n", tags=["i18n"])
+router = APIRouter(prefix="/api/v1/i18n", tags=["i18n"])
 
 # 所有支持的语言
 LOCALES = {"zh", "en", "ja", "ko", "es", "fr", "de", "pt", "ru", "ar", "th", "vi"}

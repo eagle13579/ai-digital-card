@@ -29,7 +29,7 @@ from app.payment.alipay import AlipayProvider
 from app.payment.wechat import WeChatPayProvider
 from app.routers.auth import get_current_user
 
-router = APIRouter(prefix="/api/payment", tags=["支付"])
+router = APIRouter(prefix="/api/v1/payment", tags=["支付"])
 
 
 # ── 支付渠道注册 ─────────────────────────────────────────────────────

@@ -306,6 +306,16 @@ def create_app():
         except Exception as e:
             logger.warning("Redis 初始化失败（降级运行）: %s", e)
 
+        # 初始化异步任务队列
+        try:
+            from task_queue import init_task_queue
+            await init_task_queue(
+                max_workers=cfg.TASK_QUEUE_MAX_WORKERS,
+                max_queue_size=cfg.TASK_QUEUE_MAX_SIZE,
+            )
+        except Exception as e:
+            logger.warning("任务队列初始化失败（降级运行）: %s", e)
+
     # Shutdown
     @app.on_event("shutdown")
     async def shutdown():
@@ -315,5 +325,12 @@ def create_app():
             logger.info("Webhook HTTP 客户端已关闭")
         except Exception as e:
             logger.exception("Webhook 关闭异常: %s", e)
+
+        # 关闭异步任务队列
+        try:
+            from task_queue import shutdown_task_queue
+            await shutdown_task_queue()
+        except Exception as e:
+            logger.exception("任务队列关闭异常: %s", e)
 
     return app

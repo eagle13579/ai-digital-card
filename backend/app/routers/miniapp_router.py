@@ -35,14 +35,14 @@ logger = logging.getLogger(__name__)
 
 # 小程序调用: GET/POST/PUT /api/business-card/cards/...
 # 后端映射:   GET/POST/PUT /api/brochures/...
-router = APIRouter(prefix="/api/business-card/cards", tags=["miniapp"])
+router = APIRouter(prefix="/api/v1/business-card/cards", tags=["miniapp"])
 
 # 小程序也可能调用 POST /api/business-card/exchange（无 /cards 前缀）
-exchange_alt_router = APIRouter(prefix="/api/business-card", tags=["miniapp"])
+exchange_alt_router = APIRouter(prefix="/api/v1/business-card", tags=["miniapp"])
 
 # 小程序调用: GET /api/matching/recommendations
 # 后端映射:   POST /api/match/engine
-recommend_router = APIRouter(prefix="/api/matching", tags=["miniapp"])
+recommend_router = APIRouter(prefix="/api/v1/matching", tags=["miniapp"])
 
 
 # ── 请求/响应模型 ───────────────────────────────────────────────

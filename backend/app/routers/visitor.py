@@ -11,7 +11,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas import VisitorLogCreate, VisitorLogResponse, InterestCreate
 
-router = APIRouter(prefix="/api/visitors", tags=["访客日志"])
+router = APIRouter(prefix="/api/v1/visitors", tags=["访客日志"])
 
 
 @router.get("/{brochure_id}", response_model=list[VisitorLogResponse])

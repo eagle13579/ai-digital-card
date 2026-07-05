@@ -24,7 +24,7 @@ from app.ai.ab_testing import (
     SignificanceTester,
 )
 
-router = APIRouter(prefix="/api/ab-test", tags=["A/B测试"])
+router = APIRouter(prefix="/api/v1/ab-test", tags=["A/B测试"])
 
 
 # ─── Pydantic Schemas ────────────────────────────────────

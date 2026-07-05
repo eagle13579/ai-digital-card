@@ -39,7 +39,7 @@ from app.services.ab_pricing import (
     start_experiment,
 )
 
-router = APIRouter(prefix="/api/subscription", tags=["订阅管理"])
+router = APIRouter(prefix="/api/v1/subscription", tags=["订阅管理"])
 
 
 # ── 响应模型 ─────────────────────────────────────────────────────────────

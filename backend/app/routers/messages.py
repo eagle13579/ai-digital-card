@@ -7,7 +7,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.services.message_service import MessageService
 
-router = APIRouter(prefix="/api/messages", tags=["消息"])
+router = APIRouter(prefix="/api/v1/messages", tags=["消息"])
 
 
 # ── Pydantic 请求/响应模型 ──────────────────────────────────────

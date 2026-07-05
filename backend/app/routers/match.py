@@ -15,7 +15,7 @@ from app.routers.brochure import SmartSearchQuery, SmartSearchResponse, execute_
 from app.routers.brochure import PURPOSE_TEMPLATES, PurposeTemplateResponse
 from app.schemas import MatchResponse, MatchAction, UnlockRequest, UnlockResponse
 
-router = APIRouter(prefix="/api/match", tags=["匹配"])
+router = APIRouter(prefix="/api/v1/match", tags=["匹配"])
 
 
 # ── 脱敏工具函数 ────────────────────────────────────────────────────────────
@@ -416,9 +416,9 @@ async def unlock_contact(
     )
 
 
-# ── 别名路由：POST /api/brochure/smart-search ────────────────────────────
+# ── 别名路由：POST /api/v1/brochure/smart-search ────────────────────────
 
-brochure_alias_router = APIRouter(prefix="/api/brochure", tags=["画册别名"])
+brochure_alias_router = APIRouter(prefix="/api/v1/brochure", tags=["画册别名"])
 
 
 @brochure_alias_router.post("/smart-search")

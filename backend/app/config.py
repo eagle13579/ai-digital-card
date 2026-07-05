@@ -120,6 +120,13 @@ class Settings(BaseSettings):
     REDIS_CACHE_TTL: int = 300
     """默认缓存过期时间（秒）"""
 
+    # ── 异步任务队列 ─────────────────────────────────────────────────
+    TASK_QUEUE_MAX_WORKERS: int = 4
+    """任务队列并发工作协程数。名片AI扫描/匹配/通知/导出共享此池。"""
+
+    TASK_QUEUE_MAX_SIZE: int = 0
+    """任务队列最大长度（0 = 无限）。生产环境建议设 1000 防止内存溢出。"""
+
     @property
     def REDIS_URL(self) -> str:
         """Build Redis URL from component parts."""
