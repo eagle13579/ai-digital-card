@@ -45,11 +45,18 @@ function request(method, url, data = {}, options = {}) {
   const baseUrl = app.globalData.apiBaseUrl || 'http://localhost:8001'
 
   return new Promise((resolve, reject) => {
-    // 检查登录态
+    // 检查登录态 - 开发模式下跳过
+    const app2 = getApp()
+    const isDev = app2 && app2.globalData && app2.globalData.__DEV_MODE__
     if (!options.noAuth && !token) {
-      wx.showToast({ title: '请先登录', icon: 'none' })
-      reject(new Error('未登录'))
-      return
+      if (isDev) {
+        // 开发模式: 放行请求, 后端会返回401, 由调用方catch处理
+        console.warn('[API] 开发模式: 未登录, 尝试请求后端...')
+      } else {
+        wx.showToast({ title: '请先登录', icon: 'none' })
+        reject(new Error('未登录'))
+        return
+      }
     }
 
     const header = {
