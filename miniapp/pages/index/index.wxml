@@ -63,6 +63,23 @@
       </view>
     </view>
 
+    <!-- AI能力中心入口 -->
+    <view class="card ai-entry-card" bindtap="goAiCenter">
+      <view class="ai-entry-bg">
+        <view class="ai-entry-content">
+          <view class="ai-entry-icon-wrap">
+            <text class="ai-entry-icon">🤖</text>
+          </view>
+          <view class="ai-entry-text">
+            <text class="ai-entry-title">AI能力中心</text>
+            <text class="ai-entry-desc">智能对话 · 名片扫描 · 人脉匹配 · 数据洞察</text>
+          </view>
+          <text class="ai-entry-arrow">›</text>
+        </view>
+        <view class="ai-entry-glow"></view>
+      </view>
+    </view>
+
     <!-- 我的名片卡片 -->
     <view class="card brochure-card" bindtap="goPreview">
       <view class="card-header">

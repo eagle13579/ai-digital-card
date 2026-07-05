@@ -274,6 +274,11 @@ Page({
     wx.navigateTo({ url: '/pages/membership/membership' })
   },
 
+  /** 跳转AI能力中心 */
+  goAiCenter() {
+    wx.navigateTo({ url: '/pages/ai/index' })
+  },
+
   // 关闭升级提示
   closeUpgradeHint() {
     this.setData({ showUpgradeHint: false })

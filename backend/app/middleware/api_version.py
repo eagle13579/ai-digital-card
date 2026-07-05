@@ -11,9 +11,18 @@ from __future__ import annotations
 
 # V1 endpoints explicitly registered in the app — these will NOT be rewritten
 _EXPLICIT_V1_PREFIXES = frozenset({
-    "/api/v1/users",
-    "/api/v1/brochures",
-    "/api/v1/ai",
+    "/api/v1/ab-test", "/api/v1/admin", "/api/v1/ai",
+    "/api/v1/analytics", "/api/v1/api-keys", "/api/v1/auth",
+    "/api/v1/bot", "/api/v1/brochure", "/api/v1/brochures",
+    "/api/v1/business-card", "/api/v1/crm", "/api/v1/design-qa",
+    "/api/v1/developer", "/api/v1/export", "/api/v1/gaia",
+    "/api/v1/i18n", "/api/v1/integrations", "/api/v1/invoices",
+    "/api/v1/knowledge-graph", "/api/v1/knowledge-models",
+    "/api/v1/match", "/api/v1/matching",
+    "/api/v1/messages", "/api/v1/metrics", "/api/v1/oauth",
+    "/api/v1/payment", "/api/v1/recommend", "/api/v1/subscription",
+    "/api/v1/tags", "/api/v1/tenant", "/api/v1/trust",
+    "/api/v1/users", "/api/v1/visitors", "/api/v1/webhooks",
 })
 
 

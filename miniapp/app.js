@@ -17,7 +17,7 @@ App({
     // API 基础地址 — 从 config.js 读取，开发/生产自动切换
     apiBaseUrl: config.apiBaseUrl,
     // 开发模式标志 — 开发环境下跳过登录阻断，方便调试
-    __DEV_MODE__: config.apiBaseUrl === 'http://localhost:8001',
+    __DEV_MODE__: config.apiBaseUrl === 'http://localhost:8002',
   },
 
   onLaunch() {

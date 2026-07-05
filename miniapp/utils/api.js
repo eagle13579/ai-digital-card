@@ -27,7 +27,7 @@ function getBaseUrl() {
   } catch (e) {
     // app 未初始化时使用默认值
   }
-  return 'http://localhost:8001'
+  return 'http://localhost:8002'
 }
 
 // 启动时日志 — 输出当前API地址，方便开发/生产切换验证
@@ -186,11 +186,11 @@ const tagApi = {
 const matchApi = {
   /** 获取推荐列表 */
   getRecommend(params) {
-    return get('/api/v1/match/recommend', params)
+    return get('/api/v1/matching/recommendations', params)
   },
   /** 获取匹配列表（分页） */
   getMatches(params) {
-    return get('/api/v1/match/list', params)
+    return get('/api/v1/matching/recommendations', params)
   },
   /** 获取匹配详情 */
   getMatchDetail(id) {

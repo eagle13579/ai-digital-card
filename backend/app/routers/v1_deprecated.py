@@ -30,21 +30,3 @@ async def v1_list_users():
         },
         status_code=410,
     )
-
-
-@router.get("/brochures")
-@deprecated(
-    sunset="Sat, 01 Jan 2027 00:00:00 GMT",
-    successor="/api/v1/brochures",
-)
-async def v1_list_brochures():
-    """[弃用] 获取画册列表 — 请使用 /api/v1/brochures 替代。"""
-    from fastapi.responses import JSONResponse
-
-    return JSONResponse(
-        content={
-            "code": "DEPRECATED",
-            "message": "此接口已弃用，请使用 /api/v1/brochures",
-        },
-        status_code=410,
-    )

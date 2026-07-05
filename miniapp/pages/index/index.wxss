@@ -164,6 +164,77 @@
   color: #666;
 }
 
+/* AI能力中心入口卡片 */
+.ai-entry-card {
+  margin: 16px;
+  padding: 0 !important;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+}
+.ai-entry-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.ai-entry-content {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.ai-entry-icon-wrap {
+  width: 52px;
+  height: 52px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+.ai-entry-icon {
+  font-size: 28px;
+}
+.ai-entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.ai-entry-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+}
+.ai-entry-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  display: block;
+}
+.ai-entry-arrow {
+  font-size: 22px;
+  color: rgba(255,255,255,0.6);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.ai-entry-glow {
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 120px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: aiGlow 4s ease-in-out infinite;
+}
+@keyframes aiGlow {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-10px); opacity: 1; }
+}
+
 /* 画册封面卡片 */
 .brochure-card {
   padding: 0 !important;

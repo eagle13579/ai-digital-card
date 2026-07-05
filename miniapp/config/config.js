@@ -21,7 +21,7 @@ const ENV = 'development'   // 可选值: 'development' | 'production'
 const CONFIGS = {
   development: {
     name: '开发环境',
-    apiBaseUrl: 'http://localhost:8001',
+    apiBaseUrl: 'http://localhost:8002',
     // 调试开关
     debug: true,
     // 是否启用 Mock（无后端时可打开）
