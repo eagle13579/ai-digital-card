@@ -1,7 +1,11 @@
 /**
  * AI数智名片 - 微信小程序入口
  * 全局状态管理 + 生命周期
+ *
+ * API 基础地址通过 config/config.js 统一管理（开发/生产双模式切换）
  */
+const config = require('./config/config')
+
 App({
   globalData: {
     userInfo: null,
@@ -10,10 +14,8 @@ App({
     matchCount: 0,
     visitorCount: 0,
     trustCount: 0,
-    // API 基础地址 — 通过此变量配置，开发/生产切换
-    // 本地开发: 'http://localhost:8001' 或 'http://192.168.x.x:8201'
-    // 生产环境: 'https://api.liankebao.top'
-    apiBaseUrl: 'http://localhost:8001',
+    // API 基础地址 — 从 config.js 读取，开发/生产自动切换
+    apiBaseUrl: config.apiBaseUrl,
   },
 
   onLaunch() {

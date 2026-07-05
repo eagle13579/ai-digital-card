@@ -4,22 +4,18 @@
  */
 
 // API baseURL
-// 微信小程序API基础URL — 自动检测环境
-// 开发工具中用本机IP，真机调试用实际服务器地址
-const API_BASE_URL = (function() {
-  // 微信开发者工具中可以用 localhost 或本机IP
-  // 真机/预览时必须用实际IP或域名
-  const DEV_IP = '192.168.7.48'   // 后端服务器IP
-  const DEV_PORT = '8201'          // AI数智名片后端端口
-  
-  // __wxConfig 是微信开发者工具注入的全局变量
-  try {
-    if (typeof __wxConfig !== 'undefined' && __wxConfig && __wxConfig.envVersion === 'develop') {
-      return `http://${DEV_IP}:${DEV_PORT}`
-    }
-  } catch(e) {}
-  return `http://${DEV_IP}:${DEV_PORT}`
-})()
+// 从 app.globalData.apiBaseUrl 读取（由 config/config.js 统一管理）
+// 开发环境: http://localhost:8001
+// 生产环境: https://api.liankebao.top
+let API_BASE_URL = 'http://localhost:8001'  // 默认值，onLaunch 后会被覆盖
+try {
+  const app = getApp()
+  if (app && app.globalData && app.globalData.apiBaseUrl) {
+    API_BASE_URL = app.globalData.apiBaseUrl
+  }
+} catch (e) {
+  // app 未初始化时使用默认值
+}
 
 // 请求超时时间(ms)
 const REQUEST_TIMEOUT = 8000
@@ -45,6 +41,8 @@ const ERROR_MAP = {
 function request(method, url, data = {}, options = {}) {
   const app = getApp()
   const token = app.globalData.token
+  // 运行时动态获取 apiBaseUrl（确保 onLaunch 写入后生效）
+  const baseUrl = app.globalData.apiBaseUrl || 'http://localhost:8001'
 
   return new Promise((resolve, reject) => {
     // 检查登录态
@@ -62,7 +60,7 @@ function request(method, url, data = {}, options = {}) {
     }
 
     wx.request({
-      url: `${API_BASE_URL}${url}`,
+      url: `${baseUrl}${url}`,
       method,
       header,
       data,

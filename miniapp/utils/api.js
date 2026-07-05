@@ -30,6 +30,15 @@ function getBaseUrl() {
   return 'http://localhost:8001'
 }
 
+// 启动时日志 — 输出当前API地址，方便开发/生产切换验证
+try {
+  const env = getBaseUrl()
+  console.log(`[API] 当前环境: ${env.includes('localhost') ? '开发(Development)' : '生产(Production)'}`)
+  console.log(`[API] API基础地址: ${env}`)
+} catch (e) {
+  console.log('[API] 无法获取API地址（app未初始化）')
+}
+
 // =============================================================================
 //  认证模块 (auth) — /api/auth
 // =============================================================================

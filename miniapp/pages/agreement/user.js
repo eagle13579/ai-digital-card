@@ -23,7 +23,7 @@ Page({
   onShareAppMessage() {
     return {
       title: 'AI数智名片 - 用户协议',
-      path: '/pages/agreement/user/user',
+      path: '/pages/agreement/user',
     };
   },
 });
