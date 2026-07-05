@@ -1,8 +1,8 @@
 /**
  * 首页 - 名片列表 + 推荐
- * 使用MockService获取数据
+ * 连接后端真实API（/api/v1/ 前缀）
  */
-const { MockService } = require('../../utils/mockService')
+const { userApi, brochureApi, trustApi, matchApi, visitorApi } = require('../../utils/api')
 const { Logger } = require('../../utils/util')
 
 Page({
@@ -18,7 +18,7 @@ Page({
     recommendList: [],
     visitorList: [],
 
-    // 平台推荐
+    // 平台推荐（静态UI数据，非后端数据）
     platformRecommend: [
       { id: 1, name: 'AI技术合作平台', desc: 'AI技术开发·模型训练·数据标注', icon: '🤖', bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
       { id: 2, name: '供应链资源平台', desc: '供应商对接·物流配送·仓储服务', icon: '🚚', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
@@ -39,33 +39,47 @@ Page({
     }
   },
 
+  /**
+   * 加载首页全部数据
+   * 并行请求：用户信息、名片、信任网络、推荐列表
+   * 每个请求独立降级，互不影响
+   */
   async loadPageData() {
     this.setData({ loading: true })
     try {
-      const [profile, brochures, trustNet, recommend] = await Promise.all([
-        MockService.getUserProfile().catch(() => ({ userInfo: {}, memberLevel: 'free' })),
-        MockService.getBrochures().catch(() => []),
-        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
-        MockService.getRecommendList().catch(() => []),
+      // ===== 并行请求全部数据 =====
+      const [
+        profileRes,
+        brochuresRes,
+        trustNetRes,
+        recommendRes,
+      ] = await Promise.all([
+        // 1. 用户信息
+        userApi.getProfile().catch(err => {
+          Logger.warn('首页', '获取用户信息失败，使用默认值', err)
+          return null
+        }),
+        // 2. 名片/画册列表
+        brochureApi.list({ page: 1, size: 10 }).catch(err => {
+          Logger.warn('首页', '获取画册列表失败', err)
+          return null
+        }),
+        // 3. 信任网络
+        trustApi.getNetwork().catch(err => {
+          Logger.warn('首页', '获取信任网络失败', err)
+          return null
+        }),
+        // 4. 推荐匹配列表
+        matchApi.getRecommend({ page: 1, size: 10 }).catch(err => {
+          Logger.warn('首页', '获取推荐列表失败', err)
+          return null
+        }),
       ])
 
-      const userInfoData = profile.userInfo || profile
-      const brochuresList = brochures
-      const trustData = trustNet
-      const recommendData = recommend
-
-      const brochure = Array.isArray(brochuresList) ? brochuresList[0] : null
-
-      const trustList = trustData.trusting || []
-      const trustCount = trustList.length
-
-      let stats = { visitors: 0, matches: recommendData.length, trust: trustCount }
-      if (brochure) {
-        const vStats = await MockService.getVisitorStats().catch(() => null)
-        if (vStats) {
-          stats.visitors = vStats.total_visits || vStats.total || 0
-        }
-      }
+      // ===== 1. 解析用户信息 =====
+      // 后端可能直接返回对象或包装在 { data: ... } 中
+      const profileData = profileRes?.data !== undefined ? profileRes.data : profileRes
+      const userInfoData = profileData?.userInfo || profileData || {}
 
       const userInfo = {
         name: userInfoData.name || '',
@@ -74,13 +88,66 @@ Page({
         title: userInfoData.title || '',
       }
 
-      const memberLevel = profile.memberLevel || 'free'
+      const memberLevel = profileData?.memberLevel || userInfoData.memberLevel || 'free'
       const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
 
       const app = getApp()
       app.updateUserInfo(userInfo)
       app.updateMemberLevel(memberLevel)
 
+      // ===== 2. 解析名片/画册 =====
+      // 后端可能返回 { items: [], total: ... } 或直接数组或 { data: [] }
+      let brochuresList = []
+      if (Array.isArray(brochuresRes)) {
+        brochuresList = brochuresRes
+      } else if (brochuresRes?.data && Array.isArray(brochuresRes.data)) {
+        brochuresList = brochuresRes.data
+      } else if (brochuresRes?.items && Array.isArray(brochuresRes.items)) {
+        brochuresList = brochuresRes.items
+      } else if (brochuresRes?.list && Array.isArray(brochuresRes.list)) {
+        brochuresList = brochuresRes.list
+      }
+      const brochure = brochuresList.length > 0 ? brochuresList[0] : null
+
+      // ===== 3. 解析信任网络 =====
+      // 后端可能返回 { trusting: [], trusted_by: [] } 或 { data: { trusting: [], ... } }
+      const trustData = trustNetRes?.data !== undefined ? trustNetRes.data : (trustNetRes || {})
+      const trustList = trustData.trusting || []
+      const trustCount = trustList.length
+
+      // ===== 4. 解析推荐列表 =====
+      // 后端可能返回数组或 { items: [], ... } 或 { data: [] }
+      let recommendData = []
+      if (Array.isArray(recommendRes)) {
+        recommendData = recommendRes
+      } else if (recommendRes?.data && Array.isArray(recommendRes.data)) {
+        recommendData = recommendRes.data
+      } else if (recommendRes?.items && Array.isArray(recommendRes.items)) {
+        recommendData = recommendRes.items
+      } else if (recommendRes?.list && Array.isArray(recommendRes.list)) {
+        recommendData = recommendRes.list
+      }
+
+      // ===== 5. 获取访客统计（需要 brochureId） =====
+      let visitors = 0
+      if (brochure) {
+        try {
+          const vStatsRes = await visitorApi.getStats(brochure.id)
+          const vStats = vStatsRes?.data !== undefined ? vStatsRes.data : vStatsRes
+          visitors = vStats?.total_visits || vStats?.total || vStats?.visitors || 0
+        } catch (e) {
+          Logger.warn('首页', '获取访客统计失败', e)
+        }
+      }
+
+      // ===== 6. 组装统计数据 =====
+      const stats = {
+        visitors: visitors,
+        matches: recommendData.length,
+        trust: trustCount,
+      }
+
+      // ===== 7. 更新页面数据 =====
       this.setData({
         userInfo,
         memberLevel,
@@ -95,12 +162,12 @@ Page({
         } : null,
         trustCount,
         trustList: trustList.slice(0, 10),
-        recommendList: Array.isArray(recommendData) ? recommendData.slice(0, 3) : [],
+        recommendList: recommendData.slice(0, 3),
         visitorList: [],
         loading: false,
       })
 
-      Logger.info('首页', '数据加载完成')
+      Logger.info('首页', '数据加载完成', { stats, recommendCount: recommendData.length })
     } catch (err) {
       Logger.error('首页', '加载失败', err)
       this.setData({ loading: false })

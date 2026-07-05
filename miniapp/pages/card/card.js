@@ -2,7 +2,7 @@
  * 名片详情页
  * 展示单张名片的详细信息与统计数据
  */
-const { MockService } = require('../../utils/mockService')
+const { brochureApi, visitorApi, miniappApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -25,7 +25,7 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
-      const brochure = await MockService.getBrochureById(cardId)
+      const brochure = await brochureApi.getById(cardId)
       
       let card = null
       if (brochure) {
@@ -55,7 +55,7 @@ Page({
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await MockService.getVisitorStats(cardId)
+        const vStats = await visitorApi.getStats(cardId)
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
       }

@@ -1,8 +1,8 @@
 /**
  * 微信授权登录页
- * 使用 wx.login() 获取临时 code → 后端换取 session
+ * 使用 wx.login() 获取临时 code → 后端 /api/v1/auth/wx-mini-login 换取 JWT token
  */
-const { MockService } = require('../../utils/mockService')
+const { authApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -22,35 +22,43 @@ Page({
   wxLogin() {
     const app = getApp()
     this.setData({ loading: true })
-    
+
     wx.login({
       success: (res) => {
         if (res.code) {
-          MockService.login({ code: res.code })
+          // 调用后端真实API — /api/v1/auth/wx-mini-login
+          authApi.wxMiniLogin(res.code)
             .then(result => {
-              if (result.token) {
-                app.setLogin(result.token, result.userInfo)
+              // result 格式: { access_token, token_type, user }
+              // 由后端 TokenResponse schema 定义
+              if (result.access_token && result.user) {
+                app.setLogin(result.access_token, result.user)
+                // 保存会员等级（如果有）
+                if (result.user.membership_tier) {
+                  app.globalData.memberLevel = result.user.membership_tier
+                }
                 wx.switchTab({ url: '/pages/index/index' })
               } else {
-                wx.showToast({ title: '登录失败', icon: 'none' })
+                wx.showToast({ title: '登录失败，返回数据异常', icon: 'none' })
                 this.setData({ loading: false })
               }
             })
             .catch(err => {
-              console.error('登录请求失败:', err)
-              wx.showToast({ title: '网络连接失败，请检查网络', icon: 'none' })
+              console.error('微信登录请求失败:', err)
+              const errMsg = (err && (err.detail || err.errMsg || err.message)) || '网络连接失败，请检查网络'
+              wx.showToast({ title: errMsg, icon: 'none' })
               this.setData({ loading: false })
             })
         } else {
-          wx.showToast({ title: '微信登录失败', icon: 'none' })
+          wx.showToast({ title: '微信登录失败（获取code失败）', icon: 'none' })
           this.setData({ loading: false })
         }
       },
       fail: (err) => {
-        console.error('wx.login失败:', err)
+        console.error('wx.login调用失败:', err)
         wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
         this.setData({ loading: false })
-      }
+      },
     })
   },
 
