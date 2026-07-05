@@ -17,6 +17,7 @@ from app.routers.auth import get_current_user
 from app.schemas import BrochureCreate, BrochureUpdate, BrochureResponse, PageSchema
 from app.services.matching_engine import MatchEngine
 from app.services.brochure import BrochureService
+from sqlalchemy.orm import selectinload
 from app.ai.vector_search import VectorSearchEngine
 from app.services.media_service import MediaService
 
@@ -215,9 +216,14 @@ async def create_brochure(
         db.add(page)
 
     await db.commit()
-    await db.refresh(brochure)
+
+    # 重新查询（含pages关系）
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure.id)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
-    resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
+    resp.pages = [PageSchema.model_validate(p) for p in (brochure.pages or [])]
 
     # 创建画册后自动触发匹配池（异步执行，不阻塞响应）
     asyncio.create_task(_trigger_matching_pool(db, current_user.id))
@@ -232,9 +238,10 @@ async def list_brochures(
     user_id: int | None = Query(None, description="按用户ID筛选"),
     status: str | None = Query(None, description="按状态筛选(draft|published)"),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """获取画册列表（cursor 分页）"""
-    query = select(Brochure)
+    query = select(Brochure).options(selectinload(Brochure.pages))
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
@@ -251,7 +258,9 @@ async def get_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册详情（含页面数据）"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -267,7 +276,9 @@ async def get_brochure_by_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """通过分享token获取画册（公开访问）"""
-    result = await db.execute(select(Brochure).where(Brochure.share_token == share_token))
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.share_token == share_token)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在或链接已失效")
