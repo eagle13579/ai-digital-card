@@ -52,7 +52,7 @@ export default function MatchingPage() {
   useEffect(() => {
     const fetchCardList = async () => {
       try {
-        const res = await api.get('/api/v1/brochure/list');
+        const res = await api.get('/api/v1/brochures');
         if (res.code === 200) {
           const items = Array.isArray(res.data) ? res.data : (res.data as any)?.items || [];
           setCardList(items);
@@ -78,22 +78,29 @@ export default function MatchingPage() {
     setMatchResults([]);
 
     try {
-      const res = await api.post<{ total: number; items: MatchItem[] }>(
-        `/api/card/${selectedCardId}/match`,
-        {}
+      const res = await api.post<{ matches: any[]; total: number }>(
+        '/api/v1/match/engine',
+        { min_score: 0.3 }
       );
 
-      if (res.code !== 200 || !res.data) {
+      if (res.code === 200 && res.data) {
+        const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+          type: 'product' as const,
+          id: m.user_id,
+          title: m.user_name || '',
+          category: m.user_company || '',
+          score: m.score / 100,
+          reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+        }));
+        setMatchResults(items);
+        if (items.length === 0) {
+          showToast(t('match.noResults'), 'success');
+        } else {
+          showToast(t('match.foundResults', { n: items.length }), 'success');
+        }
+      } else {
         setMatchResults([]);
         showToast(t('match.failed'), 'error');
-        return;
-      }
-
-      setMatchResults(res.data.items || []);
-      if (res.data.items?.length === 0) {
-        showToast(t('match.noResults'), 'success');
-      } else {
-        showToast(t('match.foundResults', { n: res.data.items.length }), 'success');
       }
     } catch {
       setMatchResults([]);

@@ -212,7 +212,7 @@ export default function BusinessCardPage() {
     setListLoading(true);
     setError('');
     try {
-      const res = await api.get('/api/v1/brochure/list');
+      const res = await api.get('/api/v1/brochures');
       if (res.code === 200 && Array.isArray(res.data)) {
         setCardList(res.data as CardListItem[]);
       } else if (res.code === 200 && (res.data as { items: CardListItem[] })?.items) {
@@ -262,9 +262,9 @@ export default function BusinessCardPage() {
   const fetchTrustNetwork = useCallback(async (id: number) => {
     setTrustNetworkLoading(true);
     try {
-      const res = await api.get(`/api/v1/brochures/${id}/trust_network`);
-      if (res.code === 200 && Array.isArray(res.data)) {
-        setTrustNetwork(res.data as TrustNetworkUser[]);
+      const res = await api.get(`/api/v1/trust/network`);
+      if (res.code === 200 && Array.isArray(res.data?.trusting)) {
+        setTrustNetwork(res.data.trusting as TrustNetworkUser[]);
       } else {
         setTrustNetwork([]);
       }
@@ -278,7 +278,7 @@ export default function BusinessCardPage() {
   const fetchVisitors = useCallback(async (id: number) => {
     setVisitorsLoading(true);
     try {
-      const res = await api.get(`/api/v1/brochure/${id}/visitors`);
+      const res = await api.get(`/api/v1/visitors/${id}`);
       if (res.code === 200 && Array.isArray(res.data)) {
         setVisitors(res.data as VisitorRecord[]);
       } else {
@@ -322,7 +322,7 @@ export default function BusinessCardPage() {
   const handleRemoveTrust = async (trustedUserId: number) => {
     if (!detailCardId) return;
     try {
-      const res = await api.delete(`/api/v1/brochures/${detailCardId}/trust_network?trusted_user_id=${trustedUserId}`);
+      const res = await api.delete(`/api/v1/trust/network/${trustedUserId}`);
       if (res.code === 200) {
         showToast('已移除信任用户', 'success');
         fetchTrustNetwork(detailCardId);
@@ -456,18 +456,25 @@ export default function BusinessCardPage() {
     setMatchLoading(true);
 
     try {
-      const res = await api.post<{ total: number; items: MatchItem[] }>(
-        `/api/card/${cardData.id}/match`,
-        {}
+      const res = await api.post<{ matches: any[]; total: number }>(
+        '/api/v1/match/engine',
+        { min_score: 0.3 }
       );
 
-      if (res.code !== 200 || !res.data) {
+      if (res.code === 200 && res.data) {
+        const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+          type: 'product' as const,
+          id: m.user_id,
+          title: m.user_name || '',
+          category: m.user_company || '',
+          score: m.score / 100,
+          reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+        }));
+        setMatchResults(items);
+        setStep('matched');
+      } else {
         setMatchResults([]);
-        return;
       }
-
-      setMatchResults(res.data.items || []);
-      setStep('matched');
     } catch {
       setMatchResults([]);
     } finally {

@@ -62,3 +62,9 @@ _service_logs/
 *.pem
 *.key
 certs/
+
+# 敏感数据文件
+backend/data/*.json
+training_data/*.jsonl
+bandit_report.json
+soc2_audit_package/

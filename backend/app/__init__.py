@@ -198,6 +198,7 @@ def create_app():
     app.include_router(tag_router)
     app.include_router(match_router)
     app.include_router(brochure_alias_router)
+    app.include_router(card_alias_router)
     app.include_router(miniapp_router)
     app.include_router(miniapp_exchange_router)
     app.include_router(miniapp_recommend_router)

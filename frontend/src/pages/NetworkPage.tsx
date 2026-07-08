@@ -78,7 +78,7 @@ export default function NetworkPage() {
   useEffect(() => {
     const fetchCardList = async () => {
       try {
-        const res = await api.get('/api/v1/brochure/list');
+        const res = await api.get('/api/v1/brochures');
         if (res.code === 200) {
           const items = Array.isArray(res.data) ? res.data : (res.data as any)?.items || [];
           setCardList(items.map((item: any) => ({ id: item.id, name: item.fields?.name || item.name || t('network.unnamed') })));
@@ -97,9 +97,9 @@ export default function NetworkPage() {
   const fetchTrustNetwork = useCallback(async (id: number) => {
     setTrustNetworkLoading(true);
     try {
-      const res = await api.get(`/api/v1/brochures/${id}/trust_network`);
-      if (res.code === 200 && Array.isArray(res.data)) {
-        setTrustNetwork(res.data as TrustNetworkUser[]);
+      const res = await api.get(`/api/v1/trust/network`);
+      if (res.code === 200 && Array.isArray(res.data?.trusting)) {
+        setTrustNetwork(res.data.trusting as TrustNetworkUser[]);
       } else {
         setTrustNetwork([]);
       }
@@ -113,7 +113,7 @@ export default function NetworkPage() {
   const fetchVisitors = useCallback(async (id: number) => {
     setVisitorsLoading(true);
     try {
-      const res = await api.get(`/api/v1/brochure/${id}/visitors`);
+      const res = await api.get(`/api/v1/visitors/${id}`);
       if (res.code === 200 && Array.isArray(res.data)) {
         setVisitors(res.data as VisitorRecord[]);
       } else {
@@ -139,7 +139,7 @@ export default function NetworkPage() {
   const handleRemoveTrust = async (trustedUserId: number) => {
     if (!selectedCardId) return;
     try {
-      const res = await api.delete(`/api/v1/brochures/${selectedCardId}/trust_network?trusted_user_id=${trustedUserId}`);
+      const res = await api.delete(`/api/v1/trust/network/${trustedUserId}`);
       if (res.code === 200) {
         showToast(t('network.removeSuccess'), 'success');
         fetchTrustNetwork(selectedCardId);

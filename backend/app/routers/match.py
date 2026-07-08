@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -461,3 +461,59 @@ async def brochure_template_alias(purpose: str):
         highlights=template["highlights"],
         suggested_sections=template["suggested_sections"],
     )
+
+
+# ── /api/card 别名路由（兼容旧前端调用）──────────────────────────────
+
+card_alias_router = APIRouter(prefix="/api/card", tags=["画册别名"])
+
+
+@card_alias_router.post("/generate")
+async def card_generate_alias(
+    data: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """生成名片（别名路由，转发至 POST /api/brochures）"""
+    from app.routers.brochure import create_brochure
+    from app.schemas import BrochureCreate, PageSchema
+
+    fields = data.get("fields", {})
+    template = data.get("template", "default")
+
+    pages = [
+        {
+            "sort_order": 0,
+            "content_type": "cover",
+            "content": json.dumps(fields, ensure_ascii=False),
+        }
+    ]
+    brochure_data = BrochureCreate(
+        title=fields.get("name", "未命名名片"),
+        pages=[PageSchema(**p) for p in pages],
+        album_meta={
+            "total_pages": 1,
+            "pages": [{"page": 0, "type": "cover", "title": fields.get("name", ""), "style": {"background": "#ffffff", "textColor": "#000000", "accentColor": "#1657ff"}}],
+            "settings": {"turn_animation": "slide", "page_width": 320, "page_height": 480, "corner_radius": 12, "shadow": True},
+        },
+    )
+    return await create_brochure(brochure_data, current_user, db)
+
+
+@card_alias_router.post("/scan")
+async def card_scan_alias(
+    file: UploadFile | None = None,
+    current_user: User = Depends(get_current_user),
+):
+    """扫描名片（别名路由 — 暂未实现 OCR）"""
+    raise HTTPException(status_code=501, detail="名片扫描功能暂未实现，请直接填写信息")
+
+
+@card_alias_router.get("/{card_id}/qrcode")
+async def card_qrcode_alias(
+    card_id: int,
+    download: bool = False,
+    db: AsyncSession = Depends(get_db),
+):
+    """获取名片二维码（别名路由 — 暂未实现 QR 码生成）"""
+    raise HTTPException(status_code=501, detail="二维码生成功能暂未实现")
