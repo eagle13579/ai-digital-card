@@ -144,7 +144,7 @@ def create_app():
 
     # Routers
     from app.routers import (auth_router, user_router, brochure_router, tag_router,
-                             match_router, brochure_alias_router, visitor_router,
+                                 match_router, brochure_alias_router, card_alias_router, visitor_router,
                              trust_router, i18n_router, public_router, payment_router,
                              integration_router, export_router, webhook_router,
                              recommend_router, ab_test_router, api_keys_router,
