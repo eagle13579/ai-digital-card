@@ -1,0 +1,68 @@
+[
+  {
+    "severity": "P0",
+    "title": "存储型XSS漏洞",
+    "detail": "XSS payload被存储并返回: <script>alert(document.cookie)</script>",
+    "fix": "对所有用户输入进行HTML转义, 使用Content-Security-Policy"
+  },
+  {
+    "severity": "P0",
+    "title": "敏感凭据明文存储",
+    "detail": ".env文件包含微信支付密钥等敏感凭据, 文件系统权限不足可能泄露",
+    "fix": "对生产凭据加密存储, 使用密钥管理服务"
+  },
+  {
+    "severity": "P1",
+    "title": "响应头信息泄露",
+    "detail": "Server=N/A, Deprecation=N/A, 暴露了uvicorn和API版本信息",
+    "fix": "隐藏Server头或使用通用值；移除deprecation标头或限制仅向已认证用户显示"
+  },
+  {
+    "severity": "P1",
+    "title": "敏感路径暴露: /docs",
+    "detail": "HTTP 200, 返回934字节内容",
+    "fix": "生产环境禁用/docs、/redoc、/metrics，或添加IP白名单和认证"
+  },
+  {
+    "severity": "P1",
+    "title": "敏感路径暴露: /redoc",
+    "detail": "HTTP 200, 返回894字节内容",
+    "fix": "生产环境禁用/docs、/redoc、/metrics，或添加IP白名单和认证"
+  },
+  {
+    "severity": "P1",
+    "title": "敏感路径暴露: /openapi.json",
+    "detail": "HTTP 200, 返回272174字节内容",
+    "fix": "生产环境禁用/docs、/redoc、/metrics，或添加IP白名单和认证"
+  },
+  {
+    "severity": "P1",
+    "title": "敏感路径暴露: /metrics",
+    "detail": "HTTP 200, 返回4746字节内容",
+    "fix": "生产环境禁用/docs、/redoc、/metrics，或添加IP白名单和认证"
+  },
+  {
+    "severity": "P1",
+    "title": "JWT过期时间过长",
+    "detail": "Token有效期7天(配置为7天), 增加了token泄露风险",
+    "fix": "建议将ACCESS_TOKEN_EXPIRE_MINUTES降低到60分钟以内"
+  },
+  {
+    "severity": "P1",
+    "title": "依赖安全问题: passlib",
+    "detail": "passlib 1.7.4 (已知弃用, 建议迁移到 bcrypt 直接)",
+    "fix": "升级或替换为维护中的替代包"
+  },
+  {
+    "severity": "P1",
+    "title": "依赖安全问题: jose",
+    "detail": "python-jose 可能有已知漏洞, 建议用 PyJWT",
+    "fix": "升级或替换为维护中的替代包"
+  },
+  {
+    "severity": "P2",
+    "title": "JWT密钥强度可疑",
+    "detail": ".env中JWT_SECRET包含'change'字样, 可能是默认/弱密钥",
+    "fix": "使用 openssl rand -hex 32 生成强随机密钥"
+  }
+]

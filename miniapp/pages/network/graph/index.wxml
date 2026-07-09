@@ -1,7 +1,8 @@
-<!-- 人脉图谱 — Canvas 2D 力导向图 -->
-<view class="graph-page">
-  <!-- 顶部信息栏 -->
-  <view class="graph-header">
+<!-- 人脉图谱 — Canvas 2D 力导向图（暗色玻璃质感版） -->
+<view class="graph-page dark">
+
+  <!-- ===== 顶部信息栏 玻璃层2 + spring入场 ===== -->
+  <view class="graph-header glass-2 glass-edge animate-spring-in-down">
     <view class="header-left" bindtap="goBack">
       <text class="back-icon">‹</text>
     </view>
@@ -10,21 +11,21 @@
       <text class="header-subtitle">{{nodeCount}}个联系人 · {{edgeCount}}条关系</text>
     </view>
     <view class="header-right">
-      <view class="legend-dot"></view>
+      <view class="legend-dot orb-cyan"></view>
       <text class="legend-text">我</text>
     </view>
   </view>
 
-  <!-- 加载状态 -->
-  <view class="loading-layer" wx:if="{{loading}}">
+  <!-- ===== 加载状态 玻璃层 + spring ===== -->
+  <view class="loading-layer animate-spring-in" wx:if="{{loading}}">
     <view class="loading-spinner"></view>
     <text class="loading-text">加载人脉数据...</text>
   </view>
 
-  <!-- Canvas 画布 -->
+  <!-- ===== Canvas 画布 ===== -->
   <canvas
     wx:if="{{!loading}}"
-    class="graph-canvas"
+    class="graph-canvas animate-spring-in-scale"
     type="2d"
     id="graphCanvas"
     bindtouchstart="onTouchStart"
@@ -32,9 +33,14 @@
     bindtouchend="onTouchEnd"
   />
 
-  <!-- 底部操作提示 -->
-  <view class="graph-footer" wx:if="{{!loading}}">
+  <!-- ===== 底部操作提示 玻璃层2 + spring入场 ===== -->
+  <view class="graph-footer glass-1 glass-edge animate-spring-in-up" wx:if="{{!loading}}">
     <text class="footer-hint">👆 拖拽移动节点 · 双指缩放</text>
     <text class="footer-count">{{nodeCount}} 人</text>
   </view>
+
+  <!-- ===== 背景Orb装饰（光晕替代阴影）= -->
+  <view class="orb-bg-deco orb-bg-1"></view>
+  <view class="orb-bg-deco orb-bg-2"></view>
+
 </view>

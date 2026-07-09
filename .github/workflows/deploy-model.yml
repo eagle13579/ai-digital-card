@@ -1,0 +1,87 @@
+# ============================================================
+# AI数智名片 — ML模型自动部署 Workflow
+#
+# 触发器:
+#   - push 到 main 分支, 修改了 model_registry.py
+#   - workflow_dispatch (手动触发, 可指定模型名称和模式)
+# ============================================================
+name: Deploy ML Model
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"   # 每3小时自动检查模型更新
+  push:
+    branches: [main]
+    paths:
+      - "backend/app/ai/model_registry.py"
+      - "backend/app/services/ml_pipeline.py"
+      - "backend/app/ai/training_pipeline.py"
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: "模型名称 (如 intent_classifier)"
+        required: true
+        type: string
+      mode:
+        description: "部署模式"
+        required: true
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - rollback
+
+permissions:
+  contents: read
+
+env:
+  MODEL_NAME: ${{ github.event.inputs.model_name || 'default' }}
+
+jobs:
+  deploy-model:
+    name: 部署 ML 模型
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: 检查模型部署脚本
+        run: |
+          ls -la deploy/deploy_model.py deploy/deploy_model_pipeline.sh
+          chmod +x deploy/deploy_model_pipeline.sh
+
+      - name: 运行 ML 模型部署管线
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          MODE_FLAG=""
+          if [[ "${{ github.event.inputs.mode }}" == "rollback" ]]; then
+            MODE_FLAG="--rollback"
+          fi
+          bash deploy/deploy_model_pipeline.sh "${{ github.event.inputs.model_name }}" $MODE_FLAG
+
+      - name: 运行默认模型检查 (代码变更触发)
+        if: github.event_name == 'push'
+        run: |
+          echo "模型注册表代码已更新, 执行健康检查..."
+          python deploy/deploy_model.py health --health-url "${{ vars.ML_HEALTH_URL || 'http://localhost:8201/api/ml/health' }}"
+
+      - name: 部署结果通知
+        if: always()
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "✅ ML 模型部署/检查成功"
+          else
+            echo "❌ ML 模型部署/检查失败, 请查看详细日志"
+          fi

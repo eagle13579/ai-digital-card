@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "loading": "/components/loading/index",
-    "empty-state": "/components/empty-state/index"
+    "empty-state": "/components/empty-state/index",
+    "network-mini-map": "/components/network-mini-map/index"
   },
   "navigationBarTitleText": "名片详情"
 }

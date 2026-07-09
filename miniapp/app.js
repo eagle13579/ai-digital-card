@@ -10,6 +10,7 @@ App({
   globalData: {
     userInfo: null,
     token: null,
+    openid: '',
     memberLevel: 'free',
     matchCount: 0,
     visitorCount: 0,
@@ -17,28 +18,27 @@ App({
     // API 基础地址 — 从 config.js 读取，开发/生产自动切换
     apiBaseUrl: config.apiBaseUrl,
     // 开发模式标志 — 开发环境下跳过登录阻断，方便调试
-    __DEV_MODE__: config.apiBaseUrl === 'http://localhost:8002',
+    __DEV_MODE__: config.apiBaseUrl === 'http://127.0.0.1:8002',
   },
 
   onLaunch() {
-    // 从本地缓存恢复登录态
     const token = wx.getStorageSync('token')
     const userInfo = wx.getStorageSync('userInfo')
+    const openid = wx.getStorageSync('openid')
     if (token) {
       this.globalData.token = token
       this.globalData.userInfo = userInfo
-      // 异步验证token是否有效
+      if (openid) {
+        this.globalData.openid = openid
+      }
       wx.request({
         url: this.globalData.apiBaseUrl + '/api/v1/users/me',
         header: { 'Authorization': 'Bearer ' + token },
-        fail: () => {
-          // 网络错误不处理（可能只是离线）
-        },
+        timeout: 8000,
+        fail: () => {},
         complete: (res) => {
           if (res.statusCode === 401) {
-            // token已过期，清除缓存
             this.clearLogin()
-            // 强制跳登录页
             const pages = getCurrentPages()
             const currentPage = pages[pages.length - 1]
             if (currentPage && currentPage.route !== 'pages/login/index') {
@@ -64,9 +64,16 @@ App({
   },
 
   // 设置登录态
-  setLogin(token, userInfo) {
+  setLogin(token, userInfo, memberLevel, openid) {
     this.globalData.token = token
     this.globalData.userInfo = userInfo
+    if (memberLevel) {
+      this.globalData.memberLevel = memberLevel
+    }
+    if (openid) {
+      this.globalData.openid = openid
+      wx.setStorageSync('openid', openid)
+    }
     wx.setStorageSync('token', token)
     wx.setStorageSync('userInfo', userInfo)
   },

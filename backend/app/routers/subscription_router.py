@@ -55,8 +55,11 @@ class PlanResponse(BaseModel):
     tier: str
     name_cn: str
     name_en: str
+    name: str = ""              # 前端兼容: 默认等于 name_cn
     price_cents: int
     price_yuan: str
+    price: str = ""             # 前端兼容: 默认等于 price_yuan
+    amount: str = ""            # 前端兼容: 默认等于 price_yuan
     interval: str
     features: list[PlanFeatureResponse]
     feature_tags: list[str]
@@ -170,8 +173,11 @@ async def list_plans(
                 tier=plan.tier,
                 name_cn=plan.name_cn,
                 name_en=plan.name_en,
+                name=plan.name_cn,       # 前端兼容字段
                 price_cents=plan.price_cents,
                 price_yuan=plan.price_yuan,
+                price=plan.price_yuan,   # 前端兼容字段
+                amount=plan.price_yuan,  # 前端兼容字段
                 interval=plan.interval,
                 features=[
                     PlanFeatureResponse(

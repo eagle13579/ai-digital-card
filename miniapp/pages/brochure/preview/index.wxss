@@ -1,3 +1,4 @@
+/* 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代 */
 .preview-container {
   height: 100vh;
   background: #1a1a2e;

@@ -1,8 +1,7 @@
-// pages/ai/chat/index.js — AI对话聊天页 (连接后端真实API)
-// 后端API: POST /api/v1/ai/chat (RAG会话) | POST /api/v1/ai/deepseek/chat (DeepSeek纯对话)
-// 支持模式切换: rag (智能对话) / deepseek (深度推理)
+// pages/ai/chat/index.js
 const STORAGE_KEY = 'ai_chat_history';
 const MAX_HISTORY = 100;
+const { MockService } = require('../../../utils/mockService');
 
 Page({
   data: {
@@ -31,6 +30,8 @@ Page({
   },
 
   onLoad() {
+    const sys = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sys.statusBarHeight })
     // 尝试加载本地历史
     const history = wx.getStorageSync(STORAGE_KEY);
     if (history && history.length > 0) {
@@ -132,72 +133,22 @@ Page({
     });
   },
 
-  // ==================== AI接口 (真实API) ====================
-
   callAiApi(question, history) {
-    const startTime = Date.now();
-    const { aiApi } = require('../../../utils/api');
     const mode = this.data.aiMode;
-
-    // 将历史消息转换为后端需要的格式
     const historyMessages = history
       .filter(m => m.role === 'user' || m.role === 'ai')
       .map(m => ({ role: m.role, content: m.content }));
-
-    // 根据模式选择不同API
-    let apiPromise;
-    if (mode === 'deepseek') {
-      // DeepSeek模式: POST /api/v1/ai/deepseek/chat
-      apiPromise = aiApi.deepseekChat({
-        messages: [
-          {
-            role: 'system',
-            content: '你是一个专业的AI数智名片助手。请用中文回答，回答简洁、准确、有帮助。可以解答各类技术问题、商业分析、代码编写等。'
-          },
-          ...historyMessages.slice(-20) // 最近20轮上下文
-        ],
-        temperature: 0.7
-      });
-    } else {
-      // RAG模式: POST /api/v1/ai/chat (原有逻辑)
-      apiPromise = aiApi.getChat({
-        question: question,
-        history: historyMessages,
-        session_id: this.data.sessionId || '',
-      });
-    }
-
-    apiPromise
+    MockService.aiChat(question, mode, historyMessages)
       .then(res => {
-        const elapsed = Date.now() - startTime;
-        let reply = '';
-
-        if (mode === 'deepseek') {
-          // DeepSeek返回格式: { reply: '...', model: 'deepseek-chat', usage: {...} }
-          reply = res.reply || res.data?.reply || res.content || res.data?.content || '';
-        } else {
-          // RAG返回格式
-          reply = res.data?.reply || res.data?.content || res.content || res.reply || '';
-        }
-
-        // 至少展示 800ms 的 typing 效果以增强体验
-        const minDelay = 800;
-        const delay = Math.max(0, minDelay - elapsed);
-
+        let reply = res.content || '抱歉，我暂时无法回答这个问题。';
         setTimeout(() => {
-          // 保存会话ID (仅RAG模式)
-          if (mode === 'rag' && res.data?.session_id) {
-            this.setData({ sessionId: res.data.session_id });
-          }
-
           const aiMsg = {
             id: this.genId(),
             role: 'ai',
             content: reply,
             time: this.getTimeStr(),
-            mode: mode  // 标记消息来源模式
+            mode: mode
           };
-
           const finalMessages = [...this.data.messages, aiMsg];
           this.setData({
             messages: finalMessages,
@@ -206,7 +157,7 @@ Page({
             this.scrollToBottom();
             this.saveHistory(finalMessages);
           });
-        }, delay);
+        }, 800);
       })
       .catch(err => {
         console.error('[AI Chat] 请求失败:', err);

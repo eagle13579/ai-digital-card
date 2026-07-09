@@ -1,23 +1,7 @@
 /**
  * 创建资源平台 — 平台创建表单页面
- * =============================================
- * 参考设计模式: platform_creation_design_patterns.json
- *   - 角色体系: secretary_general(创建者) → secretariat(秘书处) → member(成员)
- *   - 品牌色: #7c3aed (purple-600)
- *   - API: teamApi (/api/v1/teams) — 后端用团队模块管理平台
- *     创建者自动成为 secretary_general 角色
- * 
- * 表单字段（按设计模式）:
- *   - 平台名称 (name, 必填)
- *   - 简介 (description, 选填, max 500字)
- *   - 行业标签 (industryTags, 多选)
- *   - 所在地区 (region, 省市区选择)
- *   - 联系方式 (contact, 选填)
- *   - 年费标准 (annualFee, 元/年, 提交转分为分)
- *   - 同意协议 (agreed)
  */
-
-const { teamApi } = require('../../../utils/api')
+const { MockService } = require('../../../utils/mockService')
 
 // 行业标签选项（参考设计模式中"询赋"的行业覆盖）
 const INDUSTRY_OPTIONS = [
@@ -62,6 +46,8 @@ Page({
   },
 
   onLoad() {
+    const sys = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sys.statusBarHeight })
     // 页面加载时可从上一页带参数（如编辑模式）
   },
 
@@ -231,18 +217,10 @@ Page({
 
     this.setData({ submitting: true, error: '' })
 
-    // ---- 调用 API ----
-    // 使用 teamApi.create() — 后端以团队机制管理平台
-    // 创建者自动成为 secretary_general（秘书长）角色
-    teamApi.create(payload)
+    MockService.createTeam(payload)
       .then(res => {
         const teamId = res?.data?.id || res?.id
         wx.showToast({ title: '平台创建成功', icon: 'success' })
-
-        // 成功后跳转到平台管理页
-        // 当前 mini-app 尚无独立 platform/manage 页，先跳 profile（我的）
-        // 待创建平台管理页后可改为:
-        // wx.redirectTo({ url: `/pages/platform/manage/index?id=${teamId}` })
         setTimeout(() => {
           wx.switchTab({ url: '/pages/profile/profile' })
         }, 1500)

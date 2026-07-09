@@ -1,0 +1,79 @@
+# BizOps 自动化 — A/B测试→最优部署管道
+name: BizOps A/B Auto-Deploy
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      experiment_id:
+        description: 指定实验ID
+        required: false
+        default: ''
+      dry_run:
+        description: 只分析不部署
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  analyze:
+    name: 分析A/B实验
+    runs-on: ubuntu-latest
+    outputs:
+      has_deployable: ${{ steps.check.outputs.has_deployable }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install deps
+        run: pip install -r backend/requirements.txt || true
+      - name: Run BizOps analysis
+        id: analyze
+        run: |
+          cd backend
+          ARGS=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ -n "${{ github.event.inputs.experiment_id }}" ]; then ARGS="$ARGS --experiment ${{ github.event.inputs.experiment_id }}"; fi
+          python scripts/bizops_ab_runner.py $ARGS
+      - name: Check deployable
+        id: check
+        run: |
+          if [ -f backend/scripts/bizops_ab_result.json ]; then
+            CNT=$(python3 -c "import json;print(json.load(open('backend/scripts/bizops_ab_result.json')).get('deployable_count',0))")
+            echo "has_deployable=$([ $CNT -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+          else
+            echo "has_deployable=false" >> $GITHUB_OUTPUT
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bizops-result
+          path: backend/scripts/bizops_ab_result.json
+
+  deploy:
+    name: 部署最优变体
+    needs: analyze
+    if: needs.analyze.outputs.has_deployable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: bizops-result
+      - name: Deploy winners
+        run: |
+          python3 backend/scripts/bizops_ab_runner.py
+          echo "Deploy decisions logged in bizops_ab_result.json"
+      - name: Summary
+        run: |
+          echo "## BizOps 自动部署" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+import json
+d = json.load(open('bizops_ab_result.json'))
+for e in d.get('experiments', []):
+    if e.get('deploy_decision') == 'deploy':
+        c = e.get('confidence', 0)
+        print(f'| {d[\"generated_at\"]} | {e[\"experiment_name\"]} | {e[\"winner\"]} | {c*100:.0f}% |')
+"

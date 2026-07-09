@@ -1,3 +1,5 @@
+import html
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -118,7 +120,7 @@ async def send_message(
         raise HTTPException(status_code=400, detail="不能给自己发送消息")
 
     msg = await MessageService.send_message(
-        db, current_user.id, data.receiver_id, data.content
+        db, current_user.id, data.receiver_id, html.escape(data.content)
     )
     return ok(
         {

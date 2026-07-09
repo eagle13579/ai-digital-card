@@ -28,6 +28,9 @@ from typing import Any, Optional
 from sqlalchemy import func as sa_func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+
 from app.ai.feedback_loop import apply_feedback_boost, get_feedback_loop
 from app.ai.knowledge_graph import CachedKnowledgeGraphBuilder, KnowledgeGraphBuilder
 from app.ai.vector_search import VectorSearchEngine, cosine_similarity
@@ -59,6 +62,7 @@ class RecommendItem:
     tag_match_score: float = 0.0
     graph_score: float = 0.0
     semantic_score: float = 0.0
+    ml_score: float = 0.0
     reasons: list[str] = field(default_factory=list)
     common_tags: list[str] = field(default_factory=list)
     match_type: str = "mixed"  # tag | graph | semantic | mixed
@@ -75,6 +79,7 @@ class RecommendItem:
             "tag_match_score": round(self.tag_match_score, 4),
             "graph_score": round(self.graph_score, 4),
             "semantic_score": round(self.semantic_score, 4),
+            "ml_score": round(self.ml_score, 4),
             "reasons": self.reasons,
             "common_tags": self.common_tags,
             "match_type": self.match_type,
@@ -97,6 +102,238 @@ class RecommendResult:
 
 
 # ======================================================================
+# FeatureBasedScorer — ML-based scoring using LogisticRegression
+# ======================================================================
+
+
+class FeatureBasedScorer:
+    """基于特征的 ML 评分模型 — 使用 LogisticRegression 对候选用户排序
+
+    从 MatchRecord 中采样训练数据，提取 6 维特征向量训练分类器，
+    为推荐引擎提供第四维 ML 评分权重。
+    """
+
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self._model: LogisticRegression | None = None
+        self._is_trained = False
+
+    @property
+    def is_trained(self) -> bool:
+        return self._is_trained and self._model is not None
+
+    async def _extract_features(
+        self, user_id: int, candidate_id: int
+    ) -> list[float]:
+        """提取 6 维特征向量: [标签匹配度, 行业相似度, 信任网络距离, 共同访问数, 标签重合数, 用户活跃度]
+
+        Args:
+            user_id: 当前用户 ID
+            candidate_id: 候选用户 ID
+
+        Returns:
+            list[float]: 长度为 6 的特征向量
+        """
+        # 1 标签匹配度: user 的 provide ↔ candidate 的 need, user 的 need ↔ candidate 的 provide
+        tag_match = 0.0
+        result = await self.db.execute(
+            select(UserTag).where(UserTag.user_id.in_([user_id, candidate_id]))
+        )
+        all_tags = result.scalars().all()
+        user_provide = {t.tag: t.weight for t in all_tags if t.user_id == user_id and t.tag_type == "provide"}
+        user_need = {t.tag: t.weight for t in all_tags if t.user_id == user_id and t.tag_type == "need"}
+        cand_provide = {t.tag: t.weight for t in all_tags if t.user_id == candidate_id and t.tag_type == "provide"}
+        cand_need = {t.tag: t.weight for t in all_tags if t.user_id == candidate_id and t.tag_type == "need"}
+
+        for tag, w in user_provide.items():
+            if tag in cand_need:
+                tag_match += w * cand_need[tag]
+        for tag, w in user_need.items():
+            if tag in cand_provide:
+                tag_match += w * cand_provide[tag]
+
+        # 2 行业相似度(company文本): 简单字符串相等判定 + Jaccard 字符集相似
+        result_user = await self.db.execute(select(User).where(User.id == user_id))
+        user = result_user.scalars().first()
+        result_cand = await self.db.execute(select(User).where(User.id == candidate_id))
+        candidate = result_cand.scalars().first()
+        industry_sim = 0.0
+        if user and candidate and user.company and candidate.company:
+            c1 = user.company.strip().lower()
+            c2 = candidate.company.strip().lower()
+            if c1 == c2:
+                industry_sim = 1.0
+            else:
+                # 字符集 Jaccard 相似度
+                set1 = set(c1)
+                set2 = set(c2)
+                inter = len(set1 & set2)
+                union = len(set1 | set2)
+                industry_sim = inter / union if union > 0 else 0.0
+
+        # 3 信任网络距离: 是否直接信任 (0 或 1)
+        trust_dist = 0.0
+        result = await self.db.execute(
+            select(TrustNetwork).where(
+                TrustNetwork.user_id == user_id,
+                TrustNetwork.trusted_user_id == candidate_id,
+            )
+        )
+        if result.scalars().first():
+            trust_dist = 1.0
+
+        # 4 共同访问数: 访问过相同画册的次数
+        common_visits = 0.0
+        # 找到用户拥有的画册
+        result = await self.db.execute(
+            select(Brochure.id).where(Brochure.user_id == user_id)
+        )
+        user_brochure_ids = [row for row in result.scalars().all()]
+        result = await self.db.execute(
+            select(Brochure.id).where(Brochure.user_id == candidate_id)
+        )
+        cand_brochure_ids = [row for row in result.scalars().all()]
+        if user_brochure_ids and cand_brochure_ids:
+            # 统计 candidate 访问 user 画册的次数 + user 访问 candidate 画册的次数
+            result = await self.db.execute(
+                select(sa_func.count(VisitorLog.id)).where(
+                    VisitorLog.brochure_id.in_(user_brochure_ids),
+                    VisitorLog.visitor_id == str(candidate_id),
+                )
+            )
+            cnt1 = result.scalar() or 0
+            result = await self.db.execute(
+                select(sa_func.count(VisitorLog.id)).where(
+                    VisitorLog.brochure_id.in_(cand_brochure_ids),
+                    VisitorLog.visitor_id == str(user_id),
+                )
+            )
+            cnt2 = result.scalar() or 0
+            common_visits = float(cnt1 + cnt2)
+
+        # 5 标签重合数: 共同标签数
+        overlap = 0.0
+        user_tags_set = {t.tag for t in all_tags if t.user_id == user_id}
+        cand_tags_set = {t.tag for t in all_tags if t.user_id == candidate_id}
+        overlap = float(len(user_tags_set & cand_tags_set))
+
+        # 6 用户活跃度(visitor_log计数): candidate 的画册被访问的总次数
+        activity = 0.0
+        if cand_brochure_ids:
+            result = await self.db.execute(
+                select(sa_func.count(VisitorLog.id)).where(
+                    VisitorLog.brochure_id.in_(cand_brochure_ids),
+                )
+            )
+            activity = float(result.scalar() or 0)
+
+        return [tag_match, industry_sim, trust_dist, common_visits, overlap, activity]
+
+    async def train(self, limit: int = 1000):
+        """从 MatchRecord 采样训练数据，训练 LogisticRegression 模型
+
+        正样本: match_score > 0.5
+        负样本: match_score < 0.3
+        采样上限 limit 条，不足则使用全部。
+
+        Args:
+            limit: 最大训练样本数
+        """
+        try:
+            # 采样正样本
+            result = await self.db.execute(
+                select(MatchRecord).where(
+                    MatchRecord.match_score >= 0.5,
+                ).order_by(MatchRecord.id.desc()).limit(limit // 2 + 1)
+            )
+            positive = result.scalars().all()
+
+            # 采样负样本
+            result = await self.db.execute(
+                select(MatchRecord).where(
+                    MatchRecord.match_score <= 0.3,
+                ).order_by(MatchRecord.id.desc()).limit(limit // 2 + 1)
+            )
+            negative = result.scalars().all()
+
+            samples = positive + negative
+            if len(samples) < 10:
+                logger.info("FeatureBasedScorer 训练数据不足 (%d 条), 跳过训练", len(samples))
+                return
+
+            X, y = [], []
+            for rec in samples:
+                feats = await self._extract_features(rec.user_a_id, rec.user_b_id)
+                X.append(feats)
+                y.append(1 if rec.match_score > 0.5 else 0)
+
+            if len(set(y)) < 2:
+                logger.info("FeatureBasedScorer 训练标签单一, 跳过训练")
+                return
+
+            X_arr = np.array(X, dtype=np.float64)
+            y_arr = np.array(y, dtype=np.int64)
+
+            model = LogisticRegression(max_iter=500, random_state=42)
+            model.fit(X_arr, y_arr)
+            self._model = model
+            self._is_trained = True
+            logger.info(
+                "FeatureBasedScorer 训练完成: 样本数=%d, 正样本=%d, 负样本=%d",
+                len(samples), len(positive), len(negative),
+            )
+        except Exception as e:
+            logger.warning("FeatureBasedScorer 训练失败: %s", e, exc_info=True)
+            self._is_trained = False
+
+    async def predict(
+        self, user_id: int, candidates_list: list[int]
+    ) -> dict[int, float]:
+        """对候选列表做 ML 评分, 返回归一化 [0,1] 的分数
+
+        Args:
+            user_id: 当前用户 ID
+            candidates_list: 候选用户 ID 列表
+
+        Returns:
+            dict[candidate_id, ml_score]: 归一化到 [0,1] 的 ML 评分
+        """
+        if not self.is_trained or not candidates_list:
+            return {}
+
+        try:
+            X = []
+            valid_ids = []
+            for cid in candidates_list:
+                feats = await self._extract_features(user_id, cid)
+                X.append(feats)
+                valid_ids.append(cid)
+
+            if not X:
+                return {}
+
+            X_arr = np.array(X, dtype=np.float64)
+            probs = self._model.predict_proba(X_arr)
+
+            # 取正类 (class 1) 概率作为评分
+            if probs.shape[1] > 1:
+                scores = probs[:, 1]
+            else:
+                scores = probs[:, 0]
+
+            # 归一化到 [0, 1]
+            max_score = float(scores.max()) if len(scores) > 0 and scores.max() > 0 else 1.0
+            result = {}
+            for cid, s in zip(valid_ids, scores):
+                result[cid] = float(s) / max_score
+
+            return result
+        except Exception as e:
+            logger.warning("FeatureBasedScorer predict 失败: %s", e, exc_info=True)
+            return {}
+
+
+# ======================================================================
 # 推荐引擎
 # ======================================================================
 
@@ -104,16 +341,21 @@ class RecommendResult:
 class RecommendEngine:
     """实时推荐引擎 - 多维度混合推荐"""
 
-    WEIGHT_TAG_MATCH = 0.40   # 标签匹配权重 (默认, 在线学习会覆盖)
-    WEIGHT_GRAPH = 0.30       # 图谱社交权重 (默认)
-    WEIGHT_SEMANTIC = 0.30    # 语义相似权重 (默认)
+    WEIGHT_TAG_MATCH = 0.30   # 标签匹配权重 (默认, 在线学习会覆盖)
+    WEIGHT_GRAPH = 0.20       # 图谱社交权重 (默认)
+    WEIGHT_SEMANTIC = 0.20    # 语义相似权重 (默认)
+    WEIGHT_ML = 0.30          # ML 评分权重 (默认)
     _online_weights_loaded = False
 
     def __init__(self, db: AsyncSession):
         self.db = db
         self.graph_builder = CachedKnowledgeGraphBuilder(db)
         self.vector_engine = VectorSearchEngine(db)
+        self.scorer = FeatureBasedScorer(db)
         self._load_online_weights()
+        # 异步后台训练，不阻塞 __init__
+        self._train_scorer_task = None
+        self._schedule_scorer_train()
 
     @classmethod
     def _load_online_weights(cls):
@@ -161,6 +403,54 @@ class RecommendEngine:
             logger.warning("在线学习权重热更新失败: %s", e)
         return False
 
+    def _schedule_scorer_train(self):
+        """异步后台启动 scorer 训练（非阻塞）"""
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                self._train_scorer_task = asyncio.ensure_future(self._train_scorer())
+            else:
+                self._train_scorer_task = asyncio.ensure_future(self._train_scorer())
+        except RuntimeError:
+            # 没有运行中的事件循环时静默跳过
+            pass
+
+    async def _train_scorer(self):
+        """执行 scorer 训练（首次加载才训练，失败不阻塞推荐流程）"""
+        try:
+            await self.scorer.train()
+        except Exception as e:
+            logger.warning("FeatureBasedScorer 后台训练失败: %s", e)
+
+    async def _score_by_ml(
+        self,
+        user_id: int,
+        exclude_set: set[int],
+    ) -> tuple[dict[int, float], str]:
+        """ML 评分 - 基于 FeatureBasedScorer
+
+        Args:
+            user_id: 当前用户 ID
+            exclude_set: 排除的用户 ID 集合
+
+        Returns:
+            tuple[dict[int, float], str]: (scores, type)
+        """
+        try:
+            # 从所有活跃用户中获取候选列表
+            result = await self.db.execute(
+                select(User.id).where(User.id.not_in(list(exclude_set))).limit(100)
+            )
+            candidates = [row for row in result.scalars().all()]
+            if not candidates:
+                return {}, "ml"
+            scores = await self.scorer.predict(user_id, candidates)
+            return scores, "ml"
+        except Exception as e:
+            logger.warning("ML scoring failed: %s", e)
+            return {}, "ml"
+
     async def personalize_recommend(
         self,
         user_id: int,
@@ -182,6 +472,9 @@ class RecommendEngine:
         exclude_set = set(exclude_ids or [])
         exclude_set.add(user_id)
 
+        # ── 实时加载在线学习权重 (确保反馈飞轮立即可见) ──
+        self.__class__.refresh_online_weights()
+
         # 获取当前用户信息
         result = await self.db.execute(select(User).where(User.id == user_id))
         user = result.scalars().first()
@@ -194,6 +487,7 @@ class RecommendEngine:
         tag_scores = {}
         graph_scores = {}
         semantic_scores = {}
+        ml_scores = {}
 
         tasks = []
         if strategy in ("tag", "hybrid"):
@@ -202,6 +496,8 @@ class RecommendEngine:
             tasks.append(self._score_by_graph(user_id, exclude_set))
         if strategy in ("semantic", "hybrid"):
             tasks.append(self._score_by_semantic(user_id, exclude_set))
+        if strategy == "hybrid":
+            tasks.append(self._score_by_ml(user_id, exclude_set))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -213,6 +509,8 @@ class RecommendEngine:
                     graph_scores = r.get("scores", {})
                 elif "semantic" in str(r.get("type", "")):
                     semantic_scores = r.get("scores", {})
+                elif "ml" in str(r.get("type", "")):
+                    ml_scores = r.get("scores", {})
             elif isinstance(r, tuple):
                 # 兼容直接返回 (scores_dict, type_str)
                 scores, score_type = r
@@ -222,9 +520,11 @@ class RecommendEngine:
                     graph_scores = scores
                 elif score_type == "semantic":
                     semantic_scores = scores
+                elif score_type == "ml":
+                    ml_scores = scores
 
         # 融合评分
-        all_candidates = set(tag_scores.keys()) | set(graph_scores.keys()) | set(semantic_scores.keys())
+        all_candidates = set(tag_scores.keys()) | set(graph_scores.keys()) | set(semantic_scores.keys()) | set(ml_scores.keys())
         all_candidates -= exclude_set
 
         # 在线学习 & 数据网络效应
@@ -239,6 +539,7 @@ class RecommendEngine:
             t_score = tag_scores.get(cid, 0.0)
             g_score = graph_scores.get(cid, 0.0)
             s_score = semantic_scores.get(cid, 0.0)
+            m_score = ml_scores.get(cid, 0.0)
 
             # 加权融合
             if strategy == "tag":
@@ -252,6 +553,7 @@ class RecommendEngine:
                     self.WEIGHT_TAG_MATCH * t_score
                     + self.WEIGHT_GRAPH * g_score
                     + self.WEIGHT_SEMANTIC * s_score
+                    + self.WEIGHT_ML * m_score
                 )
 
             # 在线学习调整：行为权重提升 [1.0, 1.3]
@@ -278,7 +580,7 @@ class RecommendEngine:
                 final_score = final_score * _feedback_boost
 
             # 获取用户详情
-            item = await self._build_recommend_item(cid, final_score, t_score, g_score, s_score)
+            item = await self._build_recommend_item(cid, final_score, t_score, g_score, s_score, m_score)
             if item:
                 items.append(item)
 
@@ -417,6 +719,7 @@ class RecommendEngine:
         tag_score: float,
         graph_score: float,
         semantic_score: float,
+        ml_score: float = 0.0,
     ) -> Optional[RecommendItem]:
         """构建推荐条目"""
         result = await self.db.execute(select(User).where(User.id == user_id))
@@ -429,6 +732,7 @@ class RecommendEngine:
             "tag": tag_score,
             "graph": graph_score,
             "semantic": semantic_score,
+            "ml": ml_score,
         }
         match_type = max(scores_map, key=scores_map.get)
 
@@ -440,6 +744,8 @@ class RecommendEngine:
             reasons.append("有共同社交关系链")
         if semantic_score > 0.3:
             reasons.append("业务描述语义相似")
+        if ml_score > 0.3:
+            reasons.append("智能模型综合评分")
 
         if not reasons:
             reasons.append("综合匹配")
@@ -462,6 +768,7 @@ class RecommendEngine:
             tag_match_score=tag_score,
             graph_score=graph_score,
             semantic_score=semantic_score,
+            ml_score=ml_score,
             reasons=reasons,
             common_tags=common_tags,
             match_type=match_type,

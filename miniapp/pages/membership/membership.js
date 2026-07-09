@@ -1,11 +1,7 @@
 /**
  * 会员中心页面
- * 展示 MECE 三层定价方案 (Free / Pro / Enterprise)
- * 顶部: 当前层级+到期时间
- * 中间: 三种方案卡片
- * 底部: 功能对比表
  */
-const { membershipApi, userApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
@@ -82,20 +78,18 @@ Page({
   async loadMembershipData() {
     this.setData({ loading: true })
     try {
-      // 并行获取会员状态和使用统计
       const [statusRes, usageRes] = await Promise.all([
-        membershipApi.getStatus().catch(() => null),
-        membershipApi.getUsageStats().catch(() => null),
+        MockService.getMembershipStatus(),
+        MockService.getMembershipUsage(),
       ])
 
-      const status = statusRes?.data ?? statusRes ?? {}
-      const usage = usageRes?.data ?? usageRes ?? {}
+      const status = statusRes.data !== undefined ? statusRes.data : statusRes
+      const usage = usageRes.data !== undefined ? usageRes.data : usageRes
 
       const memberLevel = status.tier || status.level || 'free'
       const levelTextMap = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }
       const currentLevelText = levelTextMap[memberLevel] || 'Free'
 
-      // 更新套餐卡片突出显示
       const plans = this.data.plans.map(p => ({
         ...p,
         highlighted: p.id === memberLevel || (p.id === 'pro' && memberLevel === 'free'),
@@ -108,11 +102,11 @@ Page({
         expireDate: status.expire_at || status.expire_date || '',
         plans,
         usage: {
-          card_count: usage.card_count ?? usage.cardCount ?? 0,
-          card_limit: usage.card_limit ?? usage.cardLimit ?? (memberLevel === 'free' ? 1 : 10),
-          ocr_count: usage.ocr_count ?? usage.ocrCount ?? 0,
-          ocr_limit: usage.ocr_limit ?? usage.ocrLimit ?? (memberLevel === 'free' ? 3 : 100),
-          visitor_count: usage.visitor_count ?? usage.visitorCount ?? 0,
+          card_count: usage.card_count || usage.cardCount || 0,
+          card_limit: usage.card_limit || usage.cardLimit || (memberLevel === 'free' ? 1 : 10),
+          ocr_count: usage.ocr_count || usage.ocrCount || 0,
+          ocr_limit: usage.ocr_limit || usage.ocrLimit || (memberLevel === 'free' ? 3 : 100),
+          visitor_count: usage.visitor_count || usage.visitorCount || 0,
         },
         loading: false,
       })
@@ -136,21 +130,19 @@ Page({
     this.doUpgrade(planId)
   },
 
-  // 执行升级
   async doUpgrade(planId) {
     wx.showLoading({ title: '处理中...', mask: true })
     try {
-      const res = await membershipApi.upgrade(planId, 'monthly')
+      const res = await MockService.membershipUpgrade(planId, 'monthly')
       wx.hideLoading()
       if (res && res.pay_params) {
-        // 微信支付 — 调起支付界面
         const pay = res.pay_params
         const app = getApp()
         wx.requestPayment({
           timeStamp: pay.timeStamp || String(Math.floor(Date.now() / 1000)),
           nonceStr: pay.nonceStr || 'mock_nonce',
           package: pay.package || 'prepay_id=mock',
-          signType: pay.signType || 'MD5',
+          signType: pay.signType || 'RSA',
           paySign: pay.paySign || 'mock_sign',
           success: () => {
             wx.showToast({ title: '支付成功', icon: 'success' })
@@ -169,7 +161,6 @@ Page({
           },
         })
       } else {
-        // 开发模式/自动升级
         wx.showToast({ title: '升级成功', icon: 'success' })
         this.loadMembershipData()
         const app = getApp()

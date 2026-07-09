@@ -1,7 +1,7 @@
 <view class="chat-page">
-  <!-- 顶部导航 -->
-  <view class="chat-header">
-    <view class="back-btn" bindtap="goBack">
+  <!-- 顶部导航 — 玻璃导航栏 -->
+  <view class="chat-header" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn spring-tap" bindtap="goBack">
       <text class="icon">‹</text>
     </view>
     <view class="header-title">
@@ -14,17 +14,21 @@
     </view>
   </view>
 
-  <!-- 模式切换栏 -->
+  <!-- 模式切换栏 — 玻璃卡片选项卡 -->
   <view class="mode-switch">
-    <view class="mode-tab {{aiMode === 'rag' ? 'active rag' : ''}}" data-mode="rag" bindtap="onModeSwitch">
+    <view class="mode-tab {{aiMode === 'rag' ? 'active rag' : ''}} spring-tap" data-mode="rag" bindtap="onModeSwitch">
       <text class="mode-icon">🧠</text>
-      <text class="mode-label">智能对话</text>
-      <text class="mode-desc">知识库问答</text>
+      <view class="mode-info">
+        <text class="mode-label">智能对话</text>
+        <text class="mode-desc">知识库问答</text>
+      </view>
     </view>
-    <view class="mode-tab {{aiMode === 'deepseek' ? 'active deepseek' : ''}}" data-mode="deepseek" bindtap="onModeSwitch">
+    <view class="mode-tab {{aiMode === 'deepseek' ? 'active deepseek' : ''}} spring-tap" data-mode="deepseek" bindtap="onModeSwitch">
       <text class="mode-icon">🔮</text>
-      <text class="mode-label">深度推理</text>
-      <text class="mode-desc">复杂分析/代码</text>
+      <view class="mode-info">
+        <text class="mode-label">深度推理</text>
+        <text class="mode-desc">复杂分析/代码</text>
+      </view>
     </view>
   </view>
 
@@ -33,15 +37,15 @@
     <view class="message-list">
       <block wx:for="{{messages}}" wx:key="id" wx:for-index="idx">
         <view class="message-item {{item.role}}" id="msg-{{item.id}}">
-          <!-- AI 头像 -->
+          <!-- AI 头像 — 玻璃+orb光晕 -->
           <view class="message-avatar ai-avatar" wx:if="{{item.role === 'ai'}}">
             <text class="ai-icon">{{item.mode === 'deepseek' ? '🔮' : '🤖'}}</text>
           </view>
-          <!-- 用户头像 -->
+          <!-- 用户头像 — orb光晕 -->
           <view class="message-avatar user-avatar" wx:if="{{item.role === 'user'}}">
             <image src="{{userAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
           </view>
-          <!-- 消息内容 -->
+          <!-- 消息气泡内容 -->
           <view class="message-content">
             <text class="message-text">{{item.content}}</text>
             <text class="message-time">{{item.time}}</text>
@@ -49,7 +53,7 @@
         </view>
       </block>
 
-      <!-- 打字中指示器 -->
+      <!-- 打字中指示器 — 紫色玻璃点 -->
       <view class="message-item ai" wx:if="{{isTyping}}">
         <view class="message-avatar ai-avatar">
           <text class="ai-icon">{{aiMode === 'deepseek' ? '🔮' : '🤖'}}</text>
@@ -63,25 +67,25 @@
         </view>
       </view>
 
-      <!-- 锚点 -->
+      <!-- 底部锚点 -->
       <view id="scroll-bottom"></view>
     </view>
   </scroll-view>
 
-  <!-- 快捷问题 -->
+  <!-- 快捷问题 — 玻璃标签 -->
   <view class="quick-questions" wx:if="{{showQuickQuestions && messages.length <= 1}}">
     <text class="quick-title">💡 试试这些问题</text>
     <view class="quick-list">
-      <view class="quick-item" wx:for="{{quickQuestions[aiMode]}}" wx:key="index" bindtap="onQuickQuestion" data-question="{{item}}">
+      <view class="quick-item spring-tap" wx:for="{{quickQuestions[aiMode]}}" wx:key="index" bindtap="onQuickQuestion" data-question="{{item}}">
         <text>{{item}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 底部输入区 -->
+  <!-- 底部输入区 — 玻璃面板 -->
   <view class="input-area">
     <input class="chat-input" type="text" placeholder="{{aiMode === 'deepseek' ? '输入问题（深度推理）...' : '输入您的问题...'}}" value="{{inputValue}}" bindinput="onInputChange" bindconfirm="sendMessage" disabled="{{isTyping}}" maxlength="500" confirm-type="send" />
-    <view class="send-btn {{inputValue.trim() ? '' : 'disabled'}}" bindtap="sendMessage">
+    <view class="send-btn spring-tap {{inputValue.trim() ? '' : 'disabled'}}" bindtap="sendMessage">
       <image class="icon" src="/images/icon-send.png" mode="aspectFit" />
     </view>
   </view>

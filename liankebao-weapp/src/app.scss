@@ -1,4 +1,55 @@
+/* =============================================================================
+   AI数智名片 — 全局样式 (AI原生暗色)
+   基底: #0A0A18 深邃夜空
+   ============================================================================= */
+
+/* 页面根元素 — 暗色基底 */
 page {
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #0A0A18;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Geist', 'Noto Sans SC', -apple-system, BlinkMacSystemFont,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局滚动条风格 (暗色) */
+::-webkit-scrollbar {
+  width: 4rpx;
+  height: 4rpx;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 4rpx;
+}
+
+/* 选中文本色 */
+::selection {
+  background: rgba(139, 92, 246, 0.30);
+  color: #fff;
+}
+
+/* 全局CSS自定义属性 (运行时可用) */
+page {
+  /* 基底色 */
+  --bg-page: #0A0A18;
+  --bg-elevated: #0F0F13;
+  --bg-overlay: #141418;
+
+  /* 文字色 */
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.40);
+
+  /* 品牌主色 */
+  --cyan: #06b6d4;
+  --purple: #8b5cf6;
+  --purple-light: #a78bfa;
+  --pink: #ec4899;
 }

@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container dark-mode">
   <loading visible="{{loading}}" text="加载中..." />
 
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
@@ -9,76 +9,82 @@
         <image src="{{card.cover || '/images/default-cover.png'}}" mode="aspectFill" />
       </view>
       <view class="hero-overlay">
-        <view class="hero-avatar">
+        <view class="hero-avatar spring-press" hover-class="spring-scale-down">
           <image src="{{card.user_avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
         </view>
         <text class="hero-name">{{card.user_name || '未知用户'}}</text>
         <text class="hero-company">{{card.user_company}} · {{card.user_title}}</text>
         <text class="hero-title">{{card.title || 'AI数智名片'}}</text>
       </view>
+      <!-- 人脉链微地图 - P2功能 -->
+      <network-mini-map 
+        wx:if="{{showNetworkMap}}"
+        current-user-id="{{currentUserId}}"
+        target-user-id="{{card.user_id}}"
+        bind:connecttap="onConnectTap" />
     </view>
 
-    <!-- 名片信息 -->
-    <view class="card info-card">
+    <!-- 名片信息 - 玻璃中厚 -->
+    <view class="card info-card glass-tier-2">
       <view class="card-header">
         <text class="title">📋 基本信息</text>
       </view>
       <view class="card-body info-body">
-        <view class="info-row" wx:if="{{card.user_company}}">
+        <view class="info-row spring-press" wx:if="{{card.user_company}}">
           <text class="info-label">公司</text>
           <text class="info-value">{{card.user_company}}</text>
         </view>
-        <view class="info-row" wx:if="{{card.user_title}}">
+        <view class="info-row spring-press" wx:if="{{card.user_title}}">
           <text class="info-label">职位</text>
           <text class="info-value">{{card.user_title}}</text>
         </view>
-        <view class="info-row" wx:if="{{card.purpose}}">
+        <view class="info-row spring-press" wx:if="{{card.purpose}}">
           <text class="info-label">合作意向</text>
           <text class="info-value tag provide">{{purposeText}}</text>
         </view>
-        <view class="info-row">
+        <view class="info-row spring-press">
           <text class="info-label">状态</text>
           <text class="info-value badge badge-{{card.status === 'published' ? 'gold' : 'free'}}">
             {{card.status === 'published' ? '已发布' : '草稿'}}
           </text>
         </view>
-        <view class="info-row">
+        <view class="info-row spring-press">
           <text class="info-label">浏览</text>
           <text class="info-value">{{card.view_count || 0}} 次</text>
         </view>
       </view>
     </view>
 
-    <!-- 统计数据 -->
-    <view class="card">
+    <!-- 统计数据 - 玻璃薄 -->
+    <view class="card glass-tier-1">
       <view class="card-header">
         <text class="title">📊 数据概览</text>
       </view>
       <view class="stats-grid">
-        <view class="stat-item">
+        <view class="stat-item spring-press" hover-class="spring-scale-mini">
           <text class="stat-num">{{stats.views || 0}}</text>
           <text class="stat-label">浏览量</text>
         </view>
-        <view class="stat-item">
+        <view class="stat-item spring-press" hover-class="spring-scale-mini">
           <text class="stat-num">{{stats.visitors || 0}}</text>
           <text class="stat-label">访客数</text>
         </view>
-        <view class="stat-item">
+        <view class="stat-item spring-press" hover-class="spring-scale-mini">
           <text class="stat-num">{{stats.matches || 0}}</text>
           <text class="stat-label">匹配</text>
         </view>
-        <view class="stat-item">
+        <view class="stat-item spring-press" hover-class="spring-scale-mini">
           <text class="stat-num">{{stats.trust || 0}}</text>
           <text class="stat-label">信任</text>
         </view>
       </view>
     </view>
 
-    <!-- 操作按钮 -->
+    <!-- 操作按钮 - 弹簧动效 -->
     <view class="action-buttons">
-      <button class="btn-primary" bindtap="goPreview">预览画册</button>
-      <button class="btn-outline" bindtap="shareCard" style="margin-top: 24rpxpx;">分享名片</button>
-      <button class="btn-outline" bindtap="generateQRCode" style="margin-top: 12px; border-color: #07c160; color: #07c160;">生成小程序码</button>
+      <button class="btn-primary spring-press" hover-class="spring-scale-down" bindtap="goPreview">预览画册</button>
+      <button class="btn-outline spring-press" hover-class="spring-scale-down" bindtap="shareCard" style="margin-top: 24rpx;">分享名片</button>
+      <button class="btn-outline spring-press" hover-class="spring-scale-down" bindtap="generateQRCode" style="margin-top: 24rpx; border-color: var(--success, #07c160); color: var(--success, #07c160);">生成小程序码</button>
     </view>
 
     <!-- 底部占位 -->

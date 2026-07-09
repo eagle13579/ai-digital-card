@@ -1,124 +1,177 @@
+/* ============================================================
+ * AI洞察页 — 深色适配 + 玻璃卡片 + spring动效 + orb光晕
+ * 设计系统: tokens.wxss + tailwind-like.wxss (全局注入)
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ * ============================================================ */
+
+/* ── 页面基底 — 深色 + 光晕背景 ── */
+.insight-page {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+/* ── 顶部导航栏 — 玻璃层3 + orb光晕 ── */
 .insight-header {
   display: flex;
   align-items: center;
-  padding: 40rpx 16px;
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-  color: #fff;
+  padding: 40rpx var(--space-6);
+  background: var(--glass-bg-3);
+  backdrop-filter: blur(var(--glass-blur-3));
+  -webkit-backdrop-filter: blur(var(--glass-blur-3));
+  border-bottom: var(--glass-border-3);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: var(--orb-md), var(--shadow-glass-edge);
 }
 
-.back-btn {
+.insight-header .back-btn {
   width: 72rpx;
   height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 24rpx;
+  margin-right: var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--bg-glass-1);
+  border: var(--glass-border-1);
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+.insight-header .back-btn:active {
+  transform: scale(0.9);
+  background: var(--bg-hover);
+}
+.insight-header .back-btn .icon {
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  line-height: 1;
 }
 
-.back-btn .icon {
-  width: 48rpx;
-  height: 48rpx;
-  color: #fff;
-}
-
-.header-title {
+.insight-header .header-title {
   flex: 1;
 }
-
-.header-title .title {
-  font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
+.insight-header .header-title .title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
   display: block;
+  letter-spacing: var(--tracking-tight);
 }
-
-.header-title .subtitle {
-  font-size: 24rpx;
-  opacity: 0.8;
+.insight-header .header-title .subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   margin-top: 4rpx;
   display: block;
 }
 
+/* 刷新按钮 — 玻璃胶囊 */
 .insight-badge {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 12rpx 12px;
-  border-radius: 40rpx;
-  font-size: 24rpx;
-  font-weight: var(--font-weight-bold);
+  background: var(--bg-glass-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  border: var(--glass-border-1);
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+.insight-badge:active {
+  transform: scale(0.95);
+  background: var(--bg-hover);
 }
 
+/* ── 加载状态 ── */
+.loading-mask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) 0;
+  font-size: var(--text-base);
+  color: var(--text-tertiary);
+}
+
+/* ── 统计概览 — 三玻璃卡片 ── */
 .stats-overview {
   display: flex;
-  gap: 20rpx;
-  padding: 40rpx 16px;
+  gap: var(--space-5);
+  padding: var(--space-8) var(--space-6);
 }
 
 .stat-card {
   flex: 1;
-  background: var(--surface-1);
-  border-radius: var(--radius-lg);
-  padding: 32rpx 12px;
+  background: var(--glass-bg-2);
+  backdrop-filter: blur(var(--glass-blur-2));
+  -webkit-backdrop-filter: blur(var(--glass-blur-2));
+  border: var(--glass-border-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-4);
   text-align: center;
-  box-shadow: var(--shadow-sm);
-  border-top: 3px solid #6366F1;
+  box-shadow: var(--orb-sm), var(--shadow-glass-edge);
+  transition: all var(--duration-normal) var(--ease-spring);
 }
-
+.stat-card:active {
+  transform: scale(0.96);
+  box-shadow: var(--orb-md);
+}
+/* 三重渐变顶部光边 */
+.stat-card:nth-child(1) {
+  border-top: 2px solid var(--cyan);
+}
 .stat-card:nth-child(2) {
-  border-top-color: #8B5CF6;
+  border-top: 2px solid var(--purple);
 }
-
 .stat-card:nth-child(3) {
-  border-top-color: #A78BFA;
+  border-top: 2px solid var(--pink);
 }
 
 .stat-icon {
   font-size: 48rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: var(--space-3);
 }
-
 .stat-value {
-  font-size: 48rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-3xl);
+  font-weight: 700;
   color: var(--text-primary);
   display: block;
+  letter-spacing: var(--tracking-tight);
 }
-
 .stat-label {
-  font-size: 22rpx;
-  color: var(--text-muted);
-  margin-top: 8rpx;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
   display: block;
+  letter-spacing: var(--tracking-wide);
 }
 
+/* ── 趋势图 — 玻璃卡片 ── */
 .chart-section {
-  margin: 0 16px 20px;
-  background: var(--surface-1);
-  border-radius: var(--radius-lg);
-  padding: 32rpx;
-  box-shadow: var(--shadow-sm);
+  margin: 0 var(--space-6) var(--space-6);
+  background: var(--glass-bg-2);
+  backdrop-filter: blur(var(--glass-blur-2));
+  -webkit-backdrop-filter: blur(var(--glass-blur-2));
+  border: var(--glass-border-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-8);
+  box-shadow: var(--orb-sm), var(--shadow-glass-edge);
 }
 
 .chart-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 40rpx;
+  margin-bottom: var(--space-8);
 }
-
 .chart-title {
-  font-size: 30rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
 }
-
 .chart-unit {
-  font-size: 22rpx;
-  color: var(--text-muted);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
 }
 
 .chart-container {
@@ -126,7 +179,7 @@
   align-items: flex-end;
   justify-content: space-between;
   height: 360rpx;
-  padding-top: 16rpx;
+  padding-top: var(--space-4);
 }
 
 .chart-bar-group {
@@ -140,112 +193,120 @@
 
 .chart-bar {
   width: 56rpx;
-  background: linear-gradient(180deg, #6366F1, #8B5CF6);
-  border-radius: 12rpx 6px 2px 2px;
+  background: var(--gradient-cyan-purple);
+  border-radius: var(--radius-xs) 4rpx 2rpx 2rpx;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 8rpx;
+  padding-top: var(--space-2);
   min-height: 40rpx;
-  transition: height 0.3s ease;
+  transition: height var(--duration-slow) var(--ease-spring);
   position: relative;
+  box-shadow: var(--orb-cyan);
 }
 
 .chart-bar-value {
-  font-size: 20rpx;
+  font-size: var(--text-xs);
   color: #fff;
   font-weight: 500;
 }
-
 .chart-bar-label {
-  font-size: 20rpx;
-  color: var(--text-muted);
-  margin-top: 12rpx;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-3);
   text-align: center;
 }
 
+/* ── 洞察列表 — 玻璃卡片项 ── */
 .insight-list-section {
-  padding: 0 16px 24px;
+  padding: 0 var(--space-6) var(--space-8);
 }
-
 .insight-list-section .section-title {
-  font-size: 32rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 28rpx;
+  margin-bottom: var(--space-6);
+  letter-spacing: var(--tracking-tight);
 }
 
 .insight-list {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: var(--space-5);
 }
 
 .insight-item {
   display: flex;
   align-items: flex-start;
-  gap: 24rpx;
-  background: var(--surface-1);
-  border-radius: var(--radius-lg);
-  padding: 28rpx;
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-5);
+  background: var(--glass-bg-2);
+  backdrop-filter: blur(var(--glass-blur-2));
+  -webkit-backdrop-filter: blur(var(--glass-blur-2));
+  border: var(--glass-border-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  box-shadow: var(--orb-sm), var(--shadow-glass-edge);
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+.insight-item:active {
+  transform: scale(0.98);
+  box-shadow: var(--orb-md);
+  background: var(--bg-hover);
 }
 
 .insight-icon {
   width: 72rpx;
   height: 72rpx;
-  border-radius: 20rpx;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: var(--radius-sm);
+  background: var(--bg-glass-1);
+  border: var(--glass-border-1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36rpx;
   flex-shrink: 0;
+  box-shadow: var(--orb-sm);
 }
 
 .insight-content {
   flex: 1;
 }
-
 .insight-title {
-  font-size: 28rpx;
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: 8rpx;
+  margin-bottom: var(--space-2);
 }
-
 .insight-desc {
-  font-size: 24rpx;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: var(--text-sm-lh);
   display: block;
 }
 
+/* 洞察标签 — 语义色 */
 .insight-tag {
-  font-size: 20rpx;
-  padding: 6rpx 8px;
-  border-radius: 20rpx;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
   flex-shrink: 0;
   font-weight: 500;
+  letter-spacing: var(--tracking-wide);
 }
-
 .insight-tag.positive {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  border: 0.5px solid rgba(16, 185, 129, 0.25);
 }
-
 .insight-tag.suggestion {
-  background: rgba(245, 158, 11, 0.1);
-  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+  border: 0.5px solid rgba(245, 158, 11, 0.25);
 }
 
-.loading-mask {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80rpx 0;
-  font-size: 28rpx;
-  color: var(--text-muted);
+/* ── spring 过渡工具 ── */
+.spring-hover {
+  transition: all var(--duration-normal) var(--ease-spring);
 }

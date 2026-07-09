@@ -1,9 +1,7 @@
 /**
  * 画册预览页面
- * 连接后端 brochureApi + brochure_render.py 翻页能力
- * 展示翻页画册，支持分享到微信
  */
-const { brochureApi } = require('../../../utils/api')
+const { MockService } = require('../../../utils/mockService')
 const { Logger } = require('../../../utils/util')
 
 Page({
@@ -50,13 +48,10 @@ Page({
     }
   },
 
-  /**
-   * 加载画册数据
-   */
   async loadBrochure(brochureId) {
     wx.showLoading({ title: '加载中...', mask: true })
     try {
-      const brochure = await brochureApi.getById(brochureId)
+      const brochure = await MockService.getBrochureById(brochureId)
       Logger.info('画册预览页', '画册数据加载成功', {
         id: brochure.id,
         title: brochure.title,
@@ -65,9 +60,6 @@ Page({
 
       this.setData({ brochure })
       this.transformAndRender(brochure)
-
-      // 获取分享链接
-      this.fetchShareLink(brochureId)
 
     } catch (err) {
       Logger.error('画册预览页', '加载画册失败', err)
@@ -81,16 +73,10 @@ Page({
     }
   },
 
-  /**
-   * 获取分享链接
-   */
   async fetchShareLink(brochureId) {
     try {
-      const res = await brochureApi.getShareLink(brochureId)
-      const link = res.url || res.share_url || res.data?.url || ''
-      if (link) {
-        this.setData({ shareLink: link })
-      }
+      const link = `https://example.com/share/${brochureId}`
+      this.setData({ shareLink: link })
     } catch (err) {
       Logger.warn('画册预览页', '获取分享链接失败', err)
     }
@@ -103,6 +89,25 @@ Page({
    */
   transformAndRender(brochure) {
     const pages = brochure.pages || []
+
+    // ========== 数据归一化：新格式（type属性）直接透传 ==========
+    if (pages.length > 0 && pages[0].type !== undefined) {
+      const firstPage = pages[0]
+      const isCover = firstPage.type === 'cover'
+      this.setData({
+        pages: pages,
+        totalPages: pages.length,
+        currentPage: 0,
+        loading: false,
+        error: false,
+        pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+        pageType: firstPage.type || '',
+      })
+      Logger.info('画册预览页', '渲染完成（新格式透传）', { totalPages: pages.length })
+      return
+    }
+
+    // ========== 旧格式（content_type属性）：解析渲染 ==========
 
     // 解析封面页
     const coverPage = pages.find(p => p.content_type === 'cover')

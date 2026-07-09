@@ -1,14 +1,14 @@
-<view class="insight-page">
-  <!-- 顶部导航 -->
-  <view class="insight-header">
-    <view class="back-btn" bindtap="goBack">
+<view class="insight-page orb-bg">
+  <!-- 顶部导航 — 玻璃层 + spring动效 -->
+  <view class="insight-header glass-tier-3" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn spring-hover" bindtap="goBack" hover-class="spring-scale-mini">
       <text class="icon">‹</text>
     </view>
     <view class="header-title">
       <text class="title">数据洞察</text>
       <text class="subtitle">AI分析 · 驱动决策</text>
     </view>
-    <view class="insight-badge" bindtap="fetchData">
+    <view class="insight-badge" bindtap="fetchData" hover-class="spring-scale-mini">
       <text>🔄 刷新</text>
     </view>
   </view>
@@ -18,46 +18,46 @@
     <text>加载中...</text>
   </view>
 
-  <!-- 统计概览 -->
+  <!-- 统计概览 — 三层玻璃卡片 -->
   <view class="stats-overview">
-    <view class="stat-card">
+    <view class="stat-card" hover-class="none">
       <view class="stat-icon">📇</view>
       <text class="stat-value">{{displayStats.cardCount}}</text>
       <text class="stat-label">名片总数</text>
     </view>
-    <view class="stat-card">
+    <view class="stat-card" hover-class="none">
       <view class="stat-icon">👁️</view>
       <text class="stat-value">{{displayStats.viewCount}}</text>
       <text class="stat-label">总浏览量</text>
     </view>
-    <view class="stat-card">
+    <view class="stat-card" hover-class="none">
       <view class="stat-icon">🤝</view>
       <text class="stat-value">{{displayStats.matchCount}}</text>
       <text class="stat-label">匹配次数</text>
     </view>
   </view>
 
-  <!-- 趋势图表（柱状图） -->
+  <!-- 趋势图 — 玻璃卡片 -->
   <view class="chart-section">
     <view class="chart-header">
       <text class="chart-title">近7日趋势</text>
       <text class="chart-unit">次</text>
     </view>
     <view class="chart-container">
-      <view class="chart-bar-group" wx:for="{{chartData}}" wx:key="index">
-        <view class="chart-bar" style="height: {{item.height}}px;">
-          <text class="chart-bar-value">{{item.value}}</text>
+      <view class="chart-bar-group" wx:for="{{chartData}}" wx:key="index" wx:for-item="bar">
+        <view class="chart-bar" style="height: {{bar.height}}px;">
+          <text class="chart-bar-value">{{bar.value}}</text>
         </view>
-        <text class="chart-bar-label">{{item.label}}</text>
+        <text class="chart-bar-label">{{bar.label}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 洞察列表 -->
+  <!-- 洞察列表 — 玻璃卡片项 -->
   <view class="insight-list-section">
     <text class="section-title">AI洞察建议</text>
     <view class="insight-list">
-      <view class="insight-item" wx:for="{{insights}}" wx:key="index">
+      <view class="insight-item" wx:for="{{insights}}" wx:key="index" wx:for-item="item" hover-class="none">
         <view class="insight-icon">{{item.icon}}</view>
         <view class="insight-content">
           <text class="insight-title">{{item.title}}</text>

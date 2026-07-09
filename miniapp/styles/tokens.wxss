@@ -1,0 +1,250 @@
+/**
+ * tokens.wxss - AI数字名片 全局设计Token变量定义
+ */
+
+page {
+  --bg-page: #0A0A18;
+  --bg-elevated: #0F0F13;
+  --bg-overlay: #141418;
+  --bg-glass-1: rgba(255, 255, 255, 0.04);
+  --bg-glass-2: rgba(255, 255, 255, 0.07);
+  --bg-glass-3: rgba(139, 92, 246, 0.12);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.10);
+
+  --gradient-primary: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+  --gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  --gradient-purple-pink: linear-gradient(135deg, #8b5cf6, #ec4899);
+  --gradient-cyan-only: linear-gradient(135deg, #06b6d4, #22d3ee);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(139,92,246,0.3), rgba(6,182,212,0.1), transparent);
+
+  --cyan: #06b6d4;
+  --cyan-light: #22d3ee;
+  --cyan-dark: #0891b2;
+  --purple: #8b5cf6;
+  --purple-light: #a78bfa;
+  --purple-dark: #7c3aed;
+  --pink: #ec4899;
+  --pink-light: #f472b6;
+  --pink-dark: #db2777;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.40);
+  --text-quaternary: rgba(255, 255, 255, 0.20);
+  --text-inverse: #0A0A18;
+  --text-accent: #a78bfa;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-accent: rgba(139, 92, 246, 0.25);
+  --border-cyan: rgba(6, 182, 212, 0.25);
+
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+  --font-sc: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-system: 'Geist', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --text-xs: 20rpx;
+  --text-sm: 24rpx;
+  --text-base: 28rpx;
+  --text-lg: 32rpx;
+  --text-xl: 36rpx;
+  --text-2xl: 40rpx;
+  --text-3xl: 48rpx;
+  --text-4xl: 56rpx;
+
+  --text-xs-lh: 1.4;
+  --text-sm-lh: 1.5;
+  --text-base-lh: 1.6;
+  --text-lg-lh: 1.5;
+  --text-xl-lh: 1.4;
+  --text-2xl-lh: 1.3;
+  --text-3xl-lh: 1.2;
+  --text-4xl-lh: 1.1;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.05em;
+
+  --glass-bg-1: rgba(255, 255, 255, 0.04);
+  --glass-bg-2: rgba(255, 255, 255, 0.07);
+  --glass-bg-3: rgba(139, 92, 246, 0.12);
+  --glass-blur-1: 20px;
+  --glass-blur-2: 30px;
+  --glass-blur-3: 40px;
+  --glass-border-1: 0.5px solid rgba(255, 255, 255, 0.06);
+  --glass-border-2: 0.5px solid rgba(255, 255, 255, 0.10);
+  --glass-border-3: 0.5px solid rgba(139, 92, 246, 0.20);
+  --glass-glow-edge: inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
+
+  --orb-sm: 0 0 12px rgba(139, 92, 246, 0.15);
+  --orb-md: 0 0 24px rgba(139, 92, 246, 0.20);
+  --orb-lg: 0 0 40px rgba(139, 92, 246, 0.25);
+  --orb-xl: 0 0 60px rgba(6, 182, 212, 0.20);
+  --orb-cyan: 0 0 20px rgba(6, 182, 212, 0.20);
+  --orb-pink: 0 0 20px rgba(236, 72, 153, 0.20);
+  --orb-hover: 0 0 30px rgba(139, 92, 246, 0.35);
+
+  --space-1: 4rpx;
+  --space-2: 8rpx;
+  --space-3: 12rpx;
+  --space-4: 16rpx;
+  --space-5: 20rpx;
+  --space-6: 24rpx;
+  --space-8: 32rpx;
+  --space-10: 40rpx;
+  --space-12: 48rpx;
+  --space-16: 64rpx;
+  --space-20: 80rpx;
+
+  --radius-xs: 8rpx;
+  --radius-sm: 12rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+  --radius-full: 9999rpx;
+
+  --shadow-glass-edge: inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
+  --shadow-glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-orb: 4000ms;
+  --duration-shimmer: 2000ms;
+
+  --transition-fade: opacity var(--duration-normal) var(--ease-out);
+  --transition-scale: transform var(--duration-normal) var(--ease-spring);
+  --transition-glass: all var(--duration-normal) var(--ease-out);
+  --transition-spring: transform var(--duration-slow) var(--ease-spring);
+
+  --card-bg: var(--bg-glass-2);
+  --card-radius: var(--radius-md);
+  --card-padding: var(--space-8) var(--space-6);
+  --card-orb: var(--orb-md);
+  --card-border: var(--glass-border-2);
+  --card-glow-edge: var(--shadow-glass-edge);
+
+  --btn-primary-bg: var(--gradient-cyan-purple);
+  --btn-primary-color: var(--text-inverse);
+  --btn-primary-height: 88rpx;
+  --btn-primary-radius: var(--radius-sm);
+  --btn-primary-orb: var(--orb-sm);
+  --btn-primary-hover-orb: var(--orb-hover);
+  --btn-primary-font-size: var(--text-lg);
+  --btn-primary-font-weight: 600;
+  --btn-outline-bg: var(--bg-glass-1);
+  --btn-outline-border: var(--glass-border-2);
+  --btn-outline-color: var(--text-primary);
+  --btn-outline-height: 88rpx;
+  --btn-outline-radius: var(--radius-sm);
+  --btn-outline-font-size: var(--text-lg);
+  --btn-outline-font-weight: 500;
+  --btn-sm-height: 64rpx;
+  --btn-sm-radius: var(--radius-xs);
+  --btn-sm-font-size: var(--text-base);
+
+  --input-bg: var(--bg-glass-1);
+  --input-border: var(--border-subtle);
+  --input-radius: var(--radius-sm);
+  --input-height: 88rpx;
+  --input-padding: 0 var(--space-6);
+  --input-color: var(--text-primary);
+  --input-placeholder: var(--text-tertiary);
+  --input-focus-border: var(--border-accent);
+  --input-error-border: var(--danger);
+
+  --nav-bg: var(--bg-glass-2);
+  --nav-blur: var(--glass-blur-2);
+  --nav-height: 88rpx;
+  --nav-title-color: var(--text-primary);
+  --nav-title-size: var(--text-xl);
+
+  --tabbar-bg: var(--bg-elevated);
+  --tabbar-border: var(--border-subtle);
+  --tabbar-height: 100rpx;
+  --tabbar-color: var(--text-tertiary);
+  --tabbar-color-active: var(--cyan);
+  --tabbar-font-size: var(--text-xs);
+  --tabbar-icon-size: 48rpx;
+  --tabbar-safe-bottom: env(safe-area-inset-bottom);
+
+  --stat-number-size: var(--text-2xl);
+  --stat-number-weight: 700;
+  --stat-number-color: var(--text-primary);
+  --stat-label-size: var(--text-xs);
+  --stat-label-color: var(--text-secondary);
+  --stat-gap: var(--space-8);
+
+  --user-header-avatar-size: 120rpx;
+  --user-header-avatar-border: 2px solid rgba(255, 255, 255, 0.15);
+  --user-header-avatar-orb: var(--orb-md);
+  --user-header-name-size: var(--text-2xl);
+  --user-header-pos-size: var(--text-sm);
+  --user-header-padding: var(--space-10) var(--space-6);
+
+  --avatar-stack-size: 72rpx;
+  --avatar-stack-border: 2px solid var(--bg-page);
+  --avatar-stack-overlap: -16rpx;
+
+  --home-action-bar-bg: var(--bg-glass-2);
+  --home-action-bar-margin: var(--space-6);
+  --home-action-bar-radius: var(--radius-xl);
+  --home-action-bar-border: var(--glass-border-2);
+  --home-ai-entry-orb: var(--orb-lg);
+  --home-ai-entry-radius: var(--radius-lg);
+  --home-recommend-gap: var(--space-6);
+  --home-upgrade-bg: var(--gradient-purple-pink);
+}
+
+@keyframes orb-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-15rpx) scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+page {
+  font-family: var(--font-system);
+  font-size: var(--text-base);
+  line-height: var(--text-base-lh);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 4rpx;
+  height: 4rpx;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4rpx;
+}

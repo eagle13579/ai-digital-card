@@ -6,6 +6,7 @@
 
 无需修改小程序代码，只需在 app/__init__.py 中注册此适配路由即可。
 """
+import html
 import json
 import logging
 from typing import Optional
@@ -14,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models.brochure import Brochure, Page
@@ -86,7 +88,7 @@ async def list_cards(
     db: AsyncSession = Depends(get_db),
 ):
     """获取名片列表（适配小程序 GET /api/business-card/cards → GET /api/brochures）"""
-    query = select(Brochure)
+    query = select(Brochure).options(selectinload(Brochure.pages))
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
@@ -110,9 +112,11 @@ async def create_card(
     db: AsyncSession = Depends(get_db),
 ):
     """创建名片（适配小程序 POST /api/business-card/cards → POST /api/brochures）"""
+    # XSS防护：对标题和页面内容做HTML转义
+    safe_title = html.escape(data.title)
     brochure = Brochure(
         user_id=current_user.id,
-        title=data.title,
+        title=safe_title,
         cover=data.cover,
         purpose=data.purpose,
         album_meta=data.album_meta,
@@ -126,7 +130,7 @@ async def create_card(
             brochure_id=brochure.id,
             sort_order=page_data.sort_order or idx,
             content_type=page_data.content_type,
-            content=page_data.content,
+            content=html.escape(page_data.content),
             image_url=page_data.image_url,
             media_url=page_data.media_url or "",
             ai_summary=page_data.ai_summary,
@@ -134,7 +138,18 @@ async def create_card(
         db.add(page)
 
     await db.commit()
-    await db.refresh(brochure)
+
+    # 重新查询（含pages关系）
+    # 使用 populate_existing=True 强制从 DB 刷新列属性，
+    # 解决 expire_on_commit=False 下 identity-map 返回旧对象、
+    # 导致 created_at/updated_at 等 server_default 字段为 None 的 500 错误
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure.id)
+        .execution_options(populate_existing=True)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -146,7 +161,9 @@ async def get_card(
     db: AsyncSession = Depends(get_db),
 ):
     """获取名片详情（适配小程序 GET /api/business-card/cards/{id} → GET /api/brochures/{id}）"""
-    result = await db.execute(select(Brochure).where(Brochure.id == card_id))
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == card_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="名片不存在")
@@ -174,7 +191,10 @@ async def update_card(
     update_data = data.model_dump(exclude_unset=True)
     pages_data = update_data.pop("pages", None)
 
+    ESCAPED_FIELDS = {"title", "cover", "purpose", "album_meta"}
     for field, value in update_data.items():
+        if field in ESCAPED_FIELDS and isinstance(value, str):
+            value = html.escape(value)
         setattr(brochure, field, value)
 
     if pages_data is not None:
@@ -189,7 +209,7 @@ async def update_card(
                 brochure_id=brochure.id,
                 sort_order=page_data.sort_order or idx,
                 content_type=page_data.content_type,
-                content=page_data.content,
+                content=html.escape(page_data.content),
                 image_url=page_data.image_url,
                 media_url=page_data.media_url or "",
                 ai_summary=page_data.ai_summary,
@@ -199,7 +219,15 @@ async def update_card(
         brochure.pages_count = len(pages_data)
 
     await db.commit()
-    await db.refresh(brochure)
+
+    # 重新查询（含pages关系）
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == card_id)
+        .execution_options(populate_existing=True)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp

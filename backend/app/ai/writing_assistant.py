@@ -14,6 +14,7 @@ class WritingAssistant:
     - company: 公司介绍
     - recommendation: 推荐语
     - slogan: 名片标语
+    - personal: 个人用途
     """
 
     # ── 系统提示词模板 ──────────────────────────────────────────────────
@@ -27,6 +28,8 @@ class WritingAssistant:
                           "生成一段真诚、有说服力的中文推荐语（60字以内），用于名片展示。",
         "slogan": "你是一个专业的品牌标语写作助手。根据个人信息和职业背景，"
                   "生成一句简短有力、易于记住的中文个人品牌标语（15字以内）。",
+        "personal": "你是一个个人简介写作助手。根据用户提供的个人信息，"
+                     "生成一段亲切自然、突出个性的中文个人介绍（100字以内），用于个人名片展示。",
     }
 
     @staticmethod
@@ -96,6 +99,28 @@ class WritingAssistant:
                 parts.append(f"核心价值：{core_value}")
             return "请根据以下信息生成一句中文个人品牌标语（15字以内）：\n\n" + "\n".join(parts)
 
+        elif purpose == "personal":
+            name = kwargs.get("name", "")
+            position = kwargs.get("position", "")
+            company = kwargs.get("company", "")
+            industry = kwargs.get("industry", "")
+            skills = kwargs.get("skills", "")
+            description = kwargs.get("description", "")
+            parts = []
+            if name:
+                parts.append(f"姓名：{name}")
+            if position:
+                parts.append(f"职位：{position}")
+            if company:
+                parts.append(f"公司：{company}")
+            if industry:
+                parts.append(f"行业：{industry}")
+            if skills:
+                parts.append(f"技能/专长：{skills}")
+            if description:
+                parts.append(f"个人描述：{description}")
+            return "请为以下个人信息生成一段亲切自然的中文个人介绍（100字以内），突出个人特质和亲和力：\n\n" + "\n".join(parts)
+
         return "请生成一段简单的自我介绍。"
 
     @staticmethod
@@ -107,7 +132,7 @@ class WritingAssistant:
         """调用 DeepSeek API 生成文案
 
         Args:
-            purpose: 文案用途 (bio|company|recommendation|slogan)
+            purpose: 文案用途 (bio|company|recommendation|slogan|personal)
             api_key: DeepSeek API Key（默认使用配置中的 key）
             **kwargs: 根据用途传递对应参数
 

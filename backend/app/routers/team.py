@@ -1,4 +1,5 @@
 """团队管理 API：CRUD + 成员管理 + 邀请管理 + 角色管理"""
+import html
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -167,14 +168,14 @@ async def create_team(
     try:
         team = await TeamService.create_team(
             db=db,
-            name=data.name,
-            slug=data.slug,
+            name=html.escape(data.name),
+            slug=data.slug,  # slug has regex validation, safe
             owner_id=current_user.id,
-            description=data.description,
-            logo=data.logo,
-            website=data.website,
-            industry=data.industry,
-            size=data.size,
+            description=html.escape(data.description),
+            logo=html.escape(data.logo),
+            website=html.escape(data.website),
+            industry=html.escape(data.industry),
+            size=html.escape(data.size),
             max_members=data.max_members,
         )
     except ValueError as e:
@@ -272,6 +273,10 @@ async def update_team(
     await _require_admin(db, team_id, current_user.id)
 
     update_data = data.model_dump(exclude_unset=True)
+    ESCAPED_FIELDS = {"name", "description", "logo", "website", "industry", "size"}
+    for field in update_data:
+        if field in ESCAPED_FIELDS and isinstance(update_data[field], str):
+            update_data[field] = html.escape(update_data[field])
     team = await TeamService.update_team(db, team, **update_data)
 
     return TeamResponse(
@@ -358,7 +363,7 @@ async def update_member_title(
 
     try:
         member = await TeamService.update_member_title(
-            db, team_id, user_id, data.title_in_team
+            db, team_id, user_id, html.escape(data.title_in_team)
         )
         return {"message": "职位更新成功", "title_in_team": member.title_in_team}
     except ValueError as e:
@@ -412,7 +417,7 @@ async def create_invite(
             invitee_email=data.email,
             invitee_phone=data.phone,
             role=TeamRole(data.role),
-            message=data.message,
+            message=html.escape(data.message),
         )
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))

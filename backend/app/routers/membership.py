@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.routers.auth import get_current_user
+from app.services.subscription_service import PLANS, PlanConfig
 from app.services.usage_service import get_user_usage, get_limits
 
 router = APIRouter(prefix="/api/membership", tags=["会员"])
@@ -100,6 +101,48 @@ class PricingResponse(BaseModel):
     tiers: dict[str, PricingTier]
 
 
+# ── Plans 模型 ────────────────────────────────────────────────────────
+
+
+class PlanFeatureItem(BaseModel):
+    name: str
+    description: str
+    enabled: bool = True
+
+
+class PlanItemResponse(BaseModel):
+    tier: str
+    name_cn: str
+    name_en: str
+    price_cents: int
+    interval: str
+    features: list[PlanFeatureItem]
+    feature_tags: list[str]
+    quota_per_month: int
+    max_seats: int
+    trial_days_allowed: bool
+    is_recommended: bool = False
+
+
+class PlansResponse(BaseModel):
+    plans: list[PlanItemResponse]
+
+
+# ── Usage Stats 模型 ──────────────────────────────────────────────────
+
+
+class UsageStatItem(BaseModel):
+    used: int
+    limit: int
+    remaining: int
+
+
+class UsageStatsResponse(BaseModel):
+    tier: str
+    limits: dict[str, int]
+    usage: dict[str, UsageStatItem]
+
+
 # ===================================================================
 # Routes
 # ===================================================================
@@ -170,3 +213,57 @@ async def upgrade_membership(
 async def get_pricing():
     """返回定价配置表。"""
     return PricingResponse(tiers=PRICING_CONFIG)
+
+
+@router.get("/plans", response_model=PlansResponse)
+async def list_plans():
+    """返回完整的套餐配置（从 subscription_service.PLANS 读取）。"""
+    result = []
+    for tier, plan in PLANS.items():
+        is_recommended = tier == "standard"
+        result.append(
+            PlanItemResponse(
+                tier=plan.tier,
+                name_cn=plan.name_cn,
+                name_en=plan.name_en,
+                price_cents=plan.price_cents,
+                interval=plan.interval,
+                features=[
+                    PlanFeatureItem(
+                        name=f.name,
+                        description=f.description,
+                        enabled=f.enabled,
+                    )
+                    for f in plan.features
+                ],
+                feature_tags=plan.feature_tags,
+                quota_per_month=plan.quota_per_month,
+                max_seats=plan.max_seats,
+                trial_days_allowed=plan.trial_days_allowed,
+                is_recommended=is_recommended,
+            )
+        )
+    return PlansResponse(plans=result)
+
+
+@router.get("/usage-stats", response_model=UsageStatsResponse)
+async def get_usage_stats(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """返回当前周期内的使用统计和限制。"""
+    usage_data = await get_user_usage(current_user.id, db)
+
+    usage: dict[str, UsageStatItem] = {}
+    for feature, stat in usage_data.get("usage", {}).items():
+        usage[feature] = UsageStatItem(
+            used=stat.get("used", 0),
+            limit=stat.get("limit", 0),
+            remaining=stat.get("remaining", 0),
+        )
+
+    return UsageStatsResponse(
+        tier=usage_data.get("tier", "free"),
+        limits=usage_data.get("limits", {}),
+        usage=usage,
+    )

@@ -1,0 +1,536 @@
+/* ========================================================================== */
+/*  Network page — 人脉网络图谱 Canvas 力导向图                                */
+/*  暗色背景图谱风格                                                           */
+/* ========================================================================== */
+
+@import '../../styles/tokens.scss';
+
+/* ========================================================================== */
+/*  页面容器                                                                   */
+/* ========================================================================== */
+
+.network {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background: #0f0c29;
+  background-image: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+
+  /* ====================================================================== */
+  /*  顶部导航栏                                                              */
+  /* ====================================================================== */
+
+  &__header {
+    position: relative;
+    z-index: 10;
+    padding: 80px $spacing-xl $spacing-md;
+    background: rgba(15, 12, 41, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+  }
+
+  &__stats {
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  &__stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__stat-value {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  &__stat-label {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  &__back-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #ffffff;
+  }
+
+  /* ====================================================================== */
+  /*  Canvas 容器（全屏）                                                     */
+  /* ====================================================================== */
+
+  &__canvas-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
+
+  &__canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ====================================================================== */
+  /*  底部图例悬浮                                                             */
+  /* ====================================================================== */
+
+  &__legend {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-sm $spacing-lg;
+    background: rgba(15, 12, 41, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__legend-label {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+  }
+
+  /* ====================================================================== */
+  /*  Loading / Error / Empty 状态                                           */
+  /* ====================================================================== */
+
+  &__status-overlay {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: $spacing-3xl;
+  }
+
+  &__loading-icon {
+    font-size: 64px;
+    margin-bottom: $spacing-lg;
+    animation: networkSpin 1.2s linear infinite;
+  }
+
+  &__loading-text {
+    font-size: $font-size-lg;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &__error-icon {
+    font-size: 72px;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__error-title {
+    font-size: $font-size-2xl;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__error-message {
+    font-size: $font-size-md;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: $spacing-2xl;
+    text-align: center;
+  }
+
+  &__error-btn {
+    width: 280px;
+    height: 80px;
+    line-height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 40px;
+    font-size: $font-size-md;
+    color: #ffffff;
+    text-align: center;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  &__empty-icon {
+    font-size: 80px;
+    margin-bottom: $spacing-lg;
+    opacity: 0.5;
+  }
+
+  &__empty-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: $spacing-sm;
+  }
+
+  &__empty-desc {
+    font-size: $font-size-md;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    line-height: 1.6;
+    padding: 0 $spacing-2xl;
+  }
+
+  /* ====================================================================== */
+  /*  节点详情弹窗（底部上滑）                                                  */
+  /* ====================================================================== */
+
+  &__detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  &__detail-panel {
+    background: #ffffff;
+    border-radius: $radius-xl $radius-xl 0 0;
+    padding: $spacing-2xl $spacing-xl;
+    padding-bottom: calc($spacing-xl + env(safe-area-inset-bottom));
+    animation: networkSlideUp 0.3s ease;
+  }
+
+  &__detail-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: #ddd;
+    margin: 0 auto $spacing-lg;
+  }
+
+  &__detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__detail-name {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__detail-type-tag {
+    font-size: $font-size-xs;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #ffffff;
+
+    &--center {
+      background: #F59E0B;
+    }
+
+    &--person {
+      background: #3B82F6;
+    }
+
+    &--company {
+      background: #10B981;
+    }
+
+    &--industry {
+      background: #8B5CF6;
+    }
+
+    &--tag {
+      background: #F59E0B;
+    }
+  }
+
+  &__detail-body {
+    margin-bottom: $spacing-xl;
+  }
+
+  &__detail-row {
+    display: flex;
+    align-items: center;
+    padding: $spacing-sm 0;
+    border-bottom: 1px solid $color-border-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__detail-row-label {
+    width: 100px;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__detail-row-value {
+    flex: 1;
+    font-size: $font-size-md;
+    color: $color-text-primary;
+  }
+
+  &__detail-relation-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-xs;
+  }
+
+  &__detail-relation-tag {
+    font-size: $font-size-xs;
+    padding: 2px 12px;
+    border-radius: 12px;
+    background: #f0f0f0;
+    color: $color-text-secondary;
+    white-space: nowrap;
+  }
+
+  &__detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__detail-btn {
+    width: 100%;
+    height: 88px;
+    line-height: 88px;
+    border-radius: 44px;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+
+    &--primary {
+      background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
+      color: #ffffff;
+    }
+
+    &--close {
+      background: #f5f5f5;
+      color: $color-text-secondary;
+    }
+  }
+
+  /* ====================================================================== */
+  /*  动画                                                                   */
+  /* ====================================================================== */
+
+  @keyframes networkSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes networkSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* ====================================================================== */
+  /*  洞察面板（顶部导航下方轻量卡片）                                          */
+  /* ====================================================================== */
+
+  &__insights {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0 $spacing-xl $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__insights-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__insights-value {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  &__insights-label {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &__insights-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* ====================================================================== */
+  /*  筛选按钮（横滑）                                                        */
+  /* ====================================================================== */
+
+  &__filters {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-md;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__filter-btn {
+    flex-shrink: 0;
+    padding: 6px 20px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+
+    &--active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: transparent;
+    }
+  }
+
+  &__filter-btn-text {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+
+    .network__filter-btn--active & {
+      color: #ffffff;
+    }
+  }
+
+  /* ====================================================================== */
+  /*  统计小面板（折叠卡片）                                                    */
+  /* ====================================================================== */
+
+  &__stats-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    margin-left: $spacing-sm;
+    cursor: pointer;
+  }
+
+  &__stats-toggle-icon {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &__stats-panel {
+    position: absolute;
+    bottom: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    min-width: 280px;
+    padding: $spacing-md $spacing-lg;
+    background: rgba(15, 12, 41, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: networkFadeIn 0.2s ease;
+  }
+
+  &__stats-panel-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-xs 0;
+
+    & + & {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &__stats-panel-label {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  &__stats-panel-value {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  /* ====================================================================== */
+  /*  额外动画                                                               */
+  /* ====================================================================== */
+
+  @keyframes networkFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+}

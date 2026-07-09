@@ -1,9 +1,9 @@
 /**
  * 名片详情页
  * 展示单张名片的详细信息与统计数据
- * 增加：Free用户创建名片限制检查
  */
-const { brochureApi, visitorApi, miniappApi, membershipApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
+const { miniappApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -11,9 +11,18 @@ Page({
     card: null,
     stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
     purposeText: '',
+    showNetworkMap: true,
+    currentUserId: '',
   },
 
   onLoad(options) {
+    // 获取当前用户ID
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo && userInfo.id) {
+      this.setData({ currentUserId: userInfo.id })
+    } else if (getApp().globalData && getApp().globalData.userInfo) {
+      this.setData({ currentUserId: getApp().globalData.userInfo.id })
+    }
     const cardId = options.id
     if (cardId) {
       this.loadCardDetail(cardId)
@@ -23,50 +32,15 @@ Page({
     }
   },
 
-  /**
-   * 检查名片创建限制
-   * Free用户最多创建1张名片，超出提示升级Pro
-   */
   async checkCreateLimit() {
     this.setData({ loading: true })
-    try {
-      const membershipRes = await membershipApi.getStatus()
-      const membership = membershipRes.data ?? membershipRes ?? {}
-      const memberLevel = membership.tier || membership.level || 'free'
-      const cardCount = membership.card_count ?? membership.cardCount ?? 0
-      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memberLevel === 'free' ? 1 : 10)
-
-      if (memberLevel === 'free' && cardCount >= cardLimit) {
-        // 超出限制，弹窗提示升级
-        wx.showModal({
-          title: '升级Pro',
-          content: `免费版仅支持${cardLimit}张名片，您已达到上限。升级Pro可创建最多10张名片！`,
-          confirmText: '升级Pro',
-          cancelText: '取消',
-          success: (res) => {
-            if (res.confirm) {
-              wx.navigateTo({ url: '/pages/membership/membership' })
-            } else {
-              wx.navigateBack()
-            }
-          },
-        })
-        this.setData({ loading: false })
-      } else {
-        // 未超限，跳转到创建页面
-        wx.redirectTo({ url: '/pages/brochure/create/index' })
-      }
-    } catch (err) {
-      console.error('检查创建限制失败:', err)
-      // 降级：允许创建
-      wx.redirectTo({ url: '/pages/brochure/create/index' })
-    }
+    wx.redirectTo({ url: '/pages/brochure/create/index' })
   },
 
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
-      const brochure = await brochureApi.getById(cardId)
+      const brochure = await MockService.getBrochureById(cardId)
       
       let card = null
       if (brochure) {
@@ -96,9 +70,10 @@ Page({
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await visitorApi.getStats(cardId)
-        stats.views = vStats.view_count || 0
-        stats.visitors = vStats.total_visits || 0
+        const vStats = await MockService.getVisitorStats(cardId)
+        const vStatsData = vStats.data !== undefined ? vStats.data : vStats
+        stats.views = vStatsData.view_count || 0
+        stats.visitors = vStatsData.total_visits || 0
       }
 
       this.setData({
@@ -106,6 +81,7 @@ Page({
         stats,
         purposeText,
         loading: false,
+        showNetworkMap: true,
       })
     } catch (err) {
       console.error('加载名片详情失败:', err)
@@ -169,6 +145,16 @@ Page({
     return {
       title: card?.title || 'AI数智名片',
       path: card ? `/pages/preview/index?id=${card.id}` : '/pages/index/index',
+    }
+  },
+
+  // 人脉链中间人点击 - 跳转到中间人名片预览
+  onConnectTap(e) {
+    const { userId, userName } = e.detail || {}
+    if (userId) {
+      wx.navigateTo({
+        url: `/pages/card/card?id=${userId}`,
+      })
     }
   },
 })

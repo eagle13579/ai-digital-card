@@ -2,7 +2,7 @@
  * 微信授权登录页
  * 使用 wx.login() 获取临时 code → 后端 /api/v1/auth/wx-mini-login 换取 JWT token
  */
-const { authApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
@@ -30,16 +30,12 @@ Page({
     wx.login({
       success: (res) => {
         if (res.code) {
-          // 调用后端真实API — /api/v1/auth/wx-mini-login
-          authApi.wxMiniLogin(res.code)
+          MockService.wxMiniLogin({ code: res.code })
             .then(result => {
-              // result 格式: { access_token, token_type, user }
-              // 由后端 TokenResponse schema 定义
-              if (result.access_token && result.user) {
-                app.setLogin(result.access_token, result.user)
-                // 保存会员等级（如果有）
-                if (result.user.membership_tier) {
-                  app.globalData.memberLevel = result.user.membership_tier
+              if (result.token && result.userInfo) {
+                app.setLogin(result.token, result.userInfo)
+                if (result.memberLevel) {
+                  app.globalData.memberLevel = result.memberLevel
                 }
                 wx.switchTab({ url: '/pages/index/index' })
               } else {
@@ -64,6 +60,16 @@ Page({
         this.setData({ loading: false })
       },
     })
+  },
+
+  // 跳转用户协议
+  goAgreement() {
+    wx.navigateTo({ url: '/pages/agreement/user' })
+  },
+
+  // 跳转隐私政策
+  goPrivacy() {
+    wx.navigateTo({ url: '/pages/agreement/privacy/privacy' })
   },
 
   // 跳过登录（游客模式）

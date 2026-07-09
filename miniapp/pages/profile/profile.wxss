@@ -1,146 +1,353 @@
-/* 我的页面样式 */
+/**
+ * 个人中心页样式 — 深色版 v2.0
+ * 设计体系: 山膏 | 三重渐变 | 玻璃三级 | 5色横幅系统 | 弹簧动效
+ * 横幅分配: 品牌青(用户资料区) + 营收粉(使用额度/升级区)
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ */
+@import '../../styles/tokens.wxss';
+
+/* ═══════════════════════════════════════════
+   0. 光晕背景层 (Orb Background)
+   ═══════════════════════════════════════════ */
+.orb-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    /* 主光晕 — 紫色扩散 (右上) */
+    radial-gradient(ellipse 55% 45% at 80% 5%, rgba(139, 92, 246, 0.20) 0%, transparent 70%),
+    /* 副光晕 — 青色扩散 (左下) */
+    radial-gradient(ellipse 45% 55% at 15% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 70%),
+    /* 氛围光 — 粉色微光 (中下) */
+    radial-gradient(ellipse 35% 35% at 50% 95%, rgba(236, 72, 153, 0.08) 0%, transparent 60%);
+  animation: orb-breathe 8s ease-in-out infinite;
+}
+
+@keyframes orb-breathe {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   1. 页面基础容器
+   ═══════════════════════════════════════════ */
+.page-container {
+  position: relative;
+  z-index: 1;
+}
+
+.page-container.dark {
+  background: var(--bg-page, #0A0A18);
+  min-height: 100vh;
+}
 
 .page-scroll {
   height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-/* 用户头部 */
-.profile-header {
+/* ══════════════════════════════════════════════════════════════
+   2. 5色横幅系统 — 品牌青 (Banner Cyan)
+      个人中心资料区：头像、姓名、公司、职位
+   ══════════════════════════════════════════════════════════════ */
+.banner {
+  position: relative;
+  overflow: hidden;
+  margin: var(--space-6, 24rpx);
+  border-radius: var(--radius-xl, 32rpx);
+  padding: var(--space-8, 32rpx);
   display: flex;
   align-items: center;
-  padding: 40rpx 16px;
-  background: #fff;
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-.profile-avatar {
+/* 品牌青横幅 */
+.banner-cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.08) 50%, rgba(15, 15, 19, 0.6) 100%);
+  border: 0.5px solid rgba(6, 182, 212, 0.20);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.10), inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
+}
+
+.banner-cyan::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* 头像 */
+.banner-avatar-wrap {
   position: relative;
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 60rpx;
-  overflow: hidden;
+  width: var(--user-header-avatar-size, 120rpx);
+  height: var(--user-header-avatar-size, 120rpx);
   flex-shrink: 0;
-  margin-right: 28rpx;
+  margin-right: var(--space-6, 24rpx);
 }
 
-.profile-avatar image {
+.banner-avatar {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
+  border: var(--user-header-avatar-border, 2px solid rgba(255, 255, 255, 0.15));
+  box-shadow: var(--orb-cyan, 0 0 20px rgba(6, 182, 212, 0.20));
 }
 
-.profile-avatar .member-badge {
+.member-badge {
   position: absolute;
-  bottom: -6rpx;
+  bottom: -4rpx;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 18rpx;
-  padding: 2rpx 6px;
-  border-radius: 14rpx;
+  font-size: var(--text-xs, 20rpx);
+  padding: var(--space-1, 4rpx) var(--space-3, 12rpx);
+  border-radius: var(--radius-full, 9999rpx);
   white-space: nowrap;
-  border: 2px solid #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: var(--bg-glass-2, rgba(255, 255, 255, 0.07));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-primary, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-mono, monospace);
+  letter-spacing: var(--tracking-wider, 0.05em);
+  text-transform: uppercase;
 }
 
-.profile-meta {
+/* 用户元数据 */
+.banner-user-meta {
   flex: 1;
   min-width: 0;
 }
 
-.profile-name {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #1a1a1a;
+.banner-user-name {
   display: block;
+  font-size: var(--user-header-name-size, 40rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  letter-spacing: var(--tracking-tight, -0.01em);
+  margin-bottom: var(--space-1, 4rpx);
 }
 
-.profile-company {
-  font-size: 26rpx;
-  color: #666;
+.banner-user-pos {
   display: block;
-  margin-top: 4rpx;
+  font-size: var(--user-header-pos-size, 24rpx);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
 }
 
-.profile-edit {
-  padding: 12rpx 16px;
-  border: 1px solid #1657ff;
-  border-radius: 32rpx;
-  margin-left: 16rpx;
+/* 箭头 */
+.banner-arrow {
+  font-size: 48rpx;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.40));
+  margin-left: var(--space-4, 16rpx);
+  flex-shrink: 0;
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-.edit-text {
-  font-size: 26rpx;
-  color: #1657ff;
+.spring-press:active .banner-arrow {
+  transform: translateX(6rpx);
 }
 
-/* 会员卡片 */
-.member-card {
-  margin-top: 0 !important;
+/* 横幅光晕装饰 */
+.banner-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
 }
 
-.member-body {
+.banner-glow-cyan {
+  top: -60%;
+  right: -15%;
+  width: 300rpx;
+  height: 300rpx;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.banner-glow-pink {
+  bottom: -50%;
+  right: -10%;
+  width: 250rpx;
+  height: 250rpx;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ═══════════════════════════════════════════
+   3. 统计数据面板 (紧接横幅下方)
+   ═══════════════════════════════════════════ */
+.stats-panel {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  margin: -16rpx var(--space-6, 24rpx) var(--space-6, 24rpx);
+  padding: var(--space-6, 24rpx) var(--space-4, 16rpx);
+  border-radius: var(--radius-lg, 24rpx);
+  position: relative;
+  z-index: 2;
+  background: var(--bg-glass-1, rgba(255, 255, 255, 0.04));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: var(--glass-border-1, 0.5px solid rgba(255, 255, 255, 0.06));
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139, 92, 246, 0.15));
 }
 
-.member-left {
+.stats-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: var(--space-2, 8rpx) 0;
+  transition: all var(--duration-fast, 150ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-.member-level-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+.stats-item:active {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-sm, 12rpx);
 }
 
-.member-level-value {
-  padding: 4rpx 12px;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  align-self: flex-start;
-  margin-bottom: 8rpx;
+.stats-num {
+  font-size: var(--stat-number-size, 36rpx);
+  font-weight: var(--stat-number-weight, 700);
+  color: var(--stat-number-color, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-mono, monospace);
+  letter-spacing: var(--tracking-tight, -0.01em);
 }
 
-.member-expire {
-  font-size: 22rpx;
-  color: #999;
+.stats-label {
+  font-size: var(--stat-label-size, 20rpx);
+  color: var(--stat-label-color, rgba(255, 255, 255, 0.65));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  margin-top: var(--space-1, 4rpx);
 }
 
-.member-right {
+.stats-divider {
+  width: 1px;
+  height: 48rpx;
+  background: var(--border-subtle, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. 5色横幅系统 — 营收粉 (Banner Pink)
+      升级/使用额度区
+   ══════════════════════════════════════════════════════════════ */
+.banner-pink {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.20) 0%, rgba(236, 72, 153, 0.06) 60%, rgba(15, 15, 19, 0.6) 100%);
+  border: 0.5px solid rgba(236, 72, 153, 0.15);
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.08), inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
+  padding: var(--space-6, 24rpx) var(--space-8, 32rpx);
+}
+
+.banner-pink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.25), transparent);
+  pointer-events: none;
+}
+
+.banner-pink-content {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
-.member-upgrade {
-  font-size: 28rpx;
-  color: #1657ff;
-  font-weight: 500;
+.banner-pink-icon-wrap {
+  width: 88rpx;
+  height: 88rpx;
+  background: var(--bg-glass-1, rgba(255, 255, 255, 0.04));
+  border: 0.5px solid rgba(236, 72, 153, 0.15);
+  border-radius: var(--radius-lg, 24rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-6, 24rpx);
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* 升级按钮 */
-.upgrade-btn {
-  background: linear-gradient(135deg, #f5a623, #f7d94c);
-  padding: 12rpx 16px;
-  border-radius: 32rpx;
-  box-shadow: 0 2px 8px rgba(245, 166, 35, 0.3);
+.banner-pink-icon {
+  font-size: 48rpx;
+  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.3));
 }
 
-.upgrade-btn-text {
-  font-size: 26rpx;
+.banner-pink-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.banner-pink-title {
+  display: block;
+  font-size: var(--text-lg, 32rpx);
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  letter-spacing: var(--tracking-tight, -0.01em);
+  margin-bottom: var(--space-1, 4rpx);
 }
 
-/* 使用额度进度条 */
-.usage-section {
-  padding: 0 16px 16px;
+.banner-pink-desc {
+  display: block;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+}
+
+.banner-pink-cta {
+  font-size: var(--text-sm, 24rpx);
+  color: var(--pink, #ec4899);
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: var(--space-4, 16rpx);
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.spring-press:active .banner-pink-cta {
+  transform: translateX(6rpx);
+}
+
+/* ═══════════════════════════════════════════
+   5. 使用额度卡片 (Pro 用户)
+   ═══════════════════════════════════════════ */
+.usage-card {
+  margin: var(--space-6, 24rpx);
+}
+
+.usage-body {
+  padding: 0 var(--space-6, 24rpx) var(--space-8, 32rpx);
 }
 
 .usage-item {
   display: flex;
   align-items: center;
-  margin-bottom: 16rpx;
+  margin-bottom: var(--space-6, 24rpx);
 }
 
 .usage-item:last-child {
@@ -148,127 +355,287 @@
 }
 
 .usage-label {
-  font-size: 24rpx;
-  color: #999;
-  width: 80rpx;
+  display: flex;
+  align-items: center;
+  width: 160rpx;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
   flex-shrink: 0;
+}
+
+.usage-icon {
+  margin-right: var(--space-2, 8rpx);
+  font-size: var(--text-base, 28rpx);
 }
 
 .usage-bar-wrap {
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
+  height: 8rpx;
+  background: var(--bg-glass-1, rgba(255, 255, 255, 0.04));
+  border-radius: var(--radius-full, 9999rpx);
+  overflow: hidden;
+  margin: 0 var(--space-4, 16rpx);
 }
 
 .usage-bar {
-  flex: 1;
-  height: 12rpx;
-  background: #f0f0f0;
-  border-radius: 6rpx;
-  overflow: hidden;
-}
-
-.usage-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1657ff, #4a7aff);
-  border-radius: 6rpx;
-  transition: width 0.3s ease;
+  background: var(--gradient-cyan-purple, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  border-radius: var(--radius-full, 9999rpx);
+  transition: width var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-.usage-text {
-  font-size: 22rpx;
-  color: #999;
-  width: 100rpx;
-  text-align: right;
+.usage-num {
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.40));
+  font-family: var(--font-mono, monospace);
   flex-shrink: 0;
+  min-width: 90rpx;
+  text-align: right;
 }
 
-/* 数据概览 */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  padding: 0 16px 16px;
+/* ═══════════════════════════════════════════
+   6. 分类标签
+   ═══════════════════════════════════════════ */
+.section-label {
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.40));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  letter-spacing: var(--tracking-wide, 0.02em);
+  text-transform: uppercase;
+  padding: var(--space-8, 32rpx) var(--space-10, 40rpx) var(--space-4, 16rpx);
 }
 
-.stats-grid .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stats-grid .stat-num {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.stats-grid .stat-label {
-  font-size: 22rpx;
-  color: #999;
-  margin-top: 4rpx;
-}
-
-/* 菜单列表 */
+/* ═══════════════════════════════════════════
+   7. 菜单卡片 (毛玻璃 + 弹簧动效)
+   ═══════════════════════════════════════════ */
 .menu-card {
-  padding: 0 !important;
+  margin: 0 var(--space-6, 24rpx) var(--space-3, 12rpx);
+  padding: 0;
+  overflow: hidden;
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+  background: var(--bg-glass-2, rgba(255, 255, 255, 0.07));
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: var(--glass-border-2, 0.5px solid rgba(255, 255, 255, 0.10));
+  border-radius: var(--radius-md, 16rpx);
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139, 92, 246, 0.15)), var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255, 255, 255, 0.08));
 }
 
+.menu-card:active {
+  background: var(--bg-glass-3, rgba(139, 92, 246, 0.12));
+  box-shadow: var(--orb-md, 0 0 24px rgba(139, 92, 246, 0.20)), var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255, 255, 255, 0.08));
+}
+
+/* 菜单项 */
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 32rpx;
-  border-bottom: 1px solid #f5f5f5;
+  padding: var(--space-8, 32rpx) var(--space-6, 24rpx);
+  position: relative;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
+.menu-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: var(--space-6, 24rpx);
+  right: var(--space-6, 24rpx);
+  height: 0.5px;
+  background: var(--border-subtle, rgba(255, 255, 255, 0.06));
+  pointer-events: none;
+}
+
+.menu-card:last-child .menu-item::after {
+  display: none;
 }
 
 .menu-icon {
   font-size: 40rpx;
-  margin-right: 24rpx;
+  margin-right: var(--space-6, 24rpx);
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.1));
 }
 
-.menu-label {
+.menu-text {
   flex: 1;
-  font-size: 30rpx;
-  color: #1a1a1a;
+  min-width: 0;
 }
 
-.menu-value {
-  font-size: 26rpx;
-  color: #999;
-  margin-right: 16rpx;
+.menu-title {
+  display: block;
+  font-size: var(--text-base, 28rpx);
+  font-weight: 500;
+  color: var(--text-primary, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  letter-spacing: var(--tracking-tight, -0.01em);
+  margin-bottom: var(--space-1, 4rpx);
 }
 
-.menu-badge {
-  background: #ee0a24;
-  color: #fff;
-  font-size: 22rpx;
-  padding: 2rpx 8px;
-  border-radius: 20rpx;
-  min-width: 40rpx;
-  text-align: center;
-  margin-right: 16rpx;
+.menu-desc {
+  display: block;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.40));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
 }
 
 .menu-arrow {
-  font-size: 32rpx;
-  color: #ccc;
+  font-size: 40rpx;
+  color: var(--text-quaternary, rgba(255, 255, 255, 0.20));
+  margin-left: var(--space-4, 16rpx);
+  flex-shrink: 0;
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-/* 退出登录 */
+.spring-press:active .menu-arrow {
+  transform: translateX(6rpx);
+}
+
+/* 菜单未读徽章 */
+.menu-badge {
+  background: var(--pink, #ec4899);
+  min-width: 36rpx;
+  height: 36rpx;
+  border-radius: var(--radius-full, 9999rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2, 8rpx);
+  margin-right: var(--space-3, 12rpx);
+  box-shadow: var(--orb-pink, 0 0 20px rgba(236, 72, 153, 0.20));
+}
+
+.menu-badge-text {
+  font-size: 20rpx;
+  color: var(--text-inverse, #0A0A18);
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ═══════════════════════════════════════════
+   8. 退出登录区
+   ═══════════════════════════════════════════ */
 .logout-section {
-  padding: 48rpx 16px 40px;
+  padding: var(--space-12, 48rpx) var(--space-6, 24rpx);
 }
 
 .logout-btn {
-  color: #ee0a24 !important;
-  border-color: #ee0a24 !important;
+  background: var(--bg-glass-1, rgba(255, 255, 255, 0.04));
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--danger, #ef4444);
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
+.logout-btn:active {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════════
+   9. Card 组件基础覆写
+   ═══════════════════════════════════════════ */
+.card {
+  border-radius: var(--card-radius, var(--radius-md));
+  overflow: hidden;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-8, 32rpx) var(--space-6, 24rpx) var(--space-3, 12rpx);
+}
+
+.card-header .title {
+  font-size: var(--text-lg, 32rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.92));
+  font-family: var(--font-sc, 'PingFang SC', sans-serif);
+  letter-spacing: var(--tracking-tight, -0.01em);
+}
+
+/* ═══════════════════════════════════════════
+   10. 玻璃三级覆写 (组件级)
+   ═══════════════════════════════════════════ */
+.glass-tier-1 {
+  background: var(--bg-glass-1, rgba(255, 255, 255, 0.04)) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
+}
+
+.glass-tier-2 {
+  background: var(--bg-glass-2, rgba(255, 255, 255, 0.07)) !important;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 0.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-tier-3 {
+  background: rgba(15, 15, 19, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ═══════════════════════════════════════════
+   11. 弹簧动效系统
+   ═══════════════════════════════════════════ */
+.spring-press {
+  cursor: pointer;
+}
+
+.spring-scale-down {
+  transform: scale(0.97) !important;
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.spring-scale-mini {
+  transform: scale(0.95) !important;
+  transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* ═══════════════════════════════════════════
+   12. 底部占位
+   ═══════════════════════════════════════════ */
 .bottom-placeholder {
   height: 120rpx;
+}
+
+/* ═══════════════════════════════════════════
+   13. 会员等级徽章颜色
+   ═══════════════════════════════════════════ */
+.badge-free {
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--text-secondary);
+}
+
+.badge-gold {
+  background: linear-gradient(135deg, #f5a623, #f7d94c);
+  color: #0A0A18;
+}
+
+.badge-diamond {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  color: #0A0A18;
+}
+
+.badge-board {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: #fff;
 }

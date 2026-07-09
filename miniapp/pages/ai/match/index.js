@@ -1,7 +1,5 @@
-// pages/ai/match/index.js — 智能人脉匹配 (真实API连接)
-// 功能：AI根据用户偏好智能推荐匹配人脉，支持交换名片
-
-const { matchApi, userApi } = require('../../../utils/api')
+// pages/ai/match/index.js
+const { MockService } = require('../../../utils/mockService')
 
 Page({
   data: {
@@ -24,23 +22,23 @@ Page({
   },
 
   onLoad() {
+    const sys = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sys.statusBarHeight })
     wx.setNavigationBarTitle({ title: '人脉匹配' })
     this.loadRecommendations()
   },
 
-  /** 获取推荐列表 */
   loadRecommendations() {
     this.setData({ loading: true, error: false, errorMsg: '', empty: false })
 
-    matchApi.getRecommend({
+    MockService.getRecommendations({
       industry: this.data.preferences.industry,
       region: this.data.preferences.region,
       position: this.data.preferences.position,
       limit: 20
     })
       .then(res => {
-        const list = res.data || res.list || res.recommendations || res.items || []
-        // 归一化字段名
+        const list = res.list || res.data || res.recommendations || res.items || []
         const normalized = list.map((item, index) => ({
           id: item.id || item.user_id || index,
           avatar: item.avatar || item.avatar_url || '',
@@ -49,7 +47,6 @@ Page({
           company: item.company || item.company_name || '',
           matchScore: item.matchScore || item.match_score || item.score || 0,
           tags: item.tags || item.interests || item.skills || [],
-          // 是否已经交换过名片
           connected: item.connected || item.is_connected || false
         }))
 
@@ -94,12 +91,10 @@ Page({
     })
   },
 
-  /** 交换名片/解锁联系方式 */
   onConnect(e) {
     const id = e.currentTarget.dataset.id
     if (!id) return
 
-    // 检查是否已连接
     const item = this.data.recommendations.find(r => r.id === id)
     if (item && item.connected) {
       wx.showToast({ title: '已是好友', icon: 'none' })
@@ -109,12 +104,11 @@ Page({
     this.setData({ connectingId: id })
     wx.showLoading({ title: '请求中...', mask: true })
 
-    matchApi.unlock(id)
+    MockService.unlockContact(id)
       .then(res => {
         wx.hideLoading()
         wx.showToast({ title: '名片交换请求已发送', icon: 'success' })
 
-        // 更新该项状态
         const list = this.data.recommendations.map(r => {
           if (r.id === id) r.connected = true
           return r

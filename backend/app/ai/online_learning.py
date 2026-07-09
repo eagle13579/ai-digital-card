@@ -494,6 +494,107 @@ class OnlineLearningEngine:
         )
         return None
 
+    # ── 实时反馈处理 ──────────────────────────────────────────
+
+    def on_feedback(
+        self,
+        user_id: int,
+        item_id: int,
+        rating: int,
+        feedback_type: str = "rating",
+        source: str = "recommend",
+    ) -> dict[str, Any]:
+        """实时处理单条反馈，立即更新在线学习权重
+
+        每次 feedback_loop.record_feedback() 触发时自动调用。
+        单条反馈的调整幅度 = 批处理阈值分之一，确保与 batch 学习逻辑一致。
+
+        Args:
+            user_id: 当前用户 ID
+            item_id: 被推荐用户 ID
+            rating: 评分值
+            feedback_type: 反馈类型 (like/dislike/rating)
+            source: 来源
+
+        Returns:
+            dict: 调整结果报告
+        """
+        start_time = time.time()
+
+        # 计算单条反馈的调整量 (阈值分之一)
+        # 批处理每次用 100 条反馈调整 ±0.05，单条缩放为 ±0.0005
+        learning_rate = 1.0 / self.LEARN_THRESHOLD
+        if feedback_type == "like" or rating > 0:
+            delta = self.ADJUST_LIKE * learning_rate
+        elif feedback_type == "dislike" or rating < 0:
+            delta = self.ADJUST_DISLIKE * learning_rate
+        else:
+            delta = self.ADJUST_SKIP
+
+        # 更新全局调整系数
+        global _global_adjustment
+        with _global_adjustment_lock:
+            old_adjustment = _global_adjustment
+            new_adjustment = _global_adjustment + delta
+            new_adjustment = max(
+                self.MIN_GLOBAL_ADJUSTMENT,
+                min(self.MAX_GLOBAL_ADJUSTMENT, new_adjustment),
+            )
+            _global_adjustment = new_adjustment
+
+        # 更新各维度权重
+        with _weights_lock:
+            old_weights = dict(_online_weights)
+            for key in _DEFAULT_WEIGHTS:
+                base = _DEFAULT_WEIGHTS[key]
+                adjusted = base * new_adjustment
+                _online_weights[key] = round(adjusted, 4)
+            new_weights = dict(_online_weights)
+
+        # 持久化
+        save_online_weights(new_weights, new_adjustment)
+
+        # 热更新 RecommendEngine 权重
+        try:
+            from app.ai.recommendation import RecommendEngine
+            RecommendEngine.refresh_online_weights()
+        except Exception as e:
+            logger.debug("RecommendEngine 权重实时热更新跳过: %s", e)
+
+        # 记录日志
+        elapsed = time.time() - start_time
+        result = {
+            "timestamp": time.time(),
+            "type": "real_time",
+            "feedback": {
+                "user_id": user_id,
+                "item_id": item_id,
+                "rating": rating,
+                "feedback_type": feedback_type,
+                "source": source,
+            },
+            "weight_changes": {
+                "old_global_adjustment": old_adjustment,
+                "new_global_adjustment": new_adjustment,
+                "delta": round(delta, 6),
+                "old_weights": old_weights,
+                "new_weights": new_weights,
+            },
+            "duration_seconds": round(elapsed, 3),
+            "status": "completed",
+        }
+        self._append_log(result)
+
+        logger.debug(
+            "实时在线学习: user=%d item=%d rating=%d, "
+            "adjustment=%.6f→%.6f, weights=%s, 耗时=%.3fs",
+            user_id, item_id, rating,
+            old_adjustment, new_adjustment,
+            new_weights, elapsed,
+        )
+
+        return result
+
     # ── 状态查询 ──────────────────────────────────────────────
 
     def get_learning_status(self) -> dict[str, Any]:

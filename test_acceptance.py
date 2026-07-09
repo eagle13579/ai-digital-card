@@ -84,32 +84,46 @@ print("\n📝 4. 前端代码审计")
 MINIAPP = r"D:\AI数智名片\miniapp"
 
 # 4a. 所有页面在app.json注册
-test("app.json页面注册完整", lambda: (
-    lambda cfg: (
-        lambda pages: (
-            None if all(p in pages for p in [
-                "pages/ai/scan/index", "pages/ai/match/index",
-                "pages/ai/insight/index", "pages/ai/config/index",
-                "pages/membership/membership",
-            ]) else (_ for _ in ()).throw(
-                AssertionError("missing pages"))
-        )(cfg.get("pages", []))
-    )(json.load(open(os.path.join(MINIAPP, "app.json"))))
-)())
+def _check_app_json():
+    import json as _json
+    pages = _json.load(open(os.path.join(MINIAPP, "app.json"), encoding="utf-8")).get("pages", [])
+    required = [
+        "pages/ai/scan/index", "pages/ai/match/index",
+        "pages/ai/insight/index", "pages/ai/config/index",
+        "pages/membership/membership",
+    ]
+    missing = [p for p in required if p not in pages]
+    if missing:
+        raise AssertionError(f"missing pages: {missing}")
+test("app.json页面注册完整", lambda: _check_app_json())
 
-# 4b. JS语法检查
-print("   语法检查...")
+# 4b. JS语法检查（用 Node.js 而非 Python）
+print("   语法检查 (Node.js)...")
+js_errors = []
 for root, dirs, files in os.walk(os.path.join(MINIAPP, "pages")):
     for f in files:
         if f.endswith(".js"):
             path = os.path.join(root, f)
             try:
-                compile(open(path, encoding="utf-8").read(), path, "exec")
-            except SyntaxError as e:
-                results.append(f"  ❌ 语法错误 {path}: {e}")
-                FAIL += 1
-PASS += 1
-results.append("  ✅ 所有JS文件语法通过")
+                r = subprocess.run(
+                    ["node", "--check", path],
+                    capture_output=True, text=True, timeout=10
+                )
+                if r.returncode != 0:
+                    err = r.stderr.strip().split("\n")[-1] if r.stderr else "unknown error"
+                    js_errors.append(f"{os.path.relpath(path, MINIAPP)}: {err}")
+            except FileNotFoundError:
+                js_errors.append("node.js not installed — skip JS syntax check")
+                break
+            except subprocess.TimeoutExpired:
+                js_errors.append(f"timeout: {os.path.relpath(path, MINIAPP)}")
+if js_errors:
+    for e in js_errors:
+        results.append(f"  ❌ JS语法错误: {e}")
+        FAIL += 1
+else:
+    PASS += 1
+    results.append("  ✅ 所有JS文件语法通过 (Node.js)")
 
 # 4c. require路径检查
 print("   require路径检查...")

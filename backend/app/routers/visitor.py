@@ -1,3 +1,4 @@
+import html
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -55,10 +56,10 @@ async def log_visit(
     log = VisitorLog(
         brochure_id=brochure_id,
         visitor_id=data.visitor_id,
-        visitor_name=data.visitor_name,
+        visitor_name=html.escape(data.visitor_name),
         visitor_ip=data.visitor_ip or request.client.host if request.client else "",
         source=data.source,
-        page_viewed=data.page_viewed,
+        page_viewed=html.escape(data.page_viewed),
         duration=data.duration,
     )
     db.add(log)
@@ -81,11 +82,11 @@ async def express_interest(
 
     log = VisitorLog(
         brochure_id=brochure_id,
-        visitor_name=data.visitor_name,
+        visitor_name=html.escape(data.visitor_name),
         visitor_ip=request.client.host if request.client else "",
         source="interest",
         interested=True,
-        contact_msg=data.contact_msg,
+        contact_msg=html.escape(data.contact_msg),
     )
     db.add(log)
     await db.commit()

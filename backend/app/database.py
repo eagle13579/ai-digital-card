@@ -47,3 +47,14 @@ async def get_db():
             yield db
         finally:
             pass  # async_sessionmaker context manager handles close/rollback
+
+
+# ── 同步引擎兼容（用于暂未迁移到 async 的旧模块） ──────────
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+_sync_url = (
+    settings.DATABASE_URL.replace("+aiosqlite", "").replace("+asyncpg", "")
+)
+sync_engine = create_engine(_sync_url, echo=False)
+SessionLocal = sessionmaker(bind=sync_engine, expire_on_commit=False)

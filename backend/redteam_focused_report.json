@@ -1,0 +1,106 @@
+{
+  "scan_time": "2026-07-09 09:40:00",
+  "target": "AI数智名片",
+  "base_url": "http://localhost:8002",
+  "security_score": "62/100",
+  "summary": {
+    "total": 13,
+    "fixed": 8,
+    "unfixed": 4,
+    "partial": 1,
+    "severity": { "P0": 3, "P1": 8, "P2": 2 }
+  },
+  "findings": [
+    {
+      "severity": "P0",
+      "title": "存储型XSS漏洞",
+      "detail": "测试payload=<script>alert(document.cookie)</script>。POST创建后title返回'&lt;script&gt;...&lt;/script&gt;'，已正确HTML转义",
+      "status": "已修复",
+      "fix": "brochure.py中已使用html.escape()对title、cover、album_meta、page content等字段转义"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权(单条GET)",
+      "detail": "用户B(token_b)尝试GET /api/v1/brochures/{id_of_A} → HTTP 403 '无权访问此画册'。user_id所有权检查生效",
+      "status": "已修复",
+      "fix": "get_brochure()中brochure.user_id != current_user.id校验"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权(列表接口)",
+      "detail": "GET /api/v1/brochures 返回所有用户数据(未按当前user_id过滤)。发现其他用户ID:51,52,54,55",
+      "status": "部分修复",
+      "fix": "列表接口缺少WHERE user_id = current_user.id过滤"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /docs",
+      "detail": "HTTP 200, 返回934B Swagger文档内容",
+      "status": "未修复",
+      "fix": "生产环境ENV=production时/docs应禁用(当前为development)"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /redoc",
+      "detail": "HTTP 200, 返回894B ReDoc文档内容",
+      "status": "未修复",
+      "fix": "生产环境ENV=production时/redoc应禁用"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /openapi.json",
+      "detail": "HTTP 200, 返回323KB完整OpenAPI规范(含所有API端点、参数、schema)",
+      "status": "未修复",
+      "fix": "生产环境ENV=production时/openapi.json应禁用"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /metrics",
+      "detail": "HTTP 200, 返回4782B Prometheus指标数据",
+      "status": "未修复",
+      "fix": "生产环境ENV=production时/metrics应禁用或加认证"
+    },
+    {
+      "severity": "P1",
+      "title": "安全头检查",
+      "detail": "全部7项安全头已设置: CSP(default-src 'self'), HSTS, X-CTO, XFO, XXP, Referrer-Policy, Permissions-Policy",
+      "status": "已通过",
+      "fix": ""
+    },
+    {
+      "severity": "P1",
+      "title": "CSRF防护",
+      "detail": "Double Submit Cookie模式已实现。GET /api/csrf/token返回token, Cookie和Header双向校验。注意: Bearer token请求跳过CSRF(合理)",
+      "status": "已通过",
+      "fix": ""
+    },
+    {
+      "severity": "P1",
+      "title": "JWT过期时间",
+      "detail": "ACCESS_TOKEN_EXPIRE_MINUTES=60(从7天缩短), Token有效约1小时。代码config.py已验证",
+      "status": "已修复",
+      "fix": "config.py: ACCESS_TOKEN_EXPIRE_MINUTES: int = 60"
+    },
+    {
+      "severity": "P1",
+      "title": "代码安全模式检查",
+      "detail": "未发现eval/exec/subprocess/pickle等危险函数调用(扫描全部.py文件)",
+      "status": "已通过",
+      "fix": ""
+    },
+    {
+      "severity": "P2",
+      "title": "JWT签名算法",
+      "detail": "使用RS256非对称签名(2048位RSA密钥), 支持HS256降级。Token头验证alg=RS256",
+      "status": "已修复",
+      "fix": "auth_jwt.py实现RS256优先+HS256回退"
+    },
+    {
+      "severity": "P2",
+      "title": "JWT密钥强度不足",
+      "detail": ".env中JWT_SECRET='change...card'——包含'change'字样, 长度不足32字符, 是弱/默认密钥",
+      "status": "未修复",
+      "fix": "应使用 openssl rand -hex 32 生成强随机密钥。注意RS256主密钥已自动生成降低风险"
+    }
+  ]
+}

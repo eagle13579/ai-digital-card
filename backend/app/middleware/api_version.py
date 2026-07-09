@@ -1,7 +1,7 @@
 """API Version Redirect Middleware.
 
 Rewrites /api/v1/xxx -> /api/xxx at ASGI scope level for unregistered v1 paths.
-Adds Sunset/Deprecation headers for all v1-style requests.
+Adds deprecation headers for all v1-style requests.
 
 For explicitly registered v1 endpoints (in v1_deprecated.py), the path is NOT
 rewritten but deprecation headers are still added.
@@ -21,7 +21,8 @@ _EXPLICIT_V1_PREFIXES = frozenset({
     "/api/v1/match", "/api/v1/matching",
     "/api/v1/messages", "/api/v1/metrics", "/api/v1/oauth",
     "/api/v1/payment", "/api/v1/recommend", "/api/v1/subscription",
-    "/api/v1/tags", "/api/v1/tenant", "/api/v1/trust",
+    "/api/v1/tags", "/api/v1/tenant", "/api/v1/token",
+    "/api/v1/trust",
     "/api/v1/users", "/api/v1/visitors", "/api/v1/webhooks",
 })
 
@@ -57,9 +58,6 @@ class APIVersionRedirectMiddleware:
                 async def _send(message):
                     if message["type"] == "http.response.start":
                         headers = list(message.get("headers", []))
-                        headers.append(
-                            (b"sunset", b"Sat, 01 Jan 2027 00:00:00 GMT")
-                        )
                         headers.append((b"deprecation", b"true"))
                         headers.append(
                             (b"link", b'</api/v2/brochures>; rel="successor-version"')

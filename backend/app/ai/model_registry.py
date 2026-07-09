@@ -7,11 +7,12 @@
 
 import json
 import logging
+import os
 import sqlite3
 import threading
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -177,3 +178,180 @@ class ModelRegistry:
             logger.info("模型 %s 没有 production 版本", name)
             return None
         return self._row_to_record(row)
+
+    # ── 模型 A/B 自动对比 ─────────────────────────────────────
+
+    def compare_models(self, name: str, metric: str = "auto") -> Optional[dict]:
+        """比较最新 staging 模型与当前 production 模型的指标, 自动提升更优者。
+
+        流程:
+          1. 获取当前 production 模型和最新 staging 模型
+          2. 用指定指标比较
+          3. staging 更优 → 自动 promote 到 production
+
+        Args:
+            name: 模型名称
+            metric: 指标名称, "auto" 自动选择(按优先级: accuracy/f1/precision/recall)
+
+        Returns:
+            dict: {compared, production, staging, winner, metric, prod_value, stage_value}
+        """
+        production = self.get_production_model(name)
+        staging = self._get_staging_model(name)
+
+        if not staging:
+            logger.info("[compare_models] %s: 无 staging 模型, 跳过", name)
+            return None
+
+        result = {
+            "compared": False,
+            "production": production,
+            "staging": staging,
+            "winner": "none",
+            "metric": metric,
+            "prod_value": None,
+            "stage_value": None,
+        }
+
+        if not production:
+            logger.info("[compare_models] %s: 无 production, 直接提升 staging v%s",
+                        name, staging.version)
+            promoted = self.promote_model(name, staging.version)
+            result["compared"] = True
+            result["winner"] = "staging"
+            result["production"] = promoted
+            return result
+
+        # 自动选择指标
+        if metric == "auto":
+            for m in ("accuracy", "f1", "precision", "recall", "ndcg", "auc"):
+                if m in staging.metrics and m in production.metrics:
+                    metric = m
+                    break
+            if metric == "auto":
+                common = set(staging.metrics.keys()) & set(production.metrics.keys())
+                if common:
+                    metric = list(common)[0]
+
+        if metric not in staging.metrics or metric not in production.metrics:
+            logger.info("[compare_models] %s: 指标 '%s' 不全, 跳过", name, metric)
+            return None
+
+        prod_val = float(production.metrics[metric])
+        stage_val = float(staging.metrics[metric])
+        result["metric"] = metric
+        result["prod_value"] = prod_val
+        result["stage_value"] = stage_val
+
+        if stage_val > prod_val:
+            logger.info("[compare_models] %s: staging(%.4f) > production(%.4f), 自动提升",
+                        name, stage_val, prod_val)
+            promoted = self.promote_model(name, staging.version)
+            result["compared"] = True
+            result["winner"] = "staging"
+            result["production"] = promoted
+        else:
+            logger.info("[compare_models] %s: staging(%.4f) <= production(%.4f), 保持现状",
+                        name, stage_val, prod_val)
+            result["compared"] = True
+            result["winner"] = "production"
+
+        return result
+
+    def _get_staging_model(self, name: str) -> Optional[ModelRecord]:
+        """获取最新 staging 模型。"""
+        cursor = self._conn.execute(
+            "SELECT name, version, path, metrics, stage, created_at FROM models "
+            "WHERE name=? AND stage='staging' "
+            "ORDER BY created_at DESC LIMIT 1",
+            (name,),
+        )
+        row = cursor.fetchone()
+        return self._row_to_record(row) if row else None
+
+    # ── 模型健康检查 ──────────────────────────────────────────
+
+    def health_check(self) -> Tuple[int, int]:
+        """检查所有 production 模型的文件是否存在。
+
+        返回:
+            (healthy_count, total_count) — 健康的模型数量 / 总计数量
+        """
+        with self._lock:
+            cursor = self._conn.execute(
+                "SELECT name, version, path, stage FROM models WHERE stage='production'"
+            )
+            rows = cursor.fetchall()
+
+        total = len(rows)
+        healthy = 0
+
+        for name, version, path, stage in rows:
+            if os.path.exists(path):
+                healthy += 1
+                logger.debug("健康检查通过: %s v%s (%s)", name, version, path)
+            else:
+                logger.warning("健康检查失败: %s v%s 文件不存在 (%s)", name, version, path)
+
+        logger.info("模型健康检查: %d/%d 通过", healthy, total)
+        return (healthy, total)
+
+    # ── 模型回滚 ──────────────────────────────────────────────
+
+    def rollback(self, name: str) -> Optional[ModelRecord]:
+        """回滚模型: 将上一个 production 版本恢复为 production, 当前版本降为 staging。
+
+        逻辑:
+            1. 找出当前 production 版本 → 降级为 staging
+            2. 找出上一个 production 版本（时间最接近的 staging 中曾为 production 的）→ 提升为 production
+            3. 如果当前没有 production 版本, 从 staging 中选最新的提升
+
+        返回:
+            提升后的 ModelRecord, 如果无可用版本则返回 None
+        """
+        with self._lock:
+            # 1. 获取当前 production 版本
+            cursor = self._conn.execute(
+                "SELECT name, version, path, metrics, stage, created_at FROM models "
+                "WHERE name=? AND stage='production' ORDER BY created_at DESC LIMIT 1",
+                (name,),
+            )
+            current_prod = cursor.fetchone()
+
+            # 2. 获取所有 staging 版本, 按创建时间倒序
+            cursor = self._conn.execute(
+                "SELECT name, version, path, metrics, stage, created_at FROM models "
+                "WHERE name=? AND stage='staging' ORDER BY created_at DESC",
+                (name,),
+            )
+            staging_rows = cursor.fetchall()
+
+            if not staging_rows:
+                logger.warning("回滚失败: 模型 %s 没有可用的 staging 版本", name)
+                return None
+
+            # 3. 降级当前 production → staging (如果有)
+            if current_prod is not None:
+                self._conn.execute(
+                    "UPDATE models SET stage='staging' WHERE name=? AND version=?",
+                    (name, current_prod[1]),
+                )
+                logger.info("降级当前 production: %s v%s → staging", name, current_prod[1])
+
+            # 4. 将最新的 staging 提升为 production
+            target_version = staging_rows[0][1]
+            self._conn.execute(
+                "UPDATE models SET stage='production' WHERE name=? AND version=?",
+                (name, target_version),
+            )
+            self._conn.commit()
+
+            # 5. 返回更新后的记录
+            cursor = self._conn.execute(
+                "SELECT name, version, path, metrics, stage, created_at FROM models "
+                "WHERE name=? AND version=?",
+                (name, target_version),
+            )
+            updated = self._row_to_record(cursor.fetchone())
+            logger.info("模型回滚: %s v%s → production (前 production 已降级)", name, target_version)
+            return updated

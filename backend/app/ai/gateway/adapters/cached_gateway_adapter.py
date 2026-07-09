@@ -41,7 +41,9 @@ from app.ai.gateway.interfaces import (
     EmbeddingRequest,
     EmbeddingResponse,
 )
+from app.ai.token_pricing import calculate_cost, classify_model
 from app.cache.interfaces import CacheProtocol
+from app.services.usage_service import record_token_usage
 
 logger = logging.getLogger(__name__)
 
@@ -267,6 +269,8 @@ class CachedAIGateway(AIGatewayProtocol):
         self._embed_latency = LatencyHistogram()
         self._errors: int = 0
         self._total_requests: int = 0
+        self._total_tokens: int = 0
+        self._total_cost: float = 0.0
 
     # ── Public metrics access ───────────────────────────────────────
 
@@ -295,6 +299,8 @@ class CachedAIGateway(AIGatewayProtocol):
             "embed_latency": self._embed_latency.snapshot(),
             "errors": self._errors,
             "total_requests": self._total_requests,
+            "total_tokens": self._total_tokens,
+            "total_cost": round(self._total_cost, 6),
         }
 
     # ── AIGatewayProtocol ───────────────────────────────────────────
@@ -316,6 +322,7 @@ class CachedAIGateway(AIGatewayProtocol):
         if cached is not None:
             self._cache_hits += 1
             response = self._deserialize_response(cached)
+            await self._record_usage_cost(model, response.usage, feature="ai_chat")
             logger.debug(
                 "CachedAIGateway CACHE HIT (chat) for model=%s request=%s",
                 model,
@@ -356,6 +363,7 @@ class CachedAIGateway(AIGatewayProtocol):
         if cached is not None:
             self._cache_hits += 1
             response = self._deserialize_embedding_response(cached)
+            await self._record_usage_cost(model, response.usage, feature="ai_embed")
             logger.debug(
                 "CachedAIGateway CACHE HIT (embed) for model=%s",
                 model,
@@ -408,6 +416,7 @@ class CachedAIGateway(AIGatewayProtocol):
         if cached is not None:
             self._cache_hits += 1
             response = self._deserialize_response(cached)
+            await self._record_usage_cost(model, response.usage, feature="ai_chat")
             logger.debug(
                 "CachedAIGateway CACHE HIT (stream_chat) for model=%s request=%s",
                 model,
@@ -641,6 +650,95 @@ class CachedAIGateway(AIGatewayProtocol):
             else:
                 tokens.append(word)
         return tokens
+
+    async def _record_usage_cost(
+        self,
+        model: str,
+        usage: dict[str, int],
+        feature: str = "ai_chat",
+    ) -> None:
+        """Record token usage and calculate cost from cached/inner responses.
+
+        Extracts prompt/completion token counts from *usage*, classifies the
+        model type (internal/external), and runs through the centralized
+        ``token_pricing.calculate_cost`` engine so that cached hits also
+        contribute to billing and quota tracking.
+
+        Updates ``_total_tokens`` and ``_total_cost`` in-memory, then
+        **fire-and-forgets** the DB write via ``record_token_usage()``
+        (user_id=0 so the call is non-blocking and failure does not affect
+        the cached response being returned to the caller).
+
+        Args:
+            model: Model name (e.g. ``deepseek-chat``, ``m3e``).
+            usage: Dict with ``prompt_tokens``, ``completion_tokens``, ``total_tokens``.
+            feature: Feature label for the usage counter (e.g. ``ai_chat``, ``ai_embed``).
+        """
+        prompt_tokens = usage.get("prompt_tokens", 0)
+        completion_tokens = usage.get("completion_tokens", 0)
+        total_tokens = usage.get("total_tokens", prompt_tokens + completion_tokens)
+
+        model_type = classify_model(model)
+        cost_result = calculate_cost(model_type, model, prompt_tokens, completion_tokens)
+        token_cost = cost_result["token_cost"]
+
+        # ── In-memory aggregation (always, fast) ──────────────────
+        self._total_tokens += total_tokens
+        self._total_cost += token_cost
+
+        logger.debug(
+            "Usage recorded — model=%s type=%s tokens=%d cost=%.6f",
+            model,
+            model_type,
+            total_tokens,
+            token_cost,
+        )
+
+        # ── Fire-and-forget DB write (non-blocking, non-critical) ──
+        asyncio.create_task(
+            self._write_usage_db(
+                user_id=0,
+                feature=feature,
+                model_type=model_type,
+                model_name=model,
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=total_tokens,
+            )
+        )
+
+    async def _write_usage_db(
+        self,
+        user_id: int,
+        feature: str,
+        model_type: str,
+        model_name: str,
+        prompt_tokens: int,
+        completion_tokens: int,
+        total_tokens: int,
+    ) -> None:
+        """Fire-and-forget helper that writes usage to the DB.
+
+        This runs in its own task and **must never raise** — all exceptions
+        are caught and logged so the caller is never affected.
+        """
+        try:
+            await record_token_usage(
+                user_id=user_id,
+                feature=feature,
+                model_type=model_type,
+                model_name=model_name,
+                token_type="chat" if feature == "ai_chat" else "embedding",
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=total_tokens,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to persist usage to DB (non-blocking) — "
+                "user_id=%s feature=%s model=%s",
+                user_id, feature, model_name,
+            )
 
     async def close(self) -> None:
         """Forward close to the inner gateway if it supports it."""

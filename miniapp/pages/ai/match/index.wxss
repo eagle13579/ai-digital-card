@@ -1,9 +1,36 @@
+/**
+ * pages/ai/match/index.wxss
+ * AI人脉匹配页 — 深色适配 + 玻璃卡片 + spring动效 + orb光晕
+ * 设计系统: tokens.wxss + tailwind-like.wxss (已在app.wxss中全局注入)
+ * 基底: #0F0F13 | 三重渐变: 青→紫→粉 | 玻璃三层 | spring弹簧动效
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ */
+
+/* =============================================
+   1. 页面基底 + Orb背景光晕
+   ============================================= */
+.match-page {
+  min-height: 100vh;
+  background:
+    var(--bg-page),
+    radial-gradient(ellipse 500rpx 500rpx at 80% 20%, rgba(139, 92, 246, 0.10), transparent),
+    radial-gradient(ellipse 400rpx 400rpx at 20% 60%, rgba(6, 182, 212, 0.08), transparent),
+    radial-gradient(ellipse 350rpx 350rpx at 60% 90%, rgba(236, 72, 153, 0.06), transparent);
+  background-blend-mode: normal, normal, normal, normal;
+}
+
+/* =============================================
+   2. 导航栏 — 玻璃层3
+   ============================================= */
 .match-header {
   display: flex;
   align-items: center;
   padding: 40rpx 16px;
-  background: linear-gradient(135deg, #A855F7 0%, #D946EF 100%);
-  color: #fff;
+  background: rgba(15, 15, 19, 0.88);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-bottom: 0.5px solid rgba(139, 92, 246, 0.15);
+  color: var(--text-primary);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -16,12 +43,22 @@
   align-items: center;
   justify-content: center;
   margin-right: 24rpx;
+  border-radius: var(--radius-full);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.back-btn:active {
+  transform: scale(0.90);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .back-btn .icon {
   width: 48rpx;
   height: 48rpx;
-  color: #fff;
+  color: var(--text-primary);
+  font-size: 48rpx;
+  line-height: 1;
 }
 
 .header-title {
@@ -30,45 +67,60 @@
 
 .header-title .title {
   font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   display: block;
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
 }
 
 .header-title .subtitle {
   font-size: 24rpx;
-  opacity: 0.8;
+  opacity: 0.65;
   margin-top: 4rpx;
   display: block;
+  color: var(--text-secondary);
 }
 
+/* =============================================
+   3. 匹配徽章 — 紫光玻璃
+   ============================================= */
 .match-badge {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 92, 246, 0.15);
   padding: 12rpx 12px;
   border-radius: 40rpx;
   font-size: 24rpx;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
+  color: var(--purple-light);
+  border: 0.5px solid rgba(139, 92, 246, 0.2);
+  box-shadow: var(--orb-md);
 }
 
+/* =============================================
+   4. 偏好设置区
+   ============================================= */
 .preference-section {
   padding: 40rpx 16px 12px;
 }
 
 .preference-section .section-title {
-  font-size: 32rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: 30rpx;
+  font-weight: 600;
   color: var(--text-primary);
   display: block;
   margin-bottom: 28rpx;
+  letter-spacing: var(--tracking-tight);
 }
 
 .preference-list {
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: 32rpx;
-  box-shadow: var(--shadow-sm);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
 }
 
 .preference-item {
@@ -81,7 +133,7 @@
 
 .pref-label {
   font-size: 26rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   display: block;
   margin-bottom: 16rpx;
   font-weight: 500;
@@ -97,23 +149,112 @@
   padding: 12rpx 14px;
   border-radius: var(--radius-full);
   font-size: 24rpx;
-  color: var(--text-secondary);
-  background: var(--surface-2);
-  border: 1px solid var(--border-subtle);
-  transition: all var(--transition-fast);
-}
-
-.pref-tag.active {
-  background: rgba(168, 85, 247, 0.1);
-  border-color: #A855F7;
-  color: #A855F7;
-  font-weight: 500;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
+  transition: all var(--duration-normal) var(--ease-spring);
 }
 
 .pref-tag:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
+.pref-tag.active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.30);
+  color: var(--purple-light);
+  font-weight: 500;
+  box-shadow: var(--orb-sm);
+}
+
+/* =============================================
+   5. 加载/错误/空状态
+   ============================================= */
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 20px;
+}
+
+.loading-spinner {
+  width: 72rpx;
+  height: 72rpx;
+  border: 3rpx solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--purple-light);
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+  margin-bottom: 24rpx;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.error-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 20px;
+}
+
+.error-icon {
+  font-size: 64rpx;
+  margin-bottom: 24rpx;
+}
+
+.error-text {
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+  margin-bottom: 32rpx;
+}
+
+.retry-btn {
+  padding: 20rpx 48rpx;
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: var(--radius-full);
+  font-size: 26rpx;
+  color: var(--purple-light);
+  border: 0.5px solid rgba(139, 92, 246, 0.20);
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.retry-btn:active {
+  transform: scale(0.95);
+  background: rgba(139, 92, 246, 0.18);
+}
+
+.empty-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 20px;
+}
+
+.empty-icon {
+  font-size: 64rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}
+
+/* =============================================
+   6. 推荐列表区
+   ============================================= */
 .recommend-section {
   padding: 0 16px 24px;
 }
@@ -122,16 +263,21 @@
   display: flex;
   align-items: center;
   gap: 16rpx;
-  font-size: 32rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: 30rpx;
+  font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 28rpx;
+  letter-spacing: var(--tracking-tight);
 }
 
 .match-count {
   font-size: 24rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-weight: normal;
+}
+
+.recommend-scroll {
+  max-height: calc(100vh - 420rpx);
 }
 
 .recommend-list {
@@ -140,11 +286,34 @@
   gap: 28rpx;
 }
 
+/* =============================================
+   7. 推荐卡片 — 玻璃层2 + spring
+   ============================================= */
 .recommend-card {
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: 32rpx;
-  box-shadow: var(--shadow-sm);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  transition: all var(--duration-normal) var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.recommend-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.20), transparent);
+}
+
+.recommend-card:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .card-top {
@@ -157,12 +326,20 @@
   width: 96rpx;
   height: 96rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(217, 70, 239, 0.15));
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.15));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 48rpx;
   flex-shrink: 0;
+  color: var(--purple-light);
+  box-shadow: var(--orb-md);
+  overflow: hidden;
+}
+
+.card-avatar image {
+  width: 100%;
+  height: 100%;
 }
 
 .card-info {
@@ -185,49 +362,81 @@
 
 .card-company {
   font-size: 22rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   margin-top: 2rpx;
   display: block;
 }
 
+/* =============================================
+   8. 匹配分数 — 紫光渐变
+   ============================================= */
 .match-score {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(217, 70, 239, 0.1));
+  background: rgba(139, 92, 246, 0.08);
   padding: 16rpx 12px;
   border-radius: var(--radius-lg);
   flex-shrink: 0;
+  border: 0.5px solid rgba(139, 92, 246, 0.10);
+}
+
+.score-bar {
+  width: 8rpx;
+  height: 64rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4rpx;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.score-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: var(--gradient-cyan-purple);
+  border-radius: 4rpx;
+  transition: height var(--duration-slow) var(--ease-spring);
+  box-shadow: var(--orb-sm);
 }
 
 .score-value {
   font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
-  color: #A855F7;
+  font-weight: 700;
+  color: var(--purple-light);
+  line-height: 1;
 }
 
 .score-label {
   font-size: 20rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
+/* =============================================
+   9. 标签行
+   ============================================= */
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
   margin-top: 24rpx;
   padding-top: 24rpx;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.04);
 }
 
 .card-tag {
   padding: 8rpx 10px;
-  background: var(--surface-2);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: var(--radius-full);
   font-size: 22rpx;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
 }
 
+/* =============================================
+   10. 按钮操作区 — spring动效
+   ============================================= */
 .card-actions {
   display: flex;
   gap: 20rpx;
@@ -241,20 +450,41 @@
   border-radius: var(--radius-lg);
   font-size: 26rpx;
   font-weight: 500;
-}
-
-.connect-btn {
-  background: linear-gradient(135deg, #A855F7, #D946EF);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
-}
-
-.chat-btn {
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
+  transition: all var(--duration-fast) var(--ease-spring);
 }
 
 .card-action:active {
-  opacity: 0.85;
+  transform: scale(0.95);
+}
+
+.connect-btn {
+  background: var(--gradient-cyan-purple);
+  color: #fff;
+  box-shadow: var(--orb-md);
+}
+
+.connect-btn:active {
+  box-shadow: var(--orb-lg);
+}
+
+.connect-btn.connected {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  box-shadow: none;
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-btn {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-btn:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }

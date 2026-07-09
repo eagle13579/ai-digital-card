@@ -32,6 +32,7 @@ from app.services.bot_service import BotBase, BotMessage, BotCard, BotCommand, r
 from app.services.bot_slack import SlackBot, slack_bot
 from app.services.bot_feishu import FeishuBot, feishu_bot
 from app.services.bot_dingtalk import DingTalkBot, dingtalk_bot
+from app.services.ai_feishu_baize import FeishuBaizeService, feishu_baize
 from app.services.email_service import EmailService, email_service
 from app.services.email_templates import (
     welcome_html,
@@ -98,6 +99,9 @@ __all__ = [
     "feishu_bot",
     "DingTalkBot",
     "dingtalk_bot",
+    # 飞书白泽 AI
+    "FeishuBaizeService",
+    "feishu_baize",
     # 邮件服务
     "EmailService",
     "email_service",

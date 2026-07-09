@@ -6,6 +6,7 @@ import cardApi, { CardData } from '../../api/card'
 import matchApi, { RecommendItem } from '../../api/match'
 import userApi, { UserInfo } from '../../api/user'
 import './index.scss'
+import AiRecommend from '../../components/AiRecommend'
 
 /* ========================================================================== */
 /*  类型                                                                       */
@@ -210,6 +211,7 @@ const Index: FC = () => {
           </Button>
           <View className='index__no-login-preview'>
             <Text className='index__no-login-preview-title'>预览模式</Text>
+            <AiRecommend />
             <FlipBook
               cardData={{
                 name: '您的姓名',

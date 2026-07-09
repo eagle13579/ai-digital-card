@@ -326,6 +326,134 @@
 }
 
 /* ========================================================================== */
+/*  AI 名片评分卡片                                                            */
+/* ========================================================================== */
+
+.mine__ai-score {
+  margin: 0 $page-padding $spacing-lg;
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  &-header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $color-divider;
+  }
+
+  &-title {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &-body {
+    padding: $spacing-lg;
+  }
+
+  &-loading {
+    display: block;
+    text-align: center;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    padding: $spacing-md 0;
+  }
+
+  &-empty {
+    display: block;
+    text-align: center;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    padding: $spacing-md 0;
+  }
+
+  &-overall {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: $spacing-lg;
+
+    &-value {
+      font-size: 64px;
+      font-weight: 800;
+      color: $color-primary;
+      line-height: 1;
+      margin-bottom: $spacing-xs;
+    }
+
+    &-label {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+  }
+
+  &-dims {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-dim {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: $color-bg;
+    border-radius: $radius-sm;
+    padding: $spacing-sm $spacing-xs;
+
+    &-label {
+      font-size: 20px;
+      color: $color-text-tertiary;
+      margin-bottom: 4px;
+    }
+
+    &-value {
+      font-size: $font-size-lg;
+      font-weight: 700;
+      color: $color-text-primary;
+    }
+  }
+
+  &-suggestions {
+    background: $color-primary-light;
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+
+    &-title {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $color-primary-dark;
+      margin-bottom: $spacing-xs;
+    }
+  }
+
+  &-suggestion {
+    display: block;
+    font-size: 22px;
+    color: $color-text-secondary;
+    line-height: 1.6;
+    padding: 2px 0;
+  }
+
+  &-suggestion--locked {
+    opacity: 0.5;
+    color: $color-text-tertiary;
+    cursor: pointer;
+    margin-top: $spacing-xs;
+    padding: $spacing-sm;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: $radius-sm;
+    text-align: center;
+
+    &:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+  }
+}
+
+/* ========================================================================== */
 /*  功能菜单                                                                   */
 /* ========================================================================== */
 
@@ -432,4 +560,110 @@
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ========================================================================== */
+/*  AI 用量面板                                                                */
+/* ========================================================================== */
+
+.mine__ai-usage {
+  margin: 0 $page-padding $spacing-lg;
+  background: $color-bg-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  &-header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $color-divider;
+  }
+
+  &-title {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &-body {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  &-item {
+    margin-bottom: $spacing-md;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    &-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: $spacing-xs;
+    }
+
+    &-icon {
+      font-size: 28px;
+      margin-right: 8px;
+    }
+
+    &-label {
+      flex: 1;
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+    }
+
+    &-count {
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $color-text-primary;
+    }
+  }
+
+  &-progress {
+    position: relative;
+    height: 24px;
+    background: $color-border;
+    border-radius: 12px;
+    overflow: hidden;
+
+    &-bar {
+      height: 100%;
+      background: $color-gradient-primary;
+      border-radius: 12px;
+      transition: width 0.3s ease;
+    }
+
+    &-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: $color-text-secondary;
+      font-weight: 500;
+    }
+  }
+
+  &-footer {
+    margin-top: $spacing-lg;
+    padding-top: $spacing-md;
+    border-top: 1px solid $color-divider;
+  }
+
+  &-upgrade-btn {
+    width: 100%;
+    height: 72px;
+    line-height: 72px;
+    background: $color-gradient-warm;
+    color: #fff;
+    font-size: $font-size-md;
+    font-weight: 600;
+    border-radius: 36px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
+  }
 }

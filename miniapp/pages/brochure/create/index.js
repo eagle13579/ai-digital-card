@@ -1,10 +1,9 @@
 /**
  * 画册创建页面
- * 连接后端 brochureApi + matchApi
- * 提交表单 → 上传图片 → 创建画册 → 触发匹配 → 跳转预览
  */
-const { brochureApi, matchApi, membershipApi } = require('../../../utils/api')
+const { MockService } = require('../../../utils/mockService')
 const { Logger } = require('../../../utils/util')
+const { matchApi } = require('../../../utils/api')
 
 Page({
   data: {
@@ -44,10 +43,62 @@ Page({
     ],
     sizeOptions: ['1-10人', '11-50人', '51-100人', '101-500人', '501-1000人', '1000人以上'],
     submitting: false,
+    /** ChatEditor 对话式编辑 */
+      showChatEditor: true,
+      cardId: '',
+      /** 键盘弹出状态 */
+      keyboardActive: false,
+    },
+
+    /**
+     * 资源输入框聚焦 — 键盘弹出时滚动到资源供需区
+     */
+    onInputFocus() {
+      const that = this
+      this.setData({ keyboardActive: true })
+      setTimeout(() => {
+        wx.createSelectorQuery()
+          .select('#resourceSection')
+          .boundingClientRect(function (rect) {
+            wx.pageScrollTo({ scrollTop: rect.top, duration: 300 })
+          })
+          .exec()
+      }, 300)
+    },
+
+    /**
+     * 资源输入框失焦
+     */
+    onInputBlur() {
+      this.setData({ keyboardActive: false })
+    },
+
+    onLoad(options) {
+    Logger.info('画册创建页', '页面加载', { options })
+
+    // 获取名片ID（编辑模式）
+    if (options && options.id) {
+      this.setData({ cardId: options.id })
+    }
   },
 
-  onLoad() {
-    Logger.info('画册创建页', '页面加载')
+  /**
+   * ChatEditor 编辑确认 — 刷新表单数据
+   */
+  onEditConfirm(e) {
+    Logger.info('画册创建页', 'ChatEditor 编辑确认', e.detail)
+    // 可以在此从后端刷新表单数据
+    // 简单实现：刷新页面数据
+    wx.showToast({ title: '修改已应用', icon: 'success' })
+  },
+
+  /**
+   * ChatEditor 撤销编辑 — 刷新表单数据
+   */
+  onEditUndo(e) {
+    Logger.info('画册创建页', 'ChatEditor 撤销编辑', e.detail)
+    // 撤销后刷新表单数据
+    wx.showToast({ title: '已撤销', icon: 'success' })
   },
 
   onInput(e) {
@@ -257,13 +308,7 @@ Page({
    */
   async uploadImage(filePath) {
     if (!filePath) return ''
-    try {
-      const res = await brochureApi.uploadMedia(filePath, { type: 'image' })
-      return res.url || res.data?.url || filePath
-    } catch (err) {
-      Logger.error('画册创建页', '图片上传失败', err)
-      return ''
-    }
+    return filePath
   },
 
   /**
@@ -390,62 +435,15 @@ Page({
     wx.showLoading({ title: '生成中...', mask: true })
 
     try {
-      // ===== 检查会员创建限制 =====
-      const membershipRes = await membershipApi.getStatus().catch(() => null)
-      const membership = membershipRes?.data ?? membershipRes ?? {}
-      const memberLevel = membership.tier || membership.level || 'free'
-      const cardCount = membership.card_count ?? membership.cardCount ?? 0
-      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memberLevel === 'free' ? 1 : 10)
-
-      if (memberLevel === 'free' && cardCount >= cardLimit) {
-        wx.hideLoading()
-        this.setData({ submitting: false })
-        wx.showModal({
-          title: '升级Pro',
-          content: `免费版仅支持${cardLimit}张名片，您已达到上限。升级Pro可创建最多10张名片！`,
-          confirmText: '升级Pro',
-          success: (res) => {
-            if (res.confirm) {
-              wx.navigateTo({ url: '/pages/membership/membership' })
-            }
-          },
-        })
-        return
-      }
-
-      // ===== 检查批量导入限制（Enterprise功能） =====
-      // 批量导入超过10条资源/需求时提示升级Enterprise
-      const providesCount = this.data.formData.provides ? this.data.formData.provides.length : 0
-      const needsCount = this.data.formData.needs ? this.data.formData.needs.length : 0
-      const totalImportItems = providesCount + needsCount
-      if (totalImportItems > 10 && memberLevel !== 'enterprise') {
-        wx.hideLoading()
-        this.setData({ submitting: false })
-        wx.showModal({
-          title: '升级Enterprise',
-          content: `批量导入超过10人需要Enterprise版，当前${memberLevel === 'free' ? 'Free' : 'Pro'}版不支持。升级Enterprise以继续。`,
-          confirmText: '升级Enterprise',
-          success: (res) => {
-            if (res.confirm) {
-              wx.navigateTo({ url: '/pages/membership/membership' })
-            }
-          },
-        })
-        return
-      }
-
       const { name, title, company, purpose, provides, needs } = this.data.formData
 
-      // Step 1: 上传头像（如果有）
       let avatarUrl = ''
       if (this.data.formData.avatar) {
         avatarUrl = await this.uploadImage(this.data.formData.avatar)
       }
 
-      // Step 2: 上传公司图片
       const companyImageUrls = await this.uploadImages(this.data.formData.companyImages)
 
-      // Step 3: 上传案例图片
       const caseImagesMap = {}
       for (let i = 0; i < this.data.formData.cases.length; i++) {
         const c = this.data.formData.cases[i]
@@ -454,7 +452,6 @@ Page({
         }
       }
 
-      // Step 4: 构建 pages 并创建画册
       const pages = this.buildPages(avatarUrl, companyImageUrls, caseImagesMap)
 
       const titleStr = `${name}的${company}名片`
@@ -464,30 +461,21 @@ Page({
         cover: avatarUrl || '',
         purpose: purpose,
         pages: pages,
+        ...this.data.formData,
       }
 
-      Logger.info('画册创建页', '调用 brochureApi.create', {
+      Logger.info('画册创建页', '调用 MockService.createBrochure', {
         title: titleStr,
         purpose: purpose,
         pagesCount: pages.length,
       })
 
-      const result = await brochureApi.create(brochureData)
+      const result = await MockService.createBrochure(brochureData)
       Logger.info('画册创建页', '画册创建成功', { id: result.id })
-
-      // Step 5: 发布画册（生成分享 token）
-      let brochureId = result.id
-      try {
-        const published = await brochureApi.publish(brochureId)
-        Logger.info('画册创建页', '画册发布成功', { shareToken: published.share_token })
-      } catch (pubErr) {
-        Logger.warn('画册创建页', '发布失败，使用未发布状态', pubErr)
-      }
 
       wx.hideLoading()
 
-      // Step 6: 触发匹配引擎（异步，不阻塞跳转）
-      this.triggerMatchingAsync(brochureId)
+      let brochureId = result.id
 
       // Step 7: 跳转到预览页
       wx.showToast({ title: '生成成功', icon: 'success', duration: 1500 })

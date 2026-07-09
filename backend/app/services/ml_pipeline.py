@@ -8,11 +8,16 @@
   4. 模型评估: precision@k, recall@k, nDCG
   5. 模型部署: 自动切换最优模型到生产
 
-用法:
+|用法:
     pipeline = MLPipeline()
     pipeline.run_full_pipeline()       # 全自动运行
     pipeline.train_model(session)      # 单步训练
     pipeline.evaluate(session)         # 单步评估
+    pipeline.data_trigger()            # 数据变更自动触发训练
+
+数据变更自动触发:
+    data_trigger() 方法检查 training_data/ 目录下最新文件的修改时间,
+    与上次训练时间对比, 超过阈值(1小时)则自动触发全管线训练。
 """
 
 from __future__ import annotations
@@ -669,6 +674,74 @@ class MLPipeline:
 # ===================================================================
 # 单例
 # ===================================================================
+
+    # ── 数据变更自动触发 ─────────────────────────────────────
+
+    def data_trigger(self, max_lookback: int = 3600) -> Optional[dict]:
+        """检查 training_data/ 目录是否有新数据, 超阈值则自动触发训练。
+
+        Args:
+            max_lookback: 最大回溯秒数(默认1小时), 超过此时间未检测到新数据则不触发。
+
+        Returns:
+            dict: {triggered, reason, model_version, metrics} 或 None(未触发)
+        """
+        data_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'training_data')
+        data_dir = os.path.abspath(data_dir)
+
+        if not os.path.isdir(data_dir):
+            logger.info("[data_trigger] training_data/ 目录不存在, 跳过触发检查")
+            return None
+
+        # 1. 找最新文件的 mtime
+        latest_mtime = 0.0
+        for fname in os.listdir(data_dir):
+            fpath = os.path.join(data_dir, fname)
+            if os.path.isfile(fpath) and not fname.startswith('.'):
+                mtime = os.path.getmtime(fpath)
+                if mtime > latest_mtime:
+                    latest_mtime = mtime
+
+        if latest_mtime == 0.0:
+            logger.info("[data_trigger] training_data/ 目录为空, 跳过触发")
+            return None
+
+        # 2. 读上次训练时间
+        last_run_file = os.path.join(data_dir, '.last_training')
+        last_run_mtime = 0.0
+        if os.path.exists(last_run_file):
+            with open(last_run_file, 'r') as fh:
+                try:
+                    last_run_mtime = float(fh.read().strip())
+                except (ValueError, TypeError):
+                    last_run_mtime = 0.0
+
+        # 3. 判断: 是否有新数据超过阈值
+        if latest_mtime > last_run_mtime:
+            time_since_new_data = time.time() - latest_mtime
+            if time_since_new_data <= max_lookback:
+                logger.info("[data_trigger] 检测到新数据(最新mtime=%.0f, 上次训练=%.0f), 触发训练",
+                            latest_mtime, last_run_mtime)
+                # 触发全管线训练
+                session_mock = {}
+                result = self.run_full_pipeline()
+                # 记录本次训练时间
+                with open(last_run_file, 'w') as fh:
+                    fh.write(str(time.time()))
+                return {
+                    "triggered": True,
+                    "reason": f"新数据触发(最新文件mtime={latest_mtime:.0f})",
+                    "model_version": result.get("model_version", "unknown"),
+                    "metrics": result.get("metrics", {}),
+                }
+            else:
+                logger.debug("[data_trigger] 新数据存在但已过回溯窗口(%.0fs > %ds), 跳过",
+                             time_since_new_data, max_lookback)
+        else:
+            logger.debug("[data_trigger] 无新数据(since last training), 跳过")
+
+        return None
+
 
 pipeline = MLPipeline()
 

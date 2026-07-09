@@ -21,7 +21,35 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.database import Base
-from app.models import *  # noqa: F403 — ensure all models are loaded
+# Import models directly from their modules to avoid circular-import issues in __init__.py
+from app.models.user import User
+from app.models.brochure import Brochure, Page
+from app.models.tag import UserTag, MatchRecord
+from app.models.visitor import VisitorLog
+from app.models.trust import TrustNetwork
+from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
+from app.models.webhook import WebhookSubscription
+from app.models.integration import Integration
+from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent
+from app.models.audit import AuditLog
+from app.models.api_key import ApiKey, ApiKeyUsage
+from app.models.message import Message
+from app.models.invoice import Invoice
+from app.models.usage_counter import UsageCounter
+from app.models.gaia import (
+    GaiaKnowledge,
+    GaiaEvolutionEvent,
+    GaiaTrainingRun,
+    GaiaModelWeights,
+    KnowledgeModel,
+)
+from app.crm.crm_models import (
+    CrmContact,
+    CrmDeal,
+    CrmPipelineStage,
+    CrmActivity,
+    CrmNote,
+)
 
 target_metadata = Base.metadata
 

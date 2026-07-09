@@ -1,32 +1,61 @@
+/**
+ * 画册创建/编辑页 — 深色适配 v2.0
+ * 设计体系: 山膏 | 三重渐变 | 玻璃三级 | 弹簧动效 | 光晕Orb
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ */
+
+/* ── 页面滚动容器 ── */
 .page-scroll {
   height: 100vh;
 }
 
+/* ═══════════════════════════════════════════
+   1. 分区卡片 — 玻璃中厚 (glass-tier-2)
+   ═══════════════════════════════════════════ */
 .section-card {
-  background: #fff;
+  /* 玻璃中厚背景 */
+  background: var(--card-bg, var(--bg-glass-2));
+  backdrop-filter: blur(var(--glass-blur-1, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-1, 20px));
+  border: var(--card-border, var(--glass-border-2));
   margin: 32rpx;
-  border-radius: 32rpx;
+  border-radius: var(--radius-lg, 24rpx);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--card-orb, var(--orb-md));
+  /* 玻璃内发光边缘 */
+  position: relative;
+}
+.section-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
 }
 
+/* ── 分区头部 ── */
 .section-header {
   display: flex;
   align-items: center;
   padding: 32rpx;
-  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-  border-bottom: 1px solid #E2E8F0;
+  /* 深色渐变头部 */
+  background: linear-gradient(135deg, var(--bg-glass-2, rgba(255,255,255,0.07)) 0%, var(--bg-glass-1, rgba(255,255,255,0.04)) 100%);
+  border-bottom: var(--border-subtle, 0.5px solid rgba(255,255,255,0.06));
 }
 
 .section-icon-wrap {
   width: 72rpx;
   height: 72rpx;
-  background: #4F46E5;
-  border-radius: 20rpx;
+  background: var(--gradient-cyan-purple, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  border-radius: var(--radius-md, 16rpx);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 24rpx;
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
 }
 
 .section-icon {
@@ -34,15 +63,20 @@
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: var(--text-lg, 32rpx);
   font-weight: 600;
-  color: #1E293B;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  letter-spacing: var(--tracking-tight, -0.01em);
 }
 
+/* ── 表单内容区 ── */
 .form-content {
   padding: 32rpx;
 }
 
+/* ═══════════════════════════════════════════
+   2. 表单元素 — 玻璃薄 + 深色输入
+   ═══════════════════════════════════════════ */
 .form-item {
   margin-bottom: 32rpx;
 }
@@ -58,77 +92,96 @@
 }
 
 .form-label {
-  font-size: 26rpx;
-  color: #64748B;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
   margin-bottom: 12rpx;
   display: block;
+  letter-spacing: var(--tracking-wide, 0.02em);
 }
 
 .required {
-  color: #EF4444;
+  color: var(--danger, #ef4444);
 }
 
+/* ── 输入框 (玻璃薄) ── */
 .form-input {
   width: 100%;
-  height: 88rpx;
-  padding: 0 12px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #1E293B;
+  height: var(--input-height, 88rpx);
+  padding: var(--input-padding, 0 var(--space-6));
+  background: var(--input-bg, var(--bg-glass-1));
+  border: var(--input-border, var(--border-subtle));
+  border-radius: var(--input-radius, var(--radius-sm));
+  font-size: var(--text-base, 28rpx);
+  color: var(--input-color, var(--text-primary));
   box-sizing: border-box;
+  /* 弹簧过渡 */
+  transition: border-color var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1)),
+              background var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1)),
+              box-shadow var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
 }
-
 .form-input:focus {
-  border-color: #4F46E5;
-  background: #fff;
+  border-color: var(--input-focus-border, var(--border-accent));
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
 }
 
 .picker-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  color: var(--input-color, var(--text-primary));
 }
 
 .picker-arrow {
-  color: #94A3B8;
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   font-size: 36rpx;
 }
 
+/* ── 多行文本输入 ── */
 .form-textarea {
   width: 100%;
   min-height: 160rpx;
   padding: 24rpx;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #1E293B;
+  background: var(--input-bg, var(--bg-glass-1));
+  border: var(--input-border, var(--border-subtle));
+  border-radius: var(--input-radius, var(--radius-sm));
+  font-size: var(--text-base, 28rpx);
+  color: var(--input-color, var(--text-primary));
   box-sizing: border-box;
+  transition: border-color var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1)),
+              background var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
 }
-
 .form-textarea:focus {
-  border-color: #4F46E5;
-  background: #fff;
+  border-color: var(--input-focus-border, var(--border-accent));
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
 }
 
 .char-count {
-  font-size: 22rpx;
-  color: #94A3B8;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   text-align: right;
   margin-top: 8rpx;
   display: block;
 }
 
+/* ═══════════════════════════════════════════
+   3. 头像上传 — 玻璃薄
+   ═══════════════════════════════════════════ */
 .avatar-upload {
   width: 240rpx;
   height: 240rpx;
-  border-radius: 24rpx;
+  border-radius: var(--radius-md, 16rpx);
   overflow: hidden;
-  border: 2px dashed #CBD5E1;
+  border: 2px dashed var(--border-default, rgba(255,255,255,0.10));
   margin-bottom: 40rpx;
   position: relative;
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              border-color var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.avatar-upload:active {
+  transform: scale(0.97);
+  border-color: var(--border-accent, rgba(139,92,246,0.25));
 }
 
 .avatar-upload image {
@@ -143,7 +196,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #F8FAFC;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
 }
 
 .avatar-icon {
@@ -152,62 +205,13 @@
 }
 
 .avatar-text {
-  font-size: 24rpx;
-  color: #94A3B8;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
 }
 
-.avatar-size-hint {
-  position: absolute;
-  bottom: -40rpx;
-  left: 0;
-  font-size: 20rpx;
-  color: #94A3B8;
-}
-
-.resource-section {
-  margin-bottom: 40rpx;
-}
-
-.resource-section:last-child {
-  margin-bottom: 0;
-}
-
-.resource-title {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #334155;
-  margin-bottom: 20rpx;
-  display: block;
-}
-
-.resource-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
-}
-
-.resource-tag {
-  display: flex;
-  align-items: center;
-  padding: 12rpx 12px;
-  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
-  border-radius: 40rpx;
-  font-size: 26rpx;
-  color: #1D4ED8;
-}
-
-.need-tag {
-  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-  color: #B45309;
-}
-
-.tag-remove {
-  margin-left: 12rpx;
-  font-size: 32rpx;
-  color: rgba(0, 0, 0, 0.4);
-}
-
+/* ═══════════════════════════════════════════
+   4. 资源标签区
+   ═══════════════════════════════════════════ */
 .resource-input-row {
   display: flex;
   gap: 16rpx;
@@ -219,18 +223,69 @@
 
 .btn-add {
   padding: 0 20px;
-  height: 88rpx;
-  background: #4F46E5;
-  color: #fff;
-  border-radius: 20rpx;
-  font-size: 28rpx;
+  height: var(--btn-primary-height, 88rpx);
+  background: var(--btn-primary-bg, var(--gradient-cyan-purple));
+  color: var(--btn-primary-color, var(--text-inverse));
+  border-radius: var(--btn-primary-radius, var(--radius-sm));
+  font-size: var(--text-base, 28rpx);
   font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 88rpx;
+  line-height: var(--btn-primary-height, 88rpx);
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              box-shadow var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.btn-add:active {
+  transform: scale(0.96);
+  box-shadow: var(--orb-hover, 0 0 30px rgba(139,92,246,0.35));
 }
 
+/* ── 标签列表 (玻璃薄) ── */
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 12px;
+  border-radius: var(--radius-full, 9999rpx);
+  font-size: var(--text-sm, 24rpx);
+  border: var(--glass-border-1, 0.5px solid rgba(255,255,255,0.06));
+  transition: transform var(--duration-fast, 150ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.tag-item:active {
+  transform: scale(0.95);
+}
+
+.tag-item.provides-tag {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15));
+  color: var(--cyan-light, #22d3ee);
+}
+
+.tag-item.needs-tag {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(245, 158, 11, 0.15));
+  color: var(--pink-light, #f472b6);
+}
+
+.tag-text {
+  font-size: var(--text-sm, 24rpx);
+}
+
+.tag-close {
+  margin-left: 12rpx;
+  font-size: 32rpx;
+  color: var(--text-quaternary, rgba(255,255,255,0.20));
+}
+
+/* ═══════════════════════════════════════════
+   5. 合作意向选择 — 玻璃薄网格
+   ═══════════════════════════════════════════ */
 .purpose-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -241,15 +296,18 @@
   display: flex;
   align-items: center;
   padding: 28rpx;
-  background: #F8FAFC;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
   border: 2px solid transparent;
-  border-radius: 24rpx;
-  transition: all 0.2s;
+  border-radius: var(--radius-md, 16rpx);
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
-
+.purpose-option:active {
+  transform: scale(0.97);
+}
 .purpose-option.active {
-  background: #EEF2FF;
-  border-color: #4F46E5;
+  background: rgba(139, 92, 246, 0.12);
+  border-color: var(--border-accent, rgba(139,92,246,0.25));
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
 }
 
 .purpose-icon {
@@ -257,34 +315,36 @@
   margin-right: 20rpx;
 }
 
+.purpose-label {
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-primary, rgba(255,255,255,0.92));
+}
+
 .purpose-text {
-  font-size: 26rpx;
-  color: #334155;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
 }
 
-.image-upload-section {
-  margin-top: 32rpx;
-}
-
-.upload-hint {
-  font-size: 22rpx;
-  color: #94A3B8;
-  margin-bottom: 20rpx;
-  display: block;
-}
-
-.image-grid {
+/* ═══════════════════════════════════════════
+   6. 图片网格 — 玻璃薄
+   ═══════════════════════════════════════════ */
+.images-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 20rpx;
 }
 
 .image-item {
-  width: calc(33.33% - 7px);
+  width: calc(33.33% - 14rpx);
   aspect-ratio: 4/3;
-  border-radius: 20rpx;
+  border-radius: var(--radius-sm, 12rpx);
   overflow: hidden;
   position: relative;
+  border: var(--glass-border-1, 0.5px solid rgba(255,255,255,0.06));
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.image-item:active {
+  transform: scale(0.96);
 }
 
 .image-item image {
@@ -292,15 +352,17 @@
   height: 100%;
 }
 
-.image-delete {
+.image-remove {
   position: absolute;
   top: 8rpx;
   right: 8rpx;
   width: 48rpx;
   height: 48rpx;
   background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
-  border-radius: 50%;
+  border-radius: var(--radius-full, 9999rpx);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,37 +370,48 @@
 }
 
 .image-add {
-  width: calc(33.33% - 7px);
+  width: calc(33.33% - 14rpx);
   aspect-ratio: 4/3;
-  border: 2px dashed #CBD5E1;
-  border-radius: 20rpx;
+  border: 2px dashed var(--border-default, rgba(255,255,255,0.10));
+  border-radius: var(--radius-sm, 12rpx);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #F8FAFC;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.image-add:active {
+  transform: scale(0.96);
+  border-color: var(--border-accent, rgba(139,92,246,0.25));
+  background: rgba(139, 92, 246, 0.08);
 }
 
 .image-add-icon {
   font-size: 48rpx;
-  color: #94A3B8;
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
 }
 
 .image-add-text {
-  font-size: 24rpx;
-  color: #94A3B8;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   margin-top: 8rpx;
 }
 
+/* ═══════════════════════════════════════════
+   7. 案例卡片 — 玻璃超薄
+   ═══════════════════════════════════════════ */
 .case-list {
   margin-bottom: 32rpx;
 }
 
 .case-item {
   padding: 28rpx;
-  background: #F8FAFC;
-  border-radius: 24rpx;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  border: var(--glass-border-1, 0.5px solid rgba(255,255,255,0.06));
+  border-radius: var(--radius-md, 16rpx);
   margin-bottom: 24rpx;
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
 
 .case-header {
@@ -348,51 +421,39 @@
   margin-bottom: 24rpx;
 }
 
-.case-num {
-  font-size: 28rpx;
+.case-title {
+  font-size: var(--text-base, 28rpx);
   font-weight: 600;
-  color: #334155;
+  color: var(--text-primary, rgba(255,255,255,0.92));
 }
 
 .case-delete {
-  font-size: 26rpx;
-  color: #EF4444;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--danger, #ef4444);
+  transition: transform var(--duration-fast, 150ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
-
-.case-images {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 24rpx;
-}
-
-.case-image-item {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-  position: relative;
-}
-
-.case-image-item image {
-  width: 100%;
-  height: 100%;
-}
-
-.case-image-add {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 16rpx;
+.case-delete:active {
+  transform: scale(0.92);
 }
 
 .btn-add-case {
   width: 100%;
-  height: 88rpx;
-  background: #F8FAFC;
-  border-color: #E2E8F0;
-  color: #64748B;
-  border-radius: 20rpx;
+  height: var(--btn-outline-height, 88rpx);
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  border: var(--btn-outline-border, var(--glass-border-2));
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  border-radius: var(--btn-outline-radius, var(--radius-sm));
+  font-size: var(--text-base, 28rpx);
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.btn-add-case:active {
+  transform: scale(0.97);
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
 }
 
+/* ═══════════════════════════════════════════
+   8. 画册风格选择 — 玻璃薄卡片
+   ═══════════════════════════════════════════ */
 .style-options {
   display: flex;
   gap: 24rpx;
@@ -404,49 +465,68 @@
   flex-direction: column;
   align-items: center;
   padding: 28rpx 10px;
-  background: #F8FAFC;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
   border: 2px solid transparent;
-  border-radius: 24rpx;
-  transition: all 0.2s;
+  border-radius: var(--radius-md, 16rpx);
+  transition: all var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
-
+.style-option:active {
+  transform: scale(0.97);
+}
 .style-option.active {
-  background: #EEF2FF;
-  border-color: #4F46E5;
+  background: rgba(139, 92, 246, 0.12);
+  border-color: var(--border-accent, rgba(139,92,246,0.25));
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
 }
 
 .style-preview {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 16rpx;
+  border-radius: var(--radius-sm, 12rpx);
   margin-bottom: 20rpx;
 }
 
-.professional-preview {
-  background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
-}
-
-.creative-preview {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F59E0B 100%);
-}
-
-.minimal-preview {
-  background: linear-gradient(135deg, #1F2937 0%, #6B7280 50%, #F3F4F6 100%);
-}
-
 .style-name {
-  font-size: 28rpx;
+  font-size: var(--text-base, 28rpx);
   font-weight: 500;
-  color: #334155;
+  color: var(--text-primary, rgba(255,255,255,0.92));
   margin-bottom: 8rpx;
 }
 
 .style-desc {
-  font-size: 22rpx;
-  color: #94A3B8;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   text-align: center;
 }
 
+/* ═══════════════════════════════════════════
+   9. 提交区 — 弹簧按钮
+   ═══════════════════════════════════════════ */
+.submit-area {
+  margin: 32rpx;
+}
+
+.btn-submit {
+  width: 100%;
+  height: var(--btn-primary-height, 88rpx);
+  background: var(--btn-primary-bg, var(--gradient-cyan-purple));
+  color: var(--btn-primary-color, var(--text-inverse));
+  border-radius: var(--btn-primary-radius, var(--radius-sm));
+  font-size: var(--text-lg, 32rpx);
+  font-weight: 600;
+  border: none;
+  box-shadow: var(--orb-md, 0 0 24px rgba(139,92,246,0.20));
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              box-shadow var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.btn-submit:active {
+  transform: scale(0.97);
+  box-shadow: var(--orb-hover, 0 0 30px rgba(139,92,246,0.35));
+}
+
+/* ═══════════════════════════════════════════
+   10. 底部安全区适配
+   ═══════════════════════════════════════════ */
 .bottom-safe {
   height: 200rpx;
 }
@@ -460,28 +540,53 @@
   gap: 24rpx;
   padding: 24rpx 16px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom));
-  background: #fff;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  /* 玻璃厚 (glass-tier-3) */
+  background: var(--nav-bg, var(--bg-glass-2));
+  backdrop-filter: blur(var(--glass-blur-2, 30px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-2, 30px));
+  border-top: var(--glass-border-2, 0.5px solid rgba(255,255,255,0.10));
 }
 
+/* ── 底部按钮 (全局btn-primary/btn-outline覆写) ── */
 .btn-primary {
   flex: 1;
-  height: 96rpx;
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  color: #fff;
-  border-radius: 24rpx;
-  font-size: 32rpx;
-  font-weight: 600;
+  height: var(--btn-primary-height, 88rpx);
+  background: var(--btn-primary-bg, var(--gradient-cyan-purple));
+  color: var(--btn-primary-color, var(--text-inverse));
+  border-radius: var(--btn-primary-radius, var(--radius-sm));
+  font-size: var(--text-lg, 32rpx);
+  font-weight: var(--btn-primary-font-weight, 600);
   border: none;
+  box-shadow: var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              box-shadow var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: var(--orb-hover, 0 0 30px rgba(139,92,246,0.35));
 }
 
 .btn-outline {
   flex: 1;
-  height: 96rpx;
-  background: #fff;
-  border: 1.5px solid #E2E8F0;
-  color: #64748B;
-  border-radius: 24rpx;
-  font-size: 32rpx;
-  font-weight: 500;
+  height: var(--btn-outline-height, 88rpx);
+  background: var(--btn-outline-bg, var(--bg-glass-1));
+  border: var(--btn-outline-border, var(--glass-border-2));
+  color: var(--btn-outline-color, var(--text-primary));
+  border-radius: var(--btn-outline-radius, var(--radius-sm));
+  font-size: var(--btn-outline-font-size, var(--text-lg));
+  font-weight: var(--btn-outline-font-weight, 500);
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              background var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.btn-outline:active {
+  transform: scale(0.97);
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
+}
+
+/* ═══════════════════════════════════════════
+   11. 键盘弹出安全适配
+   ═══════════════════════════════════════════ */
+/* 键盘弹出时缩短scroll-view高度，防止输入框被遮盖 */
+.page-scroll.keyboard-active {
+  height: calc(100vh - 300px);
 }

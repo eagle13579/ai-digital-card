@@ -23,8 +23,8 @@ router = APIRouter(prefix="/api/v1/ai/assist", tags=["AI 助手"])
 class WriteRequest(BaseModel):
     purpose: str = Field(
         ...,
-        pattern=r"^(bio|company|recommendation|slogan)$",
-        description="文案用途: bio=个人简介, company=公司介绍, recommendation=推荐语, slogan=名片标语",
+        pattern=r"^(bio|company|company_intro|recommendation|slogan|personal)$",
+        description="文案用途: bio=个人简介, company=公司介绍, company_intro=公司介绍(与company同义), recommendation=推荐语, slogan=名片标语, personal=个人用途",
     )
     name: str = ""
     position: str = ""
@@ -89,14 +89,17 @@ async def generate_copy(
     """生成名片文案
 
     根据用途和参数生成对应的名片文案。
-    支持四种用途：
+    支持以下用途：
     - bio: 个人简介
-    - company: 公司介绍
+    - company: 公司介绍 (含 company_intro 别名)
     - recommendation: 推荐语
     - slogan: 名片标语
+    - personal: 个人用途
     """
+    # 兼容 company_intro → company
+    actual_purpose = "company" if data.purpose == "company_intro" else data.purpose
     content = await WritingAssistant.generate(
-        purpose=data.purpose,
+        purpose=actual_purpose,
         name=data.name,
         position=data.position,
         company=data.company,

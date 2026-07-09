@@ -1,25 +1,66 @@
-/* 人脉图谱页 — 深色科技感 */
+/* ============================================================
+ * 人脉图谱页 — AI原生暗色 · 玻璃质感 · 光晕Orb · Spring动效
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ * ============================================================ */
+
+/* ========== 1. 页面基底 ========== */
 .graph-page {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: #0a0a18;
+  background: var(--bg-page, #0A0A18);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* 顶部栏 */
+/* ========== 2. 深色模式锚点 ========== */
+.dark {
+  color-scheme: dark;
+}
+
+/* ========== 3. 背景Orb装饰光晕 ========== */
+.orb-bg-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+}
+.orb-bg-1 {
+  top: -120rpx;
+  right: -80rpx;
+  width: 500rpx;
+  height: 500rpx;
+  background: radial-gradient(circle, rgba(139,92,246,0.12), rgba(6,182,212,0.04), transparent 70%);
+  animation: orb-float 6s ease-in-out infinite;
+}
+.orb-bg-2 {
+  bottom: -100rpx;
+  left: -60rpx;
+  width: 400rpx;
+  height: 400rpx;
+  background: radial-gradient(circle, rgba(6,182,212,0.10), rgba(236,72,153,0.04), transparent 70%);
+  animation: orb-float 8s ease-in-out infinite reverse;
+}
+
+/* ========== 4. 顶部栏 — 玻璃层2 ========== */
 .graph-header {
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
-  padding: 12rpx 24rpx;
-  background: rgba(10,10,24,0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1rpx solid rgba(255,255,255,0.06);
-  z-index: 10;
+  padding: var(--space-3, 12rpx) var(--space-6, 24rpx);
   flex-shrink: 0;
+  /* glass-2: 玻璃质感层2 */
+  background: var(--glass-bg-2, rgba(255,255,255,0.07));
+  backdrop-filter: blur(var(--glass-blur-2, 30px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-2, 30px));
+  border-bottom: var(--glass-border-2, 0.5px solid rgba(255,255,255,0.10));
+  /* 上层微光 */
+  box-shadow: var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255,255,255,0.08)),
+              var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
 }
+
 .header-left {
   width: 80rpx;
   height: 60rpx;
@@ -27,27 +68,36 @@
   align-items: center;
   justify-content: center;
 }
+
 .back-icon {
   font-size: 44rpx;
-  color: #8b8b9e;
+  color: var(--text-secondary, rgba(255,255,255,0.65));
   line-height: 1;
+  transition: var(--transition-fade, opacity 250ms ease-out);
 }
+.back-icon:active {
+  opacity: 0.5;
+}
+
 .header-center {
   flex: 1;
   text-align: center;
 }
+
 .header-title {
-  font-size: 28rpx;
+  font-size: var(--text-lg, 28rpx);
   font-weight: 600;
-  color: #e4e4ed;
-  letter-spacing: -0.3rpx;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  letter-spacing: var(--tracking-tight, -0.01em);
 }
+
 .header-subtitle {
-  font-size: 20rpx;
-  color: #6b6b8a;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   display: block;
   margin-top: 2rpx;
 }
+
 .header-right {
   width: 80rpx;
   display: flex;
@@ -55,67 +105,172 @@
   gap: 6rpx;
   justify-content: flex-end;
 }
+
 .legend-dot {
   width: 16rpx;
   height: 16rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
-  box-shadow: 0 0 12rpx rgba(6,182,212,0.3);
-}
-.legend-text {
-  font-size: 20rpx;
-  color: #8b8b9e;
+  background: var(--gradient-cyan-purple, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  /* Orb光晕替代原生阴影 */
+  box-shadow: var(--orb-cyan, 0 0 20px rgba(6,182,212,0.20));
 }
 
-/* 加载状态 */
+.legend-text {
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+}
+
+/* ========== 5. 加载状态 ========== */
 .loading-layer {
+  position: relative;
+  z-index: 5;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* 玻璃层1背景 */
+  background: var(--glass-bg-1, rgba(255,255,255,0.04));
 }
+
 .loading-spinner {
   width: 60rpx;
   height: 60rpx;
-  border: 4rpx solid rgba(255,255,255,0.06);
-  border-top: 4rpx solid #06b6d4;
+  border: 4rpx solid var(--border-subtle, rgba(255,255,255,0.06));
+  border-top: 4rpx solid var(--cyan, #06b6d4);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 20rpx;
+  /* Orb光晕 */
+  box-shadow: var(--orb-cyan, 0 0 20px rgba(6,182,212,0.20));
 }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
 .loading-text {
-  font-size: 24rpx;
-  color: #6b6b8a;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
 }
 
-/* Canvas 画布 */
+/* ========== 6. Canvas 画布 ========== */
 .graph-canvas {
+  position: relative;
+  z-index: 3;
   flex: 1;
   width: 100%;
   display: block;
 }
 
-/* 底部栏 */
+/* ========== 7. 底部栏 — 玻璃层1 ========== */
 .graph-footer {
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16rpx 28rpx;
-  background: rgba(10,10,24,0.8);
-  backdrop-filter: blur(8px);
-  border-top: 1rpx solid rgba(255,255,255,0.04);
+  padding: var(--space-4, 16rpx) var(--space-7, 28rpx);
   flex-shrink: 0;
+  /* glass-1: 超薄玻璃 */
+  background: var(--glass-bg-1, rgba(255,255,255,0.04));
+  backdrop-filter: blur(var(--glass-blur-1, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-1, 20px));
+  border-top: var(--glass-border-1, 0.5px solid rgba(255,255,255,0.06));
+  box-shadow: var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255,255,255,0.08));
 }
+
 .footer-hint {
-  font-size: 20rpx;
-  color: rgba(255,255,255,0.2);
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-quaternary, rgba(255,255,255,0.20));
 }
+
 .footer-count {
-  font-size: 22rpx;
-  color: #6b6b8a;
+  font-size: var(--text-sm, 22rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
   font-weight: 500;
+}
+
+/* ========== 8. Spring入场动效系统 ========== */
+
+/* 8a. 从上往下入场 + 弹簧曲线 */
+.animate-spring-in-down {
+  animation: spring-in-down var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+@keyframes spring-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 8b. 从下往上入场 */
+.animate-spring-in-up {
+  animation: spring-in-up var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+  animation-delay: 0.15s;
+}
+
+@keyframes spring-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 8c. 淡入缩放入场 */
+.animate-spring-in {
+  animation: spring-in var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+  animation-delay: 0.1s;
+}
+
+@keyframes spring-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 8d. Canvas缩放入场 — 弹簧回弹 */
+.animate-spring-in-scale {
+  animation: spring-in-scale var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+  animation-delay: 0.08s;
+}
+
+@keyframes spring-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  70% {
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== 9. Orb浮动呼吸动效（复用tokens定义） ========== */
+@keyframes orb-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-15rpx) scale(1.05);
+    opacity: 1;
+  }
 }

@@ -1,4 +1,7 @@
-<view class="page-container">
+<view class="page-container dark">
+  <!-- 光晕背景层 -->
+  <view class="orb-bg"></view>
+
   <!-- 加载状态 -->
   <loading visible="{{loading}}" text="加载中..." />
 
@@ -18,7 +21,7 @@
     </view>
 
     <!-- 用户信息头部 -->
-    <view class="user-header">
+    <view class="user-header glass-layer-1">
       <view class="user-avatar">
         <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
         <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
@@ -44,7 +47,7 @@
     </view>
 
     <!-- 快速操作栏 -->
-    <view class="action-bar">
+    <view class="action-bar glass-layer-2">
       <view class="action-item" bindtap="goEditCard">
         <text class="action-icon">✏️</text>
         <text class="action-label">编辑名片</text>
@@ -80,8 +83,14 @@
       </view>
     </view>
 
+    <!-- 场景模式切换 - P2功能 -->
+    <scene-selector 
+      wx:if="{{showSceneSelector}}"
+      bind:scenechange="onSceneChange"
+      current="{{currentScene}}" />
+
     <!-- 我的名片卡片 -->
-    <view class="card brochure-card" bindtap="goPreview">
+    <view class="card brochure-card glass-layer-2" bindtap="goPreview">
       <view class="card-header">
         <text class="title">📖 我的画册</text>
         <text class="more">查看全部 ›</text>
@@ -110,7 +119,7 @@
     </view>
 
     <!-- 信任网络 → 图谱入口 -->
-    <view class="card" bindtap="goTrust" style="cursor:pointer;">
+    <view class="card glass-layer-2" bindtap="goTrust" style="cursor:pointer;">
       <view class="card-header">
         <text class="title">🤝 信任网络</text>
         <text class="more">图谱模式 ›</text>
@@ -126,7 +135,7 @@
     </view>
 
     <!-- 匹配推荐区 -->
-    <view class="card" wx:if="{{recommendList.length > 0}}">
+    <view class="card glass-layer-2" wx:if="{{recommendList.length > 0}}">
       <view class="card-header">
         <text class="title">🎯 推荐匹配</text>
         <text class="more" bindtap="goMatch">查看更多 ›</text>

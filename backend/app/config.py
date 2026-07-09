@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/digital_brochure.db"
     JWT_SECRET: str  # 必须从环境变量 JWT_SECRET 读取，无默认值 — 生产环境使用 256 位随机密钥
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 60 minutes (security: reduced from 7 days)
 
     # ── RS256 JWT 非对称签名 ──────────────────────────────────────────────────
     JWT_ALGORITHM: str = "RS256"
@@ -97,6 +97,10 @@ class Settings(BaseSettings):
     VECTOR_TOP_K: int = 50
     """向量搜索返回数量上限"""
 
+    # ── HyDE 检索增强 ────────────────────────────────────────────────────
+    USE_HYDE: bool = True
+    """是否启用 HyDE（Hypothetical Document Embeddings）检索增强。生成假设文档替代原查询进行向量搜索。"""
+
     # ── Redis 缓存 ────────────────────────────────────────────────────────
     REDIS_HOST: str = "localhost"
     """Redis 服务地址（docker 中为 redis）"""
@@ -174,6 +178,11 @@ class Settings(BaseSettings):
     FEISHU_BOT_NAME: str = "AI数字名片助手"
     """飞书机器人名称"""
 
+    FEISHU_BAIZE_API_URL: str = "https://open.feishu.cn/open-apis/ai/v1/chat/completions"
+    """飞书白泽 API 地址"""
+    FEISHU_BAIZE_DEFAULT_MODEL: str = "baize-4k"
+    """飞书白泽默认模型"""
+
     DINGTALK_WEBHOOK_URL: str = ""
     """钉钉自定义机器人 Webhook URL。为空则降级到日志输出"""
     DINGTALK_SECRET: str = ""
@@ -216,6 +225,17 @@ class Settings(BaseSettings):
     """（向后兼容）腾讯会议旧版配置"""
     TENCENT_WECHAT_SECRET: str = ""
     """（向后兼容）腾讯会议旧版配置"""
+
+    # ── API 文档暴露控制 ──────────────────────────────────────────────
+    @property
+    def docs_enabled(self) -> bool:
+        """API 文档端点 /docs /redoc /openapi.json 是否启用。
+        生产环境 (ENV=production) 自动禁用。
+        也可通过 DISABLE_DOCS=true 环境变量强制禁用。
+        """
+        env = os.getenv("ENV", "development").lower()
+        docs_disabled = os.getenv("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
+        return env not in ("production", "prod") and not docs_disabled
 
     class Config:
         env_file = ".env"

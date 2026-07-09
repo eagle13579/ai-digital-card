@@ -27,7 +27,7 @@ function getBaseUrl() {
   } catch (e) {
     // app 未初始化时使用默认值
   }
-  return 'http://localhost:8002'
+  return 'http://127.0.0.1:8002'
 }
 
 // 启动时日志 — 输出当前API地址，方便开发/生产切换验证
@@ -109,7 +109,14 @@ const userApi = {
 const brochureApi = {
   /** 获取画册列表（分页） */
   list(params) {
-    return get('/api/v1/brochures', params)
+    // 兼容 page/size → cursor/page_size 转换
+    const q = { ...params }
+    if (q.page !== undefined && q.size !== undefined) {
+      q.page_size = q.size
+      delete q.page
+      delete q.size
+    }
+    return get('/api/v1/brochures', q)
   },
   /** 获取画册详情 */
   getById(id) {
@@ -268,7 +275,7 @@ const aiApi = {
   },
   /** AI 生成内容（名片、文案等） */
   generate(data) {
-    return post('/api/v1/ai/assist/generate', data)
+    return post('/api/v1/ai/assist/write', data)
   },
   /** AI 优化建议 */
   optimize(data) {
@@ -277,6 +284,54 @@ const aiApi = {
   /** DeepSeek 纯对话（非RAG，直接调用DeepSeek API） */
   deepseekChat(data) {
     return post('/api/v1/ai/deepseek/chat', data)
+  },
+}
+
+// =============================================================================
+//  AI 配置模块 (ai/config) — /api/v1/ai/config
+// =============================================================================
+const aiConfigApi = {
+  /** 获取AI客服配置 */
+  get() {
+    return get('/api/v1/ai/config')
+  },
+  /** 保存AI客服配置 */
+  save(data) {
+    return post('/api/v1/ai/config', data)
+  },
+}
+
+// =============================================================================
+//  场景模块 (scene) — /api/v1/scene
+// =============================================================================
+const sceneApi = {
+  /** AI场景分类 — 输入context/output scene_type */
+  classify(context) {
+    return post('/api/v1/scene/classify', { context })
+  },
+}
+
+// =============================================================================
+//  人脉网络模块 (network) — /api/v1/network
+// =============================================================================
+const networkApi = {
+  /** 人脉链路径推理 — 输入from/to user_id/output paths */
+  bridge(fromUserId, toUserId) {
+    return post('/api/v1/network/bridge', { from_user_id: fromUserId, to_user_id: toUserId })
+  },
+}
+
+// =============================================================================
+//  名片编辑模块 (card/edit) — /api/v1/card/edit
+// =============================================================================
+const cardEditApi = {
+  /** 对话式编辑意图理解 — 输入自然语言指令，输出意图摘要 */
+  interpret(text, cardId) {
+    return post('/api/v1/card/edit/interpret', { text, card_id: cardId })
+  },
+  /** 对话式编辑执行 — 确认后执行编辑操作 */
+  execute(intent, cardId) {
+    return post('/api/v1/card/edit/execute', { intent, card_id: cardId })
   },
 }
 
@@ -1184,4 +1239,16 @@ module.exports = {
 
   // 公开接口
   publicApi,
+
+  // AI 配置
+  aiConfigApi,
+
+  // 场景
+  sceneApi,
+
+  // 人脉网络
+  networkApi,
+
+  // 名片编辑
+  cardEditApi,
 }

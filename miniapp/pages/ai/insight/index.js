@@ -61,6 +61,8 @@ Page({
   },
 
   onLoad() {
+    const sys = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sys.statusBarHeight })
     wx.setNavigationBarTitle({ title: '数据洞察' })
     this.fetchData()
   },

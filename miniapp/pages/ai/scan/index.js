@@ -1,8 +1,5 @@
-// pages/ai/scan/index.js — AI名片扫描分析 (真实API连接)
-// 功能：拍照/选图 → 后端AI分析识别名片信息 → 确认保存到名片夹
-
-const { aiApi, brochureApi } = require('../../../utils/api')
-
+// pages/ai/scan/index.js
+const { MockService } = require('../../../utils/mockService')
 const HISTORY_KEY = 'scan_history'
 
 Page({
@@ -26,6 +23,8 @@ Page({
   },
 
   onLoad() {
+    const sys = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sys.statusBarHeight })
     wx.setNavigationBarTitle({ title: '名片扫描' })
     this.loadHistory()
   },
@@ -77,7 +76,6 @@ Page({
     })
   },
 
-  /** 调用后端AI分析名片图片 */
   analyzeCard(imagePath) {
     const that = this
     this.setData({
@@ -88,51 +86,31 @@ Page({
       imagePath
     })
 
-    // 先显示识别中的loading
     wx.showLoading({ title: '识别中...', mask: true })
 
-    // 调用后端 AI assist/write 接口，传图片描述分析名片
-    // 由于小程序不能直接传二进制给AI接口，用base64或描述方式
-    // 实际场景：先用wx.getFileSystemManager读取为base64，或直接上传图片
-    // 这里使用wx.getImageInfo获取图片后，调用aiApi.getChat进行OCR识别
-    const fm = wx.getFileSystemManager()
-    fm.readFile({
-      filePath: imagePath,
-      encoding: 'base64',
-      success(fileRes) {
-        const base64Data = fileRes.data
-        // 通过AI对话接口传图片base64，让后端做OCR识别
-        aiApi.getChat({
-          messages: [
-            { role: 'system', content: '你是一个名片OCR识别专家。请识别图片中的名片信息，提取姓名(name)、职位(title)、公司(company)、手机号(phone)、邮箱(email)、地址(address)。只返回JSON格式，不要其他文字。' },
-            { role: 'user', content: '请识别这张名片上的信息。', image_base64: base64Data, image_mime: 'image/jpeg' }
-          ]
+    MockService.ocrScan(imagePath)
+      .then(res => {
+        wx.hideLoading()
+        const cardInfo = res.data || res
+        that.setData({
+          loading: false,
+          analyzing: false,
+          showResult: true,
+          cardData: cardInfo,
+          confidence: res.confidence || 95
         })
-          .then(res => {
-            wx.hideLoading()
-            const data = res.data || res
-            const cardInfo = that.parseCardResult(data)
-            that.setData({
-              loading: false,
-              analyzing: false,
-              showResult: true,
-              cardData: cardInfo
-            })
-          })
-          .catch(err => {
-            wx.hideLoading()
-            that.setData({ loading: false, analyzing: false })
-            wx.showToast({ title: '识别失败，请重试', icon: 'none' })
-            console.error('[Scan] AI分析失败', err)
-          })
-      },
-      fail(err) {
+        that.saveHistory({
+          name: cardInfo.name || '未知',
+          company: cardInfo.company || '',
+          time: '刚刚'
+        })
+      })
+      .catch(err => {
         wx.hideLoading()
         that.setData({ loading: false, analyzing: false })
-        wx.showToast({ title: '读取图片失败', icon: 'none' })
-        console.error('[Scan] 读取图片失败', err)
-      }
-    })
+        wx.showToast({ title: '识别失败，请重试', icon: 'none' })
+        console.error('[Scan] AI分析失败', err)
+      })
   },
 
   /** 解析AI返回结果，提取名片字段 */
@@ -170,7 +148,6 @@ Page({
     }
   },
 
-  /** 确认保存到名片夹 */
   onSave() {
     const card = this.data.cardData
     if (!card.name && !card.company) {
@@ -180,42 +157,38 @@ Page({
 
     wx.showLoading({ title: '保存中...', mask: true })
 
-    // 构建后端期望的字段映射
+    const contactLines = []
+    if (card.name) contactLines.push(`姓名：${card.name}`)
+    if (card.title) contactLines.push(`职位：${card.title}`)
+    if (card.company) contactLines.push(`公司：${card.company}`)
+    if (card.phone) contactLines.push(`电话：${card.phone}`)
+    if (card.email) contactLines.push(`邮箱：${card.email}`)
+    if (card.address) contactLines.push(`地址：${card.address}`)
+
     const brochureData = {
       title: card.name || '未命名名片',
       cover: this.data.imagePath || '',
-      purpose: '从OCR扫描创建',
+      purpose: 'partner',
       pages: [{
-        type: 'contact',
-        name: card.name || '',
-        title: card.title || '',
-        company: card.company || '',
-        phone: card.phone || '',
-        email: card.email || '',
-        address: card.address || ''
-      }]
+        content_type: 'cover',
+        sort_order: 0,
+        content: contactLines.join('\n'),
+        image_url: this.data.imagePath || '',
+      }],
+      ...card
     }
 
-    brochureApi.create(brochureData)
+    MockService.createBrochure(brochureData)
       .then(res => {
         wx.hideLoading()
         wx.showToast({ title: '已保存到名片夹', icon: 'success', duration: 1500 })
 
-        // 记录扫描历史
-        this.saveHistory({
-          name: card.name || '未知',
-          company: card.company || '',
-          time: '刚刚'
-        })
-
-        // 跳转到预览页
         setTimeout(() => {
           wx.redirectTo({
             url: `/pages/brochure/preview/index?id=${res.id}`,
           })
         }, 1500)
 
-        // 重置，准备下一次扫描
         this.setData({
           showResult: false,
           imagePath: '',

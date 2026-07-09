@@ -1,0 +1,164 @@
+/**
+ * 场景选择器样式 — SceneSelector
+ * 深色主题 + 紫光渐变 + 弹簧动效
+ */
+
+.scene-selector {
+  position: relative;
+  padding: 16rpx 0;
+}
+
+/* ── 横向滚动场景标签 ── */
+.scene-tabs {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+.scene-tab {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+
+.scene-tab:last-child {
+  margin-right: 0;
+}
+
+.scene-tab-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 120rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 20rpx;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scene-tab-inner.active {
+  background: var(--bg-glass-3, rgba(139,92,246,0.12));
+  border-color: var(--border-accent, rgba(139,92,246,0.25));
+  box-shadow: 0 0 20px rgba(139,92,246,0.15);
+}
+
+.scene-tab:active .scene-tab-inner {
+  transform: scale(0.95);
+}
+
+.scene-icon {
+  font-size: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.scene-label {
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  letter-spacing: var(--tracking-wide, 0.02em);
+}
+
+.scene-tab-inner.active .scene-label {
+  color: var(--text-accent, #a78bfa);
+  font-weight: 600;
+}
+
+/* ── AI 建议浮层 ── */
+.ai-suggestion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-suggestion-card {
+  background: var(--bg-elevated, #0F0F13);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  width: 600rpx;
+  max-width: 85%;
+  border: 1px solid var(--border-default, rgba(255,255,255,0.10));
+  box-shadow: var(--orb-lg, 0 0 40px rgba(139,92,246,0.25));
+}
+
+.suggestion-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.suggestion-emoji {
+  font-size: 40rpx;
+  margin-right: 12rpx;
+}
+
+.suggestion-title {
+  font-size: var(--text-lg, 32rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+}
+
+.suggestion-body {
+  margin-bottom: 32rpx;
+}
+
+.suggestion-text {
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  line-height: 1.6;
+}
+
+.suggestion-highlight {
+  color: var(--text-accent, #a78bfa);
+  font-weight: 600;
+}
+
+.suggestion-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+}
+
+.btn-decline {
+  padding: 16rpx 32rpx;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  border-radius: 16rpx;
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  border: none;
+}
+
+.btn-accept {
+  padding: 16rpx 32rpx;
+  background: var(--gradient-cyan-purple, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  border-radius: 16rpx;
+  font-size: var(--text-base, 28rpx);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+}
+
+/* ── AI 建议加载态 ── */
+.ai-suggesting {
+  padding: 16rpx 16px;
+}
+
+.suggesting-text {
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}

@@ -1,4 +1,5 @@
 import csv
+import html
 import io
 import json
 import uuid
@@ -221,8 +222,8 @@ class BrochureService:
                 continue
             brochure = Brochure(
                 user_id=user_id,
-                title=name or f"联系人{phone}",
-                purpose=row.get("company", ""),
+                title=html.escape(name or f"联系人{phone}"),
+                purpose=html.escape(row.get("company", "")),
                 status="published",
             )
             db.add(brochure)

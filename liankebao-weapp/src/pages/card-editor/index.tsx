@@ -14,6 +14,8 @@ import Taro from '@tarojs/taro'
 import { View, Text, Input, Button, Image, ScrollView } from '@tarojs/components'
 import cardApi, { ScanResult, CardGenerateParams } from '../../api/card'
 import matchApi from '../../api/match'
+import { writeApi } from '../../api/digitalBrochure'
+import { api } from '../../api/client'
 import './index.scss'
 
 /* ========================================================================== */
@@ -74,6 +76,18 @@ export default function CardEditor() {
   const [errorMsg, setErrorMsg] = useState<string>('')
   const [recommendations, setRecommendations] = useState<any[]>([])
   const [showRec, setShowRec] = useState(false)
+
+  /* ---- AI 写作助手状态 ------------------------------------------------ */
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiContent, setAiContent] = useState('')
+  const [showAIPanel, setShowAIPanel] = useState(false)
+
+  /* ---- 智能标签推荐状态 ------------------------------------------------ */
+  const [tagLoading, setTagLoading] = useState(false)
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [showTagPanel, setShowTagPanel] = useState(false)
+  const [tagAddLoading, setTagAddLoading] = useState(false)
 
   /* ---- 表单字段更新 ----------------------------------------------------- */
   const updateField = useCallback(
@@ -185,6 +199,139 @@ export default function CardEditor() {
     setErrorMsg('')
   }, [])
 
+  /* ---- AI 写作助手 ----------------------------------------------------- */
+  const handleAIAssist = useCallback(async () => {
+    if (!form.nickName.trim()) {
+      Taro.showToast({ title: '请先填写姓名', icon: 'none' })
+      return
+    }
+
+    setAiLoading(true)
+    setAiContent('')
+
+    try {
+      const params = {
+        purpose: 'bio',
+        name: form.nickName.trim(),
+        position: form.position.trim() || '',
+        company: form.company.trim() || '',
+        industry: '',
+        skills: '',
+        description: '',
+        highlights: '',
+      }
+
+      const res = await writeApi.generateCopy(params)
+
+      if (res.code === 200 || res.code === 0) {
+        const data = res.data as { purpose: string; content: string }
+        if (data?.content) {
+          setAiContent(data.content)
+          setShowAIPanel(true)
+        } else {
+          Taro.showToast({ title: '生成内容为空', icon: 'none' })
+        }
+      } else {
+        Taro.showToast({
+          title: res.message || '生成失败',
+          icon: 'none',
+        })
+      }
+    } catch (err: any) {
+      Taro.showToast({
+        title: err.message || '网络异常，请重试',
+        icon: 'none',
+      })
+    } finally {
+      setAiLoading(false)
+    }
+  }, [form])
+
+  /* ---- 智能标签推荐 ----------------------------------------------------- */
+  const handleSmartTagRecommend = useCallback(async () => {
+    if (!form.company.trim() && !form.position.trim()) {
+      Taro.showToast({ title: '请先填写公司和职位信息', icon: 'none' })
+      return
+    }
+
+    setTagLoading(true)
+    setTagSuggestions([])
+    setSelectedTags([])
+
+    try {
+      const res = await api.post('/api/v1/sag/analyze', {
+        mode: 'optimize_suggest',
+        content: {
+          company: form.company.trim(),
+          position: form.position.trim(),
+        },
+        depth: 'fast',
+      })
+
+      if ((res.code === 200 || res.code === 0) && Array.isArray((res.data as any)?.suggestions)) {
+        setTagSuggestions((res.data as any).suggestions)
+      } else {
+        // 降级：使用预设热门标签
+        setTagSuggestions(['技术','产品','运营','设计','市场','销售','金融','教育','医疗'])
+      }
+      setShowTagPanel(true)
+    } catch {
+      // 失败降级：使用预设热门标签
+      setTagSuggestions(['技术','产品','运营','设计','市场','销售','金融','教育','医疗'])
+      setShowTagPanel(true)
+    } finally {
+      setTagLoading(false)
+    }
+  }, [form])
+
+  /* ---- 选中/取消标签 --------------------------------------------------- */
+  const handleToggleTag = useCallback((tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    )
+  }, [])
+
+  /* ---- 添加标签到我的标签 --------------------------------------------- */
+  const handleAddTags = useCallback(async () => {
+    if (selectedTags.length === 0) {
+      Taro.showToast({ title: '请至少选择一个标签', icon: 'none' })
+      return
+    }
+
+    setTagAddLoading(true)
+
+    try {
+      const res = await api.post('/api/v1/tags/me', {
+        tags: selectedTags,
+        tag_type: 'provide',
+      })
+
+      if (res.code === 200 || res.code === 0) {
+        Taro.showToast({ title: '✅ 标签已添加', icon: 'success' })
+        setShowTagPanel(false)
+        setTagSuggestions([])
+        setSelectedTags([])
+      } else {
+        Taro.showToast({ title: res.message || '添加失败', icon: 'none' })
+      }
+    } catch (err: any) {
+      Taro.showToast({ title: err.message || '网络异常，请重试', icon: 'none' })
+    } finally {
+      setTagAddLoading(false)
+    }
+  }, [selectedTags])
+
+  /* ---- 应用 AI 文案到字段 --------------------------------------------- */
+  const handleApplySuggestion = useCallback(() => {
+    if (!aiContent) return
+
+    // 将 AI 生成的简介/宣传文案应用到表单（这里应用到 website 字段展示，
+    // 开发者可根据后端返回的 purpose 灵活映射到其他字段）
+    setForm((prev) => ({ ...prev, website: aiContent }))
+    setShowAIPanel(false)
+    Taro.showToast({ title: '✅ 文案已应用到名片', icon: 'success' })
+  }, [aiContent])
+
   /* ---- 提交表单 --------------------------------------------------------- */
   const handleSubmit = useCallback(async () => {
     if (!validate()) return
@@ -251,6 +398,13 @@ export default function CardEditor() {
     setErrorMsg('')
     setRecommendations([])
     setShowRec(false)
+    setAiContent('')
+    setShowAIPanel(false)
+    setTagLoading(false)
+    setTagSuggestions([])
+    setSelectedTags([])
+    setShowTagPanel(false)
+    setTagAddLoading(false)
   }, [])
 
   /* ---- 查看推荐详情 ----------------------------------------------------- */
@@ -622,6 +776,30 @@ export default function CardEditor() {
           </View>
         </View>
 
+        {/* AI 优化建议按钮 */}
+        <View className='card-editor__ai'>
+          <Button
+            className='card-editor__btn card-editor__btn--ai'
+            loading={aiLoading}
+            disabled={aiLoading || status === 'submitting'}
+            onClick={handleAIAssist}
+          >
+            {aiLoading ? '🤖 AI思考中...' : '🤖 AI优化建议'}
+          </Button>
+        </View>
+
+        {/* 🏷️ 智能标签推荐按钮 */}
+        <View className='card-editor__ai'>
+          <Button
+            className='card-editor__btn card-editor__btn--tag'
+            loading={tagLoading}
+            disabled={tagLoading || status === 'submitting'}
+            onClick={handleSmartTagRecommend}
+          >
+            {tagLoading ? '🤖 分析中...' : '🏷️ 智能标签推荐'}
+          </Button>
+        </View>
+
         {/* 提交按钮 */}
         <View className='card-editor__submit'>
           <Button
@@ -637,6 +815,98 @@ export default function CardEditor() {
         {/* 底部安全区 */}
         <View className='card-editor__safe-area' />
       </ScrollView>
+
+      {/* AI 写作建议面板 */}
+      {showAIPanel && (
+        <View className='card-editor__ai-overlay' onClick={() => setShowAIPanel(false)}>
+          <View
+            className='card-editor__ai-panel'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <View className='card-editor__ai-panel-header'>
+              <Text className='card-editor__ai-panel-title'>🤖 AI 优化建议</Text>
+              <Text
+                className='card-editor__ai-panel-close'
+                onClick={() => setShowAIPanel(false)}
+              >
+                ✕
+              </Text>
+            </View>
+            <ScrollView className='card-editor__ai-panel-body' scrollY>
+              <Text className='card-editor__ai-panel-content'>{aiContent}</Text>
+            </ScrollView>
+            <View className='card-editor__ai-panel-footer'>
+              <Button
+                className='card-editor__btn card-editor__btn--outline'
+                onClick={() => setShowAIPanel(false)}
+              >
+                忽略
+              </Button>
+              <Button
+                className='card-editor__btn card-editor__btn--primary'
+                onClick={handleApplySuggestion}
+              >
+                应用文案
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 🏷️ 智能标签推荐面板 */}
+      {showTagPanel && (
+        <View className='card-editor__ai-overlay' onClick={() => setShowTagPanel(false)}>
+          <View
+            className='card-editor__ai-panel'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <View className='card-editor__ai-panel-header'>
+              <Text className='card-editor__ai-panel-title'>🏷️ 智能标签推荐</Text>
+              <Text
+                className='card-editor__ai-panel-close'
+                onClick={() => setShowTagPanel(false)}
+              >
+                ✕
+              </Text>
+            </View>
+            <ScrollView className='card-editor__ai-panel-body' scrollY>
+              <Text className='card-editor__ai-panel-hint'>
+                根据公司和职位信息推荐以下标签，选择后添加到您的标签库
+              </Text>
+              <View className='card-editor__tag-list'>
+                {tagSuggestions.map((tag) => (
+                  <View
+                    key={tag}
+                    className={`card-editor__tag-item${selectedTags.includes(tag) ? ' card-editor__tag-item--active' : ''}`}
+                    onClick={() => handleToggleTag(tag)}
+                  >
+                    <Text className='card-editor__tag-text'>{tag}</Text>
+                    {selectedTags.includes(tag) && (
+                      <Text className='card-editor__tag-check'>✓</Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+            <View className='card-editor__ai-panel-footer'>
+              <Button
+                className='card-editor__btn card-editor__btn--outline'
+                onClick={() => setShowTagPanel(false)}
+              >
+                取消
+              </Button>
+              <Button
+                className='card-editor__btn card-editor__btn--primary'
+                loading={tagAddLoading}
+                disabled={tagAddLoading || selectedTags.length === 0}
+                onClick={handleAddTags}
+              >
+                添加到我的标签 ({selectedTags.length})
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

@@ -1,0 +1,66 @@
+# SOC2 合规检查 — 自动化证据采集
+name: SOC2 Compliance Check
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  collect:
+    name: 证据采集
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run SOC2 evidence collector
+        id: collect
+        run: |
+          cd backend
+          python scripts/soc2_audit_collector.py --output scripts/soc2_audit_evidence.json
+
+      - name: Show summary
+        run: |
+          python3 -c "
+import json
+d = json.load(open('backend/scripts/soc2_audit_evidence.json'))
+s = d['summary']
+print(f'SOC2: {s[\"pass_rate\"]} pass rate ({s[\"passed\"]}/{s[\"total_controls\"]})')
+for dom, st in s['by_domain'].items():
+    print(f'  {dom}: {st[\"rate\"]} ({st[\"passed\"]}/{st[\"total\"]})')
+failures = [e for e in d['evidence'] if e['status'] == '❌']
+if failures:
+    print(f'Failed items ({len(failures)}):')
+    for f in failures:
+        print(f'  ❌ {f[\"domain\"]}: {f[\"control\"]}')
+"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: soc2-evidence
+          path: backend/scripts/soc2_audit_evidence.json
+
+      - name: Write summary
+        run: |
+          echo '## SOC2 合规检查' >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+import json
+d = json.load(open('backend/scripts/soc2_audit_evidence.json'))
+s = d['summary']
+print(f'通过率: {s[\"pass_rate\"]} ({s[\"passed\"]}/{s[\"total_controls\"]})')
+for dom, st in s['by_domain'].items():
+    print(f'- {dom}: {st[\"rate\"]} ({st[\"passed\"]}/{st[\"total\"]})')
+failures = [e for e in d['evidence'] if e['status'] == '❌']
+if failures:
+    print()
+    print(f'❌ 未通过: {len(failures)}项')
+    for f in failures:
+        print(f'  - {f[\"domain\"]}: {f[\"control\"]}')
+" >> $GITHUB_STEP_SUMMARY

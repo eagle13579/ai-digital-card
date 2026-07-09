@@ -1,0 +1,82 @@
+<!--
+  人脉链微地图 NetworkMiniMap
+  极小角标 + 弹窗展开 + 中间人预览
+-->
+<view class="network-mini-map">
+  <!-- 迷你地图角标 -->
+  <view
+    class="mini-badge {{hasPath ? 'visible' : 'hidden'}} spring-press"
+    wx:if="{{hasPath}}"
+    bindtap="onTapExpand"
+    hover-class="spring-scale-mini"
+  >
+    <canvas
+      id="miniMapCanvas"
+      type="2d"
+      class="mini-canvas"
+      style="width: {{miniWidth}}rpx; height: {{miniHeight}}rpx;"
+    ></canvas>
+    <view class="badge-tag">
+      <text class="badge-text">人脉</text>
+    </view>
+  </view>
+
+  <!-- 加载态 -->
+  <view class="mini-loading" wx:if="{{loading}}">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+
+  <!-- 展开弹窗 -->
+  <view class="popup-overlay" wx:if="{{expanded}}" bindtap="onClosePopup">
+    <view class="popup-card" catchtap="noop">
+      <view class="popup-header">
+        <text class="popup-title">🔗 人脉链路径</text>
+        <view class="popup-close spring-press" bindtap="onClosePopup">
+          <text>✕</text>
+        </view>
+      </view>
+      <view class="popup-canvas-wrap">
+        <canvas
+          id="expandMapCanvas"
+          type="2d"
+          class="expand-canvas"
+          style="width: {{expandWidth}}rpx; height: {{expandHeight}}rpx;"
+        ></canvas>
+      </view>
+      <!-- 路径列表 -->
+      <view class="path-list" wx:if="{{paths.length > 0}}">
+        <view
+          class="path-node spring-press"
+          wx:for="{{(paths.length > 0 && paths[0].nodes) || []}}"
+          wx:for-index="idx"
+          wx:key="idx"
+          data-node="{{item}}"
+          bindtap="onNodeTap"
+        >
+          <view class="path-node-indicator {{idx === 0 ? 'start' : (idx === paths[0].nodes.length - 1 ? 'end' : 'mid')}}"></view>
+          <view class="path-node-info">
+            <text class="path-node-name">{{idx === 0 ? '我' : (idx === paths[0].nodes.length - 1 ? '目标' : maskName(item.name))}}</text>
+            <text class="path-node-rel" wx:if="{{item.relation}}">{{item.relation}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 中间人预览浮层 -->
+  <view class="node-preview-overlay" wx:if="{{showNodePreview}}" bindtap="onCloseNodePreview">
+    <view class="node-preview-card" catchtap="noop">
+      <view class="preview-avatar">
+        <text class="preview-avatar-text">👤</text>
+      </view>
+      <text class="preview-name">{{selectedNode.name}}</text>
+      <text class="preview-relation">关系: {{selectedNode.relation}}</text>
+      <text class="preview-trust">信任度: {{selectedNode.trustLevel}}</text>
+      <view class="preview-footer">
+        <button class="preview-close-btn spring-press" bindtap="onCloseNodePreview">关闭</button>
+      </view>
+    </view>
+  </view>
+</view>

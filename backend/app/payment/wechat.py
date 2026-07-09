@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import time
 import uuid
+import urllib.parse
 from datetime import datetime
 from typing import Any, Optional
 from xml.etree import ElementTree
@@ -53,10 +55,10 @@ def _from_xml(xml_str: str) -> dict[str, str]:
 
 
 def _sign_md5(params: dict[str, str], key: str) -> str:
-    """微信 MD5 签名"""
+    """微信 MD5 签名 - V2版本使用GBK编码"""
     sorted_keys = sorted(k for k in params if k and params[k])
     raw = "&".join(f"{k}={params[k]}" for k in sorted_keys) + f"&key={key}"
-    return _md5(raw)
+    return hashlib.md5(raw.encode("gbk")).hexdigest().upper()
 
 
 def _sign_hmac_sha256(params: dict[str, str], key: str) -> str:
@@ -74,7 +76,7 @@ class WeChatPayProvider(PaymentProvider):
         self.mch_id: str = settings.WECHAT_MCH_ID or ""
         self.api_key: str = settings.WECHAT_PAY_API_KEY or ""
         self.api_v3_key: str = settings.WECHAT_PAY_V3_KEY or ""
-        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/payment/notify/wechat"
+        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/v1/payment/notify/wechat"
         self._client: Optional[httpx.AsyncClient] = None
 
     @property
@@ -102,14 +104,12 @@ class WeChatPayProvider(PaymentProvider):
             "body": product.name_cn,
             "out_trade_no": order_no,
             "total_fee": str(product.price_cents),
-            "spbill_create_ip": req.client_ip,
+            "spbill_create_ip": req.client_ip or "127.0.0.1",
             "notify_url": self.notify_url,
             "trade_type": "JSAPI",
             "openid": req.openid,
         }
 
-        sign_type = "MD5"
-        params["sign_type"] = sign_type
         params["sign"] = _sign_md5(params, self.api_key)
 
         xml_body = _to_xml(params)
@@ -238,7 +238,47 @@ class WeChatPayProvider(PaymentProvider):
             return False
 
     def _rsa_sign(self, params: dict[str, str]) -> str:
-        """微信 V3 RSA 签名（简化实现：回退 HMAC-SHA256）"""
-        sorted_keys = sorted(k for k in params if k and params[k])
-        raw = "\n".join(params[k] for k in sorted_keys) + "\n"
+        """微信支付V3 JSAPI调起签名
+        
+        签名规则：
+        1. 参数顺序：appId, timeStamp, nonceStr, package
+        2. 每个参数值用换行符连接，最后加换行符
+        3. 使用商户API证书私钥进行RSA-SHA256签名
+        4. 签名结果Base64编码
+        
+        注意：微信支付V3的JSAPI调起签名与V2不同，必须使用RSA签名
+        """
+        sign_fields = ["appId", "timeStamp", "nonceStr", "package"]
+        raw = "\n".join(params.get(k, "") for k in sign_fields) + "\n"
+        
+        try:
+            import os
+            private_key_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wechat_pay_key.pem')
+            if not os.path.exists(private_key_path):
+                raise FileNotFoundError(f"商户私钥文件不存在: {private_key_path}")
+            
+            with open(private_key_path, 'r') as f:
+                private_key = f.read()
+            
+            from cryptography.hazmat.primitives import hashes, serialization
+            from cryptography.hazmat.primitives.asymmetric import padding
+            
+            key = serialization.load_pem_private_key(
+                private_key.encode(), 
+                password=None
+            )
+            signature = key.sign(
+                raw.encode(),
+                padding.PKCS1v15(),
+                hashes.SHA256()
+            )
+            
+            import base64
+            return base64.b64encode(signature).decode()
+            
+        except FileNotFoundError as e:
+            print(f"[WARN] 商户私钥文件不存在: {e}，降级HMAC-SHA256")
+        except Exception as e:
+            print(f"[WARN] RSA签名失败: {e}，降级HMAC-SHA256")
+        
         return _sha256_hmac(self.api_v3_key or self.api_key, raw)

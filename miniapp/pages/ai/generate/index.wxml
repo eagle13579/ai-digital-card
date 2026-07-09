@@ -1,6 +1,6 @@
 <view class="page">
-  <!-- 自定义导航栏 -->
-  <view class="page-header">
+  <!-- 自定义导航栏 — 玻璃层3 -->
+  <view class="page-header" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="goBack">
       <text class="icon">‹</text>
     </view>
@@ -15,7 +15,7 @@
   </view>
 
   <scroll-view class="page-content" scroll-y enhanced>
-    <!-- 模式切换 Tabs -->
+    <!-- 模式切换 Tabs — 玻璃容器 + spring -->
     <view class="tabs-container">
       <view
         class="tab-item {{currentTab === 0 ? 'active' : ''}}"
@@ -72,7 +72,7 @@
       </view>
     </view>
 
-    <!-- 输入区域 -->
+    <!-- 输入区域 — 玻璃卡片 -->
     <view class="input-section">
       <text class="section-title">输入提示</text>
       <input
@@ -83,7 +83,7 @@
       />
       <button
         class="generate-btn"
-        type="primary"
+        type="default"
         size="default"
         loading="{{isGenerating}}"
         disabled="{{!prompt.trim() || isGenerating}}"
@@ -93,7 +93,7 @@
       </button>
     </view>
 
-    <!-- 快捷模板 -->
+    <!-- 快捷模板 — 玻璃卡片 -->
     <view class="templates-section" wx:if="{{templates.length > 0}}">
       <text class="section-title">快捷模板</text>
       <view class="templates-list">
@@ -113,7 +113,7 @@
       </view>
     </view>
 
-    <!-- 生成结果 -->
+    <!-- 生成结果 — 玻璃层3 + 紫光orb -->
     <view class="result-section" wx:if="{{resultContent}}">
       <view class="result-header">
         <text class="section-title">生成结果</text>

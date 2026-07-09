@@ -1,6 +1,6 @@
 <view class="page-wrap">
   <!-- 顶部导航栏 -->
-  <view class="status-bar">
+  <view class="status-bar" style="padding-top: {{statusBarHeight}}px">
     <text class="back-icon" bindtap="goBack">‹</text>
     <text class="status-time">创建资源平台</text>
     <text class="status-placeholder"></text>

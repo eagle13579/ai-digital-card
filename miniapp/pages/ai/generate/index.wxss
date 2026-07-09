@@ -1,12 +1,40 @@
+/**
+ * pages/ai/generate/index.wxss
+ * AI内容生成页 — 深色适配 + 玻璃卡片 + spring动效 + orb光晕
+ * 设计系统: tokens.wxss + tailwind-like.wxss (已在app.wxss中全局注入)
+ * 基底: #0F0F13 | 三重渐变: 青→紫→粉 | 玻璃三层 | spring弹簧动效
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ */
+
+/* =============================================
+   1. 页面基底 + Orb背景光晕
+   ============================================= */
+.page {
+  min-height: 100vh;
+  background:
+    var(--bg-page),
+    radial-gradient(ellipse 600rpx 400rpx at 15% 10%, rgba(6, 182, 212, 0.10), transparent),
+    radial-gradient(ellipse 500rpx 500rpx at 75% 30%, rgba(139, 92, 246, 0.08), transparent),
+    radial-gradient(ellipse 400rpx 300rpx at 50% 85%, rgba(236, 72, 153, 0.06), transparent);
+  background-blend-mode: normal, normal, normal, normal;
+}
+
+/* =============================================
+   2. 导航栏 — 玻璃层3 + 弹簧动效
+   ============================================= */
 .page-header {
   display: flex;
   align-items: center;
   padding: 40rpx 16px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: #fff;
+  background: rgba(15, 15, 19, 0.88);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-bottom: 0.5px solid rgba(139, 92, 246, 0.15);
+  color: var(--text-primary);
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background var(--duration-normal) var(--ease-out);
 }
 
 .back-btn {
@@ -16,12 +44,22 @@
   align-items: center;
   justify-content: center;
   margin-right: 24rpx;
+  border-radius: var(--radius-full);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.back-btn:active {
+  transform: scale(0.90);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .back-btn .icon {
   width: 48rpx;
   height: 48rpx;
-  color: #fff;
+  color: var(--text-primary);
+  font-size: 48rpx;
+  line-height: 1;
 }
 
 .header-title {
@@ -30,53 +68,66 @@
 
 .header-title .title {
   font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   display: block;
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
 }
 
 .header-title .subtitle {
   font-size: 24rpx;
-  opacity: 0.8;
+  opacity: 0.65;
   margin-top: 4rpx;
   display: block;
+  color: var(--text-secondary);
 }
 
+/* =============================================
+   3. AI徽章 — 玻璃光晕
+   ============================================= */
 .ai-badge {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 92, 246, 0.15);
   padding: 12rpx 12px;
   border-radius: 40rpx;
   font-size: 24rpx;
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
+  color: var(--purple-light);
+  border: 0.5px solid rgba(139, 92, 246, 0.2);
+  box-shadow: var(--orb-md);
 }
 
 .ai-dot {
   width: 16rpx;
   height: 16rpx;
-  background: #10B981;
+  background: var(--cyan);
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  animation: pulse-glow 2000ms ease-in-out infinite;
+  box-shadow: var(--orb-sm);
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
+/* =============================================
+   4. 页面内容区
+   ============================================= */
 .page-content {
   height: calc(100vh - 88px);
   padding: 32rpx;
 }
 
+/* =============================================
+   5. Tabs容器 — 玻璃卡片 + spring
+   ============================================= */
 .tabs-container {
   display: flex;
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: 8rpx;
   margin-bottom: 40rpx;
-  box-shadow: var(--shadow-sm);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
 }
 
 .tab-item {
@@ -86,11 +137,16 @@
   align-items: center;
   padding: 24rpx 0;
   border-radius: var(--radius-md);
-  transition: all var(--transition-normal);
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+
+.tab-item:active {
+  transform: scale(0.96);
 }
 
 .tab-item.active {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: var(--gradient-cyan-purple);
+  box-shadow: var(--orb-md);
 }
 
 .tab-icon {
@@ -105,7 +161,9 @@
 .tab-item .icon {
   width: 40rpx;
   height: 40rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
+  font-size: 40rpx;
+  line-height: 1;
 }
 
 .tab-item.active .icon {
@@ -115,50 +173,153 @@
 .tab-label {
   font-size: 24rpx;
   color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
 }
 
 .tab-item.active .tab-label {
   color: #fff;
 }
 
+/* =============================================
+   6. 引擎切换 — 玻璃选择器
+   ============================================= */
+.engine-switch {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+  padding: 24rpx 32rpx;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-md);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.engine-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.engine-options {
+  display: flex;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.engine-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  border: 0.5px solid transparent;
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+
+.engine-option:active {
+  transform: scale(0.96);
+}
+
+.engine-option.active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.25);
+  color: var(--purple-light);
+  box-shadow: var(--orb-sm);
+}
+
+.engine-option-icon {
+  font-size: 28rpx;
+}
+
+.engine-option-text {
+  font-weight: 500;
+}
+
+/* =============================================
+   7. 节标题
+   ============================================= */
 .section-title {
   font-size: 30rpx;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 24rpx;
   display: block;
+  letter-spacing: var(--tracking-tight);
 }
 
+/* =============================================
+   8. 输入区域 — 玻璃层2
+   ============================================= */
 .input-section {
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: 32rpx;
   margin-bottom: 40rpx;
-  box-shadow: var(--shadow-sm);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .input-field {
   width: 100%;
   height: 96rpx;
   padding: 0 16px;
-  background: var(--surface-2);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-md);
-  font-size: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
   margin-bottom: 32rpx;
+  box-sizing: border-box;
+  transition: border var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
 
+.input-field:focus {
+  border-color: rgba(139, 92, 246, 0.25);
+  box-shadow: var(--orb-md);
+}
+
+/* 生成按钮 — 渐变 + spring */
 .generate-btn {
   height: 96rpx;
   border-radius: var(--radius-md);
+  background: var(--gradient-cyan-purple);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: var(--orb-md);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
 }
 
+.generate-btn:active {
+  transform: scale(0.97);
+  box-shadow: var(--orb-lg);
+}
+
+/* =============================================
+   9. 模板区域 — 玻璃层2
+   ============================================= */
 .templates-section {
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: 32rpx;
   margin-bottom: 40rpx;
-  box-shadow: var(--shadow-sm);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
 }
 
 .templates-list {
@@ -171,27 +332,29 @@
   display: flex;
   align-items: center;
   padding: 28rpx;
-  background: var(--surface-2);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  transition: all var(--transition-fast);
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
+  transition: all var(--duration-normal) var(--ease-spring);
 }
 
 .template-item:active {
-  background: var(--primary-50);
-  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.10);
+  border-color: rgba(139, 92, 246, 0.20);
+  transform: scale(0.98);
+  box-shadow: var(--orb-md);
 }
 
 .template-title {
-  font-size: var(--font-body);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--text-base);
+  font-weight: 500;
   color: var(--text-primary);
   flex: 1;
 }
 
 .template-desc {
   font-size: 24rpx;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   margin-right: 24rpx;
 }
 
@@ -206,15 +369,25 @@
 .template-arrow .icon {
   width: 32rpx;
   height: 32rpx;
-  color: var(--text-muted);
+  color: var(--text-quaternary);
+  font-size: 32rpx;
+  line-height: 1;
 }
 
+/* =============================================
+   10. 结果区域 — 玻璃层3 + 紫光高亮
+   ============================================= */
 .result-section {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(99, 102, 241, 0.04));
-  border: 1px solid rgba(79, 70, 229, 0.15);
+  background: rgba(139, 92, 246, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 0.5px solid rgba(139, 92, 246, 0.15);
   border-radius: var(--radius-lg);
   padding: 32rpx;
   margin-bottom: 40rpx;
+  box-shadow: var(--orb-lg),
+              inset 0 0.5px 0 rgba(255, 255, 255, 0.06);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .result-header {
@@ -234,37 +407,59 @@
   align-items: center;
   gap: 12rpx;
   padding: 16rpx 14px;
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-full);
   font-size: 24rpx;
   color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
-  transition: all var(--transition-fast);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.action-btn:active {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .action-btn .icon {
   width: 32rpx;
   height: 32rpx;
+  font-size: 32rpx;
+  line-height: 1;
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: var(--gradient-cyan-purple);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  box-shadow: var(--orb-md);
+}
+
+.action-btn.primary:active {
+  box-shadow: var(--orb-lg);
 }
 
 .result-content {
   padding: 32rpx;
-  background: var(--surface-1);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: var(--radius-md);
-  font-size: var(--font-body);
+  font-size: var(--text-base);
   color: var(--text-primary);
   line-height: 1.8;
   white-space: pre-wrap;
   min-height: 240rpx;
+  border: 0.5px solid rgba(255, 255, 255, 0.04);
 }
 
 .bottom-placeholder {
   height: 120rpx;
+}
+
+/* =============================================
+   11. 弹簧动效通用类
+   ============================================= */
+.spring-tap {
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.spring-tap:active {
+  transform: scale(0.96);
 }

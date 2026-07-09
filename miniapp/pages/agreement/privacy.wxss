@@ -1,50 +1,56 @@
+/**
+ * 隐私政策 — AI原生暗色适配
+ * 基于 tokens.wxss 设计Token系统
+ * (注：此文件为冗余副本，实际页面引用 pages/agreement/privacy/privacy.wxss)
+ */
 .agreement-container {
   min-height: 100vh;
-  background: var(--surface-2);
+  background: var(--bg-page);
 }
 
 .agreement-header {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--gradient-cyan-purple);
+  padding: var(--space-10) var(--space-8);
   text-align: center;
 }
 
 .agreement-title {
-  font-size: var(--font-h3);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-2xl);
+  font-weight: 700;
   color: #fff;
   display: block;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--space-3);
 }
 
 .agreement-subtitle {
-  font-size: var(--font-caption);
-  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.75);
+  display: block;
 }
 
 .agreement-content {
-  height: calc(100vh - 100px);
-  padding: var(--spacing-lg);
+  height: calc(100vh - 240rpx);
+  padding: var(--space-8);
 }
 
 .article {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--space-10);
 }
 
 .article-title {
-  font-size: var(--font-h4);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--text-primary);
   display: block;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--space-4);
 }
 
 .article-text {
-  font-size: var(--font-body);
+  font-size: var(--text-base);
   color: var(--text-secondary);
   line-height: 1.8;
   display: block;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--space-4);
 }
 
 .article-text:last-child {

@@ -1,13 +1,7 @@
 /**
  * 人脉图谱 — Canvas 2D 力导向图
- * ===============================
- * 信任网络数据 → 力导向布局 → Canvas 2D 渲染
- *
- * 交互: 拖拽节点 · 双指缩放 · 点击查看详情
- * 数据: trustApi.getNetwork() 同步信任联系人
  */
-
-const { trustApi, brochureApi } = require('../../../utils/api')
+const { MockService } = require('../../../utils/mockService')
 
 // 力导向算法参数
 const PHYSICS = {
@@ -73,23 +67,13 @@ Page({
   // ==================================================
   async loadGraphData() {
     try {
-      // 获取名片列表 → 取第一个的信任网络
-      const brochureRes = await brochureApi.list({ page: 1, page_size: 5 })
-      const brochures = brochureRes.data ?? brochureRes?.list ?? brochureRes?.items ?? []
+      const profile = await MockService.getUserProfile()
+      const profileData = profile.data !== undefined ? profile.data : profile
+      const userName = profileData.name || '我'
 
-      if (brochures.length === 0) {
-        this.setData({ loading: false, nodeCount: 0, edgeCount: 0 })
-        return
-      }
+      const trustRes = await MockService.getTrustNetwork()
+      const contacts = trustRes.trusting ?? trustRes.data?.trusting ?? trustRes.data ?? []
 
-      const cardId = brochures[0].id || brochures[0]._id
-      const userName = brochures[0].fields?.name || brochures[0].name || '我'
-
-      // 获取信任网络
-      const trustRes = await trustApi.getNetwork()
-      const contacts = trustRes.data?.trusting ?? trustRes.trusting ?? trustRes.data ?? []
-
-      // 构建图谱数据
       this.buildGraph(userName, contacts)
       this.setData({
         loading: false,
@@ -97,7 +81,6 @@ Page({
         edgeCount: this.edges.length,
       })
 
-      // 初始化Canvas并开始渲染
       this.initCanvas()
 
     } catch (err) {
@@ -445,6 +428,10 @@ Page({
     if (e.touches.length === 1) {
       const touch = e.touches[0]
       const node = this.findNodeAt(touch.x, touch.y)
+      this.tapTarget = node || null
+      this.tapStartTime = Date.now()
+      this.tapStartX = touch.x
+      this.tapStartY = touch.y
       if (node) {
         this.touch.dragging = true
         this.touch.draggedNode = node
@@ -496,6 +483,11 @@ Page({
   // 导航
   // ==================================================
   goBack() {
-    wx.navigateBack()
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack()
+    } else {
+      wx.switchTab({ url: '/pages/index/index' })
+    }
   },
 })

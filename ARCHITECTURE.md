@@ -51,16 +51,18 @@ D:\AI数智名片\
 
 | 端口 | 服务 | 说明 |
 |:----:|:-----|:------|
-| 8201 | FastAPI | 后端 API（开发/生产） |
-| 5173 | Vite Dev Server | 前端开发服务器 |
+| 8002 | FastAPI (run.py) | 实际后端 API（主力入口） |
+| 8201 | FastAPI (main.py) | 备用后端入口 |
+| 5173 | Vite Dev Server | 前端开发服务器（备用端口） |
+| 3000 | Vite Dev Server | 前端开发服务器（vite.config 配置） |
 | 8200 | Nginx | 统一接入层（生产） |
 
 ---
 
-## 后端架构 (FastAPI :8201)
+## 后端架构 (FastAPI :8002 / :8201)
 
 - **框架**: FastAPI + SQLAlchemy + SQLite
-- **入口**: `backend/main.py` → `app.create_app()`
+- **入口**: `backend/run.py` → `app.create_app()`（主力，端口 8002）；`backend/main.py` 为备用（端口 8201）
 - **路由**: `app/routers/` 按功能模块划分
 - **AI 引擎**: `app/ai/` — PaddleOCR + DeepSeek API + M3E Embedding
 - **中间件**: `app/middleware/` — CORS, 鉴权, 日志
@@ -68,7 +70,7 @@ D:\AI数智名片\
 ## 前端架构 (React 19 + Vite 6 :5173)
 
 - **框架**: React 19 + TypeScript
-- **构建**: Vite 6（proxy /api → localhost:8201）
+- **构建**: Vite 6（proxy /api → localhost:8002）
 - **样式**: Tailwind CSS v4 + motion（动画）
 - **路由**: react-router-dom v7
 - **图标**: lucide-react

@@ -143,11 +143,37 @@ def cache(
         _prefix = prefix or func.__name__
         _is_async = asyncio.iscoroutinefunction(func)
 
+        if _is_async:
+            @functools.wraps(func)
+            async def async_wrapper(*args, **kwargs) -> Any:
+                cache_key = _build_cache_key(_prefix, args, kwargs)
+                client = _get_client()
+                if client is not None:
+                    try:
+                        cached = client.get(cache_key)
+                        if cached is not None:
+                            _record_cache_hit()
+                            return cached
+                    except Exception:
+                        pass
+                _record_cache_miss()
+                result = await func(*args, **kwargs)
+                if result is not None or not skip_none:
+                    if client is not None:
+                        try:
+                            client.set(cache_key, result, ttl=ttl)
+                        except Exception:
+                            pass
+                return result
+
+            async_wrapper.clear_cache = lambda *a, **kw: False
+            async_wrapper.cache_prefix = _prefix
+            return async_wrapper
+
+        # ── 同步函数走原来的同步wrapper ──
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
-            # 尝试从缓存读取
             cache_key = _build_cache_key(_prefix, args, kwargs)
-
             client = _get_client()
             if client is not None:
                 try:
@@ -158,22 +184,17 @@ def cache(
                         return cached
                 except Exception:
                     logger.debug(f"缓存读取失败（降级）: {cache_key}")
-
-            # 执行原函数（同步或异步）
             _record_cache_miss()
             logger.debug(f"缓存未命中，执行函数: {_prefix}")
             if _is_async:
                 return _async_wrapper(func, cache_key, client, args, kwargs, ttl, skip_none)
             result = func(*args, **kwargs)
-
-            # 写入缓存
             if result is not None or not skip_none:
                 if client is not None:
                     try:
                         client.set(cache_key, result, ttl=ttl)
                     except Exception:
                         pass
-
             return result
 
         async def _async_wrapper(func, cache_key, client, args, kwargs, ttl, skip_none):

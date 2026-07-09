@@ -1,10 +1,17 @@
-/* 名片详情页样式 */
+/**
+ * 名片详情页 — 深色适配 v2.0
+ * 设计体系: 山膏 | 三重渐变 | 玻璃三级 | 弹簧动效
+ * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ */
 
+/* ── 页面滚动容器 ── */
 .page-scroll {
   height: 100vh;
 }
 
-/* 卡片头部英雄区 */
+/* ═══════════════════════════════════════════
+   1. 名片头部英雄区 — 深色+光晕
+   ═══════════════════════════════════════════ */
 .card-hero {
   position: relative;
   height: 520rpx;
@@ -31,18 +38,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 120rpx 16px 20px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  color: #fff;
+  padding: 120rpx 16px 32rpx;
+  /* 三重渐变投影: 透明 → 深邃夜空 */
+  background: linear-gradient(transparent, var(--bg-page, #0A0A18));
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  /* Orb光晕底部边缘 */
+  box-shadow: var(--orb-lg, 0 0 40px rgba(139,92,246,0.25));
 }
 
 .hero-avatar {
-  width: 144rpx;
-  height: 144rpx;
-  border-radius: 72rpx;
+  width: var(--user-header-avatar-size, 120rpx);
+  height: var(--user-header-avatar-size, 120rpx);
+  border-radius: var(--radius-full, 9999rpx);
   overflow: hidden;
-  border: 3px solid rgba(255, 255, 255, 0.6);
+  border: var(--user-header-avatar-border, 2px solid rgba(255,255,255,0.15));
   margin-bottom: 20rpx;
+  box-shadow: var(--orb-md, 0 0 24px rgba(139,92,246,0.20));
+  transition: var(--transition-scale, transform 250ms cubic-bezier(0.34,1.56,0.64,1));
+}
+.hero-avatar:active {
+  transform: scale(0.97);
 }
 
 .hero-avatar image {
@@ -51,23 +66,27 @@
 }
 
 .hero-name {
-  font-size: 44rpx;
+  font-size: var(--text-2xl, 40rpx);
   font-weight: 700;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  letter-spacing: var(--tracking-tight, -0.01em);
   margin-bottom: 8rpx;
 }
 
 .hero-company {
-  font-size: 28rpx;
-  opacity: 0.85;
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
   margin-bottom: 4rpx;
 }
 
 .hero-title {
-  font-size: 26rpx;
-  opacity: 0.7;
+  font-size: var(--text-sm, 24rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
 }
 
-/* 信息卡片 */
+/* ═══════════════════════════════════════════
+   2. 信息卡片 — 玻璃中厚 (glass-tier-2)
+   ═══════════════════════════════════════════ */
 .info-card {
   margin-top: 0 !important;
 }
@@ -80,27 +99,36 @@
   display: flex;
   align-items: center;
   padding: 20rpx 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: var(--border-subtle, 0.5px solid rgba(255,255,255,0.06));
 }
-
 .info-row:last-child {
   border-bottom: none;
 }
 
+/* 弹簧动效：点击行反馈 */
+.info-row {
+  transition: background var(--duration-fast, 150ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.info-row:active {
+  background: var(--bg-hover, rgba(255,255,255,0.06));
+}
+
 .info-label {
-  font-size: 28rpx;
-  color: #999;
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
   width: 160rpx;
   flex-shrink: 0;
 }
 
 .info-value {
-  font-size: 28rpx;
-  color: #1a1a1a;
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-primary, rgba(255,255,255,0.92));
   flex: 1;
 }
 
-/* 统计网格 */
+/* ═══════════════════════════════════════════
+   3. 统计网格 — 玻璃薄 (glass-tier-1)
+   ═══════════════════════════════════════════ */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -112,25 +140,114 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 16rpx 0;
+  border-radius: var(--radius-sm, 12rpx);
+  transition: background var(--duration-fast, 150ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+}
+.stats-grid .stat-item:active {
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  transform: scale(0.96);
 }
 
 .stats-grid .stat-num {
-  font-size: 44rpx;
+  font-size: var(--text-3xl, 48rpx);
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  letter-spacing: var(--tracking-tight, -0.01em);
 }
 
 .stats-grid .stat-label {
-  font-size: 22rpx;
-  color: #999;
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
   margin-top: 4rpx;
+  letter-spacing: var(--tracking-wide, 0.02em);
 }
 
-/* 操作按钮 */
+/* ═══════════════════════════════════════════
+   4. 操作按钮区 — 弹簧动效
+   ═══════════════════════════════════════════ */
 .action-buttons {
   padding: 40rpx 16px;
 }
 
+.action-buttons .btn-primary {
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              box-shadow var(--duration-normal, 250ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.action-buttons .btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: var(--orb-hover, 0 0 30px rgba(139,92,246,0.35));
+}
+
+.action-buttons .btn-outline {
+  margin-top: 24rpx;
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              background var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.action-buttons .btn-outline:active {
+  transform: scale(0.97);
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+}
+
+/* ── 底部占位 ── */
 .bottom-placeholder {
   height: 120rpx;
+}
+
+/* ═══════════════════════════════════════════
+   5. Card 组件覆写 (玻璃中厚)
+   ═══════════════════════════════════════════ */
+.card {
+  background: var(--card-bg, var(--bg-glass-2));
+  backdrop-filter: blur(var(--glass-blur-1, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-1, 20px));
+  border: var(--card-border, var(--glass-border-2));
+  border-radius: var(--card-radius, var(--radius-md));
+  box-shadow: var(--card-orb, var(--orb-md));
+  margin: 24rpx 16px;
+  overflow: hidden;
+  /* 玻璃内发光边缘 */
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 16px 12rpx;
+}
+
+.card-header .title {
+  font-size: var(--text-lg, 32rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  letter-spacing: var(--tracking-tight, -0.01em);
+}
+
+.card-body {
+  padding: 0 16px 16px;
+}
+
+/* ═══════════════════════════════════════════
+   6. 全局按钮弹簧动效增强
+   ═══════════════════════════════════════════ */
+.btn-primary,
+.btn-outline {
+  transition: transform var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)),
+              opacity var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0,0,0.2,1));
+}
+.btn-primary:active,
+.btn-outline:active {
+  transform: scale(0.97);
+  opacity: 0.9;
 }

@@ -300,6 +300,19 @@ class FeedbackLoop:
                 except Exception:
                     logger.debug("[Gaia] 反馈摄入跳过（盖娅不可用）")
 
+            # ── 数据飞轮闭环：实时推送反馈到 OnlineLearningEngine ──
+            try:
+                from app.ai.online_learning import get_online_learning_engine
+                get_online_learning_engine().on_feedback(
+                    user_id=user_id,
+                    item_id=item_id,
+                    rating=rating,
+                    feedback_type=feedback_type,
+                    source=source,
+                )
+            except Exception:
+                logger.debug("[OnlineLearning] 实时学习推送跳过", exc_info=True)
+
             return FeedbackRecord(
                 id=record_id,
                 user_id=user_id,

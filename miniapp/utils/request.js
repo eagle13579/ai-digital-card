@@ -5,9 +5,9 @@
 
 // API baseURL
 // 从 app.globalData.apiBaseUrl 读取（由 config/config.js 统一管理）
-// 开发环境: http://localhost:8002
+// 开发环境: http://127.0.0.1:8002
 // 生产环境: https://api.liankebao.top
-let API_BASE_URL = 'http://localhost:8002'  // 默认值
+let API_BASE_URL = 'http://127.0.0.1:8002'  // 默认值
 try {
   const app = getApp()
   if (app && app.globalData && app.globalData.apiBaseUrl) {
@@ -42,7 +42,7 @@ function request(method, url, data = {}, options = {}) {
   const app = getApp()
   const token = app.globalData.token
   // 运行时动态获取 apiBaseUrl（确保 onLaunch 写入后生效）
-  const baseUrl = app.globalData.apiBaseUrl || 'http://localhost:8002'
+  const baseUrl = app.globalData.apiBaseUrl || 'http://127.0.0.1:8002'
 
   return new Promise((resolve, reject) => {
     // 检查登录态 - 开发模式下跳过

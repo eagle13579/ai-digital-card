@@ -153,14 +153,15 @@ def _compute_growth_rate(series: list[dict[str, Any]], key: str) -> float:
 @router.get("/metrics", summary="核心增长指标 — DAU/MAU/名片创建数/匹配数")
 async def growth_metrics():
     """返回增长飞轮核心指标的最新值及变化率。
-
-    指标:
-      - dau: 日活跃用户
-      - mau: 月活跃用户
-      - total_cards: 累计名片创建数
-      - total_matches: 累计匹配数
-      - dau_mau_ratio: DAU/MAU 比率（用户粘性）
     """
+    import os
+    _env = os.getenv("ENV", "development").lower()
+    _docs_disabled = os.getenv("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
+    if _env in ("production", "prod") or _docs_disabled:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "metrics endpoint disabled in production"}, status_code=404)
+
+    # ── 正式指标逻辑 ──
     dau_series = _mock_dau_series(30)
     mau_series = _mock_mau_series(6)
     card_series = _mock_card_creation_series(30)

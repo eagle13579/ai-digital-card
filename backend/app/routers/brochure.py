@@ -1,5 +1,7 @@
 import asyncio
+import html
 import json
+import logging
 import uuid
 from typing import Optional
 
@@ -7,6 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, 
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.api_standards import PaginatedResponse, paginate_cursor
 from app.database import get_db
@@ -194,10 +198,10 @@ async def create_brochure(
     """创建画册"""
     brochure = Brochure(
         user_id=current_user.id,
-        title=data.title,
-        cover=data.cover,
+        title=html.escape(data.title),
+        cover=html.escape(data.cover),
         purpose=data.purpose,
-        album_meta=data.album_meta,
+        album_meta=html.escape(data.album_meta) if data.album_meta else None,
         pages_count=len(data.pages),
     )
     db.add(brochure)
@@ -208,7 +212,7 @@ async def create_brochure(
             brochure_id=brochure.id,
             sort_order=page_data.sort_order or idx,
             content_type=page_data.content_type,
-            content=page_data.content,
+            content=html.escape(page_data.content),
             image_url=page_data.image_url,
             media_url=page_data.media_url or "",
             ai_summary=page_data.ai_summary,
@@ -235,15 +239,21 @@ async def create_brochure(
 async def list_brochures(
     cursor: str | None = Query(None, description="分页游标（首次请求不传）"),
     page_size: int = Query(20, ge=1, le=100, description="每页条数"),
-    user_id: int | None = Query(None, description="按用户ID筛选"),
+    user_id: int | None = Query(None, description="按用户ID筛选（仅管理员可用）"),
     status: str | None = Query(None, description="按状态筛选(draft|published)"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """获取画册列表（cursor 分页）"""
     query = select(Brochure).options(selectinload(Brochure.pages))
-    if user_id:
-        query = query.where(Brochure.user_id == user_id)
+
+    # 普通用户只能查看自己的画册，防止水平越权
+    if current_user.role == "admin":
+        if user_id:
+            query = query.where(Brochure.user_id == user_id)
+    else:
+        query = query.where(Brochure.user_id == current_user.id)
+
     if status:
         query = query.where(Brochure.status == status)
     return await paginate_cursor(
@@ -255,6 +265,7 @@ async def list_brochures(
 @router.get("/{brochure_id}", response_model=BrochureResponse)
 async def get_brochure(
     brochure_id: int,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册详情（含页面数据）"""
@@ -264,6 +275,8 @@ async def get_brochure(
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
+    if brochure.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="无权访问此画册")
 
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
@@ -311,6 +324,8 @@ async def update_brochure(
     pages_data = update_data.pop("pages", None)
 
     for field, value in update_data.items():
+        if field in ("title", "cover", "album_meta"):
+            value = html.escape(value) if value else value
         setattr(brochure, field, value)
 
     if pages_data is not None:
@@ -325,7 +340,7 @@ async def update_brochure(
                 brochure_id=brochure.id,
                 sort_order=page_data.sort_order or idx,
                 content_type=page_data.content_type,
-                content=page_data.content,
+                content=html.escape(page_data.content),
                 image_url=page_data.image_url,
                 media_url=page_data.media_url or "",
                 ai_summary=page_data.ai_summary,
@@ -335,7 +350,12 @@ async def update_brochure(
         brochure.pages_count = len(pages_data)
 
     await db.commit()
-    await db.refresh(brochure)
+
+    # 重新查询（含pages关系）
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -378,7 +398,12 @@ async def publish_brochure(
     # 刷新分享token
     brochure.share_token = uuid.uuid4().hex[:16]
     await db.commit()
-    await db.refresh(brochure)
+
+    # 重新查询（含pages关系）
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
 
@@ -386,6 +411,28 @@ async def publish_brochure(
     asyncio.create_task(_trigger_matching_pool(db, current_user.id))
 
     return resp
+
+
+@router.get("/{brochure_id}/share-link")
+async def get_share_link(
+    brochure_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """获取画册分享链接（如无token则自动生成）"""
+    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    brochure = result.scalars().first()
+    if brochure is None:
+        raise HTTPException(status_code=404, detail="画册不存在")
+    if brochure.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="无权操作此画册")
+
+    if not brochure.share_token:
+        brochure.share_token = uuid.uuid4().hex[:16]
+        await db.commit()
+
+    share_link = f"/brochure/share/{brochure.share_token}"
+    return {"share_token": brochure.share_token, "share_link": share_link}
 
 
 @router.post("/{brochure_id}/refresh-token")

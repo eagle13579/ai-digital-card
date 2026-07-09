@@ -1,6 +1,6 @@
 <view class="match-page">
-  <!-- 顶部导航 -->
-  <view class="match-header">
+  <!-- 顶部导航 — 玻璃层3 -->
+  <view class="match-header" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="goBack">
       <text class="icon">‹</text>
     </view>
@@ -13,7 +13,7 @@
     </view>
   </view>
 
-  <!-- 匹配偏好设置 -->
+  <!-- 匹配偏好设置 — 玻璃卡片 -->
   <view class="preference-section">
     <text class="section-title">匹配偏好</text>
     <view class="preference-list">
@@ -69,7 +69,7 @@
     <text class="empty-hint">调整偏好或稍后再来</text>
   </view>
 
-  <!-- 推荐人脉列表 -->
+  <!-- 推荐人脉列表 — 玻璃卡片 -->
   <view class="recommend-section" wx:if="{{!loading && !error && !empty}}">
     <view class="section-title">
       <text>推荐人脉</text>
@@ -90,7 +90,7 @@
             </view>
             <view class="match-score">
               <view class="score-bar">
-                <view class="score-fill" style="width: {{item.matchScore}}%;"></view>
+                <view class="score-fill" style="height: {{item.matchScore}}%;"></view>
               </view>
               <text class="score-value">{{item.matchScore}}%</text>
             </view>

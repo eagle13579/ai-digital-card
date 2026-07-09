@@ -21,17 +21,17 @@ const ENV = 'development'   // 可选值: 'development' | 'production'
 const CONFIGS = {
   development: {
     name: '开发环境',
-    apiBaseUrl: 'http://localhost:8002',
+    apiBaseUrl: 'http://127.0.0.1:8002',
     // 调试开关
     debug: true,
     // 是否启用 Mock（无后端时可打开）
-    enableMock: false,
+    enableMock: true,  // 改true：离线开发模式，不依赖后端
   },
   lan: {
     name: '局域网测试',
     apiBaseUrl: 'http://192.168.1.246:8002',
     debug: true,
-    enableMock: false,
+    enableMock: true,  // 局域网调试也用Mock确保UI正常
   },
   production: {
     name: '生产环境',

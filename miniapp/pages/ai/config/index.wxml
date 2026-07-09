@@ -1,23 +1,23 @@
-<view class="config-page">
-  <!-- 顶部导航 -->
-  <view class="config-header">
-    <view class="back-btn" bindtap="goBack">
+<view class="config-page orb-bg">
+  <!-- 顶部导航 — 玻璃层 + spring动效 -->
+  <view class="config-header glass-tier-3" style="padding-top: {{statusBarHeight}}px">
+    <view class="back-btn spring-hover" bindtap="goBack" hover-class="spring-scale-mini">
       <text class="icon">‹</text>
     </view>
     <view class="header-title">
       <text class="title">客服配置</text>
       <text class="subtitle">AI智能客服 · 自定义设置</text>
     </view>
-    <view class="config-badge">
+    <view class="config-badge" hover-class="spring-scale-mini">
       <text>⚙️ 设置</text>
     </view>
   </view>
 
-  <!-- 开关配置 -->
+  <!-- 功能开关 — 玻璃卡片 -->
   <view class="settings-section">
     <text class="section-title">功能开关</text>
     <view class="settings-list">
-      <view class="setting-item">
+      <view class="setting-item" hover-class="bg-hover">
         <view class="setting-info">
           <view class="setting-icon">🤖</view>
           <view class="setting-text">
@@ -25,9 +25,9 @@
             <text class="setting-desc">开启后AI将自动回复用户咨询</text>
           </view>
         </view>
-        <switch class="setting-switch" checked="{{settings.autoReply}}" color="#F97316" bindchange="onToggle" data-key="autoReply" />
+        <switch class="setting-switch" checked="{{settings.autoReply}}" color="#8b5cf6" bindchange="onToggle" data-key="autoReply" />
       </view>
-      <view class="setting-item">
+      <view class="setting-item" hover-class="bg-hover">
         <view class="setting-info">
           <view class="setting-icon">🎯</view>
           <view class="setting-text">
@@ -35,9 +35,9 @@
             <text class="setting-desc">根据用户行为智能推荐相关内容</text>
           </view>
         </view>
-        <switch class="setting-switch" checked="{{settings.smartRecommend}}" color="#F97316" bindchange="onToggle" data-key="smartRecommend" />
+        <switch class="setting-switch" checked="{{settings.smartRecommend}}" color="#8b5cf6" bindchange="onToggle" data-key="smartRecommend" />
       </view>
-      <view class="setting-item">
+      <view class="setting-item" hover-class="bg-hover">
         <view class="setting-info">
           <view class="setting-icon">📊</view>
           <view class="setting-text">
@@ -45,12 +45,12 @@
             <text class="setting-desc">收集对话数据用于分析优化</text>
           </view>
         </view>
-        <switch class="setting-switch" checked="{{settings.dataAnalysis}}" color="#F97316" bindchange="onToggle" data-key="dataAnalysis" />
+        <switch class="setting-switch" checked="{{settings.dataAnalysis}}" color="#8b5cf6" bindchange="onToggle" data-key="dataAnalysis" />
       </view>
     </view>
   </view>
 
-  <!-- 欢迎语设置 -->
+  <!-- 欢迎语设置 — 玻璃卡片 -->
   <view class="welcome-section">
     <text class="section-title">欢迎语设置</text>
     <view class="welcome-card">
@@ -60,16 +60,16 @@
           <text>🤖  {{settings.welcomeMessage}}</text>
         </view>
       </view>
-      <textarea class="welcome-input" value="{{settings.welcomeMessage}}" maxlength="200" bindinput="onWelcomeInput" placeholder="请输入AI客服欢迎语..." auto-height />
+      <textarea class="welcome-input" value="{{settings.welcomeMessage}}" maxlength="200" bindinput="onWelcomeInput" placeholder="请输入AI客服欢迎语..." auto-height placeholder-class="input-placeholder" />
       <text class="welcome-count">{{settings.welcomeMessage.length}}/200</text>
     </view>
   </view>
 
-  <!-- 其他配置 -->
+  <!-- 其他设置 — 玻璃卡片 -->
   <view class="settings-section">
     <text class="section-title">其他设置</text>
     <view class="settings-list">
-      <view class="setting-item">
+      <view class="setting-item" hover-class="bg-hover">
         <view class="setting-info">
           <view class="setting-icon">⏰</view>
           <view class="setting-text">
@@ -81,7 +81,7 @@
           <text>{{settings.timeout}}s</text>
         </view>
       </view>
-      <view class="setting-item">
+      <view class="setting-item" hover-class="bg-hover">
         <view class="setting-info">
           <view class="setting-icon">🔒</view>
           <view class="setting-text">
@@ -89,14 +89,14 @@
             <text class="setting-desc">自动过滤包含敏感词的对话</text>
           </view>
         </view>
-        <switch class="setting-switch" checked="{{settings.filterSensitive}}" color="#F97316" bindchange="onToggle" data-key="filterSensitive" />
+        <switch class="setting-switch" checked="{{settings.filterSensitive}}" color="#8b5cf6" bindchange="onToggle" data-key="filterSensitive" />
       </view>
     </view>
   </view>
 
-  <!-- 保存按钮 -->
+  <!-- 保存按钮 — 三重渐变 + spring动效 -->
   <view class="save-section">
-    <view class="save-btn" bindtap="onSave">
+    <view class="save-btn" bindtap="onSave" hover-class="none">
       <text>保存配置</text>
     </view>
   </view>

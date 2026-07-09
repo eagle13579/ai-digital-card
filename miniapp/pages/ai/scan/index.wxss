@@ -1,27 +1,86 @@
+/**
+ * ============================================================
+ *  index.wxss — AI数字名片 扫描页
+ *  设计体系: 山膏 (ShanGao) v1.0 | AI原生暗色
+ *  改造: 天吴 (P7) — 深色适配 + 扫描框视觉升级 + Orb光晕 + spring动效
+ *  全局Token: 通过 app.wxss @import 注入
+ *  降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
+ * ============================================================
+ */
+
+/* ========== 页面容器 ========== */
+.scan-page {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-system);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 背景Orb光晕装饰 */
+.scan-page::before {
+  content: '';
+  position: fixed;
+  top: -200rpx;
+  right: -200rpx;
+  width: 600rpx;
+  height: 600rpx;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: orb-float 6s ease-in-out infinite;
+}
+
+.scan-page::after {
+  content: '';
+  position: fixed;
+  bottom: -300rpx;
+  left: -150rpx;
+  width: 500rpx;
+  height: 500rpx;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: orb-float 8s ease-in-out infinite reverse;
+}
+
+/* ========== 顶部导航栏 ========== */
 .scan-header {
   display: flex;
   align-items: center;
-  padding: 40rpx 16px;
-  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
-  color: #fff;
+  padding: 20rpx 32rpx 24rpx;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
 }
 
 .back-btn {
-  width: 72rpx;
-  height: 72rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 24rpx;
+  margin-right: 20rpx;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass-1);
+  border: var(--glass-border-1);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.back-btn:active {
+  background: var(--bg-glass-2);
+  transform: scale(0.92);
 }
 
 .back-btn .icon {
-  width: 48rpx;
-  height: 48rpx;
-  color: #fff;
+  font-size: 40rpx;
+  color: var(--text-primary);
+  line-height: 1;
 }
 
 .header-title {
@@ -29,14 +88,16 @@
 }
 
 .header-title .title {
-  font-size: 36rpx;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
   display: block;
+  letter-spacing: var(--tracking-tight);
 }
 
 .header-title .subtitle {
-  font-size: 24rpx;
-  opacity: 0.8;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
   margin-top: 4rpx;
   display: block;
 }
@@ -45,166 +106,514 @@
   display: flex;
   align-items: center;
   gap: 8rpx;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 12rpx 12px;
-  border-radius: 40rpx;
-  font-size: 24rpx;
-  font-weight: var(--font-weight-bold);
+  background: var(--gradient-cyan-purple);
+  padding: 10rpx 24rpx;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-inverse);
+  box-shadow: var(--orb-sm);
+  transition: transform var(--duration-normal) var(--ease-spring);
 }
 
+.scan-badge:active {
+  transform: scale(0.95);
+}
+
+/* ========== 扫描区域 ========== */
 .scan-area {
-  padding: 64rpx 24px;
+  padding: 80rpx 40rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* ---- 扫描框 (AI原生升级) ---- */
 .scan-frame {
-  width: 560rpx;
-  height: 400rpx;
-  border: 2px dashed #059669;
+  width: 580rpx;
+  height: 420rpx;
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(5, 150, 105, 0.05);
   margin-bottom: 48rpx;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+
+  /* 玻璃层2 + 紫光强调 */
+  background: var(--bg-glass-2);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: var(--orb-md), var(--shadow-glass-edge);
+
+  transition: transform var(--duration-slow) var(--ease-spring),
+              box-shadow var(--duration-normal) var(--ease-out);
 }
 
+.scan-frame:active {
+  transform: scale(0.98);
+  box-shadow: var(--orb-lg), var(--shadow-glass-edge);
+}
+
+/* 扫描框 — 四角装饰条 (AI相机取景框效果) */
+.scan-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: var(--gradient-cyan-purple);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* 四角端点标记 */
+.scan-frame .corner-tl,
+.scan-frame .corner-tr,
+.scan-frame .corner-bl,
+.scan-frame .corner-br {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  border-color: var(--purple-light);
+  border-style: solid;
+  z-index: 2;
+}
+
+.scan-frame .corner-tl {
+  top: 12rpx;
+  left: 12rpx;
+  border-width: 3px 0 0 3px;
+  border-radius: 8rpx 0 0 0;
+}
+
+.scan-frame .corner-tr {
+  top: 12rpx;
+  right: 12rpx;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 8rpx 0 0;
+}
+
+.scan-frame .corner-bl {
+  bottom: 12rpx;
+  left: 12rpx;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 8rpx;
+}
+
+.scan-frame .corner-br {
+  bottom: 12rpx;
+  right: 12rpx;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 8rpx 0;
+}
+
+/* ---- 扫描线动画 ---- */
+.scan-frame .scan-line {
+  position: absolute;
+  left: 8rpx;
+  right: 8rpx;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4), 0 0 24px rgba(6, 182, 212, 0.2);
+  z-index: 1;
+  animation: scan-line-move 3s ease-in-out infinite;
+}
+
+@keyframes scan-line-move {
+  0% {
+    top: 8rpx;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 8rpx);
+    opacity: 0.3;
+  }
+}
+
+/* ---- 扫描框内容 ---- */
 .scan-camera-icon {
-  font-size: 96rpx;
-  margin-bottom: 24rpx;
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+  z-index: 1;
+  animation: pulse-glow 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.3));
 }
 
 .scan-hint {
-  font-size: 26rpx;
-  color: var(--text-muted);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 8rpx;
 }
 
+.scan-sub-hint {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- 扫描按钮 (渐变主按钮) ---- */
 .scan-btn {
-  background: linear-gradient(135deg, #059669, #34D399);
-  padding: 28rpx 48px;
-  border-radius: var(--radius-full);
-  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35);
-}
-
-.scan-btn-text {
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-primary-height);
+  background: var(--gradient-cyan-purple);
+  color: var(--text-inverse);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--orb-md);
+  width: 480rpx;
+  transition: box-shadow var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-spring);
+  position: relative;
+  overflow: hidden;
 }
 
 .scan-btn:active {
-  opacity: 0.85;
+  box-shadow: var(--orb-lg);
+  transform: scale(0.97);
 }
 
+/* 按钮表面光泽动画 */
+.scan-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.scan-btn-text {
+  color: var(--text-inverse);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 识别中 — AI分析动画 ========== */
+.analyzing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.analyzing-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32rpx;
+}
+
+/* 3层嵌套旋转圈 — 青、紫、粉 */
+.analyzing-orb {
+  width: 160rpx;
+  height: 160rpx;
+  position: relative;
+}
+
+.analyzing-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border-width: 3px;
+  border-style: solid;
+}
+
+.analyzing-ring-1 {
+  border-color: transparent transparent transparent var(--cyan);
+  animation: orb-spin 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.analyzing-ring-2 {
+  inset: 12rpx;
+  border-color: transparent var(--purple) transparent transparent;
+  animation: orb-spin 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite reverse;
+}
+
+.analyzing-ring-3 {
+  inset: 24rpx;
+  border-color: transparent transparent var(--pink) transparent;
+  animation: orb-spin 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.analyzing-orb-glow {
+  position: absolute;
+  inset: -20rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes orb-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.analyzing-text {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-wide);
+  animation: fade-in-up 0.6s var(--ease-spring);
+}
+
+.analyzing-hint {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  animation: fade-in-up 0.8s var(--ease-spring);
+}
+
+.analyzing-confidence-text {
+  font-size: var(--text-xs);
+  color: var(--text-accent);
+  margin-top: 8rpx;
+  letter-spacing: var(--tracking-wide);
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== 分段标题 ========== */
 .section-title {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 0 16px;
-  margin-bottom: 24rpx;
-  font-size: 32rpx;
-  font-weight: var(--font-weight-bold);
+  gap: 12rpx;
+  padding: 0 32rpx;
+  margin-bottom: 20rpx;
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
+}
+
+.section-title .accent-dot {
+  width: 6rpx;
+  height: 28rpx;
+  border-radius: 3rpx;
+  background: var(--gradient-cyan-purple);
+  flex-shrink: 0;
 }
 
 .section-tag {
-  font-size: 20rpx;
-  color: #fff;
-  background: #059669;
-  padding: 4rpx 8px;
-  border-radius: 20rpx;
-  font-weight: normal;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  background: var(--bg-glass-1);
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-full);
+  font-weight: 400;
+  margin-left: auto;
+}
+
+/* ========== AI识别结果卡片 ========== */
+.result-section {
+  padding: 32rpx 0 48rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .card-preview {
-  margin: 0 16px 16px;
-  background: var(--surface-1);
+  margin: 0 32rpx 24rpx;
+  background: var(--bg-glass-2);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: var(--glass-border-2);
   border-radius: var(--radius-lg);
-  padding: 32rpx;
-  box-shadow: var(--shadow-sm);
+  padding: 8rpx 0;
+  box-shadow: var(--orb-sm), var(--shadow-glass-edge);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部渐变装饰条 */
+.card-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-cyan-purple);
+  opacity: 0.6;
+}
+
+/* 右侧Orb光晕装饰 */
+.card-preview::after {
+  content: '';
+  position: absolute;
+  top: -120rpx;
+  right: -80rpx;
+  width: 280rpx;
+  height: 280rpx;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.06), transparent 70%);
+  pointer-events: none;
 }
 
 .card-field {
   display: flex;
   align-items: center;
-  padding: 20rpx 0;
+  padding: 24rpx 32rpx;
   border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .card-field:last-child {
   border-bottom: none;
 }
 
+.card-field:active {
+  background: var(--bg-hover);
+}
+
 .field-label {
   width: 120rpx;
-  font-size: 26rpx;
-  color: var(--text-muted);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
   flex-shrink: 0;
+  font-weight: 400;
 }
 
 .field-value {
   flex: 1;
-  font-size: 28rpx;
+  font-size: var(--text-base);
   color: var(--text-primary);
   font-weight: 500;
+  word-break: break-all;
 }
 
+.field-empty {
+  color: var(--text-quaternary);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ========== 结果操作按钮 ========== */
 .result-actions {
   display: flex;
   gap: 24rpx;
-  padding: 0 16px 24px;
+  padding: 0 32rpx;
 }
 
 .action-btn {
   flex: 1;
   text-align: center;
-  padding: 24rpx;
-  border-radius: var(--radius-lg);
-  font-size: 28rpx;
-  font-weight: var(--font-weight-bold);
+  padding: 28rpx 24rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 600;
+  transition: transform var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.action-btn:active {
+  transform: scale(0.97);
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #059669, #34D399);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  background: var(--gradient-cyan-purple);
+  color: var(--text-inverse);
+  box-shadow: var(--orb-sm);
+}
+
+.save-btn:active {
+  box-shadow: var(--orb-hover);
 }
 
 .retry-btn {
-  background: var(--surface-2);
+  background: var(--bg-glass-1);
   color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-glass-edge);
 }
 
+.retry-btn:active {
+  background: var(--bg-glass-2);
+}
+
+/* ========== 扫描历史 ========== */
 .history-section {
-  padding-bottom: 48rpx;
+  padding: 32rpx 0 60rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .history-list {
-  margin: 0 16px;
-  background: var(--surface-1);
+  margin: 0 32rpx;
+  background: var(--bg-glass-1);
+  border: var(--glass-border-1);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  box-shadow: var(--shadow-glass-edge);
 }
 
 .history-item {
   display: flex;
   align-items: center;
-  padding: 28rpx 16px;
+  padding: 28rpx 24rpx;
   border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .history-item:last-child {
   border-bottom: none;
 }
 
+.history-item:active {
+  background: var(--bg-hover);
+}
+
 .history-icon {
-  font-size: 48rpx;
-  margin-right: 24rpx;
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .history-info {
@@ -212,21 +621,41 @@
 }
 
 .history-name {
-  font-size: 28rpx;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--text-primary);
   display: block;
 }
 
 .history-company {
-  font-size: 24rpx;
-  color: var(--text-muted);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
   margin-top: 4rpx;
   display: block;
 }
 
 .history-time {
-  font-size: 22rpx;
-  color: var(--text-muted);
+  font-size: var(--text-xs);
+  color: var(--text-quaternary);
   flex-shrink: 0;
+  padding-left: 16rpx;
 }
+
+.history-empty {
+  display: flex;
+  justify-content: center;
+  padding: 60rpx 32rpx;
+}
+
+.empty-text {
+  font-size: var(--text-sm);
+  color: var(--text-quaternary);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ========== 通用工具类 ========== */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }

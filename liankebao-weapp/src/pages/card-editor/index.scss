@@ -443,6 +443,25 @@
     font-size: $font-size-lg;
     border-radius: $radius-lg;
   }
+
+  &--ai {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: $font-size-sm;
+    height: 80px;
+
+    &:active {
+      opacity: 0.85;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  AI 优化建议按钮                                                            */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__ai {
+  padding: 0 $spacing-xl $spacing-md;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -566,6 +585,156 @@
   font-size: $font-size-xs;
   color: $color-text-tertiary;
   margin-top: $spacing-2xs;
+  line-height: 1.5;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  AI 写作建议面板                                                            */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__ai-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.card-editor__ai-panel {
+  width: 100%;
+  max-height: 60vh;
+  background: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: card-editor-slide-up 0.3s ease;
+}
+
+@keyframes card-editor-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.card-editor__ai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.card-editor__ai-panel-title {
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.card-editor__ai-panel-close {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  padding: $spacing-2xs;
+  cursor: pointer;
+}
+
+.card-editor__ai-panel-body {
+  flex: 1;
+  padding: $spacing-lg $spacing-xl;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.card-editor__ai-panel-content {
+  display: block;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.card-editor__ai-panel-footer {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-xl;
+  border-top: 1px solid $color-border-light;
+
+  .card-editor__btn {
+    flex: 1;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  智能标签推荐按钮                                                           */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__btn--tag {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #fff;
+  font-size: $font-size-sm;
+  height: 80px;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  智能标签列表                                                               */
+/* -------------------------------------------------------------------------- */
+
+.card-editor__tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.card-editor__tag-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2xs;
+  padding: $spacing-xs $spacing-md;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &--active {
+    background: $color-primary-light;
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
+.card-editor__tag-text {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.card-editor__tag-check {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: 700;
+}
+
+.card-editor__ai-panel-hint {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
   line-height: 1.5;
 }
 

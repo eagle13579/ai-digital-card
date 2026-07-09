@@ -1,9 +1,8 @@
 /**
  * 首页 - 名片列表 + 推荐
- * 连接后端真实API（/api/v1/ 前缀）
  * 增加：Free用户使用接近上限时显示智能升级提示条
  */
-const { userApi, brochureApi, trustApi, matchApi, visitorApi, membershipApi } = require('../../utils/api')
+const { MockService } = require('../../utils/mockService')
 const { Logger } = require('../../utils/util')
 
 Page({
@@ -23,6 +22,10 @@ Page({
     showUpgradeHint: false,
     upgradeHintText: '',
 
+    // 场景模式
+    showSceneSelector: true,
+    currentScene: 'online',
+
     // 平台推荐（静态UI数据，非后端数据）
     platformRecommend: [
       { id: 1, name: 'AI技术合作平台', desc: 'AI技术开发·模型训练·数据标注', icon: '🤖', bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
@@ -41,6 +44,25 @@ Page({
       return
     } else {
       Logger.info('首页', '页面加载')
+      // 恢复场景偏好
+      const scenePrefs = wx.getStorageSync('scene_prefs')
+      if (scenePrefs && scenePrefs.scene) {
+        this.setData({ currentScene: scenePrefs.scene })
+      }
+      // 首次使用弹出场景建议
+      const firstTime = wx.getStorageSync('scene_first_time')
+      if (firstTime === '' || firstTime === undefined || firstTime === null) {
+        wx.showModal({
+          title: '场景模式',
+          content: '欢迎使用！您可以选择适合您的场景模式，我们将为您提供更贴心的服务。',
+          confirmText: '去选择',
+          success: (res) => {
+            if (res.confirm) {
+              wx.setStorageSync('scene_first_time', false)
+            }
+          }
+        })
+      }
       this.loadPageData()
     }
   },
@@ -54,51 +76,20 @@ Page({
 
   /**
    * 加载首页全部数据
-   * 并行请求：用户信息、名片、信任网络、推荐列表、会员状态
+   * 并行请求：用户信息、名片、信任网络、推荐列表
    */
   async loadPageData() {
     this.setData({ loading: true })
     try {
-      // ===== 并行请求全部数据 =====
-      const [
-        profileRes,
-        brochuresRes,
-        trustNetRes,
-        recommendRes,
-        membershipRes,
-      ] = await Promise.all([
-        // 1. 用户信息
-        userApi.getProfile().catch(err => {
-          Logger.warn('首页', '获取用户信息失败，使用默认值', err)
-          return null
-        }),
-        // 2. 名片/画册列表（延迟50ms避免并发阻塞）
-        new Promise(r => setTimeout(r, 50)).then(() =>
-          brochureApi.list({ page: 1, size: 10 }).catch(err => {
-            Logger.warn('首页', '获取画册列表失败', err)
-            return null
-          })
-        ),
-        // 3. 信任网络
-        trustApi.getNetwork().catch(err => {
-          Logger.warn('首页', '获取信任网络失败', err)
-          return null
-        }),
-        // 4. 推荐匹配列表
-        matchApi.getRecommend({ page: 1, size: 10 }).catch(err => {
-          Logger.warn('首页', '获取推荐列表失败', err)
-          return null
-        }),
-        // 5. 会员状态（用于升级提示）
-        membershipApi.getStatus().catch(err => {
-          Logger.warn('首页', '获取会员状态失败', err)
-          return null
-        }),
+      const [profile, brochures, trustNet, recommend] = await Promise.all([
+        MockService.getUserProfile(),
+        MockService.getBrochures(),
+        MockService.getTrustNetwork(),
+        MockService.getRecommendList(),
       ])
 
-      // ===== 1. 解析用户信息 =====
-      const profileData = profileRes?.data !== undefined ? profileRes.data : profileRes
-      const userInfoData = profileData?.userInfo || profileData || {}
+      const profileData = profile.data !== undefined ? profile.data : profile
+      const userInfoData = profileData.userInfo || profileData || {}
 
       const userInfo = {
         name: userInfoData.name || '',
@@ -107,84 +98,45 @@ Page({
         title: userInfoData.title || '',
       }
 
-      const memberLevel = profileData?.memberLevel || userInfoData.memberLevel || 'free'
-      const memberLevelText = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memberLevel] || 'Free'
+      const memberLevel = profileData.memberLevel || userInfoData.memberLevel || 'free'
+      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
 
       const app = getApp()
       app.updateUserInfo(userInfo)
       app.updateMemberLevel(memberLevel)
 
-      // ===== 2. 解析名片/画册 =====
       let brochuresList = []
-      if (Array.isArray(brochuresRes)) {
-        brochuresList = brochuresRes
-      } else if (brochuresRes?.data && Array.isArray(brochuresRes.data)) {
-        brochuresList = brochuresRes.data
-      } else if (brochuresRes?.items && Array.isArray(brochuresRes.items)) {
-        brochuresList = brochuresRes.items
-      } else if (brochuresRes?.list && Array.isArray(brochuresRes.list)) {
-        brochuresList = brochuresRes.list
+      if (Array.isArray(brochures)) {
+        brochuresList = brochures
+      } else if (brochures.data && Array.isArray(brochures.data)) {
+        brochuresList = brochures.data
       }
       const brochure = brochuresList.length > 0 ? brochuresList[0] : null
 
-      // ===== 3. 解析信任网络 =====
-      const trustData = trustNetRes?.data !== undefined ? trustNetRes.data : (trustNetRes || {})
+      const trustData = trustNet.data !== undefined ? trustNet.data : (trustNet || {})
       const trustList = trustData.trusting || []
       const trustCount = trustList.length
 
-      // ===== 4. 解析推荐列表 =====
       let recommendData = []
-      if (Array.isArray(recommendRes)) {
-        recommendData = recommendRes
-      } else if (recommendRes?.data && Array.isArray(recommendRes.data)) {
-        recommendData = recommendRes.data
-      } else if (recommendRes?.items && Array.isArray(recommendRes.items)) {
-        recommendData = recommendRes.items
-      } else if (recommendRes?.list && Array.isArray(recommendRes.list)) {
-        recommendData = recommendRes.list
+      if (Array.isArray(recommend)) {
+        recommendData = recommend
+      } else if (recommend.data && Array.isArray(recommend.data)) {
+        recommendData = recommend.data
       }
 
-      // ===== 5. 获取访客统计（需要 brochureId） =====
       let visitors = 0
       if (brochure) {
         try {
-          const vStatsRes = await visitorApi.getStats(brochure.id)
-          const vStats = vStatsRes?.data !== undefined ? vStatsRes.data : vStatsRes
-          visitors = vStats?.total_visits || vStats?.total || vStats?.visitors || 0
+          const vStatsRes = await MockService.getVisitorStats()
+          const vStats = vStatsRes.data !== undefined ? vStatsRes.data : vStatsRes
+          visitors = vStats.total_visits || vStats.total || vStats.visitors || 0
         } catch (e) {
           Logger.warn('首页', '获取访客统计失败', e)
         }
       }
 
-      // ===== 6. 解析会员状态 → 升级提示 =====
-      const membership = membershipRes?.data ?? membershipRes ?? {}
-      const memLevel = membership.tier || membership.level || memberLevel
-      const ocrCount = membership.ocr_count ?? membership.ocrCount ?? 0
-      const ocrLimit = membership.ocr_limit ?? membership.ocrLimit ?? (memLevel === 'free' ? 3 : 100)
-      const cardCount = membership.card_count ?? membership.cardCount ?? (brochuresList.length || 0)
-      const cardLimit = membership.card_limit ?? membership.cardLimit ?? (memLevel === 'free' ? 1 : 10)
-
       let showUpgradeHint = false
       let upgradeHintText = ''
-
-      if (memLevel === 'free') {
-        // Free用户：检查使用是否接近上限
-        const ocrRatio = ocrLimit > 0 ? ocrCount / ocrLimit : 0
-        const cardRatio = cardLimit > 0 ? cardCount / cardLimit : 0
-        const maxRatio = Math.max(ocrRatio, cardRatio)
-
-        if (maxRatio >= 0.8) {
-          showUpgradeHint = true
-          if (ocrRatio >= 0.8) {
-            const remaining = ocrLimit - ocrCount
-            upgradeHintText = `您本月OCR还剩${remaining}次，升级Pro享100次/月`
-          } else if (cardRatio >= 0.8) {
-            upgradeHintText = `名片已达${cardCount}/${cardLimit}张，升级Pro可创建更多`
-          } else {
-            upgradeHintText = '使用接近上限，升级Pro解锁更多权益'
-          }
-        }
-      }
 
       // ===== 7. 组装统计数据 =====
       const stats = {
@@ -196,8 +148,8 @@ Page({
       // ===== 8. 更新页面数据 =====
       this.setData({
         userInfo,
-        memberLevel: memLevel,
-        memberLevelText: { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memLevel] || 'Free',
+        memberLevel: memberLevel,
+        memberLevelText: { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memberLevel] || 'Free',
         stats,
         brochure: brochure ? {
           id: brochure.id,
@@ -236,7 +188,11 @@ Page({
   },
 
   goQrCode() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.showModal({
+      title: '提示',
+      content: '二维码功能即将开放，敬请期待',
+      showCancel: false
+    })
   },
 
   shareCard() {
@@ -248,12 +204,12 @@ Page({
   },
 
   goMatch() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/ai/match/index' })
   },
 
   goMatchDetail(e) {
     const id = e.currentTarget.dataset.id
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: `/pages/ai/match/index?id=${id}` })
   },
 
   // 创建资源平台
@@ -264,7 +220,11 @@ Page({
   // 平台推荐详情
   goPlatformDetail(e) {
     const name = e.currentTarget.dataset.url || e.currentTarget.dataset.item
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.showModal({
+      title: '提示',
+      content: '平台详情功能即将开放，敬请期待',
+      showCancel: false
+    })
   },
 
   // 跳转会员中心
@@ -280,6 +240,13 @@ Page({
   // 关闭升级提示
   closeUpgradeHint() {
     this.setData({ showUpgradeHint: false })
+  },
+
+  // 场景模式切换
+  onSceneChange(e) {
+    const sceneType = e.detail.scene_type
+    this.setData({ currentScene: sceneType })
+    wx.setStorageSync('scene_prefs', { scene: sceneType })
   },
 
   onShareAppMessage() {

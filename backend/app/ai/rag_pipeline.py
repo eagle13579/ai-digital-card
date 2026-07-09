@@ -374,6 +374,112 @@ class ContextBuilder:
 
 
 # ======================================================================
+# HyDE 检索增强
+# ======================================================================
+
+
+class HyDEQueryTransformer:
+    """HyDE (Hypothetical Document Embeddings) 检索增强转换器
+
+    1. 用 LLM 生成一段假设文档（理想回答），将简短查询扩展为
+       语义丰富的描述文本
+    2. 对原始查询和假设文档分别做向量搜索，加权融合去重
+    """
+
+    HYDE_SYSTEM_PROMPT: str = (
+        "你是一个商务匹配专家。给定用户的查询，生成一段理想的回答文本，"
+        "包含你想找到什么样的合作伙伴、什么背景、什么技能。"
+        "这段文本将用于向量搜索，请写得详细具体。"
+    )
+
+    # 原始查询权重 vs HyDE 假设文档权重
+    QUERY_WEIGHT: float = 0.4
+    HYDE_WEIGHT: float = 0.6
+
+    def __init__(self, deepseek_client: DeepSeekClient):
+        self.deepseek = deepseek_client
+
+    async def hyde_generate(self, query: str) -> str:
+        """用 DeepSeek 生成假设文档（理想回答文本）"""
+        messages = [
+            {"role": "system", "content": self.HYDE_SYSTEM_PROMPT},
+            {"role": "user", "content": query},
+        ]
+        response = await self.deepseek.chat(
+            messages=messages,
+            temperature=0.7,
+            max_tokens=512,
+            stream=False,
+        )
+        content = response.get("content", "") if isinstance(response, dict) else str(response)
+        if not content or response.get("error"):
+            logger.warning(f"HyDE generation returned empty or error, fallback to original query: {response.get('error', '')}")
+            return query
+        logger.debug(f"HyDE generated hypothetical doc ({len(content)} chars): {content[:100]}...")
+        return content
+
+    async def hyde_search(
+        self,
+        db: AsyncSession,
+        query: str,
+        hyde_doc: str,
+        user_id: int,
+        top_k: int = 10,
+    ) -> list[dict]:
+        """分别用原 query 和 hypothetical doc 做向量搜索，加权融合去重
+
+        融合策略:
+          - 原 query 结果: 分数 × QUERY_WEIGHT (0.4)
+          - HyDE 结果: 分数 × HYDE_WEIGHT (0.6)
+          - 按 user_id 去重，取最高加权分
+          - 按加权分降序排列
+        """
+        vse = VectorSearchEngine(db)
+
+        try:
+            query_results = await vse.search(query=query, top_k=top_k, min_score=0.3)
+            hyde_results = await vse.search(query=hyde_doc, top_k=top_k, min_score=0.3)
+        except Exception as e:
+            logger.warning(f"HyDE vector search failed (fallback: original query): {e}")
+            try:
+                return await vse.search(query=query, top_k=top_k, min_score=0.3)
+            except Exception:
+                return []
+
+        # 加权融合
+        merged: dict[int, dict] = {}
+
+        for r in query_results:
+            uid = r.get("user_id")
+            if uid is None:
+                continue
+            r["_weighted_score"] = r.get("score", 0) * self.QUERY_WEIGHT
+            r["_source"] = "query"
+            merged[uid] = r
+
+        for r in hyde_results:
+            uid = r.get("user_id")
+            if uid is None:
+                continue
+            hyde_score = r.get("score", 0) * self.HYDE_WEIGHT
+            if uid in merged:
+                merged[uid]["score"] = max(merged[uid]["score"], r.get("score", 0))
+                merged[uid]["_weighted_score"] = max(merged[uid]["_weighted_score"], hyde_score)
+            else:
+                r["_weighted_score"] = hyde_score
+                r["_source"] = "hyde"
+                merged[uid] = r
+
+        # 按加权分降序排列，去掉辅助字段
+        sorted_results = sorted(merged.values(), key=lambda x: x["_weighted_score"], reverse=True)
+        for r in sorted_results:
+            r.pop("_weighted_score", None)
+            r.pop("_source", None)
+
+        return sorted_results[:top_k]
+
+
+# ======================================================================
 # RAG 管道主类
 # ======================================================================
 
@@ -385,6 +491,7 @@ class RAGPipeline:
         self.db = db
         self.deepseek = DeepSeekClient()
         self.context_builder = ContextBuilder()
+        self.hyde_transformer = HyDEQueryTransformer(self.deepseek)
 
     async def query(
         self,
@@ -417,6 +524,11 @@ class RAGPipeline:
             conversation_history=conversation_history or [],
         )
 
+        # HyDE: 用 DeepSeek 生成假设文档替代原查询进行向量搜索
+        hyde_query = query_text
+        if settings.USE_HYDE:
+            hyde_query = await self.hyde_transformer.hyde_generate(query_text)
+
         # 并行构建各层上下文
         import asyncio
         (
@@ -427,7 +539,7 @@ class RAGPipeline:
         ) = await asyncio.gather(
             self.context_builder.build_user_profile(self.db, user_id),
             self.context_builder.build_brochure_context(self.db, user_id),
-            self.context_builder.build_vector_context(self.db, query_text, user_id, top_k),
+            self.context_builder.build_vector_context(self.db, hyde_query, user_id, top_k),
             self.context_builder.build_match_context(self.db, user_id),
         )
 
@@ -526,6 +638,11 @@ class RAGPipeline:
             conversation_history=conversation_history or [],
         )
 
+        # HyDE: 用 DeepSeek 生成假设文档替代原查询进行向量搜索
+        hyde_query = query_text
+        if settings.USE_HYDE:
+            hyde_query = await self.hyde_transformer.hyde_generate(query_text)
+
         import asyncio
         (
             context.user_profile,
@@ -535,7 +652,7 @@ class RAGPipeline:
         ) = await asyncio.gather(
             self.context_builder.build_user_profile(self.db, user_id),
             self.context_builder.build_brochure_context(self.db, user_id),
-            self.context_builder.build_vector_context(self.db, query_text, user_id, top_k),
+            self.context_builder.build_vector_context(self.db, hyde_query, user_id, top_k),
             self.context_builder.build_match_context(self.db, user_id),
         )
 

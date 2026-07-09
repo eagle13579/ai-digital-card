@@ -1,34 +1,141 @@
-// ===== Design Tokens =====
-// 颜色系统
-$color-primary: #1677ff;
-$color-primary-light: #e6f4ff;
-$color-primary-dark: #0958d9;
+// ===== Design Tokens (AI原生暗色) =====
+// 来源: DESIGN.md (AI数字名片设计Token体系 v1.0)
+// 调性: 冷峻轻奢 · AI原生暗色 · 三重渐变(青→紫→粉)
 
-$color-success: #52c41a;
-$color-warning: #faad14;
-$color-error: #ff4d4f;
+// ── 基底色 ──────────────────────────────
+$bg-page: #0A0A18;           // 页面最底层，深邃夜空
+$bg-elevated: #0F0F13;       // 卡片/面板承载面
+$bg-overlay: #141418;        // 弹出层/模态背景
+$bg-glass-1: rgba(255,255,255,0.04);  // 玻璃层1-超薄
+$bg-glass-2: rgba(255,255,255,0.07);  // 玻璃层2-薄
+$bg-glass-3: rgba(255,255,255,0.12);  // 玻璃层3-中厚
+$bg-hover: rgba(255,255,255,0.06);    // 悬浮态底纹
+$bg-active: rgba(255,255,255,0.10);   // 按下态底纹
 
-// 中性色
-$color-bg: #f5f5f5;
-$color-bg-white: #ffffff;
-$color-bg-card: #ffffff;
+// ── 品牌色 ──────────────────────────────
+$cyan: #06b6d4;              // 主色-青色（科技感）
+$cyan-light: #22d3ee;        // 主色-青淡
+$cyan-dark: #0891b2;         // 主色-青深
+$purple: #8b5cf6;            // 主色-紫色（AI感）
+$purple-light: #a78bfa;      // 主色-紫淡
+$purple-dark: #7c3aed;       // 主色-紫深
+$pink: #ec4899;              // 主色-粉色（温度感）
+$pink-light: #f472b6;        // 主色-粉淡
 
-$color-text-primary: #262626;
-$color-text-secondary: #595959;
-$color-text-tertiary: #8c8c8c;
-$color-text-placeholder: #bfbfbf;
+// ── 语义色 ──────────────────────────────
+$success: #10b981;           // 成功/匹配
+$warning: #f59e0b;           // 警告/升级提示
+$danger: #ef4444;            // 错误/危险
+$info: #06b6d4;              // 信息提示
 
-$color-border: #e8e8e8;
-$color-border-light: #f0f0f0;
-$color-divider: #f0f0f0;
+// ── 字体族 ──────────────────────────────
+$font-system: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Tahoma, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
-// 品牌梯度色
-$color-gradient-primary: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
-$color-gradient-ai: linear-gradient(135deg, #1677ff 0%, #722ed1 100%);
-$color-gradient-warm: linear-gradient(135deg, #fa8c16 0%, #f5222d 100%);
-$color-gradient-success: linear-gradient(135deg, #52c41a 0%, #13c2c2 100%);
+// ── 字重 ──────────────────────────────
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 
-// 间距
+// ── 字号（文本尺寸） ─────────────────────
+$text-xs: 20rpx;
+$text-sm: 24rpx;
+$text-base: 28rpx;
+$text-lg: 32rpx;
+$text-xl: 36rpx;
+$text-2xl: 40rpx;
+
+// ── 间距系统 ────────────────────────────
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-7: 28px;
+$space-8: 32px;
+$space-9: 36px;
+$space-10: 40px;
+$page-padding: 32px;
+
+// ── 圆角 ──────────────────────────────
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 50%;
+
+// ── 时长 ──────────────────────────────
+$duration-fast: 0.15s;
+$duration-normal: 0.3s;
+$duration-shimmer: 1.5s;
+$duration-orb: 3s;
+
+// ── 缓动 ──────────────────────────────
+$ease-out: ease-out;
+
+// ── 动画定义 ────────────────────────────
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+// ── 骨架屏 ─────────────────────────────
+$skeleton-base: rgba(255, 255, 255, 0.04);
+$skeleton-shine: rgba(255, 255, 255, 0.08);
+
+// ── 玻璃边框 ────────────────────────────
+$glass-border-1: 1px solid rgba(255, 255, 255, 0.06);
+$glass-border-2: 1px solid rgba(255, 255, 255, 0.10);
+$border-default: rgba(255, 255, 255, 0.08);
+
+// ── 光晕阴影 ────────────────────────────
+$orb-sm: 0 4px 20px rgba(6, 182, 212, 0.15);
+$orb-md: 0 8px 32px rgba(6, 182, 212, 0.20);
+$orb-lg: 0 12px 48px rgba(6, 182, 212, 0.25);
+$orb-cyan: 0 4px 24px rgba(6, 182, 212, 0.3);
+
+// ── 字间距 ─────────────────────────────
+$tracking-tight: -0.5px;
+$tracking-normal: 0;
+$tracking-wide: 1px;
+
+// ── 过渡 ──────────────────────────────
+$transition-scale: transform $duration-normal $ease-out;
+$transition-glass: all $duration-normal $ease-out;
+
+// ── 渐变系统（三重渐变） ──────────────────
+$gradient-primary: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);  // 主品牌渐变
+$gradient-cyan-purple: linear-gradient(135deg, #06b6d4, #8b5cf6);      // AI卡片/按钮
+$gradient-purple-pink: linear-gradient(135deg, #8b5cf6, #ec4899);      // 高亮/强调
+$gradient-cyan-only: linear-gradient(135deg, #06b6d4, #22d3ee);        // 数字/统计
+$gradient-glow: radial-gradient(ellipse at center, rgba(139,92,246,0.3), rgba(6,182,212,0.1), transparent);  // 光晕Orb
+
+// ── 文字色 ──────────────────────────────
+$text-primary: rgba(255,255,255,0.92);   // 主标题/重要内容
+$text-secondary: rgba(255,255,255,0.65); // 正文/副标题
+$text-tertiary: rgba(255,255,255,0.40);  // 辅助说明/时间
+$text-quaternary: rgba(255,255,255,0.20);// 禁用态/占位符
+$text-inverse: #0A0A18;                  // 在渐变/高亮背景上
+$text-accent: #a78bfa;                   // 高亮强调文字
+
+// ── 边框/分割线 ──────────────────────────
+$border-subtle: rgba(255,255,255,0.06);  // 最细分割线
+$border-default: rgba(255,255,255,0.10); // 默认边框
+$border-accent: rgba(139,92,246,0.25);   // 强调边框（紫光）
+$border-cyan: rgba(6,182,212,0.25);      // 强调边框（青光）
+
+// ── 间距 ────────────────────────────────
 $spacing-2xs: 4px;
 $spacing-xs: 8px;
 $spacing-sm: 12px;
@@ -38,7 +145,7 @@ $spacing-xl: 24px;
 $spacing-2xl: 32px;
 $spacing-3xl: 40px;
 
-// 字体大小
+// ── 字体大小 ────────────────────────────
 $font-size-xs: 20px;
 $font-size-sm: 24px;
 $font-size-md: 28px;
@@ -48,18 +155,51 @@ $font-size-2xl: 40px;
 $font-size-3xl: 48px;
 $font-size-4xl: 56px;
 
-// 圆角
+// ── 圆角 ────────────────────────────────
 $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 16px;
 $radius-xl: 24px;
 $radius-round: 50%;
 
-// 阴影
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-$shadow-ai: 0 4px 20px rgba(22, 119, 255, 0.25);
+// ── 阴影 ────────────────────────────────
+$shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+$shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+$shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+$shadow-glow: 0 0 20px rgba(139,92,246,0.2);  // 紫色光晕阴影
 
-// 页面标准宽
+// ── 动效 ────────────────────────────────
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  // 弹簧物理出轴
+
+// ── 页面标准 ─────────────────────────────
 $page-padding: 32px;
+
+// ── 兼容别名（旧命名 → 新命名） ─────────
+$color-bg: $bg-page;
+$color-bg-white: $bg-elevated;
+$color-bg-card: $bg-overlay;
+
+// ── $color-* 兼容别名（与旧版设计系统前后兼容） ──────────
+$color-text-primary: $text-primary;
+$color-text-secondary: $text-secondary;
+$color-text-tertiary: $text-tertiary;
+$color-text-placeholder: $text-quaternary;
+
+// 语义色兼容
+$color-primary: $cyan;
+$color-primary-light: rgba(6, 182, 212, 0.12);
+$color-primary-dark: $cyan-dark;
+$color-error: $danger;
+$color-warning: $warning;
+$color-success: $success;
+
+// 边框兼容
+$color-border: rgba(255, 255, 255, 0.06);
+$color-border-light: rgba(255, 255, 255, 0.10);
+$color-divider: rgba(255, 255, 255, 0.06);
+
+// 渐变兼容
+$color-gradient-primary: $gradient-primary;
+$color-gradient-warm: linear-gradient(135deg, #ec4899, #f472b6);
+$color-gradient-ai: $gradient-cyan-purple;
+$color-gradient-success: linear-gradient(135deg, #10b981, #34d399);

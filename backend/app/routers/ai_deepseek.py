@@ -1,21 +1,31 @@
-"""DeepSeek AI 代理端点 — 对话/生成/状态检查"""
+"""AI 代理端点 — 支持 DeepSeek 和飞书白泽双提供商"""
 import logging
+import time
 from typing import Optional
 
-import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+import httpx
 
 from app.config import settings
+from app.models.user import User
+from app.routers.auth import get_current_user
+from app.services.usage_service import record_token_usage
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/ai/deepseek", tags=["DeepSeek AI"])
+router = APIRouter(prefix="/api/v1/ai/deepseek", tags=["AI 代理"])
 
 # ── 常量 ──────────────────────────────────────────────────────────────
 DEEPSEEK_CHAT_URL = "https://api.deepseek.com/v1/chat/completions"
 DEEPSEEK_MODEL = "deepseek-chat"
 TIMEOUT_SEC = 10
+
+
+def _use_feishu_baize() -> bool:
+    """判断是否使用飞书白泽（飞书配置存在时优先使用）"""
+    return bool(settings.FEISHU_APP_ID and settings.FEISHU_APP_SECRET)
 
 
 # ── 请求/响应模型 ──────────────────────────────────────────────────────
@@ -102,18 +112,53 @@ async def _call_deepseek(payload: dict, timeout: int = TIMEOUT_SEC) -> dict:
 
 # ── API 端点 ──────────────────────────────────────────────────────────
 
-@router.post("/chat", response_model=ChatResponse)
-async def deepseek_chat(req: ChatRequest):
-    """调用 DeepSeek 进行多轮对话
+async def _call_feishu_baize(messages: list[dict], temperature: float, max_tokens: int) -> dict:
+    """调用飞书白泽 API"""
+    from app.ai.gateway.adapters.feishu_baize_adapter import FeishuBaizeAdapter
+    from app.ai.gateway.interfaces import AIRequest
 
-    接收消息列表，通过 DeepSeek API 生成回复。
+    adapter = FeishuBaizeAdapter()
+    ai_request = AIRequest(
+        model=settings.FEISHU_BAIZE_DEFAULT_MODEL,
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    response = await adapter.chat(ai_request)
+    return {
+        "choices": [{
+            "message": {"content": response.content},
+            "finish_reason": response.finish_reason,
+        }],
+        "usage": response.usage,
+        "model": response.model,
+    }
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def deepseek_chat(req: ChatRequest, current_user: User = Depends(get_current_user)):
+    """调用 AI 进行多轮对话（飞书白泽优先，DeepSeek 降级）
+
+    接收消息列表，通过 AI API 生成回复。
+    优先使用飞书白泽（配置了 FEISHU_APP_ID 时），否则使用 DeepSeek。
     """
     if not req.messages:
         raise HTTPException(status_code=400, detail="消息列表不能为空")
 
+    messages = [{"role": m.role, "content": m.content} for m in req.messages]
+
+    if _use_feishu_baize():
+        try:
+            data = await _call_feishu_baize(messages, req.temperature, req.max_tokens)
+            reply = data["choices"][0]["message"]["content"]
+            usage = data.get("usage")
+            return ChatResponse(reply=reply, model=data.get("model", "baize-4k"), usage=usage)
+        except Exception as e:
+            logger.warning("飞书白泽调用失败，降级到 DeepSeek: %s", e)
+
     payload = {
         "model": DEEPSEEK_MODEL,
-        "messages": [{"role": m.role, "content": m.content} for m in req.messages],
+        "messages": messages,
         "temperature": req.temperature,
         "max_tokens": req.max_tokens,
     }
@@ -127,27 +172,52 @@ async def deepseek_chat(req: ChatRequest):
         raise HTTPException(status_code=502, detail="DeepSeek 响应格式异常")
 
     usage = data.get("usage")
+    # 记录 token 消耗
+    if usage:
+        try:
+            await record_token_usage(
+                user_id=current_user.id,
+                feature="ai_deepseek_chat",
+                model_type="external",
+                model_name=DEEPSEEK_MODEL,
+                prompt_tokens=usage.get("prompt_tokens", 0),
+                completion_tokens=usage.get("completion_tokens", 0),
+                total_tokens=usage.get("total_tokens", 0),
+            )
+        except Exception:
+            logger.warning("Token用量记录失败（非阻断）")
     return ChatResponse(reply=reply, usage=usage)
 
 
 @router.post("/generate", response_model=GenerateResponse)
 async def deepseek_generate(req: GenerateRequest):
-    """调用 DeepSeek 生成名片文案
+    """调用 AI 生成名片文案（飞书白泽优先，DeepSeek 降级）
 
     根据用户输入的 prompt 生成对应的文案内容。
+    优先使用飞书白泽（配置了 FEISHU_APP_ID 时），否则使用 DeepSeek。
     """
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="prompt 不能为空")
 
+    messages = [
+        {
+            "role": "system",
+            "content": "你是一个专业的名片文案撰写助手。请根据用户需求生成简洁、专业、有吸引力的名片文案。",
+        },
+        {"role": "user", "content": req.prompt},
+    ]
+
+    if _use_feishu_baize():
+        try:
+            data = await _call_feishu_baize(messages, req.temperature, req.max_tokens)
+            content = data["choices"][0]["message"]["content"]
+            return GenerateResponse(content=content, model=data.get("model", "baize-4k"))
+        except Exception as e:
+            logger.warning("飞书白泽调用失败，降级到 DeepSeek: %s", e)
+
     payload = {
         "model": DEEPSEEK_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": "你是一个专业的名片文案撰写助手。请根据用户需求生成简洁、专业、有吸引力的名片文案。",
-            },
-            {"role": "user", "content": req.prompt},
-        ],
+        "messages": messages,
         "temperature": req.temperature,
         "max_tokens": req.max_tokens,
     }
@@ -163,12 +233,32 @@ async def deepseek_generate(req: GenerateRequest):
     return GenerateResponse(content=content)
 
 
+async def _check_feishu_status() -> dict:
+    """检查飞书白泽 API 状态"""
+    if not settings.FEISHU_APP_ID or not settings.FEISHU_APP_SECRET:
+        return {"status": "error", "configured": False, "message": "FEISHU_APP_ID/FEISHU_APP_SECRET 未配置"}
+
+    from app.ai.gateway.adapters.feishu_baize_adapter import FeishuBaizeAdapter
+
+    try:
+        adapter = FeishuBaizeAdapter()
+        await adapter._ensure_token()
+        return {"status": "ok", "configured": True, "message": "飞书白泽 API 连接正常"}
+    except Exception as e:
+        return {"status": "error", "configured": False, "message": f"飞书白泽认证失败: {str(e)}"}
+
+
 @router.get("/status", response_model=StatusResponse)
 async def deepseek_status():
-    """检查 DeepSeek API Key 是否配置有效
+    """检查 AI API 状态（飞书白泽优先）
 
-    尝试用一个简单的请求验证 API Key 的有效性。
+    检查当前配置的 AI 提供商状态。
+    优先使用飞书白泽（配置了 FEISHU_APP_ID 时），否则使用 DeepSeek。
     """
+    if _use_feishu_baize():
+        result = await _check_feishu_status()
+        return StatusResponse(**result)
+
     api_key = _get_api_key()
     if not api_key:
         return StatusResponse(
@@ -177,7 +267,6 @@ async def deepseek_status():
             message="DEEPSEEK_API_KEY 未配置，请在 .env 文件中设置",
         )
 
-    # 使用一个最小请求验证 key 有效性
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",

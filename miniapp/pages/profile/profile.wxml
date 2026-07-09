@@ -1,162 +1,209 @@
-<view class="page-container">
-  <loading visible="{{loading}}" />
+<view class="page-container dark">
+  <!-- 光晕背景层 -->
+  <view class="orb-bg"></view>
 
+  <!-- 加载状态 -->
+  <loading visible="{{loading}}" text="加载中..." />
+
+  <!-- 页面内容 -->
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
 
-    <!-- 用户信息头部 -->
-    <view class="profile-header">
-      <view class="profile-avatar">
-        <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
-        <view class="member-badge badge-{{memberLevel}}">
-          {{isPro ? '⭐' + memberLevelText : memberLevelText}}
-        </view>
+    <!-- ════════════════════════════════════════════
+         横幅1: 品牌青 — 用户资料区
+         5色横幅系统 — 个人中心用品牌青
+         ════════════════════════════════════════════ -->
+    <view class="banner banner-cyan spring-press" hover-class="spring-scale-mini" bindtap="goEditProfile">
+      <!-- 头像区 -->
+      <view class="banner-avatar-wrap">
+        <image class="banner-avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
       </view>
-      <view class="profile-meta">
-        <text class="profile-name">{{userInfo.name || '未登录'}}</text>
-        <text class="profile-company">{{userInfo.company}} · {{userInfo.title}}</text>
+      <!-- 用户信息 -->
+      <view class="banner-user-meta">
+        <text class="banner-user-name">{{userInfo.name || '未设置姓名'}}</text>
+        <text class="banner-user-pos">{{userInfo.company}} {{userInfo.title}}</text>
       </view>
-      <view class="profile-edit" bindtap="goEditCard">
-        <text class="edit-text">编辑</text>
+      <!-- 编辑箭头 -->
+      <text class="banner-arrow">›</text>
+      <!-- 品牌青光晕装饰 -->
+      <view class="banner-glow banner-glow-cyan"></view>
+    </view>
+
+    <!-- 统计数据卡（紧接横幅下方，半透明玻璃面板） -->
+    <view class="stats-panel glass-tier-1">
+      <view class="stats-item spring-press" hover-class="spring-scale-mini" bindtap="goVisitorLog">
+        <text class="stats-num">{{stats.visitors || 0}}</text>
+        <text class="stats-label">访客</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item spring-press" hover-class="spring-scale-mini">
+        <text class="stats-num">{{stats.matches || 0}}</text>
+        <text class="stats-label">匹配</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item spring-press" hover-class="spring-scale-mini" bindtap="goTrustNetwork">
+        <text class="stats-num">{{trustCount || 0}}</text>
+        <text class="stats-label">信任</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item spring-press" hover-class="spring-scale-mini">
+        <text class="stats-num">{{stats.views || 0}}</text>
+        <text class="stats-label">浏览</text>
       </view>
     </view>
 
-    <!-- 会员信息 + 使用额度 -->
-    <view class="card member-card">
-      <view class="card-body member-body">
-        <view class="member-left" bindtap="goMember">
-          <text class="member-level-label">当前等级</text>
-          <text class="member-level-value badge-{{memberLevel}}">
-            {{isPro ? '⭐ ' + memberLevelText : memberLevelText}}
-          </text>
-          <text class="member-expire" wx:if="{{memberExpire}}">到期: {{memberExpire}}</text>
+    <!-- ════════════════════════════════════════════
+         横幅2: 营收粉 — 使用额度/升级区
+         5色横幅系统 — 个人中心用品牌营收粉
+         ════════════════════════════════════════════ -->
+    <view class="banner banner-pink spring-press" hover-class="spring-scale-mini" bindtap="goMember" wx:if="{{!isPro}}">
+      <view class="banner-pink-content">
+        <view class="banner-pink-icon-wrap">
+          <text class="banner-pink-icon">⭐</text>
         </view>
-        <view class="member-right" bindtap="goMember">
-          <!-- Free用户显示升级按钮 -->
-          <view wx:if="{{memberLevel === 'free'}}" class="upgrade-btn" bindtap="goMember">
-            <text class="upgrade-btn-text">升级Pro</text>
-          </view>
-          <text wx:else class="member-upgrade">查看权益 ›</text>
+        <view class="banner-pink-text">
+          <text class="banner-pink-title">升级为Pro会员</text>
+          <text class="banner-pink-desc">解锁无限名片 · AI匹配 · 数据洞察</text>
         </view>
+        <text class="banner-pink-cta">立即升级 ›</text>
       </view>
-
-      <!-- 使用额度进度 -->
-      <view class="usage-section" wx:if="{{memberLevel === 'free'}}">
-        <view class="usage-item">
-          <text class="usage-label">名片</text>
-          <view class="usage-bar-wrap">
-            <view class="usage-bar">
-              <view class="usage-fill" style="width: {{usage.card_limit > 0 ? (usage.card_count / usage.card_limit * 100) : 0}}%"></view>
-            </view>
-            <text class="usage-text">{{usage.card_count}}/{{usage.card_limit}}</text>
-          </view>
-        </view>
-        <view class="usage-item">
-          <text class="usage-label">OCR</text>
-          <view class="usage-bar-wrap">
-            <view class="usage-bar">
-              <view class="usage-fill" style="width: {{usage.ocr_limit > 0 ? (usage.ocr_count / usage.ocr_limit * 100) : 0}}%"></view>
-            </view>
-            <text class="usage-text">{{usage.ocr_count}}/{{usage.ocr_limit}}</text>
-          </view>
-        </view>
-      </view>
+      <view class="banner-glow banner-glow-pink"></view>
     </view>
 
-    <!-- 使用统计 -->
-    <view class="card">
+    <!-- 使用额度（Pro状态下显示） -->
+    <view class="card glass-tier-2 usage-card" wx:if="{{isPro}}">
       <view class="card-header">
-        <text class="title">📊 使用统计</text>
+        <text class="title">📊 使用额度</text>
       </view>
-      <view class="stats-grid">
-        <view class="stat-item">
-          <text class="stat-num">{{usage.card_count || 0}}</text>
-          <text class="stat-label">名片数量</text>
+      <view class="usage-body">
+        <view class="usage-item">
+          <view class="usage-label">
+            <text class="usage-icon">📇</text>
+            <text>名片数量</text>
+          </view>
+          <view class="usage-bar-wrap">
+            <view class="usage-bar" style="width: {{usage.card_limit > 0 ? (usage.card_count / usage.card_limit * 100) : 0}}%"></view>
+          </view>
+          <text class="usage-num">{{usage.card_count}}/{{usage.card_limit}}</text>
         </view>
-        <view class="stat-item">
-          <text class="stat-num">{{usage.ocr_count || 0}}</text>
-          <text class="stat-label">OCR次数</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{stats.visitors || 0}}</text>
-          <text class="stat-label">访客数</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{stats.views || 0}}</text>
-          <text class="stat-label">浏览量</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 数据概览（原有） -->
-    <view class="card">
-      <view class="card-header">
-        <text class="title">📈 数据概览</text>
-      </view>
-      <view class="stats-grid">
-        <view class="stat-item">
-          <text class="stat-num">{{stats.matches || 0}}</text>
-          <text class="stat-label">匹配数</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{stats.unlocks || 0}}</text>
-          <text class="stat-label">解锁次数</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{trustCount || 0}}</text>
-          <text class="stat-label">信任人数</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{newVisitorCount || 0}}</text>
-          <text class="stat-label">新访客</text>
+        <view class="usage-item">
+          <view class="usage-label">
+            <text class="usage-icon">📄</text>
+            <text>OCR识别</text>
+          </view>
+          <view class="usage-bar-wrap">
+            <view class="usage-bar" style="width: {{usage.ocr_limit > 0 ? (usage.ocr_count / usage.ocr_limit * 100) : 0}}%"></view>
+          </view>
+          <text class="usage-num">{{usage.ocr_count}}/{{usage.ocr_limit}}</text>
         </view>
       </view>
     </view>
 
-    <!-- 功能菜单 -->
-    <view class="card menu-card">
-      <view class="menu-item" bindtap="goAlbum">
-        <text class="menu-icon">🖼️</text>
-        <text class="menu-label">我的画册</text>
+    <!-- ════════════════════════════════════════════
+         功能区: 名片管理
+         ════════════════════════════════════════════ -->
+    <view class="section-label">名片管理</view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goEditCard">
+      <view class="menu-item">
+        <text class="menu-icon">✏️</text>
+        <view class="menu-text">
+          <text class="menu-title">编辑名片</text>
+          <text class="menu-desc">修改个人信息与展示内容</text>
+        </view>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" bindtap="goVisitorLog">
-        <text class="menu-icon">👀</text>
-        <text class="menu-label">访客记录</text>
-        <text class="menu-badge" wx:if="{{newVisitorCount > 0}}">{{newVisitorCount}}</text>
+    </view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goAlbum">
+      <view class="menu-item">
+        <text class="menu-icon">📖</text>
+        <view class="menu-text">
+          <text class="menu-title">画册管理</text>
+          <text class="menu-desc">管理你的AI数智名片画册</text>
+        </view>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" bindtap="goTrustNetwork">
+    </view>
+
+    <!-- ════════════════════════════════════════════
+         功能区: 数据与洞察
+         ════════════════════════════════════════════ -->
+    <view class="section-label">数据与洞察</view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goVisitorLog">
+      <view class="menu-item">
+        <text class="menu-icon">👁️</text>
+        <view class="menu-text">
+          <text class="menu-title">访客记录</text>
+          <text class="menu-desc">查看谁看过你的名片</text>
+        </view>
+        <view class="menu-badge" wx:if="{{newVisitorCount > 0}}">
+          <text class="menu-badge-text">{{newVisitorCount > 99 ? '99+' : newVisitorCount}}</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goTrustNetwork">
+      <view class="menu-item">
         <text class="menu-icon">🤝</text>
-        <text class="menu-label">信任网络</text>
-        <text class="menu-value">{{trustCount}}人</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goMember">
-        <text class="menu-icon">⭐</text>
-        <text class="menu-label">会员中心</text>
+        <view class="menu-text">
+          <text class="menu-title">信任网络</text>
+          <text class="menu-desc">人脉图谱 · 信任关系</text>
+        </view>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
-    <!-- 设置 -->
-    <view class="card menu-card">
-      <view class="menu-item" bindtap="goPrivacy">
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goMember">
+      <view class="menu-item">
+        <text class="menu-icon">💎</text>
+        <view class="menu-text">
+          <text class="menu-title">会员中心</text>
+          <text class="menu-desc">当前 {{memberLevelText}} 会员</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- ════════════════════════════════════════════
+         功能区: 设置
+         ════════════════════════════════════════════ -->
+    <view class="section-label">设置</view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goPrivacy">
+      <view class="menu-item">
         <text class="menu-icon">🔒</text>
-        <text class="menu-label">隐私设置</text>
+        <view class="menu-text">
+          <text class="menu-title">隐私设置</text>
+          <text class="menu-desc">管理隐私偏好与数据权限</text>
+        </view>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" bindtap="goAbout">
+    </view>
+
+    <view class="card glass-tier-2 menu-card spring-press" hover-class="spring-scale-mini" bindtap="goAbout">
+      <view class="menu-item">
         <text class="menu-icon">ℹ️</text>
-        <text class="menu-label">关于</text>
+        <view class="menu-text">
+          <text class="menu-title">关于</text>
+          <text class="menu-desc">AI数智名片 v1.0.0</text>
+        </view>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
-    <!-- 退出登录 -->
+    <!-- ════════════════════════════════════════════
+         退出登录
+         ════════════════════════════════════════════ -->
     <view class="logout-section">
-      <button class="btn-outline logout-btn" bindtap="logout">退出登录</button>
+      <button class="btn-outline logout-btn spring-press" hover-class="spring-scale-down" bindtap="logout">
+        退出登录
+      </button>
     </view>
 
+    <!-- 底部占位 -->
     <view class="bottom-placeholder"></view>
   </scroll-view>
 </view>

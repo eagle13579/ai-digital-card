@@ -22,6 +22,7 @@ from app.models.tag import MatchRecord
 from app.models.user import User
 from app.routers.auth import get_current_user
 from app.services.feedback_service import FeedbackAction, FeedbackResult, get_feedback_service
+from app.services.matching_client import MatchingClient
 from app.services.recommend_service import FeedbackRecommendation, RecommendService
 
 logger = logging.getLogger(__name__)
@@ -518,4 +519,180 @@ async def user_feedback_stats(
         unique_users=1,
         weight_cache_entries=1,
         adjust_threshold=loop.ADJUST_THRESHOLD,
+    )
+
+
+# ======================================================================
+# 企业推荐端点（匹配引擎 5090）
+# ======================================================================
+
+
+class EnterpriseRecommendRequest(BaseModel):
+    """企业推荐请求"""
+    product_name: str = Field(..., description="企业/产品名称")
+    industry: str = Field(..., description="所属行业")
+    intent: str = Field("cooperation", description="合作意向描述")
+    top_k: int = Field(10, ge=1, le=50, description="返回匹配数量")
+
+
+class EnterpriseRecommendResponse(BaseModel):
+    """企业推荐响应"""
+    items: list[dict] = Field(default_factory=list, description="匹配企业列表")
+    total: int = Field(0, description="总数")
+
+
+@router.post("/enterprise", response_model=EnterpriseRecommendResponse)
+async def enterprise_recommend(
+    data: EnterpriseRecommendRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """企业推荐 - 基于匹配引擎 (端口 5090)"""
+    client = MatchingClient()
+    try:
+        product = {
+            "name": data.product_name,
+            "industry": data.industry,
+            "tags": [data.industry],
+            "description": f"{data.product_name} - {data.industry}行业 - {data.intent}"
+        }
+        need = {
+            "intent": data.intent,
+            "requirements": f"寻找{data.industry}行业的合作伙伴"
+        }
+        items = await client.match(
+            product=product,
+            need=need,
+            top_k=data.top_k,
+        )
+        return EnterpriseRecommendResponse(
+            items=items,
+            total=len(items),
+        )
+    except Exception as e:
+        logger.error("企业推荐异常: %s", e)
+        return EnterpriseRecommendResponse(items=[], total=0)
+    finally:
+        await client.close()
+
+
+# ======================================================================
+# 企业评分端点（PrivateMatchEngine 芯森态 5080）
+# ======================================================================
+
+
+class EnterpriseScoreRequest(BaseModel):
+    """企业评分请求"""
+    enterprise_id: str = Field(..., description="企业/用户ID")
+    enterprise_name: str = Field(..., description="企业名称")
+
+
+class EnterpriseScoreResponse(BaseModel):
+    """企业评分响应"""
+    score: float = Field(0.0, description="综合评分")
+    dimensions: dict = Field(default_factory=dict, description="各维度评分详情")
+    summary: str = Field("", description="评分摘要/评估结论")
+
+
+PRIVATE_MATCH_ENGINE_BASE = "http://127.0.0.1:5080"
+
+
+@router.post("/enterprise-score", response_model=EnterpriseScoreResponse)
+async def enterprise_score(
+    data: EnterpriseScoreRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """企业评分 — 调用 PrivateMatchEngine (芯森态 :5080) 评分引擎
+
+    整合评分 + 企业信用两个数据源:
+      - GET  /api/score/user/{id}       — 六维评分详情
+      - GET  /api/credit/risk-report    — 企业风险报告 (含信用分)
+    """
+    import httpx
+
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        # ── 1. 评分详情 ──────────────────────────────────────────
+        score_data = {}
+        try:
+            resp = await client.get(
+                f"{PRIVATE_MATCH_ENGINE_BASE}/api/score/user/{data.enterprise_id}"
+            )
+            if resp.status_code == 200:
+                body = resp.json()
+                score_data = body.get("data", body)
+        except Exception as exc:
+            logger.warning("PrivateMatchEngine 评分详情调用失败: %s", exc)
+
+        # ── 2. 企业风险 / 信用报告 ────────────────────────────────
+        risk_data = {}
+        try:
+            resp = await client.get(
+                f"{PRIVATE_MATCH_ENGINE_BASE}/api/credit/risk-report",
+                params={"company_name": data.enterprise_name},
+            )
+            if resp.status_code == 200:
+                risk_data = resp.json()
+        except Exception as exc:
+            logger.warning("PrivateMatchEngine 风险报告调用失败: %s", exc)
+
+    # ── 3. 聚合打分 ─────────────────────────────────────────────
+    # 优先使用风险报告中的 credit_score
+    credit_score = float(risk_data.get("credit_score", 0) if isinstance(risk_data, dict) else 0)
+
+    # 从评分详情提取 total_score
+    total_score = 0.0
+    if isinstance(score_data, dict):
+        total_score = float(score_data.get("total_score", score_data.get("score", 0)))
+
+    # 综合评分: 取均值（若只有一个来源则直接用该值）
+    if credit_score > 0 and total_score > 0:
+        final_score = round((credit_score + total_score) / 2, 1)
+    elif credit_score > 0:
+        final_score = round(credit_score, 1)
+    elif total_score > 0:
+        final_score = round(total_score, 1)
+    else:
+        final_score = 0.0
+
+    # ── 4. 维度详情 ─────────────────────────────────────────────
+    dimensions = {}
+
+    # 从评分详情提取维度数据
+    if isinstance(score_data, dict):
+        details = score_data.get("details", score_data.get("dimensions", {}))
+        if isinstance(details, dict):
+            for dim, val in details.items():
+                if isinstance(val, dict):
+                    dimensions[dim] = val.get("raw", val.get("score", 0))
+                else:
+                    dimensions[dim] = val
+
+    # 从风险报告提取维度
+    if isinstance(risk_data, dict):
+        for k in ("risk_level", "risk_count", "lawsuit_count", "tax_grade", "credit_score"):
+            if k in risk_data and k not in dimensions:
+                dimensions[k] = risk_data[k]
+
+    # ── 5. 摘要 ──────────────────────────────────────────────────
+    if final_score >= 80:
+        verdict = "企业综合实力优秀，推荐优先合作"
+    elif final_score >= 60:
+        verdict = "企业综合实力良好，建议进一步考察后合作"
+    elif final_score > 0:
+        verdict = "企业综合实力一般，建议审慎评估"
+    else:
+        verdict = "暂未获取到评分数据，请稍后重试或联系管理员"
+
+    source_hint = []
+    if score_data:
+        source_hint.append("评分引擎")
+    if risk_data:
+        source_hint.append("企业信用")
+    source_str = f"（数据来源: {' + '.join(source_hint) if source_hint else '无'}）"
+
+    summary = f"{verdict}。综合评分 {final_score} 分，共 {len(dimensions)} 个评估维度。{source_str}"
+
+    return EnterpriseScoreResponse(
+        score=final_score,
+        dimensions=dimensions,
+        summary=summary,
     )

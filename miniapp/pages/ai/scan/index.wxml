@@ -1,6 +1,6 @@
 <view class="scan-page">
   <!-- 顶部导航 -->
-  <view class="scan-header">
+  <view class="scan-header" style="padding-top: {{statusBarHeight}}px">
     <view class="back-btn" bindtap="goBack">
       <text class="icon">‹</text>
     </view>
@@ -15,7 +15,16 @@
 
   <!-- 扫描区域（未识别时显示） -->
   <view class="scan-area" wx:if="{{!showResult && !analyzing}}">
+    <!-- AI原生暗色扫描框 — 渐变边框 + 四角标记 + 扫描线动画 -->
     <view class="scan-frame" bindtap="onScan">
+      <!-- 四角装饰 -->
+      <view class="corner-tl"></view>
+      <view class="corner-tr"></view>
+      <view class="corner-bl"></view>
+      <view class="corner-br"></view>
+      <!-- 动态扫描线 -->
+      <view class="scan-line"></view>
+      <!-- 中心内容 -->
       <view class="scan-camera-icon">📸</view>
       <text class="scan-hint">点击选择名片照片</text>
       <text class="scan-sub-hint">支持拍照或从相册选取</text>
@@ -25,19 +34,27 @@
     </view>
   </view>
 
-  <!-- 识别中加载动画 -->
+  <!-- 识别中 — AI分析动画（3层旋转Orb + spring动效） -->
   <view class="analyzing-section" wx:if="{{analyzing}}">
     <view class="analyzing-animation">
-      <view class="analyzing-spinner"></view>
-      <text class="analyzing-text">正在识别...</text>
-      <text class="analyzing-hint">AI智能分析名片信息中</text>
+      <view class="analyzing-orb">
+        <view class="analyzing-orb-glow"></view>
+        <view class="analyzing-ring analyzing-ring-1"></view>
+        <view class="analyzing-ring analyzing-ring-2"></view>
+        <view class="analyzing-ring analyzing-ring-3"></view>
+      </view>
+      <text class="analyzing-text">AI 智能识别中</text>
+      <text class="analyzing-hint">正在分析名片信息</text>
+      <text class="analyzing-confidence-text" wx:if="{{confidence}}">置信度 {{confidence}}%</text>
     </view>
   </view>
 
   <!-- AI识别结果 -->
   <view class="result-section" wx:if="{{showResult}}">
     <view class="section-title">
+      <view class="accent-dot"></view>
       <text>AI识别结果</text>
+      <text class="section-tag">{{confidence || 95}}% 匹配</text>
     </view>
     <view class="card-preview">
       <view class="card-field">
@@ -78,10 +95,11 @@
   <!-- 扫描历史 -->
   <view class="history-section" wx:if="{{!showResult && !analyzing}}">
     <view class="section-title">
+      <view class="accent-dot"></view>
       <text>最近扫描</text>
     </view>
     <view class="history-list" wx:if="{{scanHistory.length > 0}}">
-      <view class="history-item" wx:for="{{scanHistory}}" wx:key="index">
+      <view class="history-item" wx:for="{{scanHistory}}" wx:key="index" data-item="{{item}}">
         <view class="history-icon">📇</view>
         <view class="history-info">
           <text class="history-name">{{item.name}}</text>

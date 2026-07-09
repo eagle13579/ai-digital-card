@@ -20,16 +20,16 @@
     "pages/network/graph/index"
   ],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "AI数智名片",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f5f6fa"
+    "navigationBarBackgroundColor": "#0F0F13",
+    "backgroundColor": "#0A0A18"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1657ff",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "color": "#666677",
+    "selectedColor": "#a78bfa",
+    "backgroundColor": "#0F0F13",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -54,7 +54,10 @@
   "usingComponents": {
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
-    "empty-state": "/components/empty-state/index"
+    "empty-state": "/components/empty-state/index",
+    "scene-selector": "/components/scene-selector/index",
+    "network-mini-map": "/components/network-mini-map/index",
+    "chat-editor": "/components/chat-editor/index"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

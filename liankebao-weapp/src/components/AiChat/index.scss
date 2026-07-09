@@ -1,0 +1,12 @@
+.ai-chat {
+  display: flex; flex-direction: column; height: 100%;
+  &__msgs { flex: 1; padding: 16rpx; overflow-y: auto; }
+  &__msg { margin-bottom: 16rpx; max-width: 80%; padding: 12rpx 16rpx; border-radius: 12rpx; font-size: 26rpx; line-height: 1.5; }
+  &__msg--user { align-self: flex-end; background: #667eea; color: #fff; margin-left: auto; }
+  &__msg--assistant { align-self: flex-start; background: #f0f0f5; color: #333; }
+  &__txt { white-space: pre-wrap; }
+  &__typing { padding: 12rpx 16rpx; color: #999; font-size: 24rpx; }
+  &__bar { display: flex; padding: 12rpx; border-top: 1rpx solid #eee; background: #fff; }
+  &__inp { flex: 1; height: 72rpx; padding: 0 16rpx; border: 1rpx solid #ddd; border-radius: 36rpx; font-size: 26rpx; }
+  &__btn { flex-shrink: 0; margin-left: 12rpx; height: 72rpx; line-height: 72rpx; padding: 0 24rpx; background: #667eea; color: #fff; border-radius: 36rpx; font-size: 26rpx; }
+}

@@ -1,0 +1,276 @@
+/**
+ * 人脉链微地图样式 — NetworkMiniMap
+ * 深色主题 + 极小角标 + 弹窗动效
+ */
+
+.network-mini-map {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── 迷你角标 ── */
+.mini-badge {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mini-badge.hidden {
+  display: none;
+}
+
+.mini-badge.visible {
+  display: flex;
+}
+
+.mini-canvas {
+  display: block;
+  border-radius: 12rpx;
+  background: rgba(15, 15, 19, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.badge-tag {
+  margin-top: 4rpx;
+  padding: 2rpx 12rpx;
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
+  border-radius: 20rpx;
+  border: 1px solid var(--border-accent, rgba(139,92,246,0.25));
+}
+
+.badge-text {
+  font-size: 18rpx;
+  color: var(--text-accent, #a78bfa);
+  font-weight: 500;
+}
+
+/* ── 加载态 ── */
+.mini-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 0;
+  gap: 6rpx;
+}
+
+.loading-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--purple, #8b5cf6);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ── 弹窗覆盖层 ── */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-card {
+  width: 650rpx;
+  max-width: 90%;
+  background: var(--bg-elevated, #0F0F13);
+  border-radius: 28rpx;
+  overflow: hidden;
+  border: 1px solid var(--border-default, rgba(255,255,255,0.10));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.15);
+  animation: popupEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popupEnter {
+  0% { opacity: 0; transform: scale(0.85) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.popup-title {
+  font-size: var(--text-lg, 32rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+}
+
+.popup-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  font-size: 28rpx;
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
+}
+
+.popup-close:active {
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
+}
+
+.popup-canvas-wrap {
+  padding: 0 32rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.expand-canvas {
+  display: block;
+  border-radius: 12rpx;
+}
+
+/* ── 路径列表 ── */
+.path-list {
+  padding: 16rpx 32rpx 32rpx;
+}
+
+.path-node {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  margin-bottom: 8rpx;
+  border-radius: 12rpx;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  transition: background 150ms ease;
+}
+
+.path-node:active {
+  background: var(--bg-glass-2, rgba(255,255,255,0.07));
+}
+
+.path-node-indicator {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.path-node-indicator.start {
+  background: #06b6d4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+}
+
+.path-node-indicator.mid {
+  background: rgba(139, 92, 246, 0.5);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.path-node-indicator.end {
+  background: #a78bfa;
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+}
+
+.path-node-info {
+  flex: 1;
+}
+
+.path-node-name {
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  font-weight: 500;
+}
+
+.path-node-rel {
+  font-size: var(--text-xs, 20rpx);
+  color: var(--text-tertiary, rgba(255,255,255,0.40));
+  margin-left: 12rpx;
+}
+
+/* ── 中间人预览浮层 ── */
+.node-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-preview-card {
+  width: 480rpx;
+  background: var(--bg-elevated, #0F0F13);
+  border-radius: 24rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--border-default, rgba(255,255,255,0.10));
+  animation: popupEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.preview-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: var(--bg-glass-3, rgba(139,92,246,0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+}
+
+.preview-avatar-text {
+  font-size: 48rpx;
+}
+
+.preview-name {
+  font-size: var(--text-xl, 36rpx);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255,255,255,0.92));
+  margin-bottom: 12rpx;
+}
+
+.preview-relation,
+.preview-trust {
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  margin-bottom: 8rpx;
+}
+
+.preview-footer {
+  margin-top: 24rpx;
+  width: 100%;
+}
+
+.preview-close-btn {
+  width: 100%;
+  padding: 20rpx 0;
+  background: var(--bg-glass-1, rgba(255,255,255,0.04));
+  border-radius: 16rpx;
+  font-size: var(--text-base, 28rpx);
+  color: var(--text-secondary, rgba(255,255,255,0.65));
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+  text-align: center;
+}
