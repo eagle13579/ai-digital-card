@@ -600,7 +600,7 @@
   display: flex;
   align-items: center;
   padding: 40rpx;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(30, 30, 40, 0.88);
   backdrop-filter: blur(8px);
 }
 
@@ -611,7 +611,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(40, 40, 55, 0.85);
   border-radius: 28rpx;
   margin-right: 28rpx;
   flex-shrink: 0;

@@ -400,13 +400,13 @@ const TEST_VISITOR_STATS = {
 
 const TEST_TRUST_NETWORK = {
   trusting: [
-    { id: 't001', name: '张三', avatar: '', relation: '同事', trustScore: 95 },
-    { id: 't002', name: '李四', avatar: '', relation: '校友', trustScore: 88 },
-    { id: 't003', name: '王五', avatar: '', relation: '合作伙伴', trustScore: 92 },
+    { id: 't001', name: '张三', avatar: '', relation: '同事', trustScore: 95, brochureId: 'b001' },
+    { id: 't002', name: '李四', avatar: '', relation: '校友', trustScore: 88, brochureId: 'b002' },
+    { id: 't003', name: '王五', avatar: '', relation: '合作伙伴', trustScore: 92, brochureId: 'b003' },
   ],
   trusted_by: [
-    { id: 't004', name: '赵六', avatar: '', relation: '下属', trustScore: 90 },
-    { id: 't005', name: '孙七', avatar: '', relation: '朋友', trustScore: 85 },
+    { id: 't004', name: '赵六', avatar: '', relation: '下属', trustScore: 90, brochureId: 'b001' },
+    { id: 't005', name: '孙七', avatar: '', relation: '朋友', trustScore: 85, brochureId: 'b002' },
   ],
 }
 

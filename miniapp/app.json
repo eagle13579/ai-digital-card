@@ -17,7 +17,8 @@
     "pages/ai/insight/index",
     "pages/ai/config/index",
     "pages/membership/membership",
-    "pages/network/graph/index"
+    "pages/network/graph/index",
+    "pages/qrcode/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",

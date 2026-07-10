@@ -483,7 +483,13 @@ Page({
       const deltaY = Math.abs(e.changedTouches[0].y - this.tapStartY)
       if (deltaX < 10 && deltaY < 10 && this.tapTarget) {
         const node = this.tapTarget
-        wx.navigateTo({ url: `/pages/card/card?id=${node.id}` })
+        // 中心节点（"我"）不跳转
+        if (node.isMe) return
+        // 提取真实联系人ID（node.id格式为 c-{contactId}）
+        const contactId = node._contact?.brochureId || node._contact?.id
+        if (contactId) {
+          wx.navigateTo({ url: `/pages/card/card?id=${contactId}` })
+        }
       }
     }
   },

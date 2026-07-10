@@ -19,7 +19,7 @@ BASE_URL = "http://localhost:8201"
 ENDPOINTS = [
     "/api/v1/health",
     "/api/v1/payment/products",
-    "/api/v1/nfc/tap/stats",
+    "/api/v1/nfc/stats",
 ]
 FAILURE_THRESHOLD = 3  # consecutive failures before CRITICAL
 WATCH_INTERVAL = 60    # seconds between checks in --watch mode
