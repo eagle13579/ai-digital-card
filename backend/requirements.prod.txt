@@ -1,6 +1,3 @@
-# AI数智名片核心依赖
-# 私有包(需内部源安装): chainke-auth-service, liankebao-payment-sdk
-
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 sqlalchemy>=2.0.0
@@ -24,10 +21,6 @@ numpy>=1.24.0
 # 缓存
 redis>=5.0.0
 
-# PostgreSQL生产环境(可选,默认SQLite开发): asyncpg, psycopg2-binary
-# 高性能异步PG驱动: pip install asyncpg (配合 postgresql+asyncpg://)
-# psycopg 3异步引擎: pip install psycopg[binary] psycopg_pool (配合 postgresql+psycopg://)
-
 # QR码 / NFC 分享
 qrcode[pil]>=7.4.0
 
@@ -41,3 +34,6 @@ opentelemetry-api>=1.24.0
 opentelemetry-sdk>=1.24.0
 opentelemetry-instrumentation-fastapi>=0.45b0
 # opentelemetry-exporter-otlp-proto-http>=1.24.0  # 按需取消注释以启用 OTLP 导出
+
+# 零依赖降级后端 — numpy 已通过 requirements.txt 的 numpy 安装
+numpy>=1.24.0

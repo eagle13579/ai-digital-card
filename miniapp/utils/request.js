@@ -4,6 +4,7 @@
  */
 
 // API baseURL
+<<<<<<< Updated upstream
 // 从 app.globalData.apiBaseUrl 读取（由 config/config.js 统一管理）
 // 开发环境: http://127.0.0.1:8002
 // 生产环境: https://api.liankebao.top
@@ -16,6 +17,24 @@ try {
 } catch (e) {
   // app 未初始化时使用默认值
 }
+=======
+// 微信小程序API基础URL — 自动检测环境
+// 开发工具中用本机IP，真机调试用实际服务器地址
+const API_BASE_URL = (function() {
+  // 微信开发者工具中可以用 localhost 或本机IP
+  // 真机/预览时必须用实际IP或域名
+  const PROD_API = 'https://liankebao.top'   // 生产环境
+  const DEV_IP = '192.168.7.48'              // 开发环境IP
+  const DEV_PORT = '8201'
+  
+  try {
+    if (typeof __wxConfig !== 'undefined' && __wxConfig && __wxConfig.envVersion === 'develop') {
+      return `http://${DEV_IP}:${DEV_PORT}`
+    }
+  } catch(e) {}
+  return PROD_API
+})()
+>>>>>>> Stashed changes
 
 // 请求超时时间(ms)
 const REQUEST_TIMEOUT = 8000
