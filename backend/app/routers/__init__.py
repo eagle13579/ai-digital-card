@@ -37,6 +37,14 @@ from app.crm.crm_router import router as crm_router
 from app.routers.bot_router import router as bot_router
 from app.routers.document import router as document_router
 from app.routers.analytics import router as analytics_router
+from app.routers.social_connect_router import router as social_connect_router
+from app.routers.resource_platform_router import router as resource_platform_router
+from app.routers.nfc import router as nfc_router
+from app.routers.token_pricing_router import router as token_pricing_router
+from app.routers.membership import router as membership_router
+from app.routers.health import router as health_router
+from app.routers.metrics_dashboard import router as metrics_dashboard_router
+
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -76,4 +84,12 @@ __all__ = [
     "bot_router",
     "document_router",
     "analytics_router",
+    "social_connect_router",
+    "resource_platform_router",
+    "nfc_router",
+    "token_pricing_router",
+    "membership_router",
+    "health_router",
+    "metrics_dashboard_router",
+
 ]

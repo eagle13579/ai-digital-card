@@ -3,7 +3,7 @@ AI数字名片 检索增强生成(RAG)管道
 =================================
 从向量搜索升级为完整的RAG管道，包含：
   1. 上下文构建（向量搜索结果 + 用户画像 + 关系图谱）
-  2. DeepSeek API 调用（流式/非流式）
+  2. AI Gateway 模型路由（DeepSeek -> Cache -> Ollama 降级链）
   3. 源引用追踪（每个回复片段关联原始数据源）
   4. 支持多轮对话上下文
 
@@ -11,6 +11,7 @@ AI数字名片 检索增强生成(RAG)管道
   - vector_search.py 提供向量搜索
   - knowledge_graph.py 提供关系图谱上下文
   - config.py 中 DEEPSEEK_API_KEY / DEEPSEEK_API_URL
+  - app.ai.gateway.model_registry.ModelRegistry 提供多模型降级路由
 """
 
 import json
@@ -72,6 +73,16 @@ class RAGResponse:
     confidence: float = 0.0
     model_used: str = "deepseek-chat"
     tokens_used: int = 0
+    provider: str = "deepseek"
+    degraded: bool = False
+    # ── Hybrid/SAG enrichment fields (fusion_mode != "rag_only" 时填充) ──
+    analysis: Optional[str] = None
+    reasoning_chain: Optional[list] = None
+    suggestions: Optional[list] = None
+    has_correction: bool = False
+    pipeline: str = "rag_only"
+    rag_confidence: Optional[float] = None
+    sag_confidence: Optional[float] = None
 
     def to_dict(self) -> dict:
         return {
@@ -80,6 +91,15 @@ class RAGResponse:
             "confidence": self.confidence,
             "model_used": self.model_used,
             "tokens_used": self.tokens_used,
+            "provider": self.provider,
+            "degraded": self.degraded,
+            "analysis": self.analysis,
+            "reasoning_chain": self.reasoning_chain,
+            "suggestions": self.suggestions,
+            "has_correction": self.has_correction,
+            "pipeline": self.pipeline,
+            "rag_confidence": self.rag_confidence,
+            "sag_confidence": self.sag_confidence,
         }
 
 
@@ -89,7 +109,11 @@ class RAGResponse:
 
 
 class DeepSeekClient:
-    """DeepSeek API 客户端 - 支持非流式和流式调用"""
+    """DeepSeek API 客户端 - 支持非流式和流式调用
+
+    注意：新代码应优先使用 ModelRegistry，DeepSeekClient 仅作为
+    向后兼容的兜底方案保留。
+    """
 
     BASE_URL: str = settings.DEEPSEEK_API_URL or "https://api.deepseek.com/v1/chat/completions"
     API_KEY: str = settings.DEEPSEEK_API_KEY or ""
@@ -131,6 +155,10 @@ class DeepSeekClient:
             流式: AsyncGenerator[str, None] 逐块产出文本
         """
         from app.middleware.metrics import track_ai_inference
+        from app.ai.metrics_collector import record_ai_call
+
+        import time as _time
+        _start = _time.monotonic()
 
         with track_ai_inference(model_name=model):
             session = await self._get_session()
@@ -147,18 +175,34 @@ class DeepSeekClient:
                     if resp.status != 200:
                         error_text = await resp.text()
                         logger.error(f"DeepSeek API error (status={resp.status}): {error_text}")
+                        _latency = (_time.monotonic() - _start) * 1000
+                        record_ai_call(model_name=model, tokens=0, latency_ms=_latency, is_error=True)
                         return {"error": f"API调用失败: {resp.status}", "detail": error_text}
 
                     if stream:
                         return self._stream_response(resp)
 
                     data = await resp.json()
-                    return self._parse_response(data)
+                    result = self._parse_response(data)
+                    # 记录 token 用量和延迟
+                    _latency = (_time.monotonic() - _start) * 1000
+                    tokens_used = result.get("tokens_used", 0) if isinstance(result, dict) else 0
+                    record_ai_call(
+                        model_name=model,
+                        tokens=tokens_used,
+                        latency_ms=_latency,
+                        is_error=bool(result.get("error")) if isinstance(result, dict) else False,
+                    )
+                    return result
             except aiohttp.ClientError as e:
                 logger.error(f"DeepSeek API network error: {e}")
+                _latency = (_time.monotonic() - _start) * 1000
+                record_ai_call(model_name=model, tokens=0, latency_ms=_latency, is_error=True)
                 return {"error": f"网络错误: {str(e)}"}
             except Exception as e:
                 logger.error(f"DeepSeek API unexpected error: {e}")
+                _latency = (_time.monotonic() - _start) * 1000
+                record_ai_call(model_name=model, tokens=0, latency_ms=_latency, is_error=True)
                 return {"error": f"未知错误: {str(e)}"}
 
     async def _stream_response(self, resp: aiohttp.ClientResponse) -> AsyncGenerator[str, None]:
@@ -315,7 +359,21 @@ class ContextBuilder:
     def build_system_prompt(context: RAGContext) -> str:
         """构建系统提示词"""
         prompt_parts = [
-            "你是一个AI数字名片的智能助手，帮助用户分析商业匹配、提供推荐建议。",
+            '你是「AI数字名片」智能助手，帮助用户管理数字名片、建立人脉连接、分析商业匹配。',
+            '',
+            '【场景化引导路由】',
+            '根据用户输入的关键词，按以下场景分类回答：',
+            '- 用户问「怎么用」「如何使用」「教程」「指南」 → 优先返回名片功能全览和操作教程，分步骤引导',
+            '- 用户问「名片」「创建」「编辑」「修改」「模板」 → 优先返回名片创建和编辑步骤，介绍名片模板功能',
+            '- 用户问「人脉」「匹配」「推荐」「找人」「找」「搜索」 → 优先返回人脉匹配和推荐机制说明，展示匹配结果',
+            '- 用户问「信任」「验证」「安全」「靠谱」 → 优先返回信任网络、实名验证和隐私保护机制说明',
+            '- 用户问「扫码」「添加」「建联」「连接」「联系」 → 优先返回扫码建联流程和人脉触达路径',
+            '- 用户问「订阅」「付费」「Token」「套餐」「价格」「会员」 → 优先返回定价方案和订阅说明',
+            '- 用户问「关系」「关系网」「社交」「好友」 → 优先返回关系图谱和社交网络说明',
+            '- 用户问「平台」「功能」「能做什么」「介绍」 → 优先返回平台功能全景介绍',
+            '- 默认 → 返回通用帮助和功能导航，附上核心功能快捷入口',
+            '每个场景回复使用Markdown格式，包含具体操作步骤和功能入口。如果检索到的信息与场景相关，优先使用检索信息增强回复。',
+            "",
             "请使用以下检索到的信息来回答问题。如果信息不足，请如实说明。",
             "回答时请附上信息来源引用，格式为 [来源: 类型/名称]。",
             "",
@@ -485,13 +543,28 @@ class HyDEQueryTransformer:
 
 
 class RAGPipeline:
-    """检索增强生成管道 - 整合搜索 + 上下文 + LLM 生成"""
+    """检索增强生成管道 - 整合搜索 + 上下文 + LLM 生成
 
-    def __init__(self, db: AsyncSession):
+    使用 ModelRegistry 进行多模型路由（DeepSeek -> Cache -> Ollama 降级链），
+    DeepSeekClient 保留为向后兼容兜底。
+    """
+
+    def __init__(self, db: AsyncSession, fusion_mode: str = "rag_only"):
         self.db = db
         self.deepseek = DeepSeekClient()
         self.context_builder = ContextBuilder()
         self.hyde_transformer = HyDEQueryTransformer(self.deepseek)
+        self.fusion_mode = fusion_mode  # "rag_only" | "rag_with_sag" | "hybrid"
+        if fusion_mode in ("rag_with_sag", "hybrid"):
+            from app.ai.sag_pipeline import SAGPipeline
+            self.sag = SAGPipeline()
+        # ModelRegistry: 多模型降级路由（DeepSeek -> Cache -> Ollama）
+        # 使用延迟导入避免循环依赖
+        from app.ai.gateway.model_registry import ModelRegistry
+        self.model_registry = ModelRegistry(
+            deepseek_api_key=settings.DEEPSEEK_API_KEY,
+            deepseek_base_url=settings.DEEPSEEK_API_URL,
+        )
 
     async def query(
         self,
@@ -556,13 +629,68 @@ class RAGPipeline:
         # 添加用户当前问题
         messages.append({"role": "user", "content": query_text})
 
-        # 4. 调用 DeepSeek API
-        response = await self.deepseek.chat(
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=False,
-        )
+        # 4. 通过 ModelRegistry 调用 AI（DeepSeek -> Cache -> Ollama 降级链）
+        provider = "deepseek"
+        degraded = False
+
+        from app.middleware.metrics import track_ai_inference
+        from app.ai.metrics_collector import record_ai_call
+
+        try:
+            with track_ai_inference(model_name="deepseek-chat-rag"):
+                # 尝试使用 ModelRegistry 路由
+                from app.ai.gateway.interfaces import AIRequest
+
+                ai_request = AIRequest(
+                    model="deepseek-chat",
+                    prompt=system_prompt,
+                    messages=messages[1:],  # 排除 system prompt（已单独传入）
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    stream=False,
+                )
+                gateway_response, provider = await self.model_registry.route(ai_request)
+                answer = gateway_response.content
+                tokens_used = gateway_response.usage.get("total_tokens", 0)
+                degraded = (provider != "deepseek")
+                model_used = gateway_response.model
+
+        except Exception as gateway_error:
+            # ModelRegistry 降级链全部失败，回退到 DeepSeekClient 兜底
+            logger.warning(
+                f"ModelRegistry fallback chain exhausted: {gateway_error}. "
+                "Falling back to DeepSeekClient."
+            )
+            with track_ai_inference(model_name="deepseek-chat-rag-fallback"):
+                legacy_response = await self.deepseek.chat(
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    stream=False,
+                )
+            answer = legacy_response.get("content", "") if isinstance(legacy_response, dict) else str(legacy_response)
+            error = legacy_response.get("error", "") if isinstance(legacy_response, dict) else ""
+            tokens_used = legacy_response.get("tokens_used", 0) if isinstance(legacy_response, dict) else 0
+            model_used = "deepseek-chat"
+            provider = "deepseek_legacy"
+
+            if error:
+                logger.warning(f"RAG pipeline LLM error (DeepSeekClient fallback): {error}")
+                # 降级: 直接返回向量搜索结果
+                answer = self._fallback_answer(context)
+                degraded = True
+                record_ai_call(model_name="deepseek-chat-rag", tokens=0, latency_ms=0, is_error=True)
+            else:
+                record_ai_call(model_name="deepseek-chat-rag", tokens=tokens_used, latency_ms=0, is_error=False)
+
+        else:
+            # ModelRegistry 成功 — 记录指标
+            record_ai_call(
+                model_name=f"deepseek-chat-rag",
+                tokens=tokens_used,
+                latency_ms=0,
+                is_error=False,
+            )
 
         # 5. 构建源引用
         sources = []
@@ -585,21 +713,25 @@ class RAGPipeline:
                 })
 
         # 6. 生成 RAG 响应
-        answer = response.get("content", "") if isinstance(response, dict) else str(response)
-        error = response.get("error", "") if isinstance(response, dict) else ""
-
-        if error:
-            logger.warning(f"RAG pipeline LLM error: {error}")
-            # 降级: 直接返回向量搜索结果
-            answer = self._fallback_answer(context)
-
-        return RAGResponse(
+        response = RAGResponse(
             answer=answer,
             sources=sources,
-            confidence=0.9 if not error else 0.5,
-            model_used="deepseek-chat",
-            tokens_used=response.get("tokens_used", 0) if isinstance(response, dict) else 0,
+            confidence=0.9 if not degraded else 0.5,
+            model_used=model_used,
+            tokens_used=tokens_used,
+            provider=provider,
+            degraded=degraded,
         )
+
+        # 7. 可选: SAG 后处理校验（fusion_mode="rag_with_sag" 或 "hybrid"）
+        if self.fusion_mode in ("rag_with_sag", "hybrid"):
+            response = await self._apply_sag_post_process(
+                response=response,
+                query_text=query_text,
+                temperature=temperature,
+            )
+
+        return response
 
     def _fallback_answer(self, context: RAGContext) -> str:
         """降级方案：当 LLM 不可用时，基于检索结果生成结构化回复"""
@@ -620,6 +752,146 @@ class RAGPipeline:
                 parts.append(f"  {j}. {ms.get('name', '?')} - {ms.get('company', '?')} - 分数: {ms.get('match_score', 0):.2f}")
 
         return "\n".join(parts)
+
+    async def _apply_sag_post_process(
+        self,
+        response: RAGResponse,
+        query_text: str,
+        temperature: float,
+    ) -> RAGResponse:
+        """SAG 后处理: 对 RAG 结果进行自校验/逻辑补全
+
+        当 fusion_mode="rag_with_sag" 时: 仅做快速矛盾检测
+        当 fusion_mode="hybrid" 时: 完整执行 RAG→SAG 融合流程
+        """
+        if not hasattr(self, 'sag'):
+            return response
+
+        # 记录原始 RAG 置信度
+        response.rag_confidence = response.confidence
+
+        # 如果 RAG 完全不可用（LLM 降级），跳过 SAG
+        if response.confidence < 0.3:
+            response.pipeline = "rag_only"
+            return response
+
+        from app.ai.sag_pipeline import SAGMode, SAGDepth, SAGResponse
+
+        # Phase 1: 快速矛盾检测（所有 fusion_mode 均执行）
+        sag_check: SAGResponse = await self.sag.analyze(
+            mode=SAGMode.CONTRADICTION_DETECT,
+            content={
+                "query": query_text,
+                "rag_answer": response.answer[:1000],
+                "rag_sources": response.sources[:5],
+                "rag_confidence": response.confidence,
+            },
+            depth=SAGDepth.FAST,
+            temperature=0.3,
+        )
+
+        # Phase 2: 判断是否需要修正
+        needs_correction = self._fusion_should_correct(response, sag_check)
+
+        if self.fusion_mode == "rag_with_sag":
+            # 仅记录校验结果, 不修改回答
+            response.has_correction = needs_correction
+            response.sag_confidence = sag_check.confidence if hasattr(sag_check, 'confidence') else 0.0
+            response.pipeline = "rag_with_sag"
+            response.analysis = sag_check.conclusion if sag_check.reasoning_chain else None
+            return response
+
+        # fusion_mode == "hybrid": 执行完整融合流程
+        # Phase 3: 如需修正, 做深度推理
+        sag_reasoning: SAGResponse | None = None
+        reasoning_depth: SAGDepth = SAGDepth.STANDARD
+        if needs_correction or query_text.lower().startswith(("为什么", "怎么", "如何", "哪个")):
+            reasoning_mode = self._detect_reasoning_mode(query_text)
+            sag_reasoning = await self.sag.analyze(
+                mode=reasoning_mode,
+                content={
+                    "query": query_text,
+                    "rag_answer": response.answer[:1500],
+                    "rag_sources": response.sources[:5],
+                },
+                depth=reasoning_depth,
+                temperature=temperature,
+            )
+            # 用 SAG 推理结论补充 RAG 答案
+            if sag_reasoning.conclusion:
+                response.answer += f"\n\n【推理分析】\n{sag_reasoning.conclusion}"
+
+        # Phase 4: 融合输出
+        use_correction = needs_correction
+        merged = self._fusion_merge(response, sag_reasoning or sag_check, use_correction)
+
+        # 将融合结果写回 response
+        response.has_correction = merged.get("has_correction", needs_correction)
+        response.analysis = merged.get("analysis")
+        response.reasoning_chain = merged.get("reasoning_chain")
+        response.suggestions = merged.get("suggestions")
+        response.pipeline = merged.get("pipeline", "hybrid")
+        response.sag_confidence = merged.get("sag_confidence", 0.0)
+        if use_correction:
+            response.confidence = merged.get("confidence", response.confidence)
+
+        return response
+
+    def _fusion_should_correct(self, rag: RAGResponse, sag) -> bool:
+        """判断是否需要用 SAG 结果修正 RAG 输出"""
+        # 1. RAG 自身置信度低
+        if rag.confidence < 0.6:
+            return True
+        # 2. SAG 检测到矛盾
+        sag_score = sag.score if hasattr(sag, 'score') and sag.score is not None else 100
+        if sag_score < 40:
+            return True
+        # 3. SAG 置信度显著高于 RAG
+        sag_conf = sag.confidence if hasattr(sag, 'confidence') and sag.confidence is not None else 0.0
+        if sag_conf > rag.confidence + 0.2:
+            return True
+        return False
+
+    def _fusion_merge(self, rag: RAGResponse, sag, use_correction: bool) -> dict:
+        """融合 RAG 和 SAG 结果为一个统一 dict"""
+        sag_conclusion = sag.conclusion if hasattr(sag, 'conclusion') else None
+        sag_reasoning = [s.to_dict() for s in sag.reasoning_chain] if hasattr(sag, 'reasoning_chain') and sag.reasoning_chain else None
+        sag_suggestions = sag.suggestions if hasattr(sag, 'suggestions') else None
+        sag_conf = sag.confidence if hasattr(sag, 'confidence') and sag.confidence is not None else 0.0
+        sag_score = sag.score if hasattr(sag, 'score') and sag.score is not None else 100
+
+        merged: dict = {
+            "analysis": sag_conclusion if sag_reasoning else None,
+            "reasoning_chain": sag_reasoning,
+            "confidence": max(rag.confidence, sag_conf) if use_correction else rag.confidence,
+            "suggestions": sag_suggestions,
+            "has_correction": use_correction,
+            "pipeline": "hybrid",
+            "rag_confidence": rag.confidence,
+            "sag_confidence": sag_conf,
+        }
+
+        if use_correction and sag_score < 50:
+            rag.answer += f"\n\n[逻辑校验提示] 推理引擎发现部分信息可能需要进一步确认，建议多方核实。"
+
+        return merged
+
+    def _detect_reasoning_mode(self, query: str):
+        """根据查询内容自动选择 SAG 推理模式"""
+        from app.ai.sag_pipeline import SAGMode
+        q = query.lower()
+        if any(kw in q for kw in ["推荐", "哪个", "谁更", "比较", "哪个更"]):
+            return SAGMode.EXPLAIN_RECOMMEND
+        elif any(kw in q for kw in ["匹配", "合作", "互补", "对接", "供需"]):
+            return SAGMode.MATCHING_REASONING
+        elif any(kw in q for kw in ["信任", "可靠", "靠谱", "风险"]):
+            return SAGMode.TRUST_INFERENCE
+        elif any(kw in q for kw in ["优化", "改进", "建议", "怎么改"]):
+            return SAGMode.OPTIMIZE_SUGGEST
+        elif any(kw in q for kw in ["质量", "评审", "打分", "评价"]):
+            return SAGMode.QUALITY_REVIEW
+        else:
+            return SAGMode.EXPLAIN_RECOMMEND
 
     async def query_stream(
         self,
@@ -678,3 +950,4 @@ class RAGPipeline:
 
     async def close(self):
         await self.deepseek.close()
+        await self.model_registry.close()

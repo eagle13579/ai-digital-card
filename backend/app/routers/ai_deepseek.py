@@ -67,11 +67,10 @@ class StatusResponse(BaseModel):
 # ── 辅助函数 ──────────────────────────────────────────────────────────
 
 def _get_api_key() -> str:
-    """从配置获取 DeepSeek API Key（同时检查环境变量以支持 .env 来源）"""
-    key = settings.DEEPSEEK_API_KEY or ""
-    if not key:
-        import os
-        key = os.environ.get("DEEPSEEK_API_KEY", "")
+    """从密钥管理器获取 DeepSeek API Key。"""
+    from app.config import settings
+    from key_manager import SecretManager
+    key = settings.DEEPSEEK_API_KEY or SecretManager().get("DEEPSEEK_API_KEY", "")
     return key.strip()
 
 
@@ -264,7 +263,7 @@ async def deepseek_status():
         return StatusResponse(
             status="error",
             configured=False,
-            message="DEEPSEEK_API_KEY 未配置，请在 .env 文件中设置",
+            message="DEEPSEEK_API_KEY 未配置，请通过环境变量或 SecretManager 设置",
         )
 
     headers = {

@@ -23,6 +23,8 @@ from app.crm.crm_models import (
     CrmWorkflowRule,
     CrmWorkflowLog,
 )
+from app.crm.email_campaign import EmailCampaign
+from app.crm.customer_journey import CustomerJourneyStage
 from app.crm.crm_service import CrmService
 from app.crm.crm_analytics import CrmAnalyticsService
 from app.crm.workflow_engine import WorkflowEngine, test_rule_execution, PRESET_RULES
@@ -48,6 +50,8 @@ __all__ = [
     "CrmNote",
     "CrmWorkflowRule",
     "CrmWorkflowLog",
+    "EmailCampaign",
+    "CustomerJourneyStage",
     "CrmService",
     "CrmAnalyticsService",
     "WorkflowEngine",

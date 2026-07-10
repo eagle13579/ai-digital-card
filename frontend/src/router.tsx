@@ -11,6 +11,7 @@ const PricingPageLazy = lazy(() => import('./pages/PricingPage'));
 const PaymentCallbackLazy = lazy(() => import('./pages/PaymentCallback'));
 const ABTestingPageLazy = lazy(() => import('./pages/ABTestingPage'));
 const GDPRSettingsLazy = lazy(() => import('./pages/GDPRSettings'));
+const HealthDashboardPageLazy = lazy(() => import('./pages/HealthDashboardPage'));
 
 // 新多页面 SPA 架构页面
 const DashboardPageLazy = lazy(() => import('./pages/DashboardPage'));
@@ -251,6 +252,14 @@ export default function AppRoutes() {
         element={
           <LazyPage skeletonMode="detail">
             <GDPRSettingsLazy />
+          </LazyPage>
+        }
+      />
+      <Route
+        path="/health"
+        element={
+          <LazyPage skeletonMode="card" skeletonCount={4}>
+            <Layout><HealthDashboardPageLazy /></Layout>
           </LazyPage>
         }
       />

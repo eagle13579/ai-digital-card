@@ -42,6 +42,7 @@ class Team(Base):
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, comment="创建者/所有者")
     max_members: Mapped[int] = mapped_column(Integer, default=50, comment="最大成员数")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, comment="是否启用")
+    visibility: Mapped[str] = mapped_column(String(20), default="public", comment="可见性: public/platform/network/private")
 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())

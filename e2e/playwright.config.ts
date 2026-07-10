@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   use: {
-    baseURL: process.env.BASE_URL || "http://localhost:8201",
+    baseURL: process.env.BASE_URL || "http://localhost:8002",
     trace: "on-first-retry",
     extraHTTPHeaders: {
       "Content-Type": "application/json",

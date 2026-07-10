@@ -1,4 +1,6 @@
+import asyncio
 import json
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -7,13 +9,19 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.vector_search import VectorSearchEngine
+from app.agents.agent_runtime import AgentRuntime
 from app.database import get_db
+from app.dependencies import get_agent_runtime
 from app.models.tag import MatchRecord, UserTag
 from app.models.user import User, UnlockRecord
 from app.routers.auth import get_current_user
 from app.routers.brochure import SmartSearchQuery, SmartSearchResponse, execute_smart_search
 from app.routers.brochure import PURPOSE_TEMPLATES, PurposeTemplateResponse
 from app.schemas import MatchResponse, MatchAction, UnlockRequest, UnlockResponse
+from app.services.social_connect_service import SocialConnectService
+from app.services.social_match_service import SocialMatchService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/match", tags=["匹配"])
 
@@ -88,13 +96,55 @@ def _is_paid_member(user: User) -> bool:
     return False
 
 
+# ── Agent 通知函数（异步非阻塞） ──────────────────────────────────────
+
+
+async def _notify_growth_agent(
+    agent_runtime: AgentRuntime,
+    user_id: int,
+    match_count: int,
+    top_scores: list[float],
+) -> None:
+    """异步通知 GrowthAgent 记录匹配事件，用于 A/B 分析和优化建议。
+
+    非阻塞 — Agent 报错不会影响主 API 响应。
+    """
+    try:
+        growth = agent_runtime.get_agent("growth")
+        if growth is None:
+            logger.warning("GrowthAgent not found, skipping match event notification")
+            return
+        # 通过 handle_event 发送匹配事件，让 GrowthAgent 进行分析
+        await growth.handle_event({
+            "type": "match.engine.completed",
+            "user_id": user_id,
+            "match_count": match_count,
+            "top_scores": top_scores,
+        })
+        logger.info("GrowthAgent notified: user_id=%s, matches=%d", user_id, match_count)
+    except Exception:
+        logger.exception("GrowthAgent notification failed (non-blocking, safe to ignore)")
+
+
 @router.post("/engine")
 async def run_match_engine(
     min_score: float = Query(0.3, description="最低匹配分数"),
+    social: bool = Query(True, description="启用社交路径加权排序（默认开启，false=纯属性匹配）"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    agent_runtime: AgentRuntime = Depends(get_agent_runtime),
 ):
-    """匹配引擎：基于标签供需关系计算用户匹配度"""
+    """匹配引擎：属性匹配 + BFS社交路径加权排序（全面替换）
+
+    匹配流程：
+      1. 属性匹配：基于标签供需关系（provide→need）计算初始分数
+      2. BFS社交路径增强（social=true，默认）：
+         - 对每个候选计算社交距离（BFS，最多3度）
+         - social_score = 1.0 / distance（距离越近分越高）
+         - final_score = attribute_score × 0.6 + social_score × 0.4
+      3. 综合排序：按 final_score 降序排列
+      4. social=false 时回退纯属性匹配（兼容旧前端）
+    """
     # 获取当前用户的 provide 和 need 标签
     result = await db.execute(
         select(UserTag).where(
@@ -143,7 +193,7 @@ async def run_match_engine(
 
         if score >= min_score:
             desensitized = _desensitize_user(other, viewer_is_free)
-            matches.append({
+            match_item = {
                 "user_id": other.id,
                 "user_name": desensitized["name"],
                 "user_company": desensitized["company"],
@@ -152,9 +202,38 @@ async def run_match_engine(
                 "user_phone_masked": desensitized["phone"],
                 "score": round(score, 2),
                 "common_tags": common_tags,
-            })
+            }
 
-    matches.sort(key=lambda x: x["score"], reverse=True)
+            # ── BFS社交路径加权（social=True 时计算社交分数） ──
+            if social:
+                path_result = await SocialConnectService.find_path(
+                    db=db, user_id=current_user.id, target_user_id=other.id
+                )
+                distance = path_result.get("distance", -1)
+                match_item["social_distance"] = distance
+                match_item["social_path"] = path_result.get("path", [])
+                match_item["path_summary"] = path_result.get("message", "无社交连接路径")
+                # 社交分数：距离越近分越高（1度=1.0, 2度=0.5, 3度=0.333）
+                match_item["social_score"] = round(1.0 / distance, 4) if distance > 0 else 0.0
+            else:
+                match_item["social_distance"] = -1
+                match_item["social_path"] = []
+                match_item["path_summary"] = None
+                match_item["social_score"] = 0.0
+
+            matches.append(match_item)
+
+    # ── BFS社交路径综合排序 ──────────────────────────────────────────
+    if social:
+        # 综合评分: 属性分×0.6 + 社交分×0.4
+        for m in matches:
+            m["final_score"] = round(m["score"] * 0.6 + m.get("social_score", 0.0) * 0.4, 4)
+        matches.sort(key=lambda x: x["final_score"], reverse=True)
+    else:
+        # 纯属性分排序（兼容旧前端）
+        for m in matches:
+            m["final_score"] = m["score"]
+        matches.sort(key=lambda x: x["score"], reverse=True)
 
     # 保存匹配记录（top matches）
     for m in matches[:20]:
@@ -180,9 +259,18 @@ async def run_match_engine(
 
     await db.commit()
 
+    # ── Agent: 异步通知 GrowthAgent 记录匹配事件 ──
+    asyncio.create_task(_notify_growth_agent(
+        agent_runtime=agent_runtime,
+        user_id=current_user.id,
+        match_count=len(matches),
+        top_scores=[m["score"] for m in matches[:5]],
+    ))
+
     return {
         "matches": matches,
         "total": len(matches),
+        "social_enabled": social,
     }
 
 
@@ -414,6 +502,82 @@ async def unlock_contact(
         unlock_quota_remaining=current_user.unlock_quota,
         message="解锁成功",
     )
+
+
+# ── 社交路径增强匹配 API ────────────────────────────────────────────
+
+
+@router.get("/social")
+async def social_match_search(
+    q: str = Query("", description="搜索关键词（模糊匹配 name / company / title）"),
+    industry: str = Query("", description="行业标签过滤"),
+    city: str = Query("", description="城市过滤"),
+    limit: int = Query(20, ge=1, le=100, description="返回数量上限"),
+    include_path: bool = Query(True, description="是否包含BFS社交触达路径"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """语义搜索 + 社交路径增强
+
+    在关键词/行业/城市匹配的基础上，增加BFS社交路径维度：
+    - 有社交路径的结果排在无社交路径前面
+    - 返回结果附带社交距离和路径摘要
+
+    Returns:
+        {code: 0, data: {items: [...], total: int}, message: "success"}
+    """
+    items = await SocialMatchService.match_with_social_path(
+        db=db,
+        viewer_id=current_user.id,
+        keyword=q,
+        industry=industry,
+        city=city,
+        limit=limit,
+        include_path=include_path,
+    )
+    return {
+        "code": 0,
+        "data": {
+            "items": items,
+            "total": len(items),
+        },
+        "message": "success",
+    }
+
+
+@router.get("/social/recommend")
+async def social_based_recommendations(
+    limit: int = Query(10, ge=1, le=50, description="推荐数量"),
+    min_strength: float = Query(0.0, ge=0.0, le=1.0, description="最小关系强度阈值"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """基于社交图谱的人脉推荐（二度/三度人脉）
+
+    从当前用户的社交网络出发，推荐可能认识的人：
+    1. 直接好友（一度人脉）
+    2. 好友的好友（二度人脉）
+    3. 二度人脉的好友（三度人脉）
+
+    排序: 人脉近优先 > 关系强度高优先 > 新用户优先
+
+    Returns:
+        {code: 0, data: {items: [...], total: int}, message: "success"}
+    """
+    items = await SocialMatchService.get_social_based_recommendations(
+        db=db,
+        viewer_id=current_user.id,
+        limit=limit,
+        min_strength=min_strength,
+    )
+    return {
+        "code": 0,
+        "data": {
+            "items": items,
+            "total": len(items),
+        },
+        "message": "success",
+    }
 
 
 # ── 别名路由：POST /api/v1/brochure/smart-search ────────────────────────

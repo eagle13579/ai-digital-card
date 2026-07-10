@@ -1,6 +1,6 @@
 const API_BASE = ''; // 通过Nginx代理到后端
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   code: number;
   message: string;
   data?: T;

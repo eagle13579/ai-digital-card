@@ -8,8 +8,9 @@
 
 ```
 D:\AI数智名片\                  ← Layer 1: 工程代码
-└── backend/                      FastAPI 后端 (端口 8201)
-    ├── main.py                   入口文件
+└── backend/                      FastAPI 后端 (端口 8002)
+    ├── run.py                   主力入口文件（启动用）
+    ├── main.py                   已废弃 → 跳转到 run.py
     ├── app/
     │   ├── routers/              路由层
     │   ├── services/             服务层
@@ -40,17 +41,20 @@ pip install -r requirements.txt
 cp .env.example .env
 # 编辑 .env 填入 DeepSeek API Key
 
-# 启动
-python main.py
-# → http://localhost:8201
+# 启动（推荐使用 run.py）
+python run.py
+# → http://localhost:8002
+
+# 或使用已废弃的 main.py（自动跳转至 run.py）
+# python main.py
 ```
 
 ## 端口说明
 
 | 端口 | 服务 | 说明 |
 |:----:|:-----|:------|
+| 8002 | FastAPI | 后端 API（统一入口） |
 | 8200 | Nginx | 统一接入层（生产） |
-| 8201 | FastAPI | 后端 API |
 | 8202 | Brochure | 画册微服务（规划） |
 
 ## 核心能力

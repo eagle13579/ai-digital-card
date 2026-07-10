@@ -1,0 +1,133 @@
+# ──────────────────────────────────────────────
+# Auto-Deploy CI — 前端构建 + 自动部署到服务器
+# 触发条件: push 到 main 分支，且 frontend/** 或 backend/** 有变更
+# 依赖: GitHub Secrets DEPLOY_HOST, DEPLOY_USERNAME, DEPLOY_PASSWORD
+# ──────────────────────────────────────────────
+name: Auto-Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+      - backend/**
+
+concurrency:
+  group: auto-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  build-frontend:
+    name: Build Frontend (Vite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 3
+
+  deploy:
+    name: Deploy to Server
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
+      - name: Detect backend changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            git fetch --depth=2 origin "${{ github.sha }}"
+            CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" || echo "")
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+          fi
+          if echo "$CHANGED" | grep -q "^backend/"; then
+            echo "restart_backend=true" >> $GITHUB_OUTPUT
+          else
+            echo "restart_backend=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: SCP frontend dist to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          source: "frontend-dist/*"
+          target: "/var/www/ai-digital-card/frontend/dist"
+          strip_components: 1
+          rm: true
+
+      - name: SSH deploy & health check
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          script: |
+            set -e
+
+            echo "📦 前端部署完成: /var/www/ai-digital-card/frontend/dist/"
+
+            # 根据 GitHub Actions 检测结果重启后端
+            if [ "${{ steps.changes.outputs.restart_backend }}" = "true" ]; then
+              echo "🔄 backend 文件有变更，重启后端服务..."
+              systemctl restart ai-digital-card-8201.service
+              sleep 3
+            else
+              echo "⏭️  backend 无变更，跳过服务重启"
+            fi
+
+            # 健康检查
+            echo "🔍 健康检查: http://127.0.0.1:8201/health"
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8201/health || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ 健康检查通过 (HTTP $HTTP_CODE)"
+            else
+              echo "❌ 健康检查失败 (HTTP $HTTP_CODE)"
+              exit 1
+            fi
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          script: |
+            echo "⚠️ 部署失败，尝试回滚..."
+            systemctl restart ai-digital-card-8201.service || true
+            echo "⚠️ 回滚完成，请检查服务状态"

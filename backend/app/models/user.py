@@ -4,6 +4,7 @@ from sqlalchemy import Integer, String, Text, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.models.tenant import TenantBase
 
 
 class UnlockRecord(Base):
@@ -17,7 +18,7 @@ class UnlockRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
-class User(Base):
+class User(TenantBase):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -31,6 +32,9 @@ class User(Base):
     intro: Mapped[str] = mapped_column(Text, default="")
     avatar: Mapped[str] = mapped_column(String(256), default="")
     role: Mapped[str] = mapped_column(String(16), default="user")  # user | admin
+
+    # ── 四级可见性 ────────────────────────────────────────────────────────
+    visibility: Mapped[str] = mapped_column(String(20), default="public", comment="可见性: public/platform/network/private")
 
     # ── 会员相关字段（Phase 1） ──────────────────────────────────────────
     membership_tier: Mapped[str] = mapped_column(String(16), default="free", comment="会员等级: free/gold/diamond/board")

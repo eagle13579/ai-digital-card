@@ -696,3 +696,90 @@ async def enterprise_score(
         dimensions=dimensions,
         summary=summary,
     )
+
+
+# ======================================================================
+# PME 二次排序端点 (GET /api/v1/recommend/enterprise-ranked)
+# ======================================================================
+
+
+class EnterpriseRankedQuery(BaseModel):
+    """企业排序查询参数"""
+    top_k: int = Field(20, ge=1, le=100, description="返回数量上限")
+    min_score: float = Field(0.0, ge=0.0, le=1.0, description="最低原始分数过滤")
+    industry: Optional[str] = Field(None, description="行业筛选")
+    keyword: Optional[str] = Field(None, description="关键词筛选")
+
+
+@router.get("/enterprise-ranked", response_model=EnterpriseRecommendResponse)
+async def enterprise_ranked(
+    data: EnterpriseRankedQuery = Depends(),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """企业推荐 — PME 二次排序
+
+    流程:
+      1. 从推荐引擎获取候选企业列表（标签匹配 + 语义相似 + 反馈权重）
+      2. 经 PrivateMatchEngine (:5080) 二次评分 / 排序
+      3. 返回按 PME 综合评分降序的企业列表
+
+    降级策略: PME 不可用时返回推荐引擎原始结果。
+    """
+    try:
+        # Step 1: 获取推荐引擎原始结果
+        engine = RecommendEngine(db)
+        rec_result = await engine.personalize_recommend(
+            user_id=current_user.id,
+            top_k=data.top_k * 2,  # 多取一些供 PME 排序
+            strategy="hybrid",
+        )
+
+        raw_items = [
+            {
+                "user_id": item.id,
+                "name": getattr(item, "name", ""),
+                "company": getattr(item, "company", ""),
+                "title": getattr(item, "title", ""),
+                "avatar": getattr(item, "avatar", ""),
+                "intro": getattr(item, "intro", ""),
+                "score": getattr(item, "score", 0.0),
+                "tag_match_score": getattr(item, "tag_match_score", 0.0),
+                "graph_score": getattr(item, "graph_score", 0.0),
+                "semantic_score": getattr(item, "semantic_score", 0.0),
+                "reasons": getattr(item, "reasons", []),
+                "common_tags": getattr(item, "common_tags", []),
+                "match_type": getattr(item, "match_type", "mixed"),
+                "enterprise_id": str(getattr(item, "id", "")),
+                "enterprise_name": getattr(item, "name", getattr(item, "company", "")),
+            }
+            for item in rec_result.items
+        ]
+
+        # 过滤
+        if data.min_score > 0:
+            raw_items = [i for i in raw_items if i["score"] >= data.min_score]
+        if data.industry:
+            raw_items = [i for i in raw_items if data.industry.lower() in i.get("title", "").lower() or data.industry.lower() in i.get("intro", "").lower()]
+        if data.keyword:
+            raw_items = [i for i in raw_items if data.keyword.lower() in i.get("name", "").lower() or data.keyword.lower() in i.get("intro", "").lower()]
+
+        if not raw_items:
+            return EnterpriseRecommendResponse(items=[], total=0)
+
+        # Step 2: PME 二次排序
+        svc = RecommendService(db)
+        ranked = await svc.rerank_with_pme(
+            items=raw_items,
+            user_id=current_user.id,
+            top_k=data.top_k,
+        )
+
+        return EnterpriseRecommendResponse(
+            items=ranked,
+            total=len(ranked),
+        )
+
+    except Exception as e:
+        logger.error("enterprise_ranked 异常: %s", e, exc_info=True)
+        return EnterpriseRecommendResponse(items=[], total=0)

@@ -92,6 +92,7 @@ class BrochureResponse(BaseModel):
     purpose: str
     pages_count: int
     status: str
+    visibility: str = "public"
     share_token: str
     view_count: int
     album_meta: Optional[str] = None
@@ -100,6 +101,16 @@ class BrochureResponse(BaseModel):
     pages: list[PageSchema] = []
 
     model_config = {"from_attributes": True}
+
+
+# ── Visibility ────────────────────────────────────────────────────────────────
+
+class VisibilityUpdate(BaseModel):
+    visibility: str = Field(
+        ...,
+        pattern=r"^(public|platform|network|private)$",
+        description="可见性级别: public(公开)/platform(平台)/network(关系网)/private(私有)",
+    )
 
 
 # ── Tag ───────────────────────────────────────────────────────────────────────

@@ -5,13 +5,14 @@ from sqlalchemy import String, Text, Integer, DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models.tenant import TenantBase
 
 
 def generate_share_token() -> str:
     return uuid.uuid4().hex[:16]
 
 
-class Brochure(Base):
+class Brochure(TenantBase):
     __tablename__ = "brochures"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -21,6 +22,7 @@ class Brochure(Base):
     purpose: Mapped[str] = mapped_column(String(32), default="")  # partner/client/investor/supplier
     pages_count: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(16), default="draft")  # draft | published
+    visibility: Mapped[str] = mapped_column(String(16), default="public")  # public | platform | network | private
     share_token: Mapped[str] = mapped_column(String(32), unique=True, default=generate_share_token)
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     album_meta: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON: 翻页图册元数据
@@ -33,7 +35,7 @@ class Brochure(Base):
                          order_by="Page.sort_order")
 
 
-class Page(Base):
+class Page(TenantBase):
     __tablename__ = "pages"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

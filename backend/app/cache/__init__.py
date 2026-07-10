@@ -211,7 +211,7 @@ def cache(
         # 暴露清除方法
         def clear_cache(*clr_args, **clr_kwargs) -> bool:
             """手动清除该函数的缓存项"""
-            key = _build_cache_key(_prefix, clr_args or args, clr_kwargs or kwargs)
+            key = _build_cache_key(_prefix, clr_args if clr_args else (), clr_kwargs if clr_kwargs else {})
             client = _get_client()
             if client is not None:
                 return client.delete(key)
@@ -240,7 +240,7 @@ def invalidate(*prefix_parts: str) -> int:
     if not prefix_parts:
         return 0
 
-    pattern = f"{KEY_SEP.join(str(p) for p in prefix_parts)}:{KEY_SEP}*"
+    pattern = f"{KEY_SEP.join(str(p) for p in prefix_parts)}{KEY_SEP}*"
     client = _get_client()
     if client is None:
         return 0

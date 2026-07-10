@@ -11,7 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
+from key_manager import SecretManager
 from app.database import engine, Base
+_secrets = SecretManager()
 
 
 def init_sentry(dsn: str = "") -> None:
@@ -44,7 +46,7 @@ def init_sentry(dsn: str = "") -> None:
                 ],
                 # 生产预热阶段使用 1.0，稳定后改为 0.2
                 traces_sample_rate=1.0,  # TODO: 生产稳定后改为 0.2
-                environment=os.getenv("ENV", "development"),
+                environment=_secrets.get("ENV", "development"),
                 # 自动注入 request_id 到 Sentry scope
                 before_send=lambda event, hint: _inject_request_id(event, hint),
             )
@@ -111,6 +113,10 @@ def create_app():
         init_otel,
     )
     from app.middleware.api_version import APIVersionRedirectMiddleware
+    from app.middleware import AuditMiddleware
+    from app.middleware.tenant import TenantMiddleware
+    from app.middleware.rbac import RBACMiddleware
+    from app.middleware.sso import SSOMiddleware
 
     init_sentry(cfg.SENTRY_DSN)
     init_otel()
@@ -133,7 +139,9 @@ def create_app():
 
     # Middleware
     app.add_middleware(MetricsMiddleware)
+    app.add_middleware(TenantMiddleware)
     app.add_middleware(ApiKeyMiddleware)
+    app.add_middleware(RBACMiddleware)
     app.add_middleware(
         RateLimiterMiddleware,
         limits={"anonymous": 100, "standard": 1000, "enterprise": 10000},
@@ -156,6 +164,7 @@ def create_app():
     )
     app.add_middleware(CsrfMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(AuditMiddleware)
     app.add_middleware(UsageLimitMiddleware)
 
     # FastAPI 集成 (OpenTelemetry) — instrument_app 会在内部跳过若未初始化
@@ -196,6 +205,8 @@ def create_app():
     from app.routers.learning_router import router as learning_router
     from app.routers.v1_deprecated import router as v1_deprecated_router
     from app.crm.form_capture_router import router as form_capture_router
+    from app.crm.marketing_router import router as marketing_router
+    from app.crm.report_router import router as report_router
     from app.routers.document import router as document_router
     from app.routers.analytics import router as analytics_router
     from app.routers.metrics_dashboard import router as metrics_dashboard_router
@@ -297,6 +308,14 @@ def create_app():
     except Exception as e:
         logger.warning("DeepSeek代理路由注册失败（可降级运行）: %s", e)
 
+    # ── AI画册生成路由 ──────────────────────────────────────────
+    try:
+        from app.routers.brochure_generation import router as brochure_gen_router
+        app.include_router(brochure_gen_router)
+        logger.info("AI画册生成路由已注册: /api/v1/brochure-gen/*")
+    except Exception as e:
+        logger.warning("AI画册生成路由注册失败（可降级运行）: %s", e)
+
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
     def _register_knowledge_models(app):
@@ -319,6 +338,8 @@ def create_app():
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)
+    app.include_router(marketing_router)
+    app.include_router(report_router)
     app.include_router(auth_router)
     app.include_router(user_router)
     app.include_router(brochure_router)
@@ -349,6 +370,14 @@ def create_app():
     app.include_router(oauth_router)
     app.include_router(admin_router)
 
+    # ── NFC 名片路由 ─────────────────────────────────────────
+    try:
+        from app.routers.nfc import router as nfc_router
+        app.include_router(nfc_router, prefix="/api/v1/nfc")
+        logger.info("NFC 路由已注册: /api/v1/nfc/*")
+    except Exception as e:
+        logger.warning("NFC 路由注册失败（可降级运行）: %s", e)
+
     # ── 翻译管理路由 ─────────────────────────────────────────
     try:
         from app.routers.translation_admin import router as translation_admin_router
@@ -364,9 +393,41 @@ def create_app():
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
     app.include_router(membership_router)
+    # ── A08 扫码建联路由 ─────────────────────────
+    try:
+        from app.routers.social_connect_router import router as social_connect_router
+        app.include_router(social_connect_router)
+        logger.info("扫码建联路由已注册: /api/v1/scan/*")
+    except Exception as e:
+        logger.warning("扫码建联路由注册失败（可降级运行）: %s", e)
+
+    # ── 资源平台商业化路由 ─────────────────────────
+    try:
+        from app.routers.resource_platform_router import router as resource_platform_router
+        app.include_router(resource_platform_router)
+        logger.info("资源平台路由已注册: /api/v1/platforms/*")
+    except Exception as e:
+        logger.warning("资源平台路由注册失败（可降级运行）: %s", e)
+
     app.include_router(usage_router)
     app.include_router(token_pricing_router)
     logger.info("Token定价路由已注册: /api/v1/token/*")
+
+    # ── AI 用量监控路由 ────────────────────────────────────────
+    try:
+        from app.routers.ai_metrics_router import router as ai_metrics_router
+        app.include_router(ai_metrics_router)
+        logger.info("AI用量监控路由已注册: /api/v1/ai/metrics/*")
+    except Exception as e:
+        logger.warning("AI指标路由注册失败（可降级运行）: %s", e)
+
+    # ── 模型部署（Canary）路由 ──────────────────────────
+    try:
+        from app.routers.model_deploy_router import router as deploy_router
+        app.include_router(deploy_router)
+        logger.info("模型部署路由已注册: /api/v1/deploy/*")
+    except Exception as e:
+        logger.warning("模型部署路由注册失败（可降级运行）: %s", e)
     # ── 芯森态Feature: 管理中心API ──────────────────────────
     try:
         from services.feature_manager import get_registry
@@ -425,6 +486,22 @@ def create_app():
         logger.info("App Store 路由已注册: /api/v1/app-store/*")
     except Exception as e:
         logger.warning("App Store 路由注册失败: %s", e)
+
+    # ── Agent 活跃看板路由 ──────────────────────────
+    try:
+        from app.routers.agent_dashboard_router import router as agent_dashboard_router
+        app.include_router(agent_dashboard_router)
+        logger.info("Agent活跃看板路由已注册: /api/v1/admin/agents/*")
+    except Exception as e:
+        logger.warning("Agent活跃看板路由注册失败（可降级运行）: %s", e)
+
+    # ── App Store Marketplace 路由 ──────────────────────────
+    try:
+        from app.routers.app_store_marketplace import router as app_store_marketplace_router
+        app.include_router(app_store_marketplace_router)
+        logger.info("应用市场路由已注册: /api/v1/marketplace/*")
+    except Exception as e:
+        logger.warning("应用市场路由注册失败: %s", e)
 
     # ── 批量 IO 路由（CSV 导入/导出） ──────────────────────
     try:
@@ -530,10 +607,8 @@ p{color:rgba(255,255,255,0.6);margin-bottom:20px;line-height:1.6}
                 )
 
     # API endpoints
-    @app.get("/health", response_class=PlainTextResponse)
-    def health():
-        return "OK"
-
+    # GET /health is provided by routers/health.py (simple "OK" plaintext)
+    # GET /api/health returns JSON with version + status for monitoring
     @app.get("/api/health")
     def api_health():
         from fastapi.responses import JSONResponse

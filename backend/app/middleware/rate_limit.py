@@ -4,6 +4,8 @@ IP Rate Limiter Middleware — 基于 IP 的滑动窗口限流中间件
 限制每个 IP 每分钟最多 60 次请求，超限返回 429 Too Many Requests。
 白名单中的 IP（127.0.0.1 / localhost）不限制。
 
+默认使用 Redis 滑动窗口限流（跨实例共享），Redis 不可用时自动降级到内存限流。
+
 用法:
     from app.middleware.rate_limit import IPRateLimitMiddleware
     app.add_middleware(IPRateLimitMiddleware)
@@ -29,6 +31,10 @@ WHITELIST_IPS = {"127.0.0.1", "::1", "localhost"}
 
 class IPRateLimitMiddleware:
     """基于 IP 地址的滑动窗口限流中间件。
+
+    限流后端（按优先级）:
+        1. RedisRateLimiter — Redis 滑动窗口（跨实例共享）
+        2. MemoryRateLimiter — 进程内内存限流（降级方案）
 
     限制每个 IP 每分钟（默认）最多 60 次请求。
     127.0.0.1 和 localhost 不受限制。
@@ -59,11 +65,28 @@ class IPRateLimitMiddleware:
         self.max_requests = max_requests
         self.window_seconds = window_seconds
 
-        # {ip: [timestamp, ...]}  按时间序存储每个请求的时间戳
+        # ── Redis 限流后端（惰性初始化，不可用时降级到内存） ──
+        self._redis_limiter = None
+        self._use_redis = False
+        self._init_redis_limiter()
+
+        # {ip: [timestamp, ...]}  按时间序存储每个请求的时间戳（内存降级）
         self._visits: dict[str, list[float]] = defaultdict(list)
         self._lock = threading.Lock()
         # 清理阈值 — 当累计超过 N 条记录时触发一次清理
         self._cleanup_trigger = 10000
+
+    def _init_redis_limiter(self) -> None:
+        """尝试初始化 Redis 限流后端。"""
+        try:
+            from app.cache.redis_rate_limiter import RedisRateLimiter
+            from app.config import settings
+
+            self._redis_limiter = RedisRateLimiter(settings.REDIS_URL)
+            self._use_redis = True
+        except Exception:
+            self._redis_limiter = None
+            self._use_redis = False
 
     # ── IP 提取 ──────────────────────────────────────────────────────────────
 
@@ -90,6 +113,10 @@ class IPRateLimitMiddleware:
 
     # ── 滑动窗口限流核心 ────────────────────────────────────────────────────
 
+    def _build_rate_limit_key(self, ip: str) -> str:
+        """构建 Redis 限流键。"""
+        return f"ratelimit:ip:{ip}"
+
     def _cleanup_old(self, now: float):
         """移除窗口之外的过期时间戳。"""
         cutoff = now - self.window_seconds
@@ -102,16 +129,27 @@ class IPRateLimitMiddleware:
         for ip in expired_ips:
             del self._visits[ip]
 
-    def _check_rate_limit(
+    async def _check_rate_limit_redis(
         self, ip: str
     ) -> tuple[bool, int, float]:
-        """检查速率限制。返回 (allowed, remaining, retry_after)。
+        """使用 Redis 后端检查速率限制。"""
+        key = self._build_rate_limit_key(ip)
+        try:
+            return await self._redis_limiter.check_rate_limit(
+                key,
+                max_requests=self.max_requests,
+                window_seconds=self.window_seconds,
+            )
+        except Exception:
+            # Redis 异常 → 降级到内存
+            self._use_redis = False
+            self._redis_limiter = None
+            return self._check_rate_limit_memory(ip)
 
-        Returns:
-            allowed: True 表示允许通过
-            remaining: 窗口内剩余可用请求数（0 表示已超限）
-            retry_after: 建议重试等待秒数
-        """
+    def _check_rate_limit_memory(
+        self, ip: str
+    ) -> tuple[bool, int, float]:
+        """使用内存后端检查速率限制。返回 (allowed, remaining, retry_after)。"""
         now = time.time()
         with self._lock:
             timestamps = self._visits[ip]
@@ -143,6 +181,20 @@ class IPRateLimitMiddleware:
 
             return True, remaining, 0.0
 
+    async def _check_rate_limit(
+        self, ip: str
+    ) -> tuple[bool, int, float]:
+        """检查速率限制。优先使用 Redis，不可用时降级到内存。
+
+        Returns:
+            allowed: True 表示允许通过
+            remaining: 窗口内剩余可用请求数（0 表示已超限）
+            retry_after: 建议重试等待秒数
+        """
+        if self._use_redis and self._redis_limiter is not None:
+            return await self._check_rate_limit_redis(ip)
+        return self._check_rate_limit_memory(ip)
+
     # ── ASGI 接口 ────────────────────────────────────────────────────────────
 
     async def __call__(self, scope, receive, send):
@@ -157,7 +209,7 @@ class IPRateLimitMiddleware:
             await self.app(scope, receive, send)
             return
 
-        allowed, remaining, retry_after = self._check_rate_limit(client_ip)
+        allowed, remaining, retry_after = await self._check_rate_limit(client_ip)
 
         if not allowed:
             retry_seconds = int(retry_after) + 1

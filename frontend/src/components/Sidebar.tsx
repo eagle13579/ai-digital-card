@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, CreditCard, Settings, Users, Sparkles,
   ChevronLeft, ChevronRight, FileText, Key, ContactRound,
-  Target, BarChart3, ScanLine,
+  Target, BarChart3, ScanLine, DollarSign, Activity,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useT } from '../i18n';
@@ -27,6 +27,8 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/crm/dashboard', labelKey: 'CRM仪表盘', icon: <BarChart3 className="w-5 h-5" /> },
   { path: '/crm/pipeline', labelKey: '销售管道', icon: <Target className="w-5 h-5" /> },
   { path: '/api-keys', labelKey: '开发者门户', icon: <Key className="w-5 h-5" /> },
+  { path: '/pricing', labelKey: '定价', icon: <DollarSign className="w-5 h-5" /> },
+  { path: '/health', labelKey: '系统监控', icon: <Activity className="w-5 h-5" /> },
   { path: '/settings', labelKey: '设置', icon: <Settings className="w-5 h-5" /> },
 ];
 

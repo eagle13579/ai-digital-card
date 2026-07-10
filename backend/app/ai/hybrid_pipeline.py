@@ -1,31 +1,27 @@
 """
-Hybrid 推理管道 — RAG + SAG 融合
-======================================
-先 RAG 检索外部材料 → 再 SAG 自校验/逻辑补全 → 融合输出
+hybrid_pipeline.py - 已废弃, 功能已合并到 rag_pipeline.py
+============================================================
 
-解决场景:
-  1. 需要私有资料（名片库/匹配记录）+ 复杂逻辑推理的业务查询
-     "这些推荐中谁最有可能和我合作成功？"
-  2. RAG 结果有内部矛盾时，SAG 自校验自动修正
-     "为什么推荐了A也推荐了B，但A和B是竞争对手？"
-  3. RAG 检索信息不足时，SAG 逻辑补全
-     "对方资料不全，但凭已知信息能推断到什么程度？"
+此文件保留仅用于向后兼容。新代码请直接使用 RAGPipeline 的 fusion_mode 参数:
 
-架构:
-  HybridPipeline
-    ├─ RAGPipeline    — 先做外部检索（向量/图谱/画像）
-    ├─ SAGPipeline    — 再做自我推演（校验/补全/推理）
-    └─ 融合策略       — 根据 SAG 校验结果修正 RAG 输出
+    # 替代 HybridPipeline (完整 RAG→SAG 融合)
+    pipeline = RAGPipeline(db, fusion_mode="hybrid")
+    result = await pipeline.query(user_id=1, query_text="...")
 
-使用方式:
-    hybrid = HybridPipeline(db)
-    result = await hybrid.query(
-        user_id=1,
-        query_text="这些推荐里谁最适合和我合作？",
-    )
+    # 仅 SAG 校验 (不修正回答)
+    pipeline = RAGPipeline(db, fusion_mode="rag_with_sag")
+    result = await pipeline.query(user_id=1, query_text="...")
+
+    # 纯 RAG (默认行为)
+    pipeline = RAGPipeline(db, fusion_mode="rag_only")
+    result = await pipeline.query(user_id=1, query_text="...")
+
+所有原有导入 (from app.ai.hybrid_pipeline import HybridPipeline) 仍然可用，
+但会收到废弃警告。
 """
 
 import logging
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -40,28 +36,35 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+# 发出废弃警告
+warnings.warn(
+    "hybrid_pipeline.py 已废弃, 请使用 RAGPipeline(fusion_mode='hybrid') 替代。",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 
 # ======================================================================
-# 融合策略
+# 融合策略 (保留向后兼容)
 # ======================================================================
 
 
 class FusionStrategy:
-    """RAG 与 SAG 的融合策略"""
+    """RAG 与 SAG 的融合策略
 
-    # 当 SAG 自校验发现 RAG 结果置信度低于此值时触发修正
+    .. deprecated::
+        请使用 RAGPipeline(fusion_mode='hybrid') 替代。
+    """
+
     CONFIDENCE_THRESHOLD: float = 0.4
 
     @staticmethod
     def should_correct(rag_response: RAGResponse, sag_response: SAGResponse) -> bool:
         """判断是否需要用 SAG 结果修正 RAG 输出"""
-        # 1. RAG 自身置信度低（LLM 降级了）
         if rag_response.confidence < 0.6:
             return True
-        # 2. SAG 检测到矛盾
         if sag_response.score is not None and sag_response.score < 40:
             return True
-        # 3. SAG 置信度显著高于 RAG
         if sag_response.confidence > rag_response.confidence + 0.2:
             return True
         return False
@@ -93,23 +96,25 @@ class FusionStrategy:
 
 
 # ======================================================================
-# Hybrid 管道主类
+# Hybrid 管道主类 (保留向后兼容 — 委托给 RAGPipeline)
 # ======================================================================
 
 
 class HybridPipeline:
     """RAG + SAG 融合管道
 
-    执行流程:
-        Phase 1: RAG 检索 — 向量搜索 + 画像构建 + 关系图谱
-        Phase 2: SAG 自校验 — 检验 RAG 结果的逻辑一致性
-        Phase 3: SAG 逻辑补全 — 针对 RAG 信息不足的部分推理补充
-        Phase 4: 融合输出 — 合并 RAG 事实 + SAG 推理
+    .. deprecated::
+        请使用 RAGPipeline(fusion_mode='hybrid') 替代。
+
+        示例::
+
+            pipeline = RAGPipeline(db, fusion_mode="hybrid")
+            result = await pipeline.query(user_id=1, query_text="...")
     """
 
     def __init__(self, db):
         self.db = db
-        self.rag = RAGPipeline(db)
+        self.rag = RAGPipeline(db, fusion_mode="hybrid")
         self.sag = SAGPipeline()
         self.fusion = FusionStrategy()
 
@@ -123,13 +128,7 @@ class HybridPipeline:
         conversation_history: list[dict] | None = None,
         reasoning_depth: SAGDepth = SAGDepth.STANDARD,
     ) -> dict:
-        """执行 Hybrid 查询
-
-        两步走:
-            1. RAG 检索外部知识
-            2. SAG 校验+补全 + 融合输出
-        """
-        # Phase 1: RAG 检索
+        """执行 Hybrid 查询 (委托给 RAGPipeline)"""
         rag_response: RAGResponse = await self.rag.query(
             user_id=user_id,
             query_text=query_text,
@@ -139,83 +138,8 @@ class HybridPipeline:
             include_sources=True,
             conversation_history=conversation_history,
         )
-
-        # 如果 RAG 完全不可用（LLM 降级），跳过 SAG
-        if rag_response.confidence < 0.3:
-            return {
-                "answer": rag_response.answer,
-                "sources": rag_response.sources,
-                "pipeline": "rag_only",
-                "confidence": rag_response.confidence,
-                "has_correction": False,
-            }
-
-        # Phase 2: SAG 自校验
-        sag_check: SAGResponse = await self.sag.analyze(
-            mode=SAGMode.CONTRADICTION_DETECT,
-            content={
-                "query": query_text,
-                "rag_answer": rag_response.answer[:1000],
-                "rag_sources": rag_response.sources[:5],
-                "rag_confidence": rag_response.confidence,
-            },
-            depth=SAGDepth.FAST,  # 校验用快速模式
-            temperature=0.3,  # 校验用低温度
-        )
-
-        # Phase 3: 决定是否需要修正
-        needs_correction = self.fusion.should_correct(rag_response, sag_check)
-
-        # Phase 4: 如需修正，做深度推理
-        sag_reasoning: SAGResponse | None = None
-        if needs_correction or query_text.lower().startswith(("为什么", "怎么", "如何", "哪个")):
-            # 含推理需求的查询走深度 SAG
-            reasoning_mode = self._detect_reasoning_mode(query_text)
-            sag_reasoning = await self.sag.analyze(
-                mode=reasoning_mode,
-                content={
-                    "query": query_text,
-                    "rag_answer": rag_response.answer[:1500],
-                    "rag_sources": rag_response.sources[:5],
-                },
-                depth=reasoning_depth,
-                temperature=temperature,
-            )
-
-            # 用 SAG 推理结论补充 RAG 答案
-            rag_response.answer += f"\n\n【推理分析】\n{sag_reasoning.conclusion}"
-
-        # Phase 5: 融合输出
-        result = self.fusion.merge_results(
-            rag=rag_response,
-            sag=sag_reasoning or sag_check,
-            use_correction=needs_correction,
-        )
-
-        # 统计 token
-        result["tokens_used"] = {
-            "rag": rag_response.tokens_used if hasattr(rag_response, 'tokens_used') else 0,
-            "sag": sag_reasoning.tokens_used if sag_reasoning else (sag_check.tokens_used if hasattr(sag_check, 'tokens_used') else 0),
-        }
-
-        return result
-
-    def _detect_reasoning_mode(self, query: str) -> SAGMode:
-        """根据查询内容自动选择 SAG 推理模式"""
-        q = query.lower()
-        if any(kw in q for kw in ["推荐", "哪个", "谁更", "比较", "哪个更"]):
-            return SAGMode.EXPLAIN_RECOMMEND
-        elif any(kw in q for kw in ["匹配", "合作", "互补", "对接", "供需"]):
-            return SAGMode.MATCHING_REASONING
-        elif any(kw in q for kw in ["信任", "可靠", "靠谱", "风险"]):
-            return SAGMode.TRUST_INFERENCE
-        elif any(kw in q for kw in ["优化", "改进", "建议", "怎么改"]):
-            return SAGMode.OPTIMIZE_SUGGEST
-        elif any(kw in q for kw in ["质量", "评审", "打分", "评价"]):
-            return SAGMode.QUALITY_REVIEW
-        else:
-            # 默认用推荐解释
-            return SAGMode.EXPLAIN_RECOMMEND
+        # 将 RAGResponse 转为 dict (向后兼容原有 HybridPipeline 接口)
+        return rag_response.to_dict()
 
     async def query_stream(
         self,
@@ -226,8 +150,7 @@ class HybridPipeline:
         max_tokens: int = 2048,
         conversation_history: list[dict] | None = None,
     ):
-        """流式 Hybrid 查询"""
-        # 先流式返回 RAG 结果
+        """流式 Hybrid 查询 (委托给 RAGPipeline)"""
         async for chunk in self.rag.query_stream(
             user_id=user_id,
             query_text=query_text,
@@ -237,16 +160,6 @@ class HybridPipeline:
             conversation_history=conversation_history,
         ):
             yield chunk
-
-        # 再补充 SAG 逻辑分析（非流式）
-        sag_result = await self.sag.analyze(
-            mode=SAGMode.EXPLAIN_RECOMMEND,
-            content={"query": query_text},
-            depth=SAGDepth.FAST,
-            temperature=temperature,
-        )
-        if sag_result.conclusion:
-            yield f"\n\n【推理分析】\n{sag_result.conclusion}"
 
     async def close(self):
         await self.rag.close()

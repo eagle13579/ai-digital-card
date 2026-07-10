@@ -9,7 +9,12 @@
     </view>
   </view>
 
-  <view wx:if="{{totalPages === 0}}" class="empty-state">
+  <view wx:if="{{loading}}" class="loading-state">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载画册中...</text>
+  </view>
+
+  <view wx:elif="{{totalPages === 0}}" class="empty-state">
     <view class="empty-icon">📄</view>
     <text class="empty-title">暂无画册内容</text>
     <text class="empty-desc">请先创建您的AI数智名片</text>

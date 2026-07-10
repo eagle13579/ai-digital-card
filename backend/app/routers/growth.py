@@ -154,9 +154,9 @@ def _compute_growth_rate(series: list[dict[str, Any]], key: str) -> float:
 async def growth_metrics():
     """返回增长飞轮核心指标的最新值及变化率。
     """
-    import os
-    _env = os.getenv("ENV", "development").lower()
-    _docs_disabled = os.getenv("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
+    from key_manager import SecretManager
+    _env = SecretManager().get("ENV", "development").lower()
+    _docs_disabled = SecretManager().get("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
     if _env in ("production", "prod") or _docs_disabled:
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": "metrics endpoint disabled in production"}, status_code=404)

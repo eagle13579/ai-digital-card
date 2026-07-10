@@ -1,5 +1,7 @@
 """AI 助手 API — 文案生成与优化建议"""
 
+import asyncio
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -9,10 +11,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.writing_assistant import WritingAssistant
 from app.ai.optimization import OptimizationAnalyzer
+from app.agents.agent_runtime import AgentRuntime
 from app.database import get_db
+from app.dependencies import get_agent_runtime
 from app.models.brochure import Brochure
 from app.models.user import User
 from app.routers.auth import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/ai/assist", tags=["AI 助手"])
 
@@ -78,6 +84,35 @@ class OptimizeResponse(BaseModel):
     top_priorities: list[str]
 
 
+# ── Agent 通知函数（异步非阻塞） ──────────────────────────────────────
+
+
+async def _assess_copy_quality(
+    agent_runtime: AgentRuntime,
+    user_id: int,
+    purpose: str,
+    content: str,
+) -> None:
+    """异步通知 KnowledgeAgent 做文案质量评估并反馈到 Gaia 学习循环。
+
+    非阻塞 — Agent 报错不会影响主 API 响应。
+    """
+    try:
+        knowledge = agent_runtime.get_agent("knowledge")
+        if knowledge is None:
+            logger.warning("KnowledgeAgent not found, skipping copy quality assessment")
+            return
+        await knowledge.handle_event({
+            "type": "ai.assist.copy.generated",
+            "user_id": user_id,
+            "purpose": purpose,
+            "content_length": len(content),
+        })
+        logger.info("KnowledgeAgent quality assessment triggered: user_id=%s, purpose=%s", user_id, purpose)
+    except Exception:
+        logger.exception("KnowledgeAgent quality assessment failed (non-blocking, safe to ignore)")
+
+
 # ── API 端点 ──────────────────────────────────────────────────────────
 
 
@@ -85,6 +120,7 @@ class OptimizeResponse(BaseModel):
 async def generate_copy(
     data: WriteRequest,
     current_user: User = Depends(get_current_user),
+    agent_runtime: AgentRuntime = Depends(get_agent_runtime),
 ):
     """生成名片文案
 
@@ -113,6 +149,14 @@ async def generate_copy(
 
     if content.startswith("【"):
         return WriteResponse(purpose=data.purpose, content="", error=content)
+
+    # ── Agent: 异步通知 KnowledgeAgent 做回答质量评估（反馈到Gaia学习循环）──
+    asyncio.create_task(_assess_copy_quality(
+        agent_runtime=agent_runtime,
+        user_id=current_user.id,
+        purpose=data.purpose,
+        content=content,
+    ))
 
     return WriteResponse(purpose=data.purpose, content=content)
 

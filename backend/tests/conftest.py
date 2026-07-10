@@ -21,6 +21,11 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 
 from app.database import Base
 
+# ── Pre-import all models so Base.metadata.create_all works ─────────────
+import app.models.user  # noqa: F401, E402
+import app.models.brochure  # noqa: F401, E402
+import app.models.tag  # noqa: F401, E402
+
 
 # ── App instance (shared across tests, lazy-created) ────────────────────
 _app = None

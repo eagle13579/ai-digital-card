@@ -1,4 +1,4 @@
-"""Alembic 异步迁移环境配置（PostgreSQL + asyncpg）"""
+"""Alembic 异步迁移环境配置（支持 SQLite + aiosqlite 和 PostgreSQL + asyncpg）"""
 
 import asyncio
 from logging.config import fileConfig
@@ -21,21 +21,24 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.database import Base
-# Import models directly from their modules to avoid circular-import issues in __init__.py
-from app.models.user import User
+
+# ── 导入所有 ORM 模型以确保 autogenerate 捕获完整 schema ──────────────────
+from app.models.user import User, UnlockRecord
 from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
+from app.models.social_connection import SocialConnection
 from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
 from app.models.webhook import WebhookSubscription
 from app.models.integration import Integration
-from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent
+from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent, ABTestDecisionLog
 from app.models.audit import AuditLog
 from app.models.api_key import ApiKey, ApiKeyUsage
 from app.models.message import Message
 from app.models.invoice import Invoice
 from app.models.usage_counter import UsageCounter
+from app.models.resource_platform import ResourcePlatform, PlatformMember, PlatformOpportunity
 from app.models.gaia import (
     GaiaKnowledge,
     GaiaEvolutionEvent,
@@ -43,13 +46,34 @@ from app.models.gaia import (
     GaiaModelWeights,
     KnowledgeModel,
 )
+from app.models.team import Team, TeamMember, TeamInvite, ApprovalRequest
+from app.models.tenant import Tenant, TenantBase
+from app.models.document import Document
+from app.models.sync_state import SyncState, SyncConflict
+from app.models.developer_app import DeveloperApp
+from app.models.app_store import (
+    Plugin,
+    PluginVersion,
+    PluginReview,
+    PluginInstall,
+    DeveloperReward,
+    DeveloperRewardBalance,
+    RewardRedemption,
+)
+from app.models.rbac import RoleDefinition, RolePermission, UserRole
 from app.crm.crm_models import (
     CrmContact,
     CrmDeal,
     CrmPipelineStage,
     CrmActivity,
     CrmNote,
+    CrmWorkflowRule,
+    CrmWorkflowLog,
+    CrmCampaign,
+    CrmCampaignRecipient,
 )
+from app.crm.email_campaign import EmailCampaign
+from app.crm.customer_journey import CustomerJourneyStage
 
 target_metadata = Base.metadata
 

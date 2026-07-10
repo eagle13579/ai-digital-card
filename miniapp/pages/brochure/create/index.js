@@ -27,9 +27,9 @@ Page({
       companyImages: [],
       cases: [],
       style: 'professional',
+      newProvide: '',
+      newNeed: '',
     },
-    newProvide: '',
-    newNeed: '',
     purposeOptions: [
       { value: 'partner', label: '寻找合作伙伴', icon: '🤝' },
       { value: 'client', label: '寻找客户', icon: '🎯' },
@@ -47,30 +47,42 @@ Page({
       showChatEditor: true,
       cardId: '',
       /** 键盘弹出状态 */
-      keyboardActive: false,
+        keyboardActive: false,
+        keyboardHeight: 0,
+        scrollTop: 0,
     },
 
     /**
-     * 资源输入框聚焦 — 键盘弹出时滚动到资源供需区
+     * 输入框聚焦 — 记录键盘状态
      */
     onInputFocus() {
-      const that = this
       this.setData({ keyboardActive: true })
-      setTimeout(() => {
-        wx.createSelectorQuery()
-          .select('#resourceSection')
-          .boundingClientRect(function (rect) {
-            wx.pageScrollTo({ scrollTop: rect.top, duration: 300 })
-          })
-          .exec()
-      }, 300)
     },
 
     /**
-     * 资源输入框失焦
+     * 输入框失焦
      */
     onInputBlur() {
       this.setData({ keyboardActive: false })
+    },
+
+    /**
+     * 多行文本聚焦 — 滚动scroll-view使所在区域可见
+     */
+    onTextareaFocus(e) {
+      const section = e.currentTarget.dataset.section
+      this.setData({ keyboardActive: true })
+      // 延迟至键盘弹出后再滚动
+      setTimeout(() => {
+        wx.createSelectorQuery()
+          .select(`#${section}`)
+          .boundingClientRect(rect => {
+            if (rect && rect.top) {
+              this.setData({ scrollTop: Math.max(0, rect.top - 80) })
+            }
+          })
+          .exec()
+      }, 400)
     },
 
     onLoad(options) {
@@ -80,6 +92,11 @@ Page({
     if (options && options.id) {
       this.setData({ cardId: options.id })
     }
+
+    // 监听键盘高度变化
+    wx.onKeyboardHeightChange(res => {
+      this.setData({ keyboardHeight: res.height, keyboardActive: res.height > 0 })
+    })
   },
 
   /**
@@ -137,7 +154,7 @@ Page({
   },
 
   addProvide() {
-    const value = this.data.newProvide.trim()
+    const value = this.data.formData.newProvide ? this.data.formData.newProvide.trim() : ''
     if (!value) {
       wx.showToast({ title: '请输入资源名称', icon: 'none' })
       return
@@ -145,7 +162,7 @@ Page({
     const provides = [...this.data.formData.provides, value]
     this.setData({
       'formData.provides': provides,
-      newProvide: '',
+      'formData.newProvide': '',
     })
   },
 
@@ -158,7 +175,7 @@ Page({
   },
 
   addNeed() {
-    const value = this.data.newNeed.trim()
+    const value = this.data.formData.newNeed ? this.data.formData.newNeed.trim() : ''
     if (!value) {
       wx.showToast({ title: '请输入需求名称', icon: 'none' })
       return
@@ -166,7 +183,7 @@ Page({
     const needs = [...this.data.formData.needs, value]
     this.setData({
       'formData.needs': needs,
-      newNeed: '',
+      'formData.newNeed': '',
     })
   },
 
@@ -332,62 +349,52 @@ Page({
       purpose, companyName, companyDesc, development, cases } = this.data.formData
 
     const displayCompany = companyName || company
-    const contactContent = [
-      phone ? `📞 ${phone}` : '',
-      email ? `✉️ ${email}` : '',
-      wechat ? `💬 ${wechat}` : '',
-    ].filter(Boolean).join('\n')
-
-    const providesText = provides.length > 0
-      ? '我能提供：\n' + provides.map(p => `• ${p}`).join('\n')
-      : ''
-    const needsText = needs.length > 0
-      ? '我需要的：\n' + needs.map(n => `• ${n}`).join('\n')
-      : ''
-    const resourcesText = [providesText, needsText].filter(Boolean).join('\n\n')
-
-    const bioText = `姓名：${name}\n职位：${title}\n公司：${displayCompany}\n\n${bio || ''}`
-
     const pages = []
 
     // 第0页：封面
     pages.push({
-      sort_order: 0,
-      content_type: 'cover',
-      content: `${name}\n${title}\n${displayCompany}`,
-      image_url: avatarUrl || '',
+      type: 'cover',
+      title: `${name || '用户'}的AI数智名片`,
+      subtitle: `${displayCompany || ''}${displayCompany && title ? ' · ' : ''}${title || ''}`,
+      avatar: avatarUrl || '',
     })
 
     // 第1页：个人简介
     pages.push({
-      sort_order: 1,
-      content_type: 'text',
-      content: bioText,
-      image_url: '',
+      type: 'profile',
+      name: name || '',
+      title: title || '',
+      company: displayCompany || '',
+      bio: bio || '',
+      contact: {
+        phone: phone || '',
+        email: email || '',
+        wechat: wechat || '',
+      },
     })
 
     // 第2页：资源供需
-    if (resourcesText) {
+    const providesList = provides.length > 0 ? provides.map(p => p) : []
+    const needsList = needs.length > 0 ? needs.map(n => n) : []
+    if (providesList.length || needsList.length) {
       pages.push({
-        sort_order: 2,
-        content_type: 'text',
-        content: resourcesText,
-        image_url: '',
+        type: 'resources',
+        provides: providesList,
+        needs: needsList,
+        purpose: purpose || 'partner',
       })
     }
 
-    // 第3页：公司介绍
-    const companyText = [
-      companyDesc ? `公司简介：\n${companyDesc}` : '',
-      development ? `发展历程：\n${development}` : '',
-    ].filter(Boolean).join('\n\n')
-
-    if (companyText) {
+    // 公司介绍
+    if (companyDesc || development) {
       pages.push({
-        sort_order: pages.length,
-        content_type: 'text',
-        content: companyText,
-        image_url: companyImageUrls[0] || '',
+        type: 'company',
+        name: displayCompany || '',
+        industry: this.data.formData.industry || '',
+        size: this.data.formData.companySize || '',
+        desc: companyDesc || '',
+        development: development || '',
+        images: companyImageUrls || [],
       })
     }
 
@@ -395,25 +402,24 @@ Page({
     for (let i = 0; i < cases.length; i++) {
       const c = cases[i]
       if (!c.name && !c.desc) continue
-      const caseContent = [
-        c.name ? `案例名称：${c.name}` : '',
-        c.date ? `时间：${c.date}` : '',
-        c.desc ? `\n${c.desc}` : '',
-      ].filter(Boolean).join('\n')
       pages.push({
-        sort_order: pages.length,
-        content_type: 'text',
-        content: caseContent,
-        image_url: (caseImageUrlsMap[i] && caseImageUrlsMap[i][0]) || '',
+        type: 'case',
+        index: i + 1,
+        name: c.name || '',
+        date: c.date || '',
+        desc: c.desc || '',
+        images: (caseImageUrlsMap[i]) || [],
       })
     }
 
-    // 最后一页：联系方式
+    // 联系方式
     pages.push({
-      sort_order: pages.length,
-      content_type: 'image',
-      content: contactContent || `📞 ${phone || '未填写'}`,
-      image_url: '',
+      type: 'contact',
+      name: name || '',
+      phone: phone || '',
+      email: email || '',
+      wechat: wechat || '',
+      company: displayCompany || '',
     })
 
     return pages
@@ -479,6 +485,11 @@ Page({
 
       // Step 7: 跳转到预览页
       wx.showToast({ title: '生成成功', icon: 'success', duration: 1500 })
+
+      // 标记首页数据需要刷新
+      const app = getApp()
+      app.globalData._dataDirty = true
+
       setTimeout(() => {
         wx.redirectTo({
           url: `/pages/brochure/preview/index?id=${brochureId}`,

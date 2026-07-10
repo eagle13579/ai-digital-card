@@ -1,11 +1,19 @@
 """
 多臂老虎机个性化引擎 (Thompson Sampling)
-==========================================
-基于 Beta 分布的 Thompson 采样实现，用于候选内容排序与在线学习。
+|多臂老虎机个性化引擎 (Thompson Sampling)
+|==========================================
+|基于 Beta 分布的 Thompson 采样实现，用于候选内容排序与在线学习。
+|
+|包含：
+|  - ThompsonSampling    : 纯内存版（向后兼容）
+|  - PersistentThompsonSampling : 带 SQLite 持久化的子类
 """
 
 import numpy as np
+import sqlite3
+import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 
@@ -107,3 +115,87 @@ class BanditService:
         self.ts.arms = list(self.user_arms[user_id].values())
         arm_idx = [a.arm_id for a in self.ts.arms].index(arm_id)
         self.ts.update(arm_idx, reward)
+
+
+class PersistentThompsonSampling(ThompsonSampling):
+    """带 SQLite 持久化的 Thompson Sampling（用户级臂管理 + 自动保存）"""
+
+    def __init__(self, db_path: str = "./data/bandit_weights.db"):
+        super().__init__()
+        # user_id -> {arm_id: Arm}
+        self.user_arms: dict[str, dict[str, Arm]] = {}
+        self.db_path = db_path
+        self._init_db()
+        self._load_arms()
+
+    def _init_db(self):
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        conn = sqlite3.connect(self.db_path)
+        conn.execute('''CREATE TABLE IF NOT EXISTS bandit_arms (
+            user_id TEXT, arm_id TEXT, alpha REAL, beta REAL,
+            PRIMARY KEY (user_id, arm_id)
+        )''')
+        conn.close()
+
+    def _load_arms(self):
+        conn = sqlite3.connect(self.db_path)
+        rows = conn.execute(
+            'SELECT user_id, arm_id, alpha, beta FROM bandit_arms'
+        ).fetchall()
+        for user_id, arm_id, alpha, beta in rows:
+            if user_id not in self.user_arms:
+                self.user_arms[user_id] = {}
+            self.user_arms[user_id][arm_id] = Arm(arm_id=arm_id, alpha=alpha, beta=beta)
+        conn.close()
+
+    def _get_user_arms(self, user_id: str, candidate_ids: list[str]) -> list[Arm]:
+        """获取或创建用户对候选臂的 Beta 参数"""
+        if user_id not in self.user_arms:
+            self.user_arms[user_id] = {}
+        user_dict = self.user_arms[user_id]
+        arms = []
+        for cid in candidate_ids:
+            if cid not in user_dict:
+                user_dict[cid] = Arm(arm_id=cid, alpha=1.0, beta=1.0)
+            arms.append(user_dict[cid])
+        return arms
+
+    def select_arm(self, arms: Optional[list[Arm]] = None) -> int:
+        """对每个臂从 Beta(alpha, beta) 采样，返回最大采样值对应的索引"""
+        candidates = arms if arms is not None else self.arms
+        if not candidates:
+            return -1
+        samples = np.random.beta(
+            [a.alpha for a in candidates],
+            [a.beta for a in candidates],
+        )
+        return int(np.argmax(samples))
+
+    def update_arm(self, user_id: str, arm_id: str, reward: float):
+        """更新指定用户-臂的 Beta 分布参数，并持久化到 SQLite"""
+        if user_id not in self.user_arms or arm_id not in self.user_arms[user_id]:
+            if user_id not in self.user_arms:
+                self.user_arms[user_id] = {}
+            self.user_arms[user_id][arm_id] = Arm(arm_id=arm_id, alpha=1.0, beta=1.0)
+
+        arm = self.user_arms[user_id][arm_id]
+        if reward >= 0.5:
+            arm.alpha += 1.0
+        else:
+            arm.beta += 1.0
+
+        # 持久化到 SQLite
+        conn = sqlite3.connect(self.db_path)
+        conn.execute(
+            'INSERT OR REPLACE INTO bandit_arms VALUES (?,?,?,?)',
+            (user_id, arm_id, arm.alpha, arm.beta),
+        )
+        conn.commit()
+        conn.close()
+
+    def get_expected_value(self, user_id: str, arm_id: str) -> float:
+        """返回指定用户-臂的期望值 alpha / (alpha + beta)"""
+        if user_id not in self.user_arms or arm_id not in self.user_arms[user_id]:
+            return 0.5
+        arm = self.user_arms[user_id][arm_id]
+        return arm.alpha / (arm.alpha + arm.beta)

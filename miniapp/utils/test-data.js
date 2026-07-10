@@ -10,7 +10,7 @@ const TEST_USERS = {
     userInfo: {
       id: 'u001',
       name: '张伟',
-      avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background&image_size=square',
+      avatar: 'https://picsum.photos/seed/professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background/200/200',
       phone: '13800138000',
       email: 'zhangwei@example.com',
       wechat: 'zhangwei_product',
@@ -26,7 +26,7 @@ const TEST_USERS = {
     userInfo: {
       id: 'u002',
       name: '李娜',
-      avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background&image_size=square',
+      avatar: 'https://picsum.photos/seed/professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background/200/200',
       phone: '13900139000',
       email: 'lina@example.com',
       wechat: 'lina_finance',
@@ -42,7 +42,7 @@ const TEST_USERS = {
     userInfo: {
       id: 'u003',
       name: '王强',
-      avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background&image_size=square',
+      avatar: 'https://picsum.photos/seed/professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background/200/200',
       phone: '13700137000',
       email: 'wangqiang@example.com',
       wechat: 'wangqiang_ai',
@@ -57,13 +57,13 @@ const TEST_BROCHURES = [
   {
     id: 'b001',
     title: 'AI数智名片 - 张伟',
-    cover: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20business%20man%20portrait%20headshot%20clean%20background&image_size=square',
+    cover: 'https://picsum.photos/seed/professional%20business%20man%20portrait%20headshot%20clean%20background/200/200',
     view_count: 128,
     pages_count: 5,
     user_name: '张伟',
     user_company: '科技创新有限公司',
     user_title: '产品经理',
-    user_avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background&image_size=square',
+    user_avatar: 'https://picsum.photos/seed/professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background/200/200',
     purpose: 'partner',
     status: 'active',
     share_token: 'share_b001_token',
@@ -73,7 +73,7 @@ const TEST_BROCHURES = [
         type: 'cover',
         title: '张伟的AI数智名片',
         subtitle: '科技创新有限公司 · 产品经理',
-        avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background&image_size=square',
+        avatar: 'https://picsum.photos/seed/professional%20asian%20business%20man%20portrait%20headshot%20clean%20white%20background/200/200',
       },
       {
         type: 'profile',
@@ -101,9 +101,9 @@ const TEST_BROCHURES = [
         desc: '科技创新有限公司专注于互联网产品研发和创新，致力于为用户提供优质的数字化解决方案。',
         development: '2020年：公司成立\n2022年：获得天使轮融资\n2024年：产品用户突破1000万',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=modern%20tech%20company%20office%20interior%20creative%20workspace&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=startup%20team%20meeting%20brainstorming%20whiteboard&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=digital%20product%20design%20wireframe%20mockup%20UI&image_size=landscape_4_3',
+          'https://picsum.photos/seed/modern%20tech%20company%20office%20interior%20creative%20workspace/400/300',
+          'https://picsum.photos/seed/startup%20team%20meeting%20brainstorming%20whiteboard/400/300',
+          'https://picsum.photos/seed/digital%20product%20design%20wireframe%20mockup%20UI/400/300',
         ],
       },
       {
@@ -119,13 +119,13 @@ const TEST_BROCHURES = [
   {
     id: 'b002',
     title: '投资总监名片 - 李娜',
-    cover: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20business%20woman%20portrait%20headshot%20elegant%20clean%20background&image_size=square',
+    cover: 'https://picsum.photos/seed/professional%20business%20woman%20portrait%20headshot%20elegant%20clean%20background/200/200',
     view_count: 256,
     pages_count: 7,
     user_name: '李娜',
     user_company: '金融投资集团',
     user_title: '投资总监',
-    user_avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background&image_size=square',
+    user_avatar: 'https://picsum.photos/seed/professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background/200/200',
     purpose: 'investor',
     status: 'active',
     share_token: 'share_b002_token',
@@ -135,7 +135,7 @@ const TEST_BROCHURES = [
         type: 'cover',
         title: '李娜的AI数智名片',
         subtitle: '金融投资集团 · 投资总监',
-        avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background&image_size=square',
+        avatar: 'https://picsum.photos/seed/professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background/200/200',
       },
       {
         type: 'profile',
@@ -163,9 +163,9 @@ const TEST_BROCHURES = [
         desc: '金融投资集团是一家专注于股权投资和并购重组的综合性投资机构，管理资产规模超过500亿元人民币。公司致力于发现和培育具有高成长潜力的企业，为其提供资金支持和战略指导。',
         development: '2015年：公司成立，获得首轮融资\n2018年：管理规模突破100亿元\n2021年：完成IPO上市\n2024年：管理规模突破500亿元',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=luxury%20finance%20company%20office%20building%20modern%20architecture&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=investment%20meeting%20boardroom%20professional%20business%20people&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=stock%20market%20financial%20charts%20data%20visualization&image_size=landscape_4_3',
+          'https://picsum.photos/seed/luxury%20finance%20company%20office%20building%20modern%20architecture/400/300',
+          'https://picsum.photos/seed/investment%20meeting%20boardroom%20professional%20business%20people/400/300',
+          'https://picsum.photos/seed/stock%20market%20financial%20charts%20data%20visualization/400/300',
         ],
       },
       {
@@ -175,7 +175,7 @@ const TEST_BROCHURES = [
         date: '2023年',
         desc: '主导投资某科技创新企业A轮融资，投资金额5000万元。通过专业的投后管理，帮助企业实现技术突破和市场拓展，企业估值在两年内增长了300%。',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=tech%20startup%20team%20celebrating%20funding%20success&image_size=landscape_4_3',
+          'https://picsum.photos/seed/tech%20startup%20team%20celebrating%20funding%20success/400/300',
         ],
       },
       {
@@ -185,7 +185,7 @@ const TEST_BROCHURES = [
         date: '2024年',
         desc: '成功完成某跨境并购项目，帮助国内企业收购海外优质资产。项目总金额达2亿美元，实现了企业国际化战略布局。',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=international%20business%20merger%20cross%20border%20deal&image_size=landscape_4_3',
+          'https://picsum.photos/seed/international%20business%20merger%20cross%20border%20deal/400/300',
         ],
       },
       {
@@ -201,13 +201,13 @@ const TEST_BROCHURES = [
   {
     id: 'b003',
     title: 'CTO个人名片 - 王强',
-    cover: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20background&image_size=square',
+    cover: 'https://picsum.photos/seed/professional%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20background/200/200',
     view_count: 512,
     pages_count: 8,
     user_name: '王强',
     user_company: '人工智能研究院',
     user_title: '首席技术官',
-    user_avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background&image_size=square',
+    user_avatar: 'https://picsum.photos/seed/professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background/200/200',
     purpose: 'employee',
     status: 'active',
     share_token: 'share_b003_token',
@@ -217,7 +217,7 @@ const TEST_BROCHURES = [
         type: 'cover',
         title: '王强的AI数智名片',
         subtitle: '人工智能研究院 · 首席技术官',
-        avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background&image_size=square',
+        avatar: 'https://picsum.photos/seed/professional%20asian%20tech%20leader%20man%20portrait%20headshot%20smart%20clean%20white%20background/200/200',
       },
       {
         type: 'profile',
@@ -245,9 +245,9 @@ const TEST_BROCHURES = [
         desc: '人工智能研究院是一家专注于AI技术研发和产业应用的科研机构，拥有多项核心技术专利，致力于推动人工智能技术的创新与落地。',
         development: '2018年：研究院成立\n2020年：获得国家重点研发计划支持\n2022年：研发团队突破200人\n2024年：AI产品矩阵覆盖多个行业',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=AI%20research%20laboratory%20modern%20high%20tech%20facility&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=data%20center%20server%20room%20artificial%20intelligence&image_size=landscape_4_3',
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=AI%20team%20working%20on%20computers%20innovation%20lab&image_size=landscape_4_3',
+          'https://picsum.photos/seed/AI%20research%20laboratory%20modern%20high%20tech%20facility/400/300',
+          'https://picsum.photos/seed/data%20center%20server%20room%20artificial%20intelligence/400/300',
+          'https://picsum.photos/seed/AI%20team%20working%20on%20computers%20innovation%20lab/400/300',
         ],
       },
       {
@@ -257,7 +257,7 @@ const TEST_BROCHURES = [
         date: '2022年',
         desc: '主导研发新一代智能客服系统，采用先进的NLP技术，实现95%以上的问题自动解答率，帮助企业降低60%的客服成本。',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=AI%20chatbot%20customer%20service%20digital%20interface&image_size=landscape_4_3',
+          'https://picsum.photos/seed/AI%20chatbot%20customer%20service%20digital%20interface/400/300',
         ],
       },
       {
@@ -267,7 +267,7 @@ const TEST_BROCHURES = [
         date: '2023年',
         desc: '打造一站式计算机视觉平台，支持图像识别、目标检测、图像分割等功能，已服务超过100家企业客户。',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=computer%20vision%20image%20recognition%20AI%20technology&image_size=landscape_4_3',
+          'https://picsum.photos/seed/computer%20vision%20image%20recognition%20AI%20technology/400/300',
         ],
       },
       {
@@ -277,7 +277,7 @@ const TEST_BROCHURES = [
         date: '2024年',
         desc: '带领团队成功研发千亿参数大语言模型，在多项NLP基准测试中取得优异成绩，为行业提供智能化解决方案。',
         images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=large%20language%20model%20AI%20brain%20neural%20network&image_size=landscape_4_3',
+          'https://picsum.photos/seed/large%20language%20model%20AI%20brain%20neural%20network/400/300',
         ],
       },
       {
@@ -296,7 +296,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm001',
     name: '刘芳',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20woman%20data%20analyst%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20business%20woman%20data%20analyst%20portrait%20headshot/200/200',
     company: '大数据科技公司',
     title: '数据分析师',
     matchScore: 92,
@@ -307,7 +307,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm002',
     name: '陈明',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20man%20incubator%20director%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20business%20man%20incubator%20director%20portrait%20headshot/200/200',
     company: '创业孵化平台',
     title: '孵化总监',
     matchScore: 87,
@@ -318,7 +318,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm003',
     name: '赵丽',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20tech%20woman%20CTO%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20tech%20woman%20CTO%20portrait%20headshot/200/200',
     company: '互联网公司',
     title: '技术总监',
     matchScore: 85,
@@ -329,7 +329,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm004',
     name: '孙磊',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20marketing%20man%20manager%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20marketing%20man%20manager%20portrait%20headshot/200/200',
     company: '营销策划公司',
     title: '市场总监',
     matchScore: 83,
@@ -340,7 +340,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm005',
     name: '周婷',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20HR%20woman%20director%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20HR%20woman%20director%20portrait%20headshot/200/200',
     company: '人力资源咨询',
     title: 'HR总监',
     matchScore: 80,
@@ -351,7 +351,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm006',
     name: '吴浩',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20finance%20man%20manager%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20finance%20man%20manager%20portrait%20headshot/200/200',
     company: '财务管理公司',
     title: '财务总监',
     matchScore: 78,
@@ -362,7 +362,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm007',
     name: '郑琳',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20legal%20woman%20lawyer%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20legal%20woman%20lawyer%20portrait%20headshot/200/200',
     company: '律师事务所',
     title: '合伙人',
     matchScore: 75,
@@ -373,7 +373,7 @@ const TEST_RECOMMEND_LIST = [
   {
     id: 'm008',
     name: '黄鹏',
-    avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20sales%20man%20director%20portrait%20headshot&image_size=square',
+    avatar: 'https://picsum.photos/seed/professional%20asian%20sales%20man%20director%20portrait%20headshot/200/200',
     company: '销售代理公司',
     title: '销售总监',
     matchScore: 72,

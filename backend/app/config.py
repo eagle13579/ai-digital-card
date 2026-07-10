@@ -1,6 +1,17 @@
 import os
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
+
+from key_manager import SecretManager
+
+# ── 安全密钥管理器 ─────────────────────────────────────────────────────────
+_secrets = SecretManager()
+
+
+def _secret(key: str, default: str = "") -> str:
+    """从 SecretManager (环境变量 → .env.encrypted) 读取密钥。"""
+    return _secrets.get(key, default)
 
 
 class Settings(BaseSettings):
@@ -78,6 +89,10 @@ class Settings(BaseSettings):
     ALIPAY_PUBLIC_KEY: str = ""
     """支付宝公钥"""
 
+    # ── CSRF 保护 ─────────────────────────────────────────────────────────
+    CSRF_ENABLED: bool = True
+    """是否启用CSRF保护。纯API服务可设为False, 前端SPA推荐开启"""
+
     # ── 向量搜索 ──────────────────────────────────────────────────────────
     USE_VECTOR_SEARCH: bool = True
     """是否启用向量搜索（设为 False 回退到旧版 TF-IDF）"""
@@ -130,6 +145,19 @@ class Settings(BaseSettings):
 
     TASK_QUEUE_MAX_SIZE: int = 0
     """任务队列最大长度（0 = 无限）。生产环境建议设 1000 防止内存溢出。"""
+
+    # ── JWT_SECRET 门禁 ──────────────────────────────────────────────────
+    @field_validator("JWT_SECRET", mode="after")
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        """生产环境强制要求强随机 JWT_SECRET，开发环境可跳过。"""
+        env = _secret("ENV", "development").lower()
+        if env in ("production", "prod"):
+            if not v or v.startswith("change-me"):
+                raise ValueError(
+                    "生产环境必须设置强随机JWT_SECRET,建议openssl rand -hex 32"
+                )
+        return v
 
     @property
     def REDIS_URL(self) -> str:
@@ -233,17 +261,18 @@ class Settings(BaseSettings):
         生产环境 (ENV=production) 自动禁用。
         也可通过 DISABLE_DOCS=true 环境变量强制禁用。
         """
-        env = os.getenv("ENV", "development").lower()
-        docs_disabled = os.getenv("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
+        env = _secret("ENV", "development").lower()
+        docs_disabled = _secret("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
         return env not in ("production", "prod") and not docs_disabled
 
     class Config:
-        env_file = ".env"
+        # .env 不再直接加载 — 密钥通过 SecretManager (环境变量 → .env.encrypted) 管理
         env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 settings = Settings()
 
 
-# Sentry DSN (从环境变量读取)
-SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
+# Sentry DSN (从密钥管理器读取)
+SENTRY_DSN: str = _secret("SENTRY_DSN", "")

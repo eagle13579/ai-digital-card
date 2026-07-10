@@ -206,8 +206,9 @@ class TestCachedProperty:
                 self.cnt += 1
                 return self.cnt
         c = C()
-        assert c.val == 1
-        assert c.val == 1  # 本地缓存命中
+        # cached_property 返回 wrapper 函数，通过实例方法调用
+        assert c.val() == 1
+        assert c.val() == 1  # 本地缓存命中
         assert c.cnt == 1
 
 

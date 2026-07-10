@@ -21,6 +21,8 @@ import logging
 import secrets
 from typing import Any
 
+from app.config import settings
+
 logger = logging.getLogger(__name__)
 
 # ── 配置常量 ──────────────────────────────────────────────────────────────────
@@ -77,6 +79,11 @@ class CsrfMiddleware:
         method = scope["method"]
         path = scope["path"]
 
+        # ── 全局开关：CSRF_ENABLED=False 时完全跳过 CSRF 保护 ──────────
+        if not settings.CSRF_ENABLED:
+            await self.app(scope, receive, send)
+            return
+
         # ── 处理 CSRF Token 生成请求 ──────────────────────────────────────
         if method == "GET" and path == CSRF_TOKEN_PATH:
             await self._handle_csrf_token(scope, receive, send)
@@ -102,6 +109,11 @@ class CsrfMiddleware:
         # ── 带 Bearer token 的请求跳过 CSRF（JWT 本身提供请求完整性）────
         auth_header = headers_dict.get(b"authorization", b"").decode()
         if auth_header.startswith("Bearer "):
+            await self.app(scope, receive, send)
+            return
+
+        # ── 带 X-API-Key 的请求跳过 CSRF（API Key 认证本身提供请求完整性）───
+        if b"x-api-key" in headers_dict:
             await self.app(scope, receive, send)
             return
 

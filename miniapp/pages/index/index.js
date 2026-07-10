@@ -8,6 +8,7 @@ const { Logger } = require('../../utils/util')
 Page({
   data: {
     loading: true,
+    _dataLoaded: false,
     userInfo: {},
     memberLevel: 'free',
     memberLevelText: 'Free',
@@ -69,8 +70,14 @@ Page({
 
   onShow() {
     const app = getApp()
-    if (app.globalData.token && !this.data.loading) {
-      this.loadPageData()
+    if (app.globalData.token) {
+      // 检查是否有数据更新标记（如从创建页返回）
+      if (app.globalData._dataDirty) {
+        app.globalData._dataDirty = false
+        this.loadPageData()
+      } else if (!this.data._dataLoaded) {
+        this.loadPageData()
+      }
     }
   },
 
@@ -165,6 +172,7 @@ Page({
         showUpgradeHint,
         upgradeHintText,
         loading: false,
+        _dataLoaded: true,
       })
 
       Logger.info('首页', '数据加载完成', { stats, recommendCount: recommendData.length })

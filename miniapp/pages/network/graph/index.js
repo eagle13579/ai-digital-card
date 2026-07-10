@@ -473,10 +473,19 @@ Page({
     }
   },
 
-  onTouchEnd() {
+  onTouchEnd(e) {
     this.touch.dragging = false
     this.touch.draggedNode = null
     this.pinch.dist = 0
+    // 点击检测：移动距离小于10px视为点击
+    if (e && e.changedTouches && e.changedTouches.length > 0) {
+      const deltaX = Math.abs(e.changedTouches[0].x - this.tapStartX)
+      const deltaY = Math.abs(e.changedTouches[0].y - this.tapStartY)
+      if (deltaX < 10 && deltaY < 10 && this.tapTarget) {
+        const node = this.tapTarget
+        wx.navigateTo({ url: `/pages/card/card?id=${node.id}` })
+      }
+    }
   },
 
   // ==================================================

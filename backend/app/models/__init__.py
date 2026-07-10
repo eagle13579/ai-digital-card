@@ -3,6 +3,7 @@ from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
+from app.models.social_connection import SocialConnection
 from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
 from app.models.webhook import WebhookSubscription
 from app.models.integration import Integration
@@ -12,6 +13,9 @@ from app.models.api_key import ApiKey, ApiKeyUsage
 from app.models.message import Message
 from app.models.invoice import Invoice
 from app.models.usage_counter import UsageCounter
+from app.models.nfc_card import NFCCard
+from app.models.nfc_tap import NfcTapRecord
+from app.models.resource_platform import ResourcePlatform, PlatformMember, PlatformOpportunity
 from app.models.gaia import (
     GaiaKnowledge,
     GaiaEvolutionEvent,
@@ -32,7 +36,7 @@ from app.models.gaia import (
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
-    "VisitorLog", "TrustNetwork", "PaymentOrder", "EnterpriseSubscription", "Integration",
+    "VisitorLog", "TrustNetwork", "SocialConnection", "PaymentOrder", "EnterpriseSubscription", "Integration",
     "WebhookSubscription",
     "ABTest", "ABTestVariant", "ABTestEvent",
     "AuditLog",
@@ -40,6 +44,9 @@ __all__ = [
     "Message",
     "Invoice",
     "UsageCounter",
+    "NFCCard",
+    "NfcTapRecord",
+    "ResourcePlatform", "PlatformMember", "PlatformOpportunity",
     "GaiaKnowledge", "GaiaEvolutionEvent", "GaiaTrainingRun", "GaiaModelWeights",
     "KnowledgeModel",
     # CRM
