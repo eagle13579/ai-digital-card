@@ -222,7 +222,7 @@ Page({
         const teamId = res?.data?.id || res?.id
         wx.showToast({ title: '平台创建成功', icon: 'success' })
         setTimeout(() => {
-          wx.switchTab({ url: '/pages/profile/profile' })
+          wx.navigateBack()
         }, 1500)
       })
       .catch(err => {

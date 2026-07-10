@@ -100,7 +100,7 @@ Page({
         currentPage: 0,
         loading: false,
         error: false,
-        pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+        pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
         pageType: firstPage.type || '',
       })
       Logger.info('画册预览页', '渲染完成（新格式透传）', { totalPages: pages.length })
@@ -287,7 +287,7 @@ Page({
       currentPage: 0,
       loading: false,
       error: false,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
       pageType: firstPage && firstPage.type ? firstPage.type : '',
     })
 
@@ -404,7 +404,7 @@ Page({
 
     this.setData({
       currentPage: current,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
       pageType: page && page.type ? page.type : '',
     })
   },

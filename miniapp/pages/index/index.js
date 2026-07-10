@@ -196,11 +196,7 @@ Page({
   },
 
   goQrCode() {
-    wx.showModal({
-      title: '提示',
-      content: '二维码功能即将开放，敬请期待',
-      showCancel: false
-    })
+    wx.navigateTo({ url: '/pages/qrcode/index' })
   },
 
   shareCard() {
