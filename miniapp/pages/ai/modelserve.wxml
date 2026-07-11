@@ -1,0 +1,105 @@
+<view class="page-container modelserve-page">
+  <!-- 加载状态 -->
+  <view class="ms-loading" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在探测模型服务...</text>
+  </view>
+
+  <block wx:if="{{!loading}}">
+    <!-- 头部 -->
+    <view class="ms-header">
+      <text class="ms-title">⚙️ 模型服务状态</text>
+      <text class="ms-subtitle">AI模型服务集群运行监控</text>
+    </view>
+
+    <!-- 概览统计 -->
+    <view class="ms-stats">
+      <view class="ms-stat-card" data-status="all" bindtap="filterByStatus">
+        <text class="ms-stat-num">{{stats.total}}</text>
+        <text class="ms-stat-label">总计</text>
+      </view>
+      <view class="ms-stat-card online" data-status="online" bindtap="filterByStatus">
+        <text class="ms-stat-num">{{stats.online}}</text>
+        <text class="ms-stat-label">在线</text>
+      </view>
+      <view class="ms-stat-card degraded" data-status="degraded" bindtap="filterByStatus">
+        <text class="ms-stat-num">{{stats.degraded}}</text>
+        <text class="ms-stat-label">降级</text>
+      </view>
+      <view class="ms-stat-card offline" data-status="offline" bindtap="filterByStatus">
+        <text class="ms-stat-num">{{stats.offline}}</text>
+        <text class="ms-stat-label">离线</text>
+      </view>
+    </view>
+
+    <!-- 刷新按钮 -->
+    <view class="ms-refresh-row">
+      <text class="ms-filter-label">当前筛选：{{filterStatus === 'all' ? '全部' : filterStatus === 'online' ? '在线' : filterStatus === 'degraded' ? '降级' : '离线'}}</text>
+      <view class="ms-refresh-btn" bindtap="refresh">
+        <text>🔄 刷新</text>
+      </view>
+    </view>
+
+    <!-- 服务列表 -->
+    <view class="ms-service-list">
+      <view class="ms-service-card" wx:for="{{services}}" wx:key="id"
+        wx:if="{{filterStatus === 'all' || item.status === filterStatus}}">
+        <!-- 头部 -->
+        <view class="ms-svc-header">
+          <view class="ms-svc-name-row">
+            <view class="ms-svc-icon" style="background:{{getStatusColor(item.status)}}20;">
+              <text style="font-size:20px;">{{item.status === 'online' ? '✅' : item.status === 'degraded' ? '⚠️' : '❌'}}</text>
+            </view>
+            <view class="ms-svc-info">
+              <text class="ms-svc-name">{{item.name}}</text>
+              <text class="ms-svc-model">{{item.model}}</text>
+            </view>
+          </view>
+          <view class="ms-svc-status" style="background:{{getStatusColor(item.status)}}15;color:{{getStatusColor(item.status)}};">
+            <view class="ms-svc-dot" style="background:{{getStatusColor(item.status)}}"></view>
+            <text>{{getStatusText(item.status)}}</text>
+          </view>
+        </view>
+
+        <!-- 指标 -->
+        <view class="ms-svc-metrics">
+          <view class="ms-metric">
+            <text class="ms-metric-label">运行时长</text>
+            <text class="ms-metric-value">{{item.uptime}}</text>
+          </view>
+          <view class="ms-metric">
+            <text class="ms-metric-label">响应延迟</text>
+            <text class="ms-metric-value">{{item.latency}}</text>
+          </view>
+          <view class="ms-metric">
+            <text class="ms-metric-label">今日请求</text>
+            <text class="ms-metric-value">{{item.requestsToday.toLocaleString()}}</text>
+          </view>
+          <view class="ms-metric">
+            <text class="ms-metric-label">GPU使用率</text>
+            <text class="ms-metric-value">{{item.gpuUtil}}</text>
+          </view>
+        </view>
+
+        <!-- 底部 -->
+        <view class="ms-svc-footer">
+          <view class="ms-svc-version">
+            <text class="ms-ver-label">版本</text>
+            <text class="ms-ver-value">{{item.version}}</text>
+          </view>
+          <view class="ms-svc-actions" wx:if="{{item.status !== 'online'}}">
+            <button class="ms-restart-btn" data-name="{{item.name}}" bindtap="restartService">重启</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{services.length === 0}}">
+      <text class="empty-icon">⚙️</text>
+      <text class="empty-text">暂无模型服务数据</text>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </block>
+</view>

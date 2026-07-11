@@ -45,6 +45,10 @@
         <text class="action-icon">📱</text>
         <text class="action-label">我的二维码</text>
       </view>
+      <view class="action-item" bindtap="goAICenter">
+        <text class="action-icon">🤖</text>
+        <text class="action-label">AI智能</text>
+      </view>
       <view class="action-item" bindtap="shareCard">
         <text class="action-icon">📤</text>
         <text class="action-label">分享名片</text>

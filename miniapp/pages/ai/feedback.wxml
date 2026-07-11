@@ -1,0 +1,76 @@
+<view class="page-container feedback-page">
+  <!-- 头部 -->
+  <view class="fb-header">
+    <text class="fb-title">💬 反馈建议</text>
+    <text class="fb-subtitle">你的每一条反馈都在帮助我们变得更好</text>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'submit' ? 'active' : ''}}" data-tab="submit" bindtap="switchTab">📝 提交反馈</view>
+    <view class="tab-item {{currentTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">📋 历史记录</view>
+  </view>
+
+  <!-- 提交反馈 -->
+  <view class="submit-section" wx:if="{{currentTab === 'submit'}}">
+    <view class="fb-card">
+      <view class="form-group">
+        <text class="form-label">反馈类型</text>
+        <picker mode="selector" range="{{feedbackTypes}}" range-key="label" value="{{selectedType}}" bindchange="onTypeChange">
+          <view class="picker-trigger">
+            <text class="picker-text">{{feedbackTypes[selectedType].label}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">标题</text>
+        <input class="form-input" placeholder="简要描述你的反馈" value="{{title}}" bindinput="onTitleInput" maxlength="50" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">详细内容</text>
+        <textarea class="form-textarea fb-textarea" placeholder="请详细描述你的问题或建议..." value="{{content}}" bindinput="onContentInput" maxlength="500" />
+        <text class="char-count">{{content.length}}/500</text>
+      </view>
+
+      <button class="btn-primary" bindtap="submitFeedback" disabled="{{submitting}}">
+        {{submitting ? '提交中...' : '提交反馈'}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="history-section" wx:if="{{currentTab === 'history'}}">
+    <view class="history-list">
+      <view class="history-item" wx:for="{{history}}" wx:key="id">
+        <view class="hi-header">
+          <view class="hi-type-row">
+            <text class="hi-type">{{getTypeLabel(item.type)}}</text>
+            <view class="hi-status" style="background:{{getStatusColor(item.status)}}15;color:{{getStatusColor(item.status)}};">
+              <view class="hi-status-dot" style="background:{{getStatusColor(item.status)}}"></view>
+              <text>{{getStatusText(item.status)}}</text>
+            </view>
+          </view>
+          <text class="hi-title">{{item.title}}</text>
+        </view>
+        <text class="hi-content">{{item.content}}</text>
+        <view class="hi-reply" wx:if="{{item.reply}}">
+          <text class="hi-reply-label">📩 回复：</text>
+          <text class="hi-reply-text">{{item.reply}}</text>
+        </view>
+        <view class="hi-footer">
+          <text class="hi-date">{{item.createdAt}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!historyLoading && history.length === 0}}">
+      <text class="empty-icon">💬</text>
+      <text class="empty-text">暂无反馈记录</text>
+    </view>
+  </view>
+
+  <view class="bottom-placeholder"></view>
+</view>

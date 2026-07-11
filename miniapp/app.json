@@ -17,7 +17,11 @@
     "pages/ai/chat/index",
     "pages/ai/generate/index",
     "pages/ai/config/index",
-    "pages/ai/index/index"
+    "pages/ai/index/index",
+    "pages/ai/gaia",
+    "pages/ai/abtest",
+    "pages/ai/feedback",
+    "pages/ai/modelserve"
   ],
   "window": {
     "navigationBarTextStyle": "black",

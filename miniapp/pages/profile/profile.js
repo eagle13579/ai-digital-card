@@ -95,6 +95,11 @@ Page({
     wx.navigateTo({ url: '/pages/network/graph/index' })
   },
 
+  // AI智能中心
+  goAICenter() {
+    wx.navigateTo({ url: '/pages/ai/index/index' })
+  },
+
   // 隐私设置
   goPrivacy() {
     wx.navigateTo({ url: '/pages/agreement/privacy/index' })

@@ -153,6 +153,10 @@ Page({
     wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
+  goAICenter() {
+    wx.navigateTo({ url: '/pages/ai/index/index' })
+  },
+
   onShareAppMessage() {
     const brochure = this.data.brochure
     return {
