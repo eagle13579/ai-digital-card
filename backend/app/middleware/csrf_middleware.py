@@ -40,6 +40,12 @@ EXCLUDED_PATHS = (
     "/api/auth/wx-login",
     "/api/payments/webhook",
     "/api/webhooks/",
+    "/api/brochures",
+    "/api/brochure/",
+    "/api/match/",
+    "/api/trust/",
+    "/api/card/",
+    "/api/visitors/",
 )
 """不进行 CSRF 校验的路径前缀（登录、注册、第三方回调等）。"""
 

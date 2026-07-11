@@ -212,6 +212,8 @@ def create_app():
     app.include_router(webhook_router)
     app.include_router(recommend_router)
     app.include_router(ab_test_router)
+    from app.routers.xinsen_match import router as xinsen_router
+    app.include_router(xinsen_router)
     app.include_router(api_keys_router)
     app.include_router(docs_router)
     app.include_router(web_vitals_router)
