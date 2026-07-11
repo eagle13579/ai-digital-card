@@ -297,13 +297,16 @@ Page({
 
   onTouchStart(e) {
     const touch = e.touches[0]
+    const canvasRect = this._canvasRect || { left: 0, top: 0 }
+    const tx = touch.clientX - canvasRect.left
+    const ty = touch.clientY - canvasRect.top
     const centerX = this.canvasWidth / 2
     const centerY = this.canvasHeight / 2
 
     for (let i = this.nodes.length - 1; i >= 0; i--) {
       const node = this.nodes[i]
-      const dx = touch.clientX - (centerX + node.x)
-      const dy = touch.clientY - (centerY + node.y)
+      const dx = tx - (centerX + node.x)
+      const dy = ty - (centerY + node.y)
       if (dx * dx + dy * dy <= node.radius * node.radius * 4) {
         this.draggingNode = node
         this.stopAnimation()
@@ -315,11 +318,14 @@ Page({
   onTouchMove(e) {
     if (!this.draggingNode) return
     const touch = e.touches[0]
+    const canvasRect = this._canvasRect || { left: 0, top: 0 }
+    const tx = touch.clientX - canvasRect.left
+    const ty = touch.clientY - canvasRect.top
     const centerX = this.canvasWidth / 2
     const centerY = this.canvasHeight / 2
 
-    this.draggingNode.x = touch.clientX - centerX
-    this.draggingNode.y = touch.clientY - centerY
+    this.draggingNode.x = tx - centerX
+    this.draggingNode.y = ty - centerY
     this.renderGraph()
   },
 
