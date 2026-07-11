@@ -11,6 +11,8 @@ from app.models.audit import AuditLog
 from app.models.api_key import ApiKey, ApiKeyUsage
 from app.models.message import Message
 from app.models.invoice import Invoice
+from app.models.platform import Platform, PlatformMember
+from app.models.connection import Connection
 from app.models.gaia import (
     GaiaKnowledge,
     GaiaEvolutionEvent,
@@ -40,6 +42,8 @@ __all__ = [
     "Invoice",
     "GaiaKnowledge", "GaiaEvolutionEvent", "GaiaTrainingRun", "GaiaModelWeights",
     "KnowledgeModel",
+    "Platform", "PlatformMember",
+    "Connection",
     # CRM
     "CrmContact", "CrmDeal", "CrmPipelineStage", "CrmActivity", "CrmNote",
 ]

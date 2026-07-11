@@ -24,6 +24,10 @@ class Brochure(Base):
     share_token: Mapped[str] = mapped_column(String(32), unique=True, default=generate_share_token)
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     album_meta: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON: 翻页图册元数据
+    visibility: Mapped[str] = mapped_column(String(16), default="public",
+        comment="可见性: public(所有人) / platform(同平台) / network(好友) / private(仅自己)")
+    platform_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("platforms.id"), nullable=True, default=None,
+        comment="关联平台ID(visibility=platform时使用)")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 

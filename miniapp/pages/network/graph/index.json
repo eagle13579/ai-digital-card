@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "信任网络",
   "usingComponents": {
-    "network-mini-map": "/components/network-mini-map/index"
+    "network-mini-map": "/components/network-mini-map/index",
+    "path-display": "/components/path-display/index"
   }
 }

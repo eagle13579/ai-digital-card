@@ -1,0 +1,177 @@
+.path-display {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.path-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.path-card {
+  position: relative;
+  width: 85%;
+  max-width: 360px;
+  max-height: 70vh;
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.path-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.path-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.path-close {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+}
+
+.path-body {
+  padding: 20px 16px;
+}
+
+.path-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.path-distance {
+  font-size: 24px;
+  font-weight: 700;
+  color: #8b5cf6;
+  display: block;
+}
+
+.path-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  display: block;
+}
+
+.path-info.not-found .path-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.path-info.not-found .path-message {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.path-nodes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.path-node {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  min-width: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.path-node:active {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.node-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.2);
+  border: 2px solid rgba(139, 92, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-dot.first {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  border-color: #8b5cf6;
+}
+
+.node-dot.last {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  border-color: #06b6d4;
+}
+
+.node-initial {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.node-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  flex: 1;
+}
+
+.node-degree {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.path-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.connector-line {
+  width: 1px;
+  height: 12px;
+  background: rgba(139, 92, 246, 0.3);
+}
+
+.connector-arrow {
+  font-size: 14px;
+  color: rgba(139, 92, 246, 0.5);
+}
+
+.path-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.path-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}

@@ -6,7 +6,8 @@
  *   1. 将 USE_MOCK 改为 false 即可使用真实API
  *   2. 将 USE_MOCK 改为 true 即可使用Mock数据
  */
-const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_AI_GENERATE_TEMPLATES } = require('./test-data')
+const store = require('./store')
+const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_FRIENDS_MAP, TEST_PLATFORMS, TEST_PLATFORM_MEMBERS, TEST_PLATFORM_APPLICATIONS, TEST_AI_GENERATE_TEMPLATES } = require('./test-data')
 const { Logger } = require('./util')
 const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi } = require('./api')
 
@@ -34,8 +35,7 @@ const MockService = {
   },
 
   getTestUserByToken() {
-    const app = getApp()
-    const token = app.globalData.token
+    const { token } = store.getState()
     if (!token) {
       console.warn('[MockService] token为空，返回free用户')
       return TEST_USERS.free
@@ -53,8 +53,8 @@ const MockService = {
     if (this.USE_MOCK) {
       await this.mockDelay()
       const user = TEST_USERS.gold
-      const app = getApp()
-      app.setLogin(user.token, user.userInfo, user.memberLevel, true)
+      store.setAuth(user.token, user.userInfo)
+      if (user.memberLevel) store.updateMemberLevel(user.memberLevel)
       return {
         token: user.token,
         userInfo: user.userInfo,
@@ -68,15 +68,15 @@ const MockService = {
     if (this.USE_MOCK) {
       await this.mockDelay()
       const user = TEST_USERS.gold
-      const app = getApp()
-      app.setLogin(user.token, user.userInfo, user.memberLevel, true)
+      store.setAuth(user.token, user.userInfo)
+      if (user.memberLevel) store.updateMemberLevel(user.memberLevel)
       return {
         token: user.token,
         userInfo: user.userInfo,
         memberLevel: user.memberLevel,
       }
     }
-    return miniappApi.login(data)
+    return authApi.wxMiniLogin(data.code)
   },
 
   async getBrochures() {
@@ -267,6 +267,173 @@ const MockService = {
     // TODO: 对接真实API
     const { api } = require('./api')
     return api.post('/api/v1/resources', formData)
+  },
+
+  // ====== 好友列表 ======
+  async getFriendsList(userId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 600)
+      const key = userId || 'self'
+      return TEST_FRIENDS_MAP[key] || []
+    }
+    return trustApi.getNetwork(userId)
+  },
+
+  // ====== BFS触达路径 ======
+  async findPath(targetUserId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 1000)
+      const { BFSFinder } = require('./bfs')
+      const getFriends = async (id) => {
+        const key = id === 'self' ? 'self' : id
+        return TEST_FRIENDS_MAP[key] || []
+      }
+      const result = await BFSFinder.findPath('self', targetUserId, getFriends)
+      return result
+    }
+    return trustApi.getScore(targetUserId)
+  },
+
+  // ====== 平台管理 ======
+  async createPlatform(formData) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(800, 1200)
+      const newPlatform = {
+        id: `p${Date.now()}`,
+        ...formData,
+        creator_id: this.getTestUserByToken().user_id,
+        created_at: Date.now(),
+        member_count: 1,
+        resource_count: 0,
+      }
+      TEST_PLATFORMS.unshift(newPlatform)
+      // 创建者自动成为秘书长
+      const { userInfo } = store.getState()
+      const userId = userInfo?.id || 'u001'
+      const userName = userInfo?.name || '我'
+      if (!TEST_PLATFORM_MEMBERS[newPlatform.id]) {
+        TEST_PLATFORM_MEMBERS[newPlatform.id] = []
+      }
+      TEST_PLATFORM_MEMBERS[newPlatform.id].push({
+        id: userId,
+        name: userName,
+        role: 'secretary_general',
+        joined_at: Date.now(),
+      })
+      Logger.info('平台管理', 'Mock创建平台', newPlatform)
+      return { success: true, message: '创建成功', data: newPlatform }
+    }
+    const { api } = require('./api')
+    return api.post('/api/v1/platforms', formData)
+  },
+
+  async getPlatformList() {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      return { data: TEST_PLATFORMS }
+    }
+    const { api } = require('./api')
+    return api.get('/api/v1/platforms')
+  },
+
+  async getPlatformDetail(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 600)
+      const platform = TEST_PLATFORMS.find(p => p.id === platformId)
+      return platform || TEST_PLATFORMS[0]
+    }
+    const { api } = require('./api')
+    return api.get(`/api/v1/platforms/${platformId}`)
+  },
+
+  async getPlatformMembers(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 600)
+      const members = TEST_PLATFORM_MEMBERS[platformId] || []
+      // 按角色排序：秘书长 > 秘书处 > 会员
+      const roleOrder = { secretary_general: 1, secretariat: 2, member: 3 }
+      members.sort((a, b) => (roleOrder[a.role] || 9) - (roleOrder[b.role] || 9))
+      return { data: members }
+    }
+    const { api } = require('./api')
+    return api.get(`/api/v1/platforms/${platformId}/members`)
+  },
+
+  async getPlatformApplications(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      return { data: TEST_PLATFORM_APPLICATIONS[platformId] || [] }
+    }
+    const { api } = require('./api')
+    return api.get(`/api/v1/platforms/${platformId}/applications`)
+  },
+
+  async reviewApplication(applicationId, approved) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 800)
+      // 查找并更新申请
+      for (const pid in TEST_PLATFORM_APPLICATIONS) {
+        const apps = TEST_PLATFORM_APPLICATIONS[pid]
+        const idx = apps.findIndex(a => a.id === applicationId)
+        if (idx !== -1) {
+          if (approved) {
+            apps[idx].status = 'approved'
+            // 添加到成员列表
+            if (!TEST_PLATFORM_MEMBERS[pid]) TEST_PLATFORM_MEMBERS[pid] = []
+            TEST_PLATFORM_MEMBERS[pid].push({
+              id: apps[idx].user_id,
+              name: apps[idx].user_name,
+              role: 'member',
+              joined_at: Date.now(),
+            })
+          } else {
+            apps[idx].status = 'rejected'
+          }
+          break
+        }
+      }
+      return { success: true, message: approved ? '已通过申请' : '已拒绝申请' }
+    }
+    const { api } = require('./api')
+    return api.put(`/api/v1/applications/${applicationId}`, { approved })
+  },
+
+  async inviteMember(platformId, userId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 800)
+      if (!TEST_PLATFORM_MEMBERS[platformId]) TEST_PLATFORM_MEMBERS[platformId] = []
+      TEST_PLATFORM_MEMBERS[platformId].push({
+        id: userId,
+        name: `用户${userId}`,
+        role: 'member',
+        joined_at: Date.now(),
+      })
+      return { success: true, message: '邀请成功' }
+    }
+    const { api } = require('./api')
+    return api.post(`/api/v1/platforms/${platformId}/invite`, { user_id: userId })
+  },
+
+  async getPlatformReport(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 800)
+      const members = TEST_PLATFORM_MEMBERS[platformId] || []
+      // 角色分布
+      const roleDistribution = { secretary_general: 0, secretariat: 0, member: 0 }
+      members.forEach(m => { roleDistribution[m.role] = (roleDistribution[m.role] || 0) + 1 })
+      // 资源统计
+      const platform = TEST_PLATFORMS.find(p => p.id === platformId)
+      return {
+        data: {
+          roleDistribution,
+          totalMembers: members.length,
+          resourceCount: platform?.resource_count || 0,
+          industries: platform?.industries || [],
+        },
+      }
+    }
+    const { api } = require('./api')
+    return api.get(`/api/v1/platforms/${platformId}/report`)
   },
 }
 

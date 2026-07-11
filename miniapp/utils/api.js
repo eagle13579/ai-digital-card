@@ -1,14 +1,44 @@
 /**
  * API 接口封装
- * 指向新后端 http://localhost:8003
+ * AI数智名片 - 微信小程序
+ * 
+ * 所有接口返回 Promise，成功时直接返回 data 字段（由 request.js 统一解包）。
+ * 遵循 { code, message, data } 响应格式。
+ * 
+ * 参考: D:\AI询赋拆解\frontend\src\services\api.ts
  */
 const { get, post, put, del } = require('./request')
 
+// ===== 认证模块 =====
+const authApi = {
+  /** 微信小程序一键登录（wx.login → code → JWT） */
+  wxMiniLogin(code) {
+    return post('/api/auth/wx-mini-login', { code }, { noAuth: true })
+  },
+
+  /** 手机号 + 验证码登录（H5/备用） */
+  login(data) {
+    return post('/api/auth/login', data, { noAuth: true })
+  },
+
+  /** 注册 */
+  register(data) {
+    return post('/api/auth/register', data, { noAuth: true })
+  },
+
+  /** 登出 */
+  logout() {
+    return post('/api/auth/logout')
+  },
+
+  /** 获取当前用户信息 */
+  getProfile() {
+    return get('/api/auth/me')
+  },
+}
+
 // ===== 小程序专用模块 (mini app) =====
 const miniappApi = {
-  login(data) {
-    return post('/api/v1/miniapp/login', data, { noAuth: true })
-  },
   getCards(params) {
     return get('/api/v1/miniapp/cards', params)
   },
@@ -20,19 +50,6 @@ const miniappApi = {
   },
   share(data) {
     return post('/api/v1/miniapp/share', data)
-  },
-}
-
-// ===== 认证模块 =====
-const authApi = {
-  login(data) {
-    return post('/api/auth/login', data, { noAuth: true })
-  },
-  register(data) {
-    return post('/api/auth/register', data, { noAuth: true })
-  },
-  logout() {
-    return post('/api/auth/logout')
   },
 }
 

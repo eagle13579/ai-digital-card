@@ -38,6 +38,8 @@ from app.crm.crm_router import router as crm_router
 from app.routers.bot_router import router as bot_router
 from app.routers.document import router as document_router
 from app.routers.analytics import router as analytics_router
+from app.routers.platform_router import router as platform_router
+from app.routers.connection_router import router as connection_router
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -78,4 +80,6 @@ __all__ = [
     "bot_router",
     "document_router",
     "analytics_router",
+    "platform_router",
+    "connection_router",
 ]

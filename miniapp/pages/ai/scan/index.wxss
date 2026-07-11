@@ -122,3 +122,72 @@
 .save-area {
   padding: 0 16px 32px;
 }
+
+/* 扫码分割线 */
+.scan-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 24px 0 16px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 16px;
+  padding: 14px 48px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 12px;
+}
+
+/* 扫码结果卡片 - 二维码 */
+.qr-info {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-type-badge {
+  font-size: 14px;
+  padding: 6px 16px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 20px;
+  color: #a78bfa;
+}
+
+.qr-id {
+  font-size: 15px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.qr-raw {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  word-break: break-all;
+  text-align: center;
+}
+
+.auto-jump-hint {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 14px 0;
+}

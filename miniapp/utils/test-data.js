@@ -1,6 +1,7 @@
 /**
  * 测试数据 - AI数智名片小程序
  */
+const store = require('./store')
 
 const TEST_USERS = {
   free: {
@@ -355,6 +356,125 @@ const TEST_TRUST_NETWORK = {
   ],
 }
 
+// ===== 扩展好友关系图谱（用于BFS测试） =====
+const TEST_FRIENDS_MAP = {
+  // 当前用户的好友
+  self: [
+    { id: 't001', name: '张三' },
+    { id: 't002', name: '李四' },
+    { id: 't003', name: '王五' },
+  ],
+  // 张三的好友
+  t001: [
+    { id: 't002', name: '李四' },
+    { id: 't004', name: '赵六' },
+    { id: 't008', name: '周八' },
+  ],
+  // 李四的好友
+  t002: [
+    { id: 't001', name: '张三' },
+    { id: 't005', name: '孙七' },
+    { id: 't009', name: '吴九' },
+  ],
+  // 王五的好友
+  t003: [
+    { id: 't006', name: '郑十' },
+    { id: 't007', name: '冯十一' },
+  ],
+  // 赵六的好友
+  t004: [
+    { id: 't001', name: '张三' },
+    { id: 't010', name: '陈十二' },
+  ],
+  // 孙七的好友
+  t005: [
+    { id: 't002', name: '李四' },
+    { id: 't011', name: '褚十三' },
+  ],
+  // 郑十的好友
+  t006: [
+    { id: 't003', name: '王五' },
+    { id: 't012', name: '魏十四' },
+    { id: 't013', name: '蒋十五' },
+  ],
+  // 冯十一的好友
+  t007: [{ id: 't003', name: '王五' }],
+  // 周八的好友
+  t008: [{ id: 't001', name: '张三' }],
+  // 吴九的好友
+  t009: [{ id: 't002', name: '李四' }],
+  // 陈十二的好友
+  t010: [{ id: 't004', name: '赵六' }],
+  // 褚十三的好友
+  t011: [{ id: 't005', name: '孙七' }],
+  // 魏十四的好友
+  t012: [{ id: 't006', name: '郑十' }],
+  // 蒋十五的好友
+  t013: [{ id: 't006', name: '郑十' }],
+}
+
+// ===== 平台测试数据 =====
+const TEST_PLATFORMS = [
+  {
+    id: 'p001',
+    name: '长三角产业资源平台',
+    description: '汇聚长三角地区优质产业资源，促进区域经济协同发展',
+    creator_id: 'u001',
+    annual_fee: 999,
+    industries: ['科技', '制造', '金融'],
+    province: '上海市',
+    city: '上海市',
+    created_at: Date.now() - 86400000 * 30,
+    member_count: 12,
+    resource_count: 45,
+  },
+  {
+    id: 'p002',
+    name: '粤港澳大湾区创新联盟',
+    description: '链接大湾区科技创新资源，打造国际创新生态圈',
+    creator_id: 'u002',
+    annual_fee: 1999,
+    industries: ['科技', '金融'],
+    province: '广东省',
+    city: '深圳市',
+    created_at: Date.now() - 86400000 * 15,
+    member_count: 8,
+    resource_count: 23,
+  },
+]
+
+const TEST_PLATFORM_MEMBERS = {
+  p001: [
+    { id: 'u001', name: '张伟', role: 'secretary_general', joined_at: Date.now() - 86400000 * 30 },
+    { id: 'u002', name: '李娜', role: 'secretariat', joined_at: Date.now() - 86400000 * 25 },
+    { id: 'u003', name: '王强', role: 'secretariat', joined_at: Date.now() - 86400000 * 20 },
+    { id: 'u004', name: '赵敏', role: 'member', joined_at: Date.now() - 86400000 * 18 },
+    { id: 'u005', name: '周瑜', role: 'member', joined_at: Date.now() - 86400000 * 15 },
+    { id: 'u006', name: '吴用', role: 'member', joined_at: Date.now() - 86400000 * 12 },
+    { id: 'u007', name: '郑和', role: 'member', joined_at: Date.now() - 86400000 * 10 },
+    { id: 'u008', name: '王昭君', role: 'member', joined_at: Date.now() - 86400000 * 8 },
+    { id: 'u009', name: '孙膑', role: 'member', joined_at: Date.now() - 86400000 * 6 },
+    { id: 'u010', name: '苏秦', role: 'member', joined_at: Date.now() - 86400000 * 5 },
+    { id: 'u011', name: '张仪', role: 'member', joined_at: Date.now() - 86400000 * 3 },
+    { id: 'u012', name: '范蠡', role: 'member', joined_at: Date.now() - 86400000 * 1 },
+  ],
+  p002: [
+    { id: 'u002', name: '李娜', role: 'secretary_general', joined_at: Date.now() - 86400000 * 15 },
+    { id: 'u003', name: '王强', role: 'secretariat', joined_at: Date.now() - 86400000 * 12 },
+    { id: 'u001', name: '张伟', role: 'member', joined_at: Date.now() - 86400000 * 10 },
+  ],
+}
+
+const TEST_PLATFORM_APPLICATIONS = {
+  p001: [
+    { id: 'a001', user_id: 'u013', user_name: '李白', status: 'pending', applied_at: Date.now() - 3600000 * 2 },
+    { id: 'a002', user_id: 'u014', user_name: '杜甫', status: 'pending', applied_at: Date.now() - 3600000 * 5 },
+  ],
+  p002: [
+    { id: 'a003', user_id: 'u015', user_name: '白居易', status: 'pending', applied_at: Date.now() - 3600000 },
+  ],
+}
+
 const TEST_AI_GENERATE_TEMPLATES = {
   intro: {
     professional: {
@@ -401,8 +521,7 @@ const TestData = {
   },
 
   getTestUserByToken() {
-    const app = getApp()
-    const token = app.globalData.token
+    const { token } = store.getState()
     if (!token) {
       console.warn('[TestData] token为空，返回free用户')
       return TEST_USERS.free
@@ -441,6 +560,10 @@ module.exports = {
   TEST_TAGS,
   TEST_VISITOR_STATS,
   TEST_TRUST_NETWORK,
+  TEST_FRIENDS_MAP,
+  TEST_PLATFORMS,
+  TEST_PLATFORM_MEMBERS,
+  TEST_PLATFORM_APPLICATIONS,
   TEST_AI_GENERATE_TEMPLATES,
   TestData,
 }

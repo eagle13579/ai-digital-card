@@ -1,0 +1,47 @@
+<view class="path-display" wx:if="{{visible && showResult}}">
+  <view class="path-overlay" bindtap="close"></view>
+  <view class="path-card">
+    <view class="path-header">
+      <text class="path-title">🔗 触达路径</text>
+      <text class="path-close" bindtap="close">✕</text>
+    </view>
+
+    <view class="path-body">
+      <view class="path-info" wx:if="{{distance > 0}}">
+        <text class="path-distance">{{distance}}度人脉</text>
+        <text class="path-message">{{message}}</text>
+      </view>
+      <view class="path-info not-found" wx:if="{{distance === -1}}">
+        <text class="path-icon">🔍</text>
+        <text class="path-message">{{message || '未找到可触达路径'}}</text>
+      </view>
+
+      <view class="path-nodes" wx:if="{{distance > 0}}">
+        <view
+          class="path-node"
+          wx:for="{{displayNodes}}"
+          wx:key="id"
+          catchtap="onNodeTap"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+        >
+          <view class="node-dot {{item.isFirst ? 'first' : ''}} {{item.isLast ? 'last' : ''}}">
+            <text class="node-initial">{{item.name ? item.name[0] : '?'}}</text>
+          </view>
+          <text class="node-name">{{item.name}}</text>
+          <text class="node-degree" wx:if="{{item.isLast}}">(目标)</text>
+          <text class="node-degree" wx:elif="{{item.isFirst}}">(我)</text>
+        </view>
+
+        <view class="path-connector" wx:for="{{displayNodes}}" wx:for-index="i" wx:key="*this" wx:if="{{i < displayNodes.length - 1}}">
+          <view class="connector-line"></view>
+          <text class="connector-arrow">→</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="path-footer" wx:if="{{distance > 0}}">
+      <text class="path-hint">点击节点查看详情</text>
+    </view>
+  </view>
+</view>

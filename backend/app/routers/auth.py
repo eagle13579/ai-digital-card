@@ -89,6 +89,25 @@ async def get_current_user(
     return user
 
 
+async def get_optional_user(
+    token: str | None = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """依赖项：可选用户认证 — 有 token 则返回用户，无 token 返回 None（不报错）"""
+    if token is None:
+        return None
+    try:
+        payload = decode_access_token(token)
+        user_id_str: str | None = payload.get("sub")
+        if user_id_str is None:
+            return None
+        user_id = int(user_id_str)
+        result = await db.execute(select(User).where(User.id == user_id))
+        return result.scalars().first()
+    except (JWTError, ValueError, Exception):
+        return None
+
+
 async def authenticate_user(db: AsyncSession, phone: str, password: str) -> User | None:
     result = await db.execute(select(User).where(User.phone == phone))
     user = result.scalars().first()

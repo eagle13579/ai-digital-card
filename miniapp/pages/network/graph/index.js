@@ -1,9 +1,20 @@
 const MockService = require('../../../utils/mockService')
+const { BFSFinder } = require('../../../utils/bfs')
 
 Page({
   data: {
     nodeCount: 0,
     hasData: true,
+    // BFS相关
+    showPathSearch: false,
+    targetUserId: '',
+    searchingPath: false,
+    pathResult: null,
+    showPathResult: false,
+    // 好友列表
+    friendList: [],
+    loadingFriends: false,
+    searchMode: 'navigate', // navigate | quick
   },
 
   nodes: [],
@@ -15,22 +26,31 @@ Page({
   animationId: null,
   draggingNode: null,
 
-  onLoad() {
-    const saved = wx.getStorageSync('trust_network')
-    if (saved && saved.length) {
-      this.nodes = saved
+  onLoad(options) {
+    // 支持外部传入nodes数据
+    if (options.data && options.nodes) {
+      this.nodes = options.nodes
+      this.buildEdgesFromNodes()
       this.setData({
-        nodeCount: this.nodes.length - 1, // exclude 'self'
+        nodeCount: this.nodes.length - 1,
         hasData: this.nodes.length > 1,
       })
     } else {
-      this.loadData()
+      const saved = wx.getStorageSync('trust_network')
+      if (saved && saved.length) {
+        this.nodes = saved
+        this.setData({
+          nodeCount: this.nodes.length - 1,
+          hasData: this.nodes.length > 1,
+        })
+      } else {
+        this.loadData()
+      }
     }
   },
 
   onReady() {
     this.initCanvas()
-    // renderGraph() is called inside initCanvas() after canvas dimensions are available
   },
 
   onShow() {
@@ -47,68 +67,103 @@ Page({
     this.stopAnimation()
   },
 
-  loadData() {
-    const trustNet = MockService.getTrustNetwork()
-    const trusting = trustNet.trusting || []
-    const trustedBy = trustNet.trustedBy || []
-    const allContacts = [...trusting, ...trustedBy]
-    
-    this.nodes = [{
-      id: 'self',
-      name: '我',
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      radius: 30,
-      isSelf: true,
-    }]
+  // ====== 数据加载 ======
+  async loadData() {
+    try {
+      const trustNet = await MockService.getTrustNetwork()
+      const data = trustNet.data || trustNet
+      const trusting = data.trusting || []
+      const trustedBy = data.trusted_by || []
+      const allContacts = [...trusting, ...trustedBy]
 
-    const angleStep = (Math.PI * 2) / Math.max(allContacts.length, 1)
-
-    allContacts.forEach((contact, index) => {
-      const angle = index * angleStep
-      const distance = 100 + Math.random() * 50
-      this.nodes.push({
-        id: contact.id || `node_${index}`,
-        name: contact.name || `联系人${index + 1}`,
-        x: Math.cos(angle) * distance,
-        y: Math.sin(angle) * distance,
+      this.nodes = [{
+        id: 'self',
+        name: '我',
+        x: 0,
+        y: 0,
         vx: 0,
         vy: 0,
-        radius: 18,
-        isSelf: false,
-        data: contact,
-      })
-      this.edges.push({
-        from: 'self',
-        to: contact.id || `node_${index}`,
-      })
-    })
+        radius: 30,
+        isSelf: true,
+      }]
 
-    this.setData({
-      nodeCount: allContacts.length,
-      hasData: allContacts.length > 0,
+      const angleStep = (Math.PI * 2) / Math.max(allContacts.length, 1)
+
+      allContacts.forEach((contact, index) => {
+        const angle = index * angleStep
+        const distance = 100 + Math.random() * 50
+        this.nodes.push({
+          id: contact.id || `node_${index}`,
+          name: contact.name || `联系人${index + 1}`,
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance,
+          vx: 0,
+          vy: 0,
+          radius: 18,
+          isSelf: false,
+          data: contact,
+        })
+        this.edges.push({
+          from: 'self',
+          to: contact.id || `node_${index}`,
+        })
+      })
+
+      this.setData({
+        nodeCount: allContacts.length,
+        hasData: allContacts.length > 0,
+      })
+
+      if (this.canvasCtx) {
+        this.renderGraph()
+      }
+    } catch (err) {
+      console.error('[Graph] 加载数据失败:', err)
+    }
+  },
+
+  buildEdgesFromNodes() {
+    this.edges = []
+    this.nodes.forEach((node) => {
+      if (!node.isSelf) {
+        this.edges.push({ from: 'self', to: node.id })
+      }
     })
   },
 
+  // 加载好友列表（用于BFS前端快速选择）
+  async loadFriendList() {
+    this.setData({ loadingFriends: true })
+    try {
+      const friends = await MockService.getFriendsList('self')
+      this.setData({
+        friendList: friends || [],
+        loadingFriends: false,
+      })
+    } catch (err) {
+      console.error('[Graph] 加载好友列表失败:', err)
+      this.setData({ loadingFriends: false })
+    }
+  },
+
+  // ====== Canvas 渲染 ======
   initCanvas() {
     const query = wx.createSelectorQuery()
     query.select('#graphCanvas').node((res) => {
       const canvas = res.node
       if (!canvas) return
-      
+
       const ctx = canvas.getContext('2d')
-      
+
       query.select('.graph-canvas').boundingClientRect((rect2) => {
         if (!rect2) return
         this._canvasRect = rect2
         this.canvasWidth = rect2.width
         this.canvasHeight = rect2.height
-        
+
         const sysInfo = wx.getDeviceInfo()
         this.dpr = sysInfo.pixelRatio || 2
-        
+
         canvas.width = this.canvasWidth * this.dpr
         canvas.height = this.canvasHeight * this.dpr
         this.canvasCtx = ctx
@@ -275,6 +330,113 @@ Page({
     }
   },
 
+  // ====== BFS 触达路径查找 ======
+  openPathSearch() {
+    this.loadFriendList()
+    this.setData({
+      showPathSearch: true,
+      targetUserId: '',
+      pathResult: null,
+    })
+  },
+
+  closePathSearch() {
+    this.setData({
+      showPathSearch: false,
+      pathResult: null,
+    })
+  },
+
+  onTargetInput(e) {
+    this.setData({ targetUserId: e.detail.value })
+  },
+
+  // 选择好友列表中的人作为目标
+  selectFriendTarget(e) {
+    const { id, name } = e.currentTarget.dataset
+    this.setData({ targetUserId: id })
+    // 自动搜索
+    this.searchPath()
+  },
+
+  async searchPath() {
+    const targetId = this.data.targetUserId.trim()
+    if (!targetId) {
+      return wx.showToast({ title: '请输入目标用户ID', icon: 'none' })
+    }
+
+    this.setData({ searchingPath: true })
+
+    try {
+      const result = await MockService.findPath(targetId)
+      this.setData({
+        searchingPath: false,
+        pathResult: result,
+        showPathResult: true,
+      })
+
+      // 如果找到路径，高亮节点
+      if (result.path && result.path.length > 1) {
+        this.highlightPath(result.path)
+      }
+    } catch (err) {
+      console.error('[Graph] BFS搜索失败:', err)
+      this.setData({
+        searchingPath: false,
+        pathResult: { distance: -1, path: [], message: '搜索失败，请重试' },
+        showPathResult: true,
+      })
+    }
+  },
+
+  // 高亮路径节点
+  highlightPath(pathNodes) {
+    if (!this.canvasCtx) return
+
+    const pathIds = new Set(pathNodes.map(n => n.id))
+    const ctx = this.canvasCtx
+    const dpr = this.dpr
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    this.renderGraph()
+
+    // 在路径节点外围绘制发光圈
+    this.nodes.forEach((node) => {
+      if (!pathIds.has(node.id)) return
+      const x = centerX + node.x
+      const y = centerY + node.y
+
+      ctx.beginPath()
+      ctx.arc(x, y, node.radius + 6, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)'
+      ctx.lineWidth = 3
+      ctx.stroke()
+
+      // 添加发光效果
+      ctx.beginPath()
+      ctx.arc(x, y, node.radius + 10, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+    })
+  },
+
+  // 路径节点点击
+  onPathNodeTap(e) {
+    const { id, name } = e.detail
+    console.log('[Graph] 路径节点点击:', id, name)
+    wx.showToast({ title: `${name} (${id})`, icon: 'none' })
+  },
+
+  closePathResult() {
+    this.setData({ showPathResult: false })
+    // 重新渲染普通图谱
+    this.renderGraph()
+  },
+
+  // ====== 联系人管理 ======
   addContact() {
     wx.showModal({
       title: '添加联系人',

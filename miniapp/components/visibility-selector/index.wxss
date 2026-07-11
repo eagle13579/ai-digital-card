@@ -1,0 +1,140 @@
+.selector-trigger {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 12px;
+}
+
+.selector-trigger:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.selector-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.selector-value {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.value-text {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.value-desc {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.selector-arrow {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  z-index: 300;
+}
+
+.picker-content {
+  width: 100%;
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.picker-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.picker-close {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+}
+
+.picker-body {
+  padding: 8px 0;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.level-item:active {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.level-item.selected {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.level-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.level-item.selected .level-icon-wrap {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.level-icon {
+  font-size: 14px;
+  color: #8b5cf6;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-label {
+  font-size: 15px;
+  color: #fff;
+  font-weight: 500;
+  display: block;
+}
+
+.level-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+  display: block;
+}

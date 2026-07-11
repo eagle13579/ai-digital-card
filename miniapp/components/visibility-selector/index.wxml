@@ -1,0 +1,36 @@
+<view class="visibility-selector">
+  <view class="selector-trigger" bindtap="openPicker">
+    <view class="selector-label" wx:if="{{showLabel}}">{{label}}</view>
+    <view class="selector-value">
+      <text class="value-text">{{selectedLabel}}</text>
+      <text class="value-desc">{{selectedDesc}}</text>
+    </view>
+    <text class="selector-arrow">›</text>
+  </view>
+
+  <view class="picker-modal" wx:if="{{showPicker}}" bindtap="closePicker">
+    <view class="picker-content" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">选择可见范围</text>
+        <text class="picker-close" bindtap="closePicker">✕</text>
+      </view>
+      <view class="picker-body">
+        <view
+          class="level-item {{item.key === value ? 'selected' : ''}}"
+          wx:for="{{levels}}"
+          wx:key="key"
+          bindtap="selectLevel"
+          data-key="{{item.key}}"
+        >
+          <view class="level-icon-wrap">
+            <text class="level-icon">{{item.key === value ? '✓' : ''}}</text>
+          </view>
+          <view class="level-info">
+            <text class="level-label">{{item.label}}</text>
+            <text class="level-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

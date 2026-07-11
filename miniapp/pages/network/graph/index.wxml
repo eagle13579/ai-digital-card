@@ -3,7 +3,7 @@
     <text class="graph-title">🤝 信任网络图谱</text>
     <text class="graph-subtitle">{{nodeCount}} 位联系人</text>
   </view>
-  
+
   <view class="graph-container">
     <canvas 
       type="2d"
@@ -25,9 +25,9 @@
       <text class="action-icon">+</text>
       <text class="action-text">添加联系人</text>
     </view>
-    <view class="action-btn import-btn" bindtap="importWechat">
-      <text class="action-icon">📱</text>
-      <text class="action-text">导入微信好友</text>
+    <view class="action-btn import-btn" bindtap="openPathSearch">
+      <text class="action-icon">🔍</text>
+      <text class="action-text">触达路径</text>
     </view>
     <view class="action-btn refresh-btn" bindtap="refreshGraph">
       <text class="action-icon">🔄</text>
@@ -49,4 +49,52 @@
       <text class="legend-text">关系连线</text>
     </view>
   </view>
+
+  <!-- BFS 路径搜索面板 -->
+  <view class="search-panel" wx:if="{{showPathSearch}}">
+    <view class="search-overlay" bindtap="closePathSearch"></view>
+    <view class="search-card">
+      <view class="search-header">
+        <text class="search-title">🔍 触达路径查找</text>
+        <text class="search-close" bindtap="closePathSearch">✕</text>
+      </view>
+      <view class="search-body">
+        <view class="input-row">
+          <input class="search-input" placeholder="输入目标用户ID" value="{{targetUserId}}" bindinput="onTargetInput" />
+          <button class="search-btn" bindtap="searchPath" wx:if="{{!searchingPath}}">查找</button>
+          <view class="search-spinner" wx:if="{{searchingPath}}">
+            <view class="mini-spinner"></view>
+          </view>
+        </view>
+
+        <!-- 快速选择好友 -->
+        <view class="friend-hint" wx:if="{{loadingFriends}}">加载好友列表...</view>
+        <view class="friend-list" wx:if="{{friendList.length > 0 && !loadingFriends}}">
+          <text class="friend-list-title">快速选择好友</text>
+          <scroll-view scroll-x class="friend-scroll">
+            <view
+              class="friend-chip {{targetUserId === item.id ? 'selected' : ''}}"
+              wx:for="{{friendList}}"
+              wx:key="id"
+              bindtap="selectFriendTarget"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+            >
+              <text class="chip-name">{{item.name}}</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 路径结果显示 -->
+  <path-display
+    visible="{{showPathResult}}"
+    path="{{pathResult.path}}"
+    distance="{{pathResult.distance}}"
+    message="{{pathResult.message}}"
+    bind:close="closePathResult"
+    bind:nodetap="onPathNodeTap"
+  />
 </view>

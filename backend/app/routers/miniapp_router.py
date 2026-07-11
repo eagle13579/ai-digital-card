@@ -17,9 +17,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.brochure import Brochure, Page
+from app.models.connection import Connection
+from app.models.platform import PlatformMember
 from app.models.tag import MatchRecord
 from app.models.user import User
-from app.routers.auth import get_current_user
+from app.routers.auth import get_current_user, get_optional_user
 from app.schemas import (
     BrochureCreate,
     BrochureResponse,
@@ -81,16 +83,76 @@ class RecommendationResponse(BaseModel):
 async def list_cards(
     user_id: int | None = Query(None, description="按用户ID筛选"),
     status: str | None = Query(None, description="按状态筛选(draft|published)"),
+    visibility: str | None = Query(None, description="按可见性筛选(public|platform|network|private)"),
+    platform_id: int | None = Query(None, description="按平台ID筛选"),
     skip: int = 0,
     limit: int = 50,
     db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
 ):
-    """获取名片列表（适配小程序 GET /api/business-card/cards → GET /api/brochures）"""
+    """获取名片列表（适配小程序 GET /api/business-card/cards → GET /api/brochures）
+
+    支持 4 级可见性矩阵过滤：
+      - public: 所有人可见
+      - platform: 同平台成员可见
+      - network: 好友可见
+      - private: 仅自己可见
+    未登录用户只能看到 public 的资源。
+    """
     query = select(Brochure)
+
+    # ── 4级可见性矩阵过滤 ────────────────────────────────────────────
+    from sqlalchemy import or_
+
+    visibility_conditions = [Brochure.visibility == "public"]
+
+    if current_user is not None:
+        # 自己的资源全部可见
+        visibility_conditions.append(Brochure.user_id == current_user.id)
+
+        # platform: 同平台成员可见
+        # 查当前用户加入了哪些平台
+        platform_subq = (
+            select(PlatformMember.platform_id)
+            .where(PlatformMember.user_id == current_user.id)
+            .subquery()
+        )
+        visibility_conditions.append(
+            (Brochure.visibility == "platform")
+            & (Brochure.platform_id.in_(select(platform_subq.c.platform_id)))
+        )
+
+        # network: 好友可见
+        friend_subq_1 = (
+            select(Connection.contact_id)
+            .where(Connection.user_id == current_user.id, Connection.status == "approved")
+            .subquery()
+        )
+        friend_subq_2 = (
+            select(Connection.user_id)
+            .where(Connection.contact_id == current_user.id, Connection.status == "approved")
+            .subquery()
+        )
+        all_friends = select(friend_subq_1.c.contact_id).union(
+            select(friend_subq_2.c.user_id)
+        ).subquery()
+        visibility_conditions.append(
+            (Brochure.visibility == "network")
+            & (Brochure.user_id.in_(select(all_friends.c.contact_id)))
+        )
+
+    query = query.where(or_(*visibility_conditions))
+    # ────────────────────────────────────────────────────────────────
+
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
         query = query.where(Brochure.status == status)
+    if visibility:
+        query = query.where(Brochure.visibility == visibility)
+    if platform_id:
+        query = query.where(Brochure.platform_id == platform_id)
+
     query = query.order_by(Brochure.updated_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
     brochures = result.scalars().all()

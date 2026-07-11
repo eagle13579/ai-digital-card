@@ -3,6 +3,7 @@
  * 使用MockService获取数据
  */
 const { MockService } = require('../../utils/mockService')
+const store = require('../../utils/store')
 const { Logger } = require('../../utils/util')
 
 Page({
@@ -33,8 +34,8 @@ Page({
   },
 
   onShow() {
-    const app = getApp()
-    if (app.globalData.token && !this.data.loading) {
+    const { isLoggedIn } = store.getState()
+    if (isLoggedIn && !this.data.loading) {
       this.loadPageData()
     }
   },

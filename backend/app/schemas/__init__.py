@@ -95,6 +95,8 @@ class BrochureResponse(BaseModel):
     share_token: str
     view_count: int
     album_meta: Optional[str] = None
+    visibility: str = "public"
+    platform_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
     pages: list[PageSchema] = []

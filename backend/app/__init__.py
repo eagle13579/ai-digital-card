@@ -172,6 +172,8 @@ def create_app():
     from app.crm.form_capture_router import router as form_capture_router
     from app.routers.document import router as document_router
     from app.routers.analytics import router as analytics_router
+    from app.routers.platform_router import router as platform_router
+    from app.routers.connection_router import router as connection_router
 
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -189,6 +191,8 @@ def create_app():
     _register_knowledge_models(app)  # 惰性注册，避免 routers/__init__.py 循环依赖
     app.include_router(design_qa_router)
     app.include_router(gaia_router)
+    app.include_router(platform_router)
+    app.include_router(connection_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)

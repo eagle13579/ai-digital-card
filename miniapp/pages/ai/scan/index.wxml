@@ -1,16 +1,27 @@
 <view class="page-container scan-page">
-  <view class="scan-guide" wx:if="{{!showResult}}">
+  <view class="scan-guide" wx:if="{{!showResult && !showQrResult}}">
     <text class="scan-icon">📷</text>
     <text class="scan-text">拍摄或选择名片图片，AI自动识别</text>
     <view class="scan-tip">本月剩余扫描次数：{{maxScans - scanCount}}/{{maxScans}}</view>
-    <button class="btn-primary" bindtap="takePhoto">拍照/选择</button>
+    <button class="btn-primary" bindtap="takePhoto">拍照/选择图片</button>
+
+    <view class="scan-divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">或</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <view class="scan-icon">📱</view>
+    <text class="scan-text">扫描名片二维码/平台协议码</text>
+    <button class="btn-secondary" bindtap="scanQRCode">扫一扫</button>
   </view>
 
   <view class="scan-loading" wx:if="{{scanning}}">
     <view class="loading-spinner"></view>
-    <text class="loading-text">AI识别中...</text>
+    <text class="loading-text">识别中...</text>
   </view>
 
+  <!-- OCR 识别结果 -->
   <view class="card" wx:if="{{showResult && result}}">
     <view class="card-header">
       <text class="title">📇 识别结果</text>
@@ -46,5 +57,27 @@
 
   <view class="save-area" wx:if="{{showResult && result}}">
     <button class="btn-primary" bindtap="saveCard">保存为名片</button>
+  </view>
+
+  <!-- 二维码扫码结果 -->
+  <view class="card" wx:if="{{showQrResult && qrResult}}">
+    <view class="card-header">
+      <text class="title">📱 扫码结果</text>
+      <text class="re-scan" bindtap="reScan">重新扫码</text>
+    </view>
+    <view class="card-body">
+      <view class="qr-info">
+        <text class="qr-type-badge" wx:if="{{qrResult.type !== 'text'}}">
+          {{qrResult.type === 'user' ? '👤 用户名片' : qrResult.type === 'platform' ? '🏢 平台' : '📦 资源'}}
+        </text>
+        <text class="qr-id">ID: {{qrResult.id}}</text>
+        <text class="qr-raw" wx:if="{{qrResult.raw}}">原始内容: {{qrResult.raw}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="save-area" wx:if="{{showQrResult && qrResult}}">
+    <button class="btn-primary" catchtap="searchText" wx:if="{{qrResult.type === 'text'}}">搜索"{{qrResult.id}}"</button>
+    <text class="auto-jump-hint" wx:if="{{qrResult.type !== 'text'}}">正在自动跳转...</text>
   </view>
 </view>

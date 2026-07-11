@@ -1,60 +1,124 @@
 /**
  * 微信授权登录页
- * 使用 wx.login() 获取临时 code → 后端换取 session
+ * AI数智名片
+ * 
+ * 流程（参考 F01_一键登录系统.feature.md）：
+ * 1. wx.login() 获取临时 code
+ * 2. 向后端 /api/auth/wx-mini-login 发送 code
+ * 3. 后端返回 { token, userInfo }
+ * 4. 调用 store.setAuth() 持久化登录态
+ * 
+ * 降级策略：若真实 API 不可用，回退到 MockService（现有逻辑保留）
  */
+const store = require('../../utils/store')
+const { authApi } = require('../../utils/api')
 const { MockService } = require('../../utils/mockService')
 
 Page({
   data: {
     loading: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    /** 是否使用真实 API（调试开关，线上应设为 true） */
+    useRealApi: true,
   },
 
   onLoad() {
     // 检查是否已登录
-    const app = getApp()
-    if (app.globalData.token) {
+    const { isLoggedIn } = store.getState()
+    if (isLoggedIn) {
       wx.switchTab({ url: '/pages/index/index' })
     }
   },
 
-  // 微信授权登录
+  // ========== 微信授权登录 ==========
   wxLogin() {
-    const app = getApp()
     this.setData({ loading: true })
-    
+
     wx.login({
       success: (res) => {
         if (res.code) {
-          MockService.login({ code: res.code })
-            .then(result => {
-              if (result.token) {
-                app.setLogin(result.token, result.userInfo)
-                wx.switchTab({ url: '/pages/index/index' })
-              } else {
-                wx.showToast({ title: '登录失败', icon: 'none' })
-                this.setData({ loading: false })
-              }
-            })
-            .catch(err => {
-              console.error('登录请求失败:', err)
-              wx.showToast({ title: '网络连接失败，请检查网络', icon: 'none' })
-              this.setData({ loading: false })
-            })
+          this._handleLogin(res.code)
         } else {
           wx.showToast({ title: '微信登录失败', icon: 'none' })
           this.setData({ loading: false })
         }
       },
       fail: (err) => {
-        console.error('wx.login失败:', err)
+        console.error('[Login] wx.login 失败:', err)
         wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
         this.setData({ loading: false })
-      }
+      },
     })
   },
 
-  // 跳过登录（游客模式）
+  /**
+   * 处理登录逻辑
+   * @param {string} code - wx.login 获取的临时 code
+   */
+  _handleLogin(code) {
+    if (this.data.useRealApi) {
+      this._realApiLogin(code)
+    } else {
+      this._mockLogin(code)
+    }
+  },
+
+  /**
+   * 真实 API 登录（推荐路径）
+   * POST /api/auth/wx-mini-login { code }
+   * 期望响应格式: { code: 0, data: { token, userInfo } }
+   */
+  _realApiLogin(code) {
+    authApi.wxMiniLogin(code)
+      .then(result => {
+        // request.js 已解包，result 即后端响应中的 data 字段
+        const token = result.token
+        const userInfo = result.userInfo || {}
+
+        if (!token) {
+          throw new Error('后端未返回 token')
+        }
+
+        // 更新全局状态
+        store.setAuth(token, userInfo)
+
+        wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/index/index' })
+        }, 1500)
+      })
+      .catch(err => {
+        console.error('[Login] API 登录失败:', err)
+        // 如果使用了 noToast: true，这里需要手动提示
+        if (err && err.message) {
+          wx.showToast({ title: err.message, icon: 'none' })
+        }
+        this.setData({ loading: false })
+      })
+  },
+
+  /**
+   * Mock 登录（开发/降级用）
+   */
+  _mockLogin(code) {
+    MockService.login({ code })
+      .then(result => {
+        if (result.token) {
+          store.setAuth(result.token, result.userInfo)
+          wx.switchTab({ url: '/pages/index/index' })
+        } else {
+          wx.showToast({ title: '登录失败', icon: 'none' })
+          this.setData({ loading: false })
+        }
+      })
+      .catch(err => {
+        console.error('[Login] Mock 登录失败:', err)
+        wx.showToast({ title: '网络连接失败，请检查网络', icon: 'none' })
+        this.setData({ loading: false })
+      })
+  },
+
+  // ========== 跳过登录（游客模式） ==========
   skipLogin() {
     wx.switchTab({ url: '/pages/index/index' })
   },

@@ -50,7 +50,9 @@ API 基础地址配置在 `utils/request.js` 中：
    - `loading` → `/components/loading/index`
    - `empty-state` → `/components/empty-state/index`
 
-4. **登录态**：请求封装（`utils/request.js`）从 `app.globalData.token` 获取 token，使用 `Authorization: Bearer <token>` 头进行认证。
+4. **登录态**：请求封装（`utils/request.js`）从 `utils/store.js` 获取 token（类 Zustand 单例模式），自动注入 `Authorization: Bearer ***` 头进行认证。
+5. **统一响应格式**：所有 API 响应遵循 `{ code: 0, message: 'xxx', data: {} }` 格式，`request.js` 自动解包返回 `data` 字段，非 0 code 自动 Toast 错误信息。
+6. **全局状态管理**：`utils/store.js` 提供 `getState()`、`setAuth()`、`logout()`、`subscribe()` 等 API，支持响应式订阅。`app.js` 代理部分方法以保持向下兼容。
 
 ## 开发调试
 
