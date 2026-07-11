@@ -75,8 +75,9 @@ Page({
         title: userInfoData.title || '',
       }
 
+      const { getLevelText } = require('../../utils/levels')
       const memberLevel = profile.memberLevel || 'free'
-      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
+      const memberLevelText = getLevelText(memberLevel)
 
       const store = require('../../utils/store')
       store.updateUserInfo(userInfo)

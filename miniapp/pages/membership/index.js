@@ -1,14 +1,6 @@
 const MockService = require('../../utils/mockService')
 
-const LEVEL_MAP = {
-  free: 'Free',
-  pro: 'Pro',
-  enterprise: 'Enterprise',
-  gold: 'Pro',
-  diamond: 'Enterprise',
-  board: 'Enterprise',
-  silver: 'Pro',
-}
+const { getLevelText } = require('../../utils/levels')
 
 const MEMBERSHIP_LEVELS = [
   {
@@ -48,7 +40,7 @@ Page({
   async loadUserLevel() {
     const profile = await MockService.getUserProfile() || {}
     const levelId = (profile && profile.memberLevel) || 'free'
-    const levelText = LEVEL_MAP[levelId] || 'Free'
+    const levelText = getLevelText(levelId)
     
     this.setData({
       currentLevel: levelText,
@@ -81,7 +73,8 @@ Page({
               currentLevel: level.name,
               currentLevelId: levelId,
             })
-            getApp().updateMemberLevel(levelId)
+            const store = require('../../utils/store')
+            store.updateMemberLevel(levelId)
           }, 1500)
         }
       },

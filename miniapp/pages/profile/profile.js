@@ -38,8 +38,9 @@ Page({
       const brochureList = Array.isArray(brochures) ? brochures : (brochures.data || [])
       const brochure = brochureList[0]
 
+      const { getLevelText } = require('../../utils/levels')
       const memberLevel = profile.member_level || 'free'
-      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
+      const memberLevelText = getLevelText(memberLevel)
 
       let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
 
