@@ -1,0 +1,36 @@
+<view class="page-container">
+  <view class="card">
+    <view class="card-body agreement-content">
+      <text class="agreement-title">隐私政策</text>
+      <text class="agreement-update">更新日期：2025年1月1日 | 生效日期：2025年1月1日</text>
+      <text class="agreement-text">欢迎您使用AI数智名片。我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。本隐私政策将向您说明我们如何收集、使用、存储、共享和保护您的个人信息。</text>
+      
+      <text class="agreement-section">一、信息收集</text>
+      <text class="agreement-text">我们在您使用服务过程中收集以下类型的信息：\n1. 账户信息：您注册时提供的手机号码、微信账号、头像、昵称等\n2. 个人资料：您主动填写的姓名、职位、公司、邮箱、个人简介等\n3. 名片内容：您创建或上传的名片信息，包括但不限于文字、图片等\n4. 使用数据：访问时间、页面浏览行为、功能使用频率、点击记录等\n5. 设备信息：设备型号、操作系统版本、唯一设备标识符等</text>
+      
+      <text class="agreement-section">二、信息使用</text>
+      <text class="agreement-text">我们收集的信息将用于以下目的：\n1. 提供、维护和改进我们的产品与服务\n2. 创建、展示和管理您的电子名片\n3. 实现人脉匹配与推荐算法\n4. 向您发送服务通知、更新和营销信息（需另行授权）\n5. 进行数据分析以优化用户体验\n6. 检测和防止欺诈、滥用等不当行为</text>
+      
+      <text class="agreement-section">三、信息存储与保护</text>
+      <text class="agreement-text">我们采取以下措施保障您的信息安全：\n1. 数据传输采用SSL/TLS加密协议\n2. 敏感信息在存储时进行加密处理\n3. 建立严格的访问控制机制，仅授权人员可接触数据\n4. 定期进行安全审计和漏洞扫描\n5. 数据存储于境内的安全服务器\n6. 您的个人信息保存期限为账户存续期间，注销账户后将及时删除</text>
+      
+      <text class="agreement-section">四、信息共享与披露</text>
+      <text class="agreement-text">我们仅在以下情形下共享您的个人信息：\n1. 获得您的明确同意或授权\n2. 根据法律法规、司法或行政程序的要求\n3. 为保护我们、用户或公众的合法权益所合理必要\n4. 与为我们提供服务的第三方合作伙伴共享（如云服务商），这些合作伙伴受严格的保密义务约束\n5. 在涉及合并、收购或资产转让时，我们会要求继受方继续受本政策的约束\n\n我们不会将您的个人信息出售给任何第三方。</text>
+      
+      <text class="agreement-section">五、您的权利</text>
+      <text class="agreement-text">您享有以下权利：\n1. 查阅权：您可以在个人中心查看我们收集的您的个人信息\n2. 更正权：如您的信息有误，您可以随时修改或更新\n3. 删除权：您可以请求删除您的个人信息，或在注销账户后自动删除\n4. 撤回同意权：您可以随时撤回对某些信息收集的同意\n5. 注销权：您可以在个人中心申请注销账户，我们将在15个工作日内处理\n6. 投诉权：如对隐私保护有疑问，您可以通过以下联系方式进行投诉</text>
+      
+      <text class="agreement-section">六、未成年人保护</text>
+      <text class="agreement-text">我们非常重视对未成年人个人信息的保护。若您为14周岁以下的未成年人，请在监护人的陪同下阅读本政策，并确保在使用服务前取得监护人的同意。我们不会在明知的情况下收集未成年人的个人信息。</text>
+      
+      <text class="agreement-section">七、Cookie及同类技术</text>
+      <text class="agreement-text">我们可能使用Cookie和同类技术来改善您的使用体验。您可以在浏览器设置中管理或禁用Cookie，但这可能影响部分功能的正常使用。</text>
+      
+      <text class="agreement-section">八、隐私政策的更新</text>
+      <text class="agreement-text">本隐私政策可能适时更新。更新后的版本将在平台上显著位置公布，并在更新后的条款生效前通过适当方式提醒您。您继续使用我们的服务即表示同意更新后的隐私政策。重大变更包括但不限于：信息收集范围或使用方式的重大变化、共享对象的重大变化、数据保护能力的重大变化等。</text>
+      
+      <text class="agreement-section">九、联系我们</text>
+      <text class="agreement-text">如您对本隐私政策有任何疑问、意见或建议，请通过以下方式与我们联系：\n邮箱：privacy@example.com\n地址：北京市海淀区中关村科技园\n电话：400-000-0000\n我们将在收到您的请求后15个工作日内回复。</text>
+    </view>
+  </view>
+</view>

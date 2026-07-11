@@ -1,0 +1,10 @@
+<view class="page-container qr-page">
+  <view class="qr-card">
+    <view class="qr-header">{{(brochure && brochure.title) || 'AI数智名片'}}</view>
+    <view class="qr-canvas">
+      <image src="/images/qr-placeholder.png" mode="aspectFit" class="qr-image" />
+    </view>
+    <text class="qr-hint">扫一扫上面的二维码，查看我的画册</text>
+    <button class="btn-outline small" bindtap="saveQR">保存二维码</button>
+  </view>
+</view>
