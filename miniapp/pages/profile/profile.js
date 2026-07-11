@@ -43,6 +43,7 @@ Page({
       const memberLevelText = getLevelText(memberLevel)
 
       let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
+      const newVisitorCount = visitorStats.new_visitors || visitorStats.todayVisits || 0
 
       const trustCount = (trustNet.trusting || []).length
 
@@ -58,13 +59,14 @@ Page({
         memberLevelText,
         memberExpire: profile.member_expire || '',
         trustCount,
+        newVisitorCount,
         stats,
         loading: false,
       })
 
-      const app = getApp()
-      app.updateUserInfo(this.data.userInfo)
-      app.updateMemberLevel(memberLevel)
+      const store = require('../../utils/store')
+      store.updateUserInfo(this.data.userInfo)
+      store.updateMemberLevel(memberLevel)
     } catch (err) {
       console.error('加载个人数据失败:', err)
       this.setData({ loading: false })

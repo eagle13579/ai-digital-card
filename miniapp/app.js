@@ -70,4 +70,17 @@ App({
   updateUserInfo(userInfo) {
     store.updateUserInfo(userInfo)
   },
+
+  /** 默认分享配置（页面可覆盖） */
+  onShareAppMessage() {
+    return {
+      title: 'AI数智名片 - 智能商务社交',
+      path: '/pages/index/index',
+    }
+  },
+
+  /** 默认分享到朋友圈 */
+  onShareTimeline() {
+    return { title: 'AI数智名片 - 智能商务社交' }
+  },
 })
