@@ -1,0 +1,52 @@
+<view class="graph-page">
+  <view class="graph-header">
+    <text class="graph-title">🤝 信任网络图谱</text>
+    <text class="graph-subtitle">{{nodeCount}} 位联系人</text>
+  </view>
+  
+  <view class="graph-container">
+    <canvas 
+      type="2d"
+      id="graphCanvas" 
+      class="graph-canvas"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    ></canvas>
+    <view class="graph-tips" wx:if="{{!hasData}}">
+      <text class="tips-icon">🔗</text>
+      <text class="tips-text">暂无联系人数据</text>
+      <text class="tips-hint">添加联系人后可查看图谱</text>
+    </view>
+  </view>
+
+  <view class="graph-actions">
+    <view class="action-btn add-btn" bindtap="addContact">
+      <text class="action-icon">+</text>
+      <text class="action-text">添加联系人</text>
+    </view>
+    <view class="action-btn import-btn" bindtap="importWechat">
+      <text class="action-icon">📱</text>
+      <text class="action-text">导入微信好友</text>
+    </view>
+    <view class="action-btn refresh-btn" bindtap="refreshGraph">
+      <text class="action-icon">🔄</text>
+      <text class="action-text">刷新图谱</text>
+    </view>
+  </view>
+
+  <view class="legend">
+    <view class="legend-item">
+      <view class="legend-dot self"></view>
+      <text class="legend-text">自己</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-dot contact"></view>
+      <text class="legend-text">联系人</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-line"></view>
+      <text class="legend-text">关系连线</text>
+    </view>
+  </view>
+</view>

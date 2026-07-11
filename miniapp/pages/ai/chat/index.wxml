@@ -1,0 +1,25 @@
+<view class="chat-page">
+  <scroll-view scroll-y class="chat-scroll" scroll-into-view="bottom">
+    <view class="msg-list">
+      <view class="msg {{item.role === 'user' ? 'msg-user' : 'msg-ai'}}" wx:for="{{messages}}" wx:key="index">
+        <image class="msg-avatar" wx:if="{{item.role === 'ai'}}" src="/images/ai-avatar.png" mode="aspectFill" />
+        <image class="msg-avatar" wx:if="{{item.role === 'user'}}" src="{{userAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <view class="msg-bubble">
+          <view class="msg-content">{{item.content}}</view>
+        </view>
+      </view>
+    </view>
+    <view id="bottom"></view>
+  </scroll-view>
+  <view class="chat-input">
+    <input class="chat-input-field" placeholder="{{isLoggedIn ? '输入消息...' : '请先登录后使用'}}" value="{{inputValue}}" bindinput="onInput" />
+    <button class="chat-send-btn" bindtap="send" disabled="{{loading || !canSend}}">发送</button>
+  </view>
+  <view wx:if="{{!isLoggedIn}}" class="login-mask">
+    <view class="login-prompt">
+      <text class="login-icon">🔐</text>
+      <text class="login-text">请登录后使用AI对话</text>
+      <button class="btn-primary" bindtap="goLogin">立即登录</button>
+    </view>
+  </view>
+</view>

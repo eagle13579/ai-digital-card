@@ -1,0 +1,33 @@
+<view class="page-container">
+  <view class="insight-header">
+    <text class="insight-title">📊 数据洞察</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:if="{{!loading && stats}}">
+    <view class="insight-grid">
+      <view class="insight-card"><text class="insight-num">{{stats.totalVisits}}</text><text class="insight-label">总访问</text></view>
+      <view class="insight-card"><text class="insight-num">{{stats.todayVisits}}</text><text class="insight-label">今日</text></view>
+      <view class="insight-card"><text class="insight-num">{{stats.weeklyVisits}}</text><text class="insight-label">本周</text></view>
+      <view class="insight-card"><text class="insight-num">{{stats.uniqueVisitors}}</text><text class="insight-label">独立访客</text></view>
+      <view class="insight-card"><text class="insight-num">{{stats.interestCount}}</text><text class="insight-label">意向用户</text></view>
+      <view class="insight-card"><text class="insight-num">{{stats.newVisitors || 0}}</text><text class="insight-label">新访客</text></view>
+    </view>
+
+    <view class="chart-card" wx:if="{{weeklyTrend.length > 0}}">
+      <canvas id="trendCanvas" type="2d" class="trend-canvas"></canvas>
+    </view>
+
+    <view class="card">
+      <view class="card-header"><text class="title">💡 AI洞察建议</text></view>
+      <view class="card-body">
+        <text class="insight-tip">• 你的名片访问量持续增长，建议更新个人动态</text>
+        <text class="insight-tip">• 有3位访客表达了合作意向，建议主动联系</text>
+        <text class="insight-tip">• 推荐完善资源对接信息，提升匹配精准度</text>
+      </view>
+    </view>
+  </view>
+</view>

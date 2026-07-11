@@ -1,0 +1,8 @@
+.ai-header { text-align: center; padding: 32px 16px 24px; }
+.ai-title { font-size: 24px; font-weight: 700; color: #1a1a1a; display: block; }
+.ai-subtitle { font-size: 14px; color: #999; display: block; margin-top: 4px; }
+.ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 32px; }
+.ai-item { background: #fff; border-radius: 16px; padding: 24px 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.ai-icon { font-size: 36px; margin-bottom: 8px; }
+.ai-name { font-size: 15px; font-weight: 600; color: #1a1a1a; display: block; }
+.ai-desc { font-size: 12px; color: #999; display: block; margin-top: 4px; }

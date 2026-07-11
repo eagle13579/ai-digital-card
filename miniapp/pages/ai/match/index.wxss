@@ -1,0 +1,29 @@
+.match-header { text-align: center; padding: 24px 16px 16px; }
+.match-title { font-size: 20px; font-weight: 700; color: #1a1a1a; display: block; }
+.match-subtitle { font-size: 13px; color: #999; display: block; margin-top: 4px; }
+
+.filter-bar { display: flex; align-items: center; background: #fff; margin: 0 16px 16px; border-radius: 12px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.filter-item { flex: 1; display: flex; align-items: center; }
+.filter-label { font-size: 13px; color: #999; margin-right: 8px; flex-shrink: 0; }
+.filter-select { display: flex; align-items: center; justify-content: space-between; flex: 1; padding: 8px 0; }
+.filter-value { font-size: 14px; color: #1a1a1a; font-weight: 500; }
+.filter-arrow { font-size: 10px; color: #ccc; margin-left: 4px; }
+.filter-divider { width: 1px; height: 24px; background: #eee; margin: 0 12px; }
+
+.match-list { padding: 0 16px 32px; display: flex; flex-direction: column; gap: 12px; }
+.match-item { display: flex; align-items: center; background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.match-avatar { width: 48px; height: 48px; border-radius: 24px; flex-shrink: 0; margin-right: 12px; }
+.match-info { flex: 1; min-width: 0; }
+.match-name { font-size: 16px; font-weight: 600; color: #1a1a1a; display: block; }
+.match-company { font-size: 12px; color: #999; display: block; }
+.match-position { font-size: 11px; color: #666; display: block; margin-top: 1px; }
+.match-tags { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.match-tag { font-size: 10px; padding: 2px 8px; background: rgba(22,87,255,0.08); color: #1657ff; border-radius: 10px; }
+.match-score { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-left: 8px; }
+.match-score-num { font-size: 20px; font-weight: 700; color: #07c160; }
+.match-score-label { font-size: 10px; color: #999; }
+
+.empty-state { text-align: center; padding: 60px 16px; }
+.empty-text { font-size: 14px; color: #999; }
+.loading-state { text-align: center; padding: 60px 16px; }
+.loading-text { font-size: 14px; color: #999; }

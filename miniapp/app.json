@@ -9,7 +9,15 @@
     "pages/platform/create/index",
     "pages/qrcode/index",
     "pages/membership/index",
-    "pages/agreement/privacy/index"
+    "pages/agreement/privacy/index",
+    "pages/network/graph/index",
+    "pages/ai/match/index",
+    "pages/ai/insight/index",
+    "pages/ai/scan/index",
+    "pages/ai/chat/index",
+    "pages/ai/generate/index",
+    "pages/ai/config/index",
+    "pages/ai/index/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -46,7 +54,8 @@
   "usingComponents": {
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
-    "empty-state": "/components/empty-state/index"
+    "empty-state": "/components/empty-state/index",
+    "network-mini-map": "/components/network-mini-map/index"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

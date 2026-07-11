@@ -1,0 +1,87 @@
+<view class="page-container">
+  <view class="card">
+    <view class="card-header">
+      <text class="title">✍️ AI内容生成</text>
+    </view>
+    <view class="card-body">
+      <view class="type-tabs">
+        <view 
+          class="type-tab {{type === item.id ? 'active' : ''}}" 
+          wx:for="{{types}}" wx:key="id"
+          data-type="{{item.id}}" bindtap="onTypeChange">
+          {{item.name}}
+        </view>
+      </view>
+      
+      <view class="subtype-chips">
+        <view 
+          class="subtype-chip {{subtype === st ? 'active' : ''}}" 
+          wx:for="{{currentSubtypes}}" wx:key="*this"
+          wx:for-item="st"
+          data-subtype="{{st}}" bindtap="onSubtypeChange">
+          {{subtypeLabels[st]}}
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">姓名</text>
+        <input class="form-input" placeholder="请输入姓名" bindinput="onInput" data-field="name" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">职位</text>
+        <input class="form-input" placeholder="请输入职位" bindinput="onInput" data-field="title" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">公司</text>
+        <input class="form-input" placeholder="请输入公司名称" bindinput="onInput" data-field="company" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">行业</text>
+        <input class="form-input" placeholder="如：互联网、金融、医疗" bindinput="onInput" data-field="industry" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">关键词</text>
+        <input class="form-input" placeholder="核心技能或标签，逗号分隔" bindinput="onInput" data-field="keywords" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">经验年限</text>
+        <input class="form-input" placeholder="如：5年、10年" bindinput="onInput" data-field="experience" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">主要成就</text>
+        <input class="form-input" placeholder="简要描述你的成就" bindinput="onInput" data-field="achievements" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">核心技能</text>
+        <input class="form-input" placeholder="你的专业技能" bindinput="onInput" data-field="skills" />
+      </view>
+    </view>
+  </view>
+
+  <view style="padding:16px;" wx:if="{{!generated}}">
+    <button class="btn-primary" bindtap="doGenerate">AI生成内容</button>
+  </view>
+
+  <view class="card" wx:if="{{generated}}">
+    <view class="card-header">
+      <text class="title">✨ 生成结果</text>
+      <view class="card-actions">
+        <text class="action-btn" bindtap="copyResult">📋 复制</text>
+      </view>
+    </view>
+    <view class="card-body">
+      <text class="result-text">{{result}}</text>
+    </view>
+  </view>
+
+  <view style="padding:16px;" wx:if="{{generated}}">
+    <button class="btn-primary" bindtap="useResult">应用到名片编辑</button>
+  </view>
+</view>

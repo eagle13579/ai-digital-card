@@ -1,0 +1,124 @@
+.scan-page {
+  min-height: 100vh;
+  background: #0f0f1a;
+}
+
+.scan-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 32px;
+  gap: 16px;
+}
+
+.scan-icon {
+  font-size: 64px;
+}
+
+.scan-text {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.scan-tip {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: -8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #fff;
+  font-size: 16px;
+  padding: 14px 48px;
+  border-radius: 24px;
+  border: none;
+  margin-top: 20px;
+}
+
+.scan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 32px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 16px;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 16px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.re-scan {
+  font-size: 13px;
+  color: #8b5cf6;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.scan-field {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scan-field:last-child {
+  border-bottom: none;
+}
+
+.scan-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 6px;
+}
+
+.scan-input {
+  font-size: 15px;
+  color: #fff;
+  background: transparent;
+}
+
+.save-area {
+  padding: 0 16px 32px;
+}

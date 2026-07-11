@@ -1,2 +1,2 @@
 /* 复用agreement/user的样式 */
-@import "../user/index.wxss";
+@import "../user.wxss";

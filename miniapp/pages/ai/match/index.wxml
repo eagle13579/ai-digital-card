@@ -1,0 +1,54 @@
+<view class="page-container">
+  <view class="match-header">
+    <text class="match-title">🎯 推荐匹配</text>
+    <text class="match-subtitle">基于AI分析，找到最合适的合作伙伴</text>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item">
+      <text class="filter-label">行业</text>
+      <picker mode="selector" range="{{industries}}" value="{{selectedIndustryIndex}}" bindchange="onIndustryChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedIndustry}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+    <view class="filter-divider"></view>
+    <view class="filter-item">
+      <text class="filter-label">地域</text>
+      <picker mode="selector" range="{{regions}}" value="{{selectedRegionIndex}}" bindchange="onRegionChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedRegion}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="match-list" wx:if="{{filteredMatches.length > 0}}">
+    <view class="match-item" wx:for="{{filteredMatches}}" wx:key="id" data-id="{{item.id}}" bindtap="unlock">
+      <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="match-avatar" />
+      <view class="match-info">
+        <text class="match-name">{{item.name}}</text>
+        <text class="match-company">{{item.company}}</text>
+        <text class="match-position" wx:if="{{item.title}}">{{item.title}}</text>
+        <view class="match-tags">
+          <text class="match-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+      <view class="match-score">
+        <text class="match-score-num">{{item.matchScore}}%</text>
+        <text class="match-score-label">匹配</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && filteredMatches.length === 0}}">
+    <text class="empty-text">暂无匹配结果，请调整筛选条件</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

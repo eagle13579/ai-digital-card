@@ -1,0 +1,50 @@
+<view class="page-container scan-page">
+  <view class="scan-guide" wx:if="{{!showResult}}">
+    <text class="scan-icon">📷</text>
+    <text class="scan-text">拍摄或选择名片图片，AI自动识别</text>
+    <view class="scan-tip">本月剩余扫描次数：{{maxScans - scanCount}}/{{maxScans}}</view>
+    <button class="btn-primary" bindtap="takePhoto">拍照/选择</button>
+  </view>
+
+  <view class="scan-loading" wx:if="{{scanning}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">AI识别中...</text>
+  </view>
+
+  <view class="card" wx:if="{{showResult && result}}">
+    <view class="card-header">
+      <text class="title">📇 识别结果</text>
+      <text class="re-scan" bindtap="reScan">重新扫描</text>
+    </view>
+    <view class="card-body">
+      <view class="scan-field">
+        <text class="scan-label">姓名</text>
+        <input class="scan-input" placeholder="姓名" value="{{result.name}}" data-field="name" bindinput="editField" />
+      </view>
+      <view class="scan-field">
+        <text class="scan-label">职位</text>
+        <input class="scan-input" placeholder="职位" value="{{result.title}}" data-field="title" bindinput="editField" />
+      </view>
+      <view class="scan-field">
+        <text class="scan-label">公司</text>
+        <input class="scan-input" placeholder="公司" value="{{result.company}}" data-field="company" bindinput="editField" />
+      </view>
+      <view class="scan-field">
+        <text class="scan-label">电话</text>
+        <input class="scan-input" placeholder="电话" value="{{result.phone}}" data-field="phone" bindinput="editField" />
+      </view>
+      <view class="scan-field">
+        <text class="scan-label">邮箱</text>
+        <input class="scan-input" placeholder="邮箱" value="{{result.email}}" data-field="email" bindinput="editField" />
+      </view>
+      <view class="scan-field">
+        <text class="scan-label">地址</text>
+        <input class="scan-input" placeholder="地址" value="{{result.address}}" data-field="address" bindinput="editField" />
+      </view>
+    </view>
+  </view>
+
+  <view class="save-area" wx:if="{{showResult && result}}">
+    <button class="btn-primary" bindtap="saveCard">保存为名片</button>
+  </view>
+</view>

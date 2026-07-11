@@ -1,0 +1,34 @@
+<view class="network-mini-map">
+  <view class="map-header">
+    <text class="map-title">🌐 信任网络</text>
+    <text class="map-count">{{totalCount}} 位伙伴</text>
+  </view>
+  <view class="map-container">
+    <view class="center-node">
+      <view class="center-avatar">
+        <image src="{{currentUser.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+      </view>
+      <text class="center-name">{{currentUser.name || '我'}}</text>
+    </view>
+    <view class="paths-container">
+      <view class="path-line" wx:for="{{paths}}" wx:key="index">
+        <view class="path-node spring-press" 
+          wx:for="{{(paths.length > 0 && paths[index].nodes) || []}}" 
+          wx:for-index="idx" 
+          wx:key="idx"
+          data-node="{{item}}"
+          bindtap="onNodeTap">
+          <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="node-avatar" />
+          <text class="node-name">{{item.name}}</text>
+          <view class="connection-line"></view>
+        </view>
+      </view>
+    </view>
+    <view class="ring-ring ring-1"></view>
+    <view class="ring-ring ring-2"></view>
+    <view class="ring-ring ring-3"></view>
+  </view>
+  <view class="map-footer">
+    <text class="footer-tip">点击节点查看详情</text>
+  </view>
+</view>

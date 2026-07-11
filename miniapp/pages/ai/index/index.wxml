@@ -1,0 +1,3 @@
+<view class="page-container"><view class="ai-header"><text class="ai-title">🤖 AI智能中心</text><text class="ai-subtitle">智能驱动，高效连接</text></view>
+<view class="ai-grid"><view class="ai-item" wx:for="{{features}}" wx:key="id" data-url="{{item.url}}" bindtap="go">
+<view class="ai-icon">{{item.icon}}</view><text class="ai-name">{{item.name}}</text><text class="ai-desc">{{item.desc}}</text></view></view></view>
