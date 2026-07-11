@@ -4,46 +4,34 @@ Page({
   data: { 
     brochure: null, 
     qrcodeData: '',
-    retryCount: 0,
-    maxRetries: 2,
     generating: false,
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     const id = options.id || ''
-    const brochure = MockService.getBrochureById(id)
-    this.setData({ brochure, qrcodeData: 'https://card.example.com/brochure/' + ((brochure && brochure.id) || '') })
+    const brochure = id ? await MockService.getBrochureById(id) : null
+    
+    if (!brochure) {
+      wx.showToast({ title: '请先创建名片', icon: 'none' })
+      setTimeout(() => wx.navigateBack(), 1500)
+      return
+    }
+
+    this.setData({ 
+      brochure, 
+      qrcodeData: 'https://card.example.com/brochure/' + brochure.id 
+    })
     this.generateQRCode()
   },
 
   generateQRCode() {
-    if (this.data.generating || this.data.retryCount >= this.data.maxRetries) {
-      if (this.data.retryCount >= this.data.maxRetries) {
-        wx.showToast({ title: '二维码生成失败', icon: 'error' })
-      }
-      return
-    }
-
-    this.setData({ generating: true, retryCount: this.data.retryCount + 1 })
+    if (this.data.generating) return
+    this.setData({ generating: true })
 
     setTimeout(() => {
-      const success = true // 移除随机失败逻辑
-      if (success) {
-        this.setData({ generating: false })
-        wx.showToast({ title: '二维码生成成功', icon: 'success' })
-      } else {
-        this.setData({ generating: false })
-        this.fallbackQRCode()
-      }
+      this.setData({ generating: false })
+      wx.showToast({ title: '二维码已就绪', icon: 'success' })
     }, 800)
-  },
-
-  fallbackQRCode() {
-    if (this.data.retryCount >= this.data.maxRetries) {
-      wx.showToast({ title: '二维码生成失败，请稍后重试', icon: 'none' })
-      return
-    }
-    this.generateQRCode()
   },
 
   saveQR() {
@@ -51,18 +39,16 @@ Page({
   },
 
   onShareAppMessage() {
-    const brochure = this.data.brochure
+    const b = this.data.brochure
     return { 
-      title: (brochure && brochure.title) || '名片二维码', 
-      path: '/pages/qrcode/index?id=' + ((brochure && brochure.id) || ''),
-      imageUrl: (brochure && brochure.cover) || '',
+      title: (b && b.title) || '名片二维码', 
+      path: '/pages/qrcode/index?id=' + ((b && b.id) || ''),
+      imageUrl: (b && b.cover) || '',
     }
   },
 
   onShareTimeline() {
-    const brochure = this.data.brochure
-    return {
-      title: (brochure && brochure.title) || '名片二维码',
-    }
+    const b = this.data.brochure
+    return { title: (b && b.title) || '名片二维码' }
   },
 })
