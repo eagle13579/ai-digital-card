@@ -1,0 +1,59 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python
+*.py text diff=python
+
+# JavaScript / TypeScript
+*.js text
+*.ts text
+*.json text
+
+# WeChat Mini Program
+*.wxml text
+*.wxss text
+*.wxs text
+
+# Web
+*.html text diff=html
+*.css text
+*.scss text
+*.less text
+
+# Config
+*.yaml text
+*.yml text
+*.toml text
+*.ini text
+*.cfg text
+*.conf text
+
+# Markdown / Docs
+*.md text diff=markdown
+*.txt text
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows batch
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Git
+.gitattributes text
+.gitignore text
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+
+# Binaries
+*.pyc binary
+*.so binary
+*.dll binary
+*.exe binary
