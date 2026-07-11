@@ -121,7 +121,7 @@ Page({
   },
 
   goQrCode() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/qrcode/index' })
   },
 
   shareCard() {
@@ -129,16 +129,16 @@ Page({
   },
 
   goTrust() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/network/graph/index' })
   },
 
   goMatch() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/ai/match/index' })
   },
 
   goMatchDetail(e) {
     const id = e.currentTarget.dataset.id
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: `/pages/ai/match/index?id=${id}` })
   },
 
   // 创建资源平台

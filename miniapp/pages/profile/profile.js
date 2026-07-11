@@ -82,7 +82,7 @@ Page({
 
   // 会员中心
   goMember() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/membership/index' })
   },
 
   // 访客记录
@@ -92,12 +92,12 @@ Page({
 
   // 信任网络
   goTrustNetwork() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/network/graph/index' })
   },
 
   // 隐私设置
   goPrivacy() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/agreement/privacy/index' })
   },
 
   // 关于
