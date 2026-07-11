@@ -78,9 +78,9 @@ Page({
       const memberLevel = profile.memberLevel || 'free'
       const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
 
-      const app = getApp()
-      app.updateUserInfo(userInfo)
-      app.updateMemberLevel(memberLevel)
+      const store = require('../../utils/store')
+      store.updateUserInfo(userInfo)
+      store.updateMemberLevel(memberLevel)
 
       this.setData({
         userInfo,

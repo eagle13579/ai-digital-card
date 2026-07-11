@@ -6,7 +6,7 @@
   <view class="map-container">
     <view class="center-node">
       <view class="center-avatar">
-        <image src="{{currentUser.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <image src="{{currentUser.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="center-avatar-image" />
       </view>
       <text class="center-name">{{currentUser.name || '我'}}</text>
     </view>
