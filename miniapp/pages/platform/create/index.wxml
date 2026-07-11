@@ -1,42 +1,105 @@
-<view class="page-wrap">
-  <!-- 顶部 -->
-  <view class="status-bar">
-    <text class="back-icon" bindtap="goBack">‹</text>
-    <text class="status-time">创建资源平台</text>
-    <text class="status-placeholder"></text>
+<view class="page-container">
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">创建资源平台</text>
   </view>
 
-  <!-- 标题 -->
-  <view class="page-title">创建资源平台</view>
+  <scroll-view scroll-y class="form-scroll">
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-group">
+        <text class="form-label">平台名称 *</text>
+        <input class="form-input" placeholder="请输入平台名称" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+      </view>
 
-  <!-- 图标 -->
-  <view class="icon-box">
-    <view class="cube-icon"></view>
-    <view class="add-circle">+</view>
+      <view class="form-group">
+        <text class="form-label">平台简介 *</text>
+        <textarea class="form-textarea" placeholder="请输入平台简介（100字以内）" value="{{formData.desc}}" maxlength="100" bindinput="onInput" data-field="desc" />
+        <text class="char-count">{{formData.desc ? formData.desc.length : 0}}/100</text>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">行业标签</view>
+      <view class="tag-list">
+        <view 
+          class="tag-item {{selectedIndustries.includes(item) ? 'selected' : ''}}" 
+          wx:for="{{industryOptions}}" 
+          wx:key="item"
+          bindtap="toggleIndustry"
+          data-industry="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">所在地区</view>
+      
+      <view class="location-row">
+        <view class="location-picker" bindtap="pickProvince">
+          <text class="picker-value">{{province || '请选择省份'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <view class="location-picker" bindtap="pickCity" wx:if="{{province}}">
+          <text class="picker-value">{{city || '请选择城市'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <view class="location-picker" bindtap="pickDistrict" wx:if="{{city}}">
+          <text class="picker-value">{{district || '请选择区/县'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">联系方式</view>
+      
+      <view class="form-group">
+        <text class="form-label">联系人</text>
+        <input class="form-input" placeholder="请输入联系人姓名" value="{{formData.contactName}}" bindinput="onInput" data-field="contactName" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">联系电话</text>
+        <input class="form-input" placeholder="请输入联系电话" type="number" value="{{formData.phone}}" bindinput="onInput" data-field="phone" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">年费（可选）</text>
+        <view class="fee-input-wrap">
+          <text class="fee-prefix">¥</text>
+          <input class="form-input fee-input" placeholder="请输入年费金额" type="number" value="{{formData.fee}}" bindinput="onInput" data-field="fee" />
+          <text class="fee-suffix">/年</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="form-footer">
+    <button class="btn-primary" bindtap="submitForm">提交创建</button>
   </view>
 
-  <!-- 表单 -->
-  <view class="form-item">
-    <text class="label-text">名称</text>
-    <input class="input-box" placeholder="请输入平台名称" value="{{name}}" bindinput="onNameInput" />
-  </view>
-
-  <view class="form-item">
-    <text class="label-text">年费标准</text>
-    <input class="input-box" placeholder="请输入" value="{{fee}}" bindinput="onFeeInput" />
-    <text class="tip-text">加入平台使用平台资源需要为您支付的年费。</text>
-  </view>
-
-  <!-- 底部 -->
-  <view class="bottom-area">
-    <button class="create-btn {{submitting ? 'create-btn--disabled' : ''}}" bindtap="submit" disabled="{{submitting}}">
-      {{submitting ? '提交中...' : '创建平台'}}
-    </button>
-    <view class="agree-wrap">
-      <radio class="agree-checkbox" checked="{{agreed}}" bindtap="toggleAgree" />
-      <text class="agree-text">
-        我已阅读并同意<text class="agree-link">《询赋资源平台服务协议》</text>
-      </text>
+  <view class="picker-modal" wx:if="{{showPicker}}" bindtap="closePicker">
+    <view class="picker-content" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">{{pickerTitle}}</text>
+        <text class="picker-close" bindtap="closePicker">✕</text>
+      </view>
+      <scroll-view scroll-y class="picker-list">
+        <view 
+          class="picker-item {{item === pickerValue ? 'selected' : ''}}" 
+          wx:for="{{pickerOptions}}" 
+          wx:key="item"
+          bindtap="selectPickerItem"
+          data-value="{{item}}"
+        >
+          {{item}}
+          <text class="picker-check" wx:if="{{item === pickerValue}}">✓</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 </view>

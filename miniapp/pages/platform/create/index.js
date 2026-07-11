@@ -1,43 +1,183 @@
-/**
- * 创建资源平台申请
- */
+const PROVINCES = [
+  '北京市', '天津市', '上海市', '重庆市', '河北省', '山西省', '内蒙古自治区',
+  '辽宁省', '吉林省', '黑龙江省', '江苏省', '浙江省', '安徽省', '福建省',
+  '江西省', '山东省', '河南省', '湖北省', '湖南省', '广东省', '广西壮族自治区',
+  '海南省', '四川省', '贵州省', '云南省', '西藏自治区', '陕西省', '甘肃省',
+  '青海省', '宁夏回族自治区', '新疆维吾尔自治区', '香港特别行政区', '澳门特别行政区', '台湾省',
+]
+
+const CITY_MAP = {
+  '北京市': ['东城区', '西城区', '朝阳区', '丰台区', '石景山区', '海淀区', '门头沟区', '房山区', '通州区', '顺义区', '昌平区', '大兴区', '怀柔区', '平谷区', '密云区', '延庆区'],
+  '天津市': ['和平区', '河东区', '河西区', '南开区', '河北区', '红桥区', '东丽区', '西青区', '津南区', '北辰区', '武清区', '宝坻区', '滨海新区', '宁河区', '静海区', '蓟州区'],
+  '上海市': ['黄浦区', '徐汇区', '长宁区', '静安区', '普陀区', '虹口区', '杨浦区', '闵行区', '宝山区', '嘉定区', '浦东新区', '金山区', '松江区', '青浦区', '奉贤区', '崇明区'],
+  '重庆市': ['万州区', '涪陵区', '渝中区', '大渡口区', '江北区', '沙坪坝区', '九龙坡区', '南岸区', '北碚区', '綦江区', '大足区', '渝北区', '巴南区', '黔江区', '长寿区', '江津区', '合川区', '永川区', '南川区', '璧山区', '铜梁区', '潼南区', '荣昌区', '开州区', '梁平区', '武隆区'],
+  '河北省': ['石家庄市', '唐山市', '秦皇岛市', '邯郸市', '邢台市', '保定市', '张家口市', '承德市', '沧州市', '廊坊市', '衡水市'],
+  '山西省': ['太原市', '大同市', '阳泉市', '长治市', '晋城市', '朔州市', '晋中市', '运城市', '忻州市', '临汾市', '吕梁市'],
+  '内蒙古自治区': ['呼和浩特市', '包头市', '乌海市', '赤峰市', '通辽市', '鄂尔多斯市', '呼伦贝尔市', '巴彦淖尔市', '乌兰察布市'],
+  '辽宁省': ['沈阳市', '大连市', '鞍山市', '抚顺市', '本溪市', '丹东市', '锦州市', '营口市', '阜新市', '辽阳市', '盘锦市', '铁岭市', '朝阳市', '葫芦岛市'],
+  '吉林省': ['长春市', '吉林市', '四平市', '辽源市', '通化市', '白山市', '松原市', '白城市'],
+  '黑龙江省': ['哈尔滨市', '齐齐哈尔市', '鸡西市', '鹤岗市', '双鸭山市', '大庆市', '伊春市', '佳木斯市', '七台河市', '牡丹江市', '黑河市', '绥化市'],
+  '江苏省': ['南京市', '无锡市', '徐州市', '常州市', '苏州市', '南通市', '连云港市', '淮安市', '盐城市', '扬州市', '镇江市', '泰州市', '宿迁市'],
+  '浙江省': ['杭州市', '宁波市', '温州市', '嘉兴市', '湖州市', '绍兴市', '金华市', '衢州市', '舟山市', '台州市', '丽水市'],
+  '安徽省': ['合肥市', '芜湖市', '蚌埠市', '淮南市', '马鞍山市', '淮北市', '铜陵市', '安庆市', '黄山市', '滁州市', '阜阳市', '宿州市', '六安市', '亳州市', '池州市', '宣城市'],
+  '福建省': ['福州市', '厦门市', '莆田市', '三明市', '泉州市', '漳州市', '南平市', '龙岩市', '宁德市'],
+  '江西省': ['南昌市', '景德镇市', '萍乡市', '九江市', '新余市', '鹰潭市', '赣州市', '吉安市', '宜春市', '抚州市', '上饶市'],
+  '山东省': ['济南市', '青岛市', '淄博市', '枣庄市', '东营市', '烟台市', '潍坊市', '济宁市', '泰安市', '威海市', '日照市', '临沂市', '德州市', '聊城市', '滨州市', '菏泽市'],
+  '河南省': ['郑州市', '开封市', '洛阳市', '平顶山市', '安阳市', '鹤壁市', '新乡市', '焦作市', '濮阳市', '许昌市', '漯河市', '三门峡市', '南阳市', '商丘市', '信阳市', '周口市', '驻马店市'],
+  '湖北省': ['武汉市', '黄石市', '十堰市', '宜昌市', '襄阳市', '鄂州市', '荆门市', '孝感市', '荆州市', '黄冈市', '咸宁市', '随州市'],
+  '湖南省': ['长沙市', '株洲市', '湘潭市', '衡阳市', '邵阳市', '岳阳市', '常德市', '张家界市', '益阳市', '郴州市', '永州市', '怀化市', '娄底市'],
+  '广东省': ['广州市', '韶关市', '深圳市', '珠海市', '汕头市', '佛山市', '江门市', '湛江市', '茂名市', '肇庆市', '惠州市', '梅州市', '汕尾市', '河源市', '阳江市', '清远市', '东莞市', '中山市', '潮州市', '揭阳市', '云浮市'],
+  '广西壮族自治区': ['南宁市', '柳州市', '桂林市', '梧州市', '北海市', '防城港市', '钦州市', '贵港市', '玉林市', '百色市', '贺州市', '河池市', '来宾市', '崇左市'],
+  '海南省': ['海口市', '三亚市', '三沙市', '儋州市'],
+  '四川省': ['成都市', '自贡市', '攀枝花市', '泸州市', '德阳市', '绵阳市', '广元市', '遂宁市', '内江市', '乐山市', '南充市', '眉山市', '宜宾市', '广安市', '达州市', '雅安市', '巴中市', '资阳市'],
+  '贵州省': ['贵阳市', '六盘水市', '遵义市', '安顺市', '毕节市', '铜仁市'],
+  '云南省': ['昆明市', '曲靖市', '玉溪市', '保山市', '昭通市', '丽江市', '普洱市', '临沧市'],
+  '西藏自治区': ['拉萨市', '日喀则市', '昌都市', '林芝市', '山南市', '那曲市'],
+  '陕西省': ['西安市', '铜川市', '宝鸡市', '咸阳市', '渭南市', '延安市', '汉中市', '榆林市', '安康市', '商洛市'],
+  '甘肃省': ['兰州市', '嘉峪关市', '金昌市', '白银市', '天水市', '武威市', '张掖市', '平凉市', '酒泉市', '庆阳市', '定西市', '陇南市'],
+  '青海省': ['西宁市', '海东市'],
+  '宁夏回族自治区': ['银川市', '石嘴山市', '吴忠市', '固原市', '中卫市'],
+  '新疆维吾尔自治区': ['乌鲁木齐市', '克拉玛依市', '吐鲁番市', '哈密市'],
+  '香港特别行政区': ['中西区', '湾仔区', '东区', '南区', '油尖旺区', '深水埗区', '九龙城区', '黄大仙区', '观塘区', '葵青区', '荃湾区', '屯门区', '元朗区', '北区', '西贡区', '沙田区', '大埔区', '北区'],
+  '澳门特别行政区': ['花地玛堂区', '圣安多尼堂区', '大堂区', '风顺堂区', '嘉模堂区', '圣方济各堂区', '路凼城'],
+  '台湾省': ['台北市', '新北市', '桃园市', '台中市', '台南市', '高雄市', '基隆市', '新竹市', '嘉义市'],
+}
+
+const DISTRICT_MAP = {
+  '北京市东城区': ['东华门街道', '景山街道', '交道口街道', '安定门街道', '北新桥街道', '东四街道', '朝阳门街道', '建国门街道', '东直门街道', '和平里街道', '崇文门外街道', '东花市街道', '龙潭街道', '体育馆路街道', '天坛街道', '永定门外街道'],
+  '上海市浦东新区': ['陆家嘴街道', '潍坊新村街道', '塘桥街道', '南码头路街道', '周家渡街道', '上钢新村街道', '南泉新村街道', '张江镇', '金桥开发区', '外高桥保税区'],
+  '广州市天河区': ['五山街道', '员村街道', '车陂街道', '沙河街道', '石牌街道', '兴华街道', '沙东街道', '林和街道', '棠下街道', '天园街道', '猎德街道', '冼村街道', '员村街道'],
+}
+
+const INDUSTRY_OPTIONS = ['科技', '金融', '教育', '医疗', '制造', '零售', '物流', '餐饮', '娱乐', '房地产', '旅游', '农业']
+
 Page({
   data: {
-    name: '',
-    fee: '',
-    agreed: false,
-    submitting: false,
+    formData: {
+      name: '',
+      desc: '',
+      contactName: '',
+      phone: '',
+      fee: '',
+    },
+    selectedIndustries: [],
+    industryOptions: INDUSTRY_OPTIONS,
+    province: '',
+    city: '',
+    district: '',
+    showPicker: false,
+    pickerTitle: '',
+    pickerOptions: [],
+    pickerValue: '',
+    pickerType: '',
   },
 
-  onNameInput(e) {
-    this.setData({ name: e.detail.value })
-  },
-  onFeeInput(e) {
-    this.setData({ fee: e.detail.value })
-  },
-  toggleAgree() {
-    this.setData({ agreed: !this.data.agreed })
+  onInput(e) {
+    const field = e.currentTarget.dataset.field
+    const value = e.detail.value
+    const formData = { ...this.data.formData, [field]: value }
+    this.setData({ formData })
   },
 
-  canSubmit() {
-    return this.data.name.trim() && this.data.fee.trim() && this.data.agreed
-  },
-
-  submit() {
-    if (!this.canSubmit()) {
-      wx.showToast({ title: '请完善信息并同意协议', icon: 'none' })
-      return
+  toggleIndustry(e) {
+    const industry = e.currentTarget.dataset.industry
+    const selectedIndustries = [...this.data.selectedIndustries]
+    const index = selectedIndustries.indexOf(industry)
+    
+    if (index > -1) {
+      selectedIndustries.splice(index, 1)
+    } else {
+      if (selectedIndustries.length < 3) {
+        selectedIndustries.push(industry)
+      } else {
+        wx.showToast({ title: '最多选择3个行业', icon: 'none' })
+        return
+      }
     }
-    this.setData({ submitting: true })
-    // Mock提交
-    setTimeout(() => {
-      wx.showToast({ title: '申请已提交', icon: 'success' })
-      this.setData({ submitting: false })
-      setTimeout(() => wx.navigateBack(), 1500)
-    }, 1000)
+    
+    this.setData({ selectedIndustries })
+  },
+
+  pickProvince() {
+    this.setData({
+      showPicker: true,
+      pickerTitle: '选择省份',
+      pickerOptions: PROVINCES,
+      pickerValue: this.data.province,
+      pickerType: 'province',
+    })
+  },
+
+  pickCity() {
+    const cities = CITY_MAP[this.data.province] || []
+    this.setData({
+      showPicker: true,
+      pickerTitle: '选择城市',
+      pickerOptions: cities,
+      pickerValue: this.data.city,
+      pickerType: 'city',
+    })
+  },
+
+  pickDistrict() {
+    const key = `${this.data.province}${this.data.city}`
+    const districts = DISTRICT_MAP[key] || ['暂无数据']
+    this.setData({
+      showPicker: true,
+      pickerTitle: '选择区/县',
+      pickerOptions: districts,
+      pickerValue: this.data.district,
+      pickerType: 'district',
+    })
+  },
+
+  closePicker() {
+    this.setData({ showPicker: false })
+  },
+
+  stopPropagation() {},
+
+  selectPickerItem(e) {
+    const value = e.currentTarget.dataset.value
+    const type = this.data.pickerType
+    
+    if (type === 'province') {
+      this.setData({ province: value, city: '', district: '' })
+    } else if (type === 'city') {
+      this.setData({ city: value, district: '' })
+    } else if (type === 'district') {
+      this.setData({ district: value })
+    }
+    
+    this.closePicker()
   },
 
   goBack() {
     wx.navigateBack()
+  },
+
+  submitForm() {
+    const { formData, selectedIndustries, province, city } = this.data
+    
+    if (!formData.name.trim()) {
+      return wx.showToast({ title: '请输入平台名称', icon: 'none' })
+    }
+    if (!formData.desc.trim()) {
+      return wx.showToast({ title: '请输入平台简介', icon: 'none' })
+    }
+    if (!province) {
+      return wx.showToast({ title: '请选择省份', icon: 'none' })
+    }
+
+    wx.showLoading({ title: '提交中...' })
+    
+    setTimeout(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '创建成功', icon: 'success' })
+      getApp().markDataDirty()
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1000)
+    }, 1000)
   },
 })
