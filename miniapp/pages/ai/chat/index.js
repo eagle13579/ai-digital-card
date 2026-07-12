@@ -1,4 +1,5 @@
 const MockService = require('../../../utils/mockService')
+const store = require('../../../utils/store')
 const CHAT_STORAGE_KEY = 'ai_chat_messages'
 
 Page({
@@ -29,7 +30,7 @@ Page({
     }
 
     const app = getApp()
-    const isLoggedIn = app.isLoggedIn()
+    const isLoggedIn = store.getState().isLoggedIn
     
     if (isLoggedIn) {
       try {
@@ -64,7 +65,7 @@ Page({
 
   send() {
     const app = getApp()
-    if (!app.isLoggedIn()) {
+    if (!store.checkLogin()) {
       return wx.showToast({ title: '请先登录', icon: 'none' })
     }
     
