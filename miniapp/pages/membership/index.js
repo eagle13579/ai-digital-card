@@ -8,7 +8,7 @@ const MEMBERSHIP_LEVELS = [
     name: 'Free',
     price: '免费',
     popular: false,
-    features: ['1张名片', 'OCR 3次/月', '5位访客追踪', '基础模板'],
+    features: ['3张名片', 'OCR 3次/月', '5位访客追踪', '基础模板'],
   },
   {
     id: 'pro',

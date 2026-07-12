@@ -1,4 +1,5 @@
 const MockService = require('../../../utils/mockService')
+const store = require('../../../utils/store')
 
 const PROVINCES = [
   '北京市', '天津市', '上海市', '重庆市', '河北省', '山西省', '内蒙古自治区',
@@ -188,6 +189,7 @@ Page({
 
       wx.hideLoading()
       wx.showToast({ title: '创建成功', icon: 'success' })
+      store.markDataDirty()
 
       const platformId = result.data?.id
       setTimeout(() => {

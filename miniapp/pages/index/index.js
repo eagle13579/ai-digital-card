@@ -17,9 +17,12 @@ Page({
     trustCount: 0,
     trustList: [],
     recommendList: [],
+    showEmpty: false,
     visitorList: [],
+    showUpgradeHint: false,
 
-    // 平台推荐
+    sceneMode: 'personal',
+    sceneModeExpanded: false,
     platformRecommend: [
       { id: 1, name: 'AI技术合作平台', desc: 'AI技术开发·模型训练·数据标注', icon: '🤖', bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
       { id: 2, name: '供应链资源平台', desc: '供应商对接·物流配送·仓储服务', icon: '🚚', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
@@ -34,9 +37,12 @@ Page({
   },
 
   onShow() {
-    const { isLoggedIn } = store.getState()
-    if (isLoggedIn && !this.data.loading) {
-      this.loadPageData()
+    const { isLoggedIn, dataDirty } = store.getState()
+    if (isLoggedIn) {
+      if (dataDirty || !this.data.loading) {
+        store.clearDataDirty()
+        this.loadPageData()
+      }
     }
   },
 
@@ -83,6 +89,9 @@ Page({
       store.updateUserInfo(userInfo)
       store.updateMemberLevel(memberLevel)
 
+      // Free用户访客≥3时显示升级提示
+      const showUpgradeHint = memberLevel === 'free' && (stats.visitors >= 3 || recommendData.length >= 3)
+
       this.setData({
         userInfo,
         memberLevel,
@@ -98,6 +107,8 @@ Page({
         trustCount,
         trustList: trustList.slice(0, 10),
         recommendList: Array.isArray(recommendData) ? recommendData.slice(0, 3) : [],
+        showEmpty: !brochure && (!Array.isArray(recommendData) || recommendData.length === 0),
+        showUpgradeHint,
         visitorList: [],
         loading: false,
       })
@@ -107,6 +118,20 @@ Page({
       Logger.error('首页', '加载失败', err)
       this.setData({ loading: false })
     }
+  },
+
+  toggleSceneMode() {
+    this.setData({
+      sceneModeExpanded: !this.data.sceneModeExpanded,
+    })
+  },
+
+  selectSceneMode(e) {
+    const mode = e.currentTarget.dataset.mode
+    this.setData({
+      sceneMode: mode,
+    })
+    wx.showToast({ title: '已切换至' + (mode === 'personal' ? '个人展示' : mode === 'business' ? '商务对接' : '社交拓展') + '模式', icon: 'none' })
   },
 
   goEditCard() {
@@ -126,8 +151,16 @@ Page({
     wx.navigateTo({ url: '/pages/qrcode/index' })
   },
 
+  // 跳转升级会员
+  goMembership() {
+    wx.navigateTo({ url: '/pages/membership/index' })
+  },
+
   shareCard() {
-    wx.showShareMenu({ withShareTicket: true })
+    wx.shareAppMessage({
+      title: this.data.userInfo.name + '的AI数智名片',
+      path: this.data.brochure ? `/pages/brochure/preview/index?id=${this.data.brochure.id}` : '/pages/index/index',
+    })
   },
 
   goTrust() {

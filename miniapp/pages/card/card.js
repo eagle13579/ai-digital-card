@@ -25,7 +25,11 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
-      const brochure = await MockService.getBrochureById(cardId)
+      const [brochure, recommendData, trustNet] = await Promise.all([
+        MockService.getBrochureById(cardId),
+        MockService.getRecommendList().catch(() => []),
+        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
+      ])
       
       let card = null
       if (brochure) {
@@ -58,6 +62,11 @@ Page({
         const vStats = await MockService.getVisitorStats(cardId)
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
+        // 从推荐列表和信任网络获取匹配/信任数据
+        const recommendList = Array.isArray(recommendData) ? recommendData : (recommendData?.data || [])
+        stats.matches = recommendList.length || 0
+        const trustData = trustNet.data || trustNet
+        stats.trust = (trustData.trusting?.length || 0) + (trustData.trusted_by?.length || 0)
       }
 
       this.setData({
@@ -81,7 +90,10 @@ Page({
 
   // 分享
   shareCard() {
-    wx.showShareMenu({ withShareTicket: true })
+    wx.shareAppMessage({
+      title: this.data.card?.title || 'AI数智名片',
+      path: this.data.card ? `/pages/preview/index?id=${this.data.card.id}` : '/pages/index/index',
+    })
   },
 
   // 生成小程序码

@@ -26,6 +26,7 @@ class Store {
       matchCount: 0,
       visitorCount: 0,
       trustCount: 0,
+      dataDirty: false,
     }
     this._listeners = []
   }
@@ -117,6 +118,16 @@ class Store {
     if (stats.visitorCount !== undefined) this._state.visitorCount = stats.visitorCount
     if (stats.trustCount !== undefined) this._state.trustCount = stats.trustCount
     this._emit()
+  }
+
+  /** 标记数据为脏，首页 onShow 检测后重载 */
+  markDataDirty() {
+    this._state.dataDirty = true
+  }
+
+  /** 清除脏标记 */
+  clearDataDirty() {
+    this._state.dataDirty = false
   }
 }
 

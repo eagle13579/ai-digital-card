@@ -29,7 +29,7 @@
     easing-function="easeOutQuad"
   >
     <swiper-item wx:for="{{pages}}" wx:key="index">
-      <view class="brochure-page {{pageType === 'cover' ? 'cover-page' : ''}}" style="background: {{pageBackground}}">
+      <view class="brochure-page {{pageType === 'cover' ? 'cover-page' : ''}}" style="background: {{pageBackgrounds[index]}}">
         <view wx:if="{{page.type === 'cover'}}" class="cover-content">
           <view class="cover-avatar-wrap">
             <image wx:if="{{page.avatar}}" src="{{page.avatar}}" class="cover-avatar" mode="aspectFill" />
@@ -63,15 +63,15 @@
             <text class="bio-content">{{page.bio}}</text>
           </view>
           <view class="profile-contact">
-            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.phone}}">
+            <view class="contact-item" wx:if="{{page.contact.phone}}" bindtap="copyText" data-text="{{page.contact.phone}}">
               <text class="contact-icon">📞</text>
               <text class="contact-text">{{page.contact.phone}}</text>
             </view>
-            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.email}}">
+            <view class="contact-item" wx:if="{{page.contact.email}}" bindtap="copyText" data-text="{{page.contact.email}}">
               <text class="contact-icon">✉️</text>
               <text class="contact-text">{{page.contact.email}}</text>
             </view>
-            <view class="contact-item" bindtap="copyText" data-text="{{page.contact.wechat}}">
+            <view class="contact-item" wx:if="{{page.contact.wechat}}" bindtap="copyText" data-text="{{page.contact.wechat}}">
               <text class="contact-icon">💬</text>
               <text class="contact-text">{{page.contact.wechat}}</text>
             </view>
@@ -135,17 +135,17 @@
             <text class="contact-card-company">{{page.company}}</text>
           </view>
           <view class="contact-list">
-            <view class="contact-list-item" bindtap="copyText" data-text="{{page.phone}}">
+            <view class="contact-list-item" wx:if="{{page.phone}}" bindtap="copyText" data-text="{{page.phone}}">
               <text class="contact-list-icon">📞</text>
               <text class="contact-list-label">电话</text>
               <text class="contact-list-value">{{page.phone}}</text>
             </view>
-            <view class="contact-list-item" bindtap="copyText" data-text="{{page.email}}">
+            <view class="contact-list-item" wx:if="{{page.email}}" bindtap="copyText" data-text="{{page.email}}">
               <text class="contact-list-icon">✉️</text>
               <text class="contact-list-label">邮箱</text>
               <text class="contact-list-value">{{page.email}}</text>
             </view>
-            <view class="contact-list-item" bindtap="copyText" data-text="{{page.wechat}}">
+            <view class="contact-list-item" wx:if="{{page.wechat}}" bindtap="copyText" data-text="{{page.wechat}}">
               <text class="contact-list-icon">💬</text>
               <text class="contact-list-label">微信</text>
               <text class="contact-list-value">{{page.wechat}}</text>

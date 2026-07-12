@@ -10,14 +10,19 @@ Page({
     isLoggedIn: false,
   },
 
-  onLoad() {
+  async onLoad() {
     const app = getApp()
     const isLoggedIn = app.isLoggedIn()
     
     if (isLoggedIn) {
-      const profile = MockService.getUserProfile() || {}
-      const userAvatar = (profile && profile.avatar) || (profile && profile.avatarUrl) || ''
-      this.setData({ userAvatar, isLoggedIn })
+      try {
+        const res = await MockService.getUserProfile()
+        const profile = res?.data || {}
+        const userAvatar = profile.avatar || ''
+        this.setData({ userAvatar, isLoggedIn })
+      } catch (e) {
+        this.setData({ userAvatar: '', isLoggedIn })
+      }
     } else {
       this.setData({ userAvatar: '', isLoggedIn })
     }

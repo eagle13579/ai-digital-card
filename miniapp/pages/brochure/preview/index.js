@@ -12,6 +12,7 @@ Page({
     currentPage: 0,
     totalPages: 0,
     pageBackground: '#ffffff',
+    pageBackgrounds: [],
     pageType: '',
     purposeMap: {
       partner: '寻找合作伙伴',
@@ -19,6 +20,19 @@ Page({
       employee: '寻找人才',
       client: '寻找客户',
     },
+  },
+
+  /** 根据页面类型返回不同背景色 */
+  getPageBackground(type) {
+    const bgMap = {
+      cover: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+      profile: '#F8FAFC',
+      resources: '#EEF2FF',
+      company: '#ffffff',
+      case: '#FAFAFA',
+      contact: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+    }
+    return bgMap[type] || '#ffffff'
   },
 
   onLoad(options) {
@@ -153,13 +167,14 @@ Page({
     Logger.info('画册预览页', '设置画册数据', { pageCount: pages ? pages.length : 0 })
     
     const firstPage = pages && pages[0]
-    const isCover = firstPage && firstPage.type === 'cover'
+    const pageBackgrounds = pages ? pages.map(p => this.getPageBackground(p.type)) : []
     
     this.setData({
       pages,
       totalPages: pages ? pages.length : 0,
       currentPage: 0,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+      pageBackgrounds,
+      pageBackground: pageBackgrounds[0] || '#ffffff',
       pageType: firstPage && firstPage.type ? firstPage.type : '',
     })
     
@@ -169,11 +184,11 @@ Page({
   onSwiperChange(e) {
     const current = e.detail.current
     const page = this.data.pages && this.data.pages[current]
-    const isCover = page && page.type === 'cover'
+    const bg = this.data.pageBackgrounds && this.data.pageBackgrounds[current]
     
     this.setData({
       currentPage: current,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#ffffff',
+      pageBackground: bg || '#ffffff',
       pageType: page && page.type ? page.type : '',
     })
     
@@ -195,9 +210,9 @@ Page({
 
   copyText(e) {
     const text = e.currentTarget.dataset.text
-    if (text) {
+    if (text && text.trim()) {
       wx.setClipboardData({
-        data: text,
+        data: text.trim(),
         success: () => {
           wx.showToast({ title: '已复制', icon: 'success' })
         },

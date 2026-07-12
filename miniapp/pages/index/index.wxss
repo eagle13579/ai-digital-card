@@ -90,6 +90,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   position: relative;
   z-index: 1;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .action-item {
@@ -113,6 +115,8 @@
 .brochure-card {
   padding: 0 !important;
   overflow: hidden;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .brochure-cover {
@@ -272,6 +276,8 @@
   overflow: hidden;
   padding: 0 !important;
   margin-top: 4px;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 .platform-entry-bg {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -350,4 +356,42 @@
   display: block;
   padding: 0 10px 10px;
   line-height: 1.4;
+}
+
+/* 场景模式 */
+.scene-mode-card {
+  overflow: hidden;
+}
+.scene-mode-content {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scene-option {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+.scene-option.active {
+  background: #eef2ff;
+  border-color: #1657ff;
+}
+.scene-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.scene-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+.scene-desc {
+  font-size: 12px;
+  color: #999;
 }

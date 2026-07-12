@@ -5,6 +5,7 @@
  */
 const { MockService } = require('../../../utils/mockService')
 const { Logger } = require('../../../utils/util')
+const store = require('../../../utils/store')
 
 Page({
   data: {
@@ -16,6 +17,10 @@ Page({
       phone: '',
       email: '',
       wechat: '',
+      school: '',
+      major: '',
+      education: '',
+      skillTags: [],
       bio: '',
       provides: [],
       needs: [],
@@ -43,10 +48,17 @@ Page({
       { value: 'minimal', name: '极简简约', desc: '适合科技行业', preview: 'linear-gradient(135deg, #64748B 0%, #1E293B 100%)' },
     ],
     sizeOptions: ['1-10人', '11-50人', '51-100人', '101-500人', '501-1000人', '1000人以上'],
+    showMoreInfo: false,
   },
 
   onLoad() {
     Logger.info('画册创建页', '页面加载')
+  },
+
+  toggleMoreInfo() {
+    this.setData({
+      showMoreInfo: !this.data.showMoreInfo,
+    })
   },
 
   onInput(e) {
@@ -297,6 +309,7 @@ Page({
       if (result.id) {
         wx.hideLoading()
         wx.showToast({ title: '生成成功', icon: 'success' })
+        store.markDataDirty()
         setTimeout(() => {
           wx.navigateTo({
             url: `/pages/brochure/preview/index?id=${result.id}`,
@@ -311,5 +324,13 @@ Page({
       Logger.error('画册创建页', '提交失败', err)
       wx.showToast({ title: '提交失败', icon: 'none' })
     }
+  },
+
+  onSkillTagsInput(e) {
+    const value = e.detail.value
+    const tags = value ? value.split(/[,，]/).map(t => t.trim()).filter(t => t) : []
+    this.setData({
+      'formData.skillTags': tags,
+    })
   },
 })

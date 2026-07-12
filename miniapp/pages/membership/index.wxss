@@ -74,3 +74,39 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
 }
+
+.student-discount-card {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+  border-radius: 16px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  margin-top: 8px;
+}
+
+.student-discount-icon {
+  font-size: 36px;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.student-discount-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-discount-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fbbf24;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.student-discount-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  display: block;
+}

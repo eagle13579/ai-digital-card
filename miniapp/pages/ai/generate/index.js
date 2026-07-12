@@ -21,6 +21,11 @@ const CONTENT_TYPES = [
     name: '求职简历',
     subtypes: ['professional', 'creative', 'summary'],
   },
+  {
+    id: 'coverletter',
+    name: '自荐信',
+    subtypes: ['professional', 'personal', 'creative'],
+  },
 ]
 
 const SUBTYPE_LABELS = {
@@ -53,6 +58,11 @@ const GENERATE_TEMPLATES = {
     professional: (data) => `【${data.name || '个人简历'}】\n\n基本信息\n姓名：${data.name || ''}\n职位：${data.title || ''}\n公司：${data.company || ''}\n行业：${data.industry || ''}\n经验：${data.experience || ''}\n\n专业技能\n${data.skills || '待补充'}\n\n主要成就\n${data.achievements || '待补充'}\n\n职业目标\n致力于在${data.keywords || '专业领域'}实现职业发展，为企业创造价值。`,
     creative: (data) => `🎨 ${data.name || '创意简历'} 🎨\n\n我是谁？\n${data.name || ''} | ${data.title || ''} | ${data.company || ''}\n\n我的技能树\n${data.skills ? data.skills.split(/[,，]/).map(s => `• ${s.trim()}`).join('\n') : '待解锁'}\n\n打怪升级之路\n${data.experience ? `⏱️ ${data.experience}经验值\n` : ''}${data.achievements ? `🏆 ${data.achievements}\n` : ''}\n\n下一步目标\n${data.keywords ? `🎯 ${data.keywords}` : '寻找新的挑战'}\n\n期待与你组队！`,
     summary: (data) => `【${data.name || '个人摘要'}】\n\n${data.title || ''}，${data.experience || ''}经验\n${data.company || ''} | ${data.industry || ''}\n\n核心技能：${data.skills || '待补充'}\n关键词：${data.keywords || '待补充'}\n成就亮点：${data.achievements || '待补充'}\n\n期待机会：寻求${data.keywords || '新的职业'}发展机会`,
+  },
+  coverletter: {
+    professional: (data) => `尊敬的招聘负责人：\n\n您好！\n\n我是${data.name || '应聘者'}，${data.title || ''}，来自${data.company || '学校/公司'}。${data.experience ? `拥有${data.experience}的${data.industry || '行业'}经验，` : ''}${data.skills ? `具备${data.skills}等核心技能。` : ''}\n\n${data.achievements ? `在过往经历中，我取得了以下成绩：${data.achievements}\n\n` : ''}我对贵公司的${data.keywords || '相关岗位'}非常感兴趣，相信我的专业背景和能力能够为贵公司创造价值。\n\n期待与您进一步沟通，详细交流我的求职意向。\n\n此致\n敬礼\n${data.name || ''}`,
+    personal: (data) => `嗨，招聘团队好！\n\n我是${data.name || '我'}，${data.title ? `现在是${data.title}，` : ''}${data.company ? `来自${data.company}。` : ''}\n\n${data.skills ? `我擅长${data.skills}，` : ''}${data.experience ? `有${data.experience}的相关经验。` : ''}${data.achievements ? `曾${data.achievements}。` : ''}\n\n我一直关注贵公司的发展，${data.keywords ? `尤其在${data.keywords}方面，` : ''}希望能有机会加入你们的团队，一起做有意义的事情！\n\n期待你的回复！\n${data.name || ''}`,
+    creative: (data) => `✨ 致未来同事的一封信 ✨\n\n你好！我叫${data.name || '追梦人'}${data.title ? `，是一名${data.title}` : ''}${data.company ? `，来自${data.company}` : ''}。\n\n🚀 我的超能力\n${data.skills ? data.skills.split(/[,，]/).map(s => `  • ${s.trim()}`).join('\n') : '  待发掘'}\n\n🏆 高光时刻\n${data.achievements || '  还有很多精彩等你发现'}\n\n${data.keywords ? `🎯 我想在${data.keywords}方向大展拳脚\n` : ''}\n\n我相信，优秀的团队成就优秀的个人。期待成为你们的一员，一起创造不凡！\n\n📬 期待你的回音！\n${data.name || ''}`,
   },
 }
 
