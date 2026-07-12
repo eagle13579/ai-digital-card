@@ -11,13 +11,15 @@ Page({
     regions: ['全部', '北京', '上海', '深圳', '杭州', '广州'],
     selectedIndustry: '全部',
     selectedRegion: '全部',
+    selectedIndustryIndex: 0,
+    selectedRegionIndex: 0,
     loading: false,
   },
 
   async onLoad() {
     this.setData({ loading: true })
     try {
-      const matches = await MockService.getMatchList()
+      const matches = await MockService.getRecommendList()
       this.setData({ matches, filteredMatches: matches, loading: false })
     } catch (e) {
       console.error('获取匹配列表失败', e)

@@ -38,6 +38,12 @@ Page({
   },
 
   async loadUserLevel() {
+    const store = require('../../utils/store')
+    const { memberLevel } = store.getState()
+    if (memberLevel && memberLevel !== 'free') {
+      this.setData({ currentLevel: getLevelText(memberLevel), currentLevelId: memberLevel })
+      return
+    }
     const profile = await MockService.getUserProfile() || {}
     const levelId = (profile && profile.memberLevel) || 'free'
     const levelText = getLevelText(levelId)

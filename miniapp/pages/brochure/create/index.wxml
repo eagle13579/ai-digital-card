@@ -106,7 +106,7 @@
           <view class="form-item">
             <text class="form-label">我能提供的资源</text>
             <view class="resource-input-row">
-              <input class="form-input resource-input" placeholder="输入资源后点击添加" value="{{newProvide}}" bindinput="onInput" data-field="newProvide" />
+              <input class="form-input resource-input" placeholder="输入资源后点击添加" value="{{formData.newProvide}}" bindinput="onInput" data-field="newProvide" />
               <button class="btn-add" bindtap="addProvide">添加</button>
             </view>
             <view class="tags-list" wx:if="{{formData.provides && formData.provides.length > 0}}">
@@ -120,7 +120,7 @@
           <view class="form-item">
             <text class="form-label">我想要的资源</text>
             <view class="resource-input-row">
-              <input class="form-input resource-input" placeholder="输入需求后点击添加" value="{{newNeed}}" bindinput="onInput" data-field="newNeed" />
+              <input class="form-input resource-input" placeholder="输入需求后点击添加" value="{{formData.newNeed}}" bindinput="onInput" data-field="newNeed" />
               <button class="btn-add" bindtap="addNeed">添加</button>
             </view>
             <view class="tags-list" wx:if="{{formData.needs && formData.needs.length > 0}}">
