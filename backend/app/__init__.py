@@ -179,6 +179,7 @@ def create_app():
     from app.routers.organization_router import router as organization_router
     from app.routers.six_degrees_router import router as six_degrees_router
     from app.routers.escrow_router import router as escrow_router
+    from app.routers.ocr_router import router as ocr_router
 
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -228,8 +229,11 @@ def create_app():
     app.include_router(webhook_router)
     app.include_router(recommend_router)
     app.include_router(ab_test_router)
-    from app.routers.xinsen_match import router as xinsen_router
-    app.include_router(xinsen_router)
+    try:
+        from app.routers.xinsen_match import router as xinsen_router
+        app.include_router(xinsen_router)
+    except ModuleNotFoundError:
+        logger.warning("xinsen_match 路由未找到，跳过")
     app.include_router(api_keys_router)
     app.include_router(docs_router)
     app.include_router(web_vitals_router)
