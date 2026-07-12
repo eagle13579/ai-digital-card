@@ -109,15 +109,15 @@ Page({
   },
 
   addProvide() {
-    const value = this.data.newProvide.trim()
+    const value = (this.data.formData.newProvide || '').trim()
     if (!value) {
       wx.showToast({ title: '请输入资源名称', icon: 'none' })
       return
     }
-    const provides = [...this.data.formData.provides, value]
+    const provides = [...(this.data.formData.provides || []), value]
     this.setData({
       'formData.provides': provides,
-      newProvide: '',
+      'formData.newProvide': '',
     })
   },
 
@@ -130,15 +130,15 @@ Page({
   },
 
   addNeed() {
-    const value = this.data.newNeed.trim()
+    const value = (this.data.formData.newNeed || '').trim()
     if (!value) {
       wx.showToast({ title: '请输入需求名称', icon: 'none' })
       return
     }
-    const needs = [...this.data.formData.needs, value]
+    const needs = [...(this.data.formData.needs || []), value]
     this.setData({
       'formData.needs': needs,
-      newNeed: '',
+      'formData.newNeed': '',
     })
   },
 

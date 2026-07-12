@@ -437,4 +437,5 @@ const MockService = {
   },
 }
 
-module.exports = { MockService }
+module.exports = MockService
+module.exports.MockService = MockService  // 兼容 { MockService } 解构导入
