@@ -34,10 +34,6 @@
       <text class="action-icon">+</text>
       <text class="action-text">添加联系人</text>
     </view>
-    <view class="action-btn import-btn" bindtap="navigateToImport">
-      <text class="action-icon">📥</text>
-      <text class="action-text">导入联系人</text>
-    </view>
     <view class="action-btn search-btn" bindtap="openPathSearch">
       <text class="action-icon">🔗</text>
       <text class="action-text">触达路径</text>
@@ -147,13 +143,6 @@
         </view>
       </view>
       <view class="info-footer">
-        <button
-          class="info-action-btn"
-          wx:if="{{!selectedNode.isSelf}}"
-          bindtap="viewContactNetwork"
-        >
-          🌐 查看TA的人脉网络
-        </button>
         <button
           class="info-close-btn"
           bindtap="closeInfoModal"

@@ -1,7 +1,6 @@
 const { MockService } = require('../../../utils/mockService')
-const { trustApi, connectionApi, sixDegreesApi } = require('../../../utils/api')
+const { sixDegreesApi } = require('../../../utils/api')
 const store = require('../../../utils/store')
-const { BFSFinder } = require('../../../utils/bfs')
 
 // Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
 if (typeof requestAnimationFrame === 'undefined') {
@@ -46,22 +45,9 @@ Page({
   _touchStartX: 0,
   _touchStartY: 0,
   _touchStartTime: 0,
-  // 保存主网络状态（用于返回）
-  _mainNetworkNodes: null,
-  _mainNetworkEdges: null,
-  _mainNetworkCenterId: null,
 
   onLoad(options) {
-    if (options.data && options.nodes) {
-      this.nodes = options.nodes
-      this.buildEdgesFromNodes()
-      this.setData({
-        nodeCount: this.nodes.length - 1,
-        hasData: this.nodes.length > 1,
-      })
-    } else {
-      this.loadData()
-    }
+    this.loadData()
   },
 
   onReady() {
@@ -88,14 +74,6 @@ Page({
     this.stopAnimation()
   },
 
-  // ====== 联系人导入 ======
-
-  navigateToImport() {
-    wx.navigateTo({
-      url: '/pages/network/import/index',
-    })
-  },
-
   // ====== 数据加载 ======
   async loadData() {
     try {
@@ -118,83 +96,6 @@ Page({
     } catch (err) {
       console.error('[Graph] 加载数据失败:', err)
       wx.showToast({ title: '加载失败', icon: 'none' })
-    }
-  },
-
-  /** 从联系人数据构建图谱 */
-  _buildGraphFromContacts(trusting, trustedBy) {
-    const allContacts = [...trusting, ...trustedBy].slice(0, MAX_NODES - 1)
-
-    this.nodes = [{
-      id: 'self',
-      name: '我',
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      radius: 30,
-      isSelf: true,
-    }]
-
-    const seenIds = new Set()
-    const uniqueContacts = allContacts.filter(c => {
-      const id = c.id !== undefined ? String(c.id) : ''
-      if (seenIds.has(id)) return false
-      seenIds.add(id)
-      return true
-    })
-
-    const angleStep = (Math.PI * 2) / Math.max(uniqueContacts.length, 1)
-
-    uniqueContacts.forEach((contact, index) => {
-      const angle = index * angleStep
-      const distance = 100 + Math.random() * 50
-      const cid = contact.id !== undefined ? String(contact.id) : `node_${index}`
-      this.nodes.push({
-        id: cid,
-        name: contact.name || `联系人${index + 1}`,
-        company: contact.company || '',
-        title: contact.title || '',
-        avatar: contact.avatar || '',
-        x: Math.cos(angle) * distance,
-        y: Math.sin(angle) * distance,
-        vx: 0,
-        vy: 0,
-        radius: 18,
-        isSelf: false,
-        data: contact,
-      })
-      this.edges.push({
-        from: 'self',
-        to: cid,
-      })
-    })
-
-    for (let i = 1; i < this.nodes.length; i++) {
-      for (let j = i + 1; j < this.nodes.length; j++) {
-        if (Math.random() > 0.6) {
-          this.edges.push({
-            from: this.nodes[i].id,
-            to: this.nodes[j].id,
-          })
-        }
-      }
-    }
-
-    this.setData({
-      nodeCount: uniqueContacts.length,
-      hasData: uniqueContacts.length > 0,
-    })
-
-    if (this.canvasCtx) {
-      this.renderGraph()
-    } else {
-      setTimeout(() => {
-        if (this.canvasCtx) {
-          this.renderGraph()
-          this.startAnimation()
-        }
-      }, 500)
     }
   },
 
@@ -295,48 +196,6 @@ Page({
           this.startAnimation()
         }
       }, 500)
-    }
-  },
-
-  buildEdgesFromNodes() {
-    this.edges = []
-    this.nodes.forEach((node) => {
-      if (!node.isSelf) {
-        this.edges.push({ from: 'self', to: node.id })
-      }
-    })
-  },
-
-  // 加载好友列表（用于BFS前端快速选择）
-  async loadFriendList() {
-    this.setData({ loadingFriends: true })
-    try {
-      if (MockService.USE_MOCK) {
-        const friends = await MockService.getSixDegreesRelations('self')
-        const list = friends.data || friends || []
-        this.setData({
-          friendList: list.map(f => ({
-            id: f.target_user_id !== undefined ? String(f.target_user_id) : '',
-            name: f.target_name || f.name || '',
-          })),
-          loadingFriends: false,
-        })
-      } else {
-        const state = store.getState()
-        const userId = state.userInfo?.id || 'u001'
-        const res = await sixDegreesApi.relations(userId)
-        const list = res.data || res || []
-        this.setData({
-          friendList: list.map(f => ({
-            id: f.target_user_id !== undefined ? String(f.target_user_id) : '',
-            name: f.target_name || f.name || '',
-          })),
-          loadingFriends: false,
-        })
-      }
-    } catch (err) {
-      console.error('[Graph] 加载好友列表失败:', err)
-      this.setData({ loadingFriends: false })
     }
   },
 
@@ -654,55 +513,6 @@ Page({
   stopPropagation() {
   },
 
-  async viewContactNetwork() {
-    const selectedNode = this.data.selectedNode
-    if (!selectedNode || selectedNode.isSelf) {
-      wx.showToast({ title: '该节点不可展开', icon: 'none' })
-      return
-    }
-
-    this.closeInfoModal()
-
-    const contactId = selectedNode.id
-    wx.showLoading({ title: '加载人脉网络...' })
-
-    try {
-      // 保存当前主网络状态（仅首次进入子网络时保存）
-      if (!this._mainNetworkNodes && !this.isSubNetwork) {
-        this._mainNetworkNodes = JSON.parse(JSON.stringify(this.nodes))
-        this._mainNetworkEdges = JSON.parse(JSON.stringify(this.edges))
-        this._mainNetworkCenterId = 'self'
-      }
-
-      let friends = []
-      if (MockService.USE_MOCK) {
-        const res = await MockService.getSixDegreesNetwork(contactId)
-        const data = res.data || res || { nodes: [], links: [] }
-        this._buildGraphFromSixDegrees(data)
-        this.setData({
-          isSubNetwork: true,
-          subNetworkLabel: selectedNode.name,
-        })
-        wx.hideLoading()
-        return
-      } else {
-        const res = await sixDegreesApi.network(contactId)
-        const data = res.data || res || { nodes: [], links: [] }
-        this._buildGraphFromSixDegrees(data)
-      }
-
-      this.setData({
-        isSubNetwork: true,
-        subNetworkLabel: selectedNode.name,
-      })
-    } catch (err) {
-      console.error('[Graph] 加载人脉网络失败:', err)
-      wx.showToast({ title: '加载失败', icon: 'none' })
-    } finally {
-      wx.hideLoading()
-    }
-  },
-
   goBackToMainNetwork() {
     if (this._mainNetworkNodes && this._mainNetworkEdges) {
       this.nodes = JSON.parse(JSON.stringify(this._mainNetworkNodes))
@@ -786,7 +596,6 @@ Page({
 
   // ====== BFS 触达路径查找 ======
   openPathSearch() {
-    this.loadFriendList()
     this.setData({
       showPathSearch: true,
       targetUserId: '',
