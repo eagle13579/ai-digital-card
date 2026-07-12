@@ -1,5 +1,6 @@
 const { MockService } = require('../../../utils/mockService')
-const { trustApi, connectionApi } = require('../../../utils/api')
+const { trustApi, connectionApi, sixDegreesApi } = require('../../../utils/api')
+const store = require('../../../utils/store')
 const { BFSFinder } = require('../../../utils/bfs')
 
 // Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
@@ -98,17 +99,21 @@ Page({
   // ====== 数据加载 ======
   async loadData() {
     try {
+      const state = store.getState()
+      const userId = state.userInfo?.id || 'u001'
+
       if (MockService.USE_MOCK) {
-        console.log('[Graph] 开始加载Mock数据')
-        const trustNet = await MockService.getTrustNetwork()
-        const data = trustNet.data || trustNet
+        console.log('[Graph] 开始加载Mock数据（六度人脉）')
+        const res = await MockService.getSixDegreesNetwork(userId)
+        const data = res.data || res
         console.log('[Graph] 数据加载完成:', JSON.stringify(data))
-        this._buildGraphFromContacts(data.trusting || [], data.trusted_by || [])
+        this._buildGraphFromSixDegrees(data)
         console.log('[Graph] 图谱构建完成:', this.nodes.length, 'nodes,', this.edges.length, 'edges')
       } else {
-        const res = await trustApi.getNetwork()
-        const data = res.data || res || { trusting: [], trusted_by: [] }
-        this._buildGraphFromContacts(data.trusting || [], data.trusted_by || [])
+        console.log('[Graph] 开始加载真实API数据（六度人脉）')
+        const res = await sixDegreesApi.network(userId)
+        const data = res.data || res || { nodes: [], links: [] }
+        this._buildGraphFromSixDegrees(data)
       }
     } catch (err) {
       console.error('[Graph] 加载数据失败:', err)
@@ -193,6 +198,106 @@ Page({
     }
   },
 
+  /** 从六度人脉API数据构建图谱（nodes + links格式） */
+  _buildGraphFromSixDegrees(data) {
+    const rawNodes = data.nodes || []
+    const rawLinks = data.links || []
+
+    if (rawNodes.length === 0) {
+      this.nodes = []
+      this.edges = []
+      this.setData({ nodeCount: 0, hasData: false })
+      return
+    }
+
+    // Find the center node (group=0 / depth=0 or first node)
+    const centerNode = rawNodes.find(n => n.depth === 0 || n.group === 0) || rawNodes[0]
+    const centerId = centerNode.id
+
+    this.stopAnimation()
+
+    // Build node map from sixDegrees data
+    const nodeMap = new Map()
+
+    // Center node
+    nodeMap.set(centerId, {
+      id: centerId,
+      name: centerNode.name || '我',
+      company: centerNode.company || '',
+      title: centerNode.title || '',
+      avatar: centerNode.avatar || '',
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 30,
+      isSelf: true,
+      data: centerNode,
+    })
+
+    // Other nodes
+    rawNodes.forEach((n) => {
+      if (n.id === centerId) return
+      if (nodeMap.has(n.id)) return
+      const angle = Math.random() * Math.PI * 2
+      const distance = 100 + Math.random() * 50
+      nodeMap.set(n.id, {
+        id: n.id,
+        name: n.name || n.id,
+        company: n.company || '',
+        title: n.title || '',
+        avatar: n.avatar || '',
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        vx: 0,
+        vy: 0,
+        radius: 18,
+        isSelf: false,
+        data: n,
+      })
+    })
+
+    // Build edges from links
+    const edgeSet = new Set()
+    const newEdges = []
+    rawLinks.forEach((l) => {
+      const src = l.source || l.from
+      const tgt = l.target || l.to
+      if (!src || !tgt) return
+      const key = `${src}-${tgt}`
+      if (edgeSet.has(key)) return
+      edgeSet.add(key)
+      edgeSet.add(`${tgt}-${src}`)
+      if (nodeMap.has(src) && nodeMap.has(tgt)) {
+        newEdges.push({
+          from: src,
+          to: tgt,
+          relation: l.relation || '',
+          trustScore: l.trustScore || 0,
+        })
+      }
+    })
+
+    this.nodes = Array.from(nodeMap.values())
+    this.edges = newEdges
+
+    this.setData({
+      nodeCount: this.nodes.length - 1,
+      hasData: this.nodes.length > 1,
+    })
+
+    if (this.canvasCtx) {
+      this.renderGraph()
+    } else {
+      setTimeout(() => {
+        if (this.canvasCtx) {
+          this.renderGraph()
+          this.startAnimation()
+        }
+      }, 500)
+    }
+  },
+
   buildEdgesFromNodes() {
     this.edges = []
     this.nodes.forEach((node) => {
@@ -207,19 +312,24 @@ Page({
     this.setData({ loadingFriends: true })
     try {
       if (MockService.USE_MOCK) {
-        const friends = await MockService.getFriendsList('self')
+        const friends = await MockService.getSixDegreesRelations('self')
+        const list = friends.data || friends || []
         this.setData({
-          friendList: friends || [],
+          friendList: list.map(f => ({
+            id: f.target_user_id !== undefined ? String(f.target_user_id) : '',
+            name: f.target_name || f.name || '',
+          })),
           loadingFriends: false,
         })
       } else {
-        // 真实API：调用 connectionApi.list() 获取已批准的连接
-        const res = await connectionApi.list('approved')
+        const state = store.getState()
+        const userId = state.userInfo?.id || 'u001'
+        const res = await sixDegreesApi.relations(userId)
         const list = res.data || res || []
         this.setData({
           friendList: list.map(f => ({
-            id: f.id !== undefined ? String(f.id) : '',
-            name: f.name || '',
+            id: f.target_user_id !== undefined ? String(f.target_user_id) : '',
+            name: f.target_name || f.name || '',
           })),
           loadingFriends: false,
         })
@@ -566,26 +676,20 @@ Page({
 
       let friends = []
       if (MockService.USE_MOCK) {
-        const res = await MockService.getFriendsList(contactId)
-        friends = res || []
+        const res = await MockService.getSixDegreesNetwork(contactId)
+        const data = res.data || res || { nodes: [], links: [] }
+        this._buildGraphFromSixDegrees(data)
+        this.setData({
+          isSubNetwork: true,
+          subNetworkLabel: selectedNode.name,
+        })
+        wx.hideLoading()
+        return
       } else {
-        // 真实API：调用 trustApi.getNetwork(userId) 获取该用户的人脉
-        try {
-          const res = await trustApi.getNetwork(contactId)
-          const data = res.data || res || { trusting: [], trusted_by: [] }
-          friends = [...(data.trusting || []), ...(data.trusted_by || [])]
-        } catch (e) {
-          // 如果 trustApi.getNetwork 不支持按用户ID查询，使用 connectionApi
-          try {
-            const res = await connectionApi.list()
-            friends = res.data || res || []
-          } catch (e2) {
-            console.error('[Graph] 加载联系人网络失败:', e2)
-            friends = []
-          }
-        }
+        const res = await sixDegreesApi.network(contactId)
+        const data = res.data || res || { nodes: [], links: [] }
+        this._buildGraphFromSixDegrees(data)
       }
-      this._rebuildGraphWithCenter(contactId, friends || [])
 
       this.setData({
         isSubNetwork: true,
@@ -717,11 +821,14 @@ Page({
 
     try {
       if (MockService.USE_MOCK) {
-        const result = await MockService.findPath(targetId)
+        const state = store.getState()
+        const userId = state.userInfo?.id || 'u001'
+        const result = await MockService.getSixDegreesPath(userId, targetId)
         this._handlePathResult(result)
       } else {
-        // 真实API：调用 connectionApi.findPath()
-        const res = await connectionApi.findPath(targetId)
+        const state = store.getState()
+        const userId = state.userInfo?.id || 'u001'
+        const res = await sixDegreesApi.path(userId, targetId)
         const result = res.data || res || { distance: -1, path: [] }
         this._handlePathResult(result)
       }
@@ -733,6 +840,58 @@ Page({
         showPathResult: true,
       })
     }
+  },
+
+  // ====== 建立关系 ======
+  async createRelation() {
+    wx.showModal({
+      title: '建立六度人脉关系',
+      content: '输入目标用户ID和关系描述',
+      editable: true,
+      placeholderText: '目标用户ID',
+      success: async (res) => {
+        if (res.confirm && res.content) {
+          const targetUserId = res.content.trim()
+          if (!targetUserId) return wx.showToast({ title: '请输入用户ID', icon: 'none' })
+
+          wx.showModal({
+            title: '关系类型',
+            content: '输入关系描述（如：同事、朋友、合作伙伴）',
+            editable: true,
+            placeholderText: '关系描述',
+            success: async (res2) => {
+              if (!res2.confirm) return
+              const relation = res2.content || '联系人'
+
+              wx.showLoading({ title: '建立关系中...' })
+              try {
+                const state = store.getState()
+                const userId = state.userInfo?.id || 'u001'
+                const payload = {
+                  user_id: userId,
+                  target_user_id: targetUserId,
+                  relation: relation,
+                  trust_score: 80,
+                }
+                if (MockService.USE_MOCK) {
+                  await MockService.createSixDegreesRelation(payload)
+                } else {
+                  await sixDegreesApi.createRelation(payload)
+                }
+                wx.hideLoading()
+                wx.showToast({ title: '关系建立成功', icon: 'success' })
+                // Refresh the graph
+                this.refreshGraph()
+              } catch (err) {
+                wx.hideLoading()
+                console.error('[Graph] 建立关系失败:', err)
+                wx.showToast({ title: '建立失败', icon: 'none' })
+              }
+            },
+          })
+        }
+      },
+    })
   },
 
   _handlePathResult(result) {

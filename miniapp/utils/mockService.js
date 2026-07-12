@@ -7,10 +7,10 @@
  *   2. 将 USE_MOCK 改为 true 即可使用Mock数据
  */
 const store = require('./store')
-const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_FRIENDS_MAP, TEST_PLATFORMS, TEST_PLATFORM_MEMBERS, TEST_PLATFORM_APPLICATIONS, TEST_AI_GENERATE_TEMPLATES } = require('./test-data')
+const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_FRIENDS_MAP, TEST_PLATFORMS, TEST_PLATFORM_MEMBERS, TEST_PLATFORM_APPLICATIONS, TEST_AI_GENERATE_TEMPLATES, TEST_SIX_DEGREES_NETWORK, TEST_SIX_DEGREES_RELATIONS } = require('./test-data')
 const { Logger } = require('./util')
 const { get, post, put, del } = require('./request')
-const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi } = require('./api')
+const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi, sixDegreesApi, organizationApi } = require('./api')
 
 const MockService = {
   USE_MOCK: true,
@@ -282,7 +282,7 @@ const MockService = {
   // ====== BFS触达路径 ======
   async findPath(targetUserId) {
     if (this.USE_MOCK) {
-      await this.mockDelay(500, 1000)
+      await this.mockDelay(100, 200)
       const { BFSFinder } = require('./bfs')
       const getFriends = async (id) => {
         const key = id === 'self' ? 'self' : id
@@ -537,6 +537,170 @@ const MockService = {
       }
     }
     return aiApi.insight()
+  },
+
+  // ====== 六度人脉 ======
+  async getSixDegreesNetwork(userId, maxDepth = 3) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 600)
+      return { data: TEST_SIX_DEGREES_NETWORK }
+    }
+    return sixDegreesApi.network(userId, maxDepth)
+  },
+
+  async getSixDegreesPath(fromId, toId, maxDepth = 6) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 1000)
+      // Build a realistic path from the test data
+      const nodes = TEST_SIX_DEGREES_NETWORK.nodes
+      const links = TEST_SIX_DEGREES_NETWORK.links
+      const fromNode = nodes.find(n => n.id === fromId)
+      const toNode = nodes.find(n => n.id === toId)
+      if (!fromNode || !toNode) {
+        return { distance: -1, path: [], message: '未找到路径' }
+      }
+      // Simple BFS to find shortest path
+      const adj = {}
+      links.forEach(l => {
+        if (!adj[l.source]) adj[l.source] = []
+        if (!adj[l.target]) adj[l.target] = []
+        adj[l.source].push(l.target)
+        adj[l.target].push(l.source)
+      })
+      const queue = [[fromId]]
+      const visited = new Set([fromId])
+      let foundPath = []
+      while (queue.length > 0) {
+        const path = queue.shift()
+        const current = path[path.length - 1]
+        if (current === toId) {
+          foundPath = path
+          break
+        }
+        const neighbors = adj[current] || []
+        for (const n of neighbors) {
+          if (!visited.has(n)) {
+            visited.add(n)
+            queue.push([...path, n])
+          }
+        }
+      }
+      if (foundPath.length > 0) {
+        const pathNodes = foundPath.map(id => {
+          const node = nodes.find(n => n.id === id)
+          return { id, name: node ? node.name : id }
+        })
+        return { distance: foundPath.length - 1, path: pathNodes, message: '找到路径' }
+      }
+      return { distance: -1, path: [], message: '未找到路径' }
+    }
+    return sixDegreesApi.path(fromId, toId, maxDepth)
+  },
+
+  async getSixDegreesRelations(userId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(200, 400)
+      return { data: TEST_SIX_DEGREES_RELATIONS.filter(r => r.user_id === userId) }
+    }
+    return sixDegreesApi.relations(userId)
+  },
+
+  async createSixDegreesRelation(data) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      const newRelation = {
+        id: Date.now(),
+        ...data,
+        created_at: Date.now(),
+      }
+      TEST_SIX_DEGREES_RELATIONS.push(newRelation)
+      return { success: true, message: '关系创建成功', data: newRelation }
+    }
+    return sixDegreesApi.createRelation(data)
+  },
+
+  async updateSixDegreesTrust(id, data) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(200, 400)
+      const relation = TEST_SIX_DEGREES_RELATIONS.find(r => r.id === id)
+      if (relation) {
+        Object.assign(relation, data)
+      }
+      return { success: true, message: '信任度已更新' }
+    }
+    return sixDegreesApi.updateTrust(id, data)
+  },
+
+  // ====== 组织管理 ======
+  async getOrganizationList() {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      return [
+        {
+          id: 1,
+          name: 'AI数智名片技术委员会',
+          slug: 'ai-digital-card-tech',
+          description: '负责AI数智名片产品的技术研发与标准制定',
+          industry: '互联网/软件',
+          size: '11-50人',
+          owner_id: 1,
+          member_count: 15,
+          invite_count: 2,
+          is_active: true,
+          created_at: new Date(Date.now() - 86400000 * 45).toISOString(),
+        },
+        {
+          id: 2,
+          name: '市场合作联盟',
+          slug: 'marketing-alliance',
+          description: '联合市场推广与品牌合作',
+          industry: '市场营销',
+          size: '1-10人',
+          owner_id: 2,
+          member_count: 8,
+          invite_count: 0,
+          is_active: true,
+          created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
+        },
+        {
+          id: 3,
+          name: '产业创新中心',
+          slug: 'industry-innovation',
+          description: '推动产业数字化转型与创新合作',
+          industry: '企业服务',
+          size: '51-200人',
+          owner_id: 1,
+          member_count: 42,
+          invite_count: 5,
+          is_active: true,
+          created_at: new Date(Date.now() - 86400000 * 60).toISOString(),
+        },
+      ]
+    }
+    return organizationApi.list()
+  },
+
+  async getOrganizationDetail(orgId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(200, 400)
+      const list = await this.getOrganizationList()
+      return list.find(o => o.id === orgId) || list[0]
+    }
+    return organizationApi.get(orgId)
+  },
+
+  async getOrganizationMembers(orgId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(200, 400)
+      return [
+        { id: 1, user_id: 'u001', name: '张伟', avatar: '', phone: '', company: '科技创新有限公司', title: '产品经理', role: 'owner', joined_at: new Date().toISOString() },
+        { id: 2, user_id: 'u002', name: '李娜', avatar: '', phone: '', company: '金融投资集团', title: '投资总监', role: 'admin', joined_at: new Date().toISOString() },
+        { id: 3, user_id: 'u003', name: '王强', avatar: '', phone: '', company: '人工智能研究院', title: '首席技术官', role: 'member', joined_at: new Date().toISOString() },
+        { id: 4, user_id: 'u004', name: '赵丽', avatar: '', phone: '', company: '互联网公司', title: '技术总监', role: 'member', joined_at: new Date().toISOString() },
+        { id: 5, user_id: 'u005', name: '陈明', avatar: '', phone: '', company: '创业孵化平台', title: '孵化总监', role: 'member', joined_at: new Date().toISOString() },
+      ]
+    }
+    return organizationApi.members(orgId)
   },
 }
 

@@ -1,0 +1,58 @@
+<view class="page-container">
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">{{isEdit ? '编辑组织' : '创建组织'}}</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="form-wrap" wx:if="{{!loading}}">
+    <view class="form-section">
+      <view class="form-group">
+        <text class="form-label">组织名称 *</text>
+        <input class="form-input" placeholder="请输入组织名称" value="{{formData.name}}" bindinput="onInput" data-field="name" maxlength="50" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">组织标识</text>
+        <input class="form-input" placeholder="英文标识，如 my-org" value="{{formData.slug}}" bindinput="onInput" data-field="slug" />
+        <text class="form-tip">用于URL中的唯一标识，不填则自动生成</text>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">组织描述</text>
+        <textarea class="form-textarea" placeholder="简要描述组织的定位和使命" value="{{formData.description}}" bindinput="onInput" data-field="description" maxlength="200" />
+        <text class="form-tip">最多200字</text>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">所属行业</text>
+        <input class="form-input" placeholder="如 互联网/软件" value="{{formData.industry}}" bindinput="onInput" data-field="industry" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">组织规模</text>
+        <picker mode="selector" range="{{['1-10','11-50','51-200','201-500','500+']}}" value="{{['1-10','11-50','51-200','201-500','500+'].indexOf(formData.size)}}" bindchange="onSizeChange">
+          <view class="picker-value">
+            <text wx:if="{{formData.size === '1-10'}}">1-10人</text>
+            <text wx:elif="{{formData.size === '11-50'}}">11-50人</text>
+            <text wx:elif="{{formData.size === '51-200'}}">51-200人</text>
+            <text wx:elif="{{formData.size === '201-500'}}">201-500人</text>
+            <text wx:elif="{{formData.size === '500+'}}">500人以上</text>
+            <text wx:else>{{formData.size}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-actions">
+      <button class="submit-btn" bindtap="handleSave" loading="{{saving}}" disabled="{{saving}}">
+        {{saving ? '保存中...' : isEdit ? '保存修改' : '创建组织'}}
+      </button>
+    </view>
+  </view>
+</view>

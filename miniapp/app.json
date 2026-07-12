@@ -30,7 +30,10 @@
     "pages/message/list/index",
     "pages/message/chat/index",
     "pages/team/list/index",
-    "pages/team/manage/index"
+    "pages/team/manage/index",
+    "pages/organization/list/index",
+    "pages/organization/detail/index",
+    "pages/organization/create/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",

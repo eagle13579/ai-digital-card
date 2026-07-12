@@ -502,60 +502,156 @@ const TEST_TRUST_NETWORK = {
 
 // ===== 扩展好友关系图谱（用于BFS测试） =====
 const TEST_FRIENDS_MAP = {
-  // 当前用户的好友
   self: [
     { id: 't001', name: '张三' },
     { id: 't002', name: '李四' },
     { id: 't003', name: '王五' },
-  ],
-  // 张三的好友
-  t001: [
-    { id: 't002', name: '李四' },
     { id: 't004', name: '赵六' },
-    { id: 't008', name: '周八' },
-  ],
-  // 李四的好友
-  t002: [
-    { id: 't001', name: '张三' },
     { id: 't005', name: '孙七' },
-    { id: 't009', name: '吴九' },
-  ],
-  // 王五的好友
-  t003: [
-    { id: 't006', name: '郑十' },
-    { id: 't007', name: '冯十一' },
-  ],
-  // 赵六的好友
-  t004: [
-    { id: 't001', name: '张三' },
+    { id: 't006', name: '周八' },
+    { id: 't007', name: '吴九' },
+    { id: 't008', name: '郑十' },
+    { id: 't009', name: '冯十一' },
     { id: 't010', name: '陈十二' },
   ],
-  // 孙七的好友
-  t005: [
+  t001: [
+    { id: 'self', name: '我' },
     { id: 't002', name: '李四' },
     { id: 't011', name: '褚十三' },
+    { id: 't016', name: '杨十八' },
   ],
-  // 郑十的好友
-  t006: [
+  t002: [
+    { id: 'self', name: '我' },
+    { id: 't001', name: '张三' },
     { id: 't003', name: '王五' },
-    { id: 't012', name: '魏十四' },
-    { id: 't013', name: '蒋十五' },
+    { id: 't012', name: '卫十四' },
+    { id: 't017', name: '朱十九' },
   ],
-  // 冯十一的好友
-  t007: [{ id: 't003', name: '王五' }],
-  // 周八的好友
-  t008: [{ id: 't001', name: '张三' }],
-  // 吴九的好友
-  t009: [{ id: 't002', name: '李四' }],
-  // 陈十二的好友
-  t010: [{ id: 't004', name: '赵六' }],
-  // 褚十三的好友
-  t011: [{ id: 't005', name: '孙七' }],
-  // 魏十四的好友
-  t012: [{ id: 't006', name: '郑十' }],
-  // 蒋十五的好友
-  t013: [{ id: 't006', name: '郑十' }],
+  t003: [
+    { id: 'self', name: '我' },
+    { id: 't002', name: '李四' },
+    { id: 't004', name: '赵六' },
+    { id: 't013', name: '蒋十五' },
+    { id: 't018', name: '秦二十' },
+  ],
+  t004: [
+    { id: 'self', name: '我' },
+    { id: 't003', name: '王五' },
+    { id: 't005', name: '孙七' },
+    { id: 't014', name: '沈十六' },
+    { id: 't019', name: '许二十一' },
+  ],
+  t005: [
+    { id: 'self', name: '我' },
+    { id: 't004', name: '赵六' },
+    { id: 't006', name: '周八' },
+    { id: 't015', name: '韩十七' },
+    { id: 't020', name: '何二十二' },
+  ],
+  t006: [
+    { id: 'self', name: '我' },
+    { id: 't005', name: '孙七' },
+    { id: 't007', name: '吴九' },
+    { id: 't021', name: '吕二十三' },
+  ],
+  t007: [
+    { id: 'self', name: '我' },
+    { id: 't006', name: '周八' },
+    { id: 't008', name: '郑十' },
+    { id: 't022', name: '施二十四' },
+  ],
+  t008: [
+    { id: 'self', name: '我' },
+    { id: 't007', name: '吴九' },
+    { id: 't009', name: '冯十一' },
+    { id: 't023', name: '张二十五' },
+  ],
+  t009: [
+    { id: 'self', name: '我' },
+    { id: 't008', name: '郑十' },
+    { id: 't010', name: '陈十二' },
+    { id: 't024', name: '孔二十六' },
+  ],
+  t010: [
+    { id: 'self', name: '我' },
+    { id: 't009', name: '冯十一' },
+    { id: 't025', name: '曹二十七' },
+  ],
+  t011: [{ id: 't001', name: '张三' }, { id: 't026', name: '严二十八' }],
+  t012: [{ id: 't002', name: '李四' }, { id: 't027', name: '华二十九' }],
+  t013: [{ id: 't003', name: '王五' }, { id: 't028', name: '金三十' }],
+  t014: [{ id: 't004', name: '赵六' }, { id: 't029', name: '魏三十一' }],
+  t015: [{ id: 't005', name: '孙七' }, { id: 't030', name: '陶三十二' }],
+  t016: [{ id: 't001', name: '张三' }, { id: 't031', name: '姜三十三' }],
+  t017: [{ id: 't002', name: '李四' }, { id: 't032', name: '谢三十四' }],
+  t018: [{ id: 't003', name: '王五' }, { id: 't033', name: '宋三十五' }],
+  t019: [{ id: 't004', name: '赵六' }, { id: 't034', name: '唐三十六' }],
+  t020: [{ id: 't005', name: '孙七' }, { id: 't035', name: '邓三十七' }],
+  t021: [{ id: 't006', name: '周八' }, { id: 't036', name: '冯三十八' }],
+  t022: [{ id: 't007', name: '吴九' }, { id: 't037', name: '韩三十九' }],
+  t023: [{ id: 't008', name: '郑十' }, { id: 't038', name: '曹四十' }],
+  t024: [{ id: 't009', name: '冯十一' }, { id: 't039', name: '钱四十一' }],
+  t025: [{ id: 't010', name: '陈十二' }, { id: 't040', name: '孙四十二' }],
+  t026: [{ id: 't011', name: '褚十三' }, { id: 't041', name: '李四十三' }],
+  t027: [{ id: 't012', name: '卫十四' }, { id: 't042', name: '周四十四' }],
+  t028: [{ id: 't013', name: '蒋十五' }, { id: 't043', name: '吴四十五' }],
+  t029: [{ id: 't014', name: '沈十六' }, { id: 't044', name: '郑四十六' }],
+  t030: [{ id: 't015', name: '韩十七' }, { id: 't045', name: '王四十七' }],
+  t031: [{ id: 't016', name: '杨十八' }, { id: 't046', name: '冯四十八' }],
+  t032: [{ id: 't017', name: '朱十九' }, { id: 't047', name: '陈四十九' }],
+  t033: [{ id: 't018', name: '秦二十' }, { id: 't048', name: '褚五十' }],
+  t034: [{ id: 't019', name: '许二十一' }, { id: 't049', name: '卫五十一' }],
+  t035: [{ id: 't020', name: '何二十二' }, { id: 't050', name: '蒋五十二' }],
+  t036: [{ id: 't021', name: '吕二十三' }],
+  t037: [{ id: 't022', name: '施二十四' }],
+  t038: [{ id: 't023', name: '张二十五' }],
+  t039: [{ id: 't024', name: '孔二十六' }],
+  t040: [{ id: 't025', name: '曹二十七' }],
+  t041: [{ id: 't026', name: '严二十八' }],
+  t042: [{ id: 't027', name: '华二十九' }],
+  t043: [{ id: 't028', name: '金三十' }],
+  t044: [{ id: 't029', name: '魏三十一' }],
+  t045: [{ id: 't030', name: '陶三十二' }],
+  t046: [{ id: 't031', name: '姜三十三' }],
+  t047: [{ id: 't032', name: '谢三十四' }],
+  t048: [{ id: 't033', name: '宋三十五' }],
+  t049: [{ id: 't034', name: '唐三十六' }],
+  t050: [{ id: 't035', name: '邓三十七' }],
 }
+
+// ===== 六度人脉扩展测试数据 =====
+const TEST_SIX_DEGREES_NETWORK = {
+  nodes: [
+    { id: 'u001', name: '张伟', company: '科技创新有限公司', title: '产品经理', avatar: '', group: 0, depth: 0 },
+    { id: 't001', name: '张三', company: '数据科技公司', title: '数据分析师', avatar: '', group: 1, depth: 1, relation: '同事', trustScore: 95 },
+    { id: 't002', name: '李四', company: '创投基金', title: '投资经理', avatar: '', group: 1, depth: 1, relation: '校友', trustScore: 88 },
+    { id: 't003', name: '王五', company: '软件公司', title: '技术总监', avatar: '', group: 1, depth: 1, relation: '合作伙伴', trustScore: 92 },
+    { id: 't004', name: '赵六', company: '设计工作室', title: '设计师', avatar: '', group: 2, depth: 2, relation: '朋友', trustScore: 78 },
+    { id: 't005', name: '孙七', company: '咨询公司', title: '顾问', avatar: '', group: 2, depth: 2, relation: '同学', trustScore: 82 },
+    { id: 't006', name: '周八', company: '电商平台', title: '运营总监', avatar: '', group: 2, depth: 2, relation: '客户', trustScore: 85 },
+    { id: 't007', name: '吴九', company: 'AI实验室', title: '研究员', avatar: '', group: 2, depth: 2, relation: '投资人', trustScore: 80 },
+    { id: 't008', name: '郑十', company: '云服务公司', title: '架构师', avatar: '', group: 3, depth: 3, relation: '合作伙伴', trustScore: 75 },
+  ],
+  links: [
+    { source: 'u001', target: 't001', relation: '同事', trustScore: 95 },
+    { source: 'u001', target: 't002', relation: '校友', trustScore: 88 },
+    { source: 'u001', target: 't003', relation: '合作伙伴', trustScore: 92 },
+    { source: 't001', target: 't004', relation: '朋友', trustScore: 78 },
+    { source: 't002', target: 't005', relation: '同学', trustScore: 82 },
+    { source: 't003', target: 't006', relation: '客户', trustScore: 85 },
+    { source: 't003', target: 't007', relation: '投资人', trustScore: 80 },
+    { source: 't004', target: 't008', relation: '合作伙伴', trustScore: 75 },
+    { source: 't005', target: 't008', relation: '朋友', trustScore: 72 },
+  ],
+}
+
+const TEST_SIX_DEGREES_RELATIONS = [
+  { id: 1, user_id: 'u001', target_user_id: 't001', target_name: '张三', relation: '同事', trustScore: 95, created_at: Date.now() - 86400000 * 365 },
+  { id: 2, user_id: 'u001', target_user_id: 't002', target_name: '李四', relation: '校友', trustScore: 88, created_at: Date.now() - 86400000 * 180 },
+  { id: 3, user_id: 'u001', target_user_id: 't003', target_name: '王五', relation: '合作伙伴', trustScore: 92, created_at: Date.now() - 86400000 * 90 },
+  { id: 4, user_id: 'u001', target_user_id: 't004', target_name: '赵六', relation: '朋友', trustScore: 78, created_at: Date.now() - 86400000 * 60 },
+  { id: 5, user_id: 'u001', target_user_id: 't005', target_name: '孙七', relation: '同学', trustScore: 82, created_at: Date.now() - 86400000 * 30 },
+]
 
 // ===== 平台测试数据 =====
 const TEST_PLATFORMS = [
@@ -839,6 +935,8 @@ module.exports = {
   TEST_VISITOR_STATS,
   TEST_TRUST_NETWORK,
   TEST_FRIENDS_MAP,
+  TEST_SIX_DEGREES_NETWORK,
+  TEST_SIX_DEGREES_RELATIONS,
   TEST_PLATFORMS,
   TEST_PLATFORM_MEMBERS,
   TEST_PLATFORM_APPLICATIONS,

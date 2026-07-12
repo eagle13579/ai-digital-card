@@ -391,6 +391,78 @@ const teamApi = {
   },
 }
 
+// ===== 六度人脉模块 =====
+const sixDegreesApi = {
+  /** 获取人脉网络图谱 */
+  network(userId, maxDepth = 3) {
+    return get(`/api/business-card/six-degrees/${userId}/network?max_depth=${maxDepth}`)
+  },
+  /** 查询最短路径 */
+  path(fromId, toId, maxDepth = 6) {
+    return get(`/api/business-card/six-degrees/path/${fromId}/${toId}?max_depth=${maxDepth}`)
+  },
+  /** 获取关系列表 */
+  relations(userId) {
+    return get(`/api/business-card/six-degrees/relations/${userId}`)
+  },
+  /** 创建关系 */
+  createRelation(data) {
+    return post('/api/business-card/six-degrees/relations', data)
+  },
+  /** 更新信任度 */
+  updateTrust(id, data) {
+    return put(`/api/business-card/six-degrees/relations/${id}/trust`, data)
+  },
+}
+
+// ===== 组织管理模块 =====
+const organizationApi = {
+  /** 创建组织 */
+  create(data) {
+    return post('/api/business-card/organizations', data)
+  },
+  /** 我的组织列表 */
+  list() {
+    return get('/api/business-card/organizations')
+  },
+  /** 组织详情 */
+  get(id) {
+    return get(`/api/business-card/organizations/${id}`)
+  },
+  /** 更新组织 */
+  update(id, data) {
+    return put(`/api/business-card/organizations/${id}`, data)
+  },
+  /** 删除组织 */
+  delete(id) {
+    return del(`/api/business-card/organizations/${id}`)
+  },
+  /** 成员列表 */
+  members(id) {
+    return get(`/api/business-card/organizations/${id}/members`)
+  },
+  /** 添加成员 */
+  addMember(id, data) {
+    return post(`/api/business-card/organizations/${id}/members`, data)
+  },
+  /** 移除成员 */
+  removeMember(orgId, userId) {
+    return del(`/api/business-card/organizations/${orgId}/members/${userId}`)
+  },
+  /** 邀请列表 */
+  invites(id) {
+    return get(`/api/business-card/organizations/${id}/invites`)
+  },
+  /** 创建邀请 */
+  createInvite(id, data) {
+    return post(`/api/business-card/organizations/${id}/invites`, data)
+  },
+  /** 接受邀请 */
+  acceptInvite(token) {
+    return post(`/api/business-card/organizations/invites/${token}/accept`)
+  },
+}
+
 module.exports = {
   miniappApi,
   authApi,
@@ -407,4 +479,6 @@ module.exports = {
   messageApi,
   ocrApi,
   teamApi,
+  sixDegreesApi,
+  organizationApi,
 }

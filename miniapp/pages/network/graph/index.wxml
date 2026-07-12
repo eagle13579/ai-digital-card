@@ -42,6 +42,10 @@
       <text class="action-icon">🔗</text>
       <text class="action-text">触达路径</text>
     </view>
+    <view class="action-btn refresh-btn" bindtap="createRelation">
+      <text class="action-icon">🤝</text>
+      <text class="action-text">建立关系</text>
+    </view>
     <view class="action-btn refresh-btn" bindtap="refreshGraph">
       <text class="action-icon">🔄</text>
       <text class="action-text">刷新图谱</text>

@@ -1,0 +1,113 @@
+<view class="page-container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">组织详情</text>
+    <view class="header-actions">
+      <view class="action-btn edit" wx:if="{{isOwner()}}" bindtap="goToEdit">编辑</view>
+      <view class="action-btn danger" wx:if="{{isOwner()}}" bindtap="deleteOrg">删除</view>
+    </view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{!loading && organization}}">
+    <!-- 组织信息头 -->
+    <view class="org-header-card">
+      <view class="org-logo">
+        <text class="logo-text">{{getInitial(organization.name)}}</text>
+      </view>
+      <view class="org-info">
+        <text class="org-name">{{organization.name}}</text>
+        <text class="org-slug">{{organization.slug}}</text>
+        <text class="org-meta-text">{{organization.industry || '未设置行业'}} · {{organization.size || '未设置规模'}} · {{organization.member_count || 0}}人</text>
+      </view>
+    </view>
+
+    <view class="org-desc-card" wx:if="{{organization.description}}">
+      <text class="desc-label">组织介绍</text>
+      <text class="desc-text">{{organization.description}}</text>
+    </view>
+
+    <!-- Tab切换 -->
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === 'members' ? 'active' : ''}}" data-tab="members" bindtap="switchTab">
+        成员 ({{members.length}})
+      </view>
+      <view class="tab-item {{activeTab === 'invites' ? 'active' : ''}}" data-tab="invites" bindtap="switchTab">
+        邀请 ({{invites.length}})
+      </view>
+    </view>
+
+    <!-- 成员列表 -->
+    <view class="tab-content" wx:if="{{activeTab === 'members'}}">
+      <view class="member-list">
+        <view class="member-item" wx:for="{{members}}" wx:key="id">
+          <view class="member-avatar">
+            <text class="avatar-text">{{getInitial(item.name)}}</text>
+          </view>
+          <view class="member-detail">
+            <view class="member-name-row">
+              <text class="member-name">{{item.name}}</text>
+              <text class="role-badge" style="background: {{getRoleLabel(item.role).color}}20; color: {{getRoleLabel(item.role).color}}; border: 1px solid {{getRoleLabel(item.role).color}}40;">
+                {{getRoleLabel(item.role).label}}
+              </text>
+            </view>
+            <text class="member-sub" wx:if="{{item.company}}">{{item.company}} · {{item.title || ''}}</text>
+            <text class="member-sub" wx:else>{{item.title || '组织成员'}}</text>
+          </view>
+          <view class="member-actions" wx:if="{{isOwner() && item.role !== 'owner'}}">
+            <view class="action-btn danger" bindtap="removeMember" data-user-id="{{item.user_id}}" data-name="{{item.name}}">移除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 邀请列表 -->
+    <view class="tab-content" wx:if="{{activeTab === 'invites'}}">
+      <view class="invite-list">
+        <view class="invite-item" wx:for="{{invites}}" wx:key="id">
+          <view class="invite-icon">📩</view>
+          <view class="invite-detail">
+            <text class="invite-target">{{item.invitee_email || item.invitee_phone || '未知'}}</text>
+            <text class="invite-role">{{item.status === 'pending' ? '待接受' : item.status}}</text>
+          </view>
+          <text class="invite-status {{item.status}}">{{item.status === 'pending' ? '等待中' : item.status === 'accepted' ? '已接受' : '已过期'}}</text>
+        </view>
+        <view class="empty-invite" wx:if="{{invites.length === 0}}">
+          <text class="empty-text">暂无邀请记录</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 邀请成员弹窗 -->
+  <view class="modal-overlay" wx:if="{{showInviteModal}}" bindtap="closeInviteModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">邀请成员</text>
+        <text class="modal-close" bindtap="closeInviteModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">邮箱</text>
+          <input class="form-input" placeholder="邀请成员的邮箱" value="{{inviteForm.email}}" bindinput="onInviteInput" data-field="email" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">手机号</text>
+          <input class="form-input" placeholder="邀请成员的手机号" value="{{inviteForm.phone}}" bindinput="onInviteInput" data-field="phone" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">邀请留言</text>
+          <input class="form-input" placeholder="给被邀请人的留言" value="{{inviteForm.message}}" bindinput="onInviteInput" data-field="message" />
+        </view>
+        <button class="submit-btn" bindtap="handleInvite" loading="{{inviting}}" disabled="{{inviting}}">
+          {{inviting ? '发送中...' : '发送邀请'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
