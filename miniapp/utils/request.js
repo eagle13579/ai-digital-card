@@ -17,8 +17,8 @@ const store = require('./store')
 const API_BASE_URL = (function() {
   // 微信开发者工具中可以用 localhost 或本机IP
   // 真机/预览时必须用实际IP或域名
-  const DEV_IP = '192.168.7.48'   // 后端服务器IP
-  const DEV_PORT = '8201'          // AI数智名片后端端口
+  const DEV_IP = '{YOUR_SERVER_IP}'   // 请替换为你的服务器IP
+  const DEV_PORT = '8201'              // AI数智名片后端端口
   
   // __wxConfig 是微信开发者工具注入的全局变量
   try {
