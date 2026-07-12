@@ -74,6 +74,14 @@ Page({
     this.stopAnimation()
   },
 
+  // ====== 导入联系人 ======
+
+  navigateToImport() {
+    wx.navigateTo({
+      url: '/pages/network/import/index',
+    })
+  },
+
   // ====== 数据加载 ======
   async loadData() {
     try {

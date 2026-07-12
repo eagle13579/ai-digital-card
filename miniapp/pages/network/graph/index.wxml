@@ -34,6 +34,10 @@
       <text class="action-icon">+</text>
       <text class="action-text">添加联系人</text>
     </view>
+    <view class="action-btn import-btn" bindtap="navigateToImport">
+      <text class="action-icon">📥</text>
+      <text class="action-text">导入名单</text>
+    </view>
     <view class="action-btn search-btn" bindtap="openPathSearch">
       <text class="action-icon">🔗</text>
       <text class="action-text">触达路径</text>
