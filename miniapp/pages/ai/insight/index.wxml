@@ -1,13 +1,16 @@
 <view class="page-container">
-  <view class="insight-header">
-    <text class="insight-title">📊 数据洞察</text>
+  <view class="section-header">
+    <text class="section-title">数据洞察</text>
   </view>
 
+  <!-- 加载 -->
   <view class="loading-state" wx:if="{{loading}}">
-    <text class="loading-text">加载中...</text>
+    <view class="spinner"></view>
+    <text style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">加载中...</text>
   </view>
 
   <view wx:if="{{!loading && stats}}">
+    <!-- 数据网格 -->
     <view class="insight-grid">
       <view class="insight-card"><text class="insight-num">{{stats.totalVisits}}</text><text class="insight-label">总访问</text></view>
       <view class="insight-card"><text class="insight-num">{{stats.todayVisits}}</text><text class="insight-label">今日</text></view>
@@ -17,13 +20,17 @@
       <view class="insight-card"><text class="insight-num">{{stats.newVisitors || 0}}</text><text class="insight-label">新访客</text></view>
     </view>
 
+    <!-- 趋势图 -->
     <view class="chart-card" wx:if="{{weeklyTrend.length > 0}}">
       <canvas id="trendCanvas" type="2d" class="trend-canvas"></canvas>
     </view>
 
-    <view class="card">
-      <view class="card-header"><text class="title">💡 AI洞察建议</text></view>
-      <view class="card-body">
+    <!-- AI洞察建议 -->
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">AI 洞察建议</text>
+      </view>
+      <view class="glass-card-body">
         <text class="insight-tip">• 你的名片访问量持续增长，建议更新个人动态</text>
         <text class="insight-tip">• 有3位访客表达了合作意向，建议主动联系</text>
         <text class="insight-tip">• 推荐完善资源对接信息，提升匹配精准度</text>

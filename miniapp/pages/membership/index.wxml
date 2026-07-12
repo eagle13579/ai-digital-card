@@ -1,13 +1,23 @@
-<view class="page-container"><view class="membership-header"><text class="m-title">会员中心</text><text class="m-subtitle">当前等级：{{currentLevel}}</text></view>
-<view class="level-list"><view class="level-card {{item.popular ? 'level-popular' : ''}}" wx:for="{{levels}}" wx:key="id" data-id="{{item.id}}" bindtap="upgrade">
-<view class="level-name">{{item.name}}</view><view class="level-price">{{item.price}}</view>
-<view class="level-tag" wx:if="{{item.popular}}">推荐</view>
-<view class="level-features"><text class="level-feature" wx:for="{{item.features}}" wx:key="index">✓ {{item}}</text></view>
-</view></view>
-<view class="student-discount-card" wx:if="{{true}}">
-  <view class="student-discount-icon">🎓</view>
-  <view class="student-discount-content">
-    <text class="student-discount-title">学生优惠</text>
-    <text class="student-discount-desc">凭学生证认证，Pro版享5折优惠（仅需¥4.9/月）</text>
+<view class="page-container">
+  <view class="membership-header">
+    <text class="m-title">会员中心</text>
+    <text class="m-subtitle">当前等级：{{currentLevel}}</text>
   </view>
-</view></view>
+  <view class="level-list">
+    <view class="level-card {{item.popular ? 'level-popular' : ''}}" wx:for="{{levels}}" wx:key="id" data-id="{{item.id}}" bindtap="upgrade">
+      <view class="level-name">{{item.name}}</view>
+      <view class="level-price">{{item.price}}</view>
+      <view class="level-tag" wx:if="{{item.popular}}">推荐</view>
+      <view class="level-features">
+        <text class="level-feature" wx:for="{{item.features}}" wx:key="index">✓ {{item}}</text>
+      </view>
+    </view>
+  </view>
+  <view class="student-discount-card" wx:if="{{true}}">
+    <view class="student-discount-icon">🎓</view>
+    <view class="student-discount-content">
+      <text class="student-discount-title">学生优惠</text>
+      <text class="student-discount-desc">凭学生证认证，Pro版享5折优惠（仅需¥4.9/月）</text>
+    </view>
+  </view>
+</view>

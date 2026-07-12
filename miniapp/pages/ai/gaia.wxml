@@ -3,13 +3,13 @@
   <view class="loading-overlay" wx:if="{{loading}}">
     <view class="loading-brain">
       <view class="brain-pulse"></view>
-      <text class="loading-brain-text">🧠 盖娅正在唤醒...</text>
+      <text class="loading-brain-text">盖娅正在唤醒...</text>
     </view>
   </view>
 
   <!-- 错误状态 -->
   <view class="error-state" wx:if="{{!loading && error}}">
-    <text class="error-icon">⚠️</text>
+    <text class="error-icon">⚠</text>
     <text class="error-text">{{error}}</text>
     <button class="btn-primary small" bindtap="refresh">重新加载</button>
   </view>
@@ -17,33 +17,31 @@
   <!-- 主体内容 -->
   <block wx:if="{{!loading && !error && gaiaData}}">
     <!-- 头部 -->
-    <view class="section-header">
+    <view class="gaia-header">
       <view class="back-btn" bindtap="refresh">
-        <text class="icon">🔄</text>
+        <text class="back-icon">↻</text>
       </view>
-      <text class="section-title">🧠 盖娅进化大脑</text>
-      <text class="section-subtitle">v{{gaiaData.evolutionLevel}}.0 · {{gaiaData.brainName}}</text>
+      <text class="gaia-title">盖娅进化大脑</text>
+      <text class="gaia-subtitle">v{{gaiaData.evolutionLevel}}.0 · {{gaiaData.brainName}}</text>
     </view>
 
     <!-- 状态卡片 -->
-    <view class="brain-status">
-      <view class="status-card">
-        <view class="status-glow"></view>
-        <view class="status-content">
-          <view class="status-indicator active"></view>
-          <text class="status-text">{{gaiaData.status === 'active' ? '运行中' : '待机中'}}</text>
-        </view>
-        <text style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:8px;display:block;">
-          进化等级 Lv.{{gaiaData.evolutionLevel}} · 知识节点 {{gaiaData.metrics[0].value}} 个
-        </text>
+    <view class="brain-status-card">
+      <view class="status-glow"></view>
+      <view class="status-content">
+        <view class="status-indicator active"></view>
+        <text class="status-text">{{gaiaData.status === 'active' ? '运行中' : '待机中'}}</text>
       </view>
+      <text class="status-info">
+        进化等级 Lv.{{gaiaData.evolutionLevel}} · 知识节点 {{gaiaData.metrics[0].value}} 个
+      </text>
     </view>
 
     <!-- 进化指标 -->
-    <view class="evolution-metrics">
+    <view class="metrics-grid">
       <view class="metric-card" wx:for="{{gaiaData.metrics}}" wx:key="id">
         <view class="metric-icon-wrap">
-          <text class="icon">{{item.icon}}</text>
+          <text class="metric-icon">{{item.icon}}</text>
           <view class="metric-pulse" wx:if="{{item.trend === 'up'}}"></view>
           <text class="metric-trend {{item.trend}}">{{item.trend === 'up' ? '↑' : '→'}}</text>
         </view>
@@ -57,7 +55,7 @@
     <!-- 数据流 -->
     <view class="data-flow-section">
       <view class="flow-header">
-        <text class="flow-title">📡 数据流</text>
+        <text class="flow-title">数据流</text>
         <view class="flow-status active">
           <view class="flow-dot"></view>
           <text>实时</text>
@@ -89,12 +87,12 @@
     <!-- Agent 列表 -->
     <view class="agent-section">
       <view class="section-header-row">
-        <text class="section-title-sm">🤖 AI Agent</text>
+        <text class="section-title-sm">AI Agent</text>
         <text class="view-all" bindtap="toggleLearn">{{learningMode ? '退出学习' : '学习模式'}}</text>
       </view>
       <view class="agent-grid">
         <view class="agent-card" wx:for="{{gaiaData.agents}}" wx:key="id" data-name="{{item.name}}" bindtap="viewAgent">
-          <view class="agent-avatar" style="background:{{item.status === 'online' ? 'linear-gradient(135deg,#0EA5E9,#38BDF8)' : 'linear-gradient(135deg,#9CA3AF,#D1D5DB)'}}">
+          <view class="agent-avatar" style="background:{{item.status === 'online' ? 'linear-gradient(135deg,#8b5cf6,#a78bfa)' : 'linear-gradient(135deg,#4a4a6a,#6a6a8a)'}}">
             <text class="agent-emoji">{{item.emoji}}</text>
           </view>
           <text class="agent-name">{{item.name}}</text>
@@ -110,12 +108,12 @@
     <!-- 知识图谱 -->
     <view class="knowledge-section">
       <view class="section-header-row">
-        <text class="section-title-sm">📚 最新知识</text>
+        <text class="section-title-sm">最新知识</text>
         <text class="view-all" bindtap="viewAllKnowledge">查看全部</text>
       </view>
       <view class="knowledge-list">
         <view class="knowledge-item" wx:for="{{gaiaData.knowledge}}" wx:key="id" data-id="{{item.id}}" bindtap="viewKnowledge">
-          <text class="knowledge-type-tag" style="background:rgba(14,165,233,0.1);color:#0EA5E9;">{{item.type}}</text>
+          <text class="knowledge-type-tag" style="background:rgba(139,92,246,0.12);color:var(--accent-light);">{{item.type}}</text>
           <view class="knowledge-content">
             <text class="knowledge-title">{{item.title}}</text>
             <text class="knowledge-desc">{{item.desc}}</text>
@@ -131,7 +129,7 @@
     <!-- 进化按钮 -->
     <view class="evolution-button" bindtap="triggerEvolution">
       <view class="button-glow"></view>
-      <text class="button-text">🚀 触发进化</text>
+      <text class="button-text">触发进化</text>
     </view>
 
     <view class="bottom-placeholder"></view>

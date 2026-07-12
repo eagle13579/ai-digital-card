@@ -6,16 +6,18 @@
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
 
     <!-- 用户信息头部 -->
-    <view class="user-header">
-      <view class="user-avatar">
-        <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
-        <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
+    <view class="user-hero">
+      <view class="user-hero-row">
+        <view class="user-avatar-wrap">
+          <image src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+          <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
+        </view>
+        <view class="user-meta">
+          <view class="user-name">{{userInfo.name || '未设置姓名'}}</view>
+          <view class="user-position">{{userInfo.company}} {{userInfo.title}}</view>
+        </view>
       </view>
-      <view class="user-meta">
-        <view class="user-name">{{userInfo.name || '未设置姓名'}}</view>
-        <view class="user-position">{{userInfo.company}} {{userInfo.title}}</view>
-      </view>
-      <view class="user-stats">
+      <view class="user-stats-row">
         <view class="stat-item">
           <text class="stat-num">{{stats.visitors || 0}}</text>
           <text class="stat-label">访客</text>
@@ -33,7 +35,7 @@
 
     <!-- 升级提示条：Free用户访客≥3时显示 -->
     <view class="upgrade-hint" wx:if="{{showUpgradeHint}}" bindtap="goMembership">
-      <text class="upgrade-hint-icon">⭐</text>
+      <text class="upgrade-hint-icon">✦</text>
       <text class="upgrade-hint-text">访客已达{{stats.visitors}}人，升级会员解锁更多权益</text>
       <text class="upgrade-hint-arrow">›</text>
     </view>
@@ -41,56 +43,62 @@
     <!-- 快速操作栏 -->
     <view class="action-bar">
       <view class="action-item" bindtap="goEditCard">
-        <text class="action-icon">✏️</text>
+        <view class="action-icon">✎</view>
         <text class="action-label">编辑名片</text>
       </view>
       <view class="action-item" bindtap="goPreview">
-        <text class="action-icon">👁️</text>
-        <text class="action-label">名片</text>
+        <view class="action-icon">◉</view>
+        <text class="action-label">名片预览</text>
       </view>
       <view class="action-item" bindtap="goQrCode">
-        <text class="action-icon">📱</text>
-        <text class="action-label">我的二维码</text>
+        <view class="action-icon">⊞</view>
+        <text class="action-label">二维码</text>
       </view>
       <view class="action-item" bindtap="goAICenter">
-        <text class="action-icon">🤖</text>
+        <view class="action-icon">◇</view>
         <text class="action-label">AI智能</text>
       </view>
       <view class="action-item" bindtap="shareCard">
-        <text class="action-icon">📤</text>
-        <text class="action-label">分享名片</text>
+        <view class="action-icon">↗</view>
+        <text class="action-label">分享</text>
       </view>
     </view>
 
     <!-- 场景模式 - 默认收起 -->
-    <view class="card scene-mode-card">
-      <view class="card-header" bindtap="toggleSceneMode">
-        <text class="title">🎬 场景模式</text>
+    <view class="glass-card scene-mode-card">
+      <view class="glass-card-header" bindtap="toggleSceneMode">
+        <text class="title">场景模式</text>
         <text class="more">{{sceneModeExpanded ? '收起 ▲' : '展开 ▼'}}</text>
       </view>
       <view wx:if="{{sceneModeExpanded}}" class="scene-mode-content">
         <view class="scene-option {{sceneMode === 'personal' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="personal">
-          <text class="scene-icon">👤</text>
-          <text class="scene-label">个人展示</text>
-          <text class="scene-desc">适合社交场合展示个人信息</text>
+          <view class="scene-icon">◉</view>
+          <view>
+            <text class="scene-label">个人展示</text>
+            <text class="scene-desc">适合社交场合展示个人信息</text>
+          </view>
         </view>
         <view class="scene-option {{sceneMode === 'business' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="business">
-          <text class="scene-icon">💼</text>
-          <text class="scene-label">商务对接</text>
-          <text class="scene-desc">突出资源供需与商务信息</text>
+          <view class="scene-icon">◆</view>
+          <view>
+            <text class="scene-label">商务对接</text>
+            <text class="scene-desc">突出资源供需与商务信息</text>
+          </view>
         </view>
         <view class="scene-option {{sceneMode === 'social' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="social">
-          <text class="scene-icon">🤝</text>
-          <text class="scene-label">社交拓展</text>
-          <text class="scene-desc">侧重信任网络与人脉连接</text>
+          <view class="scene-icon">●</view>
+          <view>
+            <text class="scene-label">社交拓展</text>
+            <text class="scene-desc">侧重信任网络与人脉连接</text>
+          </view>
         </view>
       </view>
     </view>
 
     <!-- 我的名片卡片 -->
-    <view class="card brochure-card" bindtap="goPreview">
-      <view class="card-header">
-        <text class="title">📖 我的名片</text>
+    <view class="glass-card" bindtap="goPreview" style="padding:0;overflow:hidden;">
+      <view class="glass-card-header">
+        <text class="title">我的名片</text>
         <text class="more">查看全部 ›</text>
       </view>
       <view class="brochure-cover">
@@ -103,10 +111,10 @@
     </view>
 
     <!-- 创建资源平台入口 -->
-    <view class="card platform-entry" bindtap="goCreatePlatform">
+    <view class="glass-card platform-entry-card" bindtap="goCreatePlatform">
       <view class="platform-entry-bg">
         <view class="platform-entry-content">
-          <text class="platform-entry-icon">🏗️</text>
+          <view class="platform-entry-icon">⊞</view>
           <view class="platform-entry-text">
             <text class="platform-entry-title">创建资源平台</text>
             <text class="platform-entry-desc">创建专属平台，整合优质资源</text>
@@ -117,9 +125,9 @@
     </view>
 
     <!-- 信任网络摘要 -->
-    <view class="card">
-      <view class="card-header">
-        <text class="title">🤝 信任网络</text>
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">信任网络</text>
         <text class="more" bindtap="goTrust">查看全部 ›</text>
       </view>
       <view class="trust-summary">
@@ -133,9 +141,9 @@
     </view>
 
     <!-- 匹配推荐区 -->
-    <view class="card" wx:if="{{recommendList.length > 0}}">
-      <view class="card-header">
-        <text class="title">🎯 合作伙伴推荐</text>
+    <view class="glass-card" wx:if="{{recommendList.length > 0}}">
+      <view class="glass-card-header">
+        <text class="title">合作伙伴推荐</text>
         <text class="more" bindtap="goMatch">查看更多 ›</text>
       </view>
       <view class="recommend-list">
@@ -157,7 +165,7 @@
       </view>
     </view>
 
-    <!-- 空白状态 - 仅由 showEmpty 统一控制 -->
+    <!-- 空白状态 -->
     <empty-state wx:if="{{showEmpty}}" text="暂无数据，快去创建你的名片吧" />
 
     <!-- 底部占位 -->

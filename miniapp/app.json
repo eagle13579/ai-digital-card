@@ -24,15 +24,15 @@
     "pages/ai/modelserve"
   ],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "AI数智名片",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f5f6fa"
+    "navigationBarBackgroundColor": "#0f0f1a",
+    "backgroundColor": "#0f0f1a"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1657ff",
-    "backgroundColor": "#ffffff",
+    "color": "rgba(255, 255, 255, 0.4)",
+    "selectedColor": "#a78bfa",
+    "backgroundColor": "#0f0f1a",
     "borderStyle": "black",
     "list": [
       {

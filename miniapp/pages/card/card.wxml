@@ -19,11 +19,11 @@
     </view>
 
     <!-- 名片信息 -->
-    <view class="card info-card">
-      <view class="card-header">
-        <text class="title">📋 基本信息</text>
+    <view class="glass-card info-card">
+      <view class="glass-card-header">
+        <text class="title">基本信息</text>
       </view>
-      <view class="card-body info-body">
+      <view class="glass-card-body info-body">
         <view class="info-row" wx:if="{{card.user_company}}">
           <text class="info-label">公司</text>
           <text class="info-value">{{card.user_company}}</text>
@@ -50,9 +50,9 @@
     </view>
 
     <!-- 统计数据 -->
-    <view class="card">
-      <view class="card-header">
-        <text class="title">📊 数据概览</text>
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">数据概览</text>
       </view>
       <view class="stats-grid">
         <view class="stat-item">
@@ -77,8 +77,8 @@
     <!-- 操作按钮 -->
     <view class="action-buttons">
       <button class="btn-primary" bindtap="goPreview">预览画册</button>
-      <button class="btn-outline" bindtap="shareCard" style="margin-top: 12px;">分享名片</button>
-      <button class="btn-outline" bindtap="generateQRCode" style="margin-top: 12px; border-color: #07c160; color: #07c160;">生成小程序码</button>
+      <button class="btn-secondary" bindtap="shareCard" style="margin-top: 12px;">分享名片</button>
+      <button class="btn-secondary" bindtap="generateQRCode" style="margin-top: 12px; border-color: var(--success); color: var(--success);">生成小程序码</button>
     </view>
 
     <!-- 底部占位 -->

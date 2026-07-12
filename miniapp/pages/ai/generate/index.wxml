@@ -1,9 +1,9 @@
 <view class="page-container">
-  <view class="card">
-    <view class="card-header">
-      <text class="title">✍️ AI内容生成</text>
+  <view class="glass-card">
+    <view class="glass-card-header">
+      <text class="title">AI 内容生成</text>
     </view>
-    <view class="card-body">
+    <view class="glass-card-body">
       <view class="type-tabs">
         <view 
           class="type-tab {{type === item.id ? 'active' : ''}}" 
@@ -52,45 +52,35 @@
         <text class="form-label">经验年限</text>
         <input class="form-input" placeholder="如：5年、10年" bindinput="onInput" data-field="experience" value="{{inputData.experience}}" />
       </view>
-
-      <view class="form-group">
-        <text class="form-label">主要成就</text>
-        <input class="form-input" placeholder="简要描述你的成就" bindinput="onInput" data-field="achievements" value="{{inputData.achievements}}" />
-      </view>
-
-      <view class="form-group">
-        <text class="form-label">核心技能</text>
-        <input class="form-input" placeholder="你的专业技能" bindinput="onInput" data-field="skills" value="{{inputData.skills}}" />
-      </view>
     </view>
   </view>
 
-  <view style="padding:16px;" wx:if="{{!generated}}">
-    <button class="btn-primary" bindtap="doGenerate">AI生成内容</button>
+  <view style="padding:var(--space-4);" wx:if="{{!generated}}">
+    <button class="btn-primary" bindtap="doGenerate">AI 生成内容</button>
   </view>
 
-  <view class="card" wx:if="{{generated}}">
-    <view class="card-header">
-      <text class="title">✨ 生成结果</text>
-      <view class="card-actions">
-        <text class="char-count-badge">{{charCount}}字</text>
-        <text class="action-btn" bindtap="copyResult">📋 复制</text>
+  <view class="glass-card" wx:if="{{generated}}">
+    <view class="glass-card-header">
+      <text class="title">生成结果</text>
+      <view class="result-actions">
+        <text class="result-char-count">{{charCount}}字</text>
+        <text class="result-copy-btn" bindtap="copyResult">复制</text>
       </view>
     </view>
-    <view class="card-body">
+    <view class="glass-card-body">
       <text class="result-text">{{result}}</text>
     </view>
   </view>
 
-  <!-- 加载动画 -->
+  <!-- 加载 -->
   <view class="loading-overlay" wx:if="{{loading}}">
     <view class="loading-spinner">
       <view class="spinner"></view>
-      <text class="loading-tip">AI正在努力生成中...</text>
+      <text style="display:block;text-align:center;margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);">AI正在努力生成中...</text>
     </view>
   </view>
 
-  <view style="padding:16px;" wx:if="{{generated}}">
+  <view style="padding:var(--space-4);" wx:if="{{generated}}">
     <button class="btn-primary" bindtap="useResult">应用到名片编辑</button>
   </view>
 </view>

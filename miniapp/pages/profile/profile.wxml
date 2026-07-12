@@ -19,8 +19,8 @@
     </view>
 
     <!-- 会员信息 -->
-    <view class="card member-card" bindtap="goMember">
-      <view class="card-body member-body">
+    <view class="glass-card member-card" bindtap="goMember">
+      <view class="glass-card-body member-body">
         <view class="member-left">
           <text class="member-level-label">当前等级</text>
           <text class="member-level-value badge-{{memberLevel}}">{{memberLevelText}}</text>
@@ -34,9 +34,9 @@
     </view>
 
     <!-- 数据概览 -->
-    <view class="card">
-      <view class="card-header">
-        <text class="title">📊 数据概览</text>
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">数据概览</text>
       </view>
       <view class="stats-grid">
         <view class="stat-item">
@@ -59,45 +59,45 @@
     </view>
 
     <!-- 功能菜单 -->
-    <view class="card menu-card">
+    <view class="menu-card">
       <view class="menu-item" bindtap="goAlbum">
-        <text class="menu-icon">🖼️</text>
+        <view class="menu-icon">□</view>
         <text class="menu-label">我的画册</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goVisitorLog">
-        <text class="menu-icon">👀</text>
+        <view class="menu-icon">◉</view>
         <text class="menu-label">访客记录</text>
         <text class="menu-badge" wx:if="{{newVisitorCount > 0}}">{{newVisitorCount}}</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goTrustNetwork">
-        <text class="menu-icon">🤝</text>
+        <view class="menu-icon">◎</view>
         <text class="menu-label">信任网络</text>
         <text class="menu-value">{{trustCount}}人</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goAICenter">
-        <text class="menu-icon">🤖</text>
+        <view class="menu-icon">◇</view>
         <text class="menu-label">AI智能中心</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goMember">
-        <text class="menu-icon">⭐</text>
+        <view class="menu-icon">✦</view>
         <text class="menu-label">会员中心</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
     <!-- 设置 -->
-    <view class="card menu-card">
+    <view class="menu-card">
       <view class="menu-item" bindtap="goPrivacy">
-        <text class="menu-icon">🔒</text>
+        <view class="menu-icon">⊡</view>
         <text class="menu-label">隐私设置</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goAbout">
-        <text class="menu-icon">ℹ️</text>
+        <view class="menu-icon">◎</view>
         <text class="menu-label">关于</text>
         <text class="menu-arrow">›</text>
       </view>

@@ -1,3 +1,5 @@
+/* Empty State 组件 - v2.0 Dark Minimal */
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -5,13 +7,16 @@
   justify-content: center;
   padding: 60px 20px;
 }
+
 .empty-image {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 16px;
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--space-4);
+  opacity: 0.4;
 }
+
 .empty-text {
-  font-size: 14px;
-  color: #999;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
   text-align: center;
 }

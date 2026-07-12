@@ -1,9 +1,10 @@
 <view class="page-container">
-  <view class="match-header">
-    <text class="match-title">🎯 推荐匹配</text>
-    <text class="match-subtitle">基于AI分析，找到最合适的合作伙伴</text>
+  <view class="section-header">
+    <text class="section-title">推荐匹配</text>
+    <text class="section-subtitle">基于AI分析，找到最合适的合作伙伴</text>
   </view>
 
+  <!-- 筛选栏 -->
   <view class="filter-bar">
     <view class="filter-item">
       <text class="filter-label">行业</text>
@@ -38,7 +39,7 @@
           <text class="match-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
         </view>
       </view>
-      <view class="match-score">
+      <view class="match-score-wrap">
         <text class="match-score-num">{{item.matchScore}}%</text>
         <text class="match-score-label">匹配</text>
       </view>
@@ -61,17 +62,20 @@
       <text class="detail-tag" wx:for="{{unlockedItem.tags}}" wx:key="index">{{item}}</text>
     </view>
     <view class="detail-actions">
-      <button class="btn-exchange" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">🤝 交换名片</button>
-      <button class="btn-exchanged" wx:if="{{exchangeDone}}" disabled>✅ 已发送交换请求</button>
-      <button class="btn-back" bindtap="backToList">← 返回列表</button>
+      <button class="btn-primary small" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">交换名片</button>
+      <button class="btn-secondary small" wx:if="{{exchangeDone}}" disabled>已发送交换请求</button>
+      <button class="btn-secondary small" bindtap="backToList" style="margin-top:8px;">返回列表</button>
     </view>
   </view>
 
+  <!-- 空状态 -->
   <view class="empty-state" wx:if="{{!loading && filteredMatches.length === 0}}">
-    <text class="empty-text">暂无匹配结果，请调整筛选条件</text>
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
+    <text class="text">暂无匹配结果，请调整筛选条件</text>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">
-    <text class="loading-text">加载中...</text>
+    <view class="spinner"></view>
+    <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">加载中...</text>
   </view>
 </view>

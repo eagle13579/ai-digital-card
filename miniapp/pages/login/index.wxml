@@ -1,37 +1,37 @@
-<view class="login-container">
-  <view class="login-card">
-    <view class="logo-area">
-      <image class="logo" src="/images/logo.png" mode="aspectFit" />
-      <text class="title">AI数智名片</text>
-      <text class="subtitle">让每一次连接都有价值</text>
+<view class="page-container login-page">
+  <view class="login-header">
+    <text class="login-logo">AI数智名片</text>
+    <text class="login-slogan">让每一次连接都有价值</text>
+  </view>
+  
+  <view class="feature-list">
+    <view class="feature-item">
+      <view class="feature-icon">◇</view>
+      <text class="feature-text">智能对话</text>
     </view>
-
-    <view class="features">
-      <view class="feature-item">
-        <text class="feature-icon">📇</text>
-        <text class="feature-text">智能名片创建</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-icon">🤝</text>
-        <text class="feature-text">信任网络连接</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-icon">🎯</text>
-        <text class="feature-text">AI精准匹配</text>
-      </view>
+    <view class="feature-item">
+      <view class="feature-icon">◎</view>
+      <text class="feature-text">信任网络</text>
     </view>
+    <view class="feature-item">
+      <view class="feature-icon">✦</view>
+      <text class="feature-text">精准匹配</text>
+    </view>
+  </view>
 
-    <button class="login-btn" bindtap="wxLogin" loading="{{loading}}" disabled="{{loading}}">
-      <image class="wechat-icon" src="/images/wechat.png" mode="aspectFit" />
-      微信授权登录
+  <view class="login-form">
+    <button class="btn-wechat" bindtap="wxLogin">
+      <view class="wechat-icon">💚</view>
+      <text class="wechat-text">微信授权登录</text>
     </button>
-
-    <view class="skip-btn" bindtap="skipLogin">暂不登录，先看看</view>
-
-    <view class="agreement">
-      <text>登录即表示同意</text>
-      <text class="link">《用户协议》</text>
-      <text class="link">《隐私政策》</text>
+    <view class="login-alternative" bindtap="skipLogin">
+      <text>暂不登录，先看看</text>
     </view>
+  </view>
+
+  <view class="login-footer">
+    <text>登录即代表同意</text>
+    <text class="link" bindtap="goAgreement">《用户协议》</text>
+    <text class="link" bindtap="goPrivacy">《隐私政策》</text>
   </view>
 </view>

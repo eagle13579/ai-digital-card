@@ -1,2 +1,38 @@
-/* 复用agreement/user的样式 */
-@import "../user.wxss";
+/* 隐私协议页 - v2.0 Dark Minimal */
+
+page {
+  background: var(--surface-primary) !important;
+  color: var(--text-primary);
+}
+
+.privacy-content {
+  padding: var(--space-4);
+}
+
+.privacy-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  display: block;
+  text-align: center;
+}
+
+.privacy-section {
+  margin-bottom: var(--space-4);
+}
+
+.privacy-section-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.privacy-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  display: block;
+}
