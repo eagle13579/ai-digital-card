@@ -197,3 +197,119 @@
   color: var(--danger) !important;
   border-color: var(--danger) !important;
 }
+
+/* ===== 注销账号链接 ===== */
+.delete-account-link {
+  text-align: center;
+  margin-top: var(--space-4);
+  padding: var(--space-2);
+}
+.delete-account-link text {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  opacity: 0.6;
+}
+
+/* ===== 自定义模态弹窗 ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-dialog {
+  width: 85%;
+  max-width: 320px;
+  background: var(--surface-primary, #1e1e2e);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+}
+.modal-header {
+  font-size: var(--text-lg, 18px);
+  font-weight: var(--weight-bold, 600);
+  color: var(--text-primary, #fff);
+  text-align: center;
+  padding: var(--space-5, 20px) var(--space-4, 16px) 0;
+}
+.modal-body {
+  padding: var(--space-4, 16px);
+}
+.modal-warning {
+  display: flex;
+  align-items: flex-start;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm, 8px);
+  padding: var(--space-3, 12px);
+  margin-bottom: var(--space-4, 16px);
+}
+.warning-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-top: 1px;
+}
+.warning-text {
+  font-size: var(--text-xs, 12px);
+  color: var(--danger, #ef4444);
+  line-height: 1.5;
+}
+.modal-input-group {
+  display: flex;
+  flex-direction: column;
+}
+.input-label {
+  font-size: var(--text-xs, 12px);
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+  margin-bottom: var(--space-2, 8px);
+}
+.modal-input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  border-radius: var(--radius-sm, 8px);
+  padding: var(--space-3, 12px);
+  font-size: var(--text-base, 14px);
+  color: var(--text-primary, #fff);
+  text-align: center;
+}
+.modal-footer {
+  display: flex;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+}
+.modal-btn {
+  flex: 1;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  font-size: var(--text-base, 14px);
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+.modal-btn::after {
+  border: none;
+}
+.modal-btn.cancel {
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+}
+.modal-btn.confirm {
+  color: var(--danger, #ef4444);
+  opacity: 0.4;
+}
+.modal-btn.confirm.active {
+  opacity: 1;
+}
+
+/* ===== 底部占位（为自定义TabBar留空间） ===== */
+.bottom-placeholder {
+  height: 60px;
+}

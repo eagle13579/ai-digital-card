@@ -1,0 +1,116 @@
+<!-- 联系人导入页面 -->
+<view class="import-page">
+  <!-- 页面头部 -->
+  <view class="import-header">
+    <view class="header-back" bindtap="goBack">
+      <text class="back-arrow">←</text>
+    </view>
+    <text class="header-title">导入联系人</text>
+    <view class="header-spacer"></view>
+  </view>
+
+  <!-- ====== 导入方式选择 ====== -->
+  <view class="methods-section" wx:if="{{!activeMethod}}">
+    <text class="section-title">选择导入方式</text>
+    <view
+      class="method-card"
+      wx:for="{{importMethods}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="selectMethod"
+    >
+      <view class="method-icon-wrap">
+        <text class="method-icon">{{item.icon}}</text>
+      </view>
+      <view class="method-info">
+        <text class="method-name">{{item.title}}</text>
+        <text class="method-desc">{{item.desc}}</text>
+      </view>
+      <text class="method-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- ====== 手动输入表单 ====== -->
+  <view class="manual-section" wx:if="{{activeMethod === 'manual'}}">
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">✍️</text>
+        </view>
+        <text class="section-title">手动输入联系人</text>
+      </view>
+      <view class="form-content">
+        <view class="form-item">
+          <text class="form-label">姓名<text class="required">*</text></text>
+          <input
+            class="form-input"
+            placeholder="请输入联系人姓名"
+            value="{{name}}"
+            bindinput="onNameInput"
+          />
+        </view>
+        <view class="form-item">
+          <text class="form-label">手机号<text class="required">*</text></text>
+          <input
+            class="form-input"
+            placeholder="请输入手机号"
+            value="{{phone}}"
+            bindinput="onPhoneInput"
+            type="number"
+            maxlength="11"
+          />
+        </view>
+        <button class="btn-save" bindtap="saveManualContact">保存联系人</button>
+      </view>
+    </view>
+
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">💬</text>
+        </view>
+        <text class="section-title">或分享邀请链接</text>
+      </view>
+      <view class="form-content">
+        <view class="share-tip">
+          <text class="share-tip-text">点击右上角分享按钮，将你的名片邀请链接发送给微信好友</text>
+        </view>
+        <button class="btn-share" open-type="share">邀请好友</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 已导入联系人列表 ====== -->
+  <view class="contacts-section" wx:if="{{contacts.length > 0}}">
+    <view class="contacts-header">
+      <text class="contacts-title">已导入的联系人</text>
+      <text class="contacts-count">{{contacts.length}} 位</text>
+      <text class="contacts-clear" bindtap="clearAllContacts">清空</text>
+    </view>
+
+    <view class="contact-list">
+      <view class="contact-item" wx:for="{{contacts}}" wx:key="id">
+        <view class="contact-avatar">
+          <text class="contact-avatar-text">{{item.name.slice(0, 1)}}</text>
+        </view>
+        <view class="contact-info">
+          <text class="contact-name">{{item.name}}</text>
+          <text class="contact-meta" wx:if="{{item.phone}}">{{item.phone}}</text>
+          <text class="contact-source">
+            <text wx:if="{{item.source === 'manual'}}">手动录入</text>
+            <text wx:elif="{{item.source === 'qrcode'}}">扫码添加</text>
+            <text wx:elif="{{item.source === 'wechat'}}">微信好友</text>
+          </text>
+        </view>
+        <text class="contact-delete" bindtap="deleteContact" data-id="{{item.id}}">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!activeMethod && contacts.length === 0}}">
+    <text class="empty-icon">🤝</text>
+    <text class="empty-text">暂无联系人</text>
+    <text class="empty-hint">选择上方方式导入联系人</text>
+  </view>
+</view>

@@ -1,4 +1,5 @@
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
+const { trustApi, connectionApi } = require('../../../utils/api')
 const { BFSFinder } = require('../../../utils/bfs')
 
 // Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
@@ -6,6 +7,9 @@ if (typeof requestAnimationFrame === 'undefined') {
   var requestAnimationFrame = function (cb) { return setTimeout(function () { cb(Date.now()) }, 16) }
   var cancelAnimationFrame = function (id) { clearTimeout(id) }
 }
+
+const ANIMATION_INTERVAL = 16
+const MAX_NODES = 20
 
 Page({
   data: {
@@ -21,6 +25,12 @@ Page({
     friendList: [],
     loadingFriends: false,
     searchMode: 'navigate', // navigate | quick
+    // 节点信息弹窗
+    showInfoModal: false,
+    selectedNode: null,
+    // 子网络导航
+    isSubNetwork: false,
+    subNetworkLabel: '',
   },
 
   nodes: [],
@@ -31,9 +41,16 @@ Page({
   dpr: 1,
   animationId: null,
   draggingNode: null,
+  // 触摸位置追踪（用于区分点击/拖拽）
+  _touchStartX: 0,
+  _touchStartY: 0,
+  _touchStartTime: 0,
+  // 保存主网络状态（用于返回）
+  _mainNetworkNodes: null,
+  _mainNetworkEdges: null,
+  _mainNetworkCenterId: null,
 
   onLoad(options) {
-    // 支持外部传入nodes数据
     if (options.data && options.nodes) {
       this.nodes = options.nodes
       this.buildEdgesFromNodes()
@@ -42,25 +59,22 @@ Page({
         hasData: this.nodes.length > 1,
       })
     } else {
-      const saved = wx.getStorageSync('trust_network')
-      if (saved && saved.length) {
-        this.nodes = saved
-        this.setData({
-          nodeCount: this.nodes.length - 1,
-          hasData: this.nodes.length > 1,
-        })
-      } else {
-        this.loadData()
-      }
+      this.loadData()
     }
   },
 
   onReady() {
     this.initCanvas()
+    setTimeout(() => {
+      if (this.nodes.length > 0) {
+        this.renderGraph()
+        this.startAnimation()
+      }
+    }, 300)
   },
 
   onShow() {
-    if (this.animationId) {
+    if (this.canvasCtx && this.nodes.length > 0) {
       this.startAnimation()
     }
   },
@@ -73,58 +87,109 @@ Page({
     this.stopAnimation()
   },
 
+  // ====== 联系人导入 ======
+
+  navigateToImport() {
+    wx.navigateTo({
+      url: '/pages/network/import/index',
+    })
+  },
+
   // ====== 数据加载 ======
   async loadData() {
     try {
-      const trustNet = await MockService.getTrustNetwork()
-      const data = trustNet.data || trustNet
-      const trusting = data.trusting || []
-      const trustedBy = data.trusted_by || []
-      const allContacts = [...trusting, ...trustedBy]
-
-      this.nodes = [{
-        id: 'self',
-        name: '我',
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 0,
-        radius: 30,
-        isSelf: true,
-      }]
-
-      const angleStep = (Math.PI * 2) / Math.max(allContacts.length, 1)
-
-      allContacts.forEach((contact, index) => {
-        const angle = index * angleStep
-        const distance = 100 + Math.random() * 50
-        this.nodes.push({
-          id: contact.id || `node_${index}`,
-          name: contact.name || `联系人${index + 1}`,
-          x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * distance,
-          vx: 0,
-          vy: 0,
-          radius: 18,
-          isSelf: false,
-          data: contact,
-        })
-        this.edges.push({
-          from: 'self',
-          to: contact.id || `node_${index}`,
-        })
-      })
-
-      this.setData({
-        nodeCount: allContacts.length,
-        hasData: allContacts.length > 0,
-      })
-
-      if (this.canvasCtx) {
-        this.renderGraph()
+      if (MockService.USE_MOCK) {
+        console.log('[Graph] 开始加载Mock数据')
+        const trustNet = await MockService.getTrustNetwork()
+        const data = trustNet.data || trustNet
+        console.log('[Graph] 数据加载完成:', JSON.stringify(data))
+        this._buildGraphFromContacts(data.trusting || [], data.trusted_by || [])
+        console.log('[Graph] 图谱构建完成:', this.nodes.length, 'nodes,', this.edges.length, 'edges')
+      } else {
+        const res = await trustApi.getNetwork()
+        const data = res.data || res || { trusting: [], trusted_by: [] }
+        this._buildGraphFromContacts(data.trusting || [], data.trusted_by || [])
       }
     } catch (err) {
       console.error('[Graph] 加载数据失败:', err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    }
+  },
+
+  /** 从联系人数据构建图谱 */
+  _buildGraphFromContacts(trusting, trustedBy) {
+    const allContacts = [...trusting, ...trustedBy].slice(0, MAX_NODES - 1)
+
+    this.nodes = [{
+      id: 'self',
+      name: '我',
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 30,
+      isSelf: true,
+    }]
+
+    const seenIds = new Set()
+    const uniqueContacts = allContacts.filter(c => {
+      const id = c.id !== undefined ? String(c.id) : ''
+      if (seenIds.has(id)) return false
+      seenIds.add(id)
+      return true
+    })
+
+    const angleStep = (Math.PI * 2) / Math.max(uniqueContacts.length, 1)
+
+    uniqueContacts.forEach((contact, index) => {
+      const angle = index * angleStep
+      const distance = 100 + Math.random() * 50
+      const cid = contact.id !== undefined ? String(contact.id) : `node_${index}`
+      this.nodes.push({
+        id: cid,
+        name: contact.name || `联系人${index + 1}`,
+        company: contact.company || '',
+        title: contact.title || '',
+        avatar: contact.avatar || '',
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        vx: 0,
+        vy: 0,
+        radius: 18,
+        isSelf: false,
+        data: contact,
+      })
+      this.edges.push({
+        from: 'self',
+        to: cid,
+      })
+    })
+
+    for (let i = 1; i < this.nodes.length; i++) {
+      for (let j = i + 1; j < this.nodes.length; j++) {
+        if (Math.random() > 0.6) {
+          this.edges.push({
+            from: this.nodes[i].id,
+            to: this.nodes[j].id,
+          })
+        }
+      }
+    }
+
+    this.setData({
+      nodeCount: uniqueContacts.length,
+      hasData: uniqueContacts.length > 0,
+    })
+
+    if (this.canvasCtx) {
+      this.renderGraph()
+    } else {
+      setTimeout(() => {
+        if (this.canvasCtx) {
+          this.renderGraph()
+          this.startAnimation()
+        }
+      }, 500)
     }
   },
 
@@ -141,11 +206,24 @@ Page({
   async loadFriendList() {
     this.setData({ loadingFriends: true })
     try {
-      const friends = await MockService.getFriendsList('self')
-      this.setData({
-        friendList: friends || [],
-        loadingFriends: false,
-      })
+      if (MockService.USE_MOCK) {
+        const friends = await MockService.getFriendsList('self')
+        this.setData({
+          friendList: friends || [],
+          loadingFriends: false,
+        })
+      } else {
+        // 真实API：调用 connectionApi.list() 获取已批准的连接
+        const res = await connectionApi.list('approved')
+        const list = res.data || res || []
+        this.setData({
+          friendList: list.map(f => ({
+            id: f.id !== undefined ? String(f.id) : '',
+            name: f.name || '',
+          })),
+          loadingFriends: false,
+        })
+      }
     } catch (err) {
       console.error('[Graph] 加载好友列表失败:', err)
       this.setData({ loadingFriends: false })
@@ -167,90 +245,107 @@ Page({
         this.canvasWidth = rect2.width
         this.canvasHeight = rect2.height
 
-        const sysInfo = wx.getDeviceInfo()
+        const sysInfo = wx.getSystemInfoSync ? wx.getSystemInfoSync() : wx.getDeviceInfo()
         this.dpr = sysInfo.pixelRatio || 2
 
         canvas.width = this.canvasWidth * this.dpr
         canvas.height = this.canvasHeight * this.dpr
         this.canvasCtx = ctx
         this.renderGraph()
+        if (this.nodes.length > 0) {
+          this.startAnimation()
+        }
       }).exec()
     }).exec()
   },
 
   renderGraph() {
     if (!this.canvasCtx) return
+    if (!this.canvasWidth || !this.canvasHeight) return
+    if (this.nodes.length === 0) return
 
     const ctx = this.canvasCtx
     const dpr = this.dpr
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-    const centerX = this.canvasWidth / 2
-    const centerY = this.canvasHeight / 2
+    ctx.strokeStyle = 'rgba(139, 92, 246, 0.2)'
+    ctx.lineWidth = 1
 
     this.edges.forEach((edge) => {
       const fromNode = this.nodes.find(n => n.id === edge.from)
       const toNode = this.nodes.find(n => n.id === edge.to)
       if (!fromNode || !toNode) return
-
       ctx.beginPath()
       ctx.moveTo(centerX + fromNode.x, centerY + fromNode.y)
       ctx.lineTo(centerX + toNode.x, centerY + toNode.y)
-      ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'
-      ctx.lineWidth = 1.5
       ctx.stroke()
     })
 
-    this.nodes.forEach((node) => {
+    this.nodes.forEach((node, index) => {
       const x = centerX + node.x
       const y = centerY + node.y
 
       if (node.isSelf) {
-        const gradient = ctx.createRadialGradient(x - 5, y - 5, 0, x, y, node.radius)
-        gradient.addColorStop(0, '#a78bfa')
-        gradient.addColorStop(0.5, '#8b5cf6')
-        gradient.addColorStop(1, '#6d28d9')
         ctx.beginPath()
         ctx.arc(x, y, node.radius, 0, Math.PI * 2)
-        ctx.fillStyle = gradient
+        ctx.fillStyle = '#8b5cf6'
         ctx.fill()
 
         ctx.beginPath()
         ctx.arc(x, y, node.radius + 4, 0, Math.PI * 2)
-        ctx.strokeStyle = 'rgba(139, 92, 246, 0.4)'
-        ctx.lineWidth = 2
+        ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'
+        ctx.lineWidth = 1.5
         ctx.stroke()
 
         ctx.fillStyle = '#fff'
-        ctx.font = '14px sans-serif'
+        ctx.font = '12px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText('我', x, y)
       } else {
         ctx.beginPath()
         ctx.arc(x, y, node.radius, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(30, 30, 50, 0.8)'
+        ctx.fillStyle = 'rgba(30, 30, 50, 0.9)'
         ctx.fill()
-        ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'
-        ctx.lineWidth = 1
+        ctx.strokeStyle = 'rgba(139, 92, 246, 0.2)'
+        ctx.lineWidth = 0.5
         ctx.stroke()
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-        ctx.font = '11px sans-serif'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(node.name, x, y)
+        if (index % 2 === 0) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+          ctx.font = '10px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(node.name, x, y + node.radius + 12)
+        }
       }
     })
   },
 
   startAnimation() {
+    if (this.animationId) return
+    this._animFrameCount = 0
+    this._isStable = false
+    this._lastRenderTime = Date.now()
     const animate = () => {
-      this.simulateForces()
-      this.renderGraph()
-      this.animationId = requestAnimationFrame(animate)
+      this._animFrameCount++
+      if (this._animFrameCount % 4 === 0) {
+        this.simulateForces()
+      }
+      const now = Date.now()
+      if (now - this._lastRenderTime > 100) {
+        this.renderGraph()
+        this._lastRenderTime = now
+      }
+      if (!this._isStable && this._animFrameCount < 120) {
+        this.animationId = requestAnimationFrame(animate)
+      } else if (!this._isStable) {
+        this._isStable = true
+      }
     }
     animate()
   },
@@ -265,25 +360,35 @@ Page({
   simulateForces() {
     const centerX = this.canvasWidth / 2
     const centerY = this.canvasHeight / 2
-    const damping = 0.9
-    const repulsion = 5000
-    const attraction = 0.05
+    const damping = 0.96
+    const repulsion = 2000
+    const attraction = 0.02
+    const maxInteractionDist = 150
+    let totalVelocity = 0
+    let movingCount = 0
 
-    this.nodes.forEach((node) => {
-      if (node.isSelf) return
+    const nodeCount = this.nodes.length
+    for (let i = 0; i < nodeCount; i++) {
+      const node = this.nodes[i]
+      if (node.isSelf) continue
 
-      let fx = (centerX - (centerX + node.x)) * attraction
-      let fy = (centerY - (centerY + node.y)) * attraction
+      let fx = -node.x * attraction
+      let fy = -node.y * attraction
 
-      this.nodes.forEach((other) => {
-        if (other.id === node.id) return
+      for (let j = 0; j < nodeCount; j++) {
+        if (i === j) continue
+        const other = this.nodes[j]
         const dx = node.x - other.x
         const dy = node.y - other.y
-        const dist = Math.sqrt(dx * dx + dy * dy) + 10
-        const force = repulsion / (dist * dist)
-        fx += (dx / dist) * force
-        fy += (dy / dist) * force
-      })
+        const distSq = dx * dx + dy * dy
+        if (distSq > maxInteractionDist * maxInteractionDist) continue
+        const dist = Math.sqrt(distSq)
+        const force = repulsion / (distSq + 100)
+        const nx = dx / dist
+        const ny = dy / dist
+        fx += nx * force
+        fy += ny * force
+      }
 
       node.vx = (node.vx + fx) * damping
       node.vy = (node.vy + fy) * damping
@@ -293,12 +398,22 @@ Page({
       const maxDist = Math.min(this.canvasWidth, this.canvasHeight) / 3
       const distFromCenter = Math.sqrt(node.x * node.x + node.y * node.y)
       if (distFromCenter > maxDist) {
-        node.x = (node.x / distFromCenter) * maxDist
-        node.y = (node.y / distFromCenter) * maxDist
-        node.vx *= 0.5
-        node.vy *= 0.5
+        const ratio = maxDist / distFromCenter
+        node.x *= ratio
+        node.y *= ratio
+        node.vx *= 0.3
+        node.vy *= 0.3
       }
-    })
+
+      const velSq = node.vx * node.vx + node.vy * node.vy
+      totalVelocity += Math.sqrt(velSq)
+      if (velSq > 0.01) movingCount++
+    }
+
+    const avgVelocity = totalVelocity / Math.max(nodeCount - 1, 1)
+    if (avgVelocity < 0.05 && movingCount < 2) {
+      this._isStable = true
+    }
   },
 
   onTouchStart(e) {
@@ -308,6 +423,11 @@ Page({
     const ty = touch.clientY - canvasRect.top
     const centerX = this.canvasWidth / 2
     const centerY = this.canvasHeight / 2
+
+    // 记录触摸起始位置（用于区分点击/拖拽）
+    this._touchStartX = tx
+    this._touchStartY = ty
+    this._touchStartTime = Date.now()
 
     for (let i = this.nodes.length - 1; i >= 0; i--) {
       const node = this.nodes[i]
@@ -335,11 +455,229 @@ Page({
     this.renderGraph()
   },
 
-  onTouchEnd() {
+  onTouchEnd(e) {
+    const wasDragging = this.draggingNode !== null
+
     if (this.draggingNode) {
       this.draggingNode = null
       this.startAnimation()
     }
+
+    // 检测是否为"点击"而非拖拽：移动距离小且时间短
+    if (!wasDragging) {
+      const touch = e.changedTouches[0]
+      if (touch) {
+        const canvasRect = this._canvasRect || { left: 0, top: 0 }
+        const tx = touch.clientX - canvasRect.left
+        const ty = touch.clientY - canvasRect.top
+        const dx = tx - this._touchStartX
+        const dy = ty - this._touchStartY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const duration = Date.now() - this._touchStartTime
+
+        // 判断为点击：移动距离 < 10px 且 持续时间 < 300ms
+        if (distance < 10 && duration < 300) {
+          const hitNode = this._findNodeAtPosition(tx, ty)
+          if (hitNode) {
+            this.showNodeInfo(hitNode)
+            return
+          }
+        }
+      }
+    }
+  },
+
+  _findNodeAtPosition(tx, ty) {
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+    for (let i = this.nodes.length - 1; i >= 0; i--) {
+      const node = this.nodes[i]
+      const dx = tx - (centerX + node.x)
+      const dy = ty - (centerY + node.y)
+      if (dx * dx + dy * dy <= node.radius * node.radius) {
+        return node
+      }
+    }
+    return null
+  },
+
+  // ====== 节点信息弹窗 ======
+
+  showNodeInfo(node) {
+    if (node.isSelf) {
+      const userInfo = node.data || {}
+      this.setData({
+        showInfoModal: true,
+        selectedNode: {
+          id: node.id,
+          name: node.name,
+          avatar: userInfo.avatar || '',
+          relation: '自己',
+          trustScore: 100,
+          isSelf: true,
+        },
+      })
+      return
+    }
+
+    const contactData = node.data || {}
+    this.setData({
+      showInfoModal: true,
+      selectedNode: {
+        id: node.id,
+        name: node.name,
+        avatar: contactData.avatar || '',
+        relation: contactData.relation || '联系人',
+        trustScore: contactData.trustScore || 0,
+        isSelf: false,
+      },
+    })
+  },
+
+  closeInfoModal() {
+    this.setData({
+      showInfoModal: false,
+      selectedNode: null,
+    })
+  },
+
+  stopPropagation() {
+  },
+
+  async viewContactNetwork() {
+    const selectedNode = this.data.selectedNode
+    if (!selectedNode || selectedNode.isSelf) {
+      wx.showToast({ title: '该节点不可展开', icon: 'none' })
+      return
+    }
+
+    this.closeInfoModal()
+
+    const contactId = selectedNode.id
+    wx.showLoading({ title: '加载人脉网络...' })
+
+    try {
+      // 保存当前主网络状态（仅首次进入子网络时保存）
+      if (!this._mainNetworkNodes && !this.isSubNetwork) {
+        this._mainNetworkNodes = JSON.parse(JSON.stringify(this.nodes))
+        this._mainNetworkEdges = JSON.parse(JSON.stringify(this.edges))
+        this._mainNetworkCenterId = 'self'
+      }
+
+      let friends = []
+      if (MockService.USE_MOCK) {
+        const res = await MockService.getFriendsList(contactId)
+        friends = res || []
+      } else {
+        // 真实API：调用 trustApi.getNetwork(userId) 获取该用户的人脉
+        try {
+          const res = await trustApi.getNetwork(contactId)
+          const data = res.data || res || { trusting: [], trusted_by: [] }
+          friends = [...(data.trusting || []), ...(data.trusted_by || [])]
+        } catch (e) {
+          // 如果 trustApi.getNetwork 不支持按用户ID查询，使用 connectionApi
+          try {
+            const res = await connectionApi.list()
+            friends = res.data || res || []
+          } catch (e2) {
+            console.error('[Graph] 加载联系人网络失败:', e2)
+            friends = []
+          }
+        }
+      }
+      this._rebuildGraphWithCenter(contactId, friends || [])
+
+      this.setData({
+        isSubNetwork: true,
+        subNetworkLabel: selectedNode.name,
+      })
+    } catch (err) {
+      console.error('[Graph] 加载人脉网络失败:', err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  goBackToMainNetwork() {
+    if (this._mainNetworkNodes && this._mainNetworkEdges) {
+      this.nodes = JSON.parse(JSON.stringify(this._mainNetworkNodes))
+      this.edges = JSON.parse(JSON.stringify(this._mainNetworkEdges))
+      this._mainNetworkNodes = null
+      this._mainNetworkEdges = null
+      this._mainNetworkCenterId = null
+
+      this.setData({
+        isSubNetwork: false,
+        subNetworkLabel: '',
+      })
+
+      this.renderGraph()
+      this.startAnimation()
+    } else {
+      this.loadData()
+    }
+  },
+
+  _rebuildGraphWithCenter(centerId, friends) {
+    this.stopAnimation()
+
+    const newNodeMap = new Map()
+
+    const existingNode = this.nodes.find(n => n.id === centerId)
+    const centerData = existingNode ? existingNode.data || {} : {}
+    const centerName = existingNode ? existingNode.name : (centerId === 'self' ? '我' : centerId)
+
+    newNodeMap.set(centerId, {
+      id: centerId,
+      name: centerName,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 30,
+      isSelf: true,
+      data: centerData,
+    })
+
+    const angleStep = (Math.PI * 2) / Math.max(friends.length, 1)
+    friends.forEach((friend, index) => {
+      const friendId = friend.id !== undefined ? String(friend.id) : `node_${index}`
+      if (newNodeMap.has(friendId)) return
+
+      const angle = index * angleStep
+      const distance = 100 + Math.random() * 50
+
+      newNodeMap.set(friendId, {
+        id: friendId,
+        name: friend.name || `联系人${index + 1}`,
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        vx: 0,
+        vy: 0,
+        radius: 18,
+        isSelf: false,
+        data: friend,
+      })
+    })
+
+    const newEdges = []
+    newNodeMap.forEach((node, id) => {
+      if (id !== centerId) {
+        newEdges.push({ from: centerId, to: id })
+      }
+    })
+
+    this.nodes = Array.from(newNodeMap.values())
+    this.edges = newEdges
+
+    this.setData({
+      nodeCount: this.nodes.length - 1,
+      hasData: this.nodes.length > 1,
+    })
+
+    this.renderGraph()
+    this.startAnimation()
   },
 
   // ====== BFS 触达路径查找 ======
@@ -363,11 +701,9 @@ Page({
     this.setData({ targetUserId: e.detail.value })
   },
 
-  // 选择好友列表中的人作为目标
   selectFriendTarget(e) {
     const { id, name } = e.currentTarget.dataset
     this.setData({ targetUserId: id })
-    // 自动搜索
     this.searchPath()
   },
 
@@ -380,16 +716,14 @@ Page({
     this.setData({ searchingPath: true })
 
     try {
-      const result = await MockService.findPath(targetId)
-      this.setData({
-        searchingPath: false,
-        pathResult: result,
-        showPathResult: true,
-      })
-
-      // 如果找到路径，高亮节点
-      if (result.path && result.path.length > 1) {
-        this.highlightPath(result.path)
+      if (MockService.USE_MOCK) {
+        const result = await MockService.findPath(targetId)
+        this._handlePathResult(result)
+      } else {
+        // 真实API：调用 connectionApi.findPath()
+        const res = await connectionApi.findPath(targetId)
+        const result = res.data || res || { distance: -1, path: [] }
+        this._handlePathResult(result)
       }
     } catch (err) {
       console.error('[Graph] BFS搜索失败:', err)
@@ -401,7 +735,18 @@ Page({
     }
   },
 
-  // 高亮路径节点
+  _handlePathResult(result) {
+    this.setData({
+      searchingPath: false,
+      pathResult: result,
+      showPathResult: true,
+    })
+
+    if (result.path && result.path.length > 1) {
+      this.highlightPath(result.path)
+    }
+  },
+
   highlightPath(pathNodes) {
     if (!this.canvasCtx) return
 
@@ -414,7 +759,6 @@ Page({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     this.renderGraph()
 
-    // 在路径节点外围绘制发光圈
     this.nodes.forEach((node) => {
       if (!pathIds.has(node.id)) return
       const x = centerX + node.x
@@ -426,7 +770,6 @@ Page({
       ctx.lineWidth = 3
       ctx.stroke()
 
-      // 添加发光效果
       ctx.beginPath()
       ctx.arc(x, y, node.radius + 10, 0, Math.PI * 2)
       ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)'
@@ -435,7 +778,6 @@ Page({
     })
   },
 
-  // 路径节点点击
   onPathNodeTap(e) {
     const { id, name } = e.detail
     console.log('[Graph] 路径节点点击:', id, name)
@@ -444,7 +786,6 @@ Page({
 
   closePathResult() {
     this.setData({ showPathResult: false })
-    // 重新渲染普通图谱
     this.renderGraph()
   },
 
@@ -486,9 +827,13 @@ Page({
     wx.showToast({ title: '功能开发中', icon: 'none' })
   },
 
-  refreshGraph() {
-    this.loadData()
-    this.renderGraph()
+  async refreshGraph() {
+    this.stopAnimation()
+    await this.loadData()
+    setTimeout(() => {
+      this.renderGraph()
+      this.startAnimation()
+    }, 100)
     wx.showToast({ title: '图谱已刷新', icon: 'success' })
   },
 })

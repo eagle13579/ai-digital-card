@@ -1,4 +1,5 @@
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
+const { connectionApi } = require('../../../utils/api')
 
 const ROLE_MAP = {
   secretary_general: { label: '秘书长', color: '#8b5cf6', icon: '👑' },
@@ -12,12 +13,13 @@ Page({
     platform: null,
     members: [],
     applications: [],
-    report: null,
+    coverage: {},
+    ranking: [],
     loading: true,
     showInviteModal: false,
-    inviteUserId: '',
-    activeTab: 'members', // members | applications | report
-    roleStats: [],
+    linkableCount: 1,
+    pendingApplications: 0,
+    pendingConnections: 0,
   },
 
   onLoad(options) {
@@ -39,32 +41,31 @@ Page({
   async loadData() {
     this.setData({ loading: true })
     try {
-      const [platform, membersRes, reportRes, appsRes] = await Promise.all([
+      const [platform, membersRes, appsRes, coverageRes, rankingRes] = await Promise.all([
         MockService.getPlatformDetail(this.data.platformId),
         MockService.getPlatformMembers(this.data.platformId),
-        MockService.getPlatformReport(this.data.platformId),
         MockService.getPlatformApplications(this.data.platformId),
+        MockService.getResourceCoverage(this.data.platformId),
+        MockService.getResourceRanking(this.data.platformId),
       ])
 
       const members = membersRes.data || []
       const applications = appsRes.data || []
-      const report = reportRes.data
+      const coverage = coverageRes.data || {}
+      const ranking = rankingRes.data || []
 
-      // 构建角色统计数据
-      const roleStats = []
-      if (report?.roleDistribution) {
-        for (const [role, count] of Object.entries(report.roleDistribution)) {
-          const info = ROLE_MAP[role] || { label: role, color: '#999', icon: '❓' }
-          roleStats.push({ role, count, ...info })
-        }
-      }
+      const pendingApplications = applications.filter(a => a.status === 'pending').length
+      const pendingConnections = Math.floor(Math.random() * 5)
 
       this.setData({
         platform,
         members,
         applications,
-        report,
-        roleStats,
+        coverage,
+        ranking: ranking.slice(0, 3),
+        linkableCount: coverage.linkableCities || 1,
+        pendingApplications,
+        pendingConnections,
         loading: false,
       })
     } catch (err) {
@@ -74,82 +75,88 @@ Page({
     }
   },
 
-  switchTab(e) {
-    const tab = e.currentTarget.dataset.tab
-    this.setData({ activeTab: tab })
-  },
-
   goBack() {
     wx.navigateBack()
   },
 
-  goToEdit() {
-    wx.navigateTo({
-      url: `/pages/platform/create/index?edit=${this.data.platformId}`,
-    })
-  },
-
-  // ====== 邀请成员 ======
   openInviteModal() {
-    this.setData({
-      showInviteModal: true,
-      inviteUserId: '',
-    })
+    this.setData({ showInviteModal: true })
   },
 
   closeInviteModal() {
     this.setData({ showInviteModal: false })
   },
 
-  onInviteInput(e) {
-    this.setData({ inviteUserId: e.detail.value })
+  stopPropagation() {},
+
+  inviteFromApp() {
+    wx.showToast({ title: '选择询赋好友邀请', icon: 'none' })
+    this.closeInviteModal()
   },
 
-  async confirmInvite() {
-    const userId = this.data.inviteUserId.trim()
-    if (!userId) {
-      return wx.showToast({ title: '请输入用户ID', icon: 'none' })
-    }
+  inviteFromWechat() {
+    wx.showToast({ title: '选择微信好友邀请', icon: 'none' })
+    this.closeInviteModal()
+  },
 
-    wx.showLoading({ title: '邀请中...' })
+  showQRCode() {
+    wx.showToast({ title: '展示平台二维码', icon: 'none' })
+    this.closeInviteModal()
+  },
+
+  goToMemberManage() {
+    const platformId = this.data.platformId
+    if (platformId) {
+      wx.navigateTo({ url: `/pages/platform/detail/index?id=${platformId}` })
+    }
+  },
+
+  handleImportMembers() {
+    wx.showModal({
+      title: '一键导入会员',
+      content: '功能即将上线，敬请期待。届时可通过Excel批量导入或从询赋App中直接邀请会员加入平台。',
+      showCancel: false,
+      confirmText: '知道了',
+    })
+  },
+
+  goToMessage() {
+    wx.showModal({
+      title: '消息发布/管理',
+      content: '功能即将上线，敬请期待。届时可向平台成员群发通知、活动邀请及行业资讯。',
+      showCancel: false,
+      confirmText: '知道了',
+    })
+  },
+
+  goToNewMemberReview() {
+    const platformId = this.data.platformId
+    if (platformId) {
+      wx.navigateTo({ url: `/pages/platform/detail/index?id=${platformId}` })
+    }
+  },
+
+  async goToConnectionReview() {
+    const platformId = this.data.platformId
     try {
-      await MockService.inviteMember(this.data.platformId, userId)
-      wx.hideLoading()
-      wx.showToast({ title: '邀请成功', icon: 'success' })
-      this.closeInviteModal()
-      this.loadData()
+      const pending = await connectionApi.listPending()
+      if (pending && pending.length > 0) {
+        wx.navigateTo({ url: `/pages/network/graph/index` })
+      } else {
+        wx.showToast({ title: '暂无待审核的建联请求', icon: 'none' })
+      }
     } catch (err) {
-      wx.hideLoading()
-      wx.showToast({ title: '邀请失败', icon: 'none' })
+      console.warn('[PlatformManage] 查询建联请求失败:', err)
+      wx.navigateTo({ url: `/pages/network/graph/index` })
     }
-  },
-
-  // ====== 审核申请 ======
-  async reviewApplication(e) {
-    const { id, approved } = e.currentTarget.dataset
-    const action = approved === 'true' ? '通过' : '拒绝'
-    wx.showLoading({ title: `${action}中...` })
-    try {
-      await MockService.reviewApplication(id, approved === 'true')
-      wx.hideLoading()
-      wx.showToast({ title: `已${action}申请`, icon: 'success' })
-      this.loadData()
-    } catch (err) {
-      wx.hideLoading()
-      wx.showToast({ title: '操作失败', icon: 'none' })
-    }
-  },
-
-  // ====== 格式化时间 ======
-  formatTime(ts) {
-    if (!ts) return ''
-    const date = new Date(ts)
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const day = date.getDate().toString().padStart(2, '0')
-    return `${month}-${day}`
   },
 
   getRoleInfo(role) {
     return ROLE_MAP[role] || { label: role, color: '#999', icon: '❓' }
+  },
+
+  getRankColor(rank) {
+    const colors = ['#fbbf24', '#9ca3af', '#f97316']
+    return colors[rank - 1] || '#9ca3af'
   },
 })

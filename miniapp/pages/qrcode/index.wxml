@@ -2,7 +2,10 @@
   <view class="qr-card">
     <view class="qr-header">{{(brochure && brochure.title) || 'AI数智名片'}}</view>
     <view class="qr-canvas-wrapper">
-      <canvas type="2d" id="qrcodeCanvas" class="qr-canvas"></canvas>
+      <!-- 真实API模式：显示后端生成的二维码图片 -->
+      <image wx:if="{{qrcodeImageUrl}}" src="{{qrcodeImageUrl}}" class="qr-image" mode="aspectFit"></image>
+      <!-- Mock模式：使用Canvas绘制模拟二维码 -->
+      <canvas wx:else type="2d" id="qrcodeCanvas" class="qr-canvas"></canvas>
     </view>
     <text class="qr-hint">扫一扫上面的二维码，查看我的画册</text>
     <button class="btn-secondary small" bindtap="saveQR">保存二维码</button>

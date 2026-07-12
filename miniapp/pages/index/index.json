@@ -2,7 +2,8 @@
   "usingComponents": {
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
-    "empty-state": "/components/empty-state/index"
+    "empty-state": "/components/empty-state/index",
+    "custom-tab-bar": "/custom-tab-bar/index"
   },
   "navigationBarTitleText": "AI数智名片"
 }

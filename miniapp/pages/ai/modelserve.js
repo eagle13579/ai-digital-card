@@ -2,7 +2,7 @@
  * 模型服务管理 - 在线/离线状态监控
  * 支持 MockService 数据源 (useRealApi 开关)
  */
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 
 const MOCK_SERVICES = [
   {

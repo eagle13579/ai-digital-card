@@ -1,6 +1,6 @@
 <view class="page-container">
   <!-- 加载状态 -->
-  <loading visible="{{loading}}" text="加载中..." />
+  <loading visible="{{loading}}" text="{{_t.loading}}" />
 
   <!-- 页面内容 -->
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
@@ -13,22 +13,22 @@
           <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
         </view>
         <view class="user-meta">
-          <view class="user-name">{{userInfo.name || '未设置姓名'}}</view>
+          <view class="user-name">{{userInfo.name || _t.unknownUserName}}</view>
           <view class="user-position">{{userInfo.company}} {{userInfo.title}}</view>
         </view>
       </view>
       <view class="user-stats-row">
         <view class="stat-item">
           <text class="stat-num">{{stats.visitors || 0}}</text>
-          <text class="stat-label">访客</text>
+          <text class="stat-label">{{_t.visitors}}</text>
         </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.matches || 0}}</text>
-          <text class="stat-label">匹配</text>
+          <text class="stat-label">{{_t.matches}}</text>
         </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.trust || 0}}</text>
-          <text class="stat-label">信任</text>
+          <text class="stat-label">{{_t.trustCount}}</text>
         </view>
       </view>
     </view>
@@ -36,7 +36,7 @@
     <!-- 升级提示条：Free用户访客≥3时显示 -->
     <view class="upgrade-hint" wx:if="{{showUpgradeHint}}" bindtap="goMembership">
       <text class="upgrade-hint-icon">✦</text>
-      <text class="upgrade-hint-text">访客已达{{stats.visitors}}人，升级会员解锁更多权益</text>
+      <text class="upgrade-hint-text">{{upgradeHintText}}</text>
       <text class="upgrade-hint-arrow">›</text>
     </view>
 
@@ -44,94 +44,122 @@
     <view class="action-bar">
       <view class="action-item" bindtap="goEditCard">
         <view class="action-icon">✎</view>
-        <text class="action-label">编辑名片</text>
+        <text class="action-label">{{_t.editCard}}</text>
       </view>
       <view class="action-item" bindtap="goPreview">
         <view class="action-icon">◉</view>
-        <text class="action-label">名片预览</text>
+        <text class="action-label">{{_t.cardPreview}}</text>
       </view>
       <view class="action-item" bindtap="goQrCode">
         <view class="action-icon">⊞</view>
-        <text class="action-label">二维码</text>
+        <text class="action-label">{{_t.qrcode}}</text>
       </view>
       <view class="action-item" bindtap="goAICenter">
         <view class="action-icon">◇</view>
-        <text class="action-label">AI智能</text>
+        <text class="action-label">{{_t.aiSmart}}</text>
       </view>
       <view class="action-item" bindtap="shareCard">
         <view class="action-icon">↗</view>
-        <text class="action-label">分享</text>
+        <text class="action-label">{{_t.share}}</text>
       </view>
     </view>
 
     <!-- 场景模式 - 默认收起 -->
     <view class="glass-card scene-mode-card">
       <view class="glass-card-header" bindtap="toggleSceneMode">
-        <text class="title">场景模式</text>
-        <text class="more">{{sceneModeExpanded ? '收起 ▲' : '展开 ▼'}}</text>
+        <text class="title">{{_t.sceneMode}}</text>
+        <text class="more">{{sceneModeExpanded ? _t.collapse : _t.expand}}</text>
       </view>
       <view wx:if="{{sceneModeExpanded}}" class="scene-mode-content">
         <view class="scene-option {{sceneMode === 'personal' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="personal">
           <view class="scene-icon">◉</view>
           <view>
-            <text class="scene-label">个人展示</text>
-            <text class="scene-desc">适合社交场合展示个人信息</text>
+            <text class="scene-label">{{_t.personalScene}}</text>
+            <text class="scene-desc">{{_t.personalSceneDesc}}</text>
           </view>
         </view>
         <view class="scene-option {{sceneMode === 'business' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="business">
           <view class="scene-icon">◆</view>
           <view>
-            <text class="scene-label">商务对接</text>
-            <text class="scene-desc">突出资源供需与商务信息</text>
+            <text class="scene-label">{{_t.businessScene}}</text>
+            <text class="scene-desc">{{_t.businessSceneDesc}}</text>
           </view>
         </view>
         <view class="scene-option {{sceneMode === 'social' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="social">
           <view class="scene-icon">●</view>
           <view>
-            <text class="scene-label">社交拓展</text>
-            <text class="scene-desc">侧重信任网络与人脉连接</text>
+            <text class="scene-label">{{_t.socialScene}}</text>
+            <text class="scene-desc">{{_t.socialSceneDesc}}</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 我的名片卡片 -->
-    <view class="glass-card" bindtap="goPreview" style="padding:0;overflow:hidden;">
+    <view class="glass-card" wx:if="{{showBusinessCards}}" bindtap="goPreview" style="padding:0;overflow:hidden;">
       <view class="glass-card-header">
-        <text class="title">我的名片</text>
-        <text class="more">查看全部 ›</text>
+        <text class="title">{{_t.myCard}}</text>
+        <text class="more">{{_t.viewAll}}</text>
       </view>
       <view class="brochure-cover">
         <image src="{{brochure.cover || '/images/default-cover.png'}}" mode="aspectFill" />
         <view class="brochure-info">
-          <text class="brochure-name">{{brochure.title || '我的AI数智名片'}}</text>
+          <text class="brochure-name">{{brochure.title || _t.aiCardTitle}}</text>
           <text class="brochure-stats">{{brochure.viewCount || 0}}次浏览 · {{brochure.pageCount || 0}}页</text>
         </view>
       </view>
     </view>
 
     <!-- 创建资源平台入口 -->
-    <view class="glass-card platform-entry-card" bindtap="goCreatePlatform">
+    <view class="glass-card platform-entry-card" wx:if="{{showPlatform}}" bindtap="goCreatePlatform">
       <view class="platform-entry-bg">
         <view class="platform-entry-content">
           <view class="platform-entry-icon">⊞</view>
           <view class="platform-entry-text">
-            <text class="platform-entry-title">创建资源平台</text>
-            <text class="platform-entry-desc">创建专属平台，整合优质资源</text>
+            <text class="platform-entry-title">{{_t.createPlatform}}</text>
+            <text class="platform-entry-desc">{{_t.createPlatformDesc}}</text>
           </view>
           <text class="platform-entry-arrow">›</text>
         </view>
       </view>
     </view>
 
-    <!-- 信任网络摘要 -->
-    <view class="glass-card">
+    <!-- 平台推荐区 -->
+    <view class="glass-card" wx:if="{{showPlatform && platformRecommend.length > 0}}">
       <view class="glass-card-header">
-        <text class="title">信任网络</text>
-        <text class="more" bindtap="goTrust">查看全部 ›</text>
+        <text class="title">{{_t.platformRecommend}}</text>
+        <text class="more" bindtap="goPlatformList">{{_t.viewAll}}</text>
+      </view>
+      <view class="platform-recommend-list">
+        <view class="platform-rec-item" wx:for="{{platformRecommend}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goPlatformDetail">
+          <view class="platform-rec-rank {{item.rank === 1 ? 'rank-gold' : ''}}">
+            <text wx:if="{{item.rank === 1}}">👑</text>
+            <text wx:else>{{item.rank}}</text>
+          </view>
+          <view class="platform-rec-logo">
+            <text class="platform-rec-letter">{{item.logoLetter}}</text>
+          </view>
+          <view class="platform-rec-info">
+            <view class="platform-rec-name-row">
+              <text class="platform-rec-name">{{item.name}}</text>
+              <text class="platform-rec-tag" wx:if="{{item.rank === 1}}">{{_t.officialTag}}</text>
+            </view>
+            <text class="platform-rec-desc">{{item.resourceCount}} {{_t.resourceUnits}}</text>
+          </view>
+          <text class="platform-rec-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 信任网络摘要 -->
+    <view class="glass-card" wx:if="{{showTrustNetwork}}">
+      <view class="glass-card-header">
+        <text class="title">{{_t.trustNetwork}}</text>
+        <text class="more" bindtap="goTrust">{{_t.viewAll}}</text>
       </view>
       <view class="trust-summary">
-        <text class="trust-count">{{trustCount}} 位信任伙伴</text>
+        <text class="trust-count">{{trustCount}}位信任伙伴</text>
         <view class="trust-avatars" wx:if="{{trustList.length > 0}}">
           <image class="trust-avatar" wx:for="{{trustList.slice(0, 5)}}" wx:key="id"
             src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
@@ -143,8 +171,8 @@
     <!-- 匹配推荐区 -->
     <view class="glass-card" wx:if="{{recommendList.length > 0}}">
       <view class="glass-card-header">
-        <text class="title">合作伙伴推荐</text>
-        <text class="more" bindtap="goMatch">查看更多 ›</text>
+        <text class="title">{{_t.partnerRecommend}}</text>
+        <text class="more" bindtap="goMatch">{{_t.viewAll}}</text>
       </view>
       <view class="recommend-list">
         <view class="recommend-item" wx:for="{{recommendList.slice(0, 3)}}" wx:key="id"
@@ -159,16 +187,58 @@
           </view>
           <view class="rec-score">
             <text class="score-num">{{item.matchScore}}%</text>
-            <text class="score-lbl">匹配</text>
+            <text class="score-lbl">{{_t.matchLabel}}</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 空白状态 -->
-    <empty-state wx:if="{{showEmpty}}" text="暂无数据，快去创建你的名片吧" />
+    <empty-state wx:if="{{showEmpty}}" text="{{_t.noDataHome}}" />
 
     <!-- 底部占位 -->
     <view class="bottom-placeholder"></view>
   </scroll-view>
+
+  <!-- 自定义TabBar -->
+  <custom-tab-bar selected="{{0}}" />
+
+  <!-- ===== 新手引导浮层 ===== -->
+  <view class="onboarding-overlay {{showOnboarding ? 'visible' : ''}}" wx:if="{{showOnboarding}}">
+    <!-- 半透明遮罩 -->
+    <view class="onboarding-mask" catchtap="skipOnboarding"></view>
+
+    <!-- 引导卡片 -->
+    <view class="onboarding-card">
+      <!-- 步骤指示器 -->
+      <view class="onboarding-dots">
+        <view class="onboarding-dot {{onboardingStep >= 1 ? 'active' : ''}}"></view>
+        <view class="onboarding-dot {{onboardingStep >= 2 ? 'active' : ''}}"></view>
+        <view class="onboarding-dot {{onboardingStep >= 3 ? 'active' : ''}}"></view>
+      </view>
+
+      <!-- 步骤内容 -->
+      <view class="onboarding-content">
+        <view class="onboarding-icon">{{onboardingSteps[onboardingStep - 1].icon}}</view>
+        <text class="onboarding-title">{{onboardingSteps[onboardingStep - 1].title}}</text>
+        <text class="onboarding-desc">{{onboardingSteps[onboardingStep - 1].desc}}</text>
+      </view>
+
+      <!-- 按钮栏 -->
+      <view class="onboarding-actions">
+        <view class="onboarding-btn secondary" catchtap="skipOnboarding">
+          {{_t.skipGuide}}
+        </view>
+
+        <view class="onboarding-btn-row">
+          <view class="onboarding-btn prev" wx:if="{{onboardingStep > 1}}" catchtap="prevStep">
+            {{_t.prevStep}}
+          </view>
+          <view class="onboarding-btn primary" catchtap="nextStep">
+            {{onboardingStep < 3 ? _t.nextStep : _t.startUse}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

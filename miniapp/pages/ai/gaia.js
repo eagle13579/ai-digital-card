@@ -3,7 +3,7 @@
  * 展示知识图谱状态、进化指标、Agent状态
  * 支持 MockService 数据源 (useRealApi 开关)
  */
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 
 const MOCK_GAIA_DATA = {
   status: 'active',

@@ -14,6 +14,7 @@
 const STORAGE_KEYS = {
   TOKEN: 'token',
   USER_INFO: 'userInfo',
+  LOCALE: 'app_locale',
 }
 
 class Store {
@@ -22,11 +23,13 @@ class Store {
       token: this._getStorage('token'),
       userInfo: this._getStorage('userInfo', null),
       isLoggedIn: !!this._getStorage('token'),
+      locale: this._getStorage('app_locale', 'zh'),
       memberLevel: 'free',
       matchCount: 0,
       visitorCount: 0,
       trustCount: 0,
       dataDirty: false,
+      isNewUser: this._getStorage('isNewUser', true),
     }
     this._listeners = []
   }
@@ -112,6 +115,13 @@ class Store {
     this._emit()
   }
 
+  /** 设置语言偏好 */
+  setLocale(locale) {
+    this._state.locale = locale
+    wx.setStorageSync('app_locale', locale)
+    this._emit()
+  }
+
   /** 设置统计数据 */
   setStats(stats) {
     if (stats.matchCount !== undefined) this._state.matchCount = stats.matchCount
@@ -128,6 +138,18 @@ class Store {
   /** 清除脏标记 */
   clearDataDirty() {
     this._state.dataDirty = false
+  }
+
+  /** 标记新手引导已完成，永久不再弹出 */
+  setOnboardingDone() {
+    this._state.isNewUser = false
+    wx.setStorageSync('isNewUser', false)
+    this._emit()
+  }
+
+  /** 判断是否需要展示新手引导（登录用户 + 未完成引导） */
+  isOnboardingNeeded() {
+    return this._state.isLoggedIn && this._state.isNewUser
   }
 }
 

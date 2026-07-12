@@ -145,15 +145,16 @@ def create_app():
     # Routers
     from app.routers import (auth_router, user_router, brochure_router, tag_router,
                                  match_router, brochure_alias_router, card_alias_router, visitor_router,
-                             trust_router, i18n_router, public_router, payment_router,
-                             integration_router, export_router, webhook_router,
-                             recommend_router, ab_test_router, api_keys_router,
-                             docs_router, web_vitals_router, graphql_router,
-                             oauth_router, admin_router)
+                            trust_router, i18n_router, public_router, payment_router,
+                            integration_router, export_router, webhook_router,
+                            recommend_router, ab_test_router, api_keys_router,
+                            docs_router, web_vitals_router, graphql_router,
+                            oauth_router, admin_router, ai_assist_router)
     from app.routers.miniapp_router import (
         router as miniapp_router,
         exchange_alt_router as miniapp_exchange_router,
         recommend_router as miniapp_recommend_router,
+        miniapp_code_router,
     )
     from app.routers.graphql_route import strawberry_app
     from app.routers.tenant_api import router as tenant_router
@@ -174,6 +175,11 @@ def create_app():
     from app.routers.analytics import router as analytics_router
     from app.routers.platform_router import router as platform_router
     from app.routers.connection_router import router as connection_router
+    # ── 链客宝合并路由 ──
+    from app.routers.organization_router import router as organization_router
+    from app.routers.six_degrees_router import router as six_degrees_router
+    from app.routers.escrow_router import router as escrow_router
+    from app.routers.ocr_router import router as ocr_router
 
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -193,6 +199,11 @@ def create_app():
     app.include_router(gaia_router)
     app.include_router(platform_router)
     app.include_router(connection_router)
+    # ── 链客宝合并路由 ──
+    app.include_router(organization_router)
+    app.include_router(six_degrees_router)
+    app.include_router(escrow_router)
+    app.include_router(ocr_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)
@@ -200,12 +211,14 @@ def create_app():
     app.include_router(user_router)
     app.include_router(brochure_router)
     app.include_router(tag_router)
+    app.include_router(ai_assist_router)
     app.include_router(match_router)
     app.include_router(brochure_alias_router)
     app.include_router(card_alias_router)
     app.include_router(miniapp_router)
     app.include_router(miniapp_exchange_router)
     app.include_router(miniapp_recommend_router)
+    app.include_router(miniapp_code_router)
     app.include_router(visitor_router)
     app.include_router(trust_router)
     app.include_router(i18n_router)
@@ -216,8 +229,11 @@ def create_app():
     app.include_router(webhook_router)
     app.include_router(recommend_router)
     app.include_router(ab_test_router)
-    from app.routers.xinsen_match import router as xinsen_router
-    app.include_router(xinsen_router)
+    try:
+        from app.routers.xinsen_match import router as xinsen_router
+        app.include_router(xinsen_router)
+    except ModuleNotFoundError:
+        logger.warning("xinsen_match 路由未找到，跳过")
     app.include_router(api_keys_router)
     app.include_router(docs_router)
     app.include_router(web_vitals_router)

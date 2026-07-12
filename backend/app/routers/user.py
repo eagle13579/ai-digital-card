@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_standards import PaginatedResponse, paginate, raise_http_error
 from app.database import get_db
 from app.models.user import User
+from app.models.tag import UserTag
 from app.routers.auth import get_current_user
 from app.schemas import UserResponse, UserUpdate
 
@@ -55,3 +56,62 @@ async def get_user(
     if user is None:
         raise_http_error(404, "NOT_FOUND", "用户不存在")
     return UserResponse.model_validate(user)
+
+
+@router.get("/search/list", response_model=PaginatedResponse[UserResponse])
+async def search_users(
+    q: str = Query("", description="关键词搜索 name/company/title/intro"),
+    industry: str = Query("", description="行业标签筛选"),
+    region: str = Query("", description="地区标签筛选"),
+    page: int = Query(1, ge=1, description="页码"),
+    page_size: int = Query(20, ge=1, le=100, description="每页条数"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    搜索用户（关键词+行业+地区筛选，LIKE模糊匹配）
+    - q: 在 name/company/title/intro 模糊搜索
+    - industry: 通过 UserTag(tag_type='provide', tag) 过滤行业
+    - region: 通过 UserTag(tag_type='need', tag) 过滤地区
+    """
+    # 基础查询：排除当前用户
+    query = select(User).where(User.id != current_user.id)
+
+    # 关键词模糊匹配
+    if q.strip():
+        keyword = f"%{q.strip()}%"
+        query = query.where(
+            or_(
+                User.name.ilike(keyword),
+                User.company.ilike(keyword),
+                User.title.ilike(keyword),
+                User.intro.ilike(keyword),
+            )
+        )
+
+    # 行业标签筛选（UserTag.tag_type = 'provide' 表示行业标签）
+    if industry.strip():
+        industry_sub = (
+            select(UserTag.user_id)
+            .where(
+                UserTag.tag_type == "provide",
+                UserTag.tag == industry.strip(),
+            )
+            .subquery()
+        )
+        query = query.where(User.id.in_(select(industry_sub.c.user_id)))
+
+    # 地区标签筛选（UserTag.tag_type = 'need' 表示地区标签）
+    if region.strip():
+        region_sub = (
+            select(UserTag.user_id)
+            .where(
+                UserTag.tag_type == "need",
+                UserTag.tag == region.strip(),
+            )
+            .subquery()
+        )
+        query = query.where(User.id.in_(select(region_sub.c.user_id)))
+
+    query = query.order_by(User.id)
+    return await paginate(db, query, page, page_size, UserResponse)

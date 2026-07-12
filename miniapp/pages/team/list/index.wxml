@@ -1,0 +1,82 @@
+<view class="page-container">
+  <view class="page-header">
+    <text class="title">我的团队</text>
+    <view class="create-btn" bindtap="goToCreate">+ 创建团队</view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{!loading && teams.length === 0}}">
+    <view class="empty-state">
+      <text class="empty-icon">👥</text>
+      <text class="empty-title">暂无团队</text>
+      <text class="empty-desc">创建一个团队，与伙伴们一起协作</text>
+      <view class="empty-btn" bindtap="goToCreate">创建团队</view>
+    </view>
+  </block>
+
+  <view class="team-list" wx:if="{{!loading && teams.length > 0}}">
+    <view
+      class="team-card"
+      wx:for="{{teams}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToManage"
+    >
+      <view class="team-header">
+        <view class="team-logo">
+          <text class="logo-text">{{getInitial(item.name)}}</text>
+        </view>
+        <view class="team-info">
+          <text class="team-name">{{item.name}}</text>
+          <text class="team-desc">{{item.description}}</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+      <view class="team-meta">
+        <text class="meta-item">👥 {{item.member_count}}人</text>
+        <text class="meta-item" wx:if="{{item.industry}}">🏭 {{item.industry}}</text>
+        <text class="meta-item" wx:if="{{item.invite_count > 0}}" style="color: var(--accent);">📩 {{item.invite_count}}待处理</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 创建团队弹窗 -->
+  <view class="modal-overlay" wx:if="{{showCreateModal}}" bindtap="closeCreateModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">创建团队</text>
+        <text class="modal-close" bindtap="closeCreateModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">团队名称 *</text>
+          <input class="form-input" placeholder="请输入团队名称" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">团队标识</text>
+          <input class="form-input" placeholder="英文标识，如 my-team" value="{{formData.slug}}" bindinput="onInput" data-field="slug" />
+          <text class="form-tip">不填则自动生成</text>
+        </view>
+        <view class="form-group">
+          <text class="form-label">团队描述</text>
+          <input class="form-input" placeholder="简要描述团队定位" value="{{formData.description}}" bindinput="onInput" data-field="description" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">行业</text>
+          <input class="form-input" placeholder="如 互联网/软件" value="{{formData.industry}}" bindinput="onInput" data-field="industry" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">团队规模</text>
+          <picker mode="selector" range="{{['1-10','11-50','51-200','201-500','500+']}}" value="{{formData.size}}" bindchange="onSizeChange">
+            <view class="picker-value">{{formData.size}}</view>
+          </picker>
+        </view>
+        <button class="submit-btn" bindtap="handleCreate" loading="{{creating}}" disabled="{{creating}}">创建团队</button>
+      </view>
+    </view>
+  </view>
+</view>

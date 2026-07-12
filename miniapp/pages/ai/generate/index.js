@@ -1,4 +1,4 @@
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 
 const CONTENT_TYPES = [
   {

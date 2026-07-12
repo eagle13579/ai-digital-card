@@ -9,12 +9,13 @@
 const store = require('./store')
 const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_FRIENDS_MAP, TEST_PLATFORMS, TEST_PLATFORM_MEMBERS, TEST_PLATFORM_APPLICATIONS, TEST_AI_GENERATE_TEMPLATES } = require('./test-data')
 const { Logger } = require('./util')
+const { get, post, put, del } = require('./request')
 const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi } = require('./api')
 
 const MockService = {
   USE_MOCK: true,
 
-  async mockDelay(min = 500, max = 1500) {
+  async mockDelay(min = 100, max = 300) {
     return new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))
   },
 
@@ -265,8 +266,7 @@ const MockService = {
       return { success: true, message: '发布成功，等待审核', data: { id: Date.now(), ...formData } }
     }
     // TODO: 对接真实API
-    const { api } = require('./api')
-    return api.post('/api/v1/resources', formData)
+    return post('/api/v1/resources', formData)
   },
 
   // ====== 好友列表 ======
@@ -323,8 +323,7 @@ const MockService = {
       Logger.info('平台管理', 'Mock创建平台', newPlatform)
       return { success: true, message: '创建成功', data: newPlatform }
     }
-    const { api } = require('./api')
-    return api.post('/api/v1/platforms', formData)
+    return post('/api/v1/platforms', formData)
   },
 
   async getPlatformList() {
@@ -332,8 +331,7 @@ const MockService = {
       await this.mockDelay(300, 500)
       return { data: TEST_PLATFORMS }
     }
-    const { api } = require('./api')
-    return api.get('/api/v1/platforms')
+    return get('/api/v1/platforms')
   },
 
   async getPlatformDetail(platformId) {
@@ -342,21 +340,18 @@ const MockService = {
       const platform = TEST_PLATFORMS.find(p => p.id === platformId)
       return platform || TEST_PLATFORMS[0]
     }
-    const { api } = require('./api')
-    return api.get(`/api/v1/platforms/${platformId}`)
+    return get(`/api/v1/platforms/${platformId}`)
   },
 
   async getPlatformMembers(platformId) {
     if (this.USE_MOCK) {
       await this.mockDelay(300, 600)
       const members = TEST_PLATFORM_MEMBERS[platformId] || []
-      // 按角色排序：秘书长 > 秘书处 > 会员
       const roleOrder = { secretary_general: 1, secretariat: 2, member: 3 }
       members.sort((a, b) => (roleOrder[a.role] || 9) - (roleOrder[b.role] || 9))
       return { data: members }
     }
-    const { api } = require('./api')
-    return api.get(`/api/v1/platforms/${platformId}/members`)
+    return get(`/api/v1/platforms/${platformId}/members`)
   },
 
   async getPlatformApplications(platformId) {
@@ -364,21 +359,18 @@ const MockService = {
       await this.mockDelay(300, 500)
       return { data: TEST_PLATFORM_APPLICATIONS[platformId] || [] }
     }
-    const { api } = require('./api')
-    return api.get(`/api/v1/platforms/${platformId}/applications`)
+    return get(`/api/v1/platforms/${platformId}/applications`)
   },
 
   async reviewApplication(applicationId, approved) {
     if (this.USE_MOCK) {
       await this.mockDelay(500, 800)
-      // 查找并更新申请
       for (const pid in TEST_PLATFORM_APPLICATIONS) {
         const apps = TEST_PLATFORM_APPLICATIONS[pid]
         const idx = apps.findIndex(a => a.id === applicationId)
         if (idx !== -1) {
           if (approved) {
             apps[idx].status = 'approved'
-            // 添加到成员列表
             if (!TEST_PLATFORM_MEMBERS[pid]) TEST_PLATFORM_MEMBERS[pid] = []
             TEST_PLATFORM_MEMBERS[pid].push({
               id: apps[idx].user_id,
@@ -394,8 +386,7 @@ const MockService = {
       }
       return { success: true, message: approved ? '已通过申请' : '已拒绝申请' }
     }
-    const { api } = require('./api')
-    return api.put(`/api/v1/applications/${applicationId}`, { approved })
+    return put(`/api/v1/applications/${applicationId}`, { approved })
   },
 
   async inviteMember(platformId, userId) {
@@ -410,18 +401,15 @@ const MockService = {
       })
       return { success: true, message: '邀请成功' }
     }
-    const { api } = require('./api')
-    return api.post(`/api/v1/platforms/${platformId}/invite`, { user_id: userId })
+    return post(`/api/v1/platforms/${platformId}/invite`, { user_id: userId })
   },
 
   async getPlatformReport(platformId) {
     if (this.USE_MOCK) {
       await this.mockDelay(500, 800)
       const members = TEST_PLATFORM_MEMBERS[platformId] || []
-      // 角色分布
       const roleDistribution = { secretary_general: 0, secretariat: 0, member: 0 }
       members.forEach(m => { roleDistribution[m.role] = (roleDistribution[m.role] || 0) + 1 })
-      // 资源统计
       const platform = TEST_PLATFORMS.find(p => p.id === platformId)
       return {
         data: {
@@ -432,10 +420,124 @@ const MockService = {
         },
       }
     }
-    const { api } = require('./api')
-    return api.get(`/api/v1/platforms/${platformId}/report`)
+    return get(`/api/v1/platforms/${platformId}/report`)
+  },
+
+  async getProfile() {
+    return this.getUserProfile()
+  },
+
+  async getResourceCoverage(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      return {
+        data: {
+          linkableCities: Math.floor(Math.random() * 10) + 1,
+          totalResources: Math.floor(Math.random() * 50) + 10,
+        },
+      }
+    }
+    return get(`/api/v1/platforms/${platformId}/coverage`)
+  },
+
+  async getResourceRanking(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      const ranking = []
+      for (let i = 0; i < 5; i++) {
+        ranking.push({
+          rank: i + 1,
+          resourceName: ['技术资源', '人才资源', '资金资源', '渠道资源', '市场资源'][i],
+          count: Math.floor(Math.random() * 100) + 10,
+        })
+      }
+      return { data: ranking }
+    }
+    return get(`/api/v1/platforms/${platformId}/ranking`)
+  },
+
+  async getResourceUnits(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      const units = []
+      for (let i = 0; i < 4; i++) {
+        units.push({
+          id: `ru${i + 1}`,
+          name: ['技术中心', '研发部', '市场部', '运营部'][i],
+          resource_count: Math.floor(Math.random() * 20) + 5,
+          status: ['active', 'active', 'active', 'pending'][i],
+        })
+      }
+      return { data: units }
+    }
+    return get(`/api/v1/platforms/${platformId}/resource-units`)
+  },
+
+  async getPlatformOpportunities(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(300, 500)
+      const opportunities = []
+      for (let i = 0; i < 3; i++) {
+        opportunities.push({
+          id: `opp${i + 1}`,
+          title: ['战略合作机会', '技术对接机会', '市场拓展机会'][i],
+          desc: '平台内优质合作机会，点击查看详情',
+          status: 'active',
+          created_at: Date.now() - i * 86400000,
+        })
+      }
+      return { data: opportunities }
+    }
+    return get(`/api/v1/platforms/${platformId}/opportunities`)
+  },
+
+  async joinPlatform(platformId) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 800)
+      const platform = TEST_PLATFORMS.find(p => p.id === platformId)
+      if (!platform) return { success: false, message: '平台不存在' }
+
+      const { userInfo } = store.getState()
+      const userId = userInfo?.id || `u${Date.now()}`
+      const userName = userInfo?.name || '用户'
+
+      if (!TEST_PLATFORM_MEMBERS[platformId]) TEST_PLATFORM_MEMBERS[platformId] = []
+      TEST_PLATFORM_MEMBERS[platformId].push({
+        id: userId,
+        name: userName,
+        role: 'member',
+        joined_at: Date.now(),
+      })
+
+      return { success: true, message: '加入成功' }
+    }
+    return post(`/api/v1/platforms/${platformId}/join`)
+  },
+
+  async getInsightData() {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 1000)
+      return {
+        visits: {
+          total_visits: 1256,
+          today_visits: 45,
+          week_over_week: 12.5,
+          weeklyTrend: [32, 45, 38, 52, 48, 65, 45],
+        },
+        matches: {
+          total_matches: 89,
+          today_matches: 5,
+          week_over_week: 8.3,
+        },
+        conversions: {
+          total_conversions: 156,
+          conversion_rate: 12.4,
+          week_over_week: 2.1,
+        },
+      }
+    }
+    return aiApi.insight()
   },
 }
 
-module.exports = MockService
-module.exports.MockService = MockService  // 兼容 { MockService } 解构导入
+module.exports = { MockService }

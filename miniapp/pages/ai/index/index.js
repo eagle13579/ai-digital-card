@@ -1,20 +1,15 @@
-const store = require('../../utils/store')
-
-const features = [
-  { id: 'chat', name: 'AI智能对话', icon: '🤖', desc: '基础问答/深度推理', url: '/pages/ai/chat/index' },
-  { id: 'generate', name: 'AI内容生成', icon: '✍️', desc: '自我介绍/口号/介绍信', url: '/pages/ai/generate/index' },
-  { id: 'scan', name: 'AI名片扫描', icon: '📸', desc: '拍照识别+扫码交换', url: '/pages/ai/scan/index' },
-  { id: 'match', name: '智能人脉匹配', icon: '🎯', desc: '筛选推荐合作伙伴', url: '/pages/ai/match/index' },
-  { id: 'insight', name: 'AI数据洞察', icon: '📊', desc: '访客趋势分析报告', url: '/pages/ai/insight/index' },
-  { id: 'gaia', name: '盖娅进化大脑', icon: '🧠', desc: 'AI进化状态/知识图谱', url: '/pages/ai/gaia' },
-  { id: 'feedback', name: '反馈建议', icon: '💬', desc: '意见反馈/产品建议', url: '/pages/ai/feedback' },
-  { id: 'config', name: 'AI客服配置', icon: '⚙️', desc: '自动回复/欢迎语设置', url: '/pages/ai/config/index' },
-]
+const store = require('../../../utils/store')
+const i18n = require('../../../utils/i18n')
 
 Page({
-  data: { features, isLoggedIn: false },
+  data: {
+    features: [],
+    isLoggedIn: false,
+    _t: {},
+  },
 
   onLoad() {
+    this._loadI18n()
     this.setData({ isLoggedIn: store.getState().isLoggedIn })
   },
 
@@ -23,6 +18,21 @@ Page({
     if (this.data.isLoggedIn !== isLoggedIn) {
       this.setData({ isLoggedIn })
     }
+    this._loadI18n()
+  },
+
+  _loadI18n() {
+    const features = [
+      { id: 'chat', name: i18n.t('aiChat'), icon: '🤖', desc: i18n.t('aiChatDesc'), url: '/pages/ai/chat/index' },
+      { id: 'generate', name: i18n.t('aiGenerate'), icon: '✍️', desc: i18n.t('aiGenerateDesc'), url: '/pages/ai/generate/index' },
+      { id: 'scan', name: i18n.t('aiScan'), icon: '📸', desc: i18n.t('aiScanDesc'), url: '/pages/ai/scan/index' },
+      { id: 'match', name: i18n.t('aiMatch'), icon: '🎯', desc: i18n.t('aiMatchDesc'), url: '/pages/ai/match/index' },
+      { id: 'insight', name: i18n.t('aiInsight'), icon: '📊', desc: i18n.t('aiInsightDesc'), url: '/pages/ai/insight/index' },
+      { id: 'gaia', name: i18n.t('aiGaia'), icon: '🧠', desc: i18n.t('aiGaiaDesc'), url: '/pages/ai/gaia' },
+      { id: 'feedback', name: i18n.t('aiFeedback'), icon: '💬', desc: i18n.t('aiFeedbackDesc'), url: '/pages/ai/feedback' },
+      { id: 'config', name: i18n.t('aiConfig'), icon: '⚙️', desc: i18n.t('aiConfigDesc'), url: '/pages/ai/config/index' },
+    ]
+    this.setData({ features, _t: i18n.getTranslations() })
   },
 
   go(e) {
@@ -36,6 +46,6 @@ Page({
   },
 
   onShareAppMessage() {
-    return { title: 'AI数智名片 - AI智能中心', path: '/pages/ai/index/index' }
+    return { title: i18n.t('aiCenterTitle') + ' - AI数智名片', path: '/pages/ai/index/index' }
   },
 })

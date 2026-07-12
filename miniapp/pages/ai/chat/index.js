@@ -1,4 +1,5 @@
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
+const { aiApi } = require('../../../utils/api')
 const store = require('../../../utils/store')
 const CHAT_STORAGE_KEY = 'ai_chat_messages'
 
@@ -63,7 +64,7 @@ Page({
     })
   },
 
-  send() {
+  async send() {
     const app = getApp()
     if (!store.checkLogin()) {
       return wx.showToast({ title: '请先登录', icon: 'none' })
@@ -71,16 +72,56 @@ Page({
     
     const text = this.data.inputValue.trim()
     if (!text) return
+
+    // 添加用户消息
     const msgs = [...this.data.messages, {role:'user',content:text}]
-    this.setData({ messages: msgs, inputValue: '', loading: true })
-    setTimeout(() => {
-      const newMsgs = [...msgs, {role:'ai',content:'你好！我是AI数智名片助手。我可以帮你生成名片文案、分析匹配度或回答相关问题。请告诉我你的需求。'}]
+    this.setData({ messages: msgs, inputValue: '', loading: true, canSend: false })
+
+    try {
+      // 调用后端真实API — 即使后端没有LLM也会返回规则匹配的结构化回复
+      const history = msgs.map(m => ({ role: m.role, content: m.content }))
+      const res = await aiApi.chat(text, history.slice(0, -1))
+      
+      // aiApi.chat 通过 request.js 自动解包，res 就是 ChatResponse 的 data 字段
+      const reply = res.reply || res.content || '抱歉，我没有理解您的意思，请换个问题试试。'
+      const replyType = res.type || 'text'
+
+      const newMsgs = [...msgs, {role: 'ai', content: reply, type: replyType}]
       this.setData({ messages: newMsgs, loading: false })
-      // 每次发送后自动持久化
+      
+      // 持久化
       try {
         wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
       } catch (e) {}
-    }, 800)
+    } catch (err) {
+      console.error('[AI Chat] 请求失败:', err)
+      
+      // 降级方案：使用本地规则回复（网络不通时的备用）
+      const fallbackReply = this._getFallbackReply(text)
+      const newMsgs = [...msgs, {role: 'ai', content: fallbackReply}]
+      this.setData({ messages: newMsgs, loading: false })
+      
+      try {
+        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
+      } catch (e) {}
+    }
+  },
+
+  /**
+   * 网络不通时的本地降级回复
+   */
+  _getFallbackReply(text) {
+    const t = text.toLowerCase()
+    if (t.includes('名片') || t.includes('简介') || t.includes('介绍') || t.includes('文案')) {
+      return '我可以帮您生成专业的名片文案！请提供您的姓名、职位和公司信息。'
+    }
+    if (t.includes('标签') || t.includes('关键词')) {
+      return '根据您的信息，推荐以下标签方向：\n\n🏷️ 产品经理\n🏷️ 用户增长\n🏷️ 数据分析\n🏷️ 战略规划\n\n需要调整或添加其他标签吗？'
+    }
+    if (t.includes('匹配') || t.includes('合作') || t.includes('伙伴')) {
+      return '我来帮您分析合作匹配度！请告诉我您需要什么样的合作伙伴。'
+    }
+    return '🤖 您好！我是您的AI数智名片助手。我可以帮您：\n\n1. ✍️ 生成专业的自我介绍\n2. 🏷️ 智能推荐标签\n3. 📊 分析访客数据\n4. 🎯 匹配潜在合作伙伴\n\n有什么可以帮您的？'
   },
 
   goLogin() {

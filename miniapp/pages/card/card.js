@@ -1,9 +1,10 @@
 /**
  * 名片详情页
- * 展示单张名片的详细信息与统计数据
+ * 展示单张名片的详细信息与统计数据 (i18n enabled)
  */
 const { MockService } = require('../../utils/mockService')
 const { miniappApi } = require('../../utils/api')
+const i18n = require('../../utils/i18n')
 
 Page({
   data: {
@@ -11,16 +12,28 @@ Page({
     card: null,
     stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
     purposeText: '',
+    // i18n
+    _t: {},
   },
 
   onLoad(options) {
+    this._loadI18n()
     const cardId = options.id
     if (cardId) {
       this.loadCardDetail(cardId)
     } else {
-      wx.showToast({ title: '参数错误', icon: 'none' })
+      wx.showToast({ title: i18n.t('paramError'), icon: 'none' })
       setTimeout(() => wx.navigateBack(), 1500)
     }
+  },
+
+  onShow() {
+    this._loadI18n()
+  },
+
+  /** 加载国际化翻译 */
+  _loadI18n() {
+    this.setData({ _t: i18n.getTranslations() })
   },
 
   async loadCardDetail(cardId) {
@@ -50,20 +63,20 @@ Page({
         }
       }
 
-      const purposeText = {
-        partner: '寻找合作伙伴',
-        investor: '寻找投资',
-        employee: '寻找人才',
-        client: '寻找客户',
-        friend: '社交交友',
-      }[card && card.purpose] || (card && card.purpose) || ''
+      const purposeMap = {
+        partner: i18n.t('choosePartner'),
+        investor: i18n.t('chooseInvest'),
+        employee: i18n.t('chooseTalent'),
+        client: i18n.t('chooseClient'),
+        friend: i18n.t('chooseFriend'),
+      }
+      const purposeText = purposeMap[card && card.purpose] || (card && card.purpose) || ''
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
         const vStats = await MockService.getVisitorStats(cardId)
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
-        // 从推荐列表和信任网络获取匹配/信任数据
         const recommendList = Array.isArray(recommendData) ? recommendData : (recommendData?.data || [])
         stats.matches = recommendList.length || 0
         const trustData = trustNet.data || trustNet
@@ -82,56 +95,37 @@ Page({
     }
   },
 
-  // 预览
   goPreview() {
-    if (this.data.card) {
-      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${this.data.card.id}` })
+    const card = this.data.card
+    if (card) {
+      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${card.id}` })
     }
   },
 
-  // 分享
   shareCard() {
-    wx.shareAppMessage({
-      title: this.data.card?.title || 'AI数智名片',
-      path: this.data.card ? `/pages/preview/index?id=${this.data.card.id}` : '/pages/index/index',
-    })
+    const card = this.data.card
+    if (typeof wx.shareAppMessage === 'function') {
+      wx.shareAppMessage({
+        title: (card?.user_name || '') + '的AI数智名片',
+        path: card ? `/pages/brochure/preview/index?id=${card.id}` : '/pages/index/index',
+      })
+    } else {
+      wx.showToast({ title: '当前版本不支持主动分享', icon: 'none' })
+    }
   },
 
-  // 生成小程序码
   async generateQRCode() {
-    if (!this.data.card?.share_token) {
-      wx.showToast({ title: '该名片暂不支持生成二维码', icon: 'none' })
-      return
-    }
-    wx.showLoading({ title: '生成中...' })
+    const card = this.data.card
+    if (!card) return
     try {
-      const result = await miniappApi.getQRCode(this.data.card.share_token)
-      if (result && result.tempFilePath) {
-        wx.hideLoading()
-        wx.previewImage({ urls: [result.tempFilePath] })
-      } else if (result instanceof ArrayBuffer) {
-        // 如果返回二进制图片数据
-        const fs = wx.getFileSystemManager()
-        const filePath = `${wx.env.USER_DATA_PATH}/qrcode_${this.data.card.share_token}.png`
-        fs.writeFile({
-          filePath,
-          data: result,
-          encoding: 'binary',
-          success() {
-            wx.hideLoading()
-            wx.previewImage({ urls: [filePath] })
-          },
-          fail() {
-            wx.hideLoading()
-            wx.showToast({ title: '二维码生成失败', icon: 'none' })
-          },
-        })
+      const { miniappApi } = require('../../utils/api')
+      const res = await miniappApi.getQRCode(card.share_token)
+      if (res?.qrcode_url) {
+        wx.previewImage({ urls: [res.qrcode_url] })
       } else {
-        wx.hideLoading()
-        wx.showToast({ title: '二维码生成成功', icon: 'success' })
+        wx.showToast({ title: '生成失败', icon: 'none' })
       }
     } catch (err) {
-      wx.hideLoading()
       console.error('生成二维码失败:', err)
     }
   },
@@ -139,8 +133,8 @@ Page({
   onShareAppMessage() {
     const card = this.data.card
     return {
-      title: card?.title || 'AI数智名片',
-      path: card ? `/pages/preview/index?id=${card.id}` : '/pages/index/index',
+      title: (card?.user_name || '') + '的AI数智名片',
+      path: card ? `/pages/brochure/preview/index?id=${card.id}` : '/pages/index/index',
     }
   },
 })

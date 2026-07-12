@@ -6,7 +6,7 @@
   <scroll-view scroll-y class="chat-scroll" scroll-into-view="bottom">
     <view class="msg-list">
       <view class="msg {{item.role === 'user' ? 'msg-user' : 'msg-ai'}}" wx:for="{{messages}}" wx:key="index">
-        <image class="msg-avatar" wx:if="{{item.role === 'ai'}}" src="/images/ai-avatar.png" mode="aspectFill" />
+        <image class="msg-avatar" wx:if="{{item.role === 'ai'}}" src="/images/logo.png" mode="aspectFill" />
         <image class="msg-avatar" wx:if="{{item.role === 'user'}}" src="{{userAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
         <view class="msg-bubble">
           <view class="msg-content">{{item.content}}</view>

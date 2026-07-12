@@ -56,14 +56,30 @@ Page({
       if (brochure && brochure.pages) {
         this.setBrochureData(brochure.pages)
       } else {
-        this.loadMockBrochure()
+        this.tryLoadFromStorage()
       }
       wx.hideLoading()
     } catch (err) {
       wx.hideLoading()
       Logger.error('画册预览页', '加载画册失败', err)
-      this.loadMockBrochure()
+      this.tryLoadFromStorage()
     }
+  },
+
+  /** 尝试从Storage读取刚刚创建的名片，兜底防止内容不匹配 */
+  tryLoadFromStorage() {
+    try {
+      const cached = wx.getStorageSync('last_brochure')
+      if (cached && cached.pages && Array.isArray(cached.pages) && cached.pages.length > 0) {
+        Logger.info('画册预览页', '从Storage读取缓存名片', { id: cached.id, pagesCount: cached.pages.length })
+        this.setBrochureData(cached.pages)
+        return
+      }
+    } catch (e) {
+      Logger.warn('画册预览页', '读取Storage失败', e)
+    }
+    // 没有缓存数据，回退到默认Mock数据
+    this.loadMockBrochure()
   },
 
   async loadMockBrochure() {
@@ -204,6 +220,12 @@ Page({
     wx.navigateBack()
   },
 
+  goHome() {
+    wx.switchTab({
+      url: '/pages/index/index',
+    })
+  },
+
   goCreate() {
     wx.navigateTo({ url: '/pages/brochure/create/index' })
   },
@@ -225,7 +247,11 @@ Page({
       itemList: ['分享给朋友', '生成海报', '复制链接'],
       success: (res) => {
         if (res.tapIndex === 0) {
-          wx.shareAppMessage()
+          if (typeof wx.shareAppMessage === 'function') {
+            wx.shareAppMessage()
+          } else {
+            wx.showToast({ title: '当前版本不支持主动分享', icon: 'none' })
+          }
         } else {
           wx.showToast({ title: '功能开发中', icon: 'none' })
         }

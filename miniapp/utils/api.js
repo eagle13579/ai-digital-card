@@ -35,6 +35,11 @@ const authApi = {
   getProfile() {
     return get('/api/auth/me')
   },
+
+  /** 注销账号（永久删除所有数据，不可恢复） */
+  deleteAccount() {
+    return del('/api/gdpr/account')
+  },
 }
 
 // ===== 小程序专用模块 (mini app) =====
@@ -63,6 +68,10 @@ const userApi = {
   },
   getUser(userId) {
     return get(`/api/users/${userId}`)
+  },
+  /** 搜索用户（关键词+行业+地区筛选，分页） */
+  search(params) {
+    return get('/api/users/search/list', params)
   },
 }
 
@@ -129,6 +138,9 @@ const trustApi = {
   getNetwork() {
     return get('/api/trust/network')
   },
+  getNetworkByUserId(userId) {
+    return get(`/api/trust/network/${userId}`)
+  },
   addTrust(data) {
     return post('/api/trust/network', data)
   },
@@ -164,6 +176,219 @@ const aiApi = {
   generate(data) {
     return post('/api/ai/generate', data)
   },
+  /** AI智能对话 — 发送消息，获取AI回复 */
+  chat(message, history = []) {
+    return post('/api/ai/chat', { message, history })
+  },
+}
+
+// ===== 支付模块 =====
+const paymentApi = {
+  /** 获取商品/定价列表 */
+  getProducts() {
+    return get('/api/payment/products')
+  },
+  /** 创建支付订单（微信小程序内支付） */
+  createOrder(tier, channel = 'wechat', openid = '') {
+    return post('/api/payment/create', { tier, channel, openid })
+  },
+  /** 查询订单状态 */
+  queryOrder(orderNo) {
+    return get(`/api/payment/query/${orderNo}`)
+  },
+  /** 获取当前用户订单列表 */
+  listOrders() {
+    return get('/api/payment/orders')
+  },
+  /** 获取当前用户的订阅信息 */
+  getCurrentSubscription() {
+    return get('/api/subscription/current')
+  },
+}
+
+// ===== 平台/组织管理模块 =====
+const platformApi = {
+  list(keyword, skip, limit) {
+    return get('/api/business-card/platforms', { keyword, skip, limit })
+  },
+  getById(platformId) {
+    return get(`/api/business-card/platforms/${platformId}`)
+  },
+  update(platformId, data) {
+    return put(`/api/business-card/platforms/${platformId}`, data)
+  },
+  getMembers(platformId) {
+    return get(`/api/business-card/platforms/${platformId}/members`)
+  },
+  join(platformId) {
+    return post(`/api/business-card/platforms/${platformId}/join`)
+  },
+  getReport(platformId) {
+    return get(`/api/business-card/platforms/${platformId}/report`)
+  },
+}
+
+// ===== 建联/社交关系模块 =====
+const connectionApi = {
+  request(targetUserId, message = '', source = 'platform') {
+    return post('/api/business-card/connections/request', { target_user_id: targetUserId, message, source })
+  },
+  review(connectionId, approved) {
+    return put(`/api/business-card/connections/${connectionId}/review`, { approved })
+  },
+  list(status) {
+    const params = status ? { status } : {}
+    return get('/api/business-card/connections', params)
+  },
+  listPending() {
+    return get('/api/business-card/connections/pending')
+  },
+  findPath(targetUserId) {
+    return get(`/api/business-card/connections/path/${targetUserId}`)
+  },
+}
+
+// ===== 消息模块 =====
+const messageApi = {
+  /** 获取会话列表 */
+  listConversations() {
+    return get('/api/messages')
+  },
+  /** 获取某个会话的消息（分页） */
+  getMessages(conversationId, page = 1, pageSize = 50) {
+    return get(`/api/messages/${conversationId}`, { page, page_size: pageSize })
+  },
+  /** 发送消息 */
+  sendMessage(receiverId, content) {
+    return post('/api/messages', { receiver_id: receiverId, content })
+  },
+  /** 标记会话消息已读 */
+  markAsRead(conversationId) {
+    return post(`/api/messages/${conversationId}/read`)
+  },
+  /** 获取未读消息数 */
+  getUnreadCount() {
+    return get('/api/messages/unread/count')
+  },
+}
+
+// ===== OCR扫描模块 =====
+const ocrApi = {
+  /** 扫描名片图片，返回结构化信息 */
+  scan(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: `${getApiBaseUrl()}/api/ocr/scan`,
+        filePath,
+        name: 'file',
+        header: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+        success(res) {
+          try {
+            const body = JSON.parse(res.data)
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              resolve(body)
+            } else {
+              reject(body)
+            }
+          } catch (e) {
+            reject({ message: '解析响应失败' })
+          }
+        },
+        fail(err) {
+          reject(err)
+        },
+      })
+    })
+  },
+}
+
+/** 获取 API base URL */
+function getApiBaseUrl() {
+  const store = require('./store')
+  const state = store.getState()
+  return state.apiBaseUrl || 'http://192.168.7.48:8201'
+}
+
+/** 获取 token */
+function getToken() {
+  const store = require('./store')
+  const state = store.getState()
+  return state.token || ''
+}
+
+// ===== 团队管理模块 =====
+const teamApi = {
+  /** 创建团队 */
+  create(data) {
+    return post('/api/teams', data)
+  },
+  /** 获取当前用户加入的所有团队 */
+  list() {
+    return get('/api/teams')
+  },
+  /** 获取团队详情 */
+  getById(teamId) {
+    return get(`/api/teams/${teamId}`)
+  },
+  /** 更新团队信息 */
+  update(teamId, data) {
+    return put(`/api/teams/${teamId}`, data)
+  },
+  /** 删除团队 */
+  remove(teamId) {
+    return del(`/api/teams/${teamId}`)
+  },
+  /** 获取团队成员列表 */
+  getMembers(teamId) {
+    return get(`/api/teams/${teamId}/members`)
+  },
+  /** 更新成员角色 */
+  updateMemberRole(teamId, userId, role) {
+    return put(`/api/teams/${teamId}/members/${userId}/role`, { role })
+  },
+  /** 更新成员职位 */
+  updateMemberTitle(teamId, userId, titleInTeam) {
+    return put(`/api/teams/${teamId}/members/${userId}/title`, { title_in_team: titleInTeam })
+  },
+  /** 移除成员 */
+  removeMember(teamId, userId) {
+    return del(`/api/teams/${teamId}/members/${userId}`)
+  },
+  /** 邀请成员 */
+  inviteMember(teamId, data) {
+    return post(`/api/teams/${teamId}/invites`, data)
+  },
+  /** 获取团队邀请列表 */
+  getInvites(teamId) {
+    return get(`/api/teams/${teamId}/invites`)
+  },
+  /** 取消邀请 */
+  cancelInvite(teamId, inviteId) {
+    return del(`/api/teams/${teamId}/invites/${inviteId}`)
+  },
+  /** 接受邀请 */
+  acceptInvite(token) {
+    return post(`/api/teams/invites/${token}/accept`)
+  },
+  /** 拒绝邀请 */
+  declineInvite(token) {
+    return post(`/api/teams/invites/${token}/decline`)
+  },
+  /** 提交审批请求 */
+  createApprovalRequest(teamId, data) {
+    return post(`/api/teams/${teamId}/approval-requests`, data)
+  },
+  /** 查看团队的审批请求列表 */
+  listApprovalRequests(teamId, status) {
+    const params = status ? { status } : {}
+    return get(`/api/teams/${teamId}/approval-requests`, params)
+  },
+  /** 审批请求 */
+  reviewApprovalRequest(teamId, reqId, data) {
+    return put(`/api/teams/${teamId}/approval-requests/${reqId}`, data)
+  },
 }
 
 module.exports = {
@@ -176,4 +401,10 @@ module.exports = {
   trustApi,
   visitorApi,
   aiApi,
+  paymentApi,
+  platformApi,
+  connectionApi,
+  messageApi,
+  ocrApi,
+  teamApi,
 }

@@ -1,272 +1,355 @@
-<scroll-view class="page-scroll" scroll-y>
-  <view class="form-container">
+<!-- 画册创建 - 表单Stepper 4步引导 -->
+<view class="page-wrap">
+
+  <!-- ====== 顶部步骤指示器 ====== -->
+  <view class="stepper-header">
+    <view class="stepper-progress">
+      <view
+        wx:for="{{4}}"
+        wx:for-index="idx"
+        wx:key="idx"
+        class="step-dot {{idx+1 < currentStep ? 'completed' : ''}} {{idx+1 === currentStep ? 'active' : ''}}"
+        data-step="{{idx+1}}"
+        bindtap="goToStep"
+      >
+        <view class="dot-inner">
+          <text wx:if="{{idx+1 < currentStep}}" class="dot-check">✓</text>
+          <text wx:elif="{{idx+1 === currentStep}}" class="dot-num">{{idx+1}}</text>
+          <text wx:else class="dot-num">{{idx+1}}</text>
+        </view>
+      </view>
+      <view class="step-line" wx:for="{{3}}" wx:for-index="idx" wx:key="idx">
+        <view class="step-line-fill {{idx+1 < currentStep ? 'filled' : ''}}"></view>
+      </view>
+    </view>
+    <view class="step-labels">
+      <text class="step-label {{idx+1 === currentStep ? 'active' : ''}}" wx:for="{{4}}" wx:for-index="idx" wx:key="idx" data-step="{{idx+1}}" bindtap="goToStep">
+        <text wx:if="{{idx===0}}">基本信息</text>
+        <text wx:elif="{{idx===1}}">专业信息</text>
+        <text wx:elif="{{idx===2}}">公司信息</text>
+        <text wx:else>预览发布</text>
+      </text>
+    </view>
+  </view>
+
+  <!-- ====== Step 1: 基本信息 ====== -->
+  <view wx:if="{{currentStep === 1}}" class="step-content">
     <view class="section-card">
       <view class="section-header">
         <view class="section-icon-wrap">
           <text class="section-icon">👤</text>
         </view>
-        <text class="section-title">个人身份信息</text>
+        <text class="section-title">个人基本信息</text>
+        <text class="section-badge">必填</text>
       </view>
       <view class="form-content">
-
-        <!-- 4个必填字段 - 始终显示 -->
-        <view class="form-row">
-          <view class="form-item flex-1">
-            <text class="form-label">姓名<text class="required">*</text></text>
-            <input class="form-input" placeholder="请输入姓名" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+        <!-- 头像 -->
+        <view class="avatar-upload" bindtap="chooseAvatar">
+          <image wx:if="{{formData.avatar}}" src="{{formData.avatar}}" mode="aspectFill" />
+          <view wx:else class="avatar-placeholder">
+            <text class="avatar-icon">📷</text>
+            <text class="avatar-text">上传头像</text>
           </view>
-          <view class="form-item flex-1">
+        </view>
+
+        <!-- 姓名 -->
+        <view class="form-item {{stepErrors[1].name ? 'has-error' : ''}}">
+          <text class="form-label">姓名<text class="required">*</text></text>
+          <input class="form-input" placeholder="请输入姓名" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+          <text wx:if="{{stepErrors[1].name}}" class="error-text">{{stepErrors[1].name}}</text>
+        </view>
+
+        <!-- 职位 + 公司 -->
+        <view class="form-row">
+          <view class="form-item flex-1 {{stepErrors[1].title ? 'has-error' : ''}}">
             <text class="form-label">职位<text class="required">*</text></text>
             <input class="form-input" placeholder="请输入职位" value="{{formData.title}}" bindinput="onInput" data-field="title" />
+            <text wx:if="{{stepErrors[1].title}}" class="error-text">{{stepErrors[1].title}}</text>
+          </view>
+          <view class="form-item flex-1 {{stepErrors[1].company ? 'has-error' : ''}}">
+            <text class="form-label">公司<text class="required">*</text></text>
+            <input class="form-input" placeholder="请输入公司名称" value="{{formData.company}}" bindinput="onInput" data-field="company" />
+            <text wx:if="{{stepErrors[1].company}}" class="error-text">{{stepErrors[1].company}}</text>
           </view>
         </view>
 
+        <!-- 邮箱 -->
+        <view class="form-item {{stepErrors[1].email ? 'has-error' : ''}}">
+          <text class="form-label">邮箱<text class="required">*</text></text>
+          <input class="form-input" placeholder="请输入邮箱" value="{{formData.email}}" bindinput="onInput" data-field="email" type="email" />
+          <text wx:if="{{stepErrors[1].email}}" class="error-text">{{stepErrors[1].email}}</text>
+        </view>
+
+        <!-- 手机号 + 微信号 -->
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">手机号码</text>
+            <input class="form-input" placeholder="请输入手机号" value="{{formData.phone}}" bindinput="onInput" data-field="phone" type="number" />
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">微信号</text>
+            <input class="form-input" placeholder="请输入微信号" value="{{formData.wechat}}" bindinput="onInput" data-field="wechat" />
+          </view>
+        </view>
+
+        <!-- 教育信息 -->
+        <view class="more-divider"></view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">学校</text>
+            <input class="form-input" placeholder="请输入毕业院校" value="{{formData.school}}" bindinput="onInput" data-field="school" />
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">专业</text>
+            <input class="form-input" placeholder="请输入所学专业" value="{{formData.major}}" bindinput="onInput" data-field="major" />
+          </view>
+        </view>
         <view class="form-item">
-          <text class="form-label">公司名称<text class="required">*</text></text>
-          <input class="form-input" placeholder="请输入公司名称" value="{{formData.company}}" bindinput="onInput" data-field="company" />
-        </view>
-
-        <view class="form-item">
-          <text class="form-label">手机号码</text>
-          <input class="form-input" placeholder="请输入手机号" value="{{formData.phone}}" bindinput="onInput" data-field="phone" type="number" />
-        </view>
-
-        <!-- 更多信息 - 可折叠 -->
-        <view wx:if="{{showMoreInfo}}">
-          <view class="more-divider"></view>
-
-          <view class="avatar-upload" bindtap="chooseAvatar">
-            <image wx:if="{{formData.avatar}}" src="{{formData.avatar}}" mode="aspectFill" />
-            <view wx:else class="avatar-placeholder">
-              <text class="avatar-icon">📷</text>
-              <text class="avatar-text">上传头像</text>
-            </view>
-          </view>
-
-          <view class="form-row">
-            <view class="form-item flex-1">
-              <text class="form-label">邮箱</text>
-              <input class="form-input" placeholder="请输入邮箱" value="{{formData.email}}" bindinput="onInput" data-field="email" type="email" />
-            </view>
-            <view class="form-item flex-1">
-              <text class="form-label">微信号</text>
-              <input class="form-input" placeholder="请输入微信号" value="{{formData.wechat}}" bindinput="onInput" data-field="wechat" />
-            </view>
-          </view>
-
-          <view class="form-row">
-            <view class="form-item flex-1">
-              <text class="form-label">学校</text>
-              <input class="form-input" placeholder="请输入毕业院校" value="{{formData.school}}" bindinput="onInput" data-field="school" />
-            </view>
-            <view class="form-item flex-1">
-              <text class="form-label">专业</text>
-              <input class="form-input" placeholder="请输入所学专业" value="{{formData.major}}" bindinput="onInput" data-field="major" />
-            </view>
-          </view>
-
-          <view class="form-row">
-            <view class="form-item flex-1">
-              <text class="form-label">学历</text>
-              <input class="form-input" placeholder="如：本科、硕士、博士" value="{{formData.education}}" bindinput="onInput" data-field="education" />
-            </view>
-            <view class="form-item flex-1">
-              <text class="form-label">技能标签</text>
-              <input class="form-input" placeholder="多个技能用逗号分隔" value="{{formData.skillTags && formData.skillTags.join(',')}}" bindinput="onSkillTagsInput" data-field="skillTags" />
-            </view>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">个人简介<text class="required">*</text></text>
-            <textarea class="form-textarea" placeholder="请简要介绍您自己（50-200字）" value="{{formData.bio}}" bindinput="onInput" data-field="bio" maxlength="200" />
-            <text class="char-count">{{formData.bio ? formData.bio.length : 0}}/200</text>
-          </view>
-        </view>
-
-        <!-- 更多信息折叠按钮 -->
-        <view class="more-toggle" bindtap="toggleMoreInfo">
-          <text class="more-toggle-text">{{showMoreInfo ? '收起更多信息' : '更多信息'}}</text>
-          <text class="more-toggle-icon">{{showMoreInfo ? '▲' : '▼'}}</text>
-        </view>
-
-      </view>
-    </view>
-
-    <!-- 折叠区域：资源供需信息、公司介绍、产品案例、画册风格 -->
-    <view wx:if="{{showMoreInfo}}">
-
-      <view class="section-card">
-        <view class="section-header">
-          <view class="section-icon-wrap">
-            <text class="section-icon">💎</text>
-          </view>
-          <text class="section-title">资源供需信息</text>
-        </view>
-        <view class="form-content">
-          <view class="form-item">
-            <text class="form-label">我能提供的资源</text>
-            <view class="resource-input-row">
-              <input class="form-input resource-input" placeholder="输入资源后点击添加" value="{{formData.newProvide}}" bindinput="onInput" data-field="newProvide" />
-              <button class="btn-add" bindtap="addProvide">添加</button>
-            </view>
-            <view class="tags-list" wx:if="{{formData.provides && formData.provides.length > 0}}">
-              <view wx:for="{{formData.provides}}" wx:key="index" class="tag-item provides-tag">
-                <text class="tag-text">{{item}}</text>
-                <text class="tag-close" bindtap="removeProvide" data-index="{{index}}">×</text>
-              </view>
-            </view>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">我想要的资源</text>
-            <view class="resource-input-row">
-              <input class="form-input resource-input" placeholder="输入需求后点击添加" value="{{formData.newNeed}}" bindinput="onInput" data-field="newNeed" />
-              <button class="btn-add" bindtap="addNeed">添加</button>
-            </view>
-            <view class="tags-list" wx:if="{{formData.needs && formData.needs.length > 0}}">
-              <view wx:for="{{formData.needs}}" wx:key="index" class="tag-item needs-tag">
-                <text class="tag-text">{{item}}</text>
-                <text class="tag-close" bindtap="removeNeed" data-index="{{index}}">×</text>
-              </view>
-            </view>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">合作意向</text>
-            <view class="purpose-options">
-              <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purpose === item.value ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
-                <text class="purpose-icon">{{item.icon}}</text>
-                <text class="purpose-label">{{item.label}}</text>
-              </view>
-            </view>
-          </view>
+          <text class="form-label">学历</text>
+          <input class="form-input" placeholder="如：本科、硕士、博士" value="{{formData.education}}" bindinput="onInput" data-field="education" />
         </view>
       </view>
-
-      <view class="section-card">
-        <view class="section-header">
-          <view class="section-icon-wrap">
-            <text class="section-icon">🏢</text>
-          </view>
-          <text class="section-title">公司介绍</text>
-        </view>
-        <view class="form-content">
-          <view class="form-row">
-            <view class="form-item flex-1">
-              <text class="form-label">公司名称</text>
-              <input class="form-input" placeholder="如未填写则使用个人信息中的公司" value="{{formData.companyName}}" bindinput="onInput" data-field="companyName" />
-            </view>
-            <view class="form-item flex-1">
-              <text class="form-label">行业</text>
-              <input class="form-input" placeholder="如：互联网、金融" value="{{formData.industry}}" bindinput="onInput" data-field="industry" />
-            </view>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">公司规模</text>
-            <view class="form-input picker-input" bindtap="showSizePicker">
-              <text>{{formData.companySize || '请选择公司规模'}}</text>
-              <text class="picker-arrow">›</text>
-            </view>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">公司简介</text>
-            <textarea class="form-textarea" placeholder="请简要介绍公司（100-500字）" value="{{formData.companyDesc}}" bindinput="onInput" data-field="companyDesc" maxlength="500" />
-            <text class="char-count">{{formData.companyDesc ? formData.companyDesc.length : 0}}/500</text>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">发展历程</text>
-            <textarea class="form-textarea" placeholder="请描述公司重要里程碑（每行一个）" value="{{formData.development}}" bindinput="onInput" data-field="development" maxlength="300" />
-            <text class="char-count">{{formData.development ? formData.development.length : 0}}/300</text>
-          </view>
-
-          <view class="form-item">
-            <text class="form-label">公司宣传图片（最多3张）</text>
-            <view class="images-grid">
-              <view wx:for="{{formData.companyImages || []}}" wx:key="index" class="image-item" bindtap="previewImage" data-url="{{item}}">
-                <image src="{{item}}" mode="aspectFill" />
-                <text class="image-remove" bindtap="removeCompanyImage" data-index="{{index}}">×</text>
-              </view>
-              <view wx:if="{{(!formData.companyImages || formData.companyImages.length < 3)}}" class="image-add" bindtap="chooseCompanyImage">
-                <text class="image-add-icon">+</text>
-                <text class="image-add-text">添加图片</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <view class="section-card">
-        <view class="section-header">
-          <view class="section-icon-wrap">
-            <text class="section-icon">💼</text>
-          </view>
-          <text class="section-title">产品案例</text>
-        </view>
-        <view class="form-content">
-          <view class="case-list">
-            <view class="case-item" wx:for="{{formData.cases}}" wx:key="index">
-              <view class="case-header">
-                <text class="case-title">案例 {{index + 1}}</text>
-                <text class="case-delete" bindtap="deleteCase" data-index="{{index}}">删除</text>
-              </view>
-              <view class="form-item">
-                <text class="form-label">案例名称</text>
-                <input class="form-input" placeholder="请输入案例名称" value="{{item.name}}" bindinput="onCaseInput" data-case-index="{{index}}" data-field="name" />
-              </view>
-              <view class="form-row">
-                <view class="form-item flex-1">
-                  <text class="form-label">项目时间</text>
-                  <input class="form-input" placeholder="如：2024年" value="{{item.date}}" bindinput="onCaseInput" data-case-index="{{index}}" data-field="date" />
-                </view>
-              </view>
-              <view class="form-item">
-                <text class="form-label">案例描述</text>
-                <textarea class="form-textarea" placeholder="请描述案例背景、目标和成果" value="{{item.desc}}" bindinput="onCaseInput" data-case-index="{{index}}" data-field="desc" maxlength="300" />
-              </view>
-              <view class="form-item">
-                <text class="form-label">案例图片（最多3张）</text>
-                <view class="images-grid">
-                  <view wx:for="{{item.images || []}}" wx:key="idx" class="image-item" bindtap="previewImage" data-url="{{item}}">
-                    <image src="{{item}}" mode="aspectFill" />
-                    <text class="image-remove" bindtap="removeCaseImage" data-case-index="{{index}}" data-image-index="{{idx}}">×</text>
-                  </view>
-                  <view wx:if="{{(!item.images || item.images.length < 3)}}" class="image-add" bindtap="chooseCaseImage" data-case-index="{{index}}">
-                    <text class="image-add-icon">+</text>
-                    <text class="image-add-text">添加图片</text>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </view>
-          <button class="btn-outline btn-add-case" bindtap="addCase">+ 添加案例</button>
-        </view>
-      </view>
-
-      <view class="section-card">
-        <view class="section-header">
-          <view class="section-icon-wrap">
-            <text class="section-icon">🎨</text>
-          </view>
-          <text class="section-title">画册风格</text>
-        </view>
-        <view class="form-content">
-          <view class="style-options">
-            <view wx:for="{{styleOptions}}" wx:key="value" class="style-option {{formData.style === item.value ? 'active' : ''}}" bindtap="selectStyle" data-value="{{item.value}}">
-              <view class="style-preview" style="background: {{item.preview}}"></view>
-              <text class="style-name">{{item.name}}</text>
-              <text class="style-desc">{{item.desc}}</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-    </view>
-
-    <view class="submit-area">
-      <button class="btn-submit" bindtap="submitForm">生成AI数智名片</button>
     </view>
   </view>
-</scroll-view>
+
+  <!-- ====== Step 2: 专业信息 ====== -->
+  <view wx:if="{{currentStep === 2}}" class="step-content">
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">💡</text>
+        </view>
+        <text class="section-title">专业技能与合作意向</text>
+      </view>
+      <view class="form-content">
+        <!-- 技能标签 -->
+        <view class="form-item">
+          <text class="form-label">技能标签</text>
+          <input class="form-input" placeholder="多个技能用逗号分隔" value="{{formData.skillTags && formData.skillTags.join(',')}}" bindinput="onSkillTagsInput" data-field="skillTags" />
+          <view class="tags-list" wx:if="{{formData.skillTags && formData.skillTags.length > 0}}">
+            <view wx:for="{{formData.skillTags}}" wx:key="index" class="tag-item skill-tag">
+              <text class="tag-text">{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 个人简介 -->
+        <view class="form-item {{stepErrors[2].bio ? 'has-error' : ''}}">
+          <text class="form-label">个人简介</text>
+          <textarea class="form-textarea" placeholder="请简要介绍您自己（10-200字）" value="{{formData.bio}}" bindinput="onInput" data-field="bio" maxlength="200" />
+          <text class="char-count">{{formData.bio ? formData.bio.length : 0}}/200</text>
+          <text wx:if="{{stepErrors[2].bio}}" class="error-text">{{stepErrors[2].bio}}</text>
+        </view>
+
+        <!-- 我能提供的资源 -->
+        <view class="form-item">
+          <text class="form-label">我能提供的资源</text>
+          <view class="resource-input-row">
+            <input class="form-input resource-input" placeholder="输入资源后点击添加" value="{{formData.newProvide}}" bindinput="onInput" data-field="newProvide" />
+            <button class="btn-add" bindtap="addProvide">添加</button>
+          </view>
+          <view class="tags-list" wx:if="{{formData.provides && formData.provides.length > 0}}">
+            <view wx:for="{{formData.provides}}" wx:key="index" class="tag-item provides-tag">
+              <text class="tag-text">{{item}}</text>
+              <text class="tag-close" bindtap="removeProvide" data-index="{{index}}">×</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 我想要的资源 -->
+        <view class="form-item">
+          <text class="form-label">我想要的资源</text>
+          <view class="resource-input-row">
+            <input class="form-input resource-input" placeholder="输入需求后点击添加" value="{{formData.newNeed}}" bindinput="onInput" data-field="newNeed" />
+            <button class="btn-add" bindtap="addNeed">添加</button>
+          </view>
+          <view class="tags-list" wx:if="{{formData.needs && formData.needs.length > 0}}">
+            <view wx:for="{{formData.needs}}" wx:key="index" class="tag-item needs-tag">
+              <text class="tag-text">{{item}}</text>
+              <text class="tag-close" bindtap="removeNeed" data-index="{{index}}">×</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 合作意向 -->
+        <view class="form-item">
+          <text class="form-label">合作意向</text>
+          <view class="purpose-options">
+            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purpose === item.value ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
+              <text class="purpose-icon">{{item.icon}}</text>
+              <text class="purpose-label">{{item.label}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== Step 3: 公司信息（含行业模板） ====== -->
+  <view wx:if="{{currentStep === 3}}" class="step-content">
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">🏢</text>
+        </view>
+        <text class="section-title">公司信息</text>
+      </view>
+      <view class="form-content">
+        <!-- 行业选择 -->
+        <view class="form-item">
+          <text class="form-label">行业领域</text>
+          <view class="industry-options">
+            <view wx:for="{{industryOptions}}" wx:key="value" class="industry-option {{formData.industry === item.value ? 'active' : ''}}" bindtap="selectIndustry" data-value="{{item.value}}">
+              <text class="industry-icon">{{item.icon}}</text>
+              <text class="industry-label">{{item.label}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 行业模板扩展字段 -->
+        <view wx:if="{{templateExtraFields && templateExtraFields.length > 0}}" class="template-section">
+          <view class="template-divider"></view>
+          <view class="template-header">
+            <text class="template-title">📋 {{currentTemplate && currentTemplate.label}}行业专属信息</text>
+          </view>
+          <view wx:for="{{templateExtraFields}}" wx:for-item="field" wx:key="field.key">
+            <view class="form-item">
+              <text class="form-label">{{field.label}}</text>
+              <input wx:if="{{field.type === 'text'}}" class="form-input" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" />
+              <textarea wx:if="{{field.type === 'textarea'}}" class="form-textarea" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" maxlength="500" />
+            </view>
+          </view>
+        </view>
+
+        <!-- 公司规模 -->
+        <view class="form-item">
+          <text class="form-label">公司规模</text>
+          <view class="form-input picker-input" bindtap="showSizePicker">
+            <text>{{formData.companySize || '请选择公司规模'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </view>
+
+        <!-- 公司简介 -->
+        <view class="form-item">
+          <text class="form-label">公司简介</text>
+          <textarea class="form-textarea" placeholder="请简要介绍公司（100-500字）" value="{{formData.companyDesc}}" bindinput="onInput" data-field="companyDesc" maxlength="500" />
+          <text class="char-count">{{formData.companyDesc ? formData.companyDesc.length : 0}}/500</text>
+        </view>
+
+        <!-- 发展历程 -->
+        <view class="form-item">
+          <text class="form-label">发展历程</text>
+          <textarea class="form-textarea" placeholder="请描述公司重要里程碑（每行一个）" value="{{formData.development}}" bindinput="onInput" data-field="development" maxlength="300" />
+          <text class="char-count">{{formData.development ? formData.development.length : 0}}/300</text>
+        </view>
+
+        <!-- 公司宣传图片 -->
+        <view class="form-item">
+          <text class="form-label">公司宣传图片（最多3张）</text>
+          <view class="images-grid">
+            <view wx:for="{{formData.companyImages || []}}" wx:key="index" class="image-item" bindtap="previewImage" data-url="{{item}}">
+              <image src="{{item}}" mode="aspectFill" />
+              <text class="image-remove" bindtap="removeCompanyImage" data-index="{{index}}">×</text>
+            </view>
+            <view wx:if="{{(!formData.companyImages || formData.companyImages.length < 3)}}" class="image-add" bindtap="chooseCompanyImage">
+              <text class="image-add-icon">+</text>
+              <text class="image-add-text">添加图片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== Step 4: 预览发布 ====== -->
+  <view wx:if="{{currentStep === 4}}" class="step-content">
+    <!-- 预览卡片 -->
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">🎨</text>
+        </view>
+        <text class="section-title">选择画册风格</text>
+      </view>
+      <view class="form-content">
+        <view class="style-options">
+          <view wx:for="{{styleOptions}}" wx:key="value" class="style-option {{formData.style === item.value ? 'active' : ''}}" bindtap="selectStyle" data-value="{{item.value}}">
+            <view class="style-preview" style="background: {{item.preview}}"></view>
+            <text class="style-name">{{item.name}}</text>
+            <text class="style-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 预览信息摘要 -->
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-icon-wrap">
+          <text class="section-icon">📄</text>
+        </view>
+        <text class="section-title">内容预览</text>
+      </view>
+      <view class="form-content">
+        <view class="preview-summary">
+          <view class="preview-row">
+            <text class="preview-label">👤 姓名</text>
+            <text class="preview-value">{{formData.name || '未填写'}}</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">💼 职位</text>
+            <text class="preview-value">{{formData.title || '未填写'}}</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">🏢 公司</text>
+            <text class="preview-value">{{formData.company || '未填写'}}</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">📧 邮箱</text>
+            <text class="preview-value">{{formData.email || '未填写'}}</text>
+          </view>
+          <view class="preview-row" wx:if="{{formData.industry}}">
+            <text class="preview-label">🏷️ 行业</text>
+            <text class="preview-value">{{formData.industry}}</text>
+          </view>
+          <view class="preview-row" wx:if="{{formData.skillTags && formData.skillTags.length > 0}}">
+            <text class="preview-label">🏷️ 标签</text>
+            <view class="preview-tags">
+              <text class="mini-tag" wx:for="{{formData.skillTags}}" wx:key="index">{{item}}</text>
+            </view>
+          </view>
+          <view class="preview-row" wx:if="{{formData.companySize}}">
+            <text class="preview-label">📊 规模</text>
+            <text class="preview-value">{{formData.companySize}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 底部操作按钮 ====== -->
+  <view class="bottom-actions">
+    <button
+      wx:if="{{currentStep > 1}}"
+      class="btn-prev"
+      bindtap="goPrevStep"
+    >上一步</button>
+    <button
+      wx:if="{{currentStep < totalSteps}}"
+      class="btn-next"
+      bindtap="goNextStep"
+    >下一步</button>
+    <button
+      wx:if="{{currentStep === totalSteps}}"
+      class="btn-submit"
+      bindtap="submitForm"
+    >发布名片</button>
+  </view>
+
+  <!-- 草稿保存状态 -->
+  <view class="draft-status" wx:if="{{draftSaved}}">
+    <text class="draft-icon">💾</text>
+    <text class="draft-text">草稿已自动保存</text>
+  </view>
+</view>
