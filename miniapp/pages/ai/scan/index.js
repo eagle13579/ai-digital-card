@@ -64,10 +64,10 @@ Page({
   },
 
   checkLoginAndLimit() {
-    const app = getApp()
-    const state = app.getState()
+    const store = require('../../utils/store')
+    const state = store.getState()
     if (!state.token) {
-      app.checkLogin()
+      getApp().checkLogin()
       return false
     }
 

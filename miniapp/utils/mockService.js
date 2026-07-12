@@ -12,7 +12,7 @@ const { Logger } = require('./util')
 const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi } = require('./api')
 
 const MockService = {
-  USE_MOCK: false,
+  USE_MOCK: true,
 
   async mockDelay(min = 500, max = 1500) {
     return new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))

@@ -1,8 +1,9 @@
 const MockService = require('../../../utils/mockService')
+const CHAT_STORAGE_KEY = 'ai_chat_messages'
 
 Page({
   data: {
-    messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}],
+    messages: [],
     inputValue: '',
     loading: false,
     userAvatar: '',
@@ -11,6 +12,22 @@ Page({
   },
 
   async onLoad() {
+    // 恢复聊天记录
+    try {
+      const saved = wx.getStorageSync(CHAT_STORAGE_KEY)
+      if (saved && saved.length > 0) {
+        this.setData({ messages: saved })
+      } else {
+        this.setData({
+          messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
+        })
+      }
+    } catch (e) {
+      this.setData({
+        messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
+      })
+    }
+
     const app = getApp()
     const isLoggedIn = app.isLoggedIn()
     
@@ -25,6 +42,15 @@ Page({
       }
     } else {
       this.setData({ userAvatar: '', isLoggedIn })
+    }
+  },
+
+  onUnload() {
+    // 持久化聊天记录
+    try {
+      wx.setStorageSync(CHAT_STORAGE_KEY, this.data.messages)
+    } catch (e) {
+      // ignore storage error
     }
   },
 
@@ -47,11 +73,33 @@ Page({
     const msgs = [...this.data.messages, {role:'user',content:text}]
     this.setData({ messages: msgs, inputValue: '', loading: true })
     setTimeout(() => {
-      this.setData({ messages: [...msgs, {role:'ai',content:'你好！我是AI数智名片助手。我可以帮你生成名片文案、分析匹配度或回答相关问题。请告诉我你的需求。'}], loading: false })
+      const newMsgs = [...msgs, {role:'ai',content:'你好！我是AI数智名片助手。我可以帮你生成名片文案、分析匹配度或回答相关问题。请告诉我你的需求。'}]
+      this.setData({ messages: newMsgs, loading: false })
+      // 每次发送后自动持久化
+      try {
+        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
+      } catch (e) {}
     }, 800)
   },
 
   goLogin() {
     wx.navigateTo({ url: '/pages/login/index' })
+  },
+
+  clearChat() {
+    wx.showModal({
+      title: '清空聊天记录',
+      content: '确定要清空所有聊天记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          const defaultMsg = [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
+          this.setData({ messages: defaultMsg })
+          try {
+            wx.setStorageSync(CHAT_STORAGE_KEY, defaultMsg)
+          } catch (e) {}
+          wx.showToast({ title: '已清空', icon: 'success' })
+        }
+      }
+    })
   },
 })

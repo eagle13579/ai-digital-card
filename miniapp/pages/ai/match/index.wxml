@@ -26,7 +26,8 @@
     </view>
   </view>
 
-  <view class="match-list" wx:if="{{filteredMatches.length > 0}}">
+  <!-- 匹配列表 -->
+  <view class="match-list" wx:if="{{!showDetail && filteredMatches.length > 0}}">
     <view class="match-item" wx:for="{{filteredMatches}}" wx:key="id" data-id="{{item.id}}" bindtap="unlock">
       <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="match-avatar" />
       <view class="match-info">
@@ -41,6 +42,28 @@
         <text class="match-score-num">{{item.matchScore}}%</text>
         <text class="match-score-label">匹配</text>
       </view>
+    </view>
+  </view>
+
+  <!-- 解锁详情 -->
+  <view class="unlock-detail" wx:if="{{showDetail && unlockedItem}}">
+    <view class="detail-header">
+      <image src="{{unlockedItem.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="detail-avatar" />
+      <text class="detail-name">{{unlockedItem.name}}</text>
+      <text class="detail-company">{{unlockedItem.company}}</text>
+      <text class="detail-title" wx:if="{{unlockedItem.title}}">{{unlockedItem.title}}</text>
+      <view class="detail-score">
+        <text class="detail-score-num">{{unlockedItem.matchScore}}%</text>
+        <text class="detail-score-label">匹配度</text>
+      </view>
+    </view>
+    <view class="detail-tags" wx:if="{{unlockedItem.tags && unlockedItem.tags.length > 0}}">
+      <text class="detail-tag" wx:for="{{unlockedItem.tags}}" wx:key="index">{{item}}</text>
+    </view>
+    <view class="detail-actions">
+      <button class="btn-exchange" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">🤝 交换名片</button>
+      <button class="btn-exchanged" wx:if="{{exchangeDone}}" disabled>✅ 已发送交换请求</button>
+      <button class="btn-back" bindtap="backToList">← 返回列表</button>
     </view>
   </view>
 

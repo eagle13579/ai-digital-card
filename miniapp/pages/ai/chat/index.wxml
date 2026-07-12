@@ -1,4 +1,8 @@
 <view class="chat-page">
+  <view class="chat-toolbar">
+    <text class="chat-toolbar-title">AI对话</text>
+    <text class="chat-toolbar-clear" bindtap="clearChat">清空记录</text>
+  </view>
   <scroll-view scroll-y class="chat-scroll" scroll-into-view="bottom">
     <view class="msg-list">
       <view class="msg {{item.role === 'user' ? 'msg-user' : 'msg-ai'}}" wx:for="{{messages}}" wx:key="index">

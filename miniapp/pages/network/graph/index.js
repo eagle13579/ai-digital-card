@@ -1,6 +1,12 @@
 const MockService = require('../../../utils/mockService')
 const { BFSFinder } = require('../../../utils/bfs')
 
+// Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
+if (typeof requestAnimationFrame === 'undefined') {
+  var requestAnimationFrame = function (cb) { return setTimeout(function () { cb(Date.now()) }, 16) }
+  var cancelAnimationFrame = function (id) { clearTimeout(id) }
+}
+
 Page({
   data: {
     nodeCount: 0,

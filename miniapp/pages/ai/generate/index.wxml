@@ -25,42 +25,42 @@
 
       <view class="form-group">
         <text class="form-label">姓名</text>
-        <input class="form-input" placeholder="请输入姓名" bindinput="onInput" data-field="name" />
+        <input class="form-input" placeholder="请输入姓名" bindinput="onInput" data-field="name" value="{{inputData.name}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">职位</text>
-        <input class="form-input" placeholder="请输入职位" bindinput="onInput" data-field="title" />
+        <input class="form-input" placeholder="请输入职位" bindinput="onInput" data-field="title" value="{{inputData.title}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">公司</text>
-        <input class="form-input" placeholder="请输入公司名称" bindinput="onInput" data-field="company" />
+        <input class="form-input" placeholder="请输入公司名称" bindinput="onInput" data-field="company" value="{{inputData.company}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">行业</text>
-        <input class="form-input" placeholder="如：互联网、金融、医疗" bindinput="onInput" data-field="industry" />
+        <input class="form-input" placeholder="如：互联网、金融、医疗" bindinput="onInput" data-field="industry" value="{{inputData.industry}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">关键词</text>
-        <input class="form-input" placeholder="核心技能或标签，逗号分隔" bindinput="onInput" data-field="keywords" />
+        <input class="form-input" placeholder="核心技能或标签，逗号分隔" bindinput="onInput" data-field="keywords" value="{{inputData.keywords}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">经验年限</text>
-        <input class="form-input" placeholder="如：5年、10年" bindinput="onInput" data-field="experience" />
+        <input class="form-input" placeholder="如：5年、10年" bindinput="onInput" data-field="experience" value="{{inputData.experience}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">主要成就</text>
-        <input class="form-input" placeholder="简要描述你的成就" bindinput="onInput" data-field="achievements" />
+        <input class="form-input" placeholder="简要描述你的成就" bindinput="onInput" data-field="achievements" value="{{inputData.achievements}}" />
       </view>
 
       <view class="form-group">
         <text class="form-label">核心技能</text>
-        <input class="form-input" placeholder="你的专业技能" bindinput="onInput" data-field="skills" />
+        <input class="form-input" placeholder="你的专业技能" bindinput="onInput" data-field="skills" value="{{inputData.skills}}" />
       </view>
     </view>
   </view>
@@ -73,11 +73,20 @@
     <view class="card-header">
       <text class="title">✨ 生成结果</text>
       <view class="card-actions">
+        <text class="char-count-badge">{{charCount}}字</text>
         <text class="action-btn" bindtap="copyResult">📋 复制</text>
       </view>
     </view>
     <view class="card-body">
       <text class="result-text">{{result}}</text>
+    </view>
+  </view>
+
+  <!-- 加载动画 -->
+  <view class="loading-overlay" wx:if="{{loading}}">
+    <view class="loading-spinner">
+      <view class="spinner"></view>
+      <text class="loading-tip">AI正在努力生成中...</text>
     </view>
   </view>
 

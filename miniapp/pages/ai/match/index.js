@@ -14,6 +14,11 @@ Page({
     selectedIndustryIndex: 0,
     selectedRegionIndex: 0,
     loading: false,
+
+    // 解锁详情
+    showDetail: false,
+    unlockedItem: null,
+    exchangeDone: false,
   },
 
   async onLoad() {
@@ -54,6 +59,29 @@ Page({
   },
 
   unlock(e) {
-    wx.showToast({ title: '解锁功能开发中', icon: 'none' })
+    const id = e.currentTarget.dataset.id
+    const item = this.data.filteredMatches.find(m => m.id === id)
+    if (!item) {
+      wx.showToast({ title: '未找到匹配用户', icon: 'none' })
+      return
+    }
+    this.setData({
+      unlockedItem: item,
+      showDetail: true,
+      exchangeDone: false,
+    })
+  },
+
+  backToList() {
+    this.setData({
+      showDetail: false,
+      unlockedItem: null,
+      exchangeDone: false,
+    })
+  },
+
+  exchangeCard() {
+    this.setData({ exchangeDone: true })
+    wx.showToast({ title: '✓ 已发送名片交换请求', icon: 'success' })
   },
 })

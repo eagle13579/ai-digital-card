@@ -3,6 +3,7 @@
  * 展示单张名片的详细信息与统计数据
  */
 const { MockService } = require('../../utils/mockService')
+const { miniappApi } = require('../../utils/api')
 
 Page({
   data: {
@@ -84,7 +85,7 @@ Page({
   // 预览
   goPreview() {
     if (this.data.card) {
-      wx.navigateTo({ url: `/pages/preview/index?id=${this.data.card.id}` })
+      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${this.data.card.id}` })
     }
   },
 

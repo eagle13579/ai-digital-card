@@ -89,8 +89,20 @@ Page({
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        this.setData({
-          'formData.avatar': res.tempFilePaths[0],
+        const tempPath = res.tempFilePaths[0]
+        wx.saveFile({
+          tempFilePath: tempPath,
+          success: (saveRes) => {
+            this.setData({
+              'formData.avatar': saveRes.savedFilePath,
+            })
+          },
+          fail: () => {
+            // fallback: use temp file path
+            this.setData({
+              'formData.avatar': tempPath,
+            })
+          },
         })
       },
     })
@@ -163,9 +175,29 @@ Page({
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        const images = [...(this.data.formData.companyImages || []), ...res.tempFilePaths]
-        this.setData({
-          'formData.companyImages': images,
+        const tempPaths = res.tempFilePaths
+        let savedCount = 0
+        const savedImages = []
+
+        tempPaths.forEach((path, idx) => {
+          wx.saveFile({
+            tempFilePath: path,
+            success: (saveRes) => {
+              savedImages[idx] = saveRes.savedFilePath
+            },
+            fail: () => {
+              savedImages[idx] = path // fallback
+            },
+            complete: () => {
+              savedCount++
+              if (savedCount === tempPaths.length) {
+                const images = [...(this.data.formData.companyImages || []), ...savedImages]
+                this.setData({
+                  'formData.companyImages': images,
+                })
+              }
+            },
+          })
         })
       },
     })
@@ -205,11 +237,31 @@ Page({
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        const cases = [...this.data.formData.cases]
-        cases[caseIndex] = cases[caseIndex] || { name: '', date: '', desc: '', images: [] }
-        cases[caseIndex].images = [...(cases[caseIndex].images || []), ...res.tempFilePaths]
-        this.setData({
-          'formData.cases': cases,
+        const tempPaths = res.tempFilePaths
+        let savedCount = 0
+        const savedImages = []
+
+        tempPaths.forEach((path, idx) => {
+          wx.saveFile({
+            tempFilePath: path,
+            success: (saveRes) => {
+              savedImages[idx] = saveRes.savedFilePath
+            },
+            fail: () => {
+              savedImages[idx] = path // fallback
+            },
+            complete: () => {
+              savedCount++
+              if (savedCount === tempPaths.length) {
+                const cases = [...this.data.formData.cases]
+                cases[caseIndex] = cases[caseIndex] || { name: '', date: '', desc: '', images: [] }
+                cases[caseIndex].images = [...(cases[caseIndex].images || []), ...savedImages]
+                this.setData({
+                  'formData.cases': cases,
+                })
+              }
+            },
+          })
         })
       },
     })
