@@ -88,6 +88,116 @@ def _is_paid_member(user: User) -> bool:
     return False
 
 
+@router.get("/recommend")
+async def get_match_recommend(
+    page: int = Query(1, ge=1, description="页码"),
+    size: int = Query(10, ge=1, le=50, description="每页数量"),
+    min_score: float = Query(0.3, description="最低匹配分数"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """获取匹配推荐（支持分页），基于标签供需关系计算用户匹配度"""
+    # 获取当前用户的 provide 和 need 标签
+    result = await db.execute(
+        select(UserTag).where(
+            UserTag.user_id == current_user.id,
+            UserTag.tag_type == "provide",
+        )
+    )
+    my_provide = result.scalars().all()
+    result = await db.execute(
+        select(UserTag).where(
+            UserTag.user_id == current_user.id,
+            UserTag.tag_type == "need",
+        )
+    )
+    my_need = result.scalars().all()
+
+    my_provide_map = {t.tag: t.weight for t in my_provide}
+    my_need_map = {t.tag: t.weight for t in my_need}
+
+    # 获取所有其他用户
+    result = await db.execute(select(User).where(User.id != current_user.id))
+    other_users = result.scalars().all()
+    matches = []
+    viewer_is_free = not _is_paid_member(current_user)
+
+    for other in other_users:
+        result = await db.execute(select(UserTag).where(UserTag.user_id == other.id))
+        other_tags = result.scalars().all()
+        other_provide_map = {t.tag: t.weight for t in other_tags if t.tag_type == "provide"}
+        other_need_map = {t.tag: t.weight for t in other_tags if t.tag_type == "need"}
+
+        score = 0.0
+        common_tags = []
+
+        for tag, weight in my_provide_map.items():
+            if tag in other_need_map:
+                match_weight = weight * other_need_map[tag]
+                score += match_weight
+                common_tags.append({"tag": tag, "direction": "我提供→对方需要", "weight": match_weight})
+
+        for tag, weight in my_need_map.items():
+            if tag in other_provide_map:
+                match_weight = weight * other_provide_map[tag]
+                score += match_weight
+                common_tags.append({"tag": tag, "direction": "我需要→对方提供", "weight": match_weight})
+
+        if score >= min_score:
+            desensitized = _desensitize_user(other, viewer_is_free)
+            matches.append({
+                "id": other.id,
+                "name": desensitized["name"],
+                "company": desensitized["company"],
+                "title": desensitized["title"],
+                "avatar": desensitized["avatar"],
+                "phone": desensitized["phone"],
+                "matchScore": round(score * 20, 0),  # 映射为百分制
+                "tagMatchScore": round(score * 18, 0),
+                "semanticScore": round(score * 22, 0),
+                "commonTags": [ct["tag"] for ct in common_tags],
+            })
+
+    matches.sort(key=lambda x: x["matchScore"], reverse=True)
+    total = len(matches)
+
+    # 分页
+    offset = (page - 1) * size
+    page_items = matches[offset:offset + size]
+
+    # 保存匹配记录（top matches）
+    for m in page_items:
+        result = await db.execute(
+            select(MatchRecord).where(
+                or_(
+                    (MatchRecord.user_a_id == current_user.id) & (MatchRecord.user_b_id == m["id"]),
+                    (MatchRecord.user_a_id == m["id"]) & (MatchRecord.user_b_id == current_user.id),
+                )
+            )
+        )
+        existing = result.scalars().first()
+        if not existing:
+            record = MatchRecord(
+                user_a_id=current_user.id,
+                user_b_id=m["id"],
+                match_score=round(m["matchScore"] / 20, 2),
+                status="matched",
+                common_tags=json.dumps(m["commonTags"], ensure_ascii=False),
+                source="auto",
+            )
+            db.add(record)
+
+    await db.commit()
+
+    return {
+        "data": page_items,
+        "total": total,
+        "page": page,
+        "size": size,
+        "has_more": offset + size < total,
+    }
+
+
 @router.post("/engine")
 async def run_match_engine(
     min_score: float = Query(0.3, description="最低匹配分数"),

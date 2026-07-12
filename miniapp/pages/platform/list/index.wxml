@@ -1,0 +1,66 @@
+<view class="page-container">
+  <!-- 顶部导航栏 -->
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">资源平台推荐</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-wrap" wx:elif="{{showEmpty}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无平台推荐</text>
+  </view>
+
+  <!-- 平台列表 -->
+  <scroll-view scroll-y class="list-scroll" wx:elif="{{!loading && platforms.length > 0}}">
+    <view class="list-container">
+      <view
+        class="platform-list-item"
+        wx:for="{{platforms}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+        hover-class="item-hover"
+      >
+        <!-- 排名 -->
+        <view class="rank-badge {{item.rank === 1 ? 'rank-first' : ''}}">
+          <text class="rank-text" wx:if="{{item.rank === 1}}">👑</text>
+          <text class="rank-num" wx:else>{{item.rank}}</text>
+        </view>
+
+        <!-- Logo占位（首字母） -->
+        <view class="platform-logo" style="background: {{item.logoBg || ''}}">
+          <text class="logo-letter">{{item.logoLetter}}</text>
+        </view>
+
+        <!-- 平台信息 -->
+        <view class="platform-info">
+          <view class="platform-name-row">
+            <text class="platform-name">{{item.name}}</text>
+            <!-- 第1名显示官方认证标签 -->
+            <text class="cert-badge" wx:if="{{item.rank === 1}}">官方认证</text>
+          </view>
+          <view class="platform-meta">
+            <text class="meta-item">{{item.resource_count || 0}} 资源单位</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-item">{{item.member_count || 0}} 成员</text>
+          </view>
+        </view>
+
+        <!-- 年费 -->
+        <view class="fee-tag">
+          <text class="fee-value">{{formatFee(item.annual_fee)}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

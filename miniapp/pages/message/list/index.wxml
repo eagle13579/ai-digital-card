@@ -1,0 +1,48 @@
+<view class="page-container msg-list-page">
+  <!-- 加载态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && conversations.length === 0}}">
+    <text class="empty-icon">💬</text>
+    <text class="empty-text">暂无消息</text>
+    <text class="empty-hint">去发现页面寻找新的联系人吧</text>
+    <button class="btn-primary small" bindtap="goSearch">发现用户</button>
+  </view>
+
+  <!-- 搜索入口 -->
+  <view class="search-entry" wx:if="{{conversations.length > 0}}" bindtap="goSearch">
+    <text class="search-entry-icon">🔍</text>
+    <text class="search-entry-text">搜索联系人...</text>
+  </view>
+
+  <!-- 会话列表 -->
+  <scroll-view class="conversation-list" scroll-y enhanced
+               show-scrollbar="{{false}}" wx:if="{{!loading}}">
+    <view class="conversation-item" wx:for="{{conversations}}" wx:key="conversation_id"
+          data-conv="{{item}}" bindtap="goChat" catchlongpress="deleteConversation">
+      <view class="conv-avatar-wrap">
+        <image class="conv-avatar" src="{{item.avatar || defaultAvatar}}" mode="aspectFill"></image>
+        <view class="unread-badge" wx:if="{{item.unread_count > 0}}">
+          <text wx:if="{{item.unread_count > 99}}">99+</text>
+          <text wx:else>{{item.unread_count}}</text>
+        </view>
+      </view>
+      <view class="conv-info">
+        <view class="conv-top-row">
+          <text class="conv-name">{{item.other_user_name || '用户' + item.other_user_id}}</text>
+          <text class="conv-time">{{formatTime(item.last_message_at)}}</text>
+        </view>
+        <view class="conv-bottom-row">
+          <text class="conv-preview">{{item.last_message}}</text>
+          <view class="unread-dot" wx:if="{{item.unread_count > 0}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

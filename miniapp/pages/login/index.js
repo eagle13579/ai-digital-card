@@ -18,8 +18,10 @@ Page({
   data: {
     loading: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    /** 是否使用真实 API（调试开关，线上应设为 true） */
     useRealApi: true,
+    showError: false,
+    errorTitle: '',
+    errorDesc: '',
   },
 
   onLoad() {
@@ -34,10 +36,54 @@ Page({
   wxLogin() {
     this.setData({ loading: true })
 
+    if (wx.getUserProfile) {
+      wx.getUserProfile({
+        desc: '用于完善会员资料',
+        success: (userRes) => {
+          this._handleUserProfile(userRes.userInfo)
+        },
+        fail: () => {
+          wx.login({
+            success: (res) => {
+              if (res.code) {
+                this._handleLogin(res.code)
+              } else {
+                wx.showToast({ title: '微信登录失败', icon: 'none' })
+                this.setData({ loading: false })
+              }
+            },
+            fail: (err) => {
+              console.error('[Login] wx.login 失败:', err)
+              wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+              this.setData({ loading: false })
+            },
+          })
+        },
+      })
+    } else {
+      wx.login({
+        success: (res) => {
+          if (res.code) {
+            this._handleLogin(res.code)
+          } else {
+            wx.showToast({ title: '微信登录失败', icon: 'none' })
+            this.setData({ loading: false })
+          }
+        },
+        fail: (err) => {
+          console.error('[Login] wx.login 失败:', err)
+          wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+          this.setData({ loading: false })
+        },
+      })
+    }
+  },
+
+  _handleUserProfile(userInfo) {
     wx.login({
       success: (res) => {
         if (res.code) {
-          this._handleLogin(res.code)
+          this._handleLoginWithProfile(res.code, userInfo)
         } else {
           wx.showToast({ title: '微信登录失败', icon: 'none' })
           this.setData({ loading: false })
@@ -49,6 +95,54 @@ Page({
         this.setData({ loading: false })
       },
     })
+  },
+
+  _handleLoginWithProfile(code, userInfo) {
+    if (this.data.useRealApi) {
+      authApi.wxMiniLogin(code)
+        .then(result => {
+          const token = result.token
+          const mergedUserInfo = { ...(result.userInfo || {}), ...userInfo }
+
+          if (!token) {
+            throw new Error('后端未返回 token')
+          }
+
+          store.setAuth(token, mergedUserInfo)
+
+          wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+          }, 1500)
+        })
+        .catch(err => {
+          console.error('[Login] API 登录失败:', err)
+          if (err && err.message) {
+            wx.showToast({ title: err.message, icon: 'none' })
+          }
+          this.setData({ loading: false })
+        })
+    } else {
+      MockService.login({ code })
+        .then(result => {
+          if (result.token) {
+            const mergedUserInfo = { ...(result.userInfo || {}), ...userInfo }
+            store.setAuth(result.token, mergedUserInfo)
+            wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+            setTimeout(() => {
+              wx.switchTab({ url: '/pages/index/index' })
+            }, 1500)
+          } else {
+            wx.showToast({ title: '登录失败', icon: 'none' })
+            this.setData({ loading: false })
+          }
+        })
+        .catch(err => {
+          console.error('[Login] Mock 登录失败:', err)
+          wx.showToast({ title: '网络连接失败，请检查网络', icon: 'none' })
+          this.setData({ loading: false })
+        })
+    }
   },
 
   /**
@@ -118,8 +212,61 @@ Page({
       })
   },
 
-  // ========== 跳过登录（游客模式） ==========
+  // ======== 跳过登录（游客模式） ========
   skipLogin() {
     wx.switchTab({ url: '/pages/index/index' })
+  },
+
+  goAgreement() {
+    wx.showToast({ title: '用户协议', icon: 'none' })
+  },
+
+  goPrivacy() {
+    wx.showToast({ title: '隐私政策', icon: 'none' })
+  },
+
+  mockWechatLogin() {
+    this.setData({ loading: true })
+    const mockUserInfo = {
+      nickName: '微信用户',
+      avatarUrl: '',
+      name: '微信用户',
+      avatar: '',
+    }
+    MockService.login({ code: 'test_code' })
+      .then(result => {
+        if (result.token) {
+          const mergedUserInfo = { ...(result.userInfo || {}), ...mockUserInfo }
+          store.setAuth(result.token, mergedUserInfo)
+          wx.showToast({ title: '模拟登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+          }, 1500)
+        } else {
+          this.showErrorModal('登录失败', '无法获取登录凭证，请重试')
+        }
+      })
+      .catch(err => {
+        console.error('[Login] Mock 登录失败:', err)
+        this.showErrorModal('网络连接失败', '无法连接服务器，请检查网络设置后重试')
+      })
+  },
+
+  showErrorModal(title, desc) {
+    this.setData({
+      showError: true,
+      errorTitle: title,
+      errorDesc: desc,
+      loading: false,
+    })
+  },
+
+  hideError() {
+    this.setData({ showError: false })
+  },
+
+  retryLogin() {
+    this.hideError()
+    this.wxLogin()
   },
 })

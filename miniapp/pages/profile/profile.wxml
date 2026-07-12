@@ -10,11 +10,11 @@
         <view class="member-badge badge-{{memberLevel}}">{{memberLevelText}}</view>
       </view>
       <view class="profile-meta">
-        <text class="profile-name">{{userInfo.name || '未登录'}}</text>
+        <text class="profile-name">{{userInfo.name || _t.notLoggedIn}}</text>
         <text class="profile-company">{{userInfo.company}} · {{userInfo.title}}</text>
       </view>
       <view class="profile-edit" bindtap="goEditCard">
-        <text class="edit-text">编辑</text>
+        <text class="edit-text">{{_t.edit}}</text>
       </view>
     </view>
 
@@ -22,13 +22,13 @@
     <view class="glass-card member-card" bindtap="goMember">
       <view class="glass-card-body member-body">
         <view class="member-left">
-          <text class="member-level-label">当前等级</text>
+          <text class="member-level-label">{{_t.currentLevel}}</text>
           <text class="member-level-value badge-{{memberLevel}}">{{memberLevelText}}</text>
-          <text class="member-expire" wx:if="{{memberExpire}}">到期: {{memberExpire}}</text>
+          <text class="member-expire" wx:if="{{memberExpire}}">{{_t.expireDate}}{{memberExpire}}</text>
         </view>
         <view class="member-right">
-          <text class="member-upgrade" wx:if="{{memberLevel === 'free'}}">升级会员 ›</text>
-          <text class="member-upgrade" wx:else>查看权益 ›</text>
+          <text class="member-upgrade" wx:if="{{memberLevel === 'free'}}">{{_t.upgradeMember}}</text>
+          <text class="member-upgrade" wx:else>{{_t.viewBenefits}}</text>
         </view>
       </view>
     </view>
@@ -36,24 +36,24 @@
     <!-- 数据概览 -->
     <view class="glass-card">
       <view class="glass-card-header">
-        <text class="title">数据概览</text>
+        <text class="title">{{_t.dataOverview}}</text>
       </view>
       <view class="stats-grid">
         <view class="stat-item">
           <text class="stat-num">{{stats.visitors || 0}}</text>
-          <text class="stat-label">访客数</text>
+          <text class="stat-label">{{_t.visitorCount}}</text>
         </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.matches || 0}}</text>
-          <text class="stat-label">匹配数</text>
+          <text class="stat-label">{{_t.matchCount}}</text>
         </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.unlocks || 0}}</text>
-          <text class="stat-label">解锁次数</text>
+          <text class="stat-label">{{_t.unlockCount}}</text>
         </view>
         <view class="stat-item">
           <text class="stat-num">{{stats.views || 0}}</text>
-          <text class="stat-label">浏览量</text>
+          <text class="stat-label">{{_t.viewCount}}</text>
         </view>
       </view>
     </view>
@@ -62,52 +62,86 @@
     <view class="menu-card">
       <view class="menu-item" bindtap="goAlbum">
         <view class="menu-icon">□</view>
-        <text class="menu-label">我的画册</text>
+        <text class="menu-label">{{_t.myAlbums}}</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goVisitorLog">
         <view class="menu-icon">◉</view>
-        <text class="menu-label">访客记录</text>
+        <text class="menu-label">{{_t.visitorLog}}</text>
         <text class="menu-badge" wx:if="{{newVisitorCount > 0}}">{{newVisitorCount}}</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goTrustNetwork">
         <view class="menu-icon">◎</view>
-        <text class="menu-label">信任网络</text>
+        <text class="menu-label">{{_t.trustNetworkMenu}}</text>
         <text class="menu-value">{{trustCount}}人</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goAICenter">
         <view class="menu-icon">◇</view>
-        <text class="menu-label">AI智能中心</text>
+        <text class="menu-label">{{_t.aiCenterMenu}}</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goMember">
         <view class="menu-icon">✦</view>
-        <text class="menu-label">会员中心</text>
+        <text class="menu-label">{{_t.membershipMenu}}</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
     <!-- 设置 -->
     <view class="menu-card">
+      <!-- ===== 语言切换 ===== -->
+      <view class="menu-item" bindtap="switchLanguage">
+        <view class="menu-icon">🌐</view>
+        <text class="menu-label">{{_t.languageSetting}}</text>
+        <text class="menu-value" style="color:#a78bfa;font-size:13px;">{{_t.chinese}} / {{_t.english}}</text>
+        <text class="menu-arrow" style="color:#a78bfa;">⇄</text>
+      </view>
       <view class="menu-item" bindtap="goPrivacy">
         <view class="menu-icon">⊡</view>
-        <text class="menu-label">隐私设置</text>
+        <text class="menu-label">{{_t.privacySettings}}</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goAbout">
         <view class="menu-icon">◎</view>
-        <text class="menu-label">关于</text>
+        <text class="menu-label">{{_t.aboutMenu}}</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
 
     <!-- 退出登录 -->
     <view class="logout-section">
-      <button class="btn-outline logout-btn" bindtap="logout">退出登录</button>
+      <button class="btn-outline logout-btn" bindtap="logout">{{_t.logoutLabel}}</button>
+      <view class="delete-account-link" bindtap="showDeleteConfirm">
+        <text>{{_t.deleteAccountLabel}}</text>
+      </view>
     </view>
 
     <view class="bottom-placeholder"></view>
+
+    <!-- 注销账号确认弹窗 -->
+    <view class="modal-overlay" wx:if="{{showDeleteModal}}" bindtap="hideDeleteConfirm">
+      <view class="modal-dialog" catchtap="noop">
+        <view class="modal-header">{{_t.deleteAccountLabel}}</view>
+        <view class="modal-body">
+          <view class="modal-warning">
+            <text class="warning-icon">⚠️</text>
+            <text class="warning-text">{{_t.deleteWarning}}</text>
+          </view>
+          <view class="modal-input-group">
+            <text class="input-label">{{_t.deleteInputLabel}}</text>
+            <input class="modal-input" placeholder="{{_t.deleteInputPlaceholder}}" bindinput="onDeleteInput" value="{{deleteConfirmText}}" />
+          </view>
+        </view>
+        <view class="modal-footer">
+          <button class="modal-btn cancel" bindtap="hideDeleteConfirm">{{_t.deleteCancelBtn}}</button>
+          <button class="modal-btn confirm {{deleteConfirmText === '确认注销' ? 'active' : ''}}" disabled="{{deleteConfirmText !== '确认注销'}}" bindtap="confirmDeleteAccount">{{_t.deleteConfirmBtn}}</button>
+        </view>
+      </view>
+    </view>
   </scroll-view>
+
+  <!-- 自定义TabBar -->
+  <custom-tab-bar selected="{{2}}" />
 </view>

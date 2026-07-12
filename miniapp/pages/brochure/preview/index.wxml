@@ -4,8 +4,13 @@
       <text class="back-icon">‹</text>
     </view>
     <text class="page-indicator">{{currentPage + 1}}/{{totalPages}}</text>
-    <view class="share-btn" bindtap="shareBrochure">
-      <text class="share-icon">⋮</text>
+    <view class="header-right">
+      <view class="home-btn" bindtap="goHome">
+        <text class="home-icon">🏠</text>
+      </view>
+      <view class="share-btn" bindtap="shareBrochure">
+        <text class="share-icon">⋮</text>
+      </view>
     </view>
   </view>
 

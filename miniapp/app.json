@@ -4,13 +4,18 @@
     "pages/card/card",
     "pages/login/index",
     "pages/profile/profile",
+    "pages/search/index",
     "pages/brochure/create/index",
     "pages/brochure/preview/index",
     "pages/platform/create/index",
+    "pages/platform/detail/index",
+    "pages/platform/manage/index",
+    "pages/platform/list/index",
     "pages/qrcode/index",
     "pages/membership/index",
     "pages/agreement/privacy/index",
     "pages/network/graph/index",
+    "pages/network/import/index",
     "pages/ai/match/index",
     "pages/ai/insight/index",
     "pages/ai/scan/index",
@@ -21,7 +26,11 @@
     "pages/ai/gaia",
     "pages/ai/abtest",
     "pages/ai/feedback",
-    "pages/ai/modelserve"
+    "pages/ai/modelserve",
+    "pages/message/list/index",
+    "pages/message/chat/index",
+    "pages/team/list/index",
+    "pages/team/manage/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -30,6 +39,7 @@
     "backgroundColor": "#0f0f1a"
   },
   "tabBar": {
+    "custom": true,
     "color": "rgba(255, 255, 255, 0.4)",
     "selectedColor": "#a78bfa",
     "backgroundColor": "#0f0f1a",

@@ -85,14 +85,27 @@ class WeChatPayProvider(PaymentProvider):
 
     async def create_order(self, req: OrderRequest) -> OrderResponse:
         """微信 JSAPI 下单"""
+        product = get_product(req.tier)
+
+        # ── 沙箱/开发模式：微信未配置时返回 mock 调起参数 ──
         if not self.appid or not self.mch_id:
+            mock_order_no = f"WX{datetime.utcnow().strftime('%y%m%d%H%M%S')}{uuid.uuid4().hex[:8].upper()}"
+            mock_prepay_id = f"prepay_id=mock{uuid.uuid4().hex[:24]}"
             return OrderResponse(
-                order_no="",
-                status=PaymentStatus.FAILED,
-                pay_info={"error": "微信支付未配置"},
+                order_no=mock_order_no,
+                channel_order_no=mock_prepay_id,
+                status=PaymentStatus.PENDING,
+                pay_info={
+                    "sandbox": True,
+                    "order_no": mock_order_no,
+                    "total_cents": product.price_cents,
+                    "total_formatted": f"¥{product.price_cents / 100:.2f}",
+                    "tier": req.tier.value,
+                    "message": "沙箱模式 — 模拟支付成功",
+                },
+                total_cents=product.price_cents,
             )
 
-        product = get_product(req.tier)
         order_no = f"WX{datetime.utcnow().strftime('%y%m%d%H%M%S')}{uuid.uuid4().hex[:8].upper()}"
 
         params: dict[str, str] = {

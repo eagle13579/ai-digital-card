@@ -1,0 +1,97 @@
+/* 自定义TabBar - 暗色极简 + 磨砂玻璃 + 紫色主题 */
+
+.custom-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 50px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgba(15, 15, 26, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+  z-index: 999;
+}
+
+.tab-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  padding-top: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.tab-icon {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tab-item.active .tab-icon,
+.tab-item.active .tab-text {
+  color: var(--accent-light, #a78bfa);
+}
+
+.tab-item.active .tab-icon {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--accent, #8b5cf6);
+  border-radius: 1px;
+}
+
+.tab-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(167, 139, 250, 0.12);
+  pointer-events: none;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.tab-label {
+  font-size: 10px;
+  line-height: 1.4;
+  margin-top: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.2s ease;
+}
+
+.tab-active .tab-label {
+  color: #a78bfa;
+}

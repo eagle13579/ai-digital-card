@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "loading": "/components/loading/index"
+    "loading": "/components/loading/index",
+    "custom-tab-bar": "/custom-tab-bar/index"
   },
   "navigationBarTitleText": "我的"
 }

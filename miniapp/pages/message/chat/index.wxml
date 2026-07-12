@@ -1,0 +1,48 @@
+<view class="page-container chat-page">
+  <!-- 消息列表 -->
+  <scroll-view class="msg-list" scroll-y enhanced show-scrollbar="{{false}}" 
+               scroll-into-view="{{scrollToId}}" scroll-with-animation
+               upper-threshold="100" bindscrolltoupper="onLoadMore"
+               bindscroll="onScroll">
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loadingMore}}">
+      <view class="spinner small"></view>
+      <text>加载中...</text>
+    </view>
+
+    <!-- 历史消息提示 -->
+    <view class="history-tip" wx:if="{{!hasMoreHistory && messages.length > 0}}">
+      <text>— 以上是历史消息 —</text>
+    </view>
+
+    <!-- 消息气泡 -->
+    <view class="msg-item {{item.sender_id === myUserId ? 'self' : 'other'}}" 
+          wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
+      <image class="msg-avatar" src="{{item.sender_id === myUserId ? myAvatar : otherAvatar}}" 
+             mode="aspectFill" wx:if="{{item.sender_id !== myUserId}}"></image>
+      <view class="msg-bubble-wrap">
+        <view class="msg-bubble {{item.sender_id === myUserId ? 'self' : 'other'}}">
+          <text class="msg-content">{{item.content}}</text>
+        </view>
+        <text class="msg-time" wx:if="{{showTime(item, index)}}">{{formatTime(item.created_at)}}</text>
+      </view>
+      <image class="msg-avatar" src="{{item.sender_id === myUserId ? myAvatar : otherAvatar}}" 
+             mode="aspectFill" wx:if="{{item.sender_id === myUserId}}"></image>
+    </view>
+
+    <view class="bottom-placeholder" id="scroll-bottom"></view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <view class="input-wrap">
+      <input class="chat-input" placeholder="输入消息..." 
+             value="{{inputValue}}" bindinput="onInput" 
+             bindconfirm="sendMessage" confirm-type="send"
+             maxlength="5000" />
+    </view>
+    <view class="send-btn {{sendDisabled ? 'disabled' : ''}}" bindtap="sendMessage">
+      <text>发送</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,78 @@
+<view class="page-container search-page">
+  <!-- 搜索框 -->
+  <view class="search-bar-wrap">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索姓名/公司/职位/简介" 
+             value="{{keyword}}" bindinput="onKeywordInput" 
+             bindconfirm="onSearch" confirm-type="search" />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="clearKeyword">✕</text>
+    </view>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <picker class="filter-picker" mode="selector" range="{{industryList}}" 
+            value="{{industryIndex}}" bindchange="onIndustryChange">
+      <view class="picker-trigger {{industryIndex > 0 ? 'active' : ''}}">
+        <text>{{industryIndex > 0 ? industryList[industryIndex] : '行业'}}</text>
+        <text class="picker-arrow">▾</text>
+      </view>
+    </picker>
+    <picker class="filter-picker" mode="selector" range="{{regionList}}" 
+            value="{{regionIndex}}" bindchange="onRegionChange">
+      <view class="picker-trigger {{regionIndex > 0 ? 'active' : ''}}">
+        <text>{{regionIndex > 0 ? regionList[regionIndex] : '地区'}}</text>
+        <text class="picker-arrow">▾</text>
+      </view>
+    </picker>
+    <view class="filter-search-btn" bindtap="onSearch">
+      <text>搜索</text>
+    </view>
+  </view>
+
+  <!-- 加载态 -->
+  <view class="search-loading" wx:if="{{loading && page === 1}}">
+    <view class="spinner"></view>
+    <text class="loading-text">搜索中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && results.length === 0 && hasSearched}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">未找到匹配的用户</text>
+    <text class="empty-hint">试试其他关键词或筛选条件</text>
+  </view>
+
+  <!-- 结果列表 -->
+  <scroll-view class="result-list" scroll-y enhanced
+               show-scrollbar="{{false}}"
+               lower-threshold="100" bindscrolltolower="onLoadMore"
+               wx:if="{{results.length > 0}}">
+    <view class="result-item" wx:for="{{results}}" wx:key="id" 
+          data-user="{{item}}" bindtap="goUserDetail">
+      <image class="item-avatar" src="{{item.avatar || defaultAvatar}}" mode="aspectFill"></image>
+      <view class="item-info">
+        <view class="item-name-row">
+          <text class="item-name">{{item.name}}</text>
+          <text class="item-tag" wx:if="{{item.membership_tier && item.membership_tier !== 'free'}}">
+            {{item.membership_tier}}
+          </text>
+        </view>
+        <text class="item-company" wx:if="{{item.company}}">{{item.company}}</text>
+        <text class="item-title" wx:if="{{item.title && item.title !== item.company}}">{{item.title}}</text>
+        <text class="item-intro" wx:if="{{item.intro}}">{{item.intro}}</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loadingMore}}">
+      <view class="spinner small"></view>
+      <text>加载更多...</text>
+    </view>
+    <view class="load-more end" wx:if="{{!hasMore && results.length > 0}}">
+      <text>— 没有更多了 —</text>
+    </view>
+  </scroll-view>
+</view>

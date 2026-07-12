@@ -81,3 +81,8 @@
 .action-buttons {
   padding: var(--space-5) var(--space-4);
 }
+
+/* ===== 底部占位（为自定义TabBar留空间） ===== */
+.bottom-placeholder {
+  height: 60px;
+}

@@ -1,13 +1,13 @@
 <view class="page-container">
   <view class="section-header">
-    <text class="section-title">推荐匹配</text>
-    <text class="section-subtitle">基于AI分析，找到最合适的合作伙伴</text>
+    <text class="section-title">{{_t.matchTitle}}</text>
+    <text class="section-subtitle">{{_t.matchSubtitle}}</text>
   </view>
 
   <!-- 筛选栏 -->
   <view class="filter-bar">
     <view class="filter-item">
-      <text class="filter-label">行业</text>
+      <text class="filter-label">{{_t.filterIndustry}}</text>
       <picker mode="selector" range="{{industries}}" value="{{selectedIndustryIndex}}" bindchange="onIndustryChange">
         <view class="filter-select">
           <text class="filter-value">{{selectedIndustry}}</text>
@@ -17,7 +17,7 @@
     </view>
     <view class="filter-divider"></view>
     <view class="filter-item">
-      <text class="filter-label">地域</text>
+      <text class="filter-label">{{_t.filterRegion}}</text>
       <picker mode="selector" range="{{regions}}" value="{{selectedRegionIndex}}" bindchange="onRegionChange">
         <view class="filter-select">
           <text class="filter-value">{{selectedRegion}}</text>
@@ -41,7 +41,7 @@
       </view>
       <view class="match-score-wrap">
         <text class="match-score-num">{{item.matchScore}}%</text>
-        <text class="match-score-label">匹配</text>
+        <text class="match-score-label">{{_t.matchLabel}}</text>
       </view>
     </view>
   </view>
@@ -55,27 +55,27 @@
       <text class="detail-title" wx:if="{{unlockedItem.title}}">{{unlockedItem.title}}</text>
       <view class="detail-score">
         <text class="detail-score-num">{{unlockedItem.matchScore}}%</text>
-        <text class="detail-score-label">匹配度</text>
+        <text class="detail-score-label">{{_t.matchScoreLabel}}</text>
       </view>
     </view>
     <view class="detail-tags" wx:if="{{unlockedItem.tags && unlockedItem.tags.length > 0}}">
       <text class="detail-tag" wx:for="{{unlockedItem.tags}}" wx:key="index">{{item}}</text>
     </view>
     <view class="detail-actions">
-      <button class="btn-primary small" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">交换名片</button>
-      <button class="btn-secondary small" wx:if="{{exchangeDone}}" disabled>已发送交换请求</button>
-      <button class="btn-secondary small" bindtap="backToList" style="margin-top:8px;">返回列表</button>
+      <button class="btn-primary small" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">{{_t.exchangeCard}}</button>
+      <button class="btn-secondary small" wx:if="{{exchangeDone}}" disabled>{{_t.requestSent}}</button>
+      <button class="btn-secondary small" bindtap="backToList" style="margin-top:8px;">{{_t.backToList}}</button>
     </view>
   </view>
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{!loading && filteredMatches.length === 0}}">
     <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
-    <text class="text">暂无匹配结果，请调整筛选条件</text>
+    <text class="text">{{_t.noMatchResults}}</text>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">
     <view class="spinner"></view>
-    <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">加载中...</text>
+    <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">{{_t.loadingText}}</text>
   </view>
 </view>

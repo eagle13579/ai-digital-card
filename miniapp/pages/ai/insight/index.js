@@ -1,7 +1,7 @@
 /**
  * AI数据洞察 - 带趋势图
  */
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 Page({
   data: { stats: null, loading: true, weeklyTrend: [] },
   async onLoad() {

@@ -2,7 +2,7 @@
  * 反馈收集 - 用户反馈提交与历史列表
  * 支持 MockService 数据源 (useRealApi 开关)
  */
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 
 const FEEDBACK_TYPES = [
   { value: 'bug', label: '🐛 问题反馈' },

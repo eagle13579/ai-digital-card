@@ -420,3 +420,282 @@
   font-size: 10px;
   color: var(--text-tertiary);
 }
+
+/* ===== Platform Recommend List (首页) ===== */
+.platform-recommend-list {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.platform-rec-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.platform-rec-item:last-child {
+  border-bottom: none;
+}
+
+.platform-rec-item:active {
+  opacity: 0.7;
+}
+
+.platform-rec-rank {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+
+.platform-rec-rank.rank-gold {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.platform-rec-rank.rank-gold text {
+  font-size: 16px;
+}
+
+.platform-rec-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 10px;
+  background: var(--gradient-accent);
+}
+
+.platform-rec-letter {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.platform-rec-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.platform-rec-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.platform-rec-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platform-rec-tag {
+  font-size: 9px;
+  padding: 1px 6px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #1a1a1a;
+  border-radius: 8px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.platform-rec-desc {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 1px;
+}
+
+.platform-rec-arrow {
+  font-size: 18px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin-left: var(--space-2);
+}
+
+/* ===== 底部占位（为自定义TabBar留空间） ===== */
+.bottom-placeholder {
+  height: 60px;
+}
+
+/* ===== 新手引导浮层 ===== */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.onboarding-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.onboarding-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.onboarding-card {
+  position: relative;
+  width: 88%;
+  max-width: 360px;
+  margin-bottom: 120px;
+  background: var(--surface-secondary, #1e1e2e);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+  border-radius: var(--radius-lg, 16px);
+  padding: 28px 24px 20px;
+  animation: onboardingSlideUp 0.4s ease;
+}
+
+@keyframes onboardingSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 步骤指示器 */
+.onboarding-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.onboarding-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+}
+
+.onboarding-dot.active {
+  width: 24px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+
+/* 步骤内容 */
+.onboarding-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.onboarding-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: 50%;
+  margin-bottom: 14px;
+  color: var(--accent-light, #a78bfa);
+}
+
+.onboarding-title {
+  font-size: var(--text-lg, 17px);
+  font-weight: var(--weight-bold, 600);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.onboarding-desc {
+  font-size: var(--text-sm, 13px);
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 8px;
+}
+
+/* 按钮栏 */
+.onboarding-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.onboarding-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.onboarding-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: var(--radius-md, 10px);
+  font-size: var(--text-base, 15px);
+  font-weight: var(--weight-medium, 500);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.onboarding-btn:active {
+  opacity: 0.7;
+}
+
+.onboarding-btn.primary {
+  flex: 1;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: #ffffff;
+  border: none;
+}
+
+.onboarding-btn.prev {
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary, rgba(255,255,255,0.6));
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+}
+
+.onboarding-btn.secondary {
+  background: transparent;
+  color: var(--text-tertiary, rgba(255,255,255,0.4));
+  font-size: var(--text-xs, 12px);
+  border: none;
+  height: 32px;
+  padding: 0;
+}

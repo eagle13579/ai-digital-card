@@ -2,7 +2,7 @@
   <view class="page-header">
     <view class="back" bindtap="goBack">‹</view>
     <text class="title">平台管理</text>
-    <view class="edit-btn" bindtap="goToEdit">✎</view>
+    <view class="invite-btn" bindtap="openInviteModal">邀请加入</view>
   </view>
 
   <view class="loading-wrap" wx:if="{{loading}}">
@@ -11,124 +11,118 @@
   </view>
 
   <block wx:if="{{!loading && platform}}">
-    <!-- 平台信息卡片 -->
-    <view class="platform-card">
-      <text class="platform-name">{{platform.name}}</text>
-      <text class="platform-desc">{{platform.description || ''}}</text>
-      <view class="platform-meta">
-        <text class="meta-item">👥 {{report?.totalMembers || 0}} 位成员</text>
-        <text class="meta-item">📦 {{report?.resourceCount || 0}} 个资源</text>
+    <view class="platform-header-card">
+      <view class="platform-logo">
+        <text class="logo-text">{{platform.name ? platform.name[0] : 'P'}}</text>
+      </view>
+      <view class="platform-info">
+        <text class="platform-name">{{platform.name}}</text>
+        <text class="platform-linkable">可链接单位 {{linkableCount || 1}}</text>
       </view>
     </view>
 
-    <!-- Tab 切换 -->
-    <view class="tab-bar">
-      <view class="tab-item {{activeTab === 'members' ? 'active' : ''}}" bindtap="switchTab" data-tab="members">
-        <text class="tab-text">成员列表</text>
-      </view>
-      <view class="tab-item {{activeTab === 'applications' ? 'active' : ''}}" bindtap="switchTab" data-tab="applications">
-        <text class="tab-text">审核申请</text>
-        <text class="tab-badge" wx:if="{{applications.length > 0}}">{{applications.length}}</text>
-      </view>
-      <view class="tab-item {{activeTab === 'report' ? 'active' : ''}}" bindtap="switchTab" data-tab="report">
-        <text class="tab-text">数据统计</text>
-      </view>
-    </view>
-
-    <!-- 成员列表 -->
-    <scroll-view scroll-y class="content-scroll" wx:if="{{activeTab === 'members'}}">
-      <view class="section-actions">
-        <view class="action-btn invite-btn" bindtap="openInviteModal">
-          <text class="btn-icon">+</text>
-          <text class="btn-text">邀请成员</text>
+    <view class="section-card">
+      <view class="section-row" bindtap="goToMemberManage">
+        <view class="section-item">
+          <text class="section-icon">👥</text>
+          <text class="section-title">成员管理</text>
+        </view>
+        <view class="section-right">
+          <text class="section-value">{{members.length || 0}}人</text>
+          <text class="section-arrow">›</text>
         </view>
       </view>
+    </view>
 
-      <view class="member-list">
-        <view class="member-item" wx:for="{{members}}" wx:key="id">
-          <view class="member-avatar">
-            <text class="member-initial">{{item.name ? item.name[0] : '?'}}</text>
+    <view class="import-card" bindtap="handleImportMembers">
+      <text class="import-title">一键导入会员</text>
+      <text class="import-desc">会员下载App后无需再次注册，自动以预置身份加入平台。</text>
+    </view>
+
+    <view class="section-card">
+      <view class="section-row" bindtap="goToMessage">
+        <view class="section-item">
+          <text class="section-icon">📢</text>
+          <text class="section-title">消息发布/管理</text>
+        </view>
+        <text class="section-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="action-grid">
+      <view class="action-item" bindtap="goToNewMemberReview">
+        <text class="action-icon">👤</text>
+        <text class="action-title">新成员审核</text>
+        <text class="action-count" wx:if="{{pendingApplications > 0}}">{{pendingApplications}}</text>
+      </view>
+      <view class="action-item" bindtap="goToConnectionReview">
+        <text class="action-icon">🔗</text>
+        <text class="action-title">建联审核</text>
+        <text class="action-count" wx:if="{{pendingConnections > 0}}">{{pendingConnections}}</text>
+      </view>
+    </view>
+
+    <view class="section-card">
+      <text class="card-title">平台资源覆盖率</text>
+      <view class="coverage-grid">
+        <view class="coverage-item">
+          <view class="ring-chart">
+            <text class="ring-value">{{coverage.platformCities || 0}}</text>
+            <text class="ring-label">城市</text>
           </view>
+          <view class="coverage-legend">
+            <view class="legend-item">
+              <view class="legend-dot platform"></view>
+              <text class="legend-text">平台成员</text>
+            </view>
+            <view class="legend-item">
+              <view class="legend-dot linkable"></view>
+              <text class="legend-text">可链接</text>
+            </view>
+          </view>
+        </view>
+        <view class="coverage-item">
+          <view class="ring-chart">
+            <text class="ring-value">{{coverage.platformIndustries || 0}}</text>
+            <text class="ring-label">行业</text>
+          </view>
+          <view class="coverage-legend">
+            <view class="legend-item">
+              <view class="legend-dot platform"></view>
+              <text class="legend-text">平台成员</text>
+            </view>
+            <view class="legend-item">
+              <view class="legend-dot linkable"></view>
+              <text class="legend-text">可链接</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card">
+      <text class="card-title">平台成员的资源库排名 前3名</text>
+      <view class="ranking-list">
+        <view class="ranking-item" wx:for="{{ranking}}" wx:key="id">
+          <view class="rank-badge" wx:if="{{item.rank <= 3}}">
+            <text class="rank-num" style="color: {{getRankColor(item.rank)}}">{{item.rank}}</text>
+          </view>
+          <view class="rank-num-normal" wx:else>{{item.rank}}</view>
           <view class="member-info">
-            <text class="member-name">{{item.name}}</text>
-            <text class="member-join">加入于 {{formatTime(item.joined_at)}}</text>
+            <view class="member-avatar">
+              <text class="avatar-text">{{item.name ? item.name[0] : '?'}}</text>
+            </view>
+            <view class="member-detail">
+              <text class="member-name">{{item.name}}</text>
+              <text class="member-role-text">{{getRoleInfo(item.role).label}}</text>
+            </view>
           </view>
-          <view class="member-role" style="background: {{getRoleInfo(item.role).color}}15; border-color: {{getRoleInfo(item.role).color}}30;">
-            <text class="role-icon">{{getRoleInfo(item.role).icon}}</text>
-            <text class="role-label" style="color: {{getRoleInfo(item.role).color}}">{{getRoleInfo(item.role).label}}</text>
-          </view>
-        </view>
-
-        <view class="empty-state" wx:if="{{members.length === 0}}">
-          <text class="empty-icon">👥</text>
-          <text class="empty-text">暂无成员</text>
+          <text class="resource-count">{{item.resourceCount || 0}}</text>
         </view>
       </view>
-    </scroll-view>
-
-    <!-- 审核申请 -->
-    <scroll-view scroll-y class="content-scroll" wx:if="{{activeTab === 'applications'}}">
-      <view class="application-list">
-        <view class="application-item" wx:for="{{applications}}" wx:key="id">
-          <view class="app-icon">
-            <text>{{item.user_name ? item.user_name[0] : '?'}}</text>
-          </view>
-          <view class="app-info">
-            <text class="app-name">{{item.user_name}}</text>
-            <text class="app-time">{{formatTime(item.applied_at)}} 申请加入</text>
-          </view>
-          <view class="app-actions" wx:if="{{item.status === 'pending'}}">
-            <view class="app-btn reject" bindtap="reviewApplication" data-id="{{item.id}}" data-approved="false">拒绝</view>
-            <view class="app-btn approve" bindtap="reviewApplication" data-id="{{item.id}}" data-approved="true">通过</view>
-          </view>
-          <view class="app-status" wx:else>
-            <text class="status-text {{item.status}}">{{item.status === 'approved' ? '已通过' : '已拒绝'}}</text>
-          </view>
-        </view>
-
-        <view class="empty-state" wx:if="{{applications.length === 0}}">
-          <text class="empty-icon">📭</text>
-          <text class="empty-text">暂无待审核申请</text>
-        </view>
-      </view>
-    </scroll-view>
-
-    <!-- 数据统计 -->
-    <scroll-view scroll-y class="content-scroll" wx:if="{{activeTab === 'report'}}">
-      <view class="report-section">
-        <text class="report-section-title">角色分布</text>
-        <view class="stats-grid">
-          <view class="stat-card" wx:for="{{roleStats}}" wx:key="role">
-            <text class="stat-count">{{item.count}}</text>
-            <text class="stat-label">{{item.icon}} {{item.label}}</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="report-section">
-        <text class="report-section-title">资源统计</text>
-        <view class="stats-grid">
-          <view class="stat-card">
-            <text class="stat-count">{{report?.totalMembers || 0}}</text>
-            <text class="stat-label">👥 总成员数</text>
-          </view>
-          <view class="stat-card">
-            <text class="stat-count">{{report?.resourceCount || 0}}</text>
-            <text class="stat-label">📦 资源总数</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="report-section" wx:if="{{report?.industries && report.industries.length > 0}}">
-        <text class="report-section-title">行业覆盖</text>
-        <view class="industry-tags">
-          <view class="industry-tag" wx:for="{{report.industries}}" wx:key="*this">{{item}}</view>
-        </view>
-      </view>
-    </scroll-view>
+    </view>
   </block>
 
-  <!-- 邀请成员弹窗 -->
   <view class="modal-overlay" wx:if="{{showInviteModal}}" bindtap="closeInviteModal">
     <view class="modal-content" catchtap="stopPropagation">
       <view class="modal-header">
@@ -136,14 +130,32 @@
         <text class="modal-close" bindtap="closeInviteModal">✕</text>
       </view>
       <view class="modal-body">
-        <view class="form-group">
-          <text class="form-label">用户ID</text>
-          <input class="form-input" placeholder="请输入对方用户ID" value="{{inviteUserId}}" bindinput="onInviteInput" />
+        <view class="invite-methods">
+          <view class="invite-method" bindtap="inviteFromApp">
+            <text class="method-icon">📱</text>
+            <view class="method-info">
+              <text class="method-title">从询赋 App 中邀请</text>
+              <text class="method-desc">选择询赋内的好友，发送邀请链接</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
+          <view class="invite-method" bindtap="inviteFromWechat">
+            <text class="method-icon">💬</text>
+            <view class="method-info">
+              <text class="method-title">从微信邀请</text>
+              <text class="method-desc">选择微信好友，发送邀请链接</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
+          <view class="invite-method" bindtap="showQRCode">
+            <text class="method-icon">📷</text>
+            <view class="method-info">
+              <text class="method-title">平台二维码</text>
+              <text class="method-desc">通过平台二维码邀请</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
         </view>
-      </view>
-      <view class="modal-footer">
-        <button class="btn-cancel" bindtap="closeInviteModal">取消</button>
-        <button class="btn-confirm" bindtap="confirmInvite">邀请</button>
       </view>
     </view>
   </view>

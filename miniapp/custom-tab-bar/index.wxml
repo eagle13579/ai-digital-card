@@ -1,0 +1,16 @@
+<view class="custom-tabbar">
+  <view
+    class="tab-item {{index === selected ? 'tab-active' : ''}}"
+    wx:for="{{list}}"
+    wx:key="index"
+    data-index="{{index}}"
+    data-path="{{item.pagePath}}"
+    bindtap="switchTab"
+  >
+    <view class="tab-icon-wrap">
+      <text class="tab-icon">{{item.icon}}</text>
+      <view class="tab-glow" wx:if="{{index === selected}}"></view>
+    </view>
+    <text class="tab-label">{{item.text}}</text>
+  </view>
+</view>

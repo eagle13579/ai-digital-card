@@ -1,13 +1,4 @@
-const MockService = require('../../../utils/mockService')
-
-const MOCK_RESULT = {
-  name: '张三',
-  title: '产品经理',
-  company: '星辰科技有限公司',
-  phone: '13800138000',
-  email: 'zhangsan@example.com',
-  address: '北京市海淀区中关村大街1号',
-}
+const { ocrApi } = require('../../../utils/api')
 
 /**
  * 解析扫码结果协议
@@ -64,7 +55,7 @@ Page({
   },
 
   checkLoginAndLimit() {
-    const store = require('../../utils/store')
+    const store = require('../../../utils/store')
     const state = store.getState()
     if (!state.token) {
       getApp().checkLogin()
@@ -88,7 +79,7 @@ Page({
     return true
   },
 
-  // ====== OCR名片识别（原有） ======
+  // ====== OCR名片识别（真实API调用） ======
   takePhoto() {
     if (!this.checkLoginAndLimit()) return
 
@@ -107,9 +98,27 @@ Page({
     })
   },
 
-  scanImage(imagePath) {
-    setTimeout(() => {
-      const result = { ...MOCK_RESULT }
+  async scanImage(imagePath) {
+    try {
+      // 调用真实 OCR API
+      const res = await ocrApi.scan(imagePath)
+
+      // 解析响应
+      // 后端返回 { raw_text, contact: {phone,email,wechat}, business: {company_name,position,address,website} }
+      const data = res && res.raw_text !== undefined ? res : (res?.data || res || {})
+
+      // 构建前端展示结果
+      const result = {
+        name: data.business?.company_name || '',
+        title: data.business?.position || '',
+        company: data.business?.company_name || '',
+        phone: data.contact?.phone || '',
+        email: data.contact?.email || '',
+        wechat: data.contact?.wechat || '',
+        address: data.business?.address || '',
+        raw_text: data.raw_text || '',
+      }
+
       this.setData({
         scanning: false,
         result,
@@ -118,7 +127,11 @@ Page({
       })
       wx.setStorageSync('scanCount', this.data.scanCount + 1)
       wx.showToast({ title: '识别成功', icon: 'success' })
-    }, 1500)
+    } catch (err) {
+      console.error('[Scan] OCR识别失败:', err)
+      this.setData({ scanning: false })
+      wx.showToast({ title: err?.detail || err?.message || '识别失败', icon: 'none' })
+    }
   },
 
   // ====== 二维码扫码 ======

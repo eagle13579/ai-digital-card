@@ -1,7 +1,7 @@
 <view class="page-container">
   <view class="ai-header">
-    <text class="ai-title">AI 智能中心</text>
-    <text class="ai-subtitle">智能驱动，高效连接</text>
+    <text class="ai-title">{{_t.aiCenterTitle}}</text>
+    <text class="ai-subtitle">{{_t.aiCenterSubtitle}}</text>
   </view>
   <view class="ai-grid">
     <view class="ai-item" wx:for="{{features}}" wx:key="id" data-url="{{item.url}}" bindtap="go">

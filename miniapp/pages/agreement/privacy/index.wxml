@@ -30,7 +30,9 @@
       <text class="agreement-text">本隐私政策可能适时更新。更新后的版本将在平台上显著位置公布，并在更新后的条款生效前通过适当方式提醒您。您继续使用我们的服务即表示同意更新后的隐私政策。重大变更包括但不限于：信息收集范围或使用方式的重大变化、共享对象的重大变化、数据保护能力的重大变化等。</text>
       
       <text class="agreement-section">九、联系我们</text>
-      <text class="agreement-text">如您对本隐私政策有任何疑问、意见或建议，请通过以下方式与我们联系：\n邮箱：privacy@example.com\n地址：北京市海淀区中关村科技园\n电话：400-000-0000\n我们将在收到您的请求后15个工作日内回复。</text>
-    </view>
+            <text class="agreement-text">如您对本隐私政策有任何疑问、意见或建议，请通过以下方式与我们联系：\n邮箱：privacy@example.com\n地址：北京市海淀区中关村科技园\n电话：400-000-0000\n我们将在收到您的请求后15个工作日内回复。</text>
+            <text class="agreement-section">十、安全审计与合规认证</text>
+            <text class="agreement-text">我们已通过SOC 2 Type II审计认证，涵盖安全性、可用性和保密性三大原则。如需查阅完整审计报告或获取DPA（数据处理协议），请联系合规团队：compliance@example.com</text>
+          </view>
   </view>
 </view>

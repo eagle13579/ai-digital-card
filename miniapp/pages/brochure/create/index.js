@@ -1,15 +1,66 @@
 /**
- * 画册创建页面
- * 用户可以上传身份信息、资源供需、公司介绍、产品案例等信息
- * 自动生成可翻页的AI数智名片画册
+ * 画册创建页面 - 表单Stepper版
+ * 4步引导：基本信息 → 专业信息 → 公司信息 → 预览发布
+ * 支持行业模板自动匹配
  */
 const { MockService } = require('../../../utils/mockService')
 const { Logger } = require('../../../utils/util')
 const store = require('../../../utils/store')
+const i18n = require('../../../utils/i18n')
+
+// ==================== 行业模板配置 ====================
+const INDUSTRY_TEMPLATES = {
+  tech: {
+    label: '科技',
+    icon: '💻',
+    extraFields: [
+      { key: 'techStack', label: '技术栈', placeholder: '如：React, Python, AWS', type: 'text' },
+      { key: 'patents', label: '专利/知识产权', placeholder: '请输入专利或知识产权信息', type: 'textarea' },
+    ],
+  },
+  finance: {
+    label: '金融',
+    icon: '💰',
+    extraFields: [
+      { key: 'investmentCases', label: '投资案例', placeholder: '请输入投资案例', type: 'textarea' },
+      { key: 'certifications', label: '资质认证', placeholder: '请输入资质认证信息', type: 'text' },
+    ],
+  },
+  education: {
+    label: '教育',
+    icon: '📚',
+    extraFields: [
+      { key: 'faculty', label: '师资团队', placeholder: '请输入师资团队介绍', type: 'textarea' },
+      { key: 'curriculum', label: '课程体系', placeholder: '请输入课程体系介绍', type: 'textarea' },
+    ],
+  },
+  medical: {
+    label: '医疗',
+    icon: '🏥',
+    extraFields: [
+      { key: 'academicTitle', label: '学术职务', placeholder: '请输入学术职务', type: 'text' },
+      { key: 'thesis', label: '论文/著作', placeholder: '请输入论文或著作', type: 'textarea' },
+    ],
+  },
+  manufacturing: {
+    label: '制造',
+    icon: '🏭',
+    extraFields: [
+      { key: 'productionLine', label: '生产线/产能', placeholder: '请输入生产线介绍', type: 'textarea' },
+      { key: 'certifications', label: '资质认证', placeholder: '请输入资质认证信息', type: 'text' },
+    ],
+  },
+}
 
 Page({
   data: {
+    // ====== 步骤控制 ======
+    currentStep: 1,
+    totalSteps: 4,
+
+    // ====== 表单数据 ======
     formData: {
+      // Step1 基本信息
       avatar: '',
       name: '',
       title: '',
@@ -20,22 +71,47 @@ Page({
       school: '',
       major: '',
       education: '',
+      // Step2 专业信息
       skillTags: [],
       bio: '',
       provides: [],
       needs: [],
       purpose: 'partner',
+      // Step3 公司信息
       companyName: '',
       industry: '',
       companySize: '',
       companyDesc: '',
       development: '',
       companyImages: [],
-      cases: [],
+      // Step4 预览 - 风格
       style: 'professional',
+      // 行业模板扩展字段
+      techStack: '',
+      patents: '',
+      investmentCases: '',
+      certifications: '',
+      faculty: '',
+      curriculum: '',
+      academicTitle: '',
+      thesis: '',
+      productionLine: '',
     },
     newProvide: '',
     newNeed: '',
+
+    // ====== 行业模板 ======
+    industryOptions: [
+      { value: 'tech', label: '科技', icon: '💻' },
+      { value: 'finance', label: '金融', icon: '💰' },
+      { value: 'education', label: '教育', icon: '📚' },
+      { value: 'medical', label: '医疗', icon: '🏥' },
+      { value: 'manufacturing', label: '制造', icon: '🏭' },
+    ],
+    currentTemplate: null,
+    templateExtraFields: [],
+
+    // ====== 选项数据 ======
     purposeOptions: [
       { value: 'partner', label: '寻找合作伙伴', icon: '🤝' },
       { value: 'investor', label: '寻找投资', icon: '💰' },
@@ -48,18 +124,209 @@ Page({
       { value: 'minimal', name: '极简简约', desc: '适合科技行业', preview: 'linear-gradient(135deg, #64748B 0%, #1E293B 100%)' },
     ],
     sizeOptions: ['1-10人', '11-50人', '51-100人', '101-500人', '501-1000人', '1000人以上'],
-    showMoreInfo: false,
+
+    // ====== 步骤验证状态 ======
+    stepErrors: {
+      1: {},
+      2: {},
+      3: {},
+    },
+
+    // ====== 草稿 ======
+    draftSaved: false,
   },
+
+  _draftTimer: null,
+  _storageKey: 'brochure_create_draft',
 
   onLoad() {
     Logger.info('画册创建页', '页面加载')
+    this._setupAutoSave()
+    this._checkDraft()
   },
 
-  toggleMoreInfo() {
-    this.setData({
-      showMoreInfo: !this.data.showMoreInfo,
-    })
+  onUnload() {
+    const hasContent = !this._isFormEmpty(this.data.formData)
+    if (hasContent) {
+      this._saveDraft()
+    }
   },
+
+  // ==================== 草稿自动保存/恢复 ====================
+
+  _setupAutoSave() {
+    const origSetData = this.setData.bind(this)
+    const self = this
+    this.setData = function (data, callback) {
+      origSetData(data, () => {
+        const keys = Object.keys(data)
+        const hasFormDataChange = keys.some(k => k === 'formData' || k.startsWith('formData.'))
+        if (hasFormDataChange) {
+          self._debounceSaveDraft()
+        }
+        if (typeof callback === 'function') {
+          callback()
+        }
+      })
+    }
+  },
+
+  _checkDraft() {
+    try {
+      const draft = wx.getStorageSync(this._storageKey)
+      if (draft && draft.formData) {
+        const isEmpty = this._isFormEmpty(draft.formData)
+        if (!isEmpty) {
+          wx.showModal({
+            title: '恢复草稿',
+            content: '检测到上次未保存的草稿，是否恢复？',
+            success: (res) => {
+              if (res.confirm) {
+                const formData = draft.formData
+                // 同步行业模板
+                const templateData = this._getIndustryTemplate(formData.industry)
+                this.setData({
+                  formData,
+                  currentTemplate: templateData,
+                  templateExtraFields: templateData ? templateData.extraFields : [],
+                  draftSaved: true,
+                })
+                wx.showToast({ title: '草稿已恢复', icon: 'success', duration: 1500 })
+              } else {
+                this._clearDraft()
+              }
+            },
+          })
+        }
+      }
+    } catch (e) {
+      Logger.error('画册创建页', '读取草稿失败', e)
+    }
+  },
+
+  _isFormEmpty(formData) {
+    const textFields = ['name', 'title', 'company', 'phone', 'email', 'wechat', 'bio', 'companyName', 'companyDesc', 'development']
+    for (const field of textFields) {
+      if (formData[field] && formData[field].toString().trim()) {
+        return false
+      }
+    }
+    if (formData.provides && formData.provides.length > 0) return false
+    if (formData.needs && formData.needs.length > 0) return false
+    if (formData.skillTags && formData.skillTags.length > 0) return false
+    if (formData.companyImages && formData.companyImages.length > 0) return false
+    if (formData.avatar && formData.avatar.trim()) return false
+    return true
+  },
+
+  _saveDraft() {
+    try {
+      wx.setStorageSync(this._storageKey, {
+        formData: this.data.formData,
+        savedAt: Date.now(),
+      })
+      this.setData({ draftSaved: true })
+    } catch (e) {
+      Logger.warn('画册创建页', '保存草稿失败', e)
+    }
+  },
+
+  _clearDraft() {
+    try {
+      wx.removeStorageSync(this._storageKey)
+      this.setData({ draftSaved: false })
+    } catch (e) {
+      Logger.warn('画册创建页', '清除草稿失败', e)
+    }
+  },
+
+  _debounceSaveDraft() {
+    if (this._draftTimer) {
+      clearTimeout(this._draftTimer)
+    }
+    this._draftTimer = setTimeout(() => {
+      this._saveDraft()
+      this._draftTimer = null
+    }, 500)
+  },
+
+  // ==================== Stepper 导航 ====================
+
+  goNextStep() {
+    const step = this.data.currentStep
+    if (!this._validateStep(step)) {
+      return
+    }
+    if (step < this.data.totalSteps) {
+      this.setData({
+        currentStep: step + 1,
+      })
+    }
+  },
+
+  goPrevStep() {
+    const step = this.data.currentStep
+    if (step > 1) {
+      this.setData({
+        currentStep: step - 1,
+      })
+    }
+  },
+
+  goToStep(e) {
+    const targetStep = parseInt(e.currentTarget.dataset.step)
+    const current = this.data.currentStep
+    // 只能跳转到已完成的步骤或下一步
+    if (targetStep <= current) {
+      this.setData({
+        currentStep: targetStep,
+      })
+    }
+  },
+
+  _validateStep(step) {
+    const { formData } = this.data
+    const errors = {}
+    let valid = true
+
+    if (step === 1) {
+      if (!formData.name || !formData.name.trim()) {
+        errors.name = '请输入姓名'
+        valid = false
+      }
+      if (!formData.title || !formData.title.trim()) {
+        errors.title = '请输入职位'
+        valid = false
+      }
+      if (!formData.company || !formData.company.trim()) {
+        errors.company = '请输入公司名称'
+        valid = false
+      }
+      if (!formData.email || !formData.email.trim()) {
+        errors.email = '请输入邮箱'
+        valid = false
+      }
+    } else if (step === 2) {
+      // 技能标签、合作意向不是严格必填，但bio建议至少50字
+      if (formData.bio && formData.bio.length < 10) {
+        errors.bio = '个人简介建议至少10字'
+        // 不阻止前进，只是提示
+      }
+    } else if (step === 3) {
+      // 公司信息非严格必填
+    }
+
+    this.setData({
+      [`stepErrors.${step}`]: errors,
+    })
+
+    if (!valid) {
+      wx.showToast({ title: Object.values(errors)[0], icon: 'none' })
+    }
+    return valid
+  },
+
+  // ==================== 表单字段输入 ====================
 
   onInput(e) {
     const field = e.currentTarget.dataset.field
@@ -67,21 +334,16 @@ Page({
     this.setData({
       [`formData.${field}`]: value,
     })
+    // 清除对应字段的错误
+    const step = this.data.currentStep
+    if (this.data.stepErrors[step] && this.data.stepErrors[step][field]) {
+      this.setData({
+        [`stepErrors.${step}.${field}`]: undefined,
+      })
+    }
   },
 
-  onCaseInput(e) {
-    const caseIndex = parseInt(e.currentTarget.dataset.caseIndex)
-    const field = e.currentTarget.dataset.field
-    const value = e.detail.value
-    const cases = [...this.data.formData.cases]
-    if (!cases[caseIndex]) {
-      cases[caseIndex] = {}
-    }
-    cases[caseIndex][field] = value
-    this.setData({
-      'formData.cases': cases,
-    })
-  },
+  // ==================== 头像 ====================
 
   chooseAvatar() {
     wx.chooseImage({
@@ -98,13 +360,22 @@ Page({
             })
           },
           fail: () => {
-            // fallback: use temp file path
             this.setData({
               'formData.avatar': tempPath,
             })
           },
         })
       },
+    })
+  },
+
+  // ==================== 专业信息 - 资源供需 ====================
+
+  onSkillTagsInput(e) {
+    const value = e.detail.value
+    const tags = value ? value.split(/[,，]/).map(t => t.trim()).filter(t => t) : []
+    this.setData({
+      'formData.skillTags': tags,
     })
   },
 
@@ -157,6 +428,8 @@ Page({
     })
   },
 
+  // ==================== 公司信息 ====================
+
   showSizePicker() {
     wx.showActionSheet({
       itemList: this.data.sizeOptions,
@@ -186,7 +459,7 @@ Page({
               savedImages[idx] = saveRes.savedFilePath
             },
             fail: () => {
-              savedImages[idx] = path // fallback
+              savedImages[idx] = path
             },
             complete: () => {
               savedCount++
@@ -211,73 +484,41 @@ Page({
     })
   },
 
-  addCase() {
-    const cases = [...this.data.formData.cases, { name: '', date: '', desc: '', images: [] }]
-    this.setData({
-      'formData.cases': cases,
-    })
+  // ==================== 行业模板 ====================
+
+  /**
+   * 获取行业对应的模板配置
+   */
+  _getIndustryTemplate(industry) {
+    if (!industry || !INDUSTRY_TEMPLATES[industry]) return null
+    return INDUSTRY_TEMPLATES[industry]
   },
 
-  deleteCase(e) {
-    const index = parseInt(e.currentTarget.dataset.index)
-    const cases = this.data.formData.cases.filter((_, i) => i !== index)
-    this.setData({
-      'formData.cases': cases,
-    })
-  },
+  /**
+   * 选择行业 - 自动匹配模板
+   */
+  selectIndustry(e) {
+    const value = e.currentTarget.dataset.value
+    const template = this._getIndustryTemplate(value)
+    const templateExtraFields = template ? template.extraFields : []
 
-  chooseCaseImage(e) {
-    const caseIndex = parseInt(e.currentTarget.dataset.caseIndex)
-    const caseData = this.data.formData.cases[caseIndex] || { images: [] }
-    const imageCount = caseData.images && caseData.images.length ? caseData.images.length : 0
-    const remaining = 3 - imageCount
-    
-    wx.chooseImage({
-      count: remaining,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const tempPaths = res.tempFilePaths
-        let savedCount = 0
-        const savedImages = []
-
-        tempPaths.forEach((path, idx) => {
-          wx.saveFile({
-            tempFilePath: path,
-            success: (saveRes) => {
-              savedImages[idx] = saveRes.savedFilePath
-            },
-            fail: () => {
-              savedImages[idx] = path // fallback
-            },
-            complete: () => {
-              savedCount++
-              if (savedCount === tempPaths.length) {
-                const cases = [...this.data.formData.cases]
-                cases[caseIndex] = cases[caseIndex] || { name: '', date: '', desc: '', images: [] }
-                cases[caseIndex].images = [...(cases[caseIndex].images || []), ...savedImages]
-                this.setData({
-                  'formData.cases': cases,
-                })
-              }
-            },
-          })
-        })
-      },
-    })
-  },
-
-  removeCaseImage(e) {
-    const caseIndex = parseInt(e.currentTarget.dataset.caseIndex)
-    const imageIndex = parseInt(e.currentTarget.dataset.imageIndex)
-    const cases = [...this.data.formData.cases]
-    if (cases[caseIndex] && cases[caseIndex].images) {
-      cases[caseIndex].images = cases[caseIndex].images.filter((_, i) => i !== imageIndex)
+    // 清除旧行业的扩展字段数据
+    const resetFields = {}
+    if (this.data.currentTemplate) {
+      this.data.currentTemplate.extraFields.forEach(f => {
+        resetFields[`formData.${f.key}`] = ''
+      })
     }
+
     this.setData({
-      'formData.cases': cases,
+      'formData.industry': value,
+      currentTemplate: template,
+      templateExtraFields,
+      ...resetFields,
     })
   },
+
+  // ==================== 预览 - 风格选择 ====================
 
   selectStyle(e) {
     const value = e.currentTarget.dataset.value
@@ -294,47 +535,33 @@ Page({
     })
   },
 
+  // ==================== 提交 ====================
+
   validateForm() {
-    Logger.info('画册创建页', '开始表单验证', { 
-      formData: JSON.stringify(this.data.formData),
-      name: this.data.formData.name,
-      title: this.data.formData.title,
-      company: this.data.formData.company,
-      bio: this.data.formData.bio ? this.data.formData.bio.slice(0, 30) + '...' : '',
+    const { formData } = this.data
+
+    Logger.info('画册创建页', '开始表单验证', {
+      name: formData.name,
+      title: formData.title,
+      company: formData.company,
     })
-    
-    const { name, title, company, bio } = this.data.formData
-    
-    Logger.info('画册创建页', '表单字段值', {
-      nameValue: name,
-      nameLength: name ? name.length : 0,
-      nameTrimmed: name ? name.trim() : '',
-      titleValue: title,
-      companyValue: company,
-      bioValue: bio ? bio.slice(0, 50) : '',
-      bioLength: bio ? bio.length : 0,
-    })
-    
-    if (!name || !name.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'name', value: name, reason: '姓名为空' })
+
+    if (!formData.name || !formData.name.trim()) {
       wx.showToast({ title: '请输入姓名', icon: 'none' })
+      this.setData({ currentStep: 1 })
       return false
     }
-    if (!title || !title.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'title', value: title, reason: '职位为空' })
+    if (!formData.title || !formData.title.trim()) {
       wx.showToast({ title: '请输入职位', icon: 'none' })
+      this.setData({ currentStep: 1 })
       return false
     }
-    if (!company || !company.trim()) {
-      Logger.error('画册创建页', '验证失败', { field: 'company', value: company, reason: '公司名称为空' })
+    if (!formData.company || !formData.company.trim()) {
       wx.showToast({ title: '请输入公司名称', icon: 'none' })
+      this.setData({ currentStep: 1 })
       return false
     }
-    if (bio && bio.length < 50) {
-      Logger.warn('画册创建页', '个人简介建议至少50字', { bioLength: bio.length })
-    }
-    
-    Logger.info('画册创建页', '表单验证通过')
+
     return true
   },
 
@@ -346,20 +573,22 @@ Page({
     wx.showLoading({ title: '生成中...' })
     try {
       const data = { ...this.data.formData }
-      Logger.info('画册创建页', '开始生成画册', { 
+      Logger.info('画册创建页', '开始生成画册', {
         name: data.name,
         company: data.company,
-        title: data.title,
-        providesCount: data.provides && data.provides.length ? data.provides.length : 0,
-        needsCount: data.needs && data.needs.length ? data.needs.length : 0,
-        casesCount: data.cases && data.cases.length ? data.cases.length : 0,
+        industry: data.industry,
       })
-      
+
       const result = await MockService.createBrochure(data)
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
-      
-      if (result.id) {
+
+      if (result && result.id) {
+        wx.setStorageSync('last_brochure', result)
+      }
+
+      if (result && result.id) {
         wx.hideLoading()
+        this._clearDraft()
         wx.showToast({ title: '生成成功', icon: 'success' })
         store.markDataDirty()
         setTimeout(() => {
@@ -373,16 +602,10 @@ Page({
       }
     } catch (err) {
       wx.hideLoading()
+      console.error('[BrochureCreate] 提交失败详情:', err)
       Logger.error('画册创建页', '提交失败', err)
-      wx.showToast({ title: '提交失败', icon: 'none' })
+      const errMsg = err.message || (err.data && err.data.message) || '提交失败'
+      wx.showToast({ title: errMsg, icon: 'none' })
     }
-  },
-
-  onSkillTagsInput(e) {
-    const value = e.detail.value
-    const tags = value ? value.split(/[,，]/).map(t => t.trim()).filter(t => t) : []
-    this.setData({
-      'formData.skillTags': tags,
-    })
   },
 })

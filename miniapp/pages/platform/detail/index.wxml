@@ -1,0 +1,213 @@
+<view class="page-container">
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <view class="header-right">
+      <view class="invite-btn" bindtap="openInviteModal">+邀请</view>
+      <view class="more-btn">⋯</view>
+    </view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{!loading && platform}}">
+    <view class="platform-header">
+      <view class="platform-info">
+        <text class="platform-name">{{platform.name}}</text>
+        <text class="platform-desc">资源对接，请联系<text class="secretary-link" bindtap="openContactModal">秘书处</text></text>
+      </view>
+      <view class="platform-logo">
+        <text class="logo-text">{{platform.name ? platform.name[0] : 'P'}}</text>
+      </view>
+    </view>
+
+    <view class="stats-bar">
+      <view class="stat-item">
+        <text class="stat-num">{{platform.member_count || 0}}</text>
+        <text class="stat-label">单位</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{platform.opportunity_count || 0}}</text>
+        <text class="stat-label">商机</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">--</text>
+        <text class="stat-label">行业分布</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">--</text>
+        <text class="stat-label">城市分布</text>
+      </view>
+    </view>
+
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === 'info' ? 'active' : ''}}" bindtap="switchTab" data-tab="info">
+        <text class="tab-text">介绍</text>
+      </view>
+      <view class="tab-item {{activeTab === 'resources' ? 'active' : ''}}" bindtap="switchTab" data-tab="resources">
+        <text class="tab-text">资源单位</text>
+      </view>
+      <view class="tab-item {{activeTab === 'opportunities' ? 'active' : ''}}" bindtap="switchTab" data-tab="opportunities">
+        <text class="tab-text">平台商机</text>
+      </view>
+    </view>
+
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'info'}}">
+      <view class="creator-card">
+        <view class="creator-avatar">
+          <text class="avatar-text">{{platform.creator_name ? platform.creator_name[0] : '?'}}</text>
+        </view>
+        <view class="creator-info">
+          <text class="creator-name">{{platform.creator_name || '--'}} | {{platform.creator_title || 'CEO'}}</text>
+          <text class="creator-company">{{platform.creator_company || '--'}}</text>
+        </view>
+        <view class="creator-badge">创建人</view>
+      </view>
+
+      <view class="info-section">
+        <text class="section-label">暂无介绍</text>
+      </view>
+
+      <view class="info-section">
+        <text class="section-title">资源平台介绍</text>
+        <text class="section-content">{{platform.description || '暂无'}}</text>
+      </view>
+
+      <view class="info-section" wx:if="{{resourceUnits.length > 0}}">
+        <text class="section-title">资源单位({{resourceUnits.length}})</text>
+        <view class="unit-list">
+          <text class="unit-item" wx:for="{{resourceUnits}}" wx:key="id">{{item.name}}</text>
+        </view>
+      </view>
+
+      <view class="info-section" wx:if="{{opportunities.length > 0}}">
+        <text class="section-title">平台商机</text>
+        <view class="opportunity-list">
+          <view class="opportunity-item" wx:for="{{opportunities}}" wx:key="id">
+            <text class="opp-title">{{item.title}}</text>
+            <text class="opp-desc">{{item.desc}}</text>
+            <view class="opp-meta">
+              <text class="opp-tag">{{item.type}}</text>
+              <text class="opp-location">{{item.location}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-state" wx:if="{{opportunities.length === 0}}">
+        <text class="empty-text">平台暂无发布商机</text>
+      </view>
+    </scroll-view>
+
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'resources'}}">
+      <view class="resource-list" wx:if="{{resourceUnits.length > 0}}">
+        <view class="resource-item" wx:for="{{resourceUnits}}" wx:key="id">
+          <view class="resource-avatar">
+            <text class="avatar-text">{{item.name ? item.name[0] : '?'}}</text>
+          </view>
+          <view class="resource-info">
+            <text class="resource-name">{{item.name}}</text>
+            <text class="resource-meta">{{item.industry}} · {{item.location}}</text>
+          </view>
+          <view class="resource-action">
+            <text class="action-text">查看</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <text class="empty-text">暂无资源单位</text>
+      </view>
+    </scroll-view>
+
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'opportunities'}}">
+      <view class="opportunity-list" wx:if="{{opportunities.length > 0}}">
+        <view class="opportunity-card" wx:for="{{opportunities}}" wx:key="id">
+          <view class="card-header">
+            <text class="card-title">{{item.title}}</text>
+            <text class="card-tag">{{item.type}}</text>
+          </view>
+          <text class="card-desc">{{item.desc}}</text>
+          <view class="card-footer">
+            <text class="card-info">{{item.industry}}</text>
+            <text class="card-info">{{item.location}}</text>
+            <text class="card-info">{{item.publisher}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <text class="empty-text">暂无平台商机</text>
+      </view>
+    </scroll-view>
+  </block>
+
+  <view class="bottom-bar" wx:if="{{!loading && platform}}">
+    <button class="join-btn" bindtap="handleJoin" disabled="{{alreadyJoined || joining}}">
+      <text class="join-text">{{alreadyJoined ? '已加入' : (joining ? '加入中...' : '加入需缴纳 ¥' + (platform.annual_fee || 0) + ' /年')}}</text>
+    </button>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showContactModal}}" bindtap="closeContactModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">联系:</text>
+        <text class="modal-close" bindtap="closeContactModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <text class="contact-tip">站内暂不支持聊天，如需联系可以拨打对方电话</text>
+        <view class="contact-item">
+          <view class="contact-avatar">
+            <text class="avatar-text">{{platform.creator_name ? platform.creator_name[0] : '?'}}</text>
+          </view>
+          <view class="contact-info">
+            <text class="contact-name">{{platform.creator_name || '?'}}</text>
+          </view>
+          <view class="call-btn" bindtap="makeCall">
+            <text class="call-icon">📞</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{showInviteModal}}" bindtap="closeInviteModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">你想通过什么方式邀请?</text>
+        <text class="modal-close" bindtap="closeInviteModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="invite-methods">
+          <view class="invite-method" bindtap="inviteFromApp">
+            <text class="method-icon">📱</text>
+            <view class="method-info">
+              <text class="method-title">从询赋 App 中邀请</text>
+              <text class="method-desc">选择询赋内的好友，发送邀请链接</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
+          <view class="invite-method" bindtap="inviteFromWechat">
+            <text class="method-icon">💬</text>
+            <view class="method-info">
+              <text class="method-title">从微信邀请</text>
+              <text class="method-desc">选择微信好友，发送邀请链接</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
+          <view class="invite-method" bindtap="showQRCode">
+            <text class="method-icon">📷</text>
+            <view class="method-info">
+              <text class="method-title">平台二维码</text>
+              <text class="method-desc">通过平台二维码邀请</text>
+            </view>
+            <text class="method-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -28,6 +28,7 @@ from app.schemas import (
     BrochureUpdate,
     PageSchema,
 )
+from app.services.share_service import generate_qr_code, build_share_url
 
 logger = logging.getLogger(__name__)
 
@@ -471,3 +472,89 @@ async def get_recommendations(
     await db.commit()
 
     return matches
+
+
+# ═══════════════════════════════════════════════════════════════
+# 小程序码/二维码生成
+# ═══════════════════════════════════════════════════════════════
+
+# 小程序调用: GET /api/v1/miniapp/qrcode → 被中间件重写为 GET /api/miniapp/qrcode
+miniapp_code_router = APIRouter(prefix="/api/miniapp", tags=["miniapp"])
+
+
+@miniapp_code_router.get("/qrcode")
+async def get_miniapp_qrcode(
+    share_token: str = Query(..., description="名片分享 token"),
+    width: int = Query(280, ge=100, le=1000, description="二维码图片宽度（像素）"),
+    current_user: User = Depends(get_optional_user),
+):
+    """生成名片二维码图片（使用 qrcode 库生成真实二维码）
+
+    替代前端基于字符串哈希的伪二维码生成。
+    返回 Base64 编码的 PNG 图片。（前端 request.js 期望 JSON 响应）
+
+    对接微信小程序码（wxacode.getUnlimited）：
+      当设置了 WECHAT_APPID/WECHAT_SECRET 时，自动调用微信API生成小程序码；
+      否则使用标准 QR 码（分享到浏览器查看）。
+    """
+    import base64
+
+    from app.config import settings
+
+    wechat_appid = getattr(settings, "WECHAT_APPID", "") or ""
+    wechat_secret = getattr(settings, "WECHAT_SECRET", "") or ""
+
+    img_bytes = None
+
+    # 尝试调用微信小程序码 API
+    if wechat_appid and wechat_secret:
+        try:
+            import httpx
+
+            # 1. 获取 access_token
+            async with httpx.AsyncClient() as client:
+                token_resp = await client.get(
+                    "https://api.weixin.qq.com/cgi-bin/token",
+                    params={
+                        "grant_type": "client_credential",
+                        "appid": wechat_appid,
+                        "secret": wechat_secret,
+                    },
+                )
+                token_data = token_resp.json()
+                access_token = token_data.get("access_token")
+                if not access_token:
+                    raise ValueError(f"微信 access_token 获取失败: {token_data}")
+
+                # 2. 调用 wxacode.getUnlimited
+                code_resp = await client.post(
+                    f"https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={access_token}",
+                    json={
+                        "scene": share_token,
+                        "width": width,
+                        "auto_color": False,
+                        "page": "pages/brochure/share",
+                    },
+                )
+                # 如果返回的是图片二进制（content-type 含 image），直接使用
+                content_type = code_resp.headers.get("content-type", "")
+                if "image" in content_type:
+                    img_bytes = code_resp.content
+                else:
+                    err_data = code_resp.json()
+                    logger.warning("微信小程序码生成返回错误: %s", err_data)
+        except Exception as e:
+            logger.warning("微信小程序码生成失败，降级到标准 QR 码: %s", e)
+
+    # 降级：使用标准 QR 码（分享到浏览器查看名片）
+    if img_bytes is None:
+        try:
+            img_bytes = generate_qr_code(share_token, box_size=10, border=2)
+        except Exception as e:
+            logger.error("QR 码生成失败: %s", e)
+            raise HTTPException(status_code=500, detail="二维码生成失败")
+
+    # 返回 Base64 编码（前端 request.js 期望 JSON）
+    b64 = base64.b64encode(img_bytes).decode("utf-8")
+    data_url = f"data:image/png;base64,{b64}"
+    return {"code": 0, "message": "success", "data": data_url}

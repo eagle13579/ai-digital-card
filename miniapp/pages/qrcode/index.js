@@ -1,15 +1,29 @@
-const MockService = require('../../utils/mockService')
+const { MockService } = require('../../utils/mockService')
+const { miniappApi } = require('../../utils/api')
 
 Page({
   data: { 
     brochure: null, 
     qrcodeData: '',
+    qrcodeImageUrl: '',
     generating: false,
   },
 
   async onLoad(options) {
     const id = options.id || ''
-    const brochure = id ? await MockService.getBrochureById(id) : null
+    let brochure
+    
+    if (MockService.USE_MOCK) {
+      brochure = id ? await MockService.getBrochureById(id) : null
+    } else {
+      const { brochureApi } = require('../../utils/api')
+      try {
+        const res = await brochureApi.getById(id)
+        brochure = res.data || res
+      } catch (e) {
+        console.error('获取名片详情失败', e)
+      }
+    }
     
     if (!brochure) {
       wx.showToast({ title: '请先创建名片', icon: 'none' })
@@ -17,9 +31,10 @@ Page({
       return
     }
 
+    const shareToken = brochure.share_token || brochure.id
     this.setData({ 
       brochure, 
-      qrcodeData: 'https://card.example.com/brochure/' + brochure.id 
+      qrcodeData: shareToken,
     })
     this.generateQRCode()
   },
@@ -28,6 +43,87 @@ Page({
     if (this.data.generating) return
     this.setData({ generating: true })
 
+    const shareToken = this.data.qrcodeData
+    const width = 280
+
+    if (MockService.USE_MOCK) {
+      // Mock模式：使用Canvas绘制模拟二维码
+      this._drawMockQR()
+    } else {
+      // 真实API模式：调用后端生成二维码图片
+      this._loadRealQRCode(shareToken, width)
+    }
+  },
+
+  /** 调用后端API获取真实二维码图片 */
+  async _loadRealQRCode(shareToken, width) {
+    try {
+      const res = await miniappApi.getQRCode(shareToken, width)
+      
+      if (res && res.data) {
+        // 后端返回的是Base64编码的图片
+        this.setData({
+          qrcodeImageUrl: res.data,
+          generating: false,
+        })
+        wx.showToast({ title: '二维码已就绪', icon: 'success' })
+      } else if (res && res.tempFilePath) {
+        // 直接返回临时文件路径
+        this.setData({
+          qrcodeImageUrl: res.tempFilePath,
+          generating: false,
+        })
+        wx.showToast({ title: '二维码已就绪', icon: 'success' })
+      } else {
+        throw new Error('无效的二维码响应')
+      }
+    } catch (e) {
+      console.error('[QRCode] 获取二维码失败，降级至本地生成:', e)
+      // 降级：自行绘制二维码URL
+      this._drawURLQR(shareToken)
+    }
+  },
+
+  /** 降级方案：在Canvas上绘制二维码URL文本 */
+  _drawURLQR(shareToken) {
+    const query = wx.createSelectorQuery()
+    query.select('#qrcodeCanvas')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (!res[0]) {
+          this.setData({ generating: false })
+          return
+        }
+        const canvas = res[0].node
+        const ctx = canvas.getContext('2d')
+        const dpr = wx.getWindowInfo().pixelRatio
+        const size = 200
+        canvas.width = size * dpr
+        canvas.height = size * dpr
+        ctx.scale(dpr, dpr)
+
+        // 白色背景
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, size, size)
+
+        // 显示分享链接
+        ctx.fillStyle = '#333333'
+        ctx.font = '12px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        const url = `https://card.example.com/view/${shareToken}`
+        ctx.fillText('扫码查看名片', size / 2, size / 2 - 10)
+        ctx.font = '10px sans-serif'
+        ctx.fillStyle = '#666666'
+        ctx.fillText(url, size / 2, size / 2 + 10)
+
+        this.setData({ generating: false })
+        wx.showToast({ title: '二维码已生成（降级模式）', icon: 'success' })
+      })
+  },
+
+  /** Mock模式：绘制模拟二维码 */
+  _drawMockQR() {
     const query = wx.createSelectorQuery()
     query.select('#qrcodeCanvas')
       .fields({ node: true, size: true })
@@ -136,6 +232,21 @@ Page({
   },
 
   saveQR() {
+    if (this.data.qrcodeImageUrl && !MockService.USE_MOCK) {
+      // 真实API模式：直接保存图片
+      wx.saveImageToPhotosAlbum({
+        filePath: this.data.qrcodeImageUrl,
+        success: () => {
+          wx.showToast({ title: '已保存到相册', icon: 'success' })
+        },
+        fail: () => {
+          wx.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
+        }
+      })
+      return
+    }
+
+    // Canvas模式：截图保存
     const query = wx.createSelectorQuery()
     query.select('#qrcodeCanvas')
       .fields({ node: true })

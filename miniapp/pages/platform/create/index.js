@@ -1,4 +1,4 @@
-const MockService = require('../../../utils/mockService')
+const { MockService } = require('../../../utils/mockService')
 const store = require('../../../utils/store')
 
 const PROVINCES = [

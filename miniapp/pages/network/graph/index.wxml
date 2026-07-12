@@ -1,7 +1,16 @@
 <view class="graph-page">
   <view class="graph-header">
-    <text class="graph-title">🤝 信任网络图谱</text>
-    <text class="graph-subtitle">{{nodeCount}} 位联系人</text>
+    <view class="header-top">
+      <view class="header-back-btn" wx:if="{{isSubNetwork}}" bindtap="goBackToMainNetwork">
+        <text class="back-arrow">←</text>
+        <text class="back-text">返回我的网络</text>
+      </view>
+      <view class="header-title-area">
+        <text class="graph-title" wx:if="{{!isSubNetwork}}">🤝 信任网络图谱</text>
+        <text class="graph-title" wx:if="{{isSubNetwork}}">🌐 {{subNetworkLabel}}的人脉网络</text>
+        <text class="graph-subtitle">{{nodeCount}} 位联系人</text>
+      </view>
+    </view>
   </view>
 
   <view class="graph-container">
@@ -25,8 +34,12 @@
       <text class="action-icon">+</text>
       <text class="action-text">添加联系人</text>
     </view>
-    <view class="action-btn import-btn" bindtap="openPathSearch">
-      <text class="action-icon">🔍</text>
+    <view class="action-btn import-btn" bindtap="navigateToImport">
+      <text class="action-icon">📥</text>
+      <text class="action-text">导入联系人</text>
+    </view>
+    <view class="action-btn search-btn" bindtap="openPathSearch">
+      <text class="action-icon">🔗</text>
       <text class="action-text">触达路径</text>
     </view>
     <view class="action-btn refresh-btn" bindtap="refreshGraph">
@@ -97,4 +110,53 @@
     bind:close="closePathResult"
     bind:nodetap="onPathNodeTap"
   />
+
+  <!-- 联系人信息弹窗 -->
+  <view class="info-modal" wx:if="{{showInfoModal && selectedNode}}">
+    <view class="info-overlay" bindtap="closeInfoModal"></view>
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">👤 联系人信息</text>
+        <text class="info-close" bindtap="closeInfoModal">✕</text>
+      </view>
+      <view class="info-body">
+        <view class="info-avatar-row">
+          <view class="info-avatar {{selectedNode.isSelf ? 'avatar-self' : ''}}">
+            <text class="avatar-text">{{selectedNode.name.slice(0, 1)}}</text>
+          </view>
+          <view class="info-name-area">
+            <text class="info-name">{{selectedNode.name}}</text>
+            <text class="info-relation-tag">{{selectedNode.relation}}</text>
+          </view>
+        </view>
+        <view class="info-divider"></view>
+        <view class="info-detail-row">
+          <text class="detail-label">关系</text>
+          <text class="detail-value">{{selectedNode.relation}}</text>
+        </view>
+        <view class="info-detail-row">
+          <text class="detail-label">信任度</text>
+          <view class="trust-score-bar">
+            <view class="trust-score-fill" style="width: {{selectedNode.trustScore}}%"></view>
+          </view>
+          <text class="detail-value trust-score-value">{{selectedNode.trustScore}}分</text>
+        </view>
+      </view>
+      <view class="info-footer">
+        <button
+          class="info-action-btn"
+          wx:if="{{!selectedNode.isSelf}}"
+          bindtap="viewContactNetwork"
+        >
+          🌐 查看TA的人脉网络
+        </button>
+        <button
+          class="info-close-btn"
+          bindtap="closeInfoModal"
+        >
+          关闭
+        </button>
+      </view>
+    </view>
+  </view>
 </view>
