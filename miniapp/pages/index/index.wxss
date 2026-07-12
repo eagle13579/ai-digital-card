@@ -91,7 +91,7 @@
 /* Stats Row — 右上角 */
 .user-stats-row {
   position: absolute;
-  top: 32px;
+  top: 48px;
   right: 16px;
   display: flex;
   gap: var(--space-4);
