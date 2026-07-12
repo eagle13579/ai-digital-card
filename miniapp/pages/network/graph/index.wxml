@@ -102,14 +102,57 @@
   </view>
 
   <!-- 路径结果显示 -->
-  <path-display
-    visible="{{showPathResult}}"
-    path="{{pathResult.path}}"
-    distance="{{pathResult.distance}}"
-    message="{{pathResult.message}}"
-    bind:close="closePathResult"
-    bind:nodetap="onPathNodeTap"
-  />
+  <view class="info-modal" wx:if="{{showPathResult && pathResult}}">
+    <view class="info-overlay" bindtap="closePathResult"></view>
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">🔗 触达路径</text>
+        <text class="info-close" bindtap="closePathResult">✕</text>
+      </view>
+      <view class="info-body">
+        <block wx:if="{{pathResult.distance >= 0 && pathResult.path && pathResult.path.length > 0}}">
+          <view class="info-detail-row">
+            <text class="detail-label">距离</text>
+            <text class="detail-value" style="color:#06b6d4;font-weight:600;">
+              {{pathResult.distance}} 度
+              <text style="color:rgba(255,255,255,0.5);font-weight:400;">（{{pathResult.path.length}} 个节点）</text>
+            </text>
+          </view>
+          <view class="info-divider"></view>
+          <view class="path-steps">
+            <view
+              class="path-step-item"
+              wx:for="{{pathResult.path}}"
+              wx:key="id"
+              bindtap="onPathNodeTap"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+            >
+              <view class="step-node {{item.id === 'self' ? 'step-self' : ''}}">
+                <text class="step-node-text">{{item.name.slice(0, 1)}}</text>
+              </view>
+              <view class="step-info">
+                <text class="step-name">{{item.name}}</text>
+                <text class="step-tag">{{item.relation || '关联'}} · {{item.trustScore || 0}}分</text>
+              </view>
+              <text class="step-arrow" wx:if="{{index < pathResult.path.length - 1}}">›</text>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="empty-state" style="padding:32px 0;text-align:center;">
+            <text class="empty-icon" style="font-size:48px;display:block;margin-bottom:12px;">🔍</text>
+            <text class="detail-value" style="text-align:center;display:block;">
+              {{pathResult.message || '未找到触达路径'}}
+            </text>
+          </view>
+        </block>
+      </view>
+      <view class="info-footer">
+        <button class="info-close-btn" bindtap="closePathResult">关闭</button>
+      </view>
+    </view>
+  </view>
 
   <!-- 联系人信息弹窗 -->
   <view class="info-modal" wx:if="{{showInfoModal && selectedNode}}">

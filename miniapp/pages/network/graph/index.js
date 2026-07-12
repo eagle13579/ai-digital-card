@@ -747,7 +747,7 @@ Page({
   },
 
   onPathNodeTap(e) {
-    const { id, name } = e.detail
+    const { id, name } = e.currentTarget.dataset
     console.log('[Graph] 路径节点点击:', id, name)
     wx.showToast({ title: `${name} (${id})`, icon: 'none' })
   },
