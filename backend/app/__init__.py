@@ -175,6 +175,10 @@ def create_app():
     from app.routers.analytics import router as analytics_router
     from app.routers.platform_router import router as platform_router
     from app.routers.connection_router import router as connection_router
+    # ── 链客宝合并路由 ──
+    from app.routers.organization_router import router as organization_router
+    from app.routers.six_degrees_router import router as six_degrees_router
+    from app.routers.escrow_router import router as escrow_router
 
     # ── 惰性注册：knowledge_models_router ──────────────────────────
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -194,6 +198,10 @@ def create_app():
     app.include_router(gaia_router)
     app.include_router(platform_router)
     app.include_router(connection_router)
+    # ── 链客宝合并路由 ──
+    app.include_router(organization_router)
+    app.include_router(six_degrees_router)
+    app.include_router(escrow_router)
     app.include_router(ocr_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
