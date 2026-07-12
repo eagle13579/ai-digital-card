@@ -224,8 +224,11 @@ Page({
     wx.showActionSheet({
       itemList: ['分享给朋友', '生成海报', '复制链接'],
       success: (res) => {
-        const actions = ['分享给朋友', '生成海报', '复制链接']
-        wx.showToast({ title: `${actions[res.tapIndex]}功能开发中`, icon: 'none' })
+        if (res.tapIndex === 0) {
+          wx.shareAppMessage()
+        } else {
+          wx.showToast({ title: '功能开发中', icon: 'none' })
+        }
       },
     })
   },
