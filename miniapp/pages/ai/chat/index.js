@@ -155,4 +155,4 @@ Page(i18nMixin.attach({
       }
     })
   },
-})
+}))
