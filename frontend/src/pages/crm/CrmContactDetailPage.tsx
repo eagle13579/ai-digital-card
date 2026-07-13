@@ -133,7 +133,7 @@ function DeleteConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
+      <div className="bg-white rounded-2xl shadow-modal w-full max-w-sm">
         <div className="p-6 text-center">
           <div className="w-14 h-14 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-7 h-7 text-rose-500" />
@@ -231,10 +231,10 @@ function TagEditModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm max-h-[80vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-modal w-full max-w-sm max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-border-light shrink-0">
           <h3 className="text-base font-bold text-on-surface">编辑标签</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-text-muted transition-colors">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-text-muted transition-colors" aria-label="关闭">
             <X className="w-4 h-4" />
           </button>
         </div>

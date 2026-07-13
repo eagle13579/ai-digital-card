@@ -75,7 +75,7 @@ export default function AIAssistant({ fields, brochureId, onClose, onApplyCopy, 
 
       {/* Panel */}
       <div
-        className="relative w-full max-w-lg max-h-[85vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-lg max-h-[85vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-modal overflow-hidden flex flex-col"
         style={{
           animation: 'slideUp 0.3s ease-out',
         }}
@@ -94,6 +94,7 @@ export default function AIAssistant({ fields, brochureId, onClose, onApplyCopy, 
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            aria-label={t('button.close')}
           >
             <X className="w-5 h-5" />
           </button>

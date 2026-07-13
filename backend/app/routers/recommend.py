@@ -242,7 +242,7 @@ async def discover_recommend(
             except ValueError as e:
                 logger.warning("内联反馈处理失败: %s", e)
 
-    valid_purposes = (None, "partner", "client", "investor", "supplier")
+    valid_purposes = (None, "partner", "client", "investor", "supplier", "business", "personal", "startup")
     if data.purpose not in valid_purposes:
         raise HTTPException(
             status_code=400,

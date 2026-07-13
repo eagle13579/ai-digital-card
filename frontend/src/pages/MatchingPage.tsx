@@ -60,7 +60,9 @@ export default function MatchingPage() {
             setSelectedCardId(items[0].id);
           }
         }
-      } catch {}
+      } catch {
+        console.error('[MatchingPage] Failed to fetch card list');
+      }
     };
     fetchCardList();
   }, []);
@@ -171,7 +173,7 @@ export default function MatchingPage() {
 
       {/* 匹配按钮 */}
       <button onClick={handleMatch} disabled={matchLoading || !selectedCardId}
-        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
       >
         {matchLoading ? (
           <><Loader2 className="w-5 h-5 animate-spin" /> {t('match.matching')}...</>
@@ -205,7 +207,7 @@ export default function MatchingPage() {
             {(['all', 'need', 'product'] as const).map((f) => (
               <button key={f} onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-[10px] text-xs font-medium transition-colors ${
-                  filter === f ? 'bg-white text-on-surface shadow-sm' : 'text-text-muted hover:text-on-surface'
+                  filter === f ? 'bg-white text-on-surface shadow-card' : 'text-text-muted hover:text-on-surface'
                 }`}
               >
                 {f === 'all' ? t('match.filterAll') : f === 'need' ? t('match.filterNeed') : t('match.filterProduct')}
@@ -253,7 +255,7 @@ export default function MatchingPage() {
         <div className="space-y-2">
           {filteredResults.map((item) => (
             <div key={`${item.type}-${item.id}`}
-              className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md transition-all duration-200 cursor-pointer"
+              className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated transition-all duration-200 cursor-pointer"
             >
               <div className="flex items-start gap-3">
                 <span className={`px-2 py-1 rounded-lg text-[10px] font-medium shrink-0 ${

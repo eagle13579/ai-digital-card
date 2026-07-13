@@ -715,7 +715,7 @@ export default function BusinessCardPage() {
             <div
               key={card.id}
               onClick={() => handleViewDetail(card.id)}
-              className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer"
+              className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated hover:border-primary/30 transition-all duration-200 cursor-pointer"
             >
               <div className="flex items-start gap-3">
                 {/* Avatar */}
@@ -764,7 +764,7 @@ export default function BusinessCardPage() {
       {/* Create button */}
       <button
         onClick={handleCreateNew}
-        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
       >
         <Plus className="w-5 h-5" />
         创建新名片
@@ -783,6 +783,7 @@ export default function BusinessCardPage() {
         <button
           onClick={() => setStep('list')}
           className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+          aria-label="返回"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -859,6 +860,7 @@ export default function BusinessCardPage() {
         <button
           onClick={() => setStep('upload')}
           className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+          aria-label="返回"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -1022,7 +1024,7 @@ export default function BusinessCardPage() {
               onClick={() => setSelectedTemplate(tpl.id)}
               className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-200 ${
                 isSelected
-                  ? 'border-primary ring-2 ring-primary/30 shadow-lg'
+                  ? 'border-primary ring-2 ring-primary/30 shadow-elevated'
                   : 'border-border-light hover:border-primary/50'
               }`}
             >
@@ -1070,7 +1072,7 @@ export default function BusinessCardPage() {
       <button
         onClick={handleGenerate}
         disabled={loading}
-        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
       >
         {loading ? (
           <>
@@ -1168,6 +1170,7 @@ export default function BusinessCardPage() {
               onClick={goPrevPage}
               disabled={currentPage === 0}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="上一页"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -1190,6 +1193,7 @@ export default function BusinessCardPage() {
               onClick={goNextPage}
               disabled={currentPage === totalPages - 1}
               className="p-2 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="下一页"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -1436,7 +1440,7 @@ export default function BusinessCardPage() {
         {/* AI Assistant */}
         <button
           onClick={handleOpenAIAssistant}
-          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
         >
           <Sparkles className="w-4 h-4" />
           AI 名片助手（写作 & 优化）

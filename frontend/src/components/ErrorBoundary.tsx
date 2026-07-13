@@ -84,7 +84,7 @@ function ErrorFallback({
 
   return (
     <div className="min-h-screen bg-neutral-bg flex items-center justify-center p-4">
-      <div className="bg-surface rounded-2xl shadow-sm border border-border-light max-w-md w-full p-8 text-center">
+      <div className="bg-surface rounded-2xl shadow-card border border-border-light max-w-md w-full p-8 text-center">
         {/* 错误图标 */}
         <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-error/10 flex items-center justify-center">
           <AlertTriangle className="w-10 h-10 text-error" />

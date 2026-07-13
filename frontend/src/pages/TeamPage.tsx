@@ -60,7 +60,7 @@ function TeamCard({ team, onClick }: { team: Team; onClick: () => void }) {
   const roleLabel = (id: number) => id === 1 ? t('team.owner') : t('team.member');
   return (
     <div
-      className="bg-surface rounded-xl p-5 border border-border hover:border-primary/50 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md"
+      className="bg-surface rounded-xl p-5 border border-border hover:border-primary/50 cursor-pointer transition-all duration-200 shadow-card hover:shadow-elevated"
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
@@ -122,10 +122,10 @@ function CreateTeamModal({ onClose, onCreated }: { onClose: () => void; onCreate
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
+      <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold">{t('team.createTeam')}</h2>
-          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg" aria-label={t('button.close')}><X className="w-5 h-5" /></button>
         </div>
         <div className="space-y-4">
           <div>
@@ -362,14 +362,14 @@ function BatchImportModal({ onClose, onImported }: { onClose: () => void; onImpo
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-surface rounded-2xl p-6 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="bg-surface rounded-2xl p-6 w-full max-w-2xl shadow-modal max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Upload className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-semibold">{t('team.batchImport')}</h2>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg" aria-label={t('button.close')}><X className="w-5 h-5" /></button>
         </div>
 
         {/* State: result shown */}
@@ -450,7 +450,7 @@ function BatchImportModal({ onClose, onImported }: { onClose: () => void; onImpo
                     <span className="text-sm font-medium truncate">{file.name}</span>
                     <span className="text-xs text-on-surface/40">({(file.size / 1024).toFixed(1)} KB, {totalRows} {t('team.records')})</span>
                   </div>
-                  <button onClick={resetFile} className="p-1 hover:bg-surface rounded-lg shrink-0">
+                  <button onClick={resetFile} className="p-1 hover:bg-surface rounded-lg shrink-0" aria-label={t('button.close')}>
                     <X className="w-4 h-4 text-on-surface/50" />
                   </button>
                 </div>
@@ -555,7 +555,7 @@ export default function TeamPage() {
       <header className="bg-surface border-b border-border px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/')} className="p-2 hover:bg-neutral-bg rounded-xl">
+            <button onClick={() => navigate('/')} className="p-2 hover:bg-neutral-bg rounded-xl" aria-label={t('button.back')}>
               <Users className="w-5 h-5 text-on-surface" />
             </button>
             <h1 className="text-lg font-semibold">{t('team.management')}</h1>

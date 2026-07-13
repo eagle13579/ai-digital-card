@@ -661,7 +661,7 @@ export default function CardEditorPage() {
   const renderUpload = () => (
     <div className="space-y-6 max-w-lg mx-auto">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="返回">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
@@ -724,7 +724,7 @@ export default function CardEditorPage() {
   const renderReview = () => (
     <div className="space-y-6 max-w-lg mx-auto">
       <div className="flex items-center gap-3">
-        <button onClick={() => setStep('upload')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <button onClick={() => setStep('upload')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="返回">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
@@ -788,7 +788,7 @@ export default function CardEditorPage() {
   const renderTemplate = () => (
     <div className="space-y-6 max-w-lg mx-auto">
       <div className="flex items-center gap-3">
-        <button onClick={() => setStep('review')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <button onClick={() => setStep('review')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="返回">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
@@ -804,7 +804,7 @@ export default function CardEditorPage() {
           return (
             <button key={tpl.id} onClick={() => setSelectedTemplate(tpl.id)}
               className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-200 ${
-                isSelected ? 'border-primary ring-2 ring-primary/30 shadow-lg' : 'border-border-light hover:border-primary/50'
+                isSelected ? 'border-primary ring-2 ring-primary/30 shadow-elevated' : 'border-border-light hover:border-primary/50'
               }`}
             >
               <div className={`aspect-[3/4] ${preview.bg} p-3 flex flex-col justify-between`}>
@@ -834,7 +834,7 @@ export default function CardEditorPage() {
       </div>
 
       <button onClick={handleGenerate} disabled={loading}
-        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
       >
         {loading ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> 生成中...</>
@@ -917,7 +917,7 @@ export default function CardEditorPage() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-slate-50 rounded-xl px-3 py-2.5 text-xs text-on-surface truncate">{shareUrl}</div>
-            <button onClick={handleCopyLink} className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors" title={copied ? '已复制' : '复制链接'}>
+            <button onClick={handleCopyLink} className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors" title={copied ? '已复制' : '复制链接'} aria-label="复制链接">
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
@@ -1006,14 +1006,14 @@ export default function CardEditorPage() {
     return (
       <div className="space-y-6 max-w-lg mx-auto">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+          <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="返回">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
             <h2 className="text-lg font-bold text-on-surface">名片详情</h2>
           </div>
           <button onClick={() => handleDeleteCard(cardData.id)} disabled={loading}
-            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors disabled:opacity-50" title="删除名片"
+            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors disabled:opacity-50" title="删除名片" aria-label="删除名片"
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -1071,7 +1071,7 @@ export default function CardEditorPage() {
         </div>
 
         <button onClick={handleOpenAIAssistant}
-          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+          className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
         >
           <Sparkles className="w-4 h-4" /> AI 名片助手（写作 & 优化）
         </button>
@@ -1287,10 +1287,10 @@ export default function CardEditorPage() {
       {/* QR Modal */}
       {showQRModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={handleCloseQR}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-modal" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-on-surface">名片二维码</h3>
-              <button onClick={handleCloseQR} className="p-1 rounded-lg hover:bg-slate-100 transition-colors"><X className="w-4 h-4" /></button>
+              <button onClick={handleCloseQR} className="p-1 rounded-lg hover:bg-slate-100 transition-colors" aria-label="关闭"><X className="w-4 h-4" /></button>
             </div>
             <div className="flex items-center justify-center py-4">
               {qrLoading ? (

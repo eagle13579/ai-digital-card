@@ -152,7 +152,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => navigate('/cards/new')}
-          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 text-left"
+          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated hover:border-primary/30 transition-all duration-200 text-left"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-primary to-purple-600 flex items-center justify-center mb-3">
             <Plus className="w-5 h-5 text-white" />
@@ -162,7 +162,7 @@ export default function DashboardPage() {
         </button>
         <button
           onClick={() => navigate('/matching')}
-          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 text-left"
+          className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated hover:border-primary/30 transition-all duration-200 text-left"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center mb-3">
             <Sparkles className="w-5 h-5 text-white" />
@@ -203,7 +203,7 @@ export default function DashboardPage() {
               <div
                 key={card.id}
                 onClick={() => navigate(`/cards/${card.id}`)}
-                className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer"
+                className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated hover:border-primary/30 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}

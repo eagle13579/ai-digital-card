@@ -34,7 +34,7 @@ function StatCard({ label, value, icon, trend, color, onClick }: StatCardProps) 
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-border-light p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+      className={`bg-white rounded-2xl border border-border-light p-5 transition-all duration-200 hover:shadow-elevated hover:-translate-y-0.5 ${
         onClick ? 'cursor-pointer' : ''
       }`}
     >

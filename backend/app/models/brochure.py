@@ -18,7 +18,7 @@ class Brochure(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     title: Mapped[str] = mapped_column(String(128), nullable=False)
     cover: Mapped[str] = mapped_column(String(256), default="")
-    purpose: Mapped[str] = mapped_column(String(32), default="")  # partner/client/investor/supplier
+    purpose: Mapped[str] = mapped_column(String(32), default="")  # partner/client/investor/supplier/business/personal/startup
     pages_count: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(16), default="draft")  # draft | published
     share_token: Mapped[str] = mapped_column(String(32), unique=True, default=generate_share_token)

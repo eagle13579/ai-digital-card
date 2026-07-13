@@ -119,7 +119,7 @@ export default function BusinessCardList({
         {onCreateNew && (
           <button
             onClick={onCreateNew}
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
           >
             <Plus className="w-5 h-5" />
             {t('创建新名片')}
@@ -149,7 +149,7 @@ export default function BusinessCardList({
           <div
             key={card.id}
             onClick={() => onSelect(card.id)}
-            className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer"
+            className="bg-white rounded-2xl p-4 border border-border-light hover:shadow-elevated hover:border-primary/30 transition-all duration-200 cursor-pointer"
           >
             <div className="flex items-start gap-3">
               {/* Avatar */}
@@ -198,7 +198,7 @@ export default function BusinessCardList({
       {onCreateNew && (
         <button
           onClick={onCreateNew}
-          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-button-glow shadow-primary/25"
         >
           <Plus className="w-5 h-5" />
           {t('创建新名片')}

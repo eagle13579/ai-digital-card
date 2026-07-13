@@ -161,7 +161,7 @@ function CreateDealModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-modal w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-border-light">
           <h3 className="text-base font-bold text-on-surface">新增销售机会</h3>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-text-muted transition-colors">
@@ -315,7 +315,7 @@ function DealCardItem({
     <div
       draggable
       onDragStart={(e) => onDragStart(e, deal.id)}
-      className="bg-white rounded-xl border border-border-light p-3 cursor-grab active:cursor-grabbing hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+      className="bg-white rounded-xl border border-border-light p-3 cursor-grab active:cursor-grabbing hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200 group"
     >
       <div className="flex items-start gap-2.5">
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
@@ -565,7 +565,7 @@ export default function CrmPipelinePage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-sm"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-card"
         >
           <Plus className="w-4 h-4" />
           <span>新增机会</span>
@@ -585,7 +585,7 @@ export default function CrmPipelinePage() {
                 key={stage.id}
                 className={`flex-shrink-0 w-64 flex flex-col rounded-2xl border transition-all duration-200 ${
                   isDragOver
-                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
+                    ? 'border-primary bg-primary/5 shadow-elevated shadow-primary/10'
                     : 'border-border-light bg-slate-50/80'
                 }`}
                 onDragOver={(e) => handleDragOver(e, stage.id)}
@@ -643,7 +643,7 @@ export default function CrmPipelinePage() {
         {/* 空状态 */}
         {totalDeals === 0 && stages.length > 0 && !loading && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center pointer-events-auto bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-border-light shadow-sm">
+            <div className="text-center pointer-events-auto bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-border-light shadow-card">
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
                 <Target className="w-8 h-8 text-text-muted" />
               </div>

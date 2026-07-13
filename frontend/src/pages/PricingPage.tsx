@@ -160,8 +160,8 @@ function PricingCard({
       className={`
         relative flex flex-col rounded-2xl border transition-all duration-300
         ${plan.is_recommended
-          ? 'border-sky-400 shadow-xl shadow-sky-200/50 dark:shadow-sky-900/30 scale-[1.02] z-10'
-          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm hover:shadow-md'
+          ? 'border-sky-400 shadow-modal shadow-sky-200/50 dark:shadow-sky-900/30 scale-[1.02] z-10'
+          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-card hover:shadow-elevated'
         }
         bg-white dark:bg-dark-surface
       `}
@@ -169,7 +169,7 @@ function PricingCard({
       {/* Recommended badge */}
       {plan.is_recommended && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+          <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-elevated">
             <Sparkles className="w-3.5 h-3.5" />
             最受欢迎
           </span>
@@ -268,7 +268,7 @@ function PricingCard({
               className={`
                 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
                 ${plan.is_recommended
-                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md hover:shadow-lg hover:from-sky-600 hover:to-blue-700 active:scale-[0.98]'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-elevated hover:shadow-elevated hover:from-sky-600 hover:to-blue-700 active:scale-[0.98]'
                   : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed
@@ -580,7 +580,7 @@ export default function PricingPage() {
         </div>
 
         {showCompare && (
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface shadow-card">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-700">

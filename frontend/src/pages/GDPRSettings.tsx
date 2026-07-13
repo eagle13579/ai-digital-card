@@ -143,7 +143,7 @@ export default function GDPRSettings() {
   if (deleteDone) {
     return (
       <div className="min-h-screen bg-neutral-bg flex items-center justify-center p-4">
-        <div className="bg-surface rounded-2xl p-8 max-w-md text-center shadow-xl">
+        <div className="bg-surface rounded-2xl p-8 max-w-md text-center shadow-modal">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-600" />
           </div>
@@ -167,7 +167,7 @@ export default function GDPRSettings() {
       {/* Header */}
       <header className="bg-surface border-b border-border px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <button onClick={() => navigate('/')} className="p-2 hover:bg-neutral-bg rounded-xl">
+          <button onClick={() => navigate('/')} className="p-2 hover:bg-neutral-bg rounded-xl" aria-label={t('button.back')}>
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>

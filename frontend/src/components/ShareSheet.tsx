@@ -162,7 +162,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md mx-auto shadow-2xl overflow-hidden animate-slide-up"
+        className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md mx-auto shadow-modal overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -179,6 +179,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            aria-label={t('button.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -192,7 +193,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                 activeTab === tab.key
-                  ? 'bg-primary text-white shadow-sm'
+                  ? 'bg-primary text-white shadow-card'
                   : 'text-text-muted hover:bg-slate-100'
               }`}
             >
@@ -215,6 +216,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
                   onClick={handleCopyLink}
                   className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
                   title={copied ? t('已复制') : t('复制链接')}
+                  aria-label={t('card.copyLink')}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -260,7 +262,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
                   <img
                     src={qrBlobUrl}
                     alt={t('名片二维码')}
-                    className="w-48 h-48 rounded-xl shadow-sm"
+                    className="w-48 h-48 rounded-xl shadow-card"
                   />
                 ) : (
                   <div className="w-48 h-48 flex items-center justify-center bg-slate-50 rounded-xl">
@@ -344,6 +346,7 @@ export default function ShareSheet({ shareToken, title, onClose }: ShareSheetPro
                         setTimeout(() => setCopied(false), 2000);
                       }}
                       className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
+                      aria-label={t('card.copyLink')}
                     >
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>

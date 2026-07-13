@@ -19,7 +19,7 @@ export const colors = {
   borderLight: '#F1F5F9',
   text: '#0F172A',
   textSecondary: '#64748B',
-  textTertiary: '#94A3B8',
+  textTertiary: '#64748B',
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',

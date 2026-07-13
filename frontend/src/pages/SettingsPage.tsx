@@ -40,7 +40,9 @@ export default function SettingsPage() {
     }
     try {
       localStorage.setItem('aibizcard_dark', newMode ? '1' : '0');
-    } catch {}
+    } catch {
+      console.warn('[SettingsPage] Failed to save dark mode to localStorage');
+    }
   };
 
   const handleLogout = () => {

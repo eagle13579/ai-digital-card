@@ -41,7 +41,9 @@ export default function ApiDocs() {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    try { await navigator.clipboard.writeText(codeMap[codeLang]); } catch {}
+    try { await navigator.clipboard.writeText(codeMap[codeLang]); } catch {
+      console.warn('[ApiDocs] Copy to clipboard failed');
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -131,13 +133,13 @@ export default function ApiDocs() {
                   {langs.map((t) => (
                     <button key={t.k} onClick={() => setCodeLang(t.k)}
                       className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                        codeLang === t.k ? 'bg-white text-on-surface shadow-sm' : 'text-text-muted hover:text-on-surface'
+                        codeLang === t.k ? 'bg-white text-on-surface shadow-card' : 'text-text-muted hover:text-on-surface'
                       }`}>
                       {t.label}
                     </button>
                   ))}
                 </div>
-                <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-slate-100 text-text-muted" title="复制代码">
+                <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-slate-100 text-text-muted" title="复制代码" aria-label="复制代码">
                   {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>

@@ -40,7 +40,7 @@ export default function CardPreview({ fields, template = 'default', compact = fa
   return (
     <div
       data-testid="card-preview"
-      className={`rounded-2xl overflow-hidden shadow-lg ${tpl.bg} ${tpl.text} ${compact ? 'w-64' : 'w-80'}`}
+      className={`rounded-2xl overflow-hidden shadow-elevated ${tpl.bg} ${tpl.text} ${compact ? 'w-64' : 'w-80'}`}
     >
       {/* Avatar area */}
       <div className="glass-card flex flex-col items-center pt-6 pb-4 px-4">

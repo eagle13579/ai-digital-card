@@ -73,7 +73,7 @@ export default function PaymentCallback() {
 
   return (
     <div className="min-h-screen bg-neutral-bg flex items-center justify-center px-4">
-      <div className="bg-surface rounded-xl shadow-lg border border-border p-8 max-w-sm w-full text-center">
+      <div className="bg-surface rounded-xl shadow-elevated border border-border p-8 max-w-sm w-full text-center">
         {/* Icon */}
         <div className="mb-4">
           {status === 'processing' && (

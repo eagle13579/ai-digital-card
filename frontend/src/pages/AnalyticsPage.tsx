@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api/client';
 import { useT } from '../i18n';
+import { formatRelativeTime } from '../utils/format';
 
 // ─── 类型定义 ──────────────────────────────────────────
 
@@ -41,20 +42,6 @@ interface StatsData {
 }
 
 // ─── 工具函数 ──────────────────────────────────────────
-
-function formatTime(iso: string | null, t: (key: string, vars?: Record<string, string | number>) => string): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return t('analytics.time.justNow');
-  if (mins < 60) return t('analytics.time.minutesAgo', { n: mins });
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return t('analytics.time.hoursAgo', { n: hours });
-  const days = Math.floor(hours / 24);
-  if (days < 7) return t('analytics.time.daysAgo', { n: days });
-  return d.toLocaleDateString('zh-CN');
-}
 
 function formatDuration(sec: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
   if (sec < 60) return t('analytics.duration.seconds', { n: sec });
@@ -225,7 +212,7 @@ export default function AnalyticsPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-neutral-bg flex items-center justify-center p-4">
-        <div className="bg-surface rounded-2xl shadow-sm p-8 max-w-md w-full text-center">
+        <div className="bg-surface rounded-2xl shadow-card p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-error/10 flex items-center justify-center">
             <Activity className="w-8 h-8 text-error" />
           </div>
@@ -255,6 +242,7 @@ export default function AnalyticsPage() {
           <button
             onClick={() => navigate(-1)}
             className="p-2 -ml-2 rounded-xl hover:bg-neutral-bg transition-colors"
+            aria-label={t('analytics.back')}
           >
             <ArrowLeft className="w-5 h-5 text-on-surface" />
           </button>
@@ -272,21 +260,21 @@ export default function AnalyticsPage() {
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-5 pb-24">
         {/* ── 概览卡片 ── */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-surface rounded-2xl shadow-sm p-4 text-center">
+          <div className="bg-surface rounded-2xl shadow-card p-4 text-center">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-primary/10 flex items-center justify-center">
               <Eye className="w-5 h-5 text-primary" />
             </div>
             <p className="text-2xl font-bold text-on-surface">{stats.view_count}</p>
             <p className="text-xs text-text-muted mt-0.5">{t('analytics.views')}</p>
           </div>
-          <div className="bg-surface rounded-2xl shadow-sm p-4 text-center">
+          <div className="bg-surface rounded-2xl shadow-card p-4 text-center">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-emerald-500/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-emerald-500" />
             </div>
             <p className="text-2xl font-bold text-on-surface">{stats.total_visits}</p>
             <p className="text-xs text-text-muted mt-0.5">{t('analytics.visitors')}</p>
           </div>
-          <div className="bg-surface rounded-2xl shadow-sm p-4 text-center">
+          <div className="bg-surface rounded-2xl shadow-card p-4 text-center">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-rose-500/10 flex items-center justify-center">
               <Heart className="w-5 h-5 text-rose-500" />
             </div>
@@ -296,7 +284,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* ── 趋势图 ── */}
-        <div className="bg-surface rounded-2xl shadow-sm p-5">
+        <div className="bg-surface rounded-2xl shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-4 h-4 text-primary" />
             <h2 className="text-sm font-semibold text-on-surface">{t('analytics.trend.title')}</h2>
@@ -310,7 +298,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* ── 来源分布 ── */}
-        <div className="bg-surface rounded-2xl shadow-sm p-5">
+        <div className="bg-surface rounded-2xl shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <Globe className="w-4 h-5 text-primary" />
             <h2 className="text-sm font-semibold text-on-surface">{t('analytics.source.title')}</h2>
@@ -323,7 +311,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* ── 访客时间线 ── */}
-        <div className="bg-surface rounded-2xl shadow-sm p-5">
+        <div className="bg-surface rounded-2xl shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-4 h-4 text-primary" />
             <h2 className="text-sm font-semibold text-on-surface">{t('analytics.visitor.title')}</h2>
@@ -369,7 +357,7 @@ export default function AnalyticsPage() {
                         {v.duration > 0 && (
                           <span>{formatDuration(v.duration, t)}</span>
                         )}
-                        <span>{formatTime(v.visit_time, t)}</span>
+                        <span>{formatRelativeTime(v.visit_time, t)}</span>
                       </div>
                       {v.page_viewed && (
                         <p className="text-xs text-text-muted/70 mt-0.5 truncate">

@@ -71,7 +71,7 @@ export default function Sidebar() {
               onClick={() => navigate(item.path)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 active
-                  ? 'bg-primary/10 text-primary shadow-sm'
+                  ? 'bg-primary/10 text-primary shadow-card'
                   : 'text-text-muted hover:bg-slate-50 hover:text-on-surface'
               }`}
               title={collapsed ? t(item.labelKey) : undefined}
@@ -92,6 +92,7 @@ export default function Sidebar() {
           onClick={() => setCollapsed((c) => !c)}
           className="w-full flex items-center justify-center py-2 rounded-xl text-text-muted hover:bg-slate-50 hover:text-on-surface transition-colors"
           title={collapsed ? t('展开侧栏') : t('收起侧栏')}
+          aria-label={collapsed ? t('展开侧栏') : t('收起侧栏')}
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>

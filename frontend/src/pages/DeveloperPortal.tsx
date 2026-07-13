@@ -121,7 +121,7 @@ export default function DeveloperPortal() {
                 onClick={() => setLangTab(l as any)}
                 className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   langTab === l
-                    ? 'bg-white text-on-surface shadow-sm'
+                    ? 'bg-white text-on-surface shadow-card'
                     : 'text-text-muted hover:text-on-surface'
                 }`}
               >

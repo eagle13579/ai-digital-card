@@ -56,7 +56,7 @@ function Toast({
 }) {
   return (
     <div
-      className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+      className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-elevated text-sm font-medium transition-all ${
         type === 'success'
           ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
           : 'bg-rose-50 border border-rose-200 text-rose-700'
@@ -92,7 +92,7 @@ function EmptyState({ onUpload }: { onUpload: () => void }) {
       </p>
       <button
         onClick={onUpload}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-card"
       >
         <Upload className="w-4 h-4" />
         上传名片图片
@@ -496,7 +496,7 @@ export default function OcrReviewPage() {
             </button>
             <button
               onClick={handleSubmit}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-container transition-colors shadow-card"
             >
               <Save className="w-4 h-4" />
               保存到 CRM

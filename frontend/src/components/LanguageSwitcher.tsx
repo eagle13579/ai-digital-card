@@ -61,7 +61,7 @@ export default function LanguageSwitcher() {
       {open && (
         <div
           className="absolute right-0 top-full mt-1 z-50 w-44 py-1
-                     bg-surface rounded-lg shadow-lg border border-border-color
+                     bg-surface rounded-lg shadow-elevated border border-border-color
                      max-h-64 overflow-y-auto"
         >
           {SUPPORTED_LOCALES.map((code) => (

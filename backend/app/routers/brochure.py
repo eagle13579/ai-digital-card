@@ -129,6 +129,83 @@ PURPOSE_TEMPLATES = {
             {"icon": "📋", "label": "合作流程", "description": "采购流程与合作方式说明"},
         ],
     },
+    "business": {
+        "name": "业务推广",
+        "theme": {
+            "primary": "#a78bfa",
+            "secondary": "#8b5cf6",
+            "gradient": "linear-gradient(135deg, #a78bfa, #8b5cf6)",
+            "bg_start": "#0e0a1a",
+            "bg_mid": "#1d1b2d",
+            "bg_end": "#0f0e1a",
+            "accent": "rgba(167,139,250,0.15)",
+        },
+        "pages": [
+            {"type": "cover", "title": "🏢 企业封面", "hint": "填写企业名称与核心业务定位"},
+            {"type": "text", "title": "📊 业务概览", "hint": "介绍主营业务、核心产品与服务"},
+            {"type": "text", "title": "🏆 优势亮点", "hint": "核心竞争力、技术优势或专利成果"},
+            {"type": "text", "title": "🤝 合作需求", "hint": "说明合作方向与期望的合作伙伴类型"},
+            {"type": "image", "title": "📱 联系方式", "hint": "商务联系人二维码及联系方式"},
+        ],
+        "highlights": ["业务概览", "优势亮点", "合作需求"],
+        "suggested_sections": [
+            {"icon": "📊", "label": "业务概览", "description": "核心业务与产品服务介绍"},
+            {"icon": "🏆", "label": "优势亮点", "description": "核心竞争力与行业优势"},
+            {"icon": "🤝", "label": "合作需求", "description": "合作方向与期望"},
+        ],
+    },
+    "personal": {
+        "name": "个人名片",
+        "theme": {
+            "primary": "#f472b6",
+            "secondary": "#ec4899",
+            "gradient": "linear-gradient(135deg, #f472b6, #ec4899)",
+            "bg_start": "#1a0a14",
+            "bg_mid": "#2d1b26",
+            "bg_end": "#1a0e15",
+            "accent": "rgba(244,114,182,0.15)",
+        },
+        "pages": [
+            {"type": "cover", "title": "👤 个人封面", "hint": "填写姓名、职位与个人标签"},
+            {"type": "text", "title": "📝 个人简介", "hint": "介绍个人背景、擅长领域与成就"},
+            {"type": "text", "title": "💼 职业经历", "hint": "主要职业履历与项目经验"},
+            {"type": "text", "title": "🎯 个人需求", "hint": "职业发展需求或寻求的机会"},
+            {"type": "image", "title": "📱 联系方式", "hint": "个人二维码及联系方式"},
+        ],
+        "highlights": ["个人简介", "职业经历", "个人需求"],
+        "suggested_sections": [
+            {"icon": "📝", "label": "个人简介", "description": "背景、专长与成就"},
+            {"icon": "💼", "label": "职业经历", "description": "履历与项目经验"},
+            {"icon": "🎯", "label": "个人需求", "description": "职业发展与机会寻求"},
+        ],
+    },
+    "startup": {
+        "name": "创业项目",
+        "theme": {
+            "primary": "#34d399",
+            "secondary": "#10b981",
+            "gradient": "linear-gradient(135deg, #34d399, #10b981)",
+            "bg_start": "#0a1a12",
+            "bg_mid": "#1a2d22",
+            "bg_end": "#0e1a14",
+            "accent": "rgba(52,211,153,0.15)",
+        },
+        "pages": [
+            {"type": "cover", "title": "🚀 项目封面", "hint": "填写项目名称、阶段与行业领域"},
+            {"type": "text", "title": "🎯 项目介绍", "hint": "核心产品或服务、目标用户与市场痛点"},
+            {"type": "text", "title": "👥 团队阵容", "hint": "核心团队背景、资历与分工"},
+            {"type": "text", "title": "📈 进展里程碑", "hint": "项目进展、数据表现与关键节点"},
+            {"type": "text", "title": "💰 融资需求", "hint": "融资金额、用途与投资人回报"},
+            {"type": "image", "title": "📱 联系方式", "hint": "创始人二维码及联系方式"},
+        ],
+        "highlights": ["项目介绍", "团队阵容", "进展里程碑", "融资需求"],
+        "suggested_sections": [
+            {"icon": "🎯", "label": "项目介绍", "description": "产品服务与市场痛点"},
+            {"icon": "👥", "label": "团队阵容", "description": "核心团队背景与分工"},
+            {"icon": "📈", "label": "进展里程碑", "description": "项目进展与关键数据"},
+            {"icon": "💰", "label": "融资需求", "description": "融资金额与投资人回报"},
+        ],
+    },
 }
 
 
@@ -170,7 +247,7 @@ async def get_purpose_template(purpose: str):
     if purpose not in PURPOSE_TEMPLATES:
         raise HTTPException(
             status_code=404,
-            detail=f"不支持的用途: {purpose}，可选值: partner, client, investor, supplier",
+            detail=f"不支持的用途: {purpose}，可选值: partner, client, investor, supplier, business, personal, startup",
         )
     template = PURPOSE_TEMPLATES[purpose]
     return PurposeTemplateResponse(

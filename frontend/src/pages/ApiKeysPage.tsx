@@ -119,12 +119,12 @@ function CreateKeyModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
           <h2 className="text-lg font-bold text-on-surface">
             {result ? t('API Key 已创建') : t('创建新的 API Key')}
           </h2>
-          <button onClick={handleClose} className="p-1 rounded-lg hover:bg-slate-100 text-text-muted">
+          <button onClick={handleClose} className="p-1 rounded-lg hover:bg-slate-100 text-text-muted" aria-label={t('button.close')}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -281,10 +281,10 @@ function RevokeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-modal max-w-sm w-full mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
           <h2 className="text-lg font-bold text-on-surface">{t('吊销 API Key')}</h2>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100 text-text-muted">
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100 text-text-muted" aria-label={t('button.close')}>
             <X className="w-5 h-5" />
           </button>
         </div>

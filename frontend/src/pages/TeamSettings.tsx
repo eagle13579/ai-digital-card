@@ -128,10 +128,10 @@ function InviteMemberModal({ teamId, onClose }: { teamId: number; onClose: () =>
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
+      <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold flex items-center gap-2"><UserPlus className="w-5 h-5" />邀请成员</h2>
-          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-neutral-bg rounded-lg" aria-label={t('button.close')}><X className="w-5 h-5" /></button>
         </div>
         <div className="space-y-4">
           <div>
@@ -339,7 +339,7 @@ export default function TeamSettings() {
       <header className="bg-surface border-b border-border px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/teams')} className="p-2 hover:bg-neutral-bg rounded-xl">
+            <button onClick={() => navigate('/teams')} className="p-2 hover:bg-neutral-bg rounded-xl" aria-label={t('button.back')}>
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
@@ -593,10 +593,10 @@ export default function TeamSettings() {
 
       {rejectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setRejectModal(null); setRejectReason(''); }}>
-          <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-surface rounded-2xl p-6 w-full max-w-md shadow-modal" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-semibold flex items-center gap-2"><X className="w-5 h-5" />拒绝审批</h2>
-              <button onClick={() => { setRejectModal(null); setRejectReason(''); }} className="p-1 hover:bg-neutral-bg rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={() => { setRejectModal(null); setRejectReason(''); }} className="p-1 hover:bg-neutral-bg rounded-lg" aria-label={t('button.close')}><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-4">
               <div>

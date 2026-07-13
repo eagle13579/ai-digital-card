@@ -117,7 +117,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       localStorage.setItem('aibizcard_locale', lang);
-    } catch {}
+    } catch {
+      console.warn('[i18n] Failed to save locale to localStorage:', lang);
+    }
   }, []);
 
   useEffect(() => {
@@ -126,12 +128,15 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       if (saved && SUPPORTED_LOCALES.includes(saved as any)) {
         setLocaleState(saved);
       }
-    } catch {}
+    } catch {
+      console.warn('[i18n] Failed to read locale from localStorage');
+    }
   }, []);
 
-  // 初始化/同步 dir 属性
+  // 初始化/同步 lang 和 dir 属性
   useEffect(() => {
     if (typeof document !== 'undefined') {
+      document.documentElement.lang = LOCALE_HTML_LANG[locale] || locale;
       document.documentElement.dir = RTL_LANGS.includes(locale as any) ? 'rtl' : 'ltr';
     }
   }, [locale]);

@@ -86,7 +86,9 @@ export default function NetworkPage() {
             setSelectedCardId(items[0].id);
           }
         }
-      } catch {}
+      } catch {
+        console.error('[NetworkPage] Failed to fetch card list');
+      }
     };
     fetchCardList();
   }, []);

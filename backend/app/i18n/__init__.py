@@ -26,6 +26,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "not_found": _fill_langs({"zh": "资源不存在", "en": "Resource not found", "ja": "リソースが見つかりません", "ko": "리소스를 찾을 수 없습니다", "es": "Recurso no encontrado", "fr": "Ressource introuvable", "de": "Ressource nicht gefunden", "pt": "Recurso não encontrado", "ru": "Ресурс не найден", "ar": "المورد غير موجود", "th": "ไม่พบทรัพยากร", "vi": "Không tìm thấy tài nguyên"}),
     "too_many_requests": _fill_langs({"zh": "请求过于频繁，请稍后再试", "en": "Too Many Requests, please try again later", "ja": "リクエストが多すぎます。後でもう一度お試しください", "ko": "요청이 너무 많습니다. 나중에 다시 시도해주세요", "es": "Demasiadas solicitudes, inténtelo más tarde", "fr": "Trop de requêtes, veuillez réessayer plus tard", "de": "Zu viele Anfragen, bitte später erneut versuchen", "pt": "Muitas solicitações, tente novamente mais tarde", "ru": "Слишком много запросов, повторите попытку позже", "ar": "طلبات كثيرة جداً، يرجى المحاولة لاحقاً", "th": "คำขอมากเกินไป กรุณาลองใหม่ภายหลัง", "vi": "Quá nhiều yêu cầu, vui lòng thử lại sau"}),
     "bad_request": _fill_langs({"zh": "请求参数错误", "en": "Bad request", "ja": "リクエストパラメータが不正です", "ko": "잘못된 요청입니다", "es": "Solicitud incorrecta", "fr": "Mauvaise requête", "de": "Ungültige Anfrage", "pt": "Solicitação inválida", "ru": "Неверный запрос", "ar": "طلب غير صالح", "th": "คำขอไม่ถูกต้อง", "vi": "Yêu cầu không hợp lệ"}),
+    "resource_conflict": _fill_langs({"zh": "资源冲突", "en": "Resource conflict", "ja": "リソース競合", "ko": "리소스 충돌", "es": "Conflicto de recursos", "fr": "Conflit de ressources", "de": "Ressourcenkonflikt", "pt": "Conflito de recursos", "ru": "Конфликт ресурсов", "ar": "تعارض الموارد", "th": "ทรัพยากรขัดแย้ง", "vi": "Xung đột tài nguyên"}),
+    "service_unavailable": _fill_langs({"zh": "服务暂不可用，请稍后再试", "en": "Service temporarily unavailable, please try again later", "ja": "サービスは一時的に利用できません。後でもう一度お試しください", "ko": "서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해주세요", "es": "Servicio temporalmente no disponible, inténtelo más tarde", "fr": "Service temporairement indisponible, veuillez réessayer plus tard", "de": "Dienst vorübergehend nicht verfügbar", "pt": "Serviço temporariamente indisponível", "ru": "Сервис временно недоступен", "ar": "الخدمة غير متاحة مؤقتاً", "th": "บริการไม่พร้อมใช้งานชั่วคราว", "vi": "Dịch vụ tạm thời không khả dụng"}),
+    "deprecated": _fill_langs({"zh": "此接口已废弃，请使用新接口", "en": "This endpoint is deprecated, please use the new endpoint", "ja": "このエンドポイントは非推奨です", "ko": "이 엔드포인트는 더 이상 사용되지 않습니다", "es": "Este endpoint está obsoleto", "fr": "Cet endpoint est obsolète", "de": "Dieser Endpunkt ist veraltet", "pt": "Este endpoint está obsoleto", "ru": "Этот endpoint устарел", "ar": "هذه النقطة غير مدعومة", "th": "ปลายทางนี้เลิกใช้งานแล้ว", "vi": "Điểm cuối này đã không còn được hỗ trợ"}),
 
     # ── 画册 (brochure) ──────────────────────────────────
     "brochure_created": _fill_langs({"zh": "画册创建成功", "en": "Brochure created successfully"}),
@@ -160,6 +163,12 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "ui_purpose_investor_desc": _fill_langs({"zh": "突出团队与融资亮点", "en": "Highlight team & funding"}),
     "ui_purpose_supplier": _fill_langs({"zh": "找供应商", "en": "Find Suppliers"}),
     "ui_purpose_supplier_desc": _fill_langs({"zh": "展示采购需求与合作", "en": "Show procurement needs"}),
+    "ui_purpose_business": _fill_langs({"zh": "业务推广", "en": "Business Promotion"}),
+    "ui_purpose_business_desc": _fill_langs({"zh": "展示企业实力与业务方向", "en": "Showcase business strengths"}),
+    "ui_purpose_personal": _fill_langs({"zh": "个人名片", "en": "Personal Card"}),
+    "ui_purpose_personal_desc": _fill_langs({"zh": "展示个人背景与职业经历", "en": "Showcase personal profile"}),
+    "ui_purpose_startup": _fill_langs({"zh": "创业项目", "en": "Startup"}),
+    "ui_purpose_startup_desc": _fill_langs({"zh": "展示创业项目与融资需求", "en": "Showcase startup & funding"}),
     "ui_field_name": _fill_langs({"zh": "姓名", "en": "Name"}),
     "ui_field_phone": _fill_langs({"zh": "手机", "en": "Phone"}),
     "ui_field_email": _fill_langs({"zh": "邮箱", "en": "Email"}),
@@ -182,6 +191,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "ui_purpose_hint_client": _fill_langs({"zh": "致力于拓展客户资源，提供优质产品与服务", "en": "Looking for clients, offering quality products & services"}),
     "ui_purpose_hint_investor": _fill_langs({"zh": "正在融资阶段，期待与投资人交流", "en": "Currently fundraising, looking forward to connecting with investors"}),
     "ui_purpose_hint_supplier": _fill_langs({"zh": "寻求优质供应商合作伙伴，共建供应链", "en": "Seeking quality supplier partners"}),
+    "ui_purpose_hint_business": _fill_langs({"zh": "致力于业务拓展与合作，欢迎交流洽谈", "en": "Looking for business expansion and cooperation"}),
+    "ui_purpose_hint_personal": _fill_langs({"zh": "展示个人职业形象，拓展人脉与机会", "en": "Showcase personal brand, expand network"}),
+    "ui_purpose_hint_startup": _fill_langs({"zh": "正在创业阶段，期待与投资人/合伙人交流", "en": "Startup stage, looking for investors/co-founders"}),
     "ui_brochure_title_suffix": _fill_langs({"zh": "的数字名片", "en": "'s Digital Card"}),
     "ui_contact_item_phone": _fill_langs({"zh": "电话", "en": "Phone"}),
     "ui_contact_item_email": _fill_langs({"zh": "邮箱", "en": "Email"}),
@@ -214,6 +226,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "find_partner": _fill_langs({"zh": "找合作伙伴", "en": "Find Partner"}),
     "find_supplier": _fill_langs({"zh": "找供应商", "en": "Find Supplier"}),
     "find_investor": _fill_langs({"zh": "找投资人", "en": "Find Investor"}),
+    "find_business": _fill_langs({"zh": "业务推广", "en": "Business Promotion"}),
+    "find_startup": _fill_langs({"zh": "创业项目", "en": "Startup Project"}),
     "match_result": _fill_langs({"zh": "供需匹配结果", "en": "Match Results"}),
 
     # ── 画册查看页 (Viewer) ──────────────────────────────
@@ -467,3 +481,15 @@ def detect_lang(accept_language: str = "") -> str:
             return lang
     # 默认英文
     return "en"
+
+
+# 导出 API 错误码国际化模块
+from app.i18n.error_codes import (
+    get_error_message,
+    get_error_message_with_details,
+    resolve_error_code_message,
+    get_domain_error_message,
+    get_http_status_message,
+    ERROR_CODE_I18N_MAP,
+    DOMAIN_ERROR_MAP,
+)

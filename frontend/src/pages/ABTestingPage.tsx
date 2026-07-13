@@ -82,12 +82,6 @@ function metricLabel(m: string): string {
   return map[m] || m;
 }
 
-function formatTime(iso: string | null): string {
-  if (!iso) return '-';
-  const d = new Date(iso);
-  return d.toLocaleString('zh-CN');
-}
-
 function formatPct(v: number): string {
   return (v * 100).toFixed(2) + '%';
 }
@@ -158,7 +152,7 @@ function CreateExperimentModal({ onClose, onCreated }: { onClose: () => void; on
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-xl shadow-modal max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">{t('abtest.createModal')}</h2>
         </div>
@@ -288,7 +282,7 @@ function ExperimentCard({ exp, onAction }: { exp: ExperimentItem; onAction: () =
   const totalEvents = exp.variants.reduce((s, v) => s + v.impressions + v.clicks + v.views, 0);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-card hover:shadow-elevated transition-shadow p-5">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-gray-900 truncate">{exp.name}</h3>
