@@ -180,8 +180,9 @@ def create_app():
     from app.routers.six_degrees_router import router as six_degrees_router
     from app.routers.escrow_router import router as escrow_router
     from app.routers.ocr_router import router as ocr_router
+    from app.routers.gdpr import router as gdpr_router
 
-    # ── 惰性注册：knowledge_models_router ──────────────────────────
+    # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
     def _register_knowledge_models(app):
         from app.routers.knowledge_models_router import router as km_router
@@ -249,6 +250,7 @@ def create_app():
     app.include_router(invoice_router)
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
+    app.include_router(gdpr_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -35,7 +35,7 @@ from app.models.escrow import (
     MILESTONE_STATUS_COMPLETED,
     MILESTONE_STATUS_FAILED,
     MILESTONE_STATUS_PENDING,
-    Deal,
+    EscrowDeal,
     Dispute,
     Milestone,
     validate_deal_transition,
@@ -57,7 +57,7 @@ def create_deal(
     title: str = "",
     description: str = "",
     milestones: list[dict[str, Any]] | None = None,
-) -> Deal:
+) -> EscrowDeal:
     """
     创建交易保障订单
 
@@ -78,7 +78,7 @@ def create_deal(
     if amount <= 0:
         raise ValueError("交易金额必须大于0")
 
-    deal = Deal(
+    deal = EscrowDeal(
         buyer_id=buyer_id,
         seller_id=seller_id,
         amount=amount,
@@ -135,7 +135,7 @@ def create_deal(
 # ============================================================
 
 
-def update_deal_status(db: Session, deal_id: int, new_status: str) -> Deal:
+def update_deal_status(db: Session, deal_id: int, new_status: str) -> EscrowDeal:
     """
     更新交易状态（含状态机校验）
 
@@ -147,7 +147,7 @@ def update_deal_status(db: Session, deal_id: int, new_status: str) -> Deal:
     Returns:
         更新后的 Deal 对象
     """
-    deal = db.query(Deal).filter(Deal.id == deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
     if not deal:
         raise ValueError(f"交易不存在: deal_id={deal_id}")
 
@@ -207,7 +207,7 @@ def get_milestones(db: Session, deal_id: int) -> list[Milestone]:
 # ============================================================
 
 
-def release_payment(db: Session, deal_id: int, actor_id: int) -> Deal:
+def release_payment(db: Session, deal_id: int, actor_id: int) -> EscrowDeal:
     """
     释放付款到卖家（模拟）
     状态机: fulfilled → completed
@@ -220,7 +220,7 @@ def release_payment(db: Session, deal_id: int, actor_id: int) -> Deal:
     Returns:
         更新后的 Deal 对象
     """
-    deal = db.query(Deal).filter(Deal.id == deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
     if not deal:
         raise ValueError(f"交易不存在: deal_id={deal_id}")
 
@@ -277,7 +277,7 @@ def create_dispute(
     Returns:
         创建的 Dispute 对象
     """
-    deal = db.query(Deal).filter(Deal.id == deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
     if not deal:
         raise ValueError(f"交易不存在: deal_id={deal_id}")
 
@@ -348,7 +348,7 @@ def resolve_dispute(
     dispute.resolved_at = datetime.utcnow()
 
     # 恢复交易状态
-    deal = db.query(Deal).filter(Deal.id == dispute.deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == dispute.deal_id).first()
     if deal and deal.status == DEAL_STATUS_DISPUTED:
         if status == DISPUTE_STATUS_RESOLVED:
             deal.status = DEAL_STATUS_RESOLVED
@@ -367,7 +367,7 @@ def resolve_dispute(
 # ============================================================
 
 
-def cancel_deal(db: Session, deal_id: int, actor_id: int) -> Deal:
+def cancel_deal(db: Session, deal_id: int, actor_id: int) -> EscrowDeal:
     """
     取消交易
 
@@ -379,7 +379,7 @@ def cancel_deal(db: Session, deal_id: int, actor_id: int) -> Deal:
     Returns:
         更新后的 Deal 对象
     """
-    deal = db.query(Deal).filter(Deal.id == deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
     if not deal:
         raise ValueError(f"交易不存在: deal_id={deal_id}")
 
@@ -409,18 +409,18 @@ def cancel_deal(db: Session, deal_id: int, actor_id: int) -> Deal:
 # ============================================================
 
 
-def get_deal(db: Session, deal_id: int) -> Deal | None:
+def get_deal(db: Session, deal_id: int) -> EscrowDeal | None:
     """获取交易详情"""
-    return db.query(Deal).filter(Deal.id == deal_id).first()
+    return db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
 
 
 def get_deal_status(db: Session, deal_id: int) -> str | None:
     """获取交易状态"""
-    deal = db.query(Deal).filter(Deal.id == deal_id).first()
+    deal = db.query(EscrowDeal).filter(EscrowDeal.id == deal_id).first()
     return deal.status if deal else None
 
 
-def list_deals(db: Session, user_id: int, status: str | None = None) -> list[Deal]:
+def list_deals(db: Session, user_id: int, status: str | None = None) -> list[EscrowDeal]:
     """
     获取用户的所有交易（作为买方或卖方）
 
@@ -432,10 +432,10 @@ def list_deals(db: Session, user_id: int, status: str | None = None) -> list[Dea
     Returns:
         交易列表
     """
-    query = db.query(Deal).filter((Deal.buyer_id == user_id) | (Deal.seller_id == user_id))
+    query = db.query(EscrowDeal).filter((EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id))
     if status:
-        query = query.filter(Deal.status == status)
-    return query.order_by(Deal.updated_at.desc()).all()
+        query = query.filter(EscrowDeal.status == status)
+    return query.order_by(EscrowDeal.updated_at.desc()).all()
 
 
 def list_disputes(db: Session, deal_id: int | None = None) -> list[Dispute]:
@@ -470,24 +470,24 @@ def calculate_trust_score(db: Session, user_id: int) -> dict[str, Any]:
     """
     # 统计用户参与的所有交易
     total_deals_count = (
-        db.query(func.count(Deal.id)).filter((Deal.buyer_id == user_id) | (Deal.seller_id == user_id)).scalar() or 0
+        db.query(func.count(EscrowDeal.id)).filter((EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id)).scalar() or 0
     )
 
     completed_count = (
-        db.query(func.count(Deal.id))
+        db.query(func.count(EscrowDeal.id))
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
-            Deal.status == DEAL_STATUS_COMPLETED,
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
+            EscrowDeal.status == DEAL_STATUS_COMPLETED,
         )
         .scalar()
         or 0
     )
 
     disputed_count = (
-        db.query(func.count(Deal.id))
+        db.query(func.count(EscrowDeal.id))
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
-            Deal.status == DEAL_STATUS_DISPUTED,
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
+            EscrowDeal.status == DEAL_STATUS_DISPUTED,
         )
         .scalar()
         or 0
@@ -496,9 +496,9 @@ def calculate_trust_score(db: Session, user_id: int) -> dict[str, Any]:
     # 交易已解决争议的数量
     resolved_dispute_count = (
         db.query(func.count(Dispute.id))
-        .join(Deal, Dispute.deal_id == Deal.id)
+        .join(EscrowDeal, Dispute.deal_id == EscrowDeal.id)
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
             Dispute.status == DISPUTE_STATUS_RESOLVED,
         )
         .scalar()
@@ -506,20 +506,20 @@ def calculate_trust_score(db: Session, user_id: int) -> dict[str, Any]:
     )
 
     cancelled_count = (
-        db.query(func.count(Deal.id))
+        db.query(func.count(EscrowDeal.id))
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
-            Deal.status == DEAL_STATUS_CANCELLED,
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
+            EscrowDeal.status == DEAL_STATUS_CANCELLED,
         )
         .scalar()
         or 0
     )
 
     refunded_count = (
-        db.query(func.count(Deal.id))
+        db.query(func.count(EscrowDeal.id))
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
-            Deal.status == DEAL_STATUS_REFUNDED,
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
+            EscrowDeal.status == DEAL_STATUS_REFUNDED,
         )
         .scalar()
         or 0
@@ -542,12 +542,12 @@ def calculate_trust_score(db: Session, user_id: int) -> dict[str, Any]:
     # --- 3. 完成速度 (20分) ---
     speed_score = 15.0  # 默认中间值
     completed_deals = (
-        db.query(Deal)
+        db.query(EscrowDeal)
         .filter(
-            (Deal.buyer_id == user_id) | (Deal.seller_id == user_id),
-            Deal.status == DEAL_STATUS_COMPLETED,
-            Deal.created_at.isnot(None),
-            Deal.updated_at.isnot(None),
+            (EscrowDeal.buyer_id == user_id) | (EscrowDeal.seller_id == user_id),
+            EscrowDeal.status == DEAL_STATUS_COMPLETED,
+            EscrowDeal.created_at.isnot(None),
+            EscrowDeal.updated_at.isnot(None),
         )
         .all()
     )

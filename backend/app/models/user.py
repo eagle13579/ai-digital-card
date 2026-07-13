@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Integer, String, Text, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -38,6 +38,9 @@ class User(Base):
     membership_synced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, comment="最后同步链客宝时间")
     unlock_quota: Mapped[int] = mapped_column(Integer, default=0, comment="本月剩余解锁配额")
     quota_reset_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, comment="配额重置时间")
+
+    # ── 关系 ────────────────────────────────────────────────────────────────
+    memberships: Mapped[list["OrganizationMember"]] = relationship("OrganizationMember", back_populates="user")
 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())

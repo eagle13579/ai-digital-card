@@ -308,7 +308,7 @@ def get_org_stats(db: Session, org_id: int) -> dict:
     # 线索/Deal 数
     deal_count = 0
     try:
-        from app.models import Deal
+        from app.models import BusinessDeal as Deal
 
         # Deal 通过 owner 关联组织，暂用粗略统计
         deal_count = db.query(func.count(Deal.id)).scalar()

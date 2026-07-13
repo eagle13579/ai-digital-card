@@ -107,7 +107,7 @@ def validate_deal_transition(current: str, next_status: str) -> None:
 # ============================================================
 
 
-class Deal(Base):
+class EscrowDeal(Base):
     """交易保障主表"""
 
     __tablename__ = "escrow_deals"
@@ -160,7 +160,7 @@ class Milestone(Base):
     completed_at = Column(DateTime, nullable=True, comment="完成时间")
 
     # 关系
-    deal: Mapped[Deal] = relationship("Deal", back_populates="milestones")
+    deal: Mapped[EscrowDeal] = relationship("EscrowDeal", back_populates="milestones")
 
     def to_dict(self) -> dict:
         return {
@@ -192,7 +192,7 @@ class Dispute(Base):
     resolved_at = Column(DateTime, nullable=True, comment="解决时间")
 
     # 关系
-    deal: Mapped[Deal] = relationship("Deal", back_populates="disputes")
+    deal: Mapped[EscrowDeal] = relationship("EscrowDeal", back_populates="disputes")
     initiator = relationship("User", foreign_keys=[initiator_id])
 
     def to_dict(self) -> dict:

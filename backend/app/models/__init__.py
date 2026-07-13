@@ -41,7 +41,7 @@ from app.models.circuit_breaker import CircuitBreakerState
 from app.models.contract import Contract, PaymentTransaction
 from app.models.deal import Deal as BusinessDeal, DealActivity
 from app.models.enterprise import Enterprise, EnterpriseRelation
-from app.models.escrow import Deal as EscrowDeal, Milestone, Dispute
+from app.models.escrow import EscrowDeal, Milestone, Dispute
 from app.models.import_history import ImportHistory
 from app.models.match_credit_log import MatchCreditLog
 from app.models.membership_order import MembershipOrder
