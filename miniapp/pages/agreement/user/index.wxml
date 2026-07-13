@@ -1,0 +1,73 @@
+<scroll-view class="page" scroll-y="true">
+  <view class="container">
+    <text class="title">《用户协议》</text>
+    <view class="section">
+      <text class="section-title">一、服务说明</text>
+      <text class="section-body">
+        1.1 AI数智名片（以下简称"本服务"）是一个基于人工智能技术的商业社交平台，为用户提供电子名片创建、展示、交换、匹配及连接服务。
+      </text>
+      <text class="section-body">
+        1.2 用户使用本服务前，需注册微信小程序账号并阅读、同意本协议。用户注册成功后，我们将为用户开通基础功能服务。
+      </text>
+      <text class="section-body">
+        1.3 我们有权根据业务发展需要，对本协议进行修订或变更，并通过适当方式（如站内通知、弹窗提示等）告知用户。修订后的协议一经发布即生效。如用户不同意修订内容，应停止使用本服务。
+      </text>
+      <text class="section-body">
+        1.4 本服务中的部分功能可能为收费服务，具体收费标准以页面公示为准。用户选择使用收费功能即视为同意按公示价格支付费用。
+      </text>
+    </view>
+    <view class="section">
+      <text class="section-title">二、用户责任</text>
+      <text class="section-body">
+        2.1 用户在使用本服务时应遵守国家法律法规，不得利用本服务从事任何违法违规活动，包括但不限于传播违法信息、侵犯他人合法权益、实施欺诈行为等。
+      </text>
+      <text class="section-body">
+        2.2 用户应保证其提供的个人信息（包括但不限于姓名、联系方式、职业信息等）真实、准确、完整。如信息发生变更，应及时更新。因用户提供虚假信息或未及时更新信息所导致的后果由用户自行承担。
+      </text>
+      <text class="section-body">
+        2.3 用户不得以任何方式干扰或破坏本服务的正常运行，不得利用技术手段非法获取他人数据或信息。
+      </text>
+      <text class="section-body">
+        2.4 用户应对其在本平台上的行为负责，包括但不限于发布的内容、发起的连接请求、交换的名片信息等。
+      </text>
+      <text class="section-body">
+        2.5 用户不得将账号出借、出租、转让给第三方使用。因账号出借或转让导致的损失由用户自行承担。
+      </text>
+    </view>
+    <view class="section">
+      <text class="section-title">三、免责声明</text>
+      <text class="section-body">
+        3.1 本服务按"现状"和"可用"基础提供，我们不对服务的连续性、及时性、安全性做出任何明示或默示的保证。
+      </text>
+      <text class="section-body">
+        3.2 我们有权在必要时（如系统维护、升级等）暂停或终止部分或全部服务，无需事先通知用户。
+      </text>
+      <text class="section-body">
+        3.3 用户通过本平台与其他用户进行连接或合作所产生的任何纠纷或损失，由双方自行协商解决，我们不承担任何责任。
+      </text>
+      <text class="section-body">
+        3.4 因不可抗力因素（包括但不限于自然灾害、战争、政府行为、电信网络故障等）导致本服务无法正常运行的，我们不承担责任。
+      </text>
+      <text class="section-body">
+        3.5 我们不保证本服务与用户的设备完全兼容，也不承担因设备兼容性问题导致的任何损失。
+      </text>
+    </view>
+    <view class="section">
+      <text class="section-title">四、知识产权</text>
+      <text class="section-body">
+        4.1 本服务相关的所有知识产权（包括但不限于软件著作权、商标权、专利权、商业秘密等）归我们所有。
+      </text>
+      <text class="section-body">
+        4.2 用户在本平台上发布的内容，用户保留其知识产权，但授予我们非排他的、免费的、全球范围内的使用许可，用于本服务的运营和推广。
+      </text>
+    </view>
+    <view class="section">
+      <text class="section-title">五、联系方式</text>
+      <text class="section-body">
+        如用户对本协议有任何疑问、意见或投诉，可通过以下方式与我们联系：
+      </text>
+      <text class="section-body">联系邮箱：support@aidigitalcard.com</text>
+      <text class="section-body">服务时间：工作日 9:00 - 18:00</text>
+    </view>
+  </view>
+</scroll-view>
