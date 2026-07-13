@@ -18,7 +18,7 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Select, and_, func, or_, select
+from sqlalchemy import Select, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -30,9 +30,7 @@ from app.crm.crm_models import (
     CrmPipelineStage,
 )
 from app.models.tag import MatchRecord
-from app.models.message import Message
 from app.models.user import User
-from app.models.visitor import VisitorLog
 
 logger = logging.getLogger(__name__)
 

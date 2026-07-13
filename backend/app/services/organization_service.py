@@ -298,7 +298,7 @@ def get_org_stats(db: Session, org_id: int) -> dict:
     try:
         product_count = (
             db.query(func.count(Product.id))
-            .filter(Product.organization_id == org_id, Product.is_deleted == False)
+            .filter(Product.organization_id == org_id, not Product.is_deleted)
             .scalar()
         )
     except Exception:

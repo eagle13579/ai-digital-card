@@ -4,7 +4,6 @@
   1. HubSpotProvider (async class) — 与 CRMBridge 框架集成
   2. test_connection / export_contact (sync functions) — 独立快速调用
 """
-import json
 import logging
 from typing import Any
 

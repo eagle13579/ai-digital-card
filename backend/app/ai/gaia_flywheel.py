@@ -40,7 +40,6 @@ class GaiaFlywheel:
         from app.ai.gaia_evolution_brain import get_gaia_brain
         from app.ai.gaia_trainer import get_gaia_trainer
         from app.database import AsyncSessionLocal, engine
-        from app.models.gaia import GaiaKnowledge, GaiaEvolutionEvent, GaiaTrainingRun, GaiaModelWeights
         from app.database import Base
 
         # 确保盖娅数据表已创建
@@ -209,7 +208,7 @@ async def main():
         # 单次运行
         logger.info("⚡ 盖娅进化飞轮 — 单次运行")
         result = await flywheel.run_once()
-        print(f"\n📊 进化报告:\n")
+        print("\n📊 进化报告:\n")
         print(f"  周期: #{result.get('cycle_id')}")
         print(f"  耗时: {result.get('duration_seconds')}s")
         print(f"  知识处理: {result.get('evolution', {}).get('knowledge_processed', 0)} 条")

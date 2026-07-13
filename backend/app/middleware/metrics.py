@@ -13,7 +13,6 @@ APM / Prometheus 监控中间件 — 纯 Python 实现，不依赖 prometheus_cl
 import time
 import logging
 from contextlib import contextmanager
-from functools import wraps
 
 logger = logging.getLogger(__name__)
 

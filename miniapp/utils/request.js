@@ -12,26 +12,12 @@
 const store = require('./store')
 
 // API baseURL
-// 微信小程序API基础URL — 自动检测环境
-// 开发工具中用本机IP，真机调试用实际服务器地址
-// API baseURL
-// 微信小程序API基础URL — 多环境自动切换
-// 开发工具: 内网IP直连后端
-// 体验版/正式版: 生产域名（必须HTTPS）
+// 微信小程序API基础URL — 全部走生产域名（后端已部署到服务器）
 const PROD_API = 'https://card.liankebao.top'
-const DEV_IP = '192.168.7.48'
-const DEV_PORT = '8201'
 
 const API_BASE_URL = (function() {
-  try {
-    if (typeof __wxConfig !== 'undefined' && __wxConfig) {
-      // 开发者工具 → 内网IP直连
-      if (__wxConfig.envVersion === 'develop') {
-        return `http://${DEV_IP}:${DEV_PORT}`
-      }
-    }
-  } catch(e) {}
-  // 体验版/正式版 → 生产域名
+  // 开发工具/体验版/正式版统一使用生产域名
+  // 后端部署在阿里云服务器，不需要本地开发环境
   return PROD_API
 })()
 

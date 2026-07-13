@@ -504,7 +504,6 @@ class WorkflowEngine:
         action_results: list[dict],
     ) -> None:
         """记录工作流执行日志到数据库。"""
-        from app.crm.crm_models import CrmWorkflowLog
 
         log = CrmWorkflowLog(
             owner_id=self.user_id,

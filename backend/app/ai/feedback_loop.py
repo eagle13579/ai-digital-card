@@ -27,12 +27,11 @@ AI数字名片 推荐反馈闭环
                       └───────────────────┘
 """
 
-import json
 import logging
 import os
 import sqlite3
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)

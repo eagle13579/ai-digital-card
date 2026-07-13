@@ -63,7 +63,7 @@ async def run_design_qa_audit() -> dict:
             # 查询未审核的设计条目（source 包含 'design' 或 knowledge_type 为 'design_component'）
             stmt = select(GaiaKnowledge).where(
                 and_(
-                    GaiaKnowledge.is_active == True,
+                    GaiaKnowledge.is_active,
                     (
                         GaiaKnowledge.source.like("%design%")
                         | (GaiaKnowledge.knowledge_type == "design_component")
@@ -233,7 +233,7 @@ async def main():
         # 单次运行
         logger.info("⚡ DesignQA 审核 — 单次运行")
         result = await run_design_qa_audit()
-        print(f"\n📊 DesignQA 审核报告:")
+        print("\n📊 DesignQA 审核报告:")
         print(f"  状态: {result.get('status', 'unknown')}")
         print(f"  审核条目: {result.get('audited_count', 0)} 条")
         print(f"  发现问题: {result.get('findings_count', 0)} 个")

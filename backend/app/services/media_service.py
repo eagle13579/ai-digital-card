@@ -4,7 +4,6 @@ Media Service — 视频/多媒体文件上传处理服务
 提供视频文件格式验证、大小校验、安全转码（可选）、存储等功能。
 """
 
-import os
 import uuid
 import asyncio
 import logging

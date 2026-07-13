@@ -208,8 +208,8 @@ async def wx_login(data: WeChatLogin, db: AsyncSession = Depends(get_db)):
 
 # ── 微信小程序登录（真实场景） ────────────────────────────────────────────
 
-import logging
-import httpx as _httpx
+import logging  # noqa: E402
+import httpx as _httpx  # noqa: E402
 
 _logger = logging.getLogger("wx_mini_login")
 
@@ -296,8 +296,8 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
         )
 
     openid = wx_data.get("openid")
-    unionid = wx_data.get("unionid")
-    session_key = wx_data.get("session_key")
+    wx_data.get("unionid")
+    wx_data.get("session_key")
 
     if not openid:
         raise HTTPException(status_code=400, detail="微信登录失败: 未获取到 openid")

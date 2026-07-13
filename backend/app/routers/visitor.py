@@ -116,7 +116,7 @@ async def get_visitor_stats(
     result = await db.execute(
         select(func.count(VisitorLog.id)).where(
             VisitorLog.brochure_id == brochure_id,
-            VisitorLog.interested == True,
+            VisitorLog.interested,
         )
     )
     interested = result.scalar()

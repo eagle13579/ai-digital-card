@@ -1,6 +1,5 @@
 import csv
 import io
-import json
 import uuid
 from typing import Optional
 
@@ -8,7 +7,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.brochure import Brochure, Page
-from app.models.user import User
 from app.models.visitor import VisitorLog
 
 

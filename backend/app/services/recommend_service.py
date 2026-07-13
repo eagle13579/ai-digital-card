@@ -9,19 +9,14 @@ AI数字名片 推荐服务
 """
 
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.feedback_loop import get_feedback_loop
 from app.ai.recommendation import RecommendEngine, RecommendResult
 from app.services.feedback_service import (
-    FeedbackAction,
     FeedbackResult,
-    FeedbackService,
     FeedbackSummary,
     get_feedback_service,
 )

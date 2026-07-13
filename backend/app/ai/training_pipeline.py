@@ -7,10 +7,8 @@
 
 import json
 import logging
-import os
-import re
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

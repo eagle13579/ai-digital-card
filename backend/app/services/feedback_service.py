@@ -15,7 +15,7 @@ AI数字名片 用户反馈服务 (❤️/👎 闭环)
 """
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
 
@@ -122,7 +122,7 @@ class FeedbackService:
         rating = rating_map[act]
 
         # 通过 FeedbackLoop 记录
-        record = self._loop.record_feedback(
+        self._loop.record_feedback(
             user_id=user_id,
             item_id=content_id,
             rating=rating,

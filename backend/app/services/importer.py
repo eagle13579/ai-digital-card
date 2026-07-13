@@ -10,12 +10,11 @@ import uuid
 import logging
 import urllib.request
 import urllib.error
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from app.services.dedup import (
     detect_duplicates,
     DuplicateGroup,
-    NAME_SIMILARITY_THRESHOLD,
 )
 
 logger = logging.getLogger(__name__)
@@ -160,7 +159,7 @@ def detect_format(filename: str, raw_content: bytes) -> str:
         return "vcf"
 
     # 含逗号或制表符分隔的多行 => CSV
-    lines = [l for l in text.splitlines() if l.strip()]
+    lines = [l for l in text.splitlines() if l.strip()]  # noqa: E741
     if len(lines) >= 2:
         # 检查第一行是否有常见分隔符
         first_line = lines[0]
@@ -326,7 +325,7 @@ def parse_vcf(raw_content: bytes) -> List[Dict[str, str]]:
                     params[k.upper()] = v
 
             # 映射到标准字段
-            std_field = VCF_FIELD_MAP.get(field_name, "")
+            VCF_FIELD_MAP.get(field_name, "")
 
             if field_name == "FN":
                 contact["name"] = value
@@ -732,7 +731,7 @@ class ImportEngine:
         Returns:
             {"action": "skip"|"merge"|"update", "target_fields": [...]}
         """
-        best = dup_group[0]  # 相似度最高的
+        dup_group[0]  # 相似度最高的
         if strategy == "skip":
             return {"action": "skip", "target_fields": []}
         elif strategy == "merge":

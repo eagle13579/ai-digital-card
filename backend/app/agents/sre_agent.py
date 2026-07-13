@@ -237,7 +237,7 @@ class SREAgent(BaseAgent):
             # Fallback: try a direct DB query
             try:
                 from app.database import AsyncSessionLocal
-                from sqlalchemy import select, text
+                from sqlalchemy import text
             except ImportError:
                 return {
                     "status": "unknown",

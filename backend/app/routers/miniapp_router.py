@@ -28,7 +28,7 @@ from app.schemas import (
     BrochureUpdate,
     PageSchema,
 )
-from app.services.share_service import generate_qr_code, build_share_url
+from app.services.share_service import generate_qr_code
 
 logger = logging.getLogger(__name__)
 

@@ -68,3 +68,4 @@ backend/data/*.json
 training_data/*.jsonl
 bandit_report.json
 soc2_audit_package/
+k6-v*.*/

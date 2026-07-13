@@ -156,7 +156,7 @@ def _build_agent_config(
     Returns:
         An AgentConfig with employee-derived metadata.
     """
-    agent_class = mapping["agent_class"]
+    mapping["agent_class"]
     # Get the default config from the agent class constructor
     default_config = AgentConfig(
         agent_name=f"{agent_type}_{employee.name}",

@@ -6,7 +6,7 @@ from app.database import get_db
 from app.models.tag import UserTag
 from app.models.user import User
 from app.routers.auth import get_current_user
-from app.schemas import TagInput, TagBatchInput, TagResponse
+from app.schemas import TagBatchInput, TagResponse
 
 router = APIRouter(prefix="/api/tags", tags=["标签"])
 

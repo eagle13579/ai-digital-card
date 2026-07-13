@@ -1,9 +1,7 @@
 """AI 名片优化分析 — 完整度/关键词覆盖/专业度评分"""
 
-import json
 from typing import Optional
 
-from app.config import settings
 
 
 class OptimizationAnalyzer:
@@ -134,8 +132,8 @@ class OptimizationAnalyzer:
         if not industry:
             # 尝试从字段中推断行业
             company = fields.get("company", "")
-            intro = fields.get("intro", "")
-            description = fields.get("description", "")
+            fields.get("intro", "")
+            fields.get("description", "")
             industry = company  # 用公司名做简单匹配
 
         recommended = OptimizationAnalyzer._get_industry_keywords(industry)

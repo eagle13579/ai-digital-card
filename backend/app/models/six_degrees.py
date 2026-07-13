@@ -7,7 +7,7 @@
 - 关系有方向：邀请人→被邀请人为正向，也可建立双向关系 (bidirectional=True)
 - 六度路径缓存表 `six_degree_paths` 用于存储高频查询结果
 """
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import (
     BigInteger, Boolean, Column, DateTime, Float,

@@ -134,7 +134,6 @@ def init_otel() -> None:
             BatchSpanProcessor,
             ConsoleSpanExporter,
         )
-        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
         # ── 1. 确定服务名称 ─────────────────────────────────────────
         service_name = os.getenv(

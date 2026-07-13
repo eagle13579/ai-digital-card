@@ -3,7 +3,7 @@
 from __future__ import annotations
 import os
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 
 router = APIRouter(tags=["API 文档"])

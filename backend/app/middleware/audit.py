@@ -14,10 +14,8 @@
 """
 import json
 import logging
-from datetime import datetime
 from contextvars import ContextVar
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal

@@ -7,7 +7,6 @@
 """
 
 import logging
-import time
 from typing import List, Optional
 
 import requests
@@ -140,9 +139,9 @@ class ModelServingClient:
 
         # ST
         try:
-            from sentence_transformers import SentenceTransformer
-            status["st"] = True
-        except ImportError:
+            import importlib
+            status["st"] = importlib.util.find_spec("sentence_transformers") is not None
+        except Exception:
             status["st"] = False
 
         return status

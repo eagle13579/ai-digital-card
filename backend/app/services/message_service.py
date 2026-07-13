@@ -1,8 +1,6 @@
 import uuid
-from datetime import datetime
-from typing import Optional
 
-from sqlalchemy import select, func, or_, and_, delete
+from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.message import Message
@@ -159,7 +157,7 @@ class MessageService:
             .where(
                 Message.conversation_id == conversation_id,
                 Message.receiver_id == user_id,
-                Message.is_read == False,
+                not Message.is_read,
             )
         )
         result = await db.execute(stmt)
@@ -178,7 +176,7 @@ class MessageService:
         # 总未读数
         total_stmt = select(func.count(Message.id)).where(
             Message.receiver_id == user_id,
-            Message.is_read == False,
+            not Message.is_read,
         )
         total_result = await db.execute(total_stmt)
         total_unread = total_result.scalar() or 0
@@ -191,7 +189,7 @@ class MessageService:
             )
             .where(
                 Message.receiver_id == user_id,
-                Message.is_read == False,
+                not Message.is_read,
             )
             .group_by(Message.conversation_id)
         )
@@ -239,7 +237,7 @@ class MessageService:
         stmt = select(func.count(Message.id)).where(
             Message.conversation_id == conversation_id,
             Message.receiver_id == user_id,
-            Message.is_read == False,
+            not Message.is_read,
         )
         result = await db.execute(stmt)
         return result.scalar() or 0

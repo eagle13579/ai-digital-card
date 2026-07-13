@@ -196,10 +196,10 @@ class GrowthAgent(BaseAgent):
                 )
             else:
                 recommendations.append(
-                    f"Control outperforms variant — recommend keeping current experience"
+                    "Control outperforms variant — recommend keeping current experience"
                 )
                 recommendations.append(
-                    f"Investigate whether the variant introduced friction or confusion"
+                    "Investigate whether the variant introduced friction or confusion"
                 )
         elif significance == "not_significant":
             recommendations.append(
@@ -694,7 +694,6 @@ class GrowthAgent(BaseAgent):
         Returns:
             Approximate p-value.
         """
-        import math
         # Abramowitz and Stegun approximation
         if z < 0:
             z = -z

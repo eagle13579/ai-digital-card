@@ -477,8 +477,8 @@ class BackendAgent(BaseAgent):
             data = {"error": str(error_log)}
 
         error_message = data.get("error", "")
-        traceback_str = data.get("traceback", "")
-        context = data.get("context", {})
+        data.get("traceback", "")
+        data.get("context", {})
 
         logger.info(
             "Debugging issue: %s...",

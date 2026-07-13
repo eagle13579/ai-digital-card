@@ -233,7 +233,7 @@ async def get_user_relations(
     # 构建查询：用户作为 from_user_id 或 to_user_id 的关系
     conditions = [
         (UserRelation.from_user_id == user_id) | (UserRelation.to_user_id == user_id),
-        UserRelation.is_deleted == False,
+        not UserRelation.is_deleted,
     ]
 
     if is_active is not None:

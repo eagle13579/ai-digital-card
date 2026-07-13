@@ -14,7 +14,6 @@ import json
 import logging
 import math
 import os
-import random
 from pathlib import Path
 from typing import Any
 
@@ -434,7 +433,7 @@ class SalesPredictionService:
             训练结果 dict
         """
         from sqlalchemy import select, func
-        from app.crm.crm_models import CrmContact, CrmDeal, CrmActivity, CrmPipelineStage
+        from app.crm.crm_models import CrmDeal, CrmActivity
 
         # 1. 获取所有已成交/已丢失的 Deal
         result = await db_session.execute(
@@ -517,7 +516,7 @@ class SalesPredictionService:
 
         return {
             "success": True,
-            "message": f"模型训练完成",
+            "message": "模型训练完成",
             "samples": len(y),
             "won": n_won,
             "lost": n_lost,
@@ -539,7 +538,7 @@ class SalesPredictionService:
             预测结果 dict，包含概率和置信度
         """
         from sqlalchemy import select, func
-        from app.crm.crm_models import CrmContact, CrmDeal, CrmActivity, CrmPipelineStage
+        from app.crm.crm_models import CrmDeal, CrmActivity
 
         # 查询 Deal + 关联数据
         result = await db_session.execute(

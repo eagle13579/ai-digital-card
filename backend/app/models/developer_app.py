@@ -11,10 +11,8 @@ OAuth2 风格的应用注册模型，用于管理第三方应用接入。
 import hashlib
 import secrets
 from datetime import datetime
-from typing import List, Optional
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy import func
 
 from app.database import Base
 

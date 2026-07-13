@@ -6,15 +6,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 
 from app.database import get_db
-from app.ai.gaia_evolution_brain import get_gaia_brain, GaiaEvolutionBrain
-from app.ai.gaia_trainer import get_gaia_trainer, GaiaTrainer
+from app.ai.gaia_evolution_brain import get_gaia_brain
+from app.ai.gaia_trainer import get_gaia_trainer
 
 logger = logging.getLogger(__name__)
 

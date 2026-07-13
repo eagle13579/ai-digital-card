@@ -23,7 +23,6 @@ import math
 import os
 import pickle
 import time
-import random
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
@@ -37,7 +36,7 @@ try:
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import train_test_split
-    from sklearn.metrics import precision_score, recall_score, ndcg_score as sk_ndcg
+    from sklearn.metrics import precision_score, recall_score, ndcg_score as sk_ndcg  # noqa: F401
 
     _HAS_SKLEARN = True
 except ImportError:
@@ -414,8 +413,8 @@ class MLPipeline:
         # 转 numpy 格式如果可用
         try:
             import numpy as np
-            scores_np = np.array(scores)
-            y_np = np.array(y)
+            np.array(scores)
+            np.array(y)
             _HAS_NUMPY = True
         except ImportError:
             _HAS_NUMPY = False
@@ -479,7 +478,7 @@ class MLPipeline:
 
         # 模拟模式
         if isinstance(self._current_model, dict):
-            threshold = self._current_model.get("threshold", 0.4)
+            self._current_model.get("threshold", 0.4)
             return [sum(v) / max(len(v), 1) for v in X]
 
         return [0.5] * len(X)

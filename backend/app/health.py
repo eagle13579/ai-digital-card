@@ -26,7 +26,6 @@ Usage:
 
 from __future__ import annotations
 
-import asyncio
 import importlib
 import logging
 import os
@@ -300,7 +299,7 @@ def get_system_health() -> dict[str, Any]:
     # ── New architecture layers (circular-import-safe) ───────────
     health["new_architecture_layers"] = check_new_architecture_layers()
     health["new_architecture_layers_ok"] = sum(
-        1 for l in health["new_architecture_layers"] if l.get("status") == "ok"
+        1 for layer in health["new_architecture_layers"] if layer.get("status") == "ok"
     )
 
     # ── Agent Runtime ────────────────────────────────────────────

@@ -19,8 +19,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-import numpy as np
-from sqlalchemy import select, func as sa_func, desc, and_, update
+from sqlalchemy import select, func as sa_func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.vector_search import (

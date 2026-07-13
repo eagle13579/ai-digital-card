@@ -166,10 +166,10 @@ class SlackBot(BotBase):
     async def _cmd_unknown(self, cmd: BotCommand) -> str:
         """未知命令处理。"""
         return (
-            f"❓ 未知命令 `/`。支持的命令:\n"
-            f"• `/search-contact <关键词>` — 搜索联系人\n"
-            f"• `/add-note <联系人> <备注>` — 添加备注\n"
-            f"• `/recent-activity [数量]` — 查看最近活动"
+            "❓ 未知命令 `/`。支持的命令:\n"
+            "• `/search-contact <关键词>` — 搜索联系人\n"
+            "• `/add-note <联系人> <备注>` — 添加备注\n"
+            "• `/recent-activity [数量]` — 查看最近活动"
         )
 
     # ── Slack Events API 回调验证 ────────────────────────────────────────────
@@ -199,7 +199,7 @@ class SlackBot(BotBase):
         basestring = f"v0:{timestamp}:".encode("utf-8") + body
         expected = "v0=" + self._hmac_sha256(settings.SLACK_SIGNING_SECRET, basestring)
 
-        return hmac.compare_digest(expected, signature)
+        return hmac.compare_digest(expected, signature)  # noqa: F821
 
     def parse_event(self, raw_body: bytes) -> dict[str, Any]:
         """解析 Slack Events API 回调事件。

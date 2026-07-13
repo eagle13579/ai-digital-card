@@ -17,7 +17,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
-from typing import Any, Callable, Optional, Protocol, runtime_checkable
+from typing import Any, Callable, Protocol, runtime_checkable
 
 
 # ======================================================================

@@ -20,7 +20,7 @@ import dataclasses
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Callable, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 # ======================================================================

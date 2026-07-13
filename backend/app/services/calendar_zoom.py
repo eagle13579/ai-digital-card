@@ -38,7 +38,6 @@
 from __future__ import annotations
 
 import base64
-import json
 import logging
 import time
 from typing import Any
@@ -212,7 +211,7 @@ class ZoomCalendar(CalendarBase):
         if end_time:
             params["to"] = end_time[:10]
 
-        data = await self._zoom_request("GET", f"/users/me/meetings")
+        data = await self._zoom_request("GET", "/users/me/meetings")
         meetings = data.get("meetings", [])
 
         events = []

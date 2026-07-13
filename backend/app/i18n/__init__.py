@@ -481,15 +481,3 @@ def detect_lang(accept_language: str = "") -> str:
             return lang
     # 默认英文
     return "en"
-
-
-# 导出 API 错误码国际化模块
-from app.i18n.error_codes import (
-    get_error_message,
-    get_error_message_with_details,
-    resolve_error_code_message,
-    get_domain_error_message,
-    get_http_status_message,
-    ERROR_CODE_I18N_MAP,
-    DOMAIN_ERROR_MAP,
-)

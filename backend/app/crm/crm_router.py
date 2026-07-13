@@ -52,9 +52,7 @@ AI销售预测:
 
 from __future__ import annotations
 
-import json
 import logging
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Body
 from pydantic import BaseModel, Field
@@ -65,18 +63,8 @@ from app.api_standards import PaginatedResponse, paginate_cursor
 from app.database import get_db
 from app.models.tag import MatchRecord
 from app.models.user import User
-
-# 注意: 不使用 from app.routers.auth import get_current_user
-# 避免循环导入。改用 _get_crm_current_user 函数调用内部延迟导入
-
-router = APIRouter(prefix="/api/crm", tags=["CRM"])
-
 from app.crm.crm_models import (
     CrmContact,
-    CrmDeal,
-    CrmNote,
-    CrmActivity,
-    CrmPipelineStage,
     CrmWorkflowRule,
     CrmWorkflowLog,
 )
@@ -95,7 +83,6 @@ from app.crm.crm_rbac import (
     CrmRole,
     CRM_ROLE_DISPLAY,
     CRM_PERMISSION_LABELS,
-    ALL_CRM_PERMISSIONS,
     get_user_crm_permissions,
     get_crm_permissions_for_role,
     ensure_crm_role_definition,
@@ -103,6 +90,12 @@ from app.crm.crm_rbac import (
     require_permission,
 )
 from app.crm.workflow_engine import WorkflowEngine, test_rule_execution
+from fastapi.security import OAuth2PasswordBearer
+
+# 注意: 不使用 from app.routers.auth import get_current_user
+# 避免循环导入。改用 _get_crm_current_user 函数调用内部延迟导入
+
+router = APIRouter(prefix="/api/crm", tags=["CRM"])
 
 logger = logging.getLogger(__name__)
 
@@ -375,7 +368,6 @@ class DashboardResponse(BaseModel):
 
 
 # 避免循环导入: 延迟导入 get_current_user
-from fastapi.security import OAuth2PasswordBearer
 _crm_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 async def _get_crm_current_user(
@@ -1172,7 +1164,7 @@ async def create_rbac_role(
         )
 
     role_ids = await ensure_crm_role_definition(db)
-    role_id = role_ids[data.name]
+    role_ids[data.name]
 
     # 获取角色的完整信息
     perms = get_crm_permissions_for_role(data.name)

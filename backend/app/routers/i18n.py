@@ -7,12 +7,10 @@ AI数字名片 翻译API端点
 from fastapi import APIRouter, Query
 
 from app.i18n import TRANSLATIONS
-from datetime import datetime, date
-from typing import Union
+from datetime import datetime
 
 from app.i18n.localization import (
     get_locale_formatter,
-    get_supported_locales,
 )
 
 router = APIRouter(prefix="/api/i18n", tags=["i18n"])

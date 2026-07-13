@@ -34,7 +34,7 @@ import os
 import random
 import re
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -599,7 +599,7 @@ class DocumentGenService:
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import mm
-        from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
+        from reportlab.lib.enums import TA_RIGHT, TA_CENTER
         from reportlab.platypus import (
             SimpleDocTemplate,
             Paragraph,
@@ -607,7 +607,6 @@ class DocumentGenService:
             Table,
             TableStyle,
             HRFlowable,
-            PageBreak,
         )
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
@@ -641,7 +640,7 @@ class DocumentGenService:
             rightMargin=20 * mm,
         )
 
-        styles = getSampleStyleSheet()
+        getSampleStyleSheet()
 
         # ── 样式 ──
         s_title = ParagraphStyle(
@@ -679,7 +678,7 @@ class DocumentGenService:
             spaceAfter=2 * mm,
             textColor=colors.HexColor("#111827"),
         )
-        s_right = ParagraphStyle(
+        ParagraphStyle(
             "Right",
             fontName=font_name,
             fontSize=10,
@@ -722,7 +721,7 @@ class DocumentGenService:
 
         # 提取各部分
         # 我方法与 section 标题
-        heading_matches = _re.findall(r"<h3>(.*?)</h3>", html_content)
+        _re.findall(r"<h3>(.*?)</h3>", html_content)
         # 段落内容
         para_matches = _re.findall(r"<p>(.*?)</p>", html_content)
         # 表格

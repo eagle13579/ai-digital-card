@@ -18,7 +18,6 @@ import json
 import logging
 import time
 import datetime
-from contextvars import ContextVar
 
 # ── 日志记录器 ────────────────────────────────────────────────────
 logger = logging.getLogger("app.access")
@@ -105,7 +104,7 @@ class LoggingMiddleware:
             user_id = scope.get("user_id", "")
             if not user_id:
                 # 退而求其次，从 scope 的 query_string 或 headers 中解析
-                headers = dict(scope.get("headers", []))
+                dict(scope.get("headers", []))
                 # 尝试从 Authorization header 中提取 (仅记录，不解析)
                 pass
         except Exception:

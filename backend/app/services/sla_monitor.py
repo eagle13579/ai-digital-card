@@ -20,15 +20,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import sqlite3
 import threading
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field, asdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger("chainke.sla")
 
@@ -391,7 +390,7 @@ class SlaMonitor:
         # 可用性 = (成功请求 / 总请求) * 100
         availability = (success / total * 100) if total > 0 else 100.0
         error_rate = (errors_ / total) if total > 0 else 0.0
-        avg_latency = (latency_total / total) if total > 0 else 0.0
+        (latency_total / total) if total > 0 else 0.0
 
         # 百分位计算 (聚合所有记录的 latency_buckets)
         all_latencies = []

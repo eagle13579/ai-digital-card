@@ -3,7 +3,7 @@ from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
-from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
+from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord  # noqa: F401
 from app.models.webhook import WebhookSubscription
 from app.models.integration import Integration
 from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent

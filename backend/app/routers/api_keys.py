@@ -1,7 +1,6 @@
 """API Key 管理路由：创建、列出、吊销、用量统计。"""
 import json
 from datetime import datetime, timedelta, date
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field

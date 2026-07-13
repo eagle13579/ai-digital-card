@@ -118,7 +118,7 @@ def _make_exception_handler(status_code: int, code: str):
     return handler
 
 
-def register_error_handlers(app: "FastAPI") -> None:
+def register_error_handlers(app: "FastAPI") -> None:  # noqa: F821
     """为常见异常注册统一格式的处理器。
 
     注册的异常类型：

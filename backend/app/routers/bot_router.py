@@ -13,9 +13,8 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 
 from app.services.bot_service import BotCommand, get_bot, list_bots
@@ -205,7 +204,7 @@ async def _handle_feishu_webhook(
     # ── URL 验证挑战 ──────────────────────────────────────────────────────
     if data.get("type") == "url_verification":
         challenge = data.get("challenge", "")
-        token = data.get("token", "")
+        data.get("token", "")
         logger.debug("飞书 url_verification: challenge=%s", challenge)
         return JSONResponse({"challenge": challenge})
 

@@ -16,14 +16,12 @@ Upgrade path:
 from __future__ import annotations
 
 import threading
-import time
 import uuid
 from typing import Any
 
 from app.identity.interfaces import (
     Identity,
     Tenant,
-    TenantProtocol,
 )
 
 logger = __import__("logging").getLogger(__name__)

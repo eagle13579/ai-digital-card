@@ -6,7 +6,7 @@ import io
 import os
 import random
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -350,11 +350,11 @@ class InvoiceService:
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib.units import mm, cm
-        from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
+        from reportlab.lib.units import mm
+        from reportlab.lib.enums import TA_RIGHT, TA_CENTER
         from reportlab.platypus import (
             SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-            HRFlowable, KeepTogether
+            HRFlowable
         )
         from reportlab.pdfbase import pdfmetrics
         from reportlab.pdfbase.ttfonts import TTFont
@@ -390,7 +390,7 @@ class InvoiceService:
             leftMargin=20*mm, rightMargin=20*mm,
         )
 
-        styles = getSampleStyleSheet()
+        getSampleStyleSheet()
 
         # 自定义样式
         style_title = ParagraphStyle(
@@ -428,7 +428,7 @@ class InvoiceService:
             leading=11, textColor=colors.HexColor("#9ca3af"),
             alignment=TA_CENTER,
         )
-        style_section = ParagraphStyle(
+        ParagraphStyle(
             "Section", fontName=font_name, fontSize=10,
             leading=14, textColor=colors.HexColor("#374151"),
             spaceBefore=4*mm, spaceAfter=2*mm,

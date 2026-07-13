@@ -15,15 +15,12 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-import numpy as np
 from sqlalchemy import select, func as sa_func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.vector_search import (
     get_embedding_backend,
     get_vector_index,
-    VectorSearchIndex,
-    embed_text,
 )
 from app.ai.gaia_evolution_brain import get_gaia_brain, GaiaEvolutionBrain
 from app.models.gaia import (
@@ -532,7 +529,7 @@ class GaiaTrainer:
             # Step 3: 计算进化权重
             logger.info("Step 3/4: 计算进化权重...")
             evolved_weights = await self.compute_evolved_weights(db)
-            weights_count = len(evolved_weights)
+            len(evolved_weights)
 
             # Step 4: 部署权重
             logger.info("Step 4/4: 部署权重...")

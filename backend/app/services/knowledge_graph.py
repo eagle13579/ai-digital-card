@@ -14,11 +14,10 @@ import logging
 from collections import defaultdict
 from typing import Any
 
-from sqlalchemy import select, func as sa_func, or_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
-from app.models.brochure import Brochure
 from app.models.tag import UserTag, MatchRecord
 from app.models.trust import TrustNetwork
 
@@ -205,7 +204,6 @@ class KnowledgeGraph:
                     try:
                         common = json.loads(m.common_tags)
                         for ct in common:
-                            ctid = f"tag:{ct}"
                             # 确保标签节点存在
                             self._add_tag_node(ct)
                             iid = self._add_industry_node(ct)
@@ -360,7 +358,6 @@ class KnowledgeGraph:
         companies: set[str] = set()
         industries: set[str] = set()
         match_count = 0
-        trust_count = 0
         trust_given = 0
         trust_received = 0
 

@@ -10,10 +10,9 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 
 logger = __import__("logging").getLogger(__name__)

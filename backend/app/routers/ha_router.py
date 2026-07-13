@@ -16,7 +16,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
 
 logger = logging.getLogger("chainke.ha")

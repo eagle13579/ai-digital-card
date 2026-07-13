@@ -24,7 +24,6 @@ Usage:
 
 from __future__ import annotations
 
-import asyncio
 import dataclasses
 import hashlib
 import json
@@ -328,7 +327,7 @@ class CachedAIGateway(AIGatewayProtocol):
 
         try:
             response = await self._inner.chat(request)
-        except Exception as exc:
+        except Exception:
             self._record_failure(model)
             self._errors += 1
             raise
@@ -367,7 +366,7 @@ class CachedAIGateway(AIGatewayProtocol):
 
         try:
             response = await self._inner.embed(request)
-        except Exception as exc:
+        except Exception:
             self._record_failure(model)
             self._errors += 1
             raise

@@ -25,12 +25,11 @@ import json
 import logging
 import os
 import random
-import re
 import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 logger = logging.getLogger("chainke.content_marketing")
 
@@ -470,7 +469,7 @@ class ContentMarketingEngine:
 
         try:
             from scripts.geo_content_generator import GeoContentFactory, CONTENT_DIR
-            factory = GeoContentFactory()
+            GeoContentFactory()
 
             index_path = os.path.join(CONTENT_DIR, "index.json")
 

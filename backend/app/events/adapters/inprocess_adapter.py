@@ -14,9 +14,8 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections import defaultdict
-from typing import Any, Callable
 
-from app.events.interfaces import Event, EventBusProtocol, EventHandler, EventPriority
+from app.events.interfaces import Event, EventBusProtocol, EventHandler
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +157,7 @@ class InProcessEventBus(EventBusProtocol):
         Returns True if the handler was found and removed, False otherwise.
         """
         handlers = self._handlers.get(event_type, [])
-        before = len(handlers)
+        len(handlers)
         self._handlers[event_type] = [
             (h, d) for h, d in handlers if h is not handler
         ]

@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
-from sqlalchemy import select, and_, or_, func
+from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.team import (
@@ -67,12 +67,12 @@ class TeamService:
 
     @staticmethod
     async def get_team_by_id(db: AsyncSession, team_id: int) -> Optional[Team]:
-        result = await db.execute(select(Team).where(Team.id == team_id, Team.is_active == True))
+        result = await db.execute(select(Team).where(Team.id == team_id, Team.is_active))
         return result.scalars().first()
 
     @staticmethod
     async def get_team_by_slug(db: AsyncSession, slug: str) -> Optional[Team]:
-        result = await db.execute(select(Team).where(Team.slug == slug, Team.is_active == True))
+        result = await db.execute(select(Team).where(Team.slug == slug, Team.is_active))
         return result.scalars().first()
 
     @staticmethod
@@ -96,7 +96,7 @@ class TeamService:
         """获取用户加入的所有活跃团队"""
         result = await db.execute(
             select(Team).join(TeamMember, TeamMember.team_id == Team.id)
-            .where(TeamMember.user_id == user_id, TeamMember.is_active == True, Team.is_active == True)
+            .where(TeamMember.user_id == user_id, TeamMember.is_active, Team.is_active)
             .order_by(Team.created_at.desc())
         )
         return list(result.scalars().all())
@@ -109,7 +109,7 @@ class TeamService:
         result = await db.execute(
             select(TeamMember, User)
             .join(User, User.id == TeamMember.user_id)
-            .where(TeamMember.team_id == team_id, TeamMember.is_active == True)
+            .where(TeamMember.team_id == team_id, TeamMember.is_active)
             .order_by(TeamMember.role, TeamMember.joined_at)
         )
         rows = result.all()
@@ -136,7 +136,7 @@ class TeamService:
             select(TeamMember).where(
                 TeamMember.team_id == team_id,
                 TeamMember.user_id == user_id,
-                TeamMember.is_active == True,
+                TeamMember.is_active,
             )
         )
         return result.scalars().first()
@@ -180,7 +180,7 @@ class TeamService:
     async def get_member_count(db: AsyncSession, team_id: int) -> int:
         result = await db.execute(
             select(func.count(TeamMember.id))
-            .where(TeamMember.team_id == team_id, TeamMember.is_active == True)
+            .where(TeamMember.team_id == team_id, TeamMember.is_active)
         )
         return result.scalar() or 0
 

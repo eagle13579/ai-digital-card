@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import hashlib
 import hmac
-import json
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -17,7 +16,6 @@ from typing import Any
 
 import httpx
 
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 

@@ -17,13 +17,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Query
 
 from app.services.auto_ab_testing import (
-    AutoExperiment,
     ExperimentStatus,
     ExperimentType,
     engine as ab_engine,

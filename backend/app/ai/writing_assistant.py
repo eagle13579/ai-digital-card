@@ -1,6 +1,5 @@
 """AI 名片写作助手 — 调用 DeepSeek API 生成名片文案"""
 
-import json
 from typing import Optional
 
 from app.config import settings
@@ -168,7 +167,6 @@ class WritingAssistant:
         Returns:
             {"bio": str, "company": str, "recommendation": str, "slogan": str}
         """
-        import asyncio
 
         tasks = {
             "bio": WritingAssistant.generate(

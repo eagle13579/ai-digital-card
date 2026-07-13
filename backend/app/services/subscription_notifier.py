@@ -19,14 +19,13 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.payment import EnterpriseSubscription, TrialRecord
+from app.models.payment import EnterpriseSubscription
 from app.models.user import User
 from app.config import settings
 from app.services.email_service import email_service
@@ -73,7 +72,7 @@ async def find_expiring_trials(
     """
     now = datetime.utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    today_end = today_start + timedelta(days=1)
+    today_start + timedelta(days=1)
 
     notifications: list[TrialNotification] = []
 
@@ -300,7 +299,7 @@ async def _send_trial_email(db: AsyncSession, notification: TrialNotification) -
         )
         subject = "【通知】您的 AI数智名片试用已到期"
     elif days == 1:
-        html = trial_expiring_1d_html(
+        html = trial_expiring_1d_html(  # noqa: F823
             name=name,
             company_name=company_name,
             end_date=end_date_str,

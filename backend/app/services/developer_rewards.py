@@ -16,16 +16,15 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import func as sa_func, desc
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
 from app.models.app_store import (
     Plugin,
-    PluginInstall,
     DeveloperReward,
     DeveloperRewardBalance,
     DeveloperRewardType,

@@ -14,14 +14,12 @@
 """
 import json
 import logging
-import math
 import time
 from collections import deque
 from datetime import datetime, timedelta, timezone
-from functools import lru_cache
 from typing import Dict, List, Optional, Set, Tuple
 
-from sqlalchemy import and_, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.models.six_degrees import (
@@ -96,8 +94,8 @@ class RelationGraph:
                 self.db.query(UserRelation)
                 .filter(
                     UserRelation.from_user_id.in_(current_layer),
-                    UserRelation.is_active == True,
-                    UserRelation.is_deleted == False,
+                    UserRelation.is_active,
+                    not UserRelation.is_deleted,
                 )
                 .all()
             )
@@ -720,7 +718,7 @@ def create_relation(
         .filter(
             UserRelation.from_user_id == from_user_id,
             UserRelation.to_user_id == to_user_id,
-            UserRelation.is_deleted == False,
+            not UserRelation.is_deleted,
         )
         .first()
     )

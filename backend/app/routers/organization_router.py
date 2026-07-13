@@ -21,12 +21,12 @@ API路径: /api/business-card/organizations/*
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.organization import Organization, OrganizationMember, Invite
+from app.models.organization import Organization, OrganizationMember
 from app.models.user import User
 from app.routers.auth import get_current_user
 from app.api_standards import raise_http_error, ErrorCode

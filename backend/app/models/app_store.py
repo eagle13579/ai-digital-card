@@ -8,7 +8,6 @@ PluginInstall: 用户安装记录
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, func
@@ -173,7 +172,7 @@ class PluginInstall(Base):
 
 # ── Pydantic schemas ──────────────────────────────────────────────────────────
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field  # noqa: E402
 
 
 class PluginCreate(BaseModel):

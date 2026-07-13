@@ -259,7 +259,6 @@ async def public_profile(
         for b in brochures:
             b_title = _escape_html(b.title)
             b_cover = b.cover if b.cover else ""
-            b_purpose = b.purpose if b.purpose else ""
             b_purpose_label = _escape_html(
                 {
                     "partner": "找合作伙伴",

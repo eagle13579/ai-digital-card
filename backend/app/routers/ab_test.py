@@ -12,16 +12,14 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, delete, func as sa_func
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.database import get_db
 from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent, ABTestDecisionLog
 from app.models.user import User
 from app.routers.auth import get_current_user
 from app.ai.ab_testing import (
-    ABTestingEngine,
     get_ab_testing_engine,
-    SignificanceTester,
 )
 
 router = APIRouter(prefix="/api/ab-test", tags=["A/B测试"])
@@ -517,7 +515,7 @@ async def trigger_auto_decision(
                 await db.execute(
                     delete(ABTestVariant).where(
                         ABTestVariant.experiment_id == experiment_id,
-                        ABTestVariant.is_default == True,
+                        ABTestVariant.is_default,
                     )
                 )
                 winner.is_default = True

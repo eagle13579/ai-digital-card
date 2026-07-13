@@ -15,7 +15,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from app.agents.base_agent import BaseAgent, AgentConfig, CronJob, AgentStatus
+from app.agents.base_agent import BaseAgent, AgentConfig, AgentStatus
 
 logger = logging.getLogger(__name__)
 
@@ -677,7 +677,7 @@ class SecurityAgent(BaseAgent):
             event: The deployment event with build/deploy details.
         """
         logger.info("SecurityAgent: deploy.staging event — running security scan")
-        payload = getattr(event, "payload", {})
+        getattr(event, "payload", {})
 
         # Run comprehensive security scan
         dep_scan = await self.scan_dependencies()

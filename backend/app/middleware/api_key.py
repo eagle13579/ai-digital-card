@@ -7,14 +7,12 @@ API Key 认证中间件。
 
 同时记录 API Key 的调用用量到 api_key_usage 表。
 """
-import asyncio
 from datetime import date
 from typing import Optional
 
-from fastapi import Request, HTTPException, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import select, and_
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
 from app.models.api_key import ApiKey, ApiKeyUsage

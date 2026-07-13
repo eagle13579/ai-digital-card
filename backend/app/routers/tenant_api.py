@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
@@ -38,7 +37,7 @@ AdminDep = Depends(_require_admin)
 
 # ── Schemas (内联) ────────────────────────────────────────────────────────
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field  # noqa: E402
 
 
 class TenantCreateRequest(BaseModel):

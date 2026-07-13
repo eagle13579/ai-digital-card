@@ -30,7 +30,6 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 
 from app.services.form_capture import (
-    CrmForm,
     FormCaptureService,
     form_rate_limiter,
 )

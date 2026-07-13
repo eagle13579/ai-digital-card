@@ -15,9 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.rbac import (
     Permission,
-    get_permissions_for_role,
     get_user_permissions,
-    has_permission as _has_permission,
 )
 from app.models.user import User
 from app.routers.auth import get_current_user as _get_current_user
@@ -27,7 +25,7 @@ logger = logging.getLogger("rbac.middleware")
 # ── 类型别名 ──────────────────────────────────────────────────────────────────
 
 PermissionType = Union[str, Permission]
-RoleType = Union[str, "Role"]
+RoleType = Union[str, "Role"]  # noqa: F821
 
 
 # ── FastAPI 依赖项 ────────────────────────────────────────────────────────────
@@ -194,8 +192,8 @@ def can_configure_sso(user: User) -> bool:
 
 # ── ASGI 中间件（可选，用于全局路径级拦截） ───────────────────────────────────
 
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint  # noqa: E402
+from starlette.requests import Request  # noqa: E402
 
 
 class RBACMiddleware(BaseHTTPMiddleware):
@@ -237,7 +235,7 @@ class RBACMiddleware(BaseHTTPMiddleware):
                     detail="需要认证",
                 )
 
-            route_config = self.protected_routes[path]
+            self.protected_routes[path]
             # Note: full validation with DB lookup is done at the endpoint level
             # This middleware only provides path-level gating
 

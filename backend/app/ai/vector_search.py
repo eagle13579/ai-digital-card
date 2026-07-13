@@ -24,14 +24,11 @@ AI数字名片 向量搜索引擎 — M3E本地模型 + API 多后端
 """
 
 import hashlib
-import json
 import logging
-import math
 import os
 import re
 import sqlite3
 import time
-from collections import Counter
 from typing import Any, Optional
 
 import numpy as np

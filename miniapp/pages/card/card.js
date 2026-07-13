@@ -61,11 +61,13 @@ Page({
       const state = store.getState()
       const userInfo = state.userInfo
       if (!userInfo || !userInfo.id) {
-        console.warn('[card] 无用户信息，无法加载名片列表')
+        console.warn('[card] 无用户信息，跳转登录页')
         this.setData({ myCards: [], loading: false, listError: true })
+        wx.switchTab({ url: '/pages/profile/profile' })
         return
       }
-      const res = await MockService.getBrochures()
+      const { brochureApi } = require('../../utils/api')
+      const res = await brochureApi.list()
       // MockService 返回 { data: [...] }，真实API也同理
       const allBrochures = Array.isArray(res) ? res : (res?.data || [])
       // 按当前用户过滤

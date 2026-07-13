@@ -103,7 +103,7 @@ class BanditService:
             if user_id not in self.user_arms:
                 self.user_arms[user_id] = {}
             self.user_arms[user_id][arm_id] = Arm(arm_id=arm_id, alpha=1.0, beta=1.0)
-        arm = self.user_arms[user_id][arm_id]
+        self.user_arms[user_id][arm_id]
         self.ts.arms = list(self.user_arms[user_id].values())
         arm_idx = [a.arm_id for a in self.ts.arms].index(arm_id)
         self.ts.update(arm_idx, reward)

@@ -109,13 +109,13 @@ async def admin_audit_log(user_id: Optional[int] = Query(None), action: Optional
         query = query.where(AuditLog.action == action.upper())
         count_query = count_query.where(AuditLog.action == action.upper())
     if start_time:
-        try: dt_start = datetime.fromisoformat(start_time)
-        except ValueError: raise HTTPException(400, "start_time 格式无效")
+        try: dt_start = datetime.fromisoformat(start_time)  # noqa: E701
+        except ValueError: raise HTTPException(400, "start_time 格式无效")  # noqa: E701
         query = query.where(AuditLog.timestamp >= dt_start)
         count_query = count_query.where(AuditLog.timestamp >= dt_start)
     if end_time:
-        try: dt_end = datetime.fromisoformat(end_time)
-        except ValueError: raise HTTPException(400, "end_time 格式无效")
+        try: dt_end = datetime.fromisoformat(end_time)  # noqa: E701
+        except ValueError: raise HTTPException(400, "end_time 格式无效")  # noqa: E701
         query = query.where(AuditLog.timestamp <= dt_end)
         count_query = count_query.where(AuditLog.timestamp <= dt_end)
     total = (await db.execute(count_query)).scalar() or 0

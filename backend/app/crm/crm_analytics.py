@@ -13,14 +13,13 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import func, select, case, and_
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crm.crm_models import (
     CrmActivity,
     CrmContact,
     CrmDeal,
-    CrmPipelineStage,
 )
 
 logger = logging.getLogger(__name__)

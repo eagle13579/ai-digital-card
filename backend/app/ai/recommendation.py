@@ -20,23 +20,22 @@ AI数字名片 实时推荐引擎
   - 反馈权重的范围为 [0.6, 1.5]
 """
 
-import json
 import logging
+import os
+import sqlite3
+import time
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
-from sqlalchemy import func as sa_func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.feedback_loop import apply_feedback_boost, get_feedback_loop
-from app.ai.knowledge_graph import CachedKnowledgeGraphBuilder, KnowledgeGraphBuilder
-from app.ai.vector_search import VectorSearchEngine, cosine_similarity
-from app.cache import cache
+from app.ai.feedback_loop import get_feedback_loop
+from app.ai.knowledge_graph import CachedKnowledgeGraphBuilder
+from app.ai.vector_search import VectorSearchEngine
 from app.models.brochure import Brochure
-from app.models.tag import MatchRecord, UserTag
-from app.models.trust import TrustNetwork
+from app.models.tag import UserTag
 from app.models.user import User
-from app.models.visitor import VisitorLog
 
 logger = logging.getLogger(__name__)
 
@@ -667,10 +666,6 @@ class RecommendEngine:
 # ======================================================================
 # 在线学习引擎 - 行为追踪与权重调整
 # ======================================================================
-
-import sqlite3
-import os
-import time
 
 
 class OnlineLearningTracker:

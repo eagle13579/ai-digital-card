@@ -14,6 +14,12 @@ App({
     const { token } = store.getState()
     console.log('[App] onLaunch, isLoggedIn:', !!token)
 
+    // 未登录 → 跳转登录页
+    if (!token) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+
     // 检查小程序更新
     this._checkUpdate()
   },

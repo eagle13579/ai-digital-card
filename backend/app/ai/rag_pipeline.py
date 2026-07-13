@@ -16,14 +16,13 @@ AI数字名片 检索增强生成(RAG)管道
 import json
 import logging
 from dataclasses import dataclass, field
-from typing import Any, AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional
 
 import aiohttp
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.vector_search import VectorSearchEngine
-from app.cache import cache
 from app.config import settings
 from app.models.brochure import Brochure, Page
 from app.models.tag import MatchRecord, UserTag

@@ -40,7 +40,7 @@ class User(Base):
     quota_reset_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, comment="配额重置时间")
 
     # ── 关系 ────────────────────────────────────────────────────────────────
-    memberships: Mapped[list["OrganizationMember"]] = relationship("OrganizationMember", back_populates="user")
+    memberships: Mapped[list["OrganizationMember"]] = relationship("OrganizationMember", back_populates="user")  # noqa: F821
 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())

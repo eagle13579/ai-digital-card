@@ -24,10 +24,9 @@ New architecture (Protocol-based):
 import asyncio
 import functools
 import hashlib
-import inspect
 import json
 import logging
-from typing import Any, Awaitable, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +189,7 @@ def cache(
         # 暴露清除方法
         def clear_cache(*clr_args, **clr_kwargs) -> bool:
             """手动清除该函数的缓存项"""
-            key = _build_cache_key(_prefix, clr_args or args, clr_kwargs or kwargs)
+            key = _build_cache_key(_prefix, clr_args, clr_kwargs)
             client = _get_client()
             if client is not None:
                 return client.delete(key)

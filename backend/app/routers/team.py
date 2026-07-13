@@ -1,6 +1,6 @@
 """团队管理 API：CRUD + 成员管理 + 邀请管理 + 角色管理"""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional

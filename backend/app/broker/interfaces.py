@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import dataclasses
 import uuid
-from typing import Any, Callable, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 # ======================================================================

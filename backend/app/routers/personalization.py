@@ -1,5 +1,5 @@
 """Personalization routes — interact, recommend, trending."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from app.ai.online_learning import OnlineLearningPipeline
 from app.ai.bandit_engine import BanditService
 

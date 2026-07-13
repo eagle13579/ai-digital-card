@@ -279,7 +279,7 @@ class DataAgent(BaseAgent):
             data = {"table_name": str(table)}
 
         table_name = data.get("table_name", data.get("table", "unknown"))
-        columns = data.get("columns", data.get("column_definitions", []))
+        data.get("columns", data.get("column_definitions", []))
         row_count = self._safe_int(data.get("row_count", data.get("rows", 0)), 10000)
 
         logger.info("Running data quality check on: %s", table_name)

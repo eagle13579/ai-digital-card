@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -589,7 +589,7 @@ async def card_generate_alias(
     from app.schemas import BrochureCreate, PageSchema
 
     fields = data.get("fields", {})
-    template = data.get("template", "default")
+    data.get("template", "default")
 
     pages = [
         {

@@ -26,7 +26,6 @@ import threading
 from typing import Any
 
 from app.identity.interfaces import (
-    AuthorizationProtocol,
     Identity,
 )
 

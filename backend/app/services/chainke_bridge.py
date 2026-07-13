@@ -205,7 +205,7 @@ async def sync_membership(user_id: int) -> dict:
             chainke_data = resp.get("data", resp)
             chainke_tier = chainke_data.get("tier", "free")
             expires_at_str = chainke_data.get("expires_at")
-            match_credits = chainke_data.get("match_credits", 0)
+            chainke_data.get("match_credits", 0)
 
             new_tier = _CHAINKE_TIER_MAP.get(chainke_tier, "free")
 

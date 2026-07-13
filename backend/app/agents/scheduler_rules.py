@@ -306,7 +306,7 @@ async def install_scheduler_rules() -> None:
                     event_pattern,
                 )
 
-    enabled_cron = sum(1 for j in jobs if j.enabled for jobs in cron_jobs.values())
+    sum(1 for j in jobs if j.enabled for jobs in cron_jobs.values())
     logger.info(
         "Scheduler rules installed: %d cron jobs, %d event subscriptions "
         "across %d agents",

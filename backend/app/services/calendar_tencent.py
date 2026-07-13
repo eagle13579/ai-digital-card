@@ -36,9 +36,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import hmac
-import json
 import logging
 import time
 import uuid
@@ -226,7 +223,6 @@ class TencentCalendar(CalendarBase):
           - start_time/end_time: Unix 时间戳（秒）
         """
         import datetime as dt
-        import re
 
         # 解析 ISO 时间 → Unix 时间戳
         def _to_ts(iso_str: str) -> int:
@@ -247,7 +243,7 @@ class TencentCalendar(CalendarBase):
             # fallback: 当前时间
             return int(time.time())
 
-        duration = max(1, (_to_ts(end_time) - _to_ts(start_time)) // 60)
+        max(1, (_to_ts(end_time) - _to_ts(start_time)) // 60)
 
         body = {
             "subject": title,

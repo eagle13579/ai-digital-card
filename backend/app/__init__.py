@@ -1,17 +1,15 @@
 """AI数字名片 API — 模块化架构入口。"""
 import logging
 import os
-import sys
-from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.database import engine, Base
+
+logger = logging.getLogger(__name__)
 
 
 def init_sentry(dsn: str = "") -> None:
@@ -99,7 +97,6 @@ def create_app():
         LoggingMiddleware,
         SecurityHeadersMiddleware,
         CsrfMiddleware,
-        get_metrics_instance,
         init_otel,
     )
     from app.middleware.api_version import APIVersionRedirectMiddleware
@@ -239,7 +236,7 @@ def create_app():
     app.include_router(docs_router)
     app.include_router(web_vitals_router)
     app.include_router(graphql_router)
-    from app.routers.graphql_route import HAS_STRAWBERRY, strawberry_app
+    from app.routers.graphql_route import HAS_STRAWBERRY
     if HAS_STRAWBERRY and strawberry_app is not None:
         app.include_router(strawberry_app, prefix="/graphql")
     app.include_router(oauth_router)

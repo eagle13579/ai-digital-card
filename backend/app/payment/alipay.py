@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import json
-import time
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 
 import httpx
 
@@ -14,7 +13,6 @@ from app.config import settings
 from app.payment import (
     CallbackParams,
     CallbackResult,
-    MembershipTier,
     OrderQueryResult,
     OrderRequest,
     OrderResponse,
@@ -146,7 +144,7 @@ class AlipayProvider(PaymentProvider):
         try:
             resp = await self.client.post(self.gateway, data=params)
             resp_data = self._parse_response(resp.text)
-        except Exception as e:
+        except Exception:
             return OrderQueryResult(
                 order_no=order_no, channel_order_no="",
                 status=PaymentStatus.FAILED, total_cents=0,
@@ -217,7 +215,7 @@ class AlipayProvider(PaymentProvider):
         sorted_keys = sorted(k for k in params if k and params[k])
         sign_string = "&".join(f"{k}={params[k]}" for k in sorted_keys)
         try:
-            from cryptography.hazmat.primitives import hashes, asymmetric, padding
+            from cryptography.hazmat.primitives import hashes, padding
             from cryptography.hazmat.primitives.serialization import load_pem_private_key
             private_key = load_pem_private_key(
                 self.private_key.encode("utf-8"),
@@ -240,7 +238,7 @@ class AlipayProvider(PaymentProvider):
         sorted_keys = sorted(k for k in data if k and data[k])
         sign_string = "&".join(f"{k}={data[k]}" for k in sorted_keys)
         try:
-            from cryptography.hazmat.primitives import hashes, asymmetric, padding
+            from cryptography.hazmat.primitives import hashes, padding
             from cryptography.hazmat.primitives.serialization import load_pem_public_key
             public_key = load_pem_public_key(
                 self.alipay_public_key.encode("utf-8"),

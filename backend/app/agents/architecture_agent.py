@@ -222,7 +222,7 @@ class ArchitectureAgent(BaseAgent):
         description = data.get("description", "")
         components = data.get("components", data.get("modules", []))
         tech_stack = data.get("tech_stack", data.get("technologies", []))
-        constraints = data.get("constraints", data.get("requirements", []))
+        data.get("constraints", data.get("requirements", []))
 
         logger.info("Reviewing design proposal: %s", title)
 
@@ -491,9 +491,9 @@ class ArchitectureAgent(BaseAgent):
 
         arch_name = data.get("name", data.get("architecture", f"System #{self._evolution_suggestions}"))
         arch_type = data.get("type", data.get("pattern", "monolith"))
-        scale = data.get("scale", data.get("size", "medium"))
+        data.get("scale", data.get("size", "medium"))
         pain_points = data.get("pain_points", data.get("challenges", []))
-        tech_stack = data.get("tech_stack", data.get("technologies", []))
+        data.get("tech_stack", data.get("technologies", []))
 
         logger.info("Suggesting evolution for: %s (%s)", arch_name, arch_type)
 

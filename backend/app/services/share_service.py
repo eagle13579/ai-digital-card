@@ -1,7 +1,6 @@
 """名片分享服务 — QR码生成 & NFC NDEF 记录"""
 
 import io
-from typing import Optional
 
 import qrcode
 from qrcode.image.pil import PilImage

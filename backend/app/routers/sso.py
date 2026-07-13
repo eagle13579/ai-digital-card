@@ -8,10 +8,9 @@ from __future__ import annotations
 import logging
 import secrets
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
-import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from jose import jwt
@@ -23,7 +22,7 @@ from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.routers.auth import create_access_token, oauth2_scheme
-from app.schemas import TokenResponse, UserResponse
+from app.schemas import UserResponse
 from app.services.sso_service import SSOService, get_sso_service
 
 logger = logging.getLogger("sso.router")
@@ -241,7 +240,6 @@ async def link_sso_account(
     用于已登录用户绑定第三方账号（如：手机号注册后绑定 GitHub）。
     """
     # Get current user via JWT token
-    from app.routers.auth import get_current_user
     # Re-decode to get proper user object
     # (This route uses oauth2_scheme for token extraction, then we resolve user)
     try:

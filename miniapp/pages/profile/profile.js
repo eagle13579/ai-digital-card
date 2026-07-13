@@ -24,6 +24,11 @@ Page({
 
   onLoad() {
     this._loadI18n()
+    const { token } = require('../../utils/store').getState()
+    if (!token) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     this.loadProfile()
   },
 

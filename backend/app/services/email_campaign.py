@@ -23,10 +23,8 @@ import asyncio
 import json
 import logging
 import secrets
-from datetime import datetime
-from typing import Any
 
-from sqlalchemy import Select, and_, case, func, or_, select, update
+from sqlalchemy import case, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -183,7 +181,7 @@ class EmailCampaignService:
             .join(CrmCampaign, CrmCampaign.id == CrmCampaignRecipient.campaign_id)
             .where(
                 CrmCampaign.owner_id == self.user_id,
-                CrmCampaignRecipient.unsubscribed == True,
+                CrmCampaignRecipient.unsubscribed,
             )
         )
         query = query.where(CrmContact.id.notin_(subq))
@@ -480,13 +478,13 @@ class EmailCampaignService:
             select(
                 func.count(CrmCampaignRecipient.id).label("total"),
                 func.sum(
-                    case((CrmCampaignRecipient.sent == True, 1), else_=0)
+                    case((CrmCampaignRecipient.sent, 1), else_=0)
                 ).label("sent"),
                 func.sum(
-                    case((CrmCampaignRecipient.opened == True, 1), else_=0)
+                    case((CrmCampaignRecipient.opened, 1), else_=0)
                 ).label("opened"),
                 func.sum(
-                    case((CrmCampaignRecipient.unsubscribed == True, 1), else_=0)
+                    case((CrmCampaignRecipient.unsubscribed, 1), else_=0)
                 ).label("unsubscribed"),
             ).where(CrmCampaignRecipient.campaign_id == campaign_id)
         )
@@ -503,7 +501,7 @@ class EmailCampaignService:
                 select(CrmCampaignRecipient)
                 .where(
                     CrmCampaignRecipient.campaign_id == campaign_id,
-                    CrmCampaignRecipient.opened == True,
+                    CrmCampaignRecipient.opened,
                 )
                 .order_by(CrmCampaignRecipient.opened_at.desc().nullslast())
                 .limit(50)
@@ -536,13 +534,13 @@ class EmailCampaignService:
             select(
                 func.count(CrmCampaignRecipient.id).label("total"),
                 func.sum(
-                    case((CrmCampaignRecipient.sent == True, 1), else_=0)
+                    case((CrmCampaignRecipient.sent, 1), else_=0)
                 ).label("sent"),
                 func.sum(
-                    case((CrmCampaignRecipient.opened == True, 1), else_=0)
+                    case((CrmCampaignRecipient.opened, 1), else_=0)
                 ).label("opened"),
                 func.sum(
-                    case((CrmCampaignRecipient.unsubscribed == True, 1), else_=0)
+                    case((CrmCampaignRecipient.unsubscribed, 1), else_=0)
                 ).label("unsubscribed"),
             ).where(CrmCampaignRecipient.campaign_id == campaign_id)
         )

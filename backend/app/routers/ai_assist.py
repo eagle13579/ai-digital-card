@@ -1,6 +1,5 @@
 """AI 助手 API — 文案生成与优化建议"""
 
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field

@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "base_url": "http://localhost:8201",
+    "iterations": 2,
+    "timestamp": "2026-07-13 13:45:51",
+    "tool": "api_benchmark.py"
+  },
+  "results": [
+    {
+      "endpoint": "/health",
+      "p50_ms": -1.0,
+      "p90_ms": -1,
+      "p99_ms": -1,
+      "avg_ms": -1.0,
+      "min_ms": -1,
+      "max_ms": -1,
+      "error_rate": 1.0,
+      "iterations": 2
+    },
+    {
+      "endpoint": "/api/v1/templates",
+      "p50_ms": -1.0,
+      "p90_ms": -1,
+      "p99_ms": -1,
+      "avg_ms": -1.0,
+      "min_ms": -1,
+      "max_ms": -1,
+      "error_rate": 1.0,
+      "iterations": 2
+    },
+    {
+      "endpoint": "GraphQL: templates",
+      "p50_ms": -1.0,
+      "p90_ms": -1,
+      "p99_ms": -1,
+      "avg_ms": -1.0,
+      "min_ms": -1,
+      "max_ms": -1,
+      "error_rate": 1.0,
+      "iterations": 2
+    },
+    {
+      "endpoint": "GET /api/v1/public/brochures",
+      "p50_ms": -1.0,
+      "p90_ms": -1,
+      "p99_ms": -1,
+      "avg_ms": -1.0,
+      "min_ms": -1,
+      "max_ms": -1,
+      "error_rate": 1.0,
+      "iterations": 2
+    },
+    {
+      "endpoint": "GET /api/v1/ping",
+      "p50_ms": -1.0,
+      "p90_ms": -1,
+      "p99_ms": -1,
+      "avg_ms": -1.0,
+      "min_ms": -1,
+      "max_ms": -1,
+      "error_rate": 1.0,
+      "iterations": 2
+    }
+  ]
+}

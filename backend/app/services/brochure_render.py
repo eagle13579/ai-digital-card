@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from app.models.brochure import Brochure
 
@@ -152,12 +151,11 @@ class BrochureRenderer:
             pages_html += BrochureRenderer._render_page(page, base_url, theme)
 
         # 解析 album_meta（如果有）
-        meta = {}
         if brochure.album_meta:
             try:
-                meta = json.loads(brochure.album_meta)
+                json.loads(brochure.album_meta)
             except (json.JSONDecodeError, TypeError):
-                meta = {}
+                pass
 
         return f"""<!DOCTYPE html>
 <html lang="zh-CN">

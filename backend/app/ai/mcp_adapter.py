@@ -7,7 +7,6 @@ MCP规范: https://modelcontextprotocol.io
 
 import json
 import logging
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +121,6 @@ class MCPAdapter:
                 result = await self.agent.critique_design(arguments)
             elif tool_name == "audit_design":
                 # 并行执行三个审核
-                import asyncio
                 a11y = await self.agent.audit_accessibility(arguments)
                 perf = await self.agent.audit_performance(arguments)
                 resp = await self.agent.audit_responsive(arguments)
@@ -178,10 +176,9 @@ def create_mcp_server():
     """
     try:
         from mcp.server import Server
-        from mcp.server.stdio import stdio_server
         from mcp.types import (
-            CallToolRequest, ListToolsRequest, ListPromptsRequest,
-            CallToolResult, ListToolsResult, ListPromptsResult,
+            CallToolRequest,
+            CallToolResult, ListToolsResult,
         )
     except ImportError:
         logger.warning("MCP SDK not installed. Install with: pip install mcp")

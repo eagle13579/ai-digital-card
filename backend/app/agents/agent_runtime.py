@@ -582,7 +582,7 @@ class AgentRuntime:
             event: The runtime event to handle.
         """
         event_type = getattr(event, "type", "runtime.unknown")
-        payload = getattr(event, "payload", {})
+        getattr(event, "payload", {})
 
         logger.debug("Runtime received system event: %s", event_type)
 

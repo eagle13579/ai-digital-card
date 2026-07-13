@@ -5,11 +5,10 @@ import json
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from app.database import get_db
 from app.models.user import User
@@ -59,7 +58,6 @@ async def _load_tags(
     db: AsyncSession, user_id: int,
 ) -> list[dict[str, Any]]:
     """加载用户标签。"""
-    from app.models.tag import UserTag
 
     result = await db.execute(
         select(UserTag).where(UserTag.user_id == user_id)

@@ -200,7 +200,7 @@ ENTERPRISE_PRODUCT: dict[str, dict] = {
 
 # ── 金额格式化辅助 ──────────────────────────────────────────────────────
 
-from app.utils.formatting import format_currency
+from app.utils.formatting import format_currency  # noqa: E402
 
 
 def format_price_cents(

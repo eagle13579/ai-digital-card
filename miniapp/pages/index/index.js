@@ -49,7 +49,7 @@ Page({
   async loadPlatformRecommend() {
     this.setData({ platformLoading: true })
     try {
-      const res = await platformApi.list()
+      const res = await platformApi.list().catch(() => null)
       const platforms = (res || []).slice(0, 4).map((p, index) => ({
         id: p.id,
         name: p.name,

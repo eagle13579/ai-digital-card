@@ -11,12 +11,11 @@ AI数字名片 企业关系图谱
   4. 缓存支持 (Redis)
 """
 
-import json
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
-from sqlalchemy import func, select, union
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cache import cache

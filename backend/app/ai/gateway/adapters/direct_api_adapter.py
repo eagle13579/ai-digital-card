@@ -324,7 +324,6 @@ class DirectAIGateway(AIGatewayProtocol):
         }
         url = self._embed_url()
 
-        last_error: str | None = None
         for attempt in range(1, self._max_retries + 1):
             try:
                 client = await self._get_client()
@@ -364,10 +363,8 @@ class DirectAIGateway(AIGatewayProtocol):
                         wait,
                     )
                     await asyncio.sleep(wait)
-                    last_error = f"HTTP {response.status_code}: {response.text}"
                     continue
 
-                last_error = f"HTTP {response.status_code}: {response.text}"
                 self.metrics["errors"] += 1
                 return EmbeddingResponse(
                     embeddings=[],
@@ -387,9 +384,9 @@ class DirectAIGateway(AIGatewayProtocol):
                     exc,
                 )
                 await asyncio.sleep(wait)
-                last_error = str(exc)
+                str(exc)
                 continue
-            except Exception as exc:
+            except Exception:
                 logger.exception("Unexpected error calling DeepSeek embed API")
                 self.metrics["errors"] += 1
                 return EmbeddingResponse(

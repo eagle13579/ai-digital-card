@@ -14,7 +14,6 @@ from typing import Any, Callable
 
 from app.broker.interfaces import (
     ServiceBrokerProtocol,
-    ServiceHandler,
     ServiceRequest,
     ServiceResponse,
 )

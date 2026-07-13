@@ -18,7 +18,6 @@ POST /api/business-card/exchange）时，自动:
 
 from __future__ import annotations
 
-import json
 import logging
 from datetime import datetime
 
@@ -205,9 +204,9 @@ async def _add_exchange_activity(
 ) -> None:
     """为联系人添加名片交换活动记录。"""
     if is_initiator:
-        title = f"名片交换: 与对方交换名片"
+        title = "名片交换: 与对方交换名片"
     else:
-        title = f"名片交换: 与对方交换名片"
+        title = "名片交换: 与对方交换名片"
 
     activity = CrmActivity(
         owner_id=contact.owner_id,

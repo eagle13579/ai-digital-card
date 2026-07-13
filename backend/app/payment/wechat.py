@@ -7,7 +7,7 @@ import hmac
 import time
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 from defusedxml.ElementTree import fromstring as parse_xml
 from xml.etree import ElementTree as _ET
 
@@ -17,11 +17,9 @@ from app.config import settings
 from app.payment import (
     CallbackParams,
     CallbackResult,
-    MembershipTier,
     OrderQueryResult,
     OrderRequest,
     OrderResponse,
-    PaymentChannel,
     PaymentProvider,
     PaymentStatus,
     get_product,
@@ -208,7 +206,7 @@ class WeChatPayProvider(PaymentProvider):
         try:
             resp = await self.client.post("/pay/orderquery", content=xml_body)
             result = _from_xml(resp.text)
-        except Exception as e:
+        except Exception:
             return OrderQueryResult(
                 order_no=order_no, channel_order_no="",
                 status=PaymentStatus.FAILED, total_cents=0,

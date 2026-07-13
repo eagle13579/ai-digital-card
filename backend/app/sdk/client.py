@@ -34,12 +34,11 @@ AI数字名片 Python SDK 客户端
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import time
 from dataclasses import dataclass, field
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, TypeVar
 
 import httpx
 
@@ -54,8 +53,6 @@ from app.sdk.models import (
     Brochure,
     BrochureCreate,
     BrochureUpdate,
-    Page,
-    # CRM
     CrmActivity,
     CrmContact,
     CrmContactCreate,
@@ -67,7 +64,6 @@ from app.sdk.models import (
     CrmNoteUpdate,
     CrmPipelineStage,
     # 通用
-    ApiResponse,
     PaginatedResponse,
 )
 

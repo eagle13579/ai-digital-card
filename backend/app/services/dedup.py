@@ -2,7 +2,7 @@
 去重引擎 - 三重匹配：名字相似度 + 手机号精确 + 微信ID精确 + 公司名模糊
 """
 import difflib
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Any
 
 # 中文字符集（用于判断是否含中文）
 CJK_RANGE = set(chr(i) for i in range(0x4E00, 0x9FFF + 1))

@@ -36,7 +36,7 @@ from app.models.app_store import (
     RewardRedemptionCreate,
 )
 from app.models.user import User
-from app.core.response import api_success, api_created, api_deleted, api_paginated, api_error
+from app.core.response import api_success, api_created, api_deleted, api_paginated
 
 logger = logging.getLogger("chainke.app_store")
 
@@ -163,7 +163,7 @@ def create_plugin(
     developer_id: int = Query(..., description="开发者用户 ID"),
     db: Session = Depends(get_db),
 ):
-    user = _require_user(db, developer_id)
+    _require_user(db, developer_id)
 
     # 检查同名插件
     existing = db.query(Plugin).filter(Plugin.name == data.name).first()
@@ -310,7 +310,7 @@ def install_plugin(
     if plugin.status != "published":
         raise HTTPException(status_code=400, detail="只能安装已发布的插件")
 
-    user = _require_user(db, user_id)
+    _require_user(db, user_id)
 
     # 检查是否已安装
     existing = db.query(PluginInstall).filter(
@@ -385,7 +385,7 @@ def review_plugin(
     if plugin.status not in ("pending", "review"):
         raise HTTPException(status_code=400, detail="插件不在待审核状态")
 
-    reviewer = _require_admin(db, reviewer_id)
+    _require_admin(db, reviewer_id)
 
     review = PluginReview(
         plugin_id=plugin_id,
@@ -493,7 +493,7 @@ def redeem_points(
 ):
     """积分兑换"""
     from app.services.developer_rewards import redeem_rewards as _redeem
-    user = _require_user(db, developer_id)
+    _require_user(db, developer_id)
     redemption = _redeem(db, developer_id, data)
     if not redemption:
         raise HTTPException(status_code=400, detail="积分不足或兑换失败")
@@ -510,7 +510,7 @@ def issue_developer_rewards(
 ):
     """发放开发者所有待发放奖励"""
     from app.services.developer_rewards import issue_rewards as _issue
-    user = _require_user(db, developer_id)
+    _require_user(db, developer_id)
     total = _issue(db, developer_id)
     db.commit()
     return api_success({"points_issued": total}, message=f"已发放 {total} 积分")
@@ -568,7 +568,7 @@ def get_community_stats(db: Session = Depends(get_db)):
     ).scalar() or 0
 
     # 上月安装量（用于增长率）
-    last_month_start = (month_start - timedelta(days=1)).replace(day=1)
+    (month_start - timedelta(days=1)).replace(day=1)
     # 活跃开发者
     active_devs = db.query(Plugin.developer_id).filter(
         Plugin.status == "published"

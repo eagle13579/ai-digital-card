@@ -1,8 +1,7 @@
-import io
 import os
 import re
 import tempfile
-from typing import Optional, Union
+from typing import Union
 
 from PIL import Image, ImageEnhance, ImageFilter
 

@@ -88,7 +88,7 @@ class WebhookDispatcher:
     async def _send_single(
         self,
         client: httpx.AsyncClient,
-        subscription: "WebhookSubscription",
+        subscription: "WebhookSubscription",  # noqa: F821
         payload: dict[str, Any],
         db_session_factory,
     ) -> dict[str, Any]:

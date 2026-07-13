@@ -24,7 +24,6 @@ from app.identity.interfaces import (
     AuthRequest,
     AuthResponse,
     Identity,
-    IdentityProtocol,
 )
 
 logger = logging.getLogger(__name__)
@@ -386,9 +385,6 @@ class JWTIdentityAdapter:
             True if the token is blacklisted.
         """
         with self._lock:
-            # Evict expired entries
-            now = time.time()
-            expired_keys = [k for v in self._blacklist.items() if v is not None]
             # Check raw token
             if token in self._blacklist:
                 return True

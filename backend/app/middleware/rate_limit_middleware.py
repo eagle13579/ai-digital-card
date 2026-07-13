@@ -25,7 +25,6 @@ import os
 import time
 import logging
 import ipaddress
-from collections import defaultdict
 from typing import Optional, Tuple
 
 from starlette.middleware.base import BaseHTTPMiddleware

@@ -14,9 +14,7 @@ AI数字名片 — A/B 定价实验服务 (A/B Pricing Experiment)
 
 from __future__ import annotations
 
-import json
 import logging
-import random
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional

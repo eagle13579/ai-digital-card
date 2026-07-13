@@ -14,15 +14,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.feedback_loop import FeedbackLoop, apply_feedback_boost, get_feedback_loop
+from app.ai.feedback_loop import get_feedback_loop
 from app.ai.recommendation import RecommendEngine
 from app.ai.rag_pipeline import RAGPipeline
 from app.database import get_db
 from app.models.tag import MatchRecord
 from app.models.user import User
 from app.routers.auth import get_current_user
-from app.services.feedback_service import FeedbackAction, FeedbackResult, get_feedback_service
-from app.services.recommend_service import FeedbackRecommendation, RecommendService
+from app.services.feedback_service import FeedbackResult, get_feedback_service
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +193,7 @@ async def personal_recommend(
 
     # 获取已匹配用户 ID 列表（排除已 match 的用户）
     result = await db.execute(
-        select(MatchRecord).where(
+        select(MatchRecord).where(  # noqa: F821
             (MatchRecord.user_a_id == current_user.id) | (MatchRecord.user_b_id == current_user.id)
         )
     )
@@ -410,7 +409,7 @@ async def submit_feedback(
 
 
 @router.post("/{item_id}/feedback", response_model=FeedbackResponse)
-async def submit_feedback(
+async def submit_feedback(  # noqa: F811
     item_id: int,
     data: FeedbackRequest,
     current_user: User = Depends(get_current_user),

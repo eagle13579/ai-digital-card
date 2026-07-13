@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
 
 # ── 语言代码 → locale 映射表 ────────────────────────────────────────────
 

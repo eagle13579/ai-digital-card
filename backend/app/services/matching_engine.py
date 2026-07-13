@@ -1,16 +1,13 @@
 import json
 import math
-from typing import Optional
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.vector_search import (
     VectorSearchEngine,
-    DocumentBuilder,
-    cosine_similarity as vector_cosine_similarity,
 )
-from app.cache import cache, invalidate
+from app.cache import cache
 from app.models.tag import MatchRecord, UserTag
 from app.models.user import User
 from app.models.brochure import Brochure, Page

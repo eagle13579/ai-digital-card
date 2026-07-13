@@ -14,9 +14,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.services.subscription_service import (
     PLANS,
-    PlanConfig,
     TRIAL_DAYS,
-    TRIAL_TIER,
     can_downgrade,
     can_upgrade,
     downgrade_subscription,
@@ -35,7 +33,6 @@ from app.services.subscription_cancel import (
 )
 from app.services.ab_pricing import (
     get_experiment_status,
-    list_experiments,
     start_experiment,
 )
 
@@ -540,7 +537,7 @@ async def cancel_subscription_immediate(
         )
         sub = result["subscription"]
         refund = result["refund"]
-        now = datetime.utcnow()
+        datetime.utcnow()
         days_remaining = 0
         is_trial = sub.status == "trial" or sub.features.get("is_trial", False)
 
