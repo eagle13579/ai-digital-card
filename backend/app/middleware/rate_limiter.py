@@ -26,19 +26,19 @@ from typing import Optional
 
 # ── 默认分级配置 ───────────────────────────────────────────────────────────────
 DEFAULT_LIMITS = {
-    "anonymous": 100,
-    "standard": 1000,
-    "enterprise": 10000,
+    "anonymous": 500,
+    "standard": 2000,
+    "enterprise": 20000,
 }
 """默认三级分层速率限制 (req/min)。
 
 Tiers:
-  - anonymous:   100 req/min  (免费/未认证用户)
-  - standard:   1000 req/min  (已认证用户)
-  - enterprise: 10000 req/min (企业用户)
+  - anonymous:   500 req/min  (免费/未认证用户)
+  - standard:   2000 req/min  (已认证用户)
+  - enterprise: 20000 req/min (企业用户)
 """
 
-SENSITIVE_PREFIXES = ("/auth/login", "/api/register", "/api/auth/", "/api/payment/")
+SENSITIVE_PREFIXES = ("/auth/login", "/api/register", "/api/auth/")
 """敏感端点前缀，速率在上表基础上减半。"""
 
 

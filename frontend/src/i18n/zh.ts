@@ -244,6 +244,26 @@ const zh: Record<string, string> = {
   // ===== 通用 =====
   'common.loading': '加载中...',
   'common.empty': '暂无数据',
+
+  // ===== 信任网络 =====
+  'network.title': '信任网络',
+  'network.subtitle': '管理与您互信的联系人',
+  'network.trustUsers': '信任用户',
+  'network.noTrustUsers': '暂无信任用户',
+  'network.noTrustUsersDesc': '当对方将您加入信任网络后，将显示在这里',
+  'network.selectCardFirst': '请先选择一张名片',
+  'network.visitors': '访客记录',
+  'network.noVisitors': '暂无访客记录',
+  'network.anonymousVisitor': '匿名访客',
+  'network.removeTrust': '移除信任',
+  'network.removeSuccess': '已移除信任关系',
+  'network.removeFailed': '移除失败',
+  'network.unnamed': '未命名名片',
+  'network.close': '关闭',
+  'network.justNow': '刚刚',
+  'network.minutesAgo': '{n}分钟前',
+  'network.hoursAgo': '{n}小时前',
+  'network.daysAgo': '{n}天前',
 };
 
 export default zh;

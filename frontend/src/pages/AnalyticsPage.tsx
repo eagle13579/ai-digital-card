@@ -42,23 +42,23 @@ interface StatsData {
 
 // ─── 工具函数 ──────────────────────────────────────────
 
-function formatTime(iso: string | null): string {
+function formatTime(iso: string | null, t: (key: string, vars?: Record<string, string | number>) => string): string {
   if (!iso) return '';
   const d = new Date(iso);
   const diff = Date.now() - d.getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return '刚刚';
-  if (mins < 60) return `${mins}分钟前`;
+  if (mins < 1) return t('analytics.time.justNow');
+  if (mins < 60) return t('analytics.time.minutesAgo', { n: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}小时前`;
+  if (hours < 24) return t('analytics.time.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}天前`;
+  if (days < 7) return t('analytics.time.daysAgo', { n: days });
   return d.toLocaleDateString('zh-CN');
 }
 
-function formatDuration(sec: number): string {
-  if (sec < 60) return `${sec}秒`;
-  return `${Math.floor(sec / 60)}分${sec % 60}秒`;
+function formatDuration(sec: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
+  if (sec < 60) return t('analytics.duration.seconds', { n: sec });
+  return t('analytics.duration.minutes', { n: Math.floor(sec / 60), m: sec % 60 });
 }
 
 function formatDateLabel(iso: string): string {
@@ -75,10 +75,10 @@ const SOURCE_ICONS: Record<string, typeof Share2> = {
 };
 
 const SOURCE_LABELS: Record<string, string> = {
-  direct: '直接访问',
-  qrcode: '二维码',
-  share: '分享链接',
-  scan: '扫码',
+  direct: 'analytics.source.direct',
+  qrcode: 'analytics.source.qrcode',
+  share: 'analytics.source.share',
+  scan: 'analytics.source.scan',
 };
 
 const SOURCE_COLORS: Record<string, string> = {
@@ -121,7 +121,7 @@ function TrendBarChart({ data }: { data: TrendPoint[] }) {
 
 // ─── 环形图组件（纯CSS） ──────────────────────────────
 
-function DonutChart({ data }: { data: SourceItem[] }) {
+function DonutChart({ data, t }: { data: SourceItem[]; t: (key: string, vars?: Record<string, string | number>) => string }) {
   const total = data.reduce((s, i) => s + i.count, 0) || 1;
   let cumulative = 0;
   const segments = data.map((item) => {
@@ -159,7 +159,7 @@ function DonutChart({ data }: { data: SourceItem[] }) {
         {data.map((item) => (
           <div key={item.source} className="flex items-center gap-1.5 text-xs text-on-surface">
             <span className={`w-2.5 h-2.5 rounded-full ${SOURCE_COLORS[item.source] || 'bg-slate-400'}`} />
-            {SOURCE_LABELS[item.source] || item.source}
+            {t(SOURCE_LABELS[item.source]) || item.source}
             <span className="font-semibold ml-1">{item.count}</span>
           </div>
         ))}
@@ -198,10 +198,10 @@ export default function AnalyticsPage() {
           setBrochureName((brRes.data as any).name || (brRes.data as any).title || '');
         }
       } else {
-        setError(res.message || t('获取统计数据失败'));
+        setError(res.message || t('analytics.fetchFailed'));
       }
     } catch (e: any) {
-      setError(e.message || t('网络错误'));
+      setError(e.message || t('analytics.networkError'));
     } finally {
       setLoading(false);
     }
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
       <div className="min-h-screen bg-neutral-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-sm text-text-muted">{t('加载访客数据中...')}</p>
+          <p className="text-sm text-text-muted">{t('analytics.loading')}</p>
         </div>
       </div>
     );
@@ -229,14 +229,14 @@ export default function AnalyticsPage() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-error/10 flex items-center justify-center">
             <Activity className="w-8 h-8 text-error" />
           </div>
-          <h2 className="text-lg font-semibold text-on-surface mb-2">{t('数据加载失败')}</h2>
+          <h2 className="text-lg font-semibold text-on-surface mb-2">{t('analytics.error.title')}</h2>
           <p className="text-sm text-text-muted mb-4">{error}</p>
           <button
             onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-container transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            {t('返回')}
+            {t('analytics.back')}
           </button>
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function AnalyticsPage() {
           </button>
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-semibold text-on-surface truncate">
-              {t('访客分析')}
+              {t('analytics.title')}
             </h1>
             {brochureName && (
               <p className="text-xs text-text-muted truncate">{brochureName}</p>
@@ -277,21 +277,21 @@ export default function AnalyticsPage() {
               <Eye className="w-5 h-5 text-primary" />
             </div>
             <p className="text-2xl font-bold text-on-surface">{stats.view_count}</p>
-            <p className="text-xs text-text-muted mt-0.5">{t('浏览次数')}</p>
+            <p className="text-xs text-text-muted mt-0.5">{t('analytics.views')}</p>
           </div>
           <div className="bg-surface rounded-2xl shadow-sm p-4 text-center">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-emerald-500/10 flex items-center justify-center">
               <Users className="w-5 h-5 text-emerald-500" />
             </div>
             <p className="text-2xl font-bold text-on-surface">{stats.total_visits}</p>
-            <p className="text-xs text-text-muted mt-0.5">{t('访客数')}</p>
+            <p className="text-xs text-text-muted mt-0.5">{t('analytics.visitors')}</p>
           </div>
           <div className="bg-surface rounded-2xl shadow-sm p-4 text-center">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-rose-500/10 flex items-center justify-center">
               <Heart className="w-5 h-5 text-rose-500" />
             </div>
             <p className="text-2xl font-bold text-on-surface">{stats.interested_count}</p>
-            <p className="text-xs text-text-muted mt-0.5">{t('兴趣数')}</p>
+            <p className="text-xs text-text-muted mt-0.5">{t('analytics.interests')}</p>
           </div>
         </div>
 
@@ -299,13 +299,13 @@ export default function AnalyticsPage() {
         <div className="bg-surface rounded-2xl shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-on-surface">{t('近7天访问趋势')}</h2>
+            <h2 className="text-sm font-semibold text-on-surface">{t('analytics.trend.title')}</h2>
           </div>
           <TrendBarChart data={stats.trend} />
           {/* 极简统计线 */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-light text-xs text-text-muted">
-            <span>{t('日均')} {Math.round(stats.trend.reduce((s, t) => s + t.count, 0) / 7)} {t('次')}</span>
-            <span>{t('峰值')} {maxTrend} {t('次')}</span>
+            <span>{t('analytics.trend.dailyAvg', { n: Math.round(stats.trend.reduce((s, t) => s + t.count, 0) / 7) })}</span>
+            <span>{t('analytics.trend.peak', { n: maxTrend })}</span>
           </div>
         </div>
 
@@ -313,12 +313,12 @@ export default function AnalyticsPage() {
         <div className="bg-surface rounded-2xl shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <Globe className="w-4 h-5 text-primary" />
-            <h2 className="text-sm font-semibold text-on-surface">{t('访客来源分布')}</h2>
+            <h2 className="text-sm font-semibold text-on-surface">{t('analytics.source.title')}</h2>
           </div>
           {stats.source_distribution.length > 0 ? (
-            <DonutChart data={stats.source_distribution} />
+            <DonutChart data={stats.source_distribution} t={t} />
           ) : (
-            <p className="text-sm text-text-muted text-center py-6">{t('暂无数据')}</p>
+            <p className="text-sm text-text-muted text-center py-6">{t('analytics.source.empty')}</p>
           )}
         </div>
 
@@ -326,9 +326,9 @@ export default function AnalyticsPage() {
         <div className="bg-surface rounded-2xl shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-on-surface">{t('最近访客')}</h2>
+            <h2 className="text-sm font-semibold text-on-surface">{t('analytics.visitor.title')}</h2>
             <span className="ml-auto text-xs text-text-muted">
-              {t('共')} {stats.total_visits} {t('人')}
+              {t('analytics.visitor.total', { n: stats.total_visits })}
             </span>
           </div>
 
@@ -357,23 +357,23 @@ export default function AnalyticsPage() {
                         {v.interested && (
                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-600 text-[10px] font-medium">
                             <MessageCircle className="w-3 h-3" />
-                            {t('有意向')}
+                            {t('analytics.visitor.interested')}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 text-xs text-text-muted">
                         <span className="flex items-center gap-1">
                           <SourceIcon className="w-3 h-3" />
-                          {SOURCE_LABELS[v.source] || v.source}
+                          {t(SOURCE_LABELS[v.source]) || v.source}
                         </span>
                         {v.duration > 0 && (
-                          <span>{formatDuration(v.duration)}</span>
+                          <span>{formatDuration(v.duration, t)}</span>
                         )}
-                        <span>{formatTime(v.visit_time)}</span>
+                        <span>{formatTime(v.visit_time, t)}</span>
                       </div>
                       {v.page_viewed && (
                         <p className="text-xs text-text-muted/70 mt-0.5 truncate">
-                          {t('浏览:')} {v.page_viewed}
+                          {t('analytics.visitor.viewed', { page: v.page_viewed })}
                         </p>
                       )}
                     </div>
@@ -384,7 +384,7 @@ export default function AnalyticsPage() {
           ) : (
             <div className="text-center py-8">
               <Users className="w-10 h-10 text-text-muted/30 mx-auto mb-2" />
-              <p className="text-sm text-text-muted">{t('暂无访客记录')}</p>
+              <p className="text-sm text-text-muted">{t('analytics.visitor.empty')}</p>
             </div>
           )}
         </div>

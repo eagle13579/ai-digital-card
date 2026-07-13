@@ -114,7 +114,7 @@ def create_app():
     app.add_middleware(ApiKeyMiddleware)
     app.add_middleware(
         RateLimiterMiddleware,
-        limits={"anonymous": 100, "standard": 1000, "enterprise": 10000},
+        limits={"anonymous": 500, "standard": 2000, "enterprise": 20000},
         window_seconds=60,
     )
     app.add_middleware(I18nMiddleware)
@@ -317,6 +317,15 @@ def create_app():
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("数据库表创建/验证完成 (async)")
+
+        # 运行渐进式迁移（添加缺失列等）
+        try:
+            from app.db_migration import add_visibility_column
+
+            async with engine.begin() as conn:
+                await add_visibility_column(conn)
+        except Exception as e:
+            logger.warning("数据库迁移执行失败（非致命，代码已降级处理）: %s", e)
 
         # 初始化 Redis 缓存层
         try:

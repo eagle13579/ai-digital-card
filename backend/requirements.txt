@@ -34,8 +34,21 @@ ruff>=0.3.0
 # ── GraphQL ──────────────────────────────────────
 strawberry-graphql>=0.200.0
 
+# ── HTTP 客户端 ──────────────────────────────────
+requests>=2.31.0
+
+# ── 配置 / 环境变量 ──────────────────────────────
+python-dotenv>=1.0.0
+
+# ── 序列化 ─────────────────────────────────────
+PyYAML>=6.0
+
 # ── 可观测性 ───────────────────────────────────
+prometheus-client>=0.19.0
 opentelemetry-api>=1.24.0
 opentelemetry-sdk>=1.24.0
 opentelemetry-instrumentation-fastapi>=0.45b0
 # opentelemetry-exporter-otlp-proto-http>=1.24.0  # 按需取消注释以启用 OTLP 导出
+
+# ── 嵌入式数据库 ────────────────────────────────
+aiosqlite>=0.19.0

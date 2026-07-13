@@ -88,40 +88,45 @@ async def export_my_data(
     }
 
     # 2. 名片数据
-    result = await db.execute(
-        select(Brochure).where(Brochure.user_id == user_id)
-    )
-    brochures = result.scalars().all()
+    from sqlalchemy.exc import OperationalError, ProgrammingError
     brochures_data = []
-    for b in brochures:
-        pages_result = await db.execute(
-            select(Page).where(Page.brochure_id == b.id).order_by(Page.sort_order)
+    try:
+        result = await db.execute(
+            select(Brochure).where(Brochure.user_id == user_id)
         )
-        pages = pages_result.scalars().all()
-        brochures_data.append({
-            "id": b.id,
-            "title": b.title,
-            "cover": b.cover,
-            "purpose": b.purpose,
-            "status": b.status,
-            "share_token": b.share_token,
-            "view_count": b.view_count,
-            "album_meta": b.album_meta,
-            "created_at": b.created_at.isoformat(),
-            "updated_at": b.updated_at.isoformat(),
-            "pages": [
-                {
-                    "id": p.id,
-                    "sort_order": p.sort_order,
-                    "content_type": p.content_type,
-                    "content": p.content,
-                    "image_url": p.image_url,
-                    "media_url": p.media_url,
-                    "ai_summary": p.ai_summary,
-                }
-                for p in pages
-            ],
-        })
+        brochures = result.scalars().all()
+        for b in brochures:
+            pages_result = await db.execute(
+                select(Page).where(Page.brochure_id == b.id).order_by(Page.sort_order)
+            )
+            pages = pages_result.scalars().all()
+            brochures_data.append({
+                "id": b.id,
+                "title": b.title,
+                "cover": b.cover,
+                "purpose": b.purpose,
+                "status": b.status,
+                "share_token": b.share_token,
+                "view_count": b.view_count,
+                "album_meta": b.album_meta,
+                "created_at": b.created_at.isoformat(),
+                "updated_at": b.updated_at.isoformat(),
+                "pages": [
+                    {
+                        "id": p.id,
+                        "sort_order": p.sort_order,
+                        "content_type": p.content_type,
+                        "content": p.content,
+                        "image_url": p.image_url,
+                        "media_url": p.media_url,
+                        "ai_summary": p.ai_summary,
+                    }
+                    for p in pages
+                ],
+            })
+    except (OperationalError, ProgrammingError) as e:
+        logger.warning("名片查询失败（列缺失?），降级返回空数据: %s", e)
+        brochures_data = []
 
     # 3. 标签
     result = await db.execute(
@@ -322,18 +327,22 @@ async def delete_my_account(
     current_user.membership_expires_at = None
 
     # ── 2. 匿名化名片数据 ──────────────────────────────────
-    result = await db.execute(
-        select(Brochure).where(Brochure.user_id == user_id)
-    )
-    brochures = result.scalars().all()
-    for b in brochures:
-        # 删除名片页面
-        await db.execute(delete(Page).where(Page.brochure_id == b.id))
-        # 匿名化名片元数据
-        b.title = "已删除"
-        b.cover = ""
-        b.purpose = ""
-        b.status = "deleted"
+    from sqlalchemy.exc import OperationalError, ProgrammingError
+    try:
+        result = await db.execute(
+            select(Brochure).where(Brochure.user_id == user_id)
+        )
+        brochures = result.scalars().all()
+        for b in brochures:
+            # 删除名片页面
+            await db.execute(delete(Page).where(Page.brochure_id == b.id))
+            # 匿名化名片元数据
+            b.title = "已删除"
+            b.cover = ""
+            b.purpose = ""
+            b.status = "deleted"
+    except (OperationalError, ProgrammingError) as e:
+        logger.warning("匿名化名片数据时查询失败（列缺失?），跳过名片处理: %s", e)
 
     # ── 3. 删除标签 ────────────────────────────────────────
     await db.execute(delete(UserTag).where(UserTag.user_id == user_id))

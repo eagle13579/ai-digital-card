@@ -245,6 +245,26 @@ const en: Record<string, string> = {
   'error.loadFailed': 'Failed to load',
   'error.uploadFailed': 'Failed to upload, please retry',
 
+  // ===== Trust Network =====
+  'network.title': 'Trust Network',
+  'network.subtitle': 'Manage your trusted contacts',
+  'network.trustUsers': 'Trusted Users',
+  'network.noTrustUsers': 'No trusted users',
+  'network.noTrustUsersDesc': 'When someone adds you to their trust network, they\'ll appear here',
+  'network.selectCardFirst': 'Please select a card first',
+  'network.visitors': 'Visitors',
+  'network.noVisitors': 'No visitor records',
+  'network.anonymousVisitor': 'Anonymous Visitor',
+  'network.removeTrust': 'Remove Trust',
+  'network.removeSuccess': 'Trust relationship removed',
+  'network.removeFailed': 'Failed to remove',
+  'network.unnamed': 'Unnamed Card',
+  'network.close': 'Close',
+  'network.justNow': 'Just now',
+  'network.minutesAgo': '{n}m ago',
+  'network.hoursAgo': '{n}h ago',
+  'network.daysAgo': '{n}d ago',
+
 };
 
 export default en;
