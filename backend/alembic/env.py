@@ -22,6 +22,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from app.database import Base
 from app.models import *  # noqa: F403 — ensure all models are loaded
+# 显式导入CRM模型（避免app.models.__init__中循环导入导致CrmContact缺失）
+from app.crm.crm_models import CrmContact  # noqa: F401, F403
 
 target_metadata = Base.metadata
 

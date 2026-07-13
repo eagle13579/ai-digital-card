@@ -13,6 +13,10 @@ from __future__ import annotations
 _EXPLICIT_V1_PREFIXES = frozenset({
     "/api/v1/users",
     "/api/v1/brochures",
+    "/api/v1/admin",
+    "/api/v1/developer",
+    "/api/v1/oauth",
+    "/api/v1/tenant",
 })
 
 
