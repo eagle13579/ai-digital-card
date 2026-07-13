@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 首页 -->
+  <url>
+    <loc>https://www.aibizcard.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!-- 定价页 -->
+  <url>
+    <loc>https://www.aibizcard.com/pricing</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- API文档 -->
+  <url>
+    <loc>https://www.aibizcard.com/api-docs</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- 开发门户 -->
+  <url>
+    <loc>https://www.aibizcard.com/developer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- 公开名片共享页（动态生成，示例） -->
+  <url>
+    <loc>https://www.aibizcard.com/business-card</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- 隐私政策（GDPR） -->
+  <url>
+    <loc>https://www.aibizcard.com/gdpr</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>

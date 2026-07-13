@@ -67,3 +67,66 @@ async def add_visibility_column(conn: AsyncConnection) -> None:
             logger.info("platform_id 列已存在（并发创建），忽略")
         else:
             logger.warning("添加 platform_id 列失败（非致命）: %s", e)
+
+
+async def ensure_rbac_tables(conn: AsyncConnection) -> None:
+    """确保 CRM RBAC 相关表存在 (rbac_roles, rbac_user_roles, rbac_role_permissions).
+
+    `Base.metadata.create_all` 在模型已导入时会自动建表，
+    但若 `app.models.rbac` 未被提前导入则跳过。
+    本函数提供 DDL 级别的兜底保障。
+    """
+    tables = [
+        (
+            "rbac_roles",
+            """
+            CREATE TABLE IF NOT EXISTS rbac_roles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR(32) NOT NULL UNIQUE,
+                display_name VARCHAR(64) DEFAULT '',
+                description TEXT DEFAULT '',
+                is_system BOOLEAN DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+            """,
+        ),
+        (
+            "rbac_role_permissions",
+            """
+            CREATE TABLE IF NOT EXISTS rbac_role_permissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                role_id INTEGER NOT NULL REFERENCES rbac_roles(id) ON DELETE CASCADE,
+                permission_key VARCHAR(64) NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(role_id, permission_key)
+            )
+            """,
+        ),
+        (
+            "rbac_user_roles",
+            """
+            CREATE TABLE IF NOT EXISTS rbac_user_roles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                role_id INTEGER NOT NULL REFERENCES rbac_roles(id) ON DELETE CASCADE,
+                granted_by INTEGER DEFAULT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, role_id)
+            )
+            """,
+        ),
+    ]
+    created = 0
+    for name, ddl in tables:
+        try:
+            await conn.execute(text(ddl))
+            created += 1
+            logger.info("✅ 确保表 %s 存在", name)
+        except Exception as e:
+            logger.warning("创建表 %s 失败（非致命）: %s", name, e)
+
+    if created:
+        logger.info("✅ RBAC 表迁移完成 (%d/3)", created)
+    else:
+        logger.info("RBAC 表已全部存在，跳过")

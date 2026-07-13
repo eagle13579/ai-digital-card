@@ -37,7 +37,9 @@
   }
 
   .dark body,
-  body.dark {
+  body.dark,
+  [data-theme="dark"] body,
+  body[data-theme="dark"] {
     @apply bg-dark-bg text-dark-text;
   }
 }
@@ -51,7 +53,9 @@
 }
 
 .dark .login-mesh,
-.login-mesh.dark {
+.login-mesh.dark,
+[data-theme="dark"] .login-mesh,
+.login-mesh[data-theme="dark"] {
   background-image:
     radial-gradient(ellipse 80% 60% at 0% 20%, hsla(200, 80%, 30%, 0.3) 0, transparent 60%),
     radial-gradient(ellipse 60% 50% at 100% 0%, hsla(210, 80%, 25%, 0.2) 0, transparent 60%),
@@ -66,7 +70,9 @@
 }
 
 .dark .home-mesh,
-.home-mesh.dark {
+.home-mesh.dark,
+[data-theme="dark"] .home-mesh,
+.home-mesh[data-theme="dark"] {
   background-image:
     radial-gradient(ellipse 70% 40% at 0% 10%, hsla(200, 60%, 25%, 0.2) 0, transparent 50%),
     radial-gradient(ellipse 50% 30% at 100% 20%, hsla(220, 50%, 20%, 0.15) 0, transparent 50%);
@@ -93,7 +99,8 @@
   pointer-events: none;
 }
 
-.dark .bubble {
+.dark .bubble,
+[data-theme="dark"] .bubble {
   opacity: 0.06;
 }
 
@@ -120,7 +127,9 @@
 }
 
 .dark .glass,
-.glass.dark {
+.glass.dark,
+[data-theme="dark"] .glass,
+.glass[data-theme="dark"] {
   @apply bg-slate-800/70 backdrop-blur-xl;
 }
 
@@ -156,7 +165,8 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-.dark .skeleton {
+.dark .skeleton,
+[data-theme="dark"] .skeleton {
   background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
   background-size: 200% 100%;
 }
@@ -299,12 +309,16 @@
    ============================================================ */
 
 .dark .responsive-container,
-.responsive-container.dark {
+.responsive-container.dark,
+[data-theme="dark"] .responsive-container,
+.responsive-container[data-theme="dark"] {
   @apply bg-dark-bg text-dark-text;
 }
 
 .dark .responsive-card,
-.responsive-card.dark {
+.responsive-card.dark,
+[data-theme="dark"] .responsive-card,
+.responsive-card[data-theme="dark"] {
   @apply bg-dark-surface border-dark-border;
 }
 

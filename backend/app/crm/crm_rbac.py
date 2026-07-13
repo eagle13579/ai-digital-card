@@ -39,6 +39,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.user import User
+from app.models.rbac import RoleDefinition, RolePermission, UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -178,8 +179,6 @@ async def get_user_crm_role(db: AsyncSession, user_id: int) -> str:
     如果都没有找到，返回 'viewer'。
     """
     # 尝试从 rbac_user_roles 获取 CRM 角色
-    from app.models.rbac import RoleDefinition, UserRole
-
     result = await db.execute(
         sa_select(RoleDefinition)
         .join(UserRole, UserRole.role_id == RoleDefinition.id)
@@ -280,8 +279,6 @@ async def ensure_crm_role_definition(db: AsyncSession) -> dict[str, int]:
 
     返回 {角色名: 角色ID} 映射。
     """
-    from app.models.rbac import RoleDefinition, RolePermission
-
     role_ids: dict[str, int] = {}
 
     for role_enum in CrmRole:
@@ -340,8 +337,6 @@ async def assign_crm_role(
     先确保角色定义存在，然后删除该用户的旧 CRM 角色，再分配新角色。
     返回 True 表示成功。
     """
-    from app.models.rbac import UserRole
-
     # 校验角色名
     if role_name not in CrmRole._value2member_:
         raise ValueError(f"无效的 CRM 角色: {role_name}，可选: {list(CrmRole._value2member_.keys())}")

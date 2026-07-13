@@ -59,6 +59,8 @@ from app.models.subscription import Subscription
 from app.models.user_event import UserEvent
 from app.models.wallet import Wallet, WalletTransaction
 from app.models.withdrawal import Withdrawal
+from app.models.consent import UserConsent
+from app.models.sdk import SdkApp
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
@@ -102,4 +104,6 @@ __all__ = [
     "UserEvent",
     "Wallet", "WalletTransaction",
     "Withdrawal",
+    "UserConsent",
+    "SdkApp",
 ]

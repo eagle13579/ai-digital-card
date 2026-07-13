@@ -16,7 +16,7 @@ export default function SettingsPage() {
   const { locale, setLocale } = useI18n();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof document !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
+      return document.documentElement.getAttribute('data-theme') === 'dark';
     }
     return false;
   });
@@ -32,8 +32,10 @@ export default function SettingsPage() {
     const newMode = !darkMode;
     setDarkMode(newMode);
     if (newMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
       document.documentElement.classList.add('dark');
     } else {
+      document.documentElement.removeAttribute('data-theme');
       document.documentElement.classList.remove('dark');
     }
     try {

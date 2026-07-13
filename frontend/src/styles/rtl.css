@@ -151,7 +151,7 @@
 
 /* Transform 原始值辅助 — 需要保留原始方向的元素 */
 [dir="rtl"] .rtl-no-flip {
-  transform: none !important;
+  transform: none;
 }
 
 /* Grid — 保持从左到右的网格项不受影响 */

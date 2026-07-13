@@ -314,16 +314,21 @@ def create_app():
     async def startup():
         data_dir = os.path.join(os.path.dirname(BASE_DIR), "data")
         os.makedirs(data_dir, exist_ok=True)
+
+        # 确保 RBAC 模型已注册到 Base.metadata，使 create_all 能建表
+        import app.models.rbac  # noqa: F401 — registers rbac_roles / rbac_user_roles / rbac_role_permissions
+
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("数据库表创建/验证完成 (async)")
 
-        # 运行渐进式迁移（添加缺失列等）
+        # 运行渐进式迁移（添加缺失列、RBAC 兜底建表等）
         try:
-            from app.db_migration import add_visibility_column
+            from app.db_migration import add_visibility_column, ensure_rbac_tables
 
             async with engine.begin() as conn:
                 await add_visibility_column(conn)
+                await ensure_rbac_tables(conn)
         except Exception as e:
             logger.warning("数据库迁移执行失败（非致命，代码已降级处理）: %s", e)
 
