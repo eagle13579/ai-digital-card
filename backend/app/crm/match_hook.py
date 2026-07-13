@@ -105,7 +105,7 @@ async def _find_or_create_contact(
         if target_user.phone and existing.phone != target_user.phone:
             existing.phone = target_user.phone
             changed = True
-        if target_user.email and existing.email != target_user.email:
+        if getattr(target_user, 'email', None) and existing.email != target_user.email:
             existing.email = target_user.email
             changed = True
         if target_user.company and existing.company != target_user.company:
@@ -128,7 +128,7 @@ async def _find_or_create_contact(
 
     # ── 2. 通过手机/邮箱查找 ─────────────────────────────────────────
     phone = (target_user.phone or "").strip()
-    email = (target_user.email or "").strip()
+    email = (getattr(target_user, 'email', '') or "").strip()
     if phone or email:
         filters = [CrmContact.owner_id == owner_id]
         or_conditions = []
@@ -176,7 +176,7 @@ async def _find_or_create_contact(
         user_id=target_user.id,
         name=target_user.name or "",
         phone=target_user.phone or "",
-        email=target_user.email or "",
+        email=getattr(target_user, 'email', '') or "",
         company=target_user.company or "",
         title=target_user.title or "",
         avatar=target_user.avatar or "",

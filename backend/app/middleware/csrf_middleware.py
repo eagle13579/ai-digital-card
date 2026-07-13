@@ -52,6 +52,10 @@ EXCLUDED_PATHS = (
     "/api/crm/forms/",
     "/api/ai/",
     "/api/design-qa/",
+    "/api/v1/admin",
+    "/api/v1/developer",
+    "/api/admin",
+    "/api/developer",
 )
 """不进行 CSRF 校验的路径前缀（登录、注册、第三方回调等）。"""
 

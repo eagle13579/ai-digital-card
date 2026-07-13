@@ -34,10 +34,10 @@ class TestDeveloperApi:
 
     async def _register_and_login(self, client: AsyncClient, phone: str) -> dict:
         await client.post("/api/auth/register", json={
-            "phone": phone, "password": "testpass", "name": "Dev User",
+            "phone": phone, "password": "Test@1234", "name": "Dev User",
         })
         login_resp = await client.post("/api/auth/login", json={
-            "phone": phone, "password": "testpass",
+            "phone": phone, "password": "Test@1234",
         })
         return make_token_headers(login_resp.json()["access_token"])
 

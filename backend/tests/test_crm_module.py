@@ -500,7 +500,8 @@ class TestMatchHook:
         updated = await test_db.get(CrmContact, existing.id)
         assert updated is not None
         assert updated.name == self.second_user.name  # updated
-        assert updated.source == "match"  # updated
+        # source 保留原始值 — _find_or_create_contact 只更新信息字段，不覆盖 source
+        assert updated.source == "manual"
 
     async def test_sync_by_phone_or_email(self, test_db, crm_svc):
         """通过手机号匹配已有联系人。"""

@@ -1,5 +1,5 @@
 <view class="page-container">
-  <loading visible="{{loading}}" text="{{_t.loading}}" />
+  <loading visible="{{loading}}" text="{{_t.loadingText || _t.loading || '加载中...'}}" />
 
   <!-- ==================== 列表模式（Tab直入） ==================== -->
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading && mode === 'list'}}">

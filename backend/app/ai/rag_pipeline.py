@@ -355,12 +355,15 @@ class ContextBuilder:
             prompt_parts.append("")
             prompt_parts.append("=== 关系图谱 ===")
             kg = context.knowledge_graph_context
-            if kg.get("trusted_connections"):
-                prompt_parts.append(f"信任连接: {len(kg['trusted_connections'])} 个")
-            if kg.get("common_tags_with_others"):
-                prompt_parts.append(f"共同标签关联: {len(kg['common_tags_with_others'])} 个")
-            if kg.get("industry_peers"):
-                prompt_parts.append(f"行业同行: {len(kg['industry_peers'])} 个")
+            tc = kg.get("trusted_connections")
+            if tc:
+                prompt_parts.append(f"信任连接: {tc if isinstance(tc, int) else len(tc)} 个")
+            cto = kg.get("common_tags_with_others")
+            if cto:
+                prompt_parts.append(f"共同标签关联: {cto if isinstance(cto, int) else len(cto)} 个")
+            ip = kg.get("industry_peers")
+            if ip:
+                prompt_parts.append(f"行业同行: {ip if isinstance(ip, int) else len(ip)} 个")
 
         prompt_parts.append("")
         prompt_parts.append("回答要求:")
