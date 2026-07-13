@@ -1,4 +1,4 @@
-<view class="page-container register-page">
+<view class="page-container page-container-fade-in register-page">
   <!-- 头部 -->
   <view class="register-header">
     <text class="register-title">{{_t.registerTitle || '完善个人资料'}}</text>

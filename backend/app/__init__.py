@@ -178,6 +178,7 @@ def create_app():
     from app.routers.escrow_router import router as escrow_router
     from app.routers.ocr_router import router as ocr_router
     from app.routers.gdpr import router as gdpr_router
+    from app.routers.match_v2 import router as match_v2_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -248,6 +249,7 @@ def create_app():
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
     app.include_router(gdpr_router)
+    app.include_router(match_v2_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

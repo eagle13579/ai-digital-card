@@ -1,5 +1,5 @@
 <!-- 画册创建 - 表单Stepper 4步引导 -->
-<view class="page-wrap">
+<view class="page-wrap page-container-fade-in">
 
   <!-- ====== 顶部步骤指示器 ====== -->
   <view class="stepper-header">

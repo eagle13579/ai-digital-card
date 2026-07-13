@@ -100,10 +100,10 @@ Page({
     this.setData({ loading: true })
     try {
       const [profile, brochures, trustNet, recommend] = await Promise.all([
-        userApi.getProfile().catch(() => ({ userInfo: {}, memberLevel: 'free' })),
-        brochureApi.list().catch(() => []),
-        trustApi.getNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
-        matchApi.getRecommendList().catch(() => []),
+        userApi.getProfile({ noToast: true }).catch(() => ({ userInfo: {}, memberLevel: 'free' })),
+        brochureApi.list({}, { noToast: true }).catch(() => []),
+        trustApi.getNetwork({ noToast: true }).catch(() => ({ trusting: [], trusted_by: [] })),
+        matchApi.getRecommendList(1, 10, { noToast: true }).catch(() => []),
       ])
 
       const userInfoData = profile.userInfo || profile

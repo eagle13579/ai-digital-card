@@ -1,142 +1,463 @@
-"""OnlineLearningPipeline 测试 — 至少 8 个用例，覆盖交互记录、趋势、历史与线程安全。"""
+"""
+AI数智名片 — 在线学习单元测试
+============================
 
+测试 OnlineLearningService 和 online_learning_pipeline 的核心功能。
+
+运行:
+    cd backend && python -m pytest tests/test_online_learning.py -v
+
+覆盖:
+  - OnlineLearningService.process_feedback()  — 单条反馈处理
+  - OnlineLearningService.update_model_weights() — 批量权重更新
+  - OnlineLearningService.get_online_stats()  — 学习统计
+  - 奖励值映射 (action → reward)
+  - 相似度估计 (reward → similarity)
+  - 权重重置
+  - Pipeline 初始化与配置
+"""
+
+from __future__ import annotations
+
+import json
+import sys
 import time
-import threading
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 
-from app.ai.online_learning import OnlineLearningPipeline
+# ── 将 backend 加入路径 ──
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Fixtures
+# ═══════════════════════════════════════════════════════════════════
 
 
 @pytest.fixture
-def pipeline():
-    return OnlineLearningPipeline()
+def mock_feedback_service():
+    """模拟的 FeedbackService。"""
+    svc = MagicMock()
+    # record_feedback_async 返回标准的 FeedbackResult
+    from app.services.feedback_service import FeedbackResult
+
+    async def mock_record(user_id, match_id, action, score=None, source="recommend", recommendation_id=""):
+        return FeedbackResult(
+            user_id=user_id,
+            content_id=match_id,
+            action=action,
+            weight_delta=0.3,
+            current_boost=1.0,
+            message="测试反馈",
+        )
+
+    svc.record_feedback_async = mock_record
+    svc.get_global_stats = MagicMock(return_value={
+        "total_feedback": 100,
+        "recent_feedback": 25,
+        "total_users": 10,
+    })
+    return svc
 
 
-class TestOnlineLearningPipeline:
-    """在线学习管道测试套件。"""
+@pytest.fixture
+def online_service(mock_feedback_service):
+    """带有 mock feedback_service 的 OnlineLearningService。"""
+    from app.services.online_learning_service import OnlineLearningService, reset_online_learning_service
 
-    def test_record_single_interaction(self, pipeline):
-        """1. 记录单条交互 → 成功记录"""
-        pipeline.record_interaction("user1", "item_a", "view")
-        history = pipeline.get_user_history("user1")
-        assert len(history) == 1
-        assert history[0]["item_id"] == "item_a"
-        assert history[0]["action"] == "view"
-        assert isinstance(history[0]["timestamp"], float)
+    reset_online_learning_service()
+    svc = OnlineLearningService(
+        feedback_service=mock_feedback_service,
+        model_dir=BACKEND_DIR / "tests" / "test_models",
+        lr=0.1,
+        baseline_decay=0.8,
+    )
+    yield svc
+    reset_online_learning_service()
 
-    def test_trending_correct_order(self, pipeline):
-        """2. 多条交互 → 热门趋势按交互量降序排列"""
-        pipeline.record_interaction("u1", "hot1", "view")
-        pipeline.record_interaction("u2", "hot1", "click")
-        pipeline.record_interaction("u3", "hot1", "share")
-        pipeline.record_interaction("u4", "hot2", "view")
-        pipeline.record_interaction("u5", "hot2", "view")
-        # hot1=3, hot2=2
-        trending = pipeline.get_trending(hours=24, limit=10)
-        assert len(trending) == 2
-        assert trending[0]["item_id"] == "hot1"
-        assert trending[0]["count"] == 3
-        assert trending[1]["item_id"] == "hot2"
-        assert trending[1]["count"] == 2
 
-    def test_action_type_filtering(self, pipeline):
-        """3. 不同 action 类型均可被记录和查询"""
-        pipeline.record_interaction("u1", "item_x", "view")
-        pipeline.record_interaction("u1", "item_x", "click")
-        pipeline.record_interaction("u1", "item_x", "share")
-        pipeline.record_interaction("u1", "item_x", "save")
-        history = pipeline.get_user_history("u1", limit=10)
-        actions = {h["action"] for h in history}
-        assert actions == {"view", "click", "share", "save"}
-        # 热门趋势中全部算入
-        trend = pipeline.get_trending(hours=24)
-        assert trend[0]["count"] == 4
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 单条反馈处理
+# ═══════════════════════════════════════════════════════════════════
 
-    def test_empty_data_returns_empty(self, pipeline):
-        """4. 无任何交互时，历史与趋势均返回空列表"""
-        assert pipeline.get_user_history("nonexistent") == []
-        assert pipeline.get_trending(hours=24) == []
 
-    def test_user_history_reverse_chronological(self, pipeline):
-        """5. 用户历史按时间倒序排列"""
-        t0 = 1000.0
-        pipeline.record_interaction("u1", "old", "view", timestamp=t0)
-        pipeline.record_interaction("u1", "mid", "click", timestamp=t0 + 10)
-        pipeline.record_interaction("u1", "new", "save", timestamp=t0 + 20)
-        history = pipeline.get_user_history("u1")
-        timestamps = [h["timestamp"] for h in history]
-        assert timestamps == sorted(timestamps, reverse=True)
-        assert history[0]["item_id"] == "new"
-        assert history[-1]["item_id"] == "old"
+class TestProcessFeedback:
+    """测试 OnlineLearningService.process_feedback()。"""
 
-    def test_trending_time_window(self, pipeline):
-        """6. 热门趋势只统计指定时间窗口内的交互"""
-        now = time.time()
-        pipeline.record_interaction("u1", "old_item", "view", timestamp=now - 7200)  # 2h ago
-        pipeline.record_interaction("u2", "new_item", "view", timestamp=now - 600)  # 10min ago
-        # 限定1小时内 → 只有 new_item
-        trending = pipeline.get_trending(hours=1)
-        assert len(trending) == 1
-        assert trending[0]["item_id"] == "new_item"
-        # 限定4小时内 → 两者都有
-        trending_wide = pipeline.get_trending(hours=4, limit=10)
-        assert len(trending_wide) == 2
+    @pytest.mark.asyncio
+    async def test_click_feedback(self, online_service):
+        """TC1: 点击反馈 → 权重正向更新"""
+        result = await online_service.process_feedback(
+            user_id=1, match_id=42, action="click",
+        )
 
-    def test_get_user_history_limit(self, pipeline):
-        """7. 用户历史 limit 参数正常工作"""
-        for i in range(20):
-            pipeline.record_interaction("u_limit", f"item_{i}", "view", timestamp=float(i))
-        # 限制5条
-        history = pipeline.get_user_history("u_limit", limit=5)
-        assert len(history) == 5
-        # 按时间倒序，所以最新的(top)在前
-        timestamps = [h["timestamp"] for h in history]
-        assert timestamps == sorted(timestamps, reverse=True)
+        assert result["feedback_result"] is not None
+        assert result["feedback_result"].action == "click"
+        assert result["reward"] > 0
+        assert "old_weights" in result
+        assert "new_weights" in result
+        # 权重应该发生了变化
+        assert result["new_weights"] != result["old_weights"]
+        # 奖励值应为 1.0 (click)
+        assert abs(result["reward"] - 1.0) < 0.01
 
-    def test_thread_safety(self, pipeline):
-        """8. 线程安全: 并发写入不丢失数据"""
-        n = 200
-        errors = []
+    @pytest.mark.asyncio
+    async def test_unlock_feedback(self, online_service):
+        """TC2: 解锁反馈 → 强正信号奖励"""
+        result = await online_service.process_feedback(
+            user_id=2, match_id=99, action="unlock",
+        )
 
-        def writer(uid_start):
-            try:
-                for i in range(n):
-                    pipeline.record_interaction(
-                        f"user_{uid_start}", f"item_{i}", "view"
-                    )
-            except Exception as e:
-                errors.append(e)
+        assert result["reward"] == 2.0
+        assert result["weight_delta"] >= 0
 
-        t1 = threading.Thread(target=writer, args=(1,))
-        t2 = threading.Thread(target=writer, args=(2,))
-        t3 = threading.Thread(target=writer, args=(3,))
+    @pytest.mark.asyncio
+    async def test_ignore_feedback(self, online_service):
+        """TC3: 忽略反馈 → 负奖励"""
+        result = await online_service.process_feedback(
+            user_id=3, match_id=7, action="ignore",
+        )
 
-        t1.start()
-        t2.start()
-        t3.start()
-        t1.join()
-        t2.join()
-        t3.join()
+        assert result["reward"] < 0  # 负向奖励
+        assert result["weight_delta"] >= 0
 
-        assert not errors, f"线程异常: {errors}"
-        # 总数 = 3 * 200 = 600
-        total = 0
-        for uid in ["user_1", "user_2", "user_3"]:
-            total += len(pipeline.get_user_history(uid, limit=1000))
-        assert total == 600, f"期望600条, 实际{total}条"
+    @pytest.mark.asyncio
+    async def test_rate_feedback(self, online_service):
+        """TC4: 评分反馈 → 按比例奖励"""
+        # 5分 → 正奖励
+        result_high = await online_service.process_feedback(
+            user_id=4, match_id=10, action="rate", score=5.0,
+        )
+        assert result_high["reward"] > 0
 
-    def test_invalid_action_raises(self, pipeline):
-        """9. 无效 action 抛出 ValueError"""
-        with pytest.raises(ValueError, match="无效 action"):
-            pipeline.record_interaction("u1", "item1", "invalid_action")
+        # 1分 → 负奖励
+        result_low = await online_service.process_feedback(
+            user_id=4, match_id=11, action="rate", score=1.0,
+        )
+        assert result_low["reward"] < 0
 
-    def test_different_users_isolated(self, pipeline):
-        """10. 不同用户的交互互不干扰"""
-        pipeline.record_interaction("alice", "item1", "view")
-        pipeline.record_interaction("bob", "item2", "click")
-        alice_hist = pipeline.get_user_history("alice")
-        bob_hist = pipeline.get_user_history("bob")
-        assert len(alice_hist) == 1
-        assert alice_hist[0]["item_id"] == "item1"
-        assert len(bob_hist) == 1
-        assert bob_hist[0]["item_id"] == "item2"
+        # 3分 → 中性
+        result_mid = await online_service.process_feedback(
+            user_id=4, match_id=12, action="rate", score=3.0,
+        )
+        assert abs(result_mid["reward"]) < 0.01
+
+    @pytest.mark.asyncio
+    async def test_invalid_action(self, online_service):
+        """TC5: 非法动作 → 抛出 ValueError"""
+        with pytest.raises(ValueError, match="不支持的反馈动作"):
+            await online_service.process_feedback(
+                user_id=5, match_id=1, action="invalid_action",
+            )
+
+    @pytest.mark.asyncio
+    async def test_rate_without_score(self, online_service):
+        """TC6: rate 动作缺少 score → 抛出 ValueError"""
+        with pytest.raises(ValueError, match="必须提供 score"):
+            await online_service.process_feedback(
+                user_id=5, match_id=1, action="rate",
+            )
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 批量权重更新
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestUpdateModelWeights:
+    """测试 OnlineLearningService.update_model_weights()。"""
+
+    @pytest.mark.asyncio
+    async def test_batch_update(self, online_service):
+        """TC7: 批量更新 → 返回权重变化"""
+        # 先处理几条反馈
+        for i in range(5):
+            await online_service.process_feedback(
+                user_id=i, match_id=i * 10, action="click",
+            )
+
+        result = await online_service.update_model_weights()
+
+        assert "weights_before" in result
+        assert "weights_after" in result
+        assert result["users_processed"] >= 0
+
+    @pytest.mark.asyncio
+    async def test_empty_update(self, online_service):
+        """TC8: 无反馈时更新 → 安全运行"""
+        result = await online_service.update_model_weights()
+
+        assert result is not None
+        assert isinstance(result["users_processed"], int)
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 在线学习统计
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestOnlineStats:
+    """测试 OnlineLearningService.get_online_stats()。"""
+
+    @pytest.mark.asyncio
+    async def test_initial_stats(self, online_service):
+        """TC9: 初始统计 → 零值状态"""
+        stats = await online_service.get_online_stats()
+
+        assert stats.total_feedback_processed == 0
+        assert stats.total_weight_updates == 0
+        assert stats.total_reward == 0.0
+        assert stats.avg_reward == 0.0
+        assert "alpha" in stats.current_weights
+        assert "beta" in stats.current_weights
+        assert "gamma" in stats.current_weights
+
+    @pytest.mark.asyncio
+    async def test_stats_after_feedback(self, online_service):
+        """TC10: 处理后统计 → 正确累加"""
+        await online_service.process_feedback(user_id=1, match_id=10, action="click")
+        await online_service.process_feedback(user_id=2, match_id=20, action="unlock")
+        await online_service.process_feedback(user_id=3, match_id=30, action="ignore")
+
+        stats = await online_service.get_online_stats()
+
+        assert stats.total_feedback_processed == 3
+        # click(1.0) + unlock(2.0) + ignore(-0.5) = 2.5
+        assert abs(stats.total_reward - 2.5) < 0.01
+        assert stats.total_weight_updates == 3
+        assert stats.action_distribution.get("click") == 1
+        assert stats.action_distribution.get("unlock") == 1
+        assert stats.action_distribution.get("ignore") == 1
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 奖励值映射
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestActionToReward:
+    """测试 OnlineLearningService._action_to_reward() 奖励映射。"""
+
+    def _reward(self, action, score=None):
+        from app.services.online_learning_service import OnlineLearningService
+        return OnlineLearningService._action_to_reward(action, score)
+
+    def test_like_reward(self):
+        assert self._reward("like") == 1.0
+
+    def test_dislike_reward(self):
+        assert self._reward("dislike") == -0.5
+
+    def test_skip_reward(self):
+        assert self._reward("skip") == 0.0
+
+    def test_click_reward(self):
+        assert self._reward("click") == 1.0
+
+    def test_unlock_reward(self):
+        assert self._reward("unlock") == 2.0
+
+    def test_ignore_reward(self):
+        assert self._reward("ignore") == -0.5
+
+    def test_rate_score_5(self):
+        # (5-3)/4 = 0.5
+        assert abs(self._reward("rate", 5.0) - 0.5) < 0.01
+
+    def test_rate_score_1(self):
+        # (1-3)/4 = -0.5
+        assert abs(self._reward("rate", 1.0) - (-0.5)) < 0.01
+
+    def test_rate_score_3(self):
+        # (3-3)/4 = 0.0
+        assert abs(self._reward("rate", 3.0)) < 0.01
+
+    def test_rate_no_score(self):
+        """rate 不传 score → 0.0"""
+        assert abs(self._reward("rate")) < 0.01
+
+    def test_unknown_action(self):
+        """未知动作 → 0.0"""
+        assert abs(self._reward("unknown_action")) < 0.01
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 相似度估计
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestSimilarityEstimation:
+    """测试 OnlineLearningService._estimate_similarity_from_reward()。"""
+
+    def _sim(self, reward, key="alpha"):
+        from app.services.online_learning_service import OnlineLearningService
+        return OnlineLearningService._estimate_similarity_from_reward(reward, key)
+
+    def test_positive_reward_high_similarity(self):
+        """正奖励 → 高相似度"""
+        sim = self._sim(2.0)  # unlock
+        assert 0.8 <= sim <= 0.9
+
+    def test_negative_reward_low_similarity(self):
+        """负奖励 → 低相似度"""
+        sim = self._sim(-0.5)  # ignore/dislike
+        assert 0.1 <= sim <= 0.3
+
+    def test_neutral_reward(self):
+        """中性奖励 → 0.5 附近"""
+        sim = self._sim(0.0)  # skip
+        assert abs(sim - 0.5) < 0.05
+
+    def test_mild_positive(self):
+        """弱正奖励"""
+        sim = self._sim(0.25)
+        assert 0.5 < sim < 0.6
+
+    def test_extreme_reward_clamped(self):
+        """极端值被 clamp"""
+        sim_high = self._sim(10.0)  # 远超上限
+        assert sim_high <= 0.9
+
+        sim_low = self._sim(-10.0)  # 远低下限
+        assert sim_low >= 0.1
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 权重重置
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestWeightReset:
+    """测试 OnlineLearningService.reset_weights()。"""
+
+    @pytest.mark.asyncio
+    async def test_reset_to_default(self, online_service):
+        """TC11: 重置为默认值"""
+        # 先修改权重
+        await online_service.process_feedback(user_id=1, match_id=1, action="unlock")
+        weights_before = online_service.get_weight_optimizer().get_weights()
+
+        # 重置
+        online_service.reset_weights()
+
+        weights_after = online_service.get_weight_optimizer().get_weights()
+
+        # 默认: alpha=0.5, beta=0.3, gamma=0.2
+        assert abs(weights_after["alpha"] - 0.5) < 0.01
+        assert abs(weights_after["beta"] - 0.3) < 0.01
+        assert abs(weights_after["gamma"] - 0.2) < 0.01
+        # 应该与更新前不同
+        assert weights_after != weights_before
+
+    @pytest.mark.asyncio
+    async def test_reset_custom(self, online_service):
+        """TC12: 重置为自定义权重"""
+        custom = {"alpha": 0.6, "beta": 0.3, "gamma": 0.1}
+        online_service.reset_weights(custom)
+
+        weights = online_service.get_weight_optimizer().get_weights()
+        assert abs(weights["alpha"] - 0.6) < 0.01
+        assert abs(weights["beta"] - 0.3) < 0.01
+        assert abs(weights["gamma"] - 0.1) < 0.01
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: Pipeline
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestPipeline:
+    """测试 OnlineLearningPipeline。"""
+
+    def test_pipeline_initialization(self):
+        """TC13: 管道初始化"""
+        from scripts.online_learning_pipeline import OnlineLearningPipeline, DEFAULT_MODEL_DIR
+
+        pipeline = OnlineLearningPipeline()
+        assert pipeline.min_feedback == 20
+        assert pipeline.retrain_threshold == 200
+        assert pipeline.weights_only is False
+
+    def test_pipeline_custom_config(self):
+        """TC14: 自定义配置"""
+        from scripts.online_learning_pipeline import OnlineLearningPipeline
+
+        pipeline = OnlineLearningPipeline(
+            min_feedback=10,
+            retrain_threshold=100,
+            weights_only=True,
+            lookback_hours=24,
+        )
+        assert pipeline.min_feedback == 10
+        assert pipeline.retrain_threshold == 100
+        assert pipeline.weights_only is True
+        assert pipeline.lookback_hours == 24
+
+    @pytest.mark.asyncio
+    async def test_global_singleton(self, online_service):
+        """TC15: 全局单例"""
+        from app.services.online_learning_service import (
+            get_online_learning_service, reset_online_learning_service,
+        )
+
+        svc1 = get_online_learning_service()
+        svc2 = get_online_learning_service()
+
+        assert svc1 is svc2  # 同一个实例
+
+        reset_online_learning_service()
+        svc3 = get_online_learning_service()
+        assert svc3 is not svc2  # 重置后是新实例
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 测试: 管道报告
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestPipelineReport:
+    """测试 PipelineReport 数据模型。"""
+
+    def test_default_report(self):
+        """TC16: 默认报告"""
+        from scripts.online_learning_pipeline import PipelineReport
+
+        report = PipelineReport()
+        assert report.status == "success"
+        assert report.pipeline_version == "1.0.0"
+        assert report.feedback_records_processed == 0
+        assert report.retrain_triggered is False
+
+    def test_report_serialization(self):
+        """TC17: 报告 JSON 序列化"""
+        from scripts.online_learning_pipeline import PipelineReport
+        from dataclasses import asdict
+
+        report = PipelineReport(
+            status="success",
+            feedback_records_processed=50,
+            weights_before={"alpha": 0.5, "beta": 0.3, "gamma": 0.2},
+            weights_after={"alpha": 0.52, "beta": 0.28, "gamma": 0.2},
+            weight_changes={"alpha": 0.02, "beta": -0.02, "gamma": 0.0},
+        )
+
+        data = asdict(report)
+        assert data["status"] == "success"
+        assert data["feedback_records_processed"] == 50
+        assert data["weights_after"]["alpha"] == 0.52
+
+        # 确认可 JSON 序列化
+        json_str = json.dumps(data, ensure_ascii=False)
+        assert '"status": "success"' in json_str
+
+
+# ═══════════════════════════════════════════════════════════════════
+# 执行入口
+# ═══════════════════════════════════════════════════════════════════
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

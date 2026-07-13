@@ -1,4 +1,4 @@
-<view class="graph-page">
+<view class="graph-page page-container-fade-in">
   <view class="graph-header">
     <view class="header-top">
       <view class="header-back-btn" wx:if="{{isSubNetwork}}" bindtap="goBackToMainNetwork">

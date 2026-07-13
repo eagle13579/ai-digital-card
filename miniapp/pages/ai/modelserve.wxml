@@ -1,4 +1,4 @@
-<view class="page-container modelserve-page">
+<view class="page-container page-container-fade-in modelserve-page">
   <!-- 加载状态 -->
   <view class="ms-loading" wx:if="{{loading}}">
     <view class="loading-spinner"></view>

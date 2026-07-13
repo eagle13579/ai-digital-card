@@ -1,4 +1,4 @@
-<view class="page-container feedback-page">
+<view class="page-container page-container-fade-in feedback-page">
   <!-- 头部 -->
   <view class="fb-header">
     <text class="fb-title">💬 反馈建议</text>

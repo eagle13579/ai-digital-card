@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="ai-header">
     <text class="ai-title">{{_t.aiCenterTitle}}</text>
     <text class="ai-subtitle">{{_t.aiCenterSubtitle}}</text>

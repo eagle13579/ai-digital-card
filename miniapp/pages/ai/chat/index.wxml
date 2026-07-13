@@ -1,4 +1,4 @@
-<view class="chat-page">
+<view class="chat-page page-container-fade-in">
   <view class="chat-toolbar">
     <text class="chat-toolbar-title">AI对话</text>
     <text class="chat-toolbar-clear" bindtap="clearChat">清空记录</text>

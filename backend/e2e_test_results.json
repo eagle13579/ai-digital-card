@@ -1,0 +1,254 @@
+{
+  "timestamp": "2026-07-13T13:31:30.909748",
+  "engine_version": "v2.0",
+  "total_tests": 49,
+  "passed": 48,
+  "failed": 1,
+  "results": [
+    {
+      "test": "matching_engine_v2",
+      "passed": true,
+      "detail": "MatchEngineV2 导入成功"
+    },
+    {
+      "test": "WEIGHTS_V2 之和=1.0",
+      "passed": true,
+      "detail": "当前=1.0"
+    },
+    {
+      "test": "INDUSTRY_CATEGORIES=10类",
+      "passed": true,
+      "detail": "当前=10类"
+    },
+    {
+      "test": "cf_engine",
+      "passed": true,
+      "detail": "ItemBasedCF + UserBasedCF 导入成功"
+    },
+    {
+      "test": "feedback_service",
+      "passed": true,
+      "detail": "FeedbackService 导入成功"
+    },
+    {
+      "test": "mmr_diversity",
+      "passed": true,
+      "detail": "MMRDiversityEngine 导入成功"
+    },
+    {
+      "test": "attention_matcher",
+      "passed": true,
+      "detail": "AttentionMatcher 导入成功, 四头权重和=1.0"
+    },
+    {
+      "test": "ml_models",
+      "passed": false,
+      "detail": "导入失败(无torch时正常): cannot import name 'TowerEnsemble' from 'app.models.ml' (D:\\AI数智名片\\backend\\app\\models\\ml\\__init__.py)"
+    },
+    {
+      "test": "ml_train",
+      "passed": true,
+      "detail": "train 函数导入成功"
+    },
+    {
+      "test": "路由 /api/v2/match/recommend",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "路由 /api/v2/match/diverse",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "路由 /api/v2/match/explain",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "路由 /api/v2/match/stats",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "match_v2 路由",
+      "passed": true,
+      "detail": "共 4 个端点: ['/api/v2/match/recommend', '/api/v2/match/diverse', '/api/v2/match/explain', '/api/v2/match/stats']"
+    },
+    {
+      "test": "tag_overlap 权重=0.35",
+      "passed": true,
+      "detail": "当前=0.35"
+    },
+    {
+      "test": "vector_semantic 权重=0.25",
+      "passed": true,
+      "detail": "当前=0.25"
+    },
+    {
+      "test": "tag_weight 权重=0.10",
+      "passed": true,
+      "detail": "当前=0.1"
+    },
+    {
+      "test": "industry_complement 权重=0.20",
+      "passed": true,
+      "detail": "当前=0.2"
+    },
+    {
+      "test": "attention_score 权重=0.10",
+      "passed": true,
+      "detail": "当前=0.1"
+    },
+    {
+      "test": "供需映射: AI/科技→制造/工业",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: AI/科技→医疗/健康",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: AI/科技→教育/培训",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: AI/科技→金融/投资",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 金融/投资→AI/科技",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 金融/投资→制造/工业",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 金融/投资→医疗/健康",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 制造/工业→AI/科技",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 制造/工业→电商/零售",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 品牌/营销→电商/零售",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 品牌/营销→教育/培训",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 品牌/营销→医疗/健康",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 传媒/内容→电商/零售",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 传媒/内容→品牌/营销",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 法律/合规→金融/投资",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "供需映射: 法律/合规→AI/科技",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "test": "检测 AI/科技",
+      "passed": true,
+      "detail": "检测到: ['AI/科技']"
+    },
+    {
+      "test": "检测 金融/投资",
+      "passed": true,
+      "detail": "检测到: ['金融/投资']"
+    },
+    {
+      "test": "空标签检测",
+      "passed": true,
+      "detail": "检测到: []"
+    },
+    {
+      "test": "同行业互补",
+      "passed": true,
+      "detail": "score=0.1000"
+    },
+    {
+      "test": "跨行业互补(AI→制造)",
+      "passed": true,
+      "detail": "score=0.3000"
+    },
+    {
+      "test": "一方无行业=0",
+      "passed": true,
+      "detail": "score=0.0"
+    },
+    {
+      "test": "双方空标签=0",
+      "passed": true,
+      "detail": "score=0.0"
+    },
+    {
+      "test": "注意力匹配分数范围",
+      "passed": true,
+      "detail": "score=0.6259"
+    },
+    {
+      "test": "空标签注意力",
+      "passed": true,
+      "detail": "score=0.5750"
+    },
+    {
+      "test": "explain 返回四头",
+      "passed": true,
+      "detail": "heads=['industry', 'capability', 'region', 'hotness']"
+    },
+    {
+      "test": "explain.score 范围",
+      "passed": true,
+      "detail": "score=0.5959"
+    },
+    {
+      "test": "MMR 重排序返回正确数量",
+      "passed": true,
+      "detail": "返回3条"
+    },
+    {
+      "test": "MMR 第一项最具相关性",
+      "passed": true,
+      "detail": "第一项id=1"
+    },
+    {
+      "test": "多样性分数范围",
+      "passed": true,
+      "detail": "diversity=0.5953"
+    }
+  ]
+}

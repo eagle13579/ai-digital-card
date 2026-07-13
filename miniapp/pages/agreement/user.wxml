@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="user-content">
     <text class="user-title">AI数智名片 用户协议</text>
 

@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="glass-card">
     <view class="glass-card-header">
       <text class="title">AI 内容生成</text>

@@ -1,4 +1,4 @@
-<view class="page-container login-page">
+<view class="page-container page-container-fade-in login-page">
   <view class="login-header">
     <text class="login-logo">AI数智名片</text>
     <text class="login-slogan">让每一次连接都有价值</text>
@@ -23,9 +23,6 @@
     <button class="btn-wechat" bindtap="wxLogin" loading="{{loading}}">
       <view class="wechat-icon">💚</view>
       <text class="wechat-text">{{loading ? '登录中...' : '一键登录'}}</text>
-    </button>
-    <button class="btn-test" bindtap="mockWechatLogin">
-      <text class="test-text">📱 模拟微信登录（测试用）</text>
     </button>
     <view class="login-alternative" bindtap="skipLogin">
       <text>暂不登录，先看看</text>

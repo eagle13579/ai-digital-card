@@ -11,9 +11,12 @@ const { get, post, put, del, upload } = require('./request')
 
 // ===== 认证模块 =====
 const authApi = {
-  /** 微信小程序一键登录（wx.login → code → JWT） */
-  wxMiniLogin(code) {
-    return post('/api/auth/wx-mini-login', { code }, { noAuth: true })
+  /** 微信小程序一键登录（wx.login → code → JWT）
+   *  @param {string} code - wx.login() 返回的临时 code
+   *  @param {object} [userInfo={}] - wx.getUserProfile() 返回的用户信息（nickName, avatarUrl 等）
+   */
+  wxMiniLogin(code, userInfo = {}) {
+    return post('/api/auth/wx-mini-login', { code, user_info: userInfo }, { noAuth: true })
   },
 
   /** 手机号 + 验证码登录（H5/备用） */
@@ -77,8 +80,8 @@ const userApi = {
 
 // ===== 画册(名片)模块 =====
 const brochureApi = {
-  list(params) {
-    return get('/api/brochures', params)
+  list(params = {}, options = {}) {
+    return get('/api/brochures', params, options)
   },
   getById(id) {
     return get(`/api/brochures/${id}`)
@@ -122,8 +125,8 @@ const matchApi = {
   getRecommend(params) {
     return get('/api/match/recommend', params)
   },
-  getRecommendList(page, size) {
-    return get('/api/match/recommend', { page, size })
+  getRecommendList(page = 1, size = 10, options = {}) {
+    return get('/api/match/recommend', { page, size }, options)
   },
   getMatchDetail(id) {
     return get(`/api/match/${id}`)

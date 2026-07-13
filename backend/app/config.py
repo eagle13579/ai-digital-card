@@ -210,9 +210,7 @@ class Settings(BaseSettings):
     TENCENT_WECHAT_SECRET: str = ""
     """（向后兼容）腾讯会议旧版配置"""
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
 settings = Settings()

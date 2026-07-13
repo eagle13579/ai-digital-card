@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="membership-header">
     <text class="m-title">会员中心</text>
     <text class="m-subtitle">当前等级：{{currentLevel}}</text>

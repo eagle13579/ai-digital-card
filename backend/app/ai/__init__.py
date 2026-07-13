@@ -56,6 +56,8 @@ _MODULE_MAP = {
     "OnlineLearningPipeline": ("app.ai.online_learning", "OnlineLearningPipeline"),
     "OnlineLearningEngine": ("app.ai.online_learning", "OnlineLearningEngine"),
     "get_online_learning_engine": ("app.ai.online_learning", "get_online_learning_engine"),
+    "AttentionMatcher": ("app.ai.attention_matcher", "AttentionMatcher"),
+    "UserFeatures": ("app.ai.attention_matcher", "UserFeatures"),
     "trigger_learning": ("app.ai.online_learning", "trigger_learning"),
     "get_learning_status": ("app.ai.online_learning", "get_learning_status"),
     "load_online_weights": ("app.ai.online_learning", "load_online_weights"),

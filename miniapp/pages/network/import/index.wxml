@@ -1,5 +1,5 @@
 <!-- 联系人导入页面 -->
-<view class="import-page">
+<view class="import-page page-container-fade-in">
   <!-- 页面头部 -->
   <view class="import-header">
     <view class="header-back" bindtap="goBack">

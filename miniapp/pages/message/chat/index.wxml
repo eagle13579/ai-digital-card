@@ -1,4 +1,4 @@
-<view class="page-container chat-page">
+<view class="page-container page-container-fade-in chat-page">
   <!-- 消息列表 -->
   <scroll-view class="msg-list" scroll-y enhanced show-scrollbar="{{false}}" 
                scroll-into-view="{{scrollToId}}" scroll-with-animation

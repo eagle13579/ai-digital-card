@@ -1,4 +1,4 @@
-<view class="page-container qr-page">
+<view class="page-container page-container-fade-in qr-page">
   <view class="qr-card">
     <view class="qr-header">{{(brochure && brochure.title) || 'AI数智名片'}}</view>
     <view class="qr-canvas-wrapper">

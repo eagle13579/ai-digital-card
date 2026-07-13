@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="page-header">
     <text class="title">我的组织</text>
     <view class="create-btn" bindtap="goToCreate">+ 创建组织</view>

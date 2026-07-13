@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="section-header">
     <text class="section-title">数据洞察</text>
   </view>

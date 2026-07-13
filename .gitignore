@@ -69,3 +69,11 @@ training_data/*.jsonl
 bandit_report.json
 soc2_audit_package/
 k6-v*.*/
+
+# Secret files — never commit
+.env.example
+.env.*.bak
+*.bak
+*.bak.*
+secrets/
+secrets.*

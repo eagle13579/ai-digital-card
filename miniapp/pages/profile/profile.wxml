@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <loading visible="{{loading}}" />
 
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">

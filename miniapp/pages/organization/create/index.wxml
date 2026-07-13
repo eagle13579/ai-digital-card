@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container page-container-fade-in">
   <view class="page-header">
     <view class="back" bindtap="goBack">‹</view>
     <text class="title">{{isEdit ? '编辑组织' : '创建组织'}}</text>

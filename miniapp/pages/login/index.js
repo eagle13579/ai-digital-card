@@ -99,7 +99,7 @@ Page({
 
   _handleLoginWithProfile(code, userInfo) {
     if (this.data.useRealApi) {
-      authApi.wxMiniLogin(code)
+      authApi.wxMiniLogin(code, userInfo)
         .then(result => {
           const token = result.token || result.access_token
           const mergedUserInfo = { ...(result.userInfo || result.user || {}), ...userInfo }
@@ -251,40 +251,6 @@ Page({
 
   goPrivacy() {
     wx.showToast({ title: '隐私政策', icon: 'none' })
-  },
-
-  mockWechatLogin() {
-    this.setData({ loading: true })
-    const mockUserInfo = {
-      nickName: '微信用户',
-      avatarUrl: '',
-      name: '微信用户',
-      avatar: '',
-    }
-    const { authApi } = require('../../utils/api')
-    authApi.wxMiniLogin('test_code')
-      .then(result => {
-        if (result.token) {
-          const mergedUserInfo = { ...(result.userInfo || {}), ...mockUserInfo }
-          store.setAuth(result.token, mergedUserInfo)
-          wx.showToast({ title: '模拟登录成功', icon: 'success', duration: 1500 })
-          setTimeout(() => {
-            // Mock 模式下默认视为新用户（测试用）
-            const isNew = result.is_new !== undefined ? result.is_new : true
-            if (isNew) {
-              wx.navigateTo({ url: '/pages/register/index' })
-            } else {
-              wx.switchTab({ url: '/pages/index/index' })
-            }
-          }, 1500)
-        } else {
-          this.showErrorModal('登录失败', '无法获取登录凭证，请重试')
-        }
-      })
-      .catch(err => {
-        console.error('[Login] Mock 登录失败:', err)
-        this.showErrorModal('网络连接失败', '无法连接服务器，请检查网络设置后重试')
-      })
   },
 
   showErrorModal(title, desc) {

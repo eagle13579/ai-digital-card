@@ -1,4 +1,4 @@
-<view class="preview-container">
+<view class="preview-container page-container-fade-in">
   <view class="preview-header" wx:if="{{totalPages > 0}}">
     <view class="back-btn" bindtap="goBack">
       <text class="back-icon">‹</text>

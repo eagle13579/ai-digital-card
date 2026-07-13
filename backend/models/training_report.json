@@ -1,0 +1,46 @@
+{
+  "model": "ThreeTowerModel (PyTorch)",
+  "architecture": {
+    "tower_overlap": "Linear(4→8→4)",
+    "tower_semantic": "Linear(1→4→2)",
+    "tower_weight": "Linear(5→8→4)",
+    "combined": "Linear(4+2+4=10→8→1) + Sigmoid"
+  },
+  "metrics": {
+    "accuracy": 0.9524,
+    "precision": 0.8333,
+    "recall": 1.0,
+    "f1": 0.9091,
+    "auc": 1.0
+  },
+  "feature_importance": {
+    "tag_overlap_score": 0.0302,
+    "common_tag_count": 0.0138,
+    "overlap_provide_to_need": 0.0083,
+    "overlap_need_to_provide": 0.0141,
+    "vector_semantic": 0.0001,
+    "tag_count_a": 0.8026,
+    "tag_count_b": 0.318,
+    "avg_weight_a": 0.9691,
+    "avg_weight_b": 0.9154,
+    "tag_weight_score": 0.9597
+  },
+  "training_history": {
+    "final_train_loss": 0.22045516843597093,
+    "final_val_loss": 0.1603018045425415,
+    "best_val_loss": 0.13902540504932404,
+    "best_val_acc": 1.0
+  },
+  "feature_names": [
+    "tag_overlap_score",
+    "common_tag_count",
+    "overlap_provide_to_need",
+    "overlap_need_to_provide",
+    "vector_semantic",
+    "tag_count_a",
+    "tag_count_b",
+    "avg_weight_a",
+    "avg_weight_b",
+    "tag_weight_score"
+  ]
+}
