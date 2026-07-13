@@ -214,7 +214,8 @@ Page({
    * Mock 登录（开发/降级用）
    */
   _mockLogin(code) {
-    MockService.login({ code })
+    const { authApi } = require('../../utils/api')
+    authApi.wxMiniLogin(code)
       .then(result => {
         if (result.token) {
           store.setAuth(result.token, result.userInfo)
@@ -260,7 +261,8 @@ Page({
       name: '微信用户',
       avatar: '',
     }
-    MockService.login({ code: 'test_code' })
+    const { authApi } = require('../../utils/api')
+    authApi.wxMiniLogin('test_code')
       .then(result => {
         if (result.token) {
           const mergedUserInfo = { ...(result.userInfo || {}), ...mockUserInfo }
