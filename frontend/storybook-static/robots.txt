@@ -1,0 +1,18 @@
+# AI数智名片 — 爬虫策略
+# Allow all crawlers for public pages
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.aibizcard.com/sitemap.xml
+
+# Disallow admin/privacy-sensitive paths
+Disallow: /api/
+Disallow: /login
+Disallow: /settings
+Disallow: /gdpr
+Disallow: /payment/
+
+# Crawl delay (polite crawling)
+Crawl-delay: 2

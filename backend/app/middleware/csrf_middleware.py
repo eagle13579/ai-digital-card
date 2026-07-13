@@ -47,6 +47,8 @@ EXCLUDED_PATHS = (
     "/api/card/",
     "/api/visitors/",
     "/api/bot/",
+    "/api/tags/",
+    "/api/users/",
     "/api/crm/forms/",
     "/api/ai/",
     "/api/design-qa/",

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, 
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api_standards import PaginatedResponse, paginate_cursor
 from app.database import get_db
@@ -291,7 +292,7 @@ async def create_brochure(
         db.add(page)
 
     await db.commit()
-    await db.refresh(brochure)
+    await db.refresh(brochure, ["pages"])
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -306,7 +307,7 @@ async def list_brochures(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册列表（cursor 分页）"""
-    query = select(Brochure)
+    query = select(Brochure).options(selectinload(Brochure.pages))
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
@@ -323,7 +324,11 @@ async def get_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册详情（含页面数据）"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -339,7 +344,11 @@ async def get_brochure_by_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """通过分享token获取画册（公开访问）"""
-    result = await db.execute(select(Brochure).where(Brochure.share_token == share_token))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.share_token == share_token)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在或链接已失效")
@@ -361,7 +370,11 @@ async def update_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """更新画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -409,7 +422,11 @@ async def delete_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """删除画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -428,7 +445,11 @@ async def publish_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """发布画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -452,7 +473,11 @@ async def refresh_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """刷新分享token"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")

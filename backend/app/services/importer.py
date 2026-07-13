@@ -496,7 +496,7 @@ def _call_deepseek_api(prompt: str) -> Optional[str]:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=DEEPSEEK_TIMEOUT) as resp:
+        with urllib.request.urlopen(req, timeout=DEEPSEEK_TIMEOUT) as resp:  # nosec - hardcoded DeepSeek API URL, no user input
             result = json.loads(resp.read().decode("utf-8"))
         content = result["choices"][0]["message"]["content"]
         return content

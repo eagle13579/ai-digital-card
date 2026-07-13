@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import tempfile
 from typing import Optional, Union
 
 from PIL import Image, ImageEnhance, ImageFilter
@@ -122,8 +123,9 @@ class OCRScanner:
             ocr = PaddleOCR(use_angle_cls=True, lang="ch", show_log=False)
 
             # 保存临时文件供 PaddleOCR 处理
-            temp_path = "/tmp/_ocr_temp.png"
-            image.save(temp_path)
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+                temp_path = tmp.name
+                image.save(temp_path)
 
             result = ocr.ocr(temp_path, cls=True)
 

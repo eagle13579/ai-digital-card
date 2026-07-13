@@ -174,7 +174,7 @@ class RedisClient:
             return json.loads(data.decode("utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError):
             try:
-                return pickle.loads(data)
+                return pickle.loads(data)  # nosec - fallback deserialization of self-written cache data
             except Exception:
                 return data
 

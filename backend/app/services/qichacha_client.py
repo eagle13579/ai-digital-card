@@ -169,7 +169,7 @@ class QichachaClient:
         """生成签名: MD5(AppKey + Timestamp + AppSecret)"""
         timestamp = str(int(time.time()))
         raw = f"{self.app_key}{timestamp}{self.app_secret}"
-        return hashlib.md5(raw.encode("utf-8")).hexdigest().upper()
+        return hashlib.md5(raw.encode("utf-8"), usedforsecurity=False).hexdigest().upper()  # nosec - API signing only
 
     def _get_auth_headers(self) -> dict[str, str]:
         """生成认证请求头（企查查开放平台标准认证方式）"""

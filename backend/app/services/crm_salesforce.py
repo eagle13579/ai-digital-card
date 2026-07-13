@@ -154,7 +154,7 @@ class SalesforceProvider(CRMProvider):
     async def _find_by_email(self, email: str) -> dict[str, Any] | None:
         """通过 SOQL 查询按 Email 查找联系人。"""
         escaped_email = email.replace("'", "\\'")
-        query = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{escaped_email}' LIMIT 1"
+        query = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{escaped_email}' LIMIT 1"  # nosec - SOQL, not SQL; email is sanitized
         url = f"{self._instance_url}/services/data/v58.0/query?q={quote(query)}"
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self._headers())
@@ -334,7 +334,7 @@ def export_contact(config: dict[str, Any], contact_data: dict[str, Any]) -> dict
         email = fields.get("Email", "")
         if email:
             escaped = email.replace("'", "\\'")
-            query = f"SELECT Id FROM Contact WHERE Email = '{escaped}' LIMIT 1"
+            query = f"SELECT Id FROM Contact WHERE Email = '{escaped}' LIMIT 1"  # nosec - SOQL, not SQL; sanitized
             from urllib.parse import quote
             q_url = f"{base_url}/query?q={quote(query)}"
             search_resp = requests.get(q_url, headers=headers, timeout=REQUEST_TIMEOUT)

@@ -454,7 +454,7 @@ class DataAgent(BaseAgent):
             # Add common operations
             operations.append({
                 "type": "backup",
-                "sql": f"-- BACKUP: CREATE TABLE {data.get('backup_table', 'schema_backup')} AS SELECT * FROM ...",
+                "sql": f"-- BACKUP: CREATE TABLE {data.get('backup_table', 'schema_backup')} AS SELECT * FROM ...",  # nosec - SQL comment only, not executed
                 "note": "Always backup before running migrations",
             })
 

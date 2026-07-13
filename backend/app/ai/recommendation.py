@@ -934,7 +934,7 @@ class OnlineLearningTracker:
             placeholders = ",".join("?" for _ in my_targets)
             similar_uids = set(
                 r["user_id"] for r in conn.execute(
-                    f"SELECT DISTINCT user_id FROM click_events "
+                    f"SELECT DISTINCT user_id FROM click_events "  # nosec - table/columns hardcoded, values parameterized with ?
                     f"WHERE target_id IN ({placeholders}) AND user_id != ?",
                     (*list(my_targets), user_id),
                 ).fetchall()
@@ -945,7 +945,7 @@ class OnlineLearningTracker:
             # 统计相似用户点击过的目标（协同过滤核心）
             su_ph = ",".join("?" for _ in similar_uids)
             rows = conn.execute(
-                f"SELECT target_id, COUNT(DISTINCT user_id) AS user_cnt "
+                f"SELECT target_id, COUNT(DISTINCT user_id) AS user_cnt "  # nosec - table/columns hardcoded, values parameterized with ?
                 f"FROM click_events "
                 f"WHERE user_id IN ({su_ph}) "
                 f"GROUP BY target_id ORDER BY user_cnt DESC",
@@ -972,7 +972,7 @@ class OnlineLearningTracker:
                     if su_targets:
                         su_ph2 = ",".join("?" for _ in su_targets)
                         rows2 = conn.execute(
-                            f"SELECT DISTINCT user_id FROM click_events "
+                            f"SELECT DISTINCT user_id FROM click_events "  # nosec - table/columns hardcoded, values parameterized with ?
                             f"WHERE target_id IN ({su_ph2}) "
                             f"AND user_id NOT IN (?, ?)",
                             (*list(su_targets), suid, user_id),
@@ -983,7 +983,7 @@ class OnlineLearningTracker:
                 if second_level_uids:
                     sl_ph = ",".join("?" for _ in second_level_uids)
                     rows_sl = conn.execute(
-                        f"SELECT target_id, COUNT(DISTINCT user_id) AS user_cnt "
+                        f"SELECT target_id, COUNT(DISTINCT user_id) AS user_cnt "  # nosec - table/columns hardcoded, values parameterized with ?
                         f"FROM click_events "
                         f"WHERE user_id IN ({sl_ph}) "
                         f"GROUP BY target_id ORDER BY user_cnt DESC",

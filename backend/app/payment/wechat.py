@@ -8,7 +8,8 @@ import time
 import uuid
 from datetime import datetime
 from typing import Any, Optional
-from xml.etree import ElementTree
+from defusedxml.ElementTree import fromstring as parse_xml
+from xml.etree import ElementTree as _ET
 
 import httpx
 
@@ -40,15 +41,15 @@ def _generate_nonce_str() -> str:
 
 
 def _to_xml(data: dict[str, str]) -> str:
-    root = ElementTree.Element("xml")
+    root = _ET.Element("xml")
     for k, v in data.items():
-        child = ElementTree.SubElement(root, k)
+        child = _ET.SubElement(root, k)
         child.text = v
-    return ElementTree.tostring(root, encoding="utf-8").decode()
+    return _ET.tostring(root, encoding="utf-8").decode()
 
 
 def _from_xml(xml_str: str) -> dict[str, str]:
-    root = ElementTree.fromstring(xml_str)
+    root = parse_xml(xml_str)
     return {child.tag: child.text or "" for child in root}
 
 

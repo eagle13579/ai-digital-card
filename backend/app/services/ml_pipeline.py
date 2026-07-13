@@ -534,7 +534,7 @@ class MLPipeline:
         if os.path.exists(model_path):
             try:
                 with open(model_path, "rb") as f:
-                    self._current_model = pickle.load(f)
+                    self._current_model = pickle.load(f)  # nosec - loading model files from controlled MODELS_DIR
                 logger.info("[MLPipeline] 模型 %s 已加载到生产", version_id)
             except Exception as e:
                 logger.warning("[MLPipeline] 加载模型 %s 失败: %s", version_id, e)

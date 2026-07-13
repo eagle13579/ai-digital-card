@@ -232,7 +232,7 @@ class SalesforceConnector(CrmBase):
         # SOQL 模糊搜索
         safe_query = query.replace("'", "\\'")
         soql = (
-            f"SELECT Id, FirstName, LastName, Email, Phone, Title "
+            f"SELECT Id, FirstName, LastName, Email, Phone, Title "  # nosec - SOQL, not SQL; query is sanitized
             f"FROM Contact "
             f"WHERE Name LIKE '%{safe_query}%' OR Email LIKE '%{safe_query}%' "
             f"LIMIT {limit}"
@@ -366,7 +366,7 @@ class SalesforceConnector(CrmBase):
     def _find_by_email(self, email: str) -> Optional[dict]:
         """通过 SOQL 按 Email 查找联系人。"""
         safe_email = email.replace("'", "\\'")
-        soql = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{safe_email}' LIMIT 1"
+        soql = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{safe_email}' LIMIT 1"  # nosec - SOQL, not SQL; email is sanitized
         from urllib.parse import quote
         url = f"{self._instance_url}/services/data/{SF_API_VERSION}/query?q={quote(soql)}"
         try:

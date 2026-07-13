@@ -91,7 +91,7 @@ def _http_request(method: str, url: str, data: Optional[dict] = None,
             headers=headers,
         )
 
-        with urllib_request.urlopen(req, timeout=timeout) as resp:
+        with urllib_request.urlopen(req, timeout=timeout) as resp:  # nosec - URL is constructed internally, not from user input
             resp_body = resp.read().decode("utf-8")
             if resp_body:
                 return json.loads(resp_body)

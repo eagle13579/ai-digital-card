@@ -125,7 +125,7 @@ def _safe_load_yaml(path: str) -> dict[str, Any]:
     try:
         with open(path, "r", encoding="utf-8") as f:
             raw_text = f.read()
-        data = yaml.load(raw_text, Loader=_SafeLoader)
+        data = yaml.load(raw_text, Loader=_SafeLoader)  # nosec - _SafeLoader extends yaml.SafeLoader
         if data is None:
             return {}
         if not isinstance(data, dict):
@@ -425,7 +425,7 @@ async def _query_memory_db(db_path: str, key: str, limit: int = 5) -> list[dict[
                 created_col = schema["created_col"]
                 try:
                     cursor = await db.execute(
-                        f"SELECT {content_col} AS content, {created_col} AS created_at "
+                        f"SELECT {content_col} AS content, {created_col} AS created_at "  # nosec - table/columns from hardcoded MEMORY_TABLES, values parameterized
                         f"FROM \"{table_name}\" WHERE {content_col} LIKE ? "
                         f"ORDER BY {created_col} DESC LIMIT ?",
                         (f"%{key}%", limit),

@@ -220,7 +220,7 @@ def update_lead(
     values.append(lead_id)
     with get_db() as db:
         db.execute(
-            f"UPDATE leads SET {', '.join(fields)}, updated_at = ? WHERE id = ?",
+            f"UPDATE leads SET {', '.join(fields)}, updated_at = ? WHERE id = ?",  # nosec - fields are hardcoded known columns, values are parameterized
             values,
         )
     return get_lead(lead_id)
@@ -341,13 +341,13 @@ def get_leads(
 
     with get_db() as db:
         # 总数
-        count_row = db.execute(f"SELECT COUNT(*) as cnt FROM leads {where_sql}", params).fetchone()
+        count_row = db.execute(f"SELECT COUNT(*) as cnt FROM leads {where_sql}", params).fetchone()  # nosec - where_sql built from internal conditions, values parameterized
         total = count_row["cnt"] if count_row else 0
 
         # 分页数据
         offset = (page - 1) * page_size
         rows = db.execute(
-            f"SELECT * FROM leads {where_sql} ORDER BY updated_at DESC LIMIT ? OFFSET ?",
+            f"SELECT * FROM leads {where_sql} ORDER BY updated_at DESC LIMIT ? OFFSET ?",  # nosec - where_sql built from internal conditions, values parameterized
             params + [page_size, offset],
         ).fetchall()
 

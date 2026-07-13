@@ -46,16 +46,18 @@ async def test_db():
     """In-memory SQLite async session with fresh schema per test.
 
     Creates all tables on setup, drops them on teardown.
+    Uses the session itself for table creation to avoid the :memory:
+    per-connection isolation issue.
     """
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
 
     session_factory = async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
     session = session_factory()
     try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
         yield session
     finally:
         await session.close()
@@ -93,7 +95,7 @@ def test_redis():
 
 
 @pytest_asyncio.fixture
-async def client():
+async def client(test_db):
     """Async HTTP client wired to the FastAPI app via ASGITransport.
 
     Usage::
@@ -101,7 +103,14 @@ async def client():
         resp = await client.get("/health")
         assert resp.status_code == 200
     """
+    from app.database import get_db
+
     app = _get_app()
+
+    async def override_get_db():
+        yield test_db
+
+    app.dependency_overrides[get_db] = override_get_db
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac

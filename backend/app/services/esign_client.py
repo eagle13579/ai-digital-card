@@ -284,7 +284,7 @@ class EsignClient:
             files={
                 "file": (doc_file_name, doc_pdf, "application/pdf"),
                 "contentType": (None, "application/pdf"),
-                "contentMd5": (None, hashlib.md5(doc_pdf).hexdigest()),
+                "contentMd5": (None, hashlib.md5(doc_pdf, usedforsecurity=False).hexdigest()),  # nosec - checksum only
                 "convert2Pdf": (None, "true"),
             },
         )
