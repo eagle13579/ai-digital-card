@@ -36,7 +36,7 @@ const API_BASE_URL = (function() {
 })()
 
 // 请求超时时间(ms)
-const REQUEST_TIMEOUT = 8000
+const REQUEST_TIMEOUT = 15000
 
 // HTTP状态码 → 用户提示
 const HTTP_ERROR_MAP = {

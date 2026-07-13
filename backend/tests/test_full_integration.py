@@ -133,8 +133,8 @@ class TestCompleteLifecycleFlow:
         backend = all_agents["backend"]
         assert isinstance(backend, BackendAgent)
         await backend.tools["review_code"]("def foo(): pass")
-        await backend.tools["generate_api"]("UserProfile", ["name", "email"])
-        await backend.tools["debug_issue"]("ValueError", "production")
+        await backend.tools["generate_api"]({"endpoint": "UserProfile", "fields": ["name", "email"]})
+        await backend.tools["debug_issue"]({"error": "ValueError", "environment": "production"})
 
         qa = all_agents["qa"]
         assert isinstance(qa, QAAgent)
@@ -143,8 +143,8 @@ class TestCompleteLifecycleFlow:
 
         security = all_agents["security"]
         assert isinstance(security, SecurityAgent)
-        await security.tools["scan_dependencies"]("requirements.txt")
-        await security.tools["check_compliance"]("GDPR")
+        await security.tools["scan_dependencies"]()
+        await security.tools["check_compliance"]()
         await security.tools["analyze_auth_pattern"]("JWT")
 
         # Verify brain was called for knowledge ingestion
@@ -158,8 +158,10 @@ class TestCompleteLifecycleFlow:
         assert isinstance(growth, GrowthAgent)
 
         result = await growth.tools["analyze_ab_test"](
-            variant_a={"impressions": 1000, "conversions": 50},
-            variant_b={"impressions": 1000, "conversions": 65},
+            {
+                "variant_a": {"impressions": 1000, "conversions": 50},
+                "variant_b": {"impressions": 1000, "conversions": 65},
+            }
         )
         assert result is not None
         assert growth.status == AgentStatus.IDLE
@@ -172,14 +174,13 @@ class TestCompleteLifecycleFlow:
         assert isinstance(knowledge, KnowledgeAgent)
 
         docs = await knowledge.tools["generate_docs"](
-            module="app.ai.gaia_evolution_brain",
-            style="markdown",
+            {"module": "app.ai.gaia_evolution_brain", "style": "markdown"}
         )
         assert docs is not None
 
         adr = await knowledge.tools["create_adr"](
             title="Adopt Event Sourcing for Audit Trail",
-            status="proposed",
+            decision="proposed",
             context="Need immutable audit log for compliance",
         )
         assert adr is not None
@@ -193,15 +194,19 @@ class TestCompleteLifecycleFlow:
         assert isinstance(arch, ArchitectureAgent)
 
         review = await arch.tools["review_design"](
-            component="Recommendation Engine",
-            concerns=["latency", "freshness"],
+            {
+                "component": "Recommendation Engine",
+                "concerns": ["latency", "freshness"],
+            }
         )
         assert review is not None
 
         capacity = await arch.tools["capacity_estimate"](
-            current_users=1_000_000,
-            target_users=100_000_000,
-            service_type="api_gateway",
+            {
+                "current_users": 1_000_000,
+                "target_users": 100_000_000,
+                "service_type": "api_gateway",
+            }
         )
         assert capacity is not None
 
@@ -213,14 +218,18 @@ class TestCompleteLifecycleFlow:
         assert isinstance(data_agent, DataAgent)
 
         schema = await data_agent.tools["suggest_schema_change"](
-            current_schema="CREATE TABLE users (id INT)",
-            performance_issues=["full_table_scan", "index_missing"],
+            {
+                "current_schema": "CREATE TABLE users (id INT)",
+                "performance_issues": ["full_table_scan", "index_missing"],
+            }
         )
         assert schema is not None
 
         quality = await data_agent.tools["check_data_quality"](
-            table_name="user_profiles",
-            rules=["not_null", "unique_email"],
+            {
+                "table_name": "user_profiles",
+                "rules": ["not_null", "unique_email"],
+            }
         )
         assert quality is not None
 
@@ -231,22 +240,24 @@ class TestCompleteLifecycleFlow:
         sre = all_agents["sre"]
         assert isinstance(sre, SREAgent)
 
-        health = await sre.tools["health_check"](
-            services=["api_gateway", "database", "cache", "event_bus"]
-        )
+        health = await sre.tools["health_check"]()
         assert health is not None
 
         remediation = await sre.tools["auto_remediate"](
-            issue_type="high_cpu",
-            metrics={"cpu_percent": 92.5, "memory_percent": 78.0},
-            service="api_gateway",
+            {
+                "issue_type": "high_cpu",
+                "metrics": {"cpu_percent": 92.5, "memory_percent": 78.0},
+                "service": "api_gateway",
+            }
         )
         assert remediation is not None
 
         forecast = await sre.tools["capacity_forecast"](
-            current_usage={"cpu": 60, "memory": 70},
-            growth_rate_percent=15,
-            forecast_days=90,
+            {
+                "current_usage": {"cpu": 60, "memory": 70},
+                "growth_rate_percent": 15,
+                "forecast_days": 90,
+            }
         )
         assert forecast is not None
 
@@ -258,22 +269,28 @@ class TestCompleteLifecycleFlow:
         assert isinstance(support, SupportAgent)
 
         ticket = await support.tools["handle_ticket"](
-            ticket_id="TKT-001",
-            user_query="How do I reset my password?",
-            user_tier="premium",
+            {
+                "ticket_id": "TKT-001",
+                "user_query": "How do I reset my password?",
+                "user_tier": "premium",
+            }
         )
         assert ticket is not None
 
         faq = await support.tools["faq_lookup"](
-            query="reset password",
-            top_k=3,
+            {
+                "query": "reset password",
+                "top_k": 3,
+            }
         )
         assert faq is not None
 
         resolution = await support.tools["learn_from_resolution"](
-            ticket_id="TKT-001",
-            resolution_steps=["Navigate to settings", "Click reset password"],
-            outcome="resolved",
+            {
+                "ticket_id": "TKT-001",
+                "resolution_steps": ["Navigate to settings", "Click reset password"],
+                "outcome": "resolved",
+            }
         )
         assert resolution is not None
 
@@ -307,8 +324,8 @@ class TestCompleteLifecycleFlow:
         for name, agent in all_agents.items():
             if hasattr(agent, "learn") and callable(agent.learn):
                 await agent.learn(
-                    experience=f"processed_task_for_{name}",
-                    result={"status": "ok", "duration_ms": 150},
+                    observation=f"processed_task_for_{name}",
+                    metadata={"result": "ok", "duration_ms": 150},
                 )
 
         # Verify knowledge was ingested
@@ -770,12 +787,14 @@ class TestFullStackSlow:
         await agents["backend"].tools["review_code"]("class UserService: ...")
         await agents["qa"].tools["generate_tests"]("UserService")
         await agents["support"].tools["handle_ticket"](
-            ticket_id="TKT-001", user_query="Help", user_tier="premium"
+            {"ticket_id": "TKT-001", "user_query": "Help", "user_tier": "premium"}
         )
-        await agents["sre"].tools["health_check"](services=["all"])
+        await agents["sre"].tools["health_check"]()
         await agents["growth"].tools["analyze_ab_test"](
-            variant_a={"users": 500, "conversions": 25},
-            variant_b={"users": 500, "conversions": 35},
+            {
+                "variant_a": {"users": 500, "conversions": 25},
+                "variant_b": {"users": 500, "conversions": 35},
+            }
         )
 
         # Phase 4: Gaia Brain processes evolution cycle
@@ -821,10 +840,10 @@ class TestFullStackSlow:
         results = await asyncio.gather(
             backend.tools["review_code"]("async def handler(): pass"),
             qa.tools["generate_tests"]("HandlerClass"),
-            security.tools["scan_dependencies"]("requirements.txt"),
-            backend.tools["generate_api"]("Webhook", ["url", "secret"]),
+            security.tools["scan_dependencies"](),
+            backend.tools["generate_api"]({"endpoint": "Webhook", "fields": ["url", "secret"]}),
             qa.tools["analyze_coverage"]("app/handlers/"),
-            security.tools["check_compliance"]("SOC2"),
+            security.tools["check_compliance"](),
             return_exceptions=True,
         )
 
@@ -854,7 +873,7 @@ class TestFullStackSlow:
 
         # Knowledge agent can search that knowledge
         search_results = await knowledge.tools["summarize_changes"](
-            changes=["Added risk calculation", "Updated API endpoints"]
+            "feat: add matching engine\nfix: correct pagination"
         )
         assert search_results is not None
 
@@ -881,7 +900,7 @@ class TestFullStackSlow:
         await backend.stop()
 
         # Other agent should still work
-        health = await sre.tools["health_check"](services=["api_gateway"])
+        health = await sre.tools["health_check"]()
         assert health is not None
 
         # Runtime should still report status for all agents

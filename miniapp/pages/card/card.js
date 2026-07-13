@@ -58,7 +58,8 @@ Page({
   async loadMyCards(silent = false) {
     if (!silent) this.setData({ loading: true, listError: false })
     try {
-      const { userInfo } = store.getState()
+      const state = store.getState()
+      const userInfo = state.userInfo
       if (!userInfo || !userInfo.id) {
         console.warn('[card] 无用户信息，无法加载名片列表')
         this.setData({ myCards: [], loading: false, listError: true })
@@ -93,6 +94,14 @@ Page({
   },
 
   /** 创建新名片 */
+  handleEmptyAction() {
+    if (this.data.listError) {
+      this.loadMyCards()
+    } else {
+      this.createCard()
+    }
+  },
+
   createCard() {
     wx.navigateTo({ url: '/pages/brochure/create/index' })
   },

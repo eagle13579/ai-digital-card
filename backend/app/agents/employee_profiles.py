@@ -184,7 +184,7 @@ def _build_agent_config(
     return default_config
 
 
-def create_legion_agent(
+async def create_legion_agent(
     agent_type: str,
     brain: Any | None = None,
     broker: Any | None = None,

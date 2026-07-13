@@ -43,7 +43,7 @@
     <view class="empty-state" wx:if="{{myCards.length === 0}}">
       <text class="empty-icon">{{listError ? '⚠️' : '📇'}}</text>
       <text class="text">{{listError ? (_t.loadError || '加载失败') : _t.noData}}</text>
-      <button class="btn-primary small" style="margin-top: 16px; width: auto; padding: 0 24px;" bindtap="listError ? 'loadMyCards' : 'createCard'">
+      <button class="btn-primary small" style="margin-top: 16px; width: auto; padding: 0 24px;" bindtap="handleEmptyAction">
         {{listError ? (_t.retry || '重试') : _t.editCard}}
       </button>
     </view>

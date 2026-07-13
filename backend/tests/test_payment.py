@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 from httpx import AsyncClient, ASGITransport
 from app import create_app
 app = create_app()
-from app.payment import PaymentProvider
+from app.payment import PaymentProvider, MembershipTier
 from app.payment.wechat import WeChatPayProvider as WeChatPay
 from app.payment.alipay import AlipayProvider as Alipay
 
@@ -43,17 +43,17 @@ async def test_wechat_create_order_invalid_amount():
 @pytest.mark.asyncio
 async def test_wechat_notify_verify():
     """微信支付回调验证"""
-    with patch.object(WeChatPay, 'verify_notify', new_callable=AsyncMock) as mock:
+    with patch.object(WeChatPay, 'verify_callback', new_callable=AsyncMock) as mock:
         mock.return_value = {"result_code": "SUCCESS", "out_trade_no": "T20260627001"}
-        result = await WeChatPay.verify_notify({"xml": "<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>"})
+        result = await WeChatPay.verify_callback({"xml": "<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>"})
         assert result["result_code"] == "SUCCESS"
 
 @pytest.mark.asyncio
 async def test_wechat_notify_sign_error():
     """微信支付回调签名错误"""
-    with patch.object(WeChatPay, 'verify_notify', new_callable=AsyncMock) as mock:
+    with patch.object(WeChatPay, 'verify_callback', new_callable=AsyncMock) as mock:
         mock.return_value = {"result_code": "FAIL", "err_code": "SIGNERROR"}
-        result = await WeChatPay.verify_notify({"xml": "<xml><return_code><![CDATA[FAIL]]></return_code></xml>"})
+        result = await WeChatPay.verify_callback({"xml": "<xml><return_code><![CDATA[FAIL]]></return_code></xml>"})
         assert result["err_code"] == "SIGNERROR"
 
 @pytest.mark.asyncio
@@ -88,17 +88,17 @@ async def test_alipay_create_order():
 @pytest.mark.asyncio
 async def test_alipay_notify_verify():
     """支付宝回调验证"""
-    with patch.object(Alipay, 'verify_notify', new_callable=AsyncMock) as mock:
+    with patch.object(Alipay, 'verify_callback', new_callable=AsyncMock) as mock:
         mock.return_value = {"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001"}
-        result = await Alipay.verify_notify({"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001"})
+        result = await Alipay.verify_callback({"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001"})
         assert result["trade_status"] == "TRADE_SUCCESS"
 
 @pytest.mark.asyncio
 async def test_alipay_notify_duplicate():
     """支付宝重复回调处理"""
-    with patch.object(Alipay, 'verify_notify', new_callable=AsyncMock) as mock:
+    with patch.object(Alipay, 'verify_callback', new_callable=AsyncMock) as mock:
         mock.return_value = {"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001", "duplicate": True}
-        result = await Alipay.verify_notify({"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001"})
+        result = await Alipay.verify_callback({"trade_status": "TRADE_SUCCESS", "out_trade_no": "T20260627001"})
         assert result.get("duplicate") == True
 
 @pytest.mark.asyncio
@@ -152,19 +152,18 @@ async def test_payment_route_query(client):
 async def test_pricing():
     """测试定价配置"""
     from app.payment import PRODUCTS
-    for plan in ["gold", "diamond", "board"]:
+    for plan in [MembershipTier.GOLD, MembershipTier.DIAMOND, MembershipTier.BOARD]:
         assert plan in PRODUCTS
-        assert "price" in PRODUCTS[plan]
-        assert PRODUCTS[plan]["price"] > 0
+        assert PRODUCTS[plan].price_cents > 0
 
 @pytest.mark.asyncio
 async def test_pricing_all_languages():
     """测试定价多语言配置"""
     from app.payment import PRODUCTS
     for plan in PRODUCTS:
-        names = PRODUCTS[plan].get("names", {})
-        assert "zh" in names
-        assert "en" in names
+        cfg = PRODUCTS[plan]
+        assert cfg.name_cn
+        assert cfg.name_en
 
 @pytest.mark.asyncio
 async def test_wechat_close_order():
