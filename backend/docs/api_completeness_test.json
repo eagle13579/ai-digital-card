@@ -1,0 +1,108 @@
+{
+  "total_routes_all": 315,
+  "target_routes": 17,
+  "admin_count": 8,
+  "developer_count": 4,
+  "oauth_count": 5,
+  "results": {
+    "admin": [
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/users",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/users/{user_id}",
+        "status": 401
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/admin/users/{user_id}",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/brochures",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/stats",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/audit-log",
+        "status": 401
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/tenants",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/tenants",
+        "status": 401
+      }
+    ],
+    "developer": [
+      {
+        "method": "POST",
+        "path": "/api/v1/developer/api-keys",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/developer/api-keys",
+        "status": 401
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/developer/api-keys/{key_id}",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/developer/usage",
+        "status": 401
+      }
+    ],
+    "oauth": [
+      {
+        "method": "GET",
+        "path": "/docs/oauth2-redirect",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/oauth/{provider}/login",
+        "status": 400
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/oauth/{provider}/callback",
+        "status": 400
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/oauth/providers",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/oauth/link",
+        "status": 403
+      }
+    ]
+  },
+  "failures_500": [],
+  "status_distribution": {
+    "401": 12,
+    "200": 2,
+    "400": 2,
+    "403": 1
+  },
+  "all_clear": true
+}

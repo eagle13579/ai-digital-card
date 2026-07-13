@@ -11,7 +11,7 @@
 |:-----|:-----|:------|
 | **后端框架** | FastAPI (Python 3.12+) | 异步高性能 API 框架 |
 | **数据库** | SQLite (dev) / PostgreSQL (prod) | 异步 SQLAlchemy 2.0 ORM |
-| **前端** | React 19 + TypeScript + Vite 6 | 现代 SPA 应用 |
+| **前端** | React 19 + TypeScript + Vite 6 + **Tailwind CSS v4** | 现代 SPA 应用 |
 | **小程序** | 微信小程序原生开发 | 链客宝 · 企业家智能商务厅 |
 | **AI 引擎** | PaddleOCR + DeepSeek API + M3E Embedding | OCR 识别 / NLP / 向量搜索 |
 | **认证** | JWT (RS256 + HS256 双算法) | 无状态认证，支持手机号/微信登录 |
@@ -321,4 +321,4 @@ D:\AI数智名片\
 
 ---
 
-> 最后更新: 2026-07-13 · 代码版本: `472d453` · 技术栈: FastAPI+SQLite+React+微信小程序
+> 最后更新: 2026-07-13 · 代码版本: `472d453` · 技术栈: FastAPI+SQLite+React 19+Tailwind CSS v4+微信小程序

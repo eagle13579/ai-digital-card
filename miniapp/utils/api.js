@@ -209,7 +209,11 @@ const paymentApi = {
 // ===== 平台/组织管理模块 =====
 const platformApi = {
   list(keyword, skip, limit) {
-    return get('/api/business-card/platforms', { keyword, skip, limit }, { noAuth: true })
+    const params = {}
+    if (keyword) params.keyword = keyword
+    if (skip !== undefined) params.skip = skip
+    if (limit !== undefined) params.limit = limit
+    return get('/api/business-card/platforms', params, { noAuth: true })
   },
   getById(platformId) {
     return get(`/api/business-card/platforms/${platformId}`)

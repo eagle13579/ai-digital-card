@@ -68,5 +68,33 @@ python main.py
 |:---|:------|
 | 后端 | FastAPI + SQLAlchemy + SQLite |
 | AI | PaddleOCR + DeepSeek API + M3E Embedding |
-| 前端 | HTML Templates / PWA |
+| 前端 | **React 19 + TypeScript + Vite 6 + Tailwind CSS v4** |
+| 小程序 | 微信小程序原生开发 |
 | 部署 | Nginx + Docker |
+
+## 前端开发
+
+```bash
+# 安装依赖
+cd frontend
+npm install
+
+# 开发模式（热更新）
+npm run dev
+# → http://localhost:3000（前端自动代理 /api → :8201）
+
+# 生产构建
+npm run build
+# → dist/ 目录（可直接部署到 Nginx）
+
+# 预览构建产物
+npm run preview
+
+# 代码检查
+npm run lint
+
+# 运行测试
+npm run test
+```
+
+> 前端技术栈: React 19 + TypeScript 5.8 + Vite 6.2 + Tailwind CSS v4 + React Router v7
