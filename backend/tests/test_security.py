@@ -1,6 +1,6 @@
 """Tests for security headers middleware.
 
-Verifies all 7 security headers are present and correct on HTTP responses.
+Verifies all 9 security headers are present and correct on HTTP responses.
 Uses the shared ``conftest.py`` ``client`` fixture (ASGI transport).
 """
 
@@ -53,13 +53,26 @@ class TestIndividualSecurityHeaders:
     @pytest.mark.asyncio
     async def test_content_security_policy(self, client: AsyncClient):
         resp = await client.get("/health")
-        assert resp.headers.get("content-security-policy") == "default-src 'self'"
+        assert resp.headers.get("content-security-policy") == (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://hm.baidu.com https://*.baidu.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "img-src 'self' data: blob: https:; "
+            "font-src 'self' data: https://fonts.gstatic.com; "
+            "connect-src 'self' https://api.liankebao.top wss:; "
+            "frame-src 'self' https:; "
+            "frame-ancestors 'none'; "
+            "form-action 'self'; "
+            "base-uri 'self'; "
+            "object-src 'none'; "
+            "upgrade-insecure-requests"
+        )
 
     @pytest.mark.asyncio
     async def test_strict_transport_security(self, client: AsyncClient):
         resp = await client.get("/health")
         assert resp.headers.get("strict-transport-security") == (
-            "max-age=31536000; includeSubDomains"
+            "max-age=31536000; includeSubDomains; preload"
         )
 
     @pytest.mark.asyncio
@@ -88,7 +101,11 @@ class TestIndividualSecurityHeaders:
     async def test_permissions_policy(self, client: AsyncClient):
         resp = await client.get("/health")
         assert resp.headers.get("permissions-policy") == (
-            "camera=(), microphone=(), geolocation=()"
+            "camera=(), microphone=(), geolocation=(), "
+            "display-capture=(), fullscreen=(self), "
+            "payment=(), usb=(), magnetometer=(), "
+            "accelerometer=(), gyroscope=(), "
+            "interest-cohort=()"
         )
 
     @pytest.mark.asyncio
@@ -120,5 +137,7 @@ class TestSecurityHeadersMiddlewareIsolation:
             "X-XSS-Protection",
             "Referrer-Policy",
             "Permissions-Policy",
+            "Cross-Origin-Embedder-Policy",
+            "Cross-Origin-Opener-Policy",
         }
         assert set(SECURITY_HEADERS.keys()) == expected_keys

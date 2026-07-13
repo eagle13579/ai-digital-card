@@ -39,7 +39,7 @@ EXCLUDED_PATHS = (
     "/api/auth/wx-mini-login",
     "/api/auth/wx-login",
     "/api/payments/webhook",
-    "/api/webhooks/",
+    "/api/webhooks",
     "/api/brochures",
     "/api/brochure/",
     "/api/match/",
