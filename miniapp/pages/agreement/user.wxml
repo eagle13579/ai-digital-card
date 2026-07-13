@@ -1,0 +1,74 @@
+<view class="page-container">
+  <view class="user-content">
+    <text class="user-title">AI数智名片 用户协议</text>
+
+    <view class="user-section">
+      <text class="user-section-title">一、总则</text>
+      <text class="user-text">
+        欢迎使用AI数智名片（以下简称"本服务"）。本协议是您与AI数智名片运营方之间关于使用本服务的法律协议。请您仔细阅读本协议的全部内容。您使用本服务即表示您同意本协议的全部条款。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">二、服务内容</text>
+      <text class="user-text">
+        2.1 本服务提供电子名片创建、管理、交换、智能匹配、AI分析等功能。\n
+        2.2 我们保留随时修改、暂停或终止部分或全部服务的权利。\n
+        2.3 我们会尽力保证服务的稳定性，但因不可抗力等原因导致的服务中断，我们不承担责任。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">三、用户责任</text>
+      <text class="user-text">
+        3.1 您保证您提供的信息真实、准确、完整。\n
+        3.2 您不得利用本服务从事任何违法违规活动。\n
+        3.3 您应妥善保管您的账户信息和密码，因账户信息泄露导致的损失由您自行承担。\n
+        3.4 您在使用AI功能时，应遵守法律法规，不得输入违法信息。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">四、隐私保护</text>
+      <text class="user-text">
+        4.1 我们重视您的隐私保护，具体请参阅《隐私政策》。\n
+        4.2 我们会采取合理的安全措施保护您的个人信息。\n
+        4.3 未经您的同意，我们不会向第三方提供您的个人信息，法律法规另有规定的除外。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">五、知识产权</text>
+      <text class="user-text">
+        5.1 本服务的所有知识产权归运营方所有。\n
+        5.2 您授予我们使用您上传的名片信息用于优化服务的权利。\n
+        5.3 未经许可，您不得复制、修改、传播本服务的任何部分。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">六、免责声明</text>
+      <text class="user-text">
+        6.1 本服务按"现状"提供，不提供任何明示或暗示的保证。\n
+        6.2 对于因使用本服务而产生的任何直接或间接损失，我们不承担责任。\n
+        6.3 AI生成的内容仅供参考，不构成专业建议。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-section-title">七、协议修改</text>
+      <text class="user-text">
+        7.1 我们有权随时修改本协议，修改后的协议一经发布即生效。\n
+        7.2 若您不同意修改后的协议，请停止使用本服务。继续使用即视为接受修改后的协议。
+      </text>
+    </view>
+
+    <view class="user-section">
+      <text class="user-text" style="text-align:center;color:var(--text-tertiary);margin-top:var(--space-6);">
+        最后更新日期：2026年7月
+      </text>
+    </view>
+  </view>
+
+  <view class="bottom-placeholder"></view>
+</view>

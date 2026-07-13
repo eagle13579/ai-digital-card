@@ -65,7 +65,7 @@
     </view>
 
     <!-- 场景模式 - 默认收起 -->
-    <view class="glass-card scene-mode-card">
+    <view class="glass-card-glow scene-mode-card fade-in-up fade-in-up-1">
       <view class="glass-card-header" bindtap="toggleSceneMode">
         <text class="title">{{_t.sceneMode}}</text>
         <text class="more">{{sceneModeExpanded ? _t.collapse : _t.expand}}</text>
@@ -96,7 +96,7 @@
     </view>
 
     <!-- 我的名片卡片 -->
-    <view class="glass-card" wx:if="{{showBusinessCards}}" bindtap="goPreview" style="padding:0;overflow:hidden;">
+    <view class="glass-card-glow fade-in-up fade-in-up-2" wx:if="{{showBusinessCards}}" bindtap="goPreview" style="padding:0;overflow:hidden;">
       <view class="glass-card-header">
         <text class="title">{{_t.myCard}}</text>
         <text class="more">{{_t.viewAll}}</text>
@@ -111,7 +111,7 @@
     </view>
 
     <!-- 创建资源平台入口 -->
-    <view class="glass-card platform-entry-card" wx:if="{{showPlatform}}" bindtap="goCreatePlatform">
+    <view class="glass-card-glow platform-entry-card fade-in-up fade-in-up-3" wx:if="{{showPlatform}}" bindtap="goCreatePlatform">
       <view class="platform-entry-bg">
         <view class="platform-entry-content">
           <view class="platform-entry-icon">⊞</view>
@@ -125,7 +125,7 @@
     </view>
 
     <!-- 平台推荐区 -->
-    <view class="glass-card" wx:if="{{showPlatform && platformRecommend.length > 0}}">
+    <view class="glass-card fade-in-up fade-in-up-4" wx:if="{{showPlatform && platformRecommend.length > 0}}">
       <view class="glass-card-header">
         <text class="title">{{_t.platformRecommend}}</text>
         <text class="more" bindtap="goPlatformList">{{_t.viewAll}}</text>
@@ -153,7 +153,7 @@
     </view>
 
     <!-- 信任网络摘要 -->
-    <view class="glass-card" wx:if="{{showTrustNetwork}}">
+    <view class="glass-card fade-in-up fade-in-up-5" wx:if="{{showTrustNetwork}}">
       <view class="glass-card-header">
         <text class="title">{{_t.trustNetwork}}</text>
         <text class="more" bindtap="goTrust">{{_t.viewAll}}</text>
@@ -169,7 +169,7 @@
     </view>
 
     <!-- 匹配推荐区 -->
-    <view class="glass-card" wx:if="{{recommendList.length > 0}}">
+    <view class="glass-card fade-in-up fade-in-up-6" wx:if="{{recommendList.length > 0}}">
       <view class="glass-card-header">
         <text class="title">{{_t.partnerRecommend}}</text>
         <text class="more" bindtap="goMatch">{{_t.viewAll}}</text>

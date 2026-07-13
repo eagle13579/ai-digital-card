@@ -7,7 +7,7 @@
  * 
  * 参考: D:\AI询赋拆解\frontend\src\services\api.ts
  */
-const { get, post, put, del } = require('./request')
+const { get, post, put, del, upload } = require('./request')
 
 // ===== 认证模块 =====
 const authApi = {
@@ -280,31 +280,8 @@ const messageApi = {
 const ocrApi = {
   /** 扫描名片图片，返回结构化信息 */
   scan(filePath) {
-    return new Promise((resolve, reject) => {
-      wx.uploadFile({
-        url: `${getApiBaseUrl()}/api/ocr/scan`,
-        filePath,
-        name: 'file',
-        header: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-        success(res) {
-          try {
-            const body = JSON.parse(res.data)
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              resolve(body)
-            } else {
-              reject(body)
-            }
-          } catch (e) {
-            reject({ message: '解析响应失败' })
-          }
-        },
-        fail(err) {
-          reject(err)
-        },
-      })
-    })
+    // 使用统一 upload 封装（走 request.js 的认证与错误处理）
+    return upload('/api/ocr/scan', filePath, 'file')
   },
 }
 
@@ -312,7 +289,7 @@ const ocrApi = {
 function getApiBaseUrl() {
   const store = require('./store')
   const state = store.getState()
-  return state.apiBaseUrl || 'http://192.168.7.48:8201'
+  return state.apiBaseUrl || 'https://card.liankebao.top'
 }
 
 /** 获取 token */

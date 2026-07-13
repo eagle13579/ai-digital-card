@@ -14,6 +14,7 @@
     "pages/qrcode/index",
     "pages/membership/index",
     "pages/agreement/privacy/index",
+    "pages/agreement/user",
     "pages/network/graph/index",
     "pages/network/import/index",
     "pages/ai/match/index",
@@ -73,7 +74,9 @@
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
     "empty-state": "/components/empty-state/index",
-    "network-mini-map": "/components/network-mini-map/index"
+    "network-mini-map": "/components/network-mini-map/index",
+    "stats-grid": "/components/stats-grid/index",
+    "user-header": "/components/user-header/index"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

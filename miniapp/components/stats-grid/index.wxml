@@ -1,0 +1,21 @@
+<view class="stats-grid {{gridClass}} {{sizeClass}}">
+  <view
+    class="stats-item"
+    wx:for="{{items}}"
+    wx:key="label"
+    hover-class="stats-item-hover"
+  >
+    <view class="stats-icon" wx:if="{{item.icon}}">
+      <text>{{item.icon}}</text>
+    </view>
+    <view class="stats-value" style="{{item.color ? 'color: ' + item.color : ''}}">
+      {{item.value}}
+    </view>
+    <view class="stats-label">{{item.label}}</view>
+    <view class="stats-trend {{item.trend > 0 ? 'trend-up' : item.trend < 0 ? 'trend-down' : ''}}" wx:if="{{item.trend !== undefined}}">
+      <text wx:if="{{item.trend > 0}}">↑ {{item.trend}}%</text>
+      <text wx:elif="{{item.trend < 0}}">↓ {{Math.abs(item.trend)}}%</text>
+      <text wx:else>—</text>
+    </view>
+  </view>
+</view>

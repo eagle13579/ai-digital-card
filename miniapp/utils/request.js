@@ -158,11 +158,91 @@ function del(url, data = {}, options = {}) {
   return request('DELETE', url, data, options)
 }
 
+/**
+ * 文件上传（封装 wx.uploadFile，统一走 request.js 的认证与错误处理）
+ * @param {string} url - 上传路径（相对于 API_BASE_URL）
+ * @param {string} filePath - 文件本地临时路径
+ * @param {string} name - 文件字段名（后端接收的 key）
+ * @param {object} formData - 额外的表单数据
+ * @param {object} options - 额外选项
+ * @param {boolean} options.noAuth - 是否不传 token（默认 false）
+ * @param {boolean} options.noToast - 是否不自动弹 Toast（默认 false）
+ * @returns {Promise<any>}
+ */
+function upload(url, filePath, name = 'file', formData = {}, options = {}) {
+  const { token } = store.getState()
+
+  return new Promise((resolve, reject) => {
+    if (!options.noAuth && !token) {
+      const err = new Error('未登录')
+      if (!options.noToast) {
+        wx.showToast({ title: '请先登录', icon: 'none' })
+      }
+      reject(err)
+      return
+    }
+
+    const header = {}
+    if (token) {
+      header['Authorization'] = `Bearer ${token}`
+    }
+
+    wx.uploadFile({
+      url: `${API_BASE_URL}${url}`,
+      filePath,
+      name,
+      formData,
+      header,
+      success(res) {
+        const { statusCode, data: bodyStr } = res
+        let body
+        try {
+          body = typeof bodyStr === 'string' ? JSON.parse(bodyStr) : bodyStr
+        } catch (e) {
+          body = { raw: bodyStr }
+        }
+
+        if (statusCode >= 200 && statusCode < 300) {
+          // 统一响应格式: { code, message, data }
+          if (body && typeof body === 'object' && 'code' in body) {
+            if (body.code === 0) {
+              resolve(body.data !== undefined ? body.data : body)
+            } else {
+              const errMsg = body.message || '上传失败'
+              if (!options.noToast) {
+                wx.showToast({ title: errMsg, icon: 'none' })
+              }
+              reject(body)
+            }
+          } else {
+            // 非标准格式，直接返回
+            resolve(body)
+          }
+        } else {
+          const errMsg = HTTP_ERROR_MAP[statusCode] || '上传失败'
+          if (!options.noToast) {
+            wx.showToast({ title: errMsg, icon: 'none' })
+          }
+          reject(body || { code: statusCode, message: errMsg })
+        }
+      },
+      fail(err) {
+        const errMsg = err.errMsg || '网络连接失败，请检查网络'
+        if (!options.noToast) {
+          wx.showToast({ title: errMsg, icon: 'none' })
+        }
+        reject(err)
+      },
+    })
+  })
+}
+
 module.exports = {
   get,
   post,
   put,
   del,
   request,
+  upload,
   API_BASE_URL,
 }

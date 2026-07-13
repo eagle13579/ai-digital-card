@@ -1,0 +1,25 @@
+<view class="user-header {{size}}">
+  <view class="user-header-main">
+    <view class="avatar-wrap" bindtap="onAvatarTap">
+      <image class="avatar" src="{{avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+      <view class="avatar-ring"></view>
+    </view>
+    <view class="user-info">
+      <view class="name-row">
+        <text class="user-name">{{name || _t.unknownUserName}}</text>
+        <text class="user-badge" wx:if="{{badge}}">{{badge}}</text>
+      </view>
+      <text class="user-title" wx:if="{{title}}">{{title}}</text>
+      <text class="user-company" wx:if="{{company}}">{{company}}</text>
+    </view>
+    <view class="user-actions">
+      <view class="action-btn" wx:if="{{showQr}}" bindtap="onQrTap">
+        <text class="action-icon">📱</text>
+      </view>
+      <view class="action-btn" wx:if="{{showEdit}}" bindtap="onEditTap">
+        <text class="action-icon">✏️</text>
+      </view>
+    </view>
+  </view>
+  <view class="user-divider" wx:if="{{size === 'large'}}"></view>
+</view>

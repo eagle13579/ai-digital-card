@@ -1,9 +1,11 @@
 const { MockService } = require('../../../utils/mockService')
 const { aiApi } = require('../../../utils/api')
 const store = require('../../../utils/store')
+const i18nMixin = require('../../../utils/i18n-mixin')
 const CHAT_STORAGE_KEY = 'ai_chat_messages'
+const MAX_MESSAGES = 200 // 最大保留消息数
 
-Page({
+Page(i18nMixin.attach({
   data: {
     messages: [],
     inputValue: '',
@@ -18,21 +20,23 @@ Page({
     try {
       const saved = wx.getStorageSync(CHAT_STORAGE_KEY)
       if (saved && saved.length > 0) {
-        this.setData({ messages: saved })
+        // 限制最大消息数，超出时保留最新 MAX_MESSAGES 条
+        const trimmed = saved.length > MAX_MESSAGES ? saved.slice(-MAX_MESSAGES) : saved
+        this.setData({ messages: trimmed })
       } else {
         this.setData({
-          messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
+          messages: [{role:'ai', content: i18nMixin.t('aiChatDefaultGreeting')}]
         })
       }
     } catch (e) {
       this.setData({
-        messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
+        messages: [{role:'ai', content: i18nMixin.t('aiChatDefaultGreeting')}]
       })
     }
 
     const app = getApp()
     const isLoggedIn = store.getState().isLoggedIn
-    
+
     if (isLoggedIn) {
       try {
         const res = await MockService.getUserProfile()
@@ -48,12 +52,8 @@ Page({
   },
 
   onUnload() {
-    // 持久化聊天记录
-    try {
-      wx.setStorageSync(CHAT_STORAGE_KEY, this.data.messages)
-    } catch (e) {
-      // ignore storage error
-    }
+    // 持久化聊天记录（限制数量）
+    this._trimAndSave(this.data.messages)
   },
 
   onInput(e) {
@@ -89,10 +89,8 @@ Page({
       const newMsgs = [...msgs, {role: 'ai', content: reply, type: replyType}]
       this.setData({ messages: newMsgs, loading: false })
       
-      // 持久化
-      try {
-        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
-      } catch (e) {}
+      // 限制消息数量，超出时清理最早的消息
+      this._trimAndSave(newMsgs)
     } catch (err) {
       console.error('[AI Chat] 请求失败:', err)
       
@@ -101,9 +99,22 @@ Page({
       const newMsgs = [...msgs, {role: 'ai', content: fallbackReply}]
       this.setData({ messages: newMsgs, loading: false })
       
-      try {
-        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
-      } catch (e) {}
+      // 限制消息数量，超出时清理最早的消息
+      this._trimAndSave(newMsgs)
+    }
+  },
+
+  /**
+   * 限制消息数量并持久化
+   * 超过 MAX_MESSAGES 条时自动清理最早的消息
+   */
+  _trimAndSave(msgs) {
+    const trimmed = msgs.length > MAX_MESSAGES ? msgs.slice(-MAX_MESSAGES) : msgs
+    this.setData({ messages: trimmed })
+    try {
+      wx.setStorageSync(CHAT_STORAGE_KEY, trimmed)
+    } catch (e) {
+      // ignore storage error
     }
   },
 

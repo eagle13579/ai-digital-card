@@ -77,7 +77,7 @@
     </view>
 
     <!-- 名片信息 -->
-    <view class="glass-card info-card">
+    <view class="glass-card-strong info-card fade-in-up fade-in-up-1">
       <view class="glass-card-header">
         <text class="title">{{_t.basicInfo}}</text>
       </view>
@@ -108,7 +108,7 @@
     </view>
 
     <!-- 统计数据 -->
-    <view class="glass-card">
+    <view class="glass-card-strong fade-in-up fade-in-up-2">
       <view class="glass-card-header">
         <text class="title">{{_t.dataOverviewCard}}</text>
       </view>

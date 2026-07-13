@@ -19,10 +19,16 @@ page {
   --accent:             #8b5cf6;
   --accent-light:       #a78bfa;
   --accent-dark:        #6d28d9;
+  --accent-blue:        #3b82f6;   /* 科技蓝 — 辅强调色 */
+  --accent-blue-light:  #60a5fa;
+  --accent-orange:      #ff6b35;   /* 活力橙 — CTA行动号召色 */
+  --accent-orange-light:#ff8c5a;
   --gradient-accent:    linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
   --gradient-warm:      linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
   --gradient-card:      linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.08));
   --gradient-header:    linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.04));
+  --gradient-blue:      linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  --gradient-orange:    linear-gradient(135deg, #ff6b35 0%, #f59e0b 100%);
 
   /* Text */
   --text-primary:       #ffffff;
@@ -54,6 +60,20 @@ page {
   --text-lg:    18px;
   --text-xl:    24px;
   --text-2xl:   32px;
+
+  /* Line Height Scale */
+  --leading-none:   1;
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* Line Height Shorthand (font-size * leading) */
+  --lh-xs:     calc(var(--text-xs) * var(--leading-normal));
+  --lh-sm:     calc(var(--text-sm) * var(--leading-normal));
+  --lh-base:   calc(var(--text-base) * var(--leading-normal));
+  --lh-lg:     calc(var(--text-lg) * var(--leading-tight));
+  --lh-xl:     calc(var(--text-xl) * var(--leading-tight));
+  --lh-2xl:    calc(var(--text-2xl) * var(--leading-tight));
   --weight-regular: 400;
   --weight-medium:  500;
   --weight-semibold: 600;
@@ -105,6 +125,38 @@ page {
   border-radius: var(--radius-md);
   margin: var(--space-3) var(--space-4);
   overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:active {
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* 增强毛玻璃 — 更深层材质感 */
+.glass-card-strong {
+  background: var(--surface-glass-strong);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin: var(--space-3) var(--space-4);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+/* 发光毛玻璃 — 用于关键视觉元素 */
+.glass-card-glow {
+  background: linear-gradient(135deg,
+    rgba(139, 92, 246, 0.08),
+    rgba(59, 130, 246, 0.04));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-md);
+  margin: var(--space-3) var(--space-4);
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.08);
 }
 
 .glass-card-header {
@@ -133,6 +185,19 @@ page {
 .page-container {
   min-height: 100vh;
   background: var(--surface-primary);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(59, 130, 246, 0.02) 0%, transparent 50%);
+}
+
+/* ===== Page Container 淡入动画 ===== */
+.page-container-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .page-scroll {
@@ -269,6 +334,69 @@ page {
 
 .btn-outline:active {
   background: rgba(139, 92, 246, 0.08);
+}
+
+/* ===== CTA 按钮 — 活力橙 ===== */
+.btn-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  background: var(--gradient-orange);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  border-radius: var(--radius-sm);
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.25);
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.3s;
+}
+
+.btn-cta:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+.btn-cta.small {
+  height: 36px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+  width: auto;
+  padding: 0 var(--space-5);
+  box-shadow: 0 2px 10px rgba(255, 107, 53, 0.2);
+}
+
+/* ===== 科技蓝按钮 ===== */
+.btn-blue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  background: var(--gradient-blue);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-sm);
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-blue:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.btn-blue.small {
+  height: 36px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+  width: auto;
+  padding: 0 var(--space-5);
 }
 
 /* ===== Form Elements ===== */
@@ -451,6 +579,39 @@ page {
 @keyframes spin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* ===== Scale Tap (微交互按压效果) ===== */
+.scale-tap:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* ===== Fade In Up (列表项入场) ===== */
+.fade-in-up {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.fade-in-up-1  { animation-delay: 0.05s; }
+.fade-in-up-2  { animation-delay: 0.1s; }
+.fade-in-up-3  { animation-delay: 0.15s; }
+.fade-in-up-4  { animation-delay: 0.2s; }
+.fade-in-up-5  { animation-delay: 0.25s; }
+.fade-in-up-6  { animation-delay: 0.3s; }
+.fade-in-up-7  { animation-delay: 0.35s; }
+.fade-in-up-8  { animation-delay: 0.4s; }
+.fade-in-up-9  { animation-delay: 0.45s; }
+.fade-in-up-10 { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== List Item (通用列表项) ===== */

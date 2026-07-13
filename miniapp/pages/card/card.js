@@ -113,10 +113,11 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
+      const { brochureApi, matchApi, trustApi, visitorApi } = require('../../utils/api')
       const [brochure, recommendData, trustNet] = await Promise.all([
-        MockService.getBrochureById(cardId),
-        MockService.getRecommendList().catch(() => []),
-        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
+        brochureApi.getById(cardId),
+        matchApi.getRecommendList().catch(() => []),
+        trustApi.getNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
       ])
       
       let card = null
@@ -148,7 +149,7 @@ Page({
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await MockService.getVisitorStats(cardId)
+        const vStats = await visitorApi.getStats(cardId)
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
         const recommendList = Array.isArray(recommendData) ? recommendData : (recommendData?.data || [])
