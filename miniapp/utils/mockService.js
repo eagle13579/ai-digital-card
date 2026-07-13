@@ -60,6 +60,7 @@ const MockService = {
         token: user.token,
         userInfo: user.userInfo,
         memberLevel: user.memberLevel,
+        is_new: true,
       }
     }
     return authApi.login(data)
@@ -75,6 +76,7 @@ const MockService = {
         token: user.token,
         userInfo: user.userInfo,
         memberLevel: user.memberLevel,
+        is_new: true,
       }
     }
     return authApi.wxMiniLogin(data.code)

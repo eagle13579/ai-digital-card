@@ -238,7 +238,9 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
         mock_openid = f"mock_mini_{uuid.uuid4().hex[:12]}"
         result = await db.execute(select(User).where(User.wechat_openid == mock_openid))
         user = result.scalars().first()
-        if not user:
+
+        is_new = False
+        if user is None:
             user = User(
                 phone=f"139{mock_openid[-8:]}",
                 name=data.user_info.get("nickName", f"小程序用户_{data.code[-4:]}") if data.user_info else f"小程序用户_{data.code[-4:]}",
@@ -252,15 +254,16 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
             db.add(user)
             await db.commit()
             await db.refresh(user)
+            is_new = True
 
-        # 同步会员
+        # 同步链客宝会员等级
         try:
             await sync_membership(user.id)
         except Exception:
             pass
 
         token = create_access_token({"sub": str(user.id)})
-        return TokenResponse(access_token=token, user=UserResponse.model_validate(user))
+        return TokenResponse(access_token=token, user=UserResponse.model_validate(user), is_new=is_new)
 
     # ── 真实微信小程序登录 ──
     try:
@@ -303,6 +306,7 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
     result = await db.execute(select(User).where(User.wechat_openid == openid))
     user = result.scalars().first()
 
+    is_new = False
     if not user:
         # 新用户：用微信信息创建
         nick_name = "小程序用户"
@@ -329,6 +333,7 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
         db.add(user)
         await db.commit()
         await db.refresh(user)
+        is_new = True
 
     # 同步链客宝会员等级
     try:
@@ -337,4 +342,4 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
         pass
 
     token = create_access_token({"sub": str(user.id)})
-    return TokenResponse(access_token=token, user=UserResponse.model_validate(user))
+    return TokenResponse(access_token=token, user=UserResponse.model_validate(user), is_new=is_new)

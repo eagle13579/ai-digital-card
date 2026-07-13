@@ -1,10 +1,11 @@
-/* 名片详情页样式 - v2.0 Dark Minimal */
+/* 名片页样式 - v2.0 Dark Minimal */
+/* 支持列表模式 + 详情模式 */
 
 .page-scroll {
   height: 100vh;
 }
 
-/* ===== Hero Section ===== */
+/* ===== Hero Section（详情模式） ===== */
 .card-hero {
   position: relative;
   height: 280px;
@@ -68,6 +69,29 @@
   opacity: 0.65;
 }
 
+/* ===== 详情模式返回按钮 ===== */
+.detail-back {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-primary);
+}
+
+.detail-back-icon {
+  font-size: 26px;
+  color: var(--text-primary);
+  margin-right: 4px;
+  line-height: 1;
+}
+
+.detail-back-label {
+  font-size: var(--text-base);
+  color: var(--text-primary);
+}
+
 /* ===== Info Card ===== */
 .glass-card.info-card {
   margin-top: 0 !important;
@@ -85,4 +109,106 @@
 /* ===== 底部占位（为自定义TabBar留空间） ===== */
 .bottom-placeholder {
   height: 60px;
+}
+
+/* ==================== 列表模式 ==================== */
+
+/* 名片列表容器 */
+.card-list {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* 单个名片卡片项 */
+.card-list-item {
+  display: flex;
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+
+.card-list-item:active {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.98);
+}
+
+/* 封面区域 */
+.card-list-cover {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.card-list-cover image {
+  width: 100%;
+  height: 100%;
+}
+
+.card-list-cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.card-list-status {
+  font-size: var(--text-xs);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* 信息区域 */
+.card-list-info {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.card-list-name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.card-list-desc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.card-list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-list-views {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.card-list-arrow {
+  font-size: 18px;
+  color: var(--text-tertiary);
 }

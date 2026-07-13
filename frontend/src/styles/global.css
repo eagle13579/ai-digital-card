@@ -18,7 +18,7 @@
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
-  --gradient-primary: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #2DD4BF 100%);
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 50%, var(--color-accent) 100%);
 
   /* ── 间距 token ── */
   --spacing-xs: 4px;

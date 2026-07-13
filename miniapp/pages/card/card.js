@@ -1,40 +1,103 @@
 /**
- * 名片详情页
- * 展示单张名片的详细信息与统计数据 (i18n enabled)
+ * 名片页
+ * 支持两种模式：
+ *  - 'list': tabBar 进入时展示当前用户的名片列表
+ *  - 'detail': 从其他页面传入 id 时展示具体名片详情 (i18n enabled)
  */
 const { MockService } = require('../../utils/mockService')
 const { miniappApi } = require('../../utils/api')
+const store = require('../../utils/store')
 const i18n = require('../../utils/i18n')
 
 Page({
   data: {
+    // 通用
     loading: true,
+    mode: 'list',       // 'list' | 'detail'
+    _t: {},
+
+    // 列表模式
+    myCards: [],
+    listError: false,
+
+    // 详情模式
     card: null,
     stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
     purposeText: '',
-    // i18n
-    _t: {},
   },
 
   onLoad(options) {
     this._loadI18n()
-    const cardId = options.id
+    const cardId = options && options.id
     if (cardId) {
+      this.setData({ mode: 'detail' })
       this.loadCardDetail(cardId)
     } else {
-      wx.showToast({ title: i18n.t('paramError'), icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 1500)
+      // tab 进入，展示用户自己的名片列表
+      this.setData({ mode: 'list' })
+      this.loadMyCards()
     }
   },
 
   onShow() {
     this._loadI18n()
+    // 每次显示时刷新列表（如果处于列表模式且有变化可能）
+    if (this.data.mode === 'list' && !this.data.loading) {
+      this.loadMyCards(true) // silent refresh
+    }
   },
 
   /** 加载国际化翻译 */
   _loadI18n() {
     this.setData({ _t: i18n.getTranslations() })
   },
+
+  // ======================== 列表模式 ========================
+
+  /** 获取当前用户的名片列表 */
+  async loadMyCards(silent = false) {
+    if (!silent) this.setData({ loading: true, listError: false })
+    try {
+      const { userInfo } = store.getState()
+      if (!userInfo || !userInfo.id) {
+        console.warn('[card] 无用户信息，无法加载名片列表')
+        this.setData({ myCards: [], loading: false, listError: true })
+        return
+      }
+      const res = await MockService.getBrochures()
+      // MockService 返回 { data: [...] }，真实API也同理
+      const allBrochures = Array.isArray(res) ? res : (res?.data || [])
+      // 按当前用户过滤
+      const myCards = allBrochures.filter(b => String(b.user_id) === String(userInfo.id))
+      // 按浏览数降序排列
+      myCards.sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
+      this.setData({ myCards, loading: false })
+    } catch (err) {
+      console.error('[card] 加载名片列表失败:', err)
+      this.setData({ myCards: [], loading: false, listError: true })
+    }
+  },
+
+  /** 选中一张名片 → 切到详情模式 */
+  selectCard(e) {
+    const id = e?.currentTarget?.dataset?.id
+    if (!id) return
+    this.setData({ mode: 'detail' })
+    this.loadCardDetail(id)
+  },
+
+  /** 从详情切回列表 */
+  backToList() {
+    this.setData({ mode: 'list', card: null })
+    this.loadMyCards()
+  },
+
+  /** 创建新名片 */
+  createCard() {
+    wx.navigateTo({ url: '/pages/brochure/create/index' })
+  },
+
+  // ======================== 详情模式 ========================
 
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
@@ -132,6 +195,12 @@ Page({
 
   onShareAppMessage() {
     const card = this.data.card
+    if (this.data.mode === 'list' || !card) {
+      return {
+        title: 'AI数智名片 - 智能商务连接',
+        path: '/pages/index/index',
+      }
+    }
     return {
       title: (card?.user_name || '') + '的AI数智名片',
       path: card ? `/pages/brochure/preview/index?id=${card.id}` : '/pages/index/index',

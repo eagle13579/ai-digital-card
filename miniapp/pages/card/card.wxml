@@ -1,7 +1,65 @@
 <view class="page-container">
   <loading visible="{{loading}}" text="{{_t.loading}}" />
 
-  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
+  <!-- ==================== 列表模式（Tab直入） ==================== -->
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading && mode === 'list'}}">
+
+    <!-- 列表头部 -->
+    <view class="section-header">
+      <text class="section-title">{{_t.myAlbums}}</text>
+      <text class="section-subtitle">{{_t.tabCard}}</text>
+    </view>
+
+    <!-- 名片列表 -->
+    <view class="card-list">
+      <view
+        class="card-list-item"
+        wx:for="{{myCards}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="selectCard"
+      >
+        <!-- 封面 -->
+        <view class="card-list-cover">
+          <image src="{{item.cover || '/images/default-cover.png'}}" mode="aspectFill" />
+          <view class="card-list-cover-overlay" wx:if="{{item.status === 'draft'}}">
+            <text class="card-list-status">{{_t.draft}}</text>
+          </view>
+        </view>
+        <!-- 信息 -->
+        <view class="card-list-info">
+          <text class="card-list-name">{{item.title || _t.aiCardTitle}}</text>
+          <text class="card-list-desc" wx:if="{{item.user_name}}">{{item.user_name}} · {{item.user_company || ''}}</text>
+          <text class="card-list-desc" wx:else>{{item.user_company || item.user_title || ''}}</text>
+          <view class="card-list-meta">
+            <text class="card-list-views">👁 {{item.view_count || 0}}</text>
+            <text class="card-list-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{myCards.length === 0}}">
+      <text class="empty-icon">{{listError ? '⚠️' : '📇'}}</text>
+      <text class="text">{{listError ? (_t.loadError || '加载失败') : _t.noData}}</text>
+      <button class="btn-primary small" style="margin-top: 16px; width: auto; padding: 0 24px;" bindtap="listError ? 'loadMyCards' : 'createCard'">
+        {{listError ? (_t.retry || '重试') : _t.editCard}}
+      </button>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+
+  <!-- ==================== 详情模式（有 id 参数） ==================== -->
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading && mode === 'detail'}}">
+
+    <!-- 返回按钮 -->
+    <view class="detail-back" bindtap="backToList">
+      <text class="detail-back-icon">‹</text>
+      <text class="detail-back-label">{{_t.back}}</text>
+    </view>
 
     <!-- 名片头部 -->
     <view class="card-hero">

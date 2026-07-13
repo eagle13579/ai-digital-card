@@ -1,0 +1,248 @@
+/* 完善个人资料页 - Dark Minimal / Glassmorphism */
+/* 与 app.wxss 设计 Token 完全一致 */
+
+page {
+  background: var(--surface-primary);
+}
+
+.register-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+/* ===== Header ===== */
+.register-header {
+  text-align: center;
+  padding: var(--space-10) var(--space-4) var(--space-6);
+}
+
+.register-title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  display: block;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.register-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: var(--space-2);
+}
+
+/* ===== Scroll Area ===== */
+.register-scroll {
+  flex: 1;
+  padding-bottom: var(--space-4);
+}
+
+/* ===== Avatar Section ===== */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.avatar-uploader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.avatar-uploader:active {
+  border-color: var(--accent);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.avatar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-icon {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.avatar-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+
+.avatar-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.avatar-loading .spinner {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+/* ===== Form Card ===== */
+.form-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin: 0 var(--space-4);
+  padding: var(--space-5) var(--space-4);
+}
+
+/* ===== Form Elements ===== */
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+  font-weight: var(--weight-medium);
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: var(--danger);
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-3);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-input.error {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.form-textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  min-height: 80px;
+  transition: border-color 0.2s, background 0.2s;
+  line-height: 1.5;
+}
+
+.form-textarea:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.error-text {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--danger);
+  margin-top: 4px;
+  padding-left: 2px;
+}
+
+/* ===== Actions ===== */
+.form-actions {
+  margin: var(--space-8) var(--space-4) var(--space-4);
+}
+
+.form-actions .btn-primary {
+  height: 48px;
+  background: var(--gradient-accent);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-sm);
+  border: none;
+  width: 100%;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.form-actions .btn-primary:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.form-actions .btn-primary.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.skip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.skip-btn text {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.skip-btn:active {
+  opacity: 0.6;
+}
+
+/* ===== Safe Area ===== */
+.safe-bottom {
+  height: env(safe-area-inset-bottom, 20px);
+}

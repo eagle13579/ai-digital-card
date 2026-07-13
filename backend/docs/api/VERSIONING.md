@@ -134,8 +134,8 @@ main.py
   │     ├── get_integration_routers()→ wechat, wxpay, alipay, payment_callback
   │     ├── get_seo_routers()        → seo, ssr_router, geo
   │     └── get_mobile_routers()     → mobile_api batch/mobile routers
-  ├── simple_auth_router           ← 简单认证（独立 SQLite）
-  ├── simple_plan_router           ← 套餐路由（独立 SQLite）
+  ├── [已移除] simple_auth_router   ← 原为简单认证（独立 SQLite），已整合到 auth_router
+  ├── [已移除] simple_plan_router   ← 原为套餐路由（独立 SQLite），已整合
   └── audit.router                 ← 审计日志（单独注册，已 v1）
 
 路由版本化逻辑: _versionize() 自动将 /api/* → /api/v1/*，同时保留旧路径。

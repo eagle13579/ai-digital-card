@@ -101,8 +101,8 @@ Page({
     if (this.data.useRealApi) {
       authApi.wxMiniLogin(code)
         .then(result => {
-          const token = result.token
-          const mergedUserInfo = { ...(result.userInfo || {}), ...userInfo }
+          const token = result.token || result.access_token
+          const mergedUserInfo = { ...(result.userInfo || result.user || {}), ...userInfo }
 
           if (!token) {
             throw new Error('后端未返回 token')
@@ -110,9 +110,16 @@ Page({
 
           store.setAuth(token, mergedUserInfo)
 
+          // 检查是否为新用户 → 跳转完善资料页
+          const isNew = result.is_new !== undefined ? result.is_new : (mergedUserInfo.is_new || false)
+
           wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
           setTimeout(() => {
-            wx.switchTab({ url: '/pages/index/index' })
+            if (isNew) {
+              wx.navigateTo({ url: '/pages/register/index' })
+            } else {
+              wx.switchTab({ url: '/pages/index/index' })
+            }
           }, 1500)
         })
         .catch(err => {
@@ -130,7 +137,12 @@ Page({
             store.setAuth(result.token, mergedUserInfo)
             wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
             setTimeout(() => {
-              wx.switchTab({ url: '/pages/index/index' })
+              const isNew = result.is_new !== undefined ? result.is_new : true
+              if (isNew) {
+                wx.navigateTo({ url: '/pages/register/index' })
+              } else {
+                wx.switchTab({ url: '/pages/index/index' })
+              }
             }, 1500)
           } else {
             wx.showToast({ title: '登录失败', icon: 'none' })
@@ -166,8 +178,8 @@ Page({
     authApi.wxMiniLogin(code)
       .then(result => {
         // request.js 已解包，result 即后端响应中的 data 字段
-        const token = result.token
-        const userInfo = result.userInfo || {}
+        const token = result.token || result.access_token
+        const userInfo = result.userInfo || result.user || {}
 
         if (!token) {
           throw new Error('后端未返回 token')
@@ -176,9 +188,16 @@ Page({
         // 更新全局状态
         store.setAuth(token, userInfo)
 
+        // 检查是否为新用户 → 跳转完善资料页
+        const isNew = result.is_new !== undefined ? result.is_new : (userInfo.is_new || false)
+
         wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
         setTimeout(() => {
-          wx.switchTab({ url: '/pages/index/index' })
+          if (isNew) {
+            wx.navigateTo({ url: '/pages/register/index' })
+          } else {
+            wx.switchTab({ url: '/pages/index/index' })
+          }
         }, 1500)
       })
       .catch(err => {
@@ -199,7 +218,15 @@ Page({
       .then(result => {
         if (result.token) {
           store.setAuth(result.token, result.userInfo)
-          wx.switchTab({ url: '/pages/index/index' })
+
+          // Mock 模式下默认视为新用户（测试用）
+          const isNew = result.is_new !== undefined ? result.is_new : true
+
+          if (isNew) {
+            wx.navigateTo({ url: '/pages/register/index' })
+          } else {
+            wx.switchTab({ url: '/pages/index/index' })
+          }
         } else {
           wx.showToast({ title: '登录失败', icon: 'none' })
           this.setData({ loading: false })
@@ -240,7 +267,13 @@ Page({
           store.setAuth(result.token, mergedUserInfo)
           wx.showToast({ title: '模拟登录成功', icon: 'success', duration: 1500 })
           setTimeout(() => {
-            wx.switchTab({ url: '/pages/index/index' })
+            // Mock 模式下默认视为新用户（测试用）
+            const isNew = result.is_new !== undefined ? result.is_new : true
+            if (isNew) {
+              wx.navigateTo({ url: '/pages/register/index' })
+            } else {
+              wx.switchTab({ url: '/pages/index/index' })
+            }
           }, 1500)
         } else {
           this.showErrorModal('登录失败', '无法获取登录凭证，请重试')

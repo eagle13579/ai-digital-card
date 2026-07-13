@@ -1,0 +1,145 @@
+<view class="page-container register-page">
+  <!-- 头部 -->
+  <view class="register-header">
+    <text class="register-title">{{_t.registerTitle || '完善个人资料'}}</text>
+    <text class="register-subtitle">{{_t.registerSubtitle || '请填写以下信息，让更多人了解你'}}</text>
+  </view>
+
+  <scroll-view class="register-scroll" scroll-y enable-back-to-top>
+    <!-- 头像上传 -->
+    <view class="avatar-section">
+      <view class="avatar-uploader" bindtap="chooseAvatar">
+        <image class="avatar-image" wx:if="{{avatar}}" src="{{avatar}}" mode="aspectFill" />
+        <view class="avatar-placeholder" wx:else>
+          <text class="avatar-icon">📷</text>
+          <text class="avatar-label">{{_t.registerAvatar || '上传头像'}}</text>
+        </view>
+        <view class="avatar-loading" wx:if="{{avatarLoading}}">
+          <view class="spinner"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 表单 -->
+    <view class="form-card">
+      <!-- 姓名 -->
+      <view class="form-group">
+        <text class="form-label required">{{_t.registerName || '姓名'}}</text>
+        <input
+          class="form-input {{errors.name ? 'error' : ''}}"
+          type="text"
+          value="{{name}}"
+          placeholder="{{_t.registerNamePlaceholder || '请输入你的姓名'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onNameInput"
+          maxlength="32"
+        />
+        <text class="error-text" wx:if="{{errors.name}}">{{errors.name}}</text>
+      </view>
+
+      <!-- 公司 -->
+      <view class="form-group">
+        <text class="form-label required">{{_t.registerCompany || '公司'}}</text>
+        <input
+          class="form-input {{errors.company ? 'error' : ''}}"
+          type="text"
+          value="{{company}}"
+          placeholder="{{_t.registerCompanyPlaceholder || '请输入公司名称'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onCompanyInput"
+          maxlength="64"
+        />
+        <text class="error-text" wx:if="{{errors.company}}">{{errors.company}}</text>
+      </view>
+
+      <!-- 职位 -->
+      <view class="form-group">
+        <text class="form-label required">{{_t.registerPosition || '职位'}}</text>
+        <input
+          class="form-input {{errors.title ? 'error' : ''}}"
+          type="text"
+          value="{{title}}"
+          placeholder="{{_t.registerPositionPlaceholder || '请输入你的职位'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onTitleInput"
+          maxlength="64"
+        />
+        <text class="error-text" wx:if="{{errors.title}}">{{errors.title}}</text>
+      </view>
+
+      <!-- 手机号 -->
+      <view class="form-group">
+        <text class="form-label required">{{_t.registerPhone || '手机号'}}</text>
+        <input
+          class="form-input {{errors.phone ? 'error' : ''}}"
+          type="number"
+          value="{{phone}}"
+          placeholder="{{_t.registerPhonePlaceholder || '请输入手机号'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onPhoneInput"
+          maxlength="11"
+        />
+        <text class="error-text" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+      </view>
+
+      <!-- 个人简介 -->
+      <view class="form-group">
+        <text class="form-label">{{_t.registerIntro || '个人简介'}}</text>
+        <textarea
+          class="form-textarea"
+          value="{{intro}}"
+          placeholder="{{_t.registerIntroPlaceholder || '简单介绍一下自己...'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onIntroInput"
+          maxlength="500"
+          auto-height
+        />
+      </view>
+
+      <!-- 我能提供什么 -->
+      <view class="form-group">
+        <text class="form-label">{{_t.registerProvide || '我能提供什么'}}</text>
+        <textarea
+          class="form-textarea"
+          value="{{provide}}"
+          placeholder="{{_t.registerProvidePlaceholder || '例如：软件开发、投资咨询、市场推广...'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onProvideInput"
+          maxlength="200"
+          auto-height
+        />
+      </view>
+
+      <!-- 我需要什么 -->
+      <view class="form-group">
+        <text class="form-label">{{_t.registerNeed || '我需要什么'}}</text>
+        <textarea
+          class="form-textarea"
+          value="{{need}}"
+          placeholder="{{_t.registerNeedPlaceholder || '例如：寻找合作伙伴、客户资源、投资...'}}"
+          placeholder-style="color: rgba(255,255,255,0.25)"
+          bindinput="onNeedInput"
+          maxlength="200"
+          auto-height
+        />
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="form-actions">
+      <button
+        class="btn-primary {{loading ? 'disabled' : ''}}"
+        bindtap="submitForm"
+        loading="{{loading}}"
+      >
+        {{loading ? (_t.registerSaving || '保存中...') : (_t.registerSave || '保存并进入')}}
+      </button>
+      <view class="skip-btn" bindtap="skip">
+        <text>{{_t.skipGuide || '跳过，先看看'}}</text>
+      </view>
+    </view>
+
+    <!-- 底部安全区域 -->
+    <view class="safe-bottom"></view>
+  </scroll-view>
+</view>

@@ -33,7 +33,8 @@
     "pages/team/manage/index",
     "pages/organization/list/index",
     "pages/organization/detail/index",
-    "pages/organization/create/index"
+    "pages/organization/create/index",
+    "pages/register/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",

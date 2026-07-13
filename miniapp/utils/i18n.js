@@ -236,6 +236,33 @@ const zh = {
   // 其他
   officialTag: '官方',
   resourceUnits: '资源单位',
+
+  // 注册完善资料
+  registerTitle: '完善个人资料',
+  registerSubtitle: '请填写以下信息，让更多人了解你',
+  registerAvatar: '上传头像',
+  registerName: '姓名',
+  registerNamePlaceholder: '请输入你的姓名',
+  registerCompany: '公司',
+  registerCompanyPlaceholder: '请输入公司名称',
+  registerPosition: '职位',
+  registerPositionPlaceholder: '请输入你的职位',
+  registerPhone: '手机号',
+  registerPhonePlaceholder: '请输入手机号',
+  registerIntro: '个人简介',
+  registerIntroPlaceholder: '简单介绍一下自己...',
+  registerProvide: '我能提供什么',
+  registerProvidePlaceholder: '例如：软件开发、投资咨询、市场推广...',
+  registerNeed: '我需要什么',
+  registerNeedPlaceholder: '例如：寻找合作伙伴、客户资源、投资...',
+  registerSave: '保存并进入',
+  registerSaving: '保存中...',
+  registerSuccess: '资料保存成功',
+  registerNameRequired: '请输入姓名',
+  registerCompanyRequired: '请输入公司',
+  registerPositionRequired: '请输入职位',
+  registerPhoneRequired: '请输入手机号',
+  registerPhoneInvalid: '手机号格式不正确',
 }
 
 // ===== 英文语言包 =====
@@ -464,6 +491,33 @@ const en = {
   // 其他
   officialTag: 'Official',
   resourceUnits: ' resources',
+
+  // 注册完善资料
+  registerTitle: 'Complete Profile',
+  registerSubtitle: 'Fill in the info below to let others know you better',
+  registerAvatar: 'Upload Avatar',
+  registerName: 'Name',
+  registerNamePlaceholder: 'Enter your name',
+  registerCompany: 'Company',
+  registerCompanyPlaceholder: 'Enter company name',
+  registerPosition: 'Position',
+  registerPositionPlaceholder: 'Enter your position',
+  registerPhone: 'Phone',
+  registerPhonePlaceholder: 'Enter your phone number',
+  registerIntro: 'Bio',
+  registerIntroPlaceholder: 'Briefly introduce yourself...',
+  registerProvide: 'What I Can Offer',
+  registerProvidePlaceholder: 'e.g. Software dev, Consulting, Marketing...',
+  registerNeed: 'What I Need',
+  registerNeedPlaceholder: 'e.g. Partners, Clients, Investment...',
+  registerSave: 'Save & Continue',
+  registerSaving: 'Saving...',
+  registerSuccess: 'Profile saved successfully',
+  registerNameRequired: 'Please enter your name',
+  registerCompanyRequired: 'Please enter your company',
+  registerPositionRequired: 'Please enter your position',
+  registerPhoneRequired: 'Please enter your phone number',
+  registerPhoneInvalid: 'Invalid phone number format',
 }
 
 // ===== 语言包注册表 =====

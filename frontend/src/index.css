@@ -80,15 +80,15 @@
 
 /* Gradient utilities */
 .sky-gradient {
-  background: linear-gradient(135deg, var(--color-sky-500) 0%, var(--color-sky-700) 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent-dark) 100%);
 }
 
 .sky-gradient-light {
-  background: linear-gradient(135deg, var(--color-sky-50) 0%, var(--color-sky-100) 100%);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
 }
 
 .brand-gradient {
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 50%, var(--color-accent) 100%);
 }
 
 /* Decorative floating bubbles */
@@ -123,14 +123,14 @@
 
 /* Glass effect */
 .glass {
-  @apply bg-white/70 backdrop-blur-xl;
+  @apply bg-surface/70 backdrop-blur-xl;
 }
 
 .dark .glass,
 .glass.dark,
 [data-theme="dark"] .glass,
 .glass[data-theme="dark"] {
-  @apply bg-slate-800/70 backdrop-blur-xl;
+  @apply bg-dark-surface/70 backdrop-blur-xl;
 }
 
 /* Pulse glow for brand elements */
@@ -160,14 +160,14 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background: linear-gradient(90deg, var(--color-border-light) 25%, var(--color-neutral-bg) 50%, var(--color-border-light) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .dark .skeleton,
 [data-theme="dark"] .skeleton {
-  background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+  background: linear-gradient(90deg, var(--color-dark-border) 25%, var(--color-dark-surface) 50%, var(--color-dark-border) 75%);
   background-size: 200% 100%;
 }
 
@@ -262,7 +262,7 @@
 
 /* 响应式卡片内边距 */
 .responsive-card {
-  @apply p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl;
+  @apply p-4 sm:p-5 lg:p-6 rounded-xl;
 }
 
 /* 响应式头部高度 */
