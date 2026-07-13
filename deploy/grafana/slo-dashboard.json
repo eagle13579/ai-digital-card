@@ -1,10 +1,10 @@
 {
   "title": "AI数字名片 · SLO仪表盘",
   "panels": [
-    {"title":"API可用性(99.9%)","type":"gauge","target":"sum(rate(ncard_http_requests_total{status!~"5.."}[5m]))/sum(rate(ncard_http_requests_total[5m]))*100"},
+    {"title":"API可用性(99.9%)","type":"gauge","target":"sum(rate(ncard_http_requests_total{status!~'5..'}[5m]))/sum(rate(ncard_http_requests_total[5m]))*100"},
     {"title":"P50延迟","type":"stat","target":"histogram_quantile(0.5, sum(rate(ncard_http_request_duration_seconds_bucket[5m])) by (le))"},
     {"title":"P95延迟","type":"stat","target":"histogram_quantile(0.95, sum(rate(ncard_http_request_duration_seconds_bucket[5m])) by (le))"},
-    {"title":"错误率(<1%)","type":"stat","target":"sum(rate(ncard_http_requests_total{status=~"5.."}[5m]))/sum(rate(ncard_http_requests_total[5m]))*100"},
+    {"title":"错误率(<1%)","type":"stat","target":"sum(rate(ncard_http_requests_total{status=~'5..'}[5m]))/sum(rate(ncard_http_requests_total[5m]))*100"},
     {"title":"24h活跃用户","type":"stat","target":"ncard_users_active_24h"},
     {"title":"MRR","type":"stat","target":"ncard_billing_revenue_cents_total/100"}
   ]

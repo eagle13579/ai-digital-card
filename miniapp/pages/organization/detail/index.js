@@ -1,5 +1,4 @@
 const { organizationApi } = require('../../../utils/api')
-const { MockService } = require('../../../utils/mockService')
 
 Page({
   data: {
@@ -61,60 +60,15 @@ Page({
   },
 
   async fetchOrganization() {
-    if (!MockService.USE_MOCK) {
-      try {
-        return await organizationApi.get(this.data.orgId)
-      } catch (e) {
-        console.warn('[OrgDetail] 获取组织详情失败:', e)
-      }
-    }
-    await MockService.mockDelay(200)
-    return {
-      id: this.data.orgId,
-      name: 'AI数智名片技术委员会',
-      slug: 'ai-digital-card-tech',
-      description: '负责AI数智名片产品的技术研发与标准制定',
-      industry: '互联网/软件',
-      size: '11-50人',
-      owner_id: 1,
-      member_count: 15,
-      invite_count: 2,
-      is_active: true,
-      created_at: new Date().toISOString(),
-    }
+    return await organizationApi.get(this.data.orgId)
   },
 
   async fetchMembers() {
-    if (!MockService.USE_MOCK) {
-      try {
-        return await organizationApi.members(this.data.orgId)
-      } catch (e) {
-        console.warn('[OrgDetail] 获取成员列表失败:', e)
-      }
-    }
-    await MockService.mockDelay(200)
-    return [
-      { id: 1, user_id: 'u001', name: '张伟', avatar: '', phone: '', company: '科技创新有限公司', title: '产品经理', role: 'owner', joined_at: new Date().toISOString() },
-      { id: 2, user_id: 'u002', name: '李娜', avatar: '', phone: '', company: '金融投资集团', title: '投资总监', role: 'admin', joined_at: new Date().toISOString() },
-      { id: 3, user_id: 'u003', name: '王强', avatar: '', phone: '', company: '人工智能研究院', title: '首席技术官', role: 'member', joined_at: new Date().toISOString() },
-      { id: 4, user_id: 'u004', name: '赵丽', avatar: '', phone: '', company: '互联网公司', title: '技术总监', role: 'member', joined_at: new Date().toISOString() },
-      { id: 5, user_id: 'u005', name: '陈明', avatar: '', phone: '', company: '创业孵化平台', title: '孵化总监', role: 'member', joined_at: new Date().toISOString() },
-    ]
+    return await organizationApi.members(this.data.orgId)
   },
 
   async fetchInvites() {
-    if (!MockService.USE_MOCK) {
-      try {
-        return await organizationApi.invites(this.data.orgId)
-      } catch (e) {
-        console.warn('[OrgDetail] 获取邀请列表失败:', e)
-      }
-    }
-    await MockService.mockDelay(200)
-    return [
-      { id: 1, org_id: this.data.orgId, invitee_email: 'test@example.com', invitee_phone: '', role: 'member', status: 'pending', created_at: new Date().toISOString(), inviter_id: 'u001' },
-      { id: 2, org_id: this.data.orgId, invitee_email: 'newuser@example.com', invitee_phone: '', role: 'admin', status: 'pending', created_at: new Date().toISOString(), inviter_id: 'u001' },
-    ]
+    return await organizationApi.invites(this.data.orgId)
   },
 
   switchTab(e) {

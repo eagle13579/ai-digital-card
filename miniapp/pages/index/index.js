@@ -1,8 +1,8 @@
 /**
  * 首页 - 名片列表 + 推荐
- * 使用MockService获取数据
+ * 使用真实API获取数据
  */
-const { MockService } = require('../../utils/mockService')
+const { userApi, brochureApi, matchApi, trustApi, visitorApi, platformApi } = require('../../utils/api')
 const store = require('../../utils/store')
 const i18n = require('../../utils/i18n')
 const { Logger } = require('../../utils/util')
@@ -49,8 +49,8 @@ Page({
   async loadPlatformRecommend() {
     this.setData({ platformLoading: true })
     try {
-      const res = await MockService.getPlatformList()
-      const platforms = (res.data || []).slice(0, 4).map((p, index) => ({
+      const res = await platformApi.list()
+      const platforms = (res || []).slice(0, 4).map((p, index) => ({
         id: p.id,
         name: p.name,
         desc: p.description || '',
@@ -100,10 +100,10 @@ Page({
     this.setData({ loading: true })
     try {
       const [profile, brochures, trustNet, recommend] = await Promise.all([
-        MockService.getUserProfile().catch(() => ({ userInfo: {}, memberLevel: 'free' })),
-        MockService.getBrochures().catch(() => []),
-        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
-        MockService.getRecommendList().catch(() => []),
+        userApi.getProfile().catch(() => ({ userInfo: {}, memberLevel: 'free' })),
+        brochureApi.list().catch(() => []),
+        trustApi.getNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
+        matchApi.getRecommendList().catch(() => []),
       ])
 
       const userInfoData = profile.userInfo || profile
@@ -119,7 +119,7 @@ Page({
       let stats = { visitors: 0, matches: recommendData.length, trust: trustCount }
 
       if (brochure) {
-        MockService.getVisitorStats().then(vStats => {
+        visitorApi.getStats(brochure.id).then(vStats => {
           if (vStats) {
             this.setData({
               stats: { ...this.data.stats, visitors: vStats.total_visits || vStats.total || 0 },

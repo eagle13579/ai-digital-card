@@ -10,6 +10,11 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = "-v --tb=short --strict-markers -p no:warnings"
+markers = [
+    "fuzzing: fuzz testing",
+    "slow: slow integration tests",
+    "integration: integration tests",
+]
 
 [tool.coverage.run]
 source = ["app"]

@@ -11,7 +11,8 @@ At least 8 tests covering:
 from unittest.mock import AsyncMock, patch
 
 import pytest
-import strawberry
+
+strawberry = pytest.importorskip("strawberry", reason="strawberry-graphql not available")
 
 from app.graphql.schema import schema
 

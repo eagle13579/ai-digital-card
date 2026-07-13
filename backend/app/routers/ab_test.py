@@ -388,7 +388,7 @@ async def record_event(
 @router.get("/experiments/{experiment_id}/results")
 async def get_results(
     experiment_id: int,
-    method: str = Query("chi_square", regex="^(chi_square|bayesian)$"),
+    method: str = Query("chi_square", pattern="^(chi_square|bayesian)$"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -473,7 +473,7 @@ async def list_events(
 @router.post("/{experiment_id}/auto-decision")
 async def trigger_auto_decision(
     experiment_id: int,
-    method: str = Query("chi_square", regex="^(chi_square|bayesian)$"),
+    method: str = Query("chi_square", pattern="^(chi_square|bayesian)$"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
