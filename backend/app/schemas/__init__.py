@@ -42,6 +42,8 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    pages: list[PageSchema] = []
+
     model_config = {"from_attributes": True}
 
 
@@ -65,6 +67,8 @@ class PageSchema(BaseModel):
     """视频/多媒体文件 URL"""
     ai_summary: str = ""
 
+    pages: list[PageSchema] = []
+
     model_config = {"from_attributes": True}
 
 
@@ -72,8 +76,8 @@ class BrochureCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=128)
     cover: str = ""
     purpose: str = ""
-    album_meta: Optional[str] = None
     pages: list[PageSchema] = []
+    album_meta: Optional[str] = None
 
 
 class BrochureUpdate(BaseModel):
@@ -99,9 +103,20 @@ class BrochureResponse(BaseModel):
     platform_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
+
     pages: list[PageSchema] = []
 
     model_config = {"from_attributes": True}
+
+
+class VisibilityUpdate(BaseModel):
+    visibility: str = "public"
+
+
+class VisibilityResponse(BaseModel):
+    brochure_id: int
+    visibility: str
+    message: str = ""
 
 
 # ── Tag ───────────────────────────────────────────────────────────────────────
@@ -126,6 +141,8 @@ class TagResponse(BaseModel):
     source: str
     created_at: datetime
 
+    pages: list[PageSchema] = []
+
     model_config = {"from_attributes": True}
 
 
@@ -140,6 +157,8 @@ class MatchResponse(BaseModel):
     common_tags: str = "[]"
     source: str
     created_at: datetime
+
+    pages: list[PageSchema] = []
 
     model_config = {"from_attributes": True}
 
@@ -193,6 +212,8 @@ class VisitorLogResponse(BaseModel):
     contact_msg: str
     visit_time: datetime
 
+    pages: list[PageSchema] = []
+
     model_config = {"from_attributes": True}
 
 
@@ -207,6 +228,8 @@ class TrustResponse(BaseModel):
     user_id: int
     trusted_user_id: int
     created_at: datetime
+
+    pages: list[PageSchema] = []
 
     model_config = {"from_attributes": True}
 
