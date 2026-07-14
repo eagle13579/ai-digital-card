@@ -70,7 +70,10 @@ echo "✅ Step 2 完成: $TOTAL_SAMPLES 训练样本"
 echo ""
 echo "━━━ [Step 3/4] 训练V2三塔匹配模型 ━━━"
 
-TRAIN_OUTPUT=$(python scripts/train_matching_model_v2.py 2>&1)
+# 基础设施层保护：Step 3 训练耗时可能 >30s，加 timeout 防卡死
+TIMEOUT_SEC=55
+echo "  ⏱️  训练超时保护: ${TIMEOUT_SEC}秒"
+TRAIN_OUTPUT=$(timeout $TIMEOUT_SEC python scripts/train_matching_model_v2.py 2>&1)
 TRAIN_EXIT=$?
 
 if [ $TRAIN_EXIT -ne 0 ]; then
