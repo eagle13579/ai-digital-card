@@ -25,11 +25,8 @@ Page({
   },
 
   onLoad() {
-    // 检查是否已登录
-    const { isLoggedIn } = store.getState()
-    if (isLoggedIn) {
-      wx.switchTab({ url: '/pages/index/index' })
-    }
+    // 登录页始终显示，不自动跳转
+    // 登录态由各受保护页面的三层守卫处理
   },
 
   // 开发测试用：清除登录态回到登录页

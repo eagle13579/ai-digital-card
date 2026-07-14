@@ -35,6 +35,11 @@
     <text class="link" bindtap="goPrivacy">《隐私政策》</text>
   </view>
 
+  <!-- 调试用：清除登录态回到登录页 -->
+  <view class="dev-tools" bindtap="clearLogin">
+    <text style="font-size:24rpx;color:#999;margin-top:20rpx;display:block;text-align:center;">清除登录态</text>
+  </view>
+
   <view class="error-modal" wx:if="{{showError}}" catchtap="hideError">
     <view class="error-card" catchtap="">
       <view class="error-icon">⚠️</view>
