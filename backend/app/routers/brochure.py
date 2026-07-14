@@ -218,8 +218,7 @@ async def create_brochure(
     
     # 重新查询以加载 pages 关系（避免 MissingGreenlet）
     result = await db.execute(
-        select(Brochure).where(Brochure.id == brochure.id)
-        .options(selectinload(Brochure.pages))
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure.id)
     )
     brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
@@ -253,7 +252,7 @@ async def get_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册详情（含页面数据）"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -269,7 +268,7 @@ async def get_brochure_by_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """通过分享token获取画册（公开访问）"""
-    result = await db.execute(select(Brochure).where(Brochure.share_token == share_token))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.share_token == share_token))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在或链接已失效")
@@ -291,7 +290,7 @@ async def update_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """更新画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -339,7 +338,7 @@ async def delete_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """删除画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -358,7 +357,7 @@ async def publish_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """发布画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -382,7 +381,7 @@ async def refresh_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """刷新分享token"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
