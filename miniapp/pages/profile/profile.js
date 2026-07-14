@@ -23,6 +23,12 @@ Page({
   },
 
   onLoad() {
+    // 登录守卫：未登录立即跳登录页
+    const { isLoggedIn } = store.getState()
+    if (!isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     this._loadI18n()
     this.loadProfile()
   },

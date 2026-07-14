@@ -17,6 +17,13 @@ Page({
   },
 
   onLoad(options) {
+    // 登录守卫：未登录立即跳登录页
+    const store = require('../../utils/store')
+    const { isLoggedIn } = store.getState()
+    if (!isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     this._loadI18n()
     const cardId = options.id
     if (cardId) {
