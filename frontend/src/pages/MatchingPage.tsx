@@ -41,6 +41,7 @@ export default function MatchingPage() {
   const [sortBy, setSortBy] = useState<'score' | 'title'>('score');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [connectingId, setConnectingId] = useState<number | null>(null);
+  const [loadingRecommend, setLoadingRecommend] = useState(false);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -64,6 +65,34 @@ export default function MatchingPage() {
       } catch {}
     };
     fetchCardList();
+  }, []);
+
+  // ============================================================
+  // 加载预存匹配推荐
+  // ============================================================
+  useEffect(() => {
+    const fetchRecommend = async () => {
+      setLoadingRecommend(true);
+      try {
+        const res = await api.get<{ matches: any[]; total: number }>('/api/match/recommend');
+        if (res.code === 200 && res.data) {
+          const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+            type: 'product' as const,
+            id: m.user_id,
+            title: m.user_name || '',
+            category: m.user_company || '',
+            score: m.score,
+            reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+          }));
+          setMatchResults(items);
+        }
+      } catch {
+        // 静默失败，用户可手动触发匹配
+      } finally {
+        setLoadingRecommend(false);
+      }
+    };
+    fetchRecommend();
   }, []);
 
   // ============================================================
@@ -246,7 +275,12 @@ export default function MatchingPage() {
       )}
 
       {/* 匹配结果 */}
-      {matchLoading ? (
+      {loadingRecommend ? (
+        <div className="flex flex-col items-center py-16 gap-3">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm text-text-muted">{t('match.loadingRecommend')}...</p>
+        </div>
+      ) : matchLoading ? (
         <div className="flex flex-col items-center py-16 gap-3">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
           <p className="text-sm text-text-muted">{t('match.analyzing')}...</p>
