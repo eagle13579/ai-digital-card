@@ -189,7 +189,7 @@ def business_snapshot() -> str:
         ("published_brochures", "SELECT COUNT(*) FROM brochures WHERE status='published'"),
         ("tags", "SELECT COUNT(*) FROM user_tags"),
         ("matches", "SELECT COUNT(*) FROM match_records"),
-        ("connections", "SELECT COUNT(*) FROM connections WHERE status='approved'"),
+        ("connections", "SELECT COUNT(*) FROM connections WHERE status='accepted'"),
         ("visits", "SELECT COUNT(*) FROM visitor_logs"),
     ]:
         cursor.execute(sql)

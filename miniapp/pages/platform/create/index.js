@@ -1,4 +1,5 @@
 const { MockService } = require('../../../utils/mockService')
+const { listPlatforms, createPlatform } = require('../../../utils/platform-bridge')
 const store = require('../../../utils/store')
 
 const PROVINCES = [
@@ -72,6 +73,7 @@ Page({
     pickerTitle: '',
     pickerOptions: [],
     pickerValue: '',
+    useRealApi: true,
     pickerType: '',
   },
 
@@ -175,7 +177,9 @@ Page({
     wx.showLoading({ title: '提交中...' })
 
     try {
-      const result = await MockService.createPlatform({
+      const result = this.data.useRealApi
+        ? await createPlatform(formData, true)
+        : await MockService.createPlatform({
         name: formData.name.trim(),
         description: formData.desc.trim(),
         industries: selectedIndustries,
