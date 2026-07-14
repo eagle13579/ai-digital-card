@@ -25,11 +25,8 @@ Page({
   },
 
   onLoad() {
-    // 检查是否已登录
-    const { isLoggedIn } = store.getState()
-    if (isLoggedIn) {
-      wx.switchTab({ url: '/pages/index/index' })
-    }
+    // 登录页不自动跳转 — 让用户自主决定登录或跳过
+    // （旧逻辑: 检测到已登录就跳首页，但测试阶段需要始终显示登录页）
   },
 
   // ========== 微信按钮授权登录（推荐方式，兼容新版微信） ==========
