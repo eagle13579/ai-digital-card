@@ -19,7 +19,13 @@ App({
   },
 
   onShow() {
-    // 小程序切前台时刷新数据（可选）
+    // 全局登录守卫：未登录且不在登录页时自动跳转
+    const pages = getCurrentPages()
+    const currentRoute = pages.length > 0 ? pages[pages.length - 1].route : ''
+    const state = this.getState()
+    if (!state.isLoggedIn && currentRoute !== 'pages/login/index') {
+      wx.navigateTo({ url: '/pages/login/index' })
+    }
   },
 
   onHide() {

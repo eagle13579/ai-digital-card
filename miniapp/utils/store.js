@@ -17,6 +17,9 @@ const STORAGE_KEYS = {
   LOCALE: 'app_locale',
 }
 
+/** 持久化用户信息白名单：仅存储非敏感字段 */
+const SAFE_FIELDS = ['nickName', 'avatar', 'avatarUrl', 'name', 'company', 'title']
+
 class Store {
   constructor() {
     this._state = {
@@ -77,7 +80,14 @@ class Store {
     this._state.isLoggedIn = true
     wx.setStorageSync('token', token)
     if (userInfo) {
-      wx.setStorageSync('userInfo', userInfo)
+      // 仅持久化白名单字段，避免手机号/邮箱等敏感信息落盘
+      const safeInfo = {}
+      SAFE_FIELDS.forEach(field => {
+        if (userInfo[field] !== undefined) {
+          safeInfo[field] = userInfo[field]
+        }
+      })
+      wx.setStorageSync('userInfo', safeInfo)
     }
     this._emit()
   }

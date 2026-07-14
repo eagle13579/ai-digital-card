@@ -14,6 +14,7 @@
     "pages/qrcode/index",
     "pages/membership/index",
     "pages/agreement/privacy/index",
+    "pages/agreement/user",
     "pages/network/graph/index",
     "pages/network/import/index",
     "pages/ai/match/index",

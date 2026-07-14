@@ -12,8 +12,8 @@ const { get, post, put, del } = require('./request')
 // ===== 认证模块 =====
 const authApi = {
   /** 微信小程序一键登录（wx.login → code → JWT） */
-  wxMiniLogin(code) {
-    return post('/api/auth/wx-mini-login', { code }, { noAuth: true })
+  wxMiniLogin(code, userInfo) {
+    return post('/api/auth/wx-mini-login', { code, user_info: userInfo }, { noAuth: true })
   },
 
   /** 手机号 + 验证码登录（H5/备用） */
