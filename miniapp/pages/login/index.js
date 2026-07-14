@@ -32,6 +32,21 @@ Page({
     }
   },
 
+  // 开发测试用：清除登录态回到登录页
+  clearLogin() {
+    wx.showModal({
+      title: '清除登录态',
+      content: '确定要退出当前账号，回到登录页吗？',
+      success: (res) => {
+        if (res.confirm) {
+          store.logout()
+          wx.clearStorageSync()
+          wx.reLaunch({ url: '/pages/login/index' })
+        }
+      },
+    })
+  },
+
   // ========== 微信授权登录 ==========
   wxLogin() {
     this.setData({ loading: true })
