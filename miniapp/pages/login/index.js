@@ -165,9 +165,9 @@ Page({
   _realApiLogin(code) {
     authApi.wxMiniLogin(code)
       .then(result => {
-        // request.js 已解包，result 即后端响应中的 data 字段
-        const token = result.token
-        const userInfo = result.userInfo || {}
+        // request.js 已解包，result 即后端响应体
+        const token = result.access_token
+        const userInfo = result.user || {}
 
         if (!token) {
           throw new Error('后端未返回 token')
@@ -218,38 +218,11 @@ Page({
   },
 
   goAgreement() {
-    wx.showToast({ title: '用户协议', icon: 'none' })
+    wx.navigateTo({ url: '/pages/agreement/user' })
   },
 
   goPrivacy() {
-    wx.showToast({ title: '隐私政策', icon: 'none' })
-  },
-
-  mockWechatLogin() {
-    this.setData({ loading: true })
-    const mockUserInfo = {
-      nickName: '微信用户',
-      avatarUrl: '',
-      name: '微信用户',
-      avatar: '',
-    }
-    MockService.login({ code: 'test_code' })
-      .then(result => {
-        if (result.token) {
-          const mergedUserInfo = { ...(result.userInfo || {}), ...mockUserInfo }
-          store.setAuth(result.token, mergedUserInfo)
-          wx.showToast({ title: '模拟登录成功', icon: 'success', duration: 1500 })
-          setTimeout(() => {
-            wx.switchTab({ url: '/pages/index/index' })
-          }, 1500)
-        } else {
-          this.showErrorModal('登录失败', '无法获取登录凭证，请重试')
-        }
-      })
-      .catch(err => {
-        console.error('[Login] Mock 登录失败:', err)
-        this.showErrorModal('网络连接失败', '无法连接服务器，请检查网络设置后重试')
-      })
+    wx.navigateTo({ url: '/pages/agreement/privacy/index' })
   },
 
   showErrorModal(title, desc) {

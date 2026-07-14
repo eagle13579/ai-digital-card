@@ -20,12 +20,6 @@
   </view>
 
   <view class="login-form">
-    <view class="profile-row">
-      <button class="btn-avatar" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-        <image class="avatar-preview" src="{{avatarPreview || '/images/default-avatar.png'}}"></image>
-      </button>
-      <input class="nickname-input" type="nickname" placeholder="请输入昵称" bindchange="onNicknameChange" />
-    </view>
     <button class="btn-wechat" bindtap="wxLogin" loading="{{loading}}">
       <view class="wechat-icon">💚</view>
       <text class="wechat-text">{{loading ? '登录中...' : '一键登录'}}</text>
