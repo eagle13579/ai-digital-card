@@ -600,16 +600,66 @@ Page({
 
     wx.showLoading({ title: '生成中...' })
     try {
-      const data = { ...this.data.formData }
+      const fd = this.data.formData
       Logger.info('画册创建页', '开始生成画册', {
-        name: data.name,
-        company: data.company,
-        industry: data.industry,
+        name: fd.name,
+        company: fd.company,
+        industry: fd.industry,
       })
 
+      // 构建后端期望的 brochure/pages 结构
+      const industry = fd.industry === 'other' ? fd.industryCustom : fd.industry
+      const skillTags = fd.skillTags || []
+      const purposes = (fd.purposes && fd.purposes.length > 0)
+        ? fd.purposes.join(',')
+        : (fd.purpose || '')
+      const pageData = {
+        title: (fd.name || '未知') + '的电子名片',
+        cover: fd.avatar || '',
+        purpose: purposes,
+        album_meta: null,
+        pages: [
+          {
+            content_type: 'profile',
+            content: JSON.stringify({
+              name: fd.name || '',
+              title: fd.title || '',
+              company: fd.company || '',
+              email: fd.email || '',
+              phone: fd.phone || '',
+              wechat: fd.wechat || '',
+              bio: fd.bio || '',
+              education: fd.education || '',
+              school: fd.school || '',
+              major: fd.major || '',
+              industry: industry || '',
+              companySize: fd.companySize || '',
+              companyDesc: fd.companyDesc || '',
+              development: fd.development || '',
+              style: fd.style || 'professional',
+            }),
+            sort_order: 0,
+          },
+          {
+            content_type: 'skills',
+            content: JSON.stringify(skillTags),
+            sort_order: 1,
+          },
+          {
+            content_type: 'contact',
+            content: JSON.stringify({
+              provides: fd.provides || [],
+              needs: fd.needs || [],
+              purpose: purposes,
+            }),
+            sort_order: 2,
+          },
+        ],
+      }
+
       const result = this.data.useRealApi
-        ? await brochureApi.create(data)
-        : await MockService.createBrochure(data)
+        ? await brochureApi.create(pageData)
+        : await MockService.createBrochure(pageData)
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
 
       if (result && result.id) {
