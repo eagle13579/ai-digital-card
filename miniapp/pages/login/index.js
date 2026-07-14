@@ -22,6 +22,8 @@ Page({
     showError: false,
     errorTitle: '',
     errorDesc: '',
+    avatarPreview: '',
+    userNickname: '',
   },
 
   onLoad() {
@@ -54,51 +56,46 @@ Page({
     })
   },
 
-  // ========== 微信授权登录（旧版备用） ==========
+  // ========== 微信头像选择器（新版chooseAvatar API） ==========
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail
+    this.setData({ avatarPreview: avatarUrl })
+    if (this.data.userNickname) {
+      wx.setStorageSync('pendingUserInfo', { nickName: this.data.userNickname, avatarUrl })
+    }
+  },
+
+  // ========== 微信昵称输入 | ==========
+  onNicknameChange(e) {
+    const nickname = e.detail.value
+    this.setData({ userNickname: nickname })
+    if (this.data.avatarPreview) {
+      wx.setStorageSync('pendingUserInfo', { nickName: nickname, avatarUrl: this.data.avatarPreview })
+    }
+  },
+
+  // ========== 一键登录 ==========
   wxLogin() {
     this.setData({ loading: true })
-
-    if (wx.getUserProfile) {
-      wx.getUserProfile({
-        desc: '用于完善会员资料',
-        success: (userRes) => {
-          this._handleUserProfile(userRes.userInfo)
-        },
-        fail: () => {
-          wx.login({
-            success: (res) => {
-              if (res.code) {
-                this._handleLogin(res.code)
-              } else {
-                wx.showToast({ title: '微信登录失败', icon: 'none' })
-                this.setData({ loading: false })
-              }
-            },
-            fail: (err) => {
-              console.error('[Login] wx.login 失败:', err)
-              wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
-              this.setData({ loading: false })
-            },
-          })
-        },
-      })
-    } else {
-      wx.login({
-        success: (res) => {
-          if (res.code) {
-            this._handleLogin(res.code)
-          } else {
-            wx.showToast({ title: '微信登录失败', icon: 'none' })
-            this.setData({ loading: false })
-          }
-        },
-        fail: (err) => {
-          console.error('[Login] wx.login 失败:', err)
-          wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+    wx.login({
+      success: (res) => {
+        if (res.code) {
+          // 收集用户在页面上设置的微信头像和昵称
+          const userInfo = {}
+          if (this.data.userNickname) userInfo.nickName = this.data.userNickname
+          if (this.data.avatarPreview) userInfo.avatarUrl = this.data.avatarPreview
+          this._handleLoginWithProfile(res.code, userInfo)
+        } else {
+          wx.showToast({ title: '微信登录失败', icon: 'none' })
           this.setData({ loading: false })
-        },
-      })
-    }
+        }
+      },
+      fail: (err) => {
+        console.error('[Login] wx.login 失败:', err)
+        wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+        this.setData({ loading: false })
+      },
+    })
   },
 
   _handleUserProfile(userInfo) {
