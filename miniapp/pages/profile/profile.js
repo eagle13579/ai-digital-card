@@ -2,6 +2,7 @@
  * 我的 - 个人中心/会员信息/设置 (i18n enabled)
  */
 const { MockService } = require('../../utils/mockService')
+const { getProfile, getBrochures, getTrustNetwork, getVisitorStats } = require('../../utils/compliance-bridge')
 const i18n = require('../../utils/i18n')
 const store = require('../../utils/store')
 
@@ -20,6 +21,7 @@ Page({
     deleteConfirmText: '',
     // i18n
     _t: {},
+    useRealApi: true,
   },
 
   onLoad() {
@@ -42,11 +44,12 @@ Page({
   async loadProfile() {
     this.setData({ loading: true })
     try {
+      const useReal = this.data.useRealApi
       const [profile, brochures, trustNet, visitorStats] = await Promise.all([
-        MockService.getProfile(),
-        MockService.getBrochures(),
-        MockService.getTrustNetwork(),
-        MockService.getVisitorStats(),
+        getProfile(useReal),
+        getBrochures(useReal),
+        getTrustNetwork(useReal),
+        getVisitorStats(useReal),
       ])
 
       const brochureList = Array.isArray(brochures) ? brochures : (brochures.data || [])
