@@ -39,7 +39,7 @@ from app.models.business_card import BusinessCard
 from app.models.business_need import BusinessNeed
 from app.models.circuit_breaker import CircuitBreakerState
 from app.models.contract import Contract, PaymentTransaction
-from app.models.deal import Deal as BusinessDeal, DealActivity
+from app.models.deal import BusinessDeal, DealActivity
 from app.models.enterprise import Enterprise, EnterpriseRelation
 from app.models.escrow import Deal as EscrowDeal, Milestone, Dispute
 from app.models.import_history import ImportHistory
