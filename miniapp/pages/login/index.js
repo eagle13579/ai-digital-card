@@ -139,7 +139,12 @@ Page({
       MockService.login({ code })
         .then(result => {
           if (result.token) {
-            const mergedUserInfo = { ...(result.userInfo || {}), ...userInfo }
+            const mergedUserInfo = { 
+              ...userInfo, 
+              ...(result.userInfo || {}),
+              name: result.userInfo?.name || userInfo.nickName || userInfo.name,
+              avatar: result.userInfo?.avatar || userInfo.avatarUrl || userInfo.avatar,
+            }
             store.setAuth(result.token, mergedUserInfo)
             wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
             setTimeout(() => {
@@ -208,11 +213,18 @@ Page({
    * Mock 登录（开发/降级用）
    */
   _mockLogin(code) {
+    console.log('[Login] _mockLogin - 开始Mock登录')
     MockService.login({ code })
       .then(result => {
+        console.log('[Login] _mockLogin - Mock登录结果:', JSON.stringify(result))
         if (result.token) {
           store.setAuth(result.token, result.userInfo)
-          wx.switchTab({ url: '/pages/index/index' })
+          const state = store.getState()
+          console.log('[Login] _mockLogin - store状态:', JSON.stringify(state))
+          wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+          }, 1500)
         } else {
           wx.showToast({ title: '登录失败', icon: 'none' })
           this.setData({ loading: false })

@@ -13,7 +13,7 @@ const { get, post, put, del } = require('./request')
 const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi, sixDegreesApi, organizationApi, platformApi } = require('./api')
 
 const MockService = {
-  USE_MOCK: true,
+  USE_MOCK: false,
 
   async mockDelay(min = 100, max = 300) {
     return new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))
@@ -37,12 +37,19 @@ const MockService = {
 
   getTestUserByToken() {
     const { token } = store.getState()
+    console.log('[MockService] getTestUserByToken - 当前token:', token)
+    
     if (!token) {
       console.warn('[MockService] token为空，返回free用户')
       return TEST_USERS.free
     }
+    
+    const availableTokens = Object.values(TEST_USERS).map(u => u.token)
+    console.log('[MockService] 可用token列表:', availableTokens)
+    
     for (const [level, user] of Object.entries(TEST_USERS)) {
       if (user.token === token) {
+        console.log('[MockService] token匹配成功，返回用户:', level, user.userInfo.name)
         return user
       }
     }
@@ -52,10 +59,22 @@ const MockService = {
 
   async login(data) {
     if (this.USE_MOCK) {
+      console.log('[MockService] login - 进入Mock登录模式')
+      console.log('[MockService] login - 传入数据:', JSON.stringify(data))
       await this.mockDelay()
       const user = TEST_USERS.gold
+      console.log('[MockService] login - 选择的用户:', user.memberLevel, user.userInfo.name)
+      console.log('[MockService] login - 用户token:', user.token)
+      console.log('[MockService] login - 用户信息:', JSON.stringify(user.userInfo))
       store.setAuth(user.token, user.userInfo)
       if (user.memberLevel) store.updateMemberLevel(user.memberLevel)
+      
+      const afterState = store.getState()
+      console.log('[MockService] login - store状态更新后:')
+      console.log('  isLoggedIn:', afterState.isLoggedIn)
+      console.log('  token:', afterState.token)
+      console.log('  userInfo:', JSON.stringify(afterState.userInfo))
+      
       return {
         token: user.token,
         userInfo: user.userInfo,
