@@ -1,5 +1,4 @@
-const { MockService } = require('../../../utils/mockService')
-const { sixDegreesApi } = require('../../../utils/api')
+const { getNetwork, findPath, getRelations, addTrust } = require('../../../utils/network-bridge')
 const store = require('../../../utils/store')
 
 // Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
@@ -13,6 +12,7 @@ const MAX_NODES = 20
 
 Page({
   data: {
+    useRealApi: true,
     nodeCount: 0,
     hasData: true,
     // BFS相关
@@ -87,20 +87,14 @@ Page({
     try {
       const state = store.getState()
       const userId = state.userInfo?.id || 'u001'
+      const useRealApi = this.data.useRealApi
 
-      if (MockService.USE_MOCK) {
-        console.log('[Graph] 开始加载Mock数据（六度人脉）')
-        const res = await MockService.getSixDegreesNetwork(userId)
-        const data = res.data || res
-        console.log('[Graph] 数据加载完成:', JSON.stringify(data))
-        this._buildGraphFromSixDegrees(data)
-        console.log('[Graph] 图谱构建完成:', this.nodes.length, 'nodes,', this.edges.length, 'edges')
-      } else {
-        console.log('[Graph] 开始加载真实API数据（六度人脉）')
-        const res = await sixDegreesApi.network(userId)
-        const data = res.data || res || { nodes: [], links: [] }
-        this._buildGraphFromSixDegrees(data)
-      }
+      console.log(`[Graph] 开始加载${useRealApi ? '真实API' : 'Mock'}数据（人脉网络）`)
+      const res = await getNetwork(useRealApi)
+      const data = res.data || res || { nodes: [], links: [] }
+      console.log('[Graph] 数据加载完成:', JSON.stringify(data))
+      this._buildGraphFromSixDegrees(data)
+      console.log('[Graph] 图谱构建完成:', this.nodes.length, 'nodes,', this.edges.length, 'edges')
     } catch (err) {
       console.error('[Graph] 加载数据失败:', err)
       wx.showToast({ title: '加载失败', icon: 'none' })
@@ -637,18 +631,12 @@ Page({
     this.setData({ searchingPath: true })
 
     try {
-      if (MockService.USE_MOCK) {
-        const state = store.getState()
-        const userId = state.userInfo?.id || 'u001'
-        const result = await MockService.getSixDegreesPath(userId, targetId)
-        this._handlePathResult(result)
-      } else {
-        const state = store.getState()
-        const userId = state.userInfo?.id || 'u001'
-        const res = await sixDegreesApi.path(userId, targetId)
-        const result = res.data || res || { distance: -1, path: [] }
-        this._handlePathResult(result)
-      }
+      const state = store.getState()
+      const userId = state.userInfo?.id || 'u001'
+      const useRealApi = this.data.useRealApi
+      const res = await findPath(userId, targetId, undefined, useRealApi)
+      const result = res.data || res || { distance: -1, path: [] }
+      this._handlePathResult(result)
     } catch (err) {
       console.error('[Graph] BFS搜索失败:', err)
       this.setData({
@@ -690,11 +678,7 @@ Page({
                   relation: relation,
                   trust_score: 80,
                 }
-                if (MockService.USE_MOCK) {
-                  await MockService.createSixDegreesRelation(payload)
-                } else {
-                  await sixDegreesApi.createRelation(payload)
-                }
+                await addTrust(payload, this.data.useRealApi)
                 wx.hideLoading()
                 wx.showToast({ title: '关系建立成功', icon: 'success' })
                 // Refresh the graph
