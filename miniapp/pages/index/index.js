@@ -40,6 +40,12 @@ Page({
   },
 
   onLoad(options) {
+    // 登录守卫：未登录立即跳登录页
+    const { isLoggedIn } = store.getState()
+    if (!isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     Logger.info('首页', '页面加载')
     this._loadI18n()
     this.loadPageData()
