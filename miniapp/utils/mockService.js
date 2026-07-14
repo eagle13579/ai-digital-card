@@ -10,7 +10,7 @@ const store = require('./store')
 const { TEST_USERS, TEST_BROCHURES, TEST_TAGS, TEST_RECOMMEND_LIST, TEST_VISITOR_STATS, TEST_TRUST_NETWORK, TEST_FRIENDS_MAP, TEST_PLATFORMS, TEST_PLATFORM_MEMBERS, TEST_PLATFORM_APPLICATIONS, TEST_AI_GENERATE_TEMPLATES, TEST_SIX_DEGREES_NETWORK, TEST_SIX_DEGREES_RELATIONS } = require('./test-data')
 const { Logger } = require('./util')
 const { get, post, put, del } = require('./request')
-const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi, sixDegreesApi, organizationApi } = require('./api')
+const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi, sixDegreesApi, organizationApi, platformApi } = require('./api')
 
 const MockService = {
   USE_MOCK: false,
@@ -331,7 +331,7 @@ const MockService = {
       await this.mockDelay(300, 500)
       return { data: TEST_PLATFORMS }
     }
-    return get('/api/v1/platforms')
+    return platformApi.list()
   },
 
   async getPlatformDetail(platformId) {

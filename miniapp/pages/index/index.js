@@ -3,6 +3,7 @@
  * 使用MockService获取数据
  */
 const { MockService } = require('../../utils/mockService')
+const { brochureApi, platformApi } = require('../../utils/api')
 const store = require('../../utils/store')
 const i18n = require('../../utils/i18n')
 const { Logger } = require('../../utils/util')
@@ -49,8 +50,9 @@ Page({
   async loadPlatformRecommend() {
     this.setData({ platformLoading: true })
     try {
-      const res = await MockService.getPlatformList()
-      const platforms = (res.data || []).slice(0, 4).map((p, index) => ({
+      const res = await platformApi.list()
+      const data = Array.isArray(res) ? res : (res.data || [])
+      const platforms = data.slice(0, 4).map((p, index) => ({
         id: p.id,
         name: p.name,
         desc: p.description || '',
