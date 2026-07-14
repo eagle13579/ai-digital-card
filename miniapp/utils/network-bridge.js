@@ -1,7 +1,7 @@
 /**
  * 人脉网络 — 统一API桥接
  */
-const { trustApi, connectionApi, sixDegreesApi } = require('../../utils/api')
+const { trustApi, connectionApi, sixDegreesApi } = require('./api')
 const { MockService } = require('../../utils/mockService')
 
 async function getNetwork(useRealApi) {

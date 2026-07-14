@@ -2,7 +2,7 @@
  * AI智能中心 — 统一API导出
  * 根据 useRealApi 自动选择真实API或MockService
  */
-const { aiApi, matchApi, ocrApi } = require('../../utils/api')
+const { aiApi, matchApi, ocrApi } = require('./api')
 const { MockService } = require('../../utils/mockService')
 
 /** AI对话 — 发送消息 */
