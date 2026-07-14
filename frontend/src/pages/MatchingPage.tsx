@@ -89,7 +89,7 @@ export default function MatchingPage() {
           id: m.user_id,
           title: m.user_name || '',
           category: m.user_company || '',
-          score: m.score / 100,
+          score: m.score,
           reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
         }));
         setMatchResults(items);
