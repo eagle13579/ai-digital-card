@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_standards import PaginatedResponse, paginate_cursor
@@ -214,7 +215,12 @@ async def create_brochure(
         db.add(page)
 
     await db.commit()
-    await db.refresh(brochure)
+    
+    # 重新查询以加载 pages 关系（避免 MissingGreenlet）
+    result = await db.execute(
+        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure.id)
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -246,7 +252,7 @@ async def get_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册详情（含页面数据）"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -262,7 +268,7 @@ async def get_brochure_by_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """通过分享token获取画册（公开访问）"""
-    result = await db.execute(select(Brochure).where(Brochure.share_token == share_token))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.share_token == share_token))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在或链接已失效")
@@ -284,7 +290,7 @@ async def update_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """更新画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -332,7 +338,7 @@ async def delete_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """删除画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -351,7 +357,7 @@ async def publish_brochure(
     db: AsyncSession = Depends(get_db),
 ):
     """发布画册"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -375,7 +381,7 @@ async def refresh_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """刷新分享token"""
-    result = await db.execute(select(Brochure).where(Brochure.id == brochure_id))
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -503,6 +509,83 @@ async def smart_search(
         mode=data.mode,
         results=results,
         total=len(results),
+    )
+
+
+# ── 封面图片上传 ─────────────────────────────────────────────
+
+
+import os
+from pathlib import Path
+
+
+class CoverUploadResponse(BaseModel):
+    url: str
+    original_name: str
+    size: int
+
+
+COVER_ALLOWED_EXTENSIONS: set[str] = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
+COVER_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+
+
+@router.post("/upload-cover", response_model=CoverUploadResponse)
+async def upload_cover(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """上传画册封面图片，返回可访问的 HTTPS URL
+
+    文件格式: jpg/jpeg/png/gif/webp/bmp
+    大小限制: 10MB
+    存储路径: uploads/covers/{uuid}.{ext}
+    返回URL:  https://card.liankebao.top/uploads/covers/{filename}
+    """
+    # 1. 验证扩展名
+    filename = file.filename or "cover.png"
+    ext = Path(filename).suffix.lower()
+    if ext not in COVER_ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的图片格式: {ext}，允许格式: {', '.join(sorted(COVER_ALLOWED_EXTENSIONS))}",
+        )
+
+    # 2. 验证 MIME 类型
+    content_type = file.content_type or ""
+    if content_type and not content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件类型错误: {content_type}，仅允许图片文件",
+        )
+
+    # 3. 检查大小
+    content = await file.read()
+    if len(content) > COVER_MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"图片文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {COVER_MAX_SIZE / 1024 / 1024:.0f}MB",
+        )
+
+    # 4. 保存文件
+    cover_dir = Path(settings.UPLOAD_DIR) / "covers"
+    cover_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    dest_path = cover_dir / safe_name
+    dest_path.write_bytes(content)
+
+    # 5. 返回可访问 URL
+    url = f"https://card.liankebao.top/uploads/covers/{safe_name}"
+
+    logger.info(
+        "封面图片已上传: orig=%s, saved=%s, size=%d, user_id=%d",
+        file.filename, safe_name, len(content), current_user.id,
+    )
+
+    return CoverUploadResponse(
+        url=url,
+        original_name=file.filename or "",
+        size=len(content),
     )
 
 

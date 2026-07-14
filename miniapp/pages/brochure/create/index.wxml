@@ -125,7 +125,7 @@
         <!-- 技能标签 -->
         <view class="form-item">
           <text class="form-label">技能标签</text>
-          <input class="form-input" placeholder="多个技能用逗号分隔" value="{{formData.skillTags && formData.skillTags.join(',')}}" bindinput="onSkillTagsInput" data-field="skillTags" />
+          <input class="form-input" placeholder="多个技能用逗号分隔" value="{{skillTagsRaw}}" bindinput="onSkillTagsInput" bindblur="onSkillTagsBlur" data-field="skillTags" />
           <view class="tags-list" wx:if="{{formData.skillTags && formData.skillTags.length > 0}}">
             <view wx:for="{{formData.skillTags}}" wx:key="index" class="tag-item skill-tag">
               <text class="tag-text">{{item}}</text>
@@ -136,8 +136,8 @@
         <!-- 个人简介 -->
         <view class="form-item {{stepErrors[2].bio ? 'has-error' : ''}}">
           <text class="form-label">个人简介</text>
-          <textarea class="form-textarea" placeholder="请简要介绍您自己（10-200字）" value="{{formData.bio}}" bindinput="onInput" data-field="bio" maxlength="200" />
-          <text class="char-count">{{formData.bio ? formData.bio.length : 0}}/200</text>
+          <textarea class="form-textarea" placeholder="请简要介绍您自己（10-300字）" value="{{formData.bio}}" bindinput="onInput" data-field="bio" maxlength="300" />
+          <text class="char-count">{{formData.bio ? formData.bio.length : 0}}/300</text>
           <text wx:if="{{stepErrors[2].bio}}" class="error-text">{{stepErrors[2].bio}}</text>
         </view>
 
@@ -175,7 +175,7 @@
         <view class="form-item">
           <text class="form-label">合作意向</text>
           <view class="purpose-options">
-            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purpose === item.value ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
+            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purposes.includes(item.value) ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
               <text class="purpose-icon">{{item.icon}}</text>
               <text class="purpose-label">{{item.label}}</text>
             </view>
@@ -204,6 +204,12 @@
               <text class="industry-label">{{item.label}}</text>
             </view>
           </view>
+        </view>
+
+        <!-- 自定义行业输入 -->
+        <view wx:if="{{formData.industry === 'other'}}" class="form-item">
+          <text class="form-label">自定义行业</text>
+          <input class="form-input" placeholder="请输入您的行业领域" value="{{formData.industryCustom}}" bindinput="onInput" data-field="industryCustom" />
         </view>
 
         <!-- 行业模板扩展字段 -->

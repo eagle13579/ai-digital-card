@@ -53,9 +53,12 @@ Page({
   async loadBrochure(brochureId) {
     wx.showLoading({ title: '加载中...' })
     try {
-      const brochure = await brochureApi.getById(brochureId)
+      const resp = await brochureApi.getById(brochureId)
+      // API客户端可能返回 {code, data} 包装，也可能直接返回数据
+      const brochure = resp && resp.data ? resp.data : resp
       if (brochure && brochure.pages) {
-        this.setBrochureData(brochure.pages)
+        const convertedPages = this.convertBrochurePages(brochure)
+        this.setBrochureData(convertedPages)
       } else {
         this.tryLoadFromStorage()
       }
@@ -67,13 +70,93 @@ Page({
     }
   },
 
+  /**
+   * 将后端API格式的brochure pages转换为WXML模板期望的页面数据格式
+   * 字段映射对照：
+   *   封面：brochure.cover → page.avatar
+   *   资料：content解析后 phone/email/wechat → contact对象嵌套
+   *   技能：content数组 → page.provides
+   *   联系：content的provides/needs/purpose + profileData回退contact info
+   */
+  convertBrochurePages(brochure) {
+    const convertedPages = []
+    let profileData = {}
+
+    // 构建封面页 — create页将用户头像存在brochure.cover字段
+    if (brochure.title) {
+      convertedPages.push({
+        type: 'cover',
+        title: brochure.title,
+        avatar: brochure.cover || '',
+        subtitle: '',
+      })
+    }
+
+    // 转换每一页
+    brochure.pages.forEach(page => {
+      const { content_type, content, sort_order } = page
+      let converted = {}
+
+      try {
+        if (content_type === 'profile') {
+          const parsed = JSON.parse(content)
+          profileData = parsed
+          converted = {
+            type: 'profile',
+            ...parsed,
+            contact: {
+              phone: parsed.phone || '',
+              email: parsed.email || '',
+              wechat: parsed.wechat || '',
+            },
+            sort_order,
+          }
+        } else if (content_type === 'skills') {
+          const parsed = JSON.parse(content)
+          converted = {
+            type: 'resources',
+            provides: Array.isArray(parsed) ? parsed : [],
+            needs: [],
+            purpose: '',
+            sort_order,
+          }
+        } else if (content_type === 'contact') {
+          const parsed = JSON.parse(content)
+          converted = {
+            type: 'contact',
+            name: profileData.name || '',
+            company: profileData.company || '',
+            phone: profileData.phone || '',
+            email: profileData.email || '',
+            wechat: profileData.wechat || '',
+            provides: parsed.provides || [],
+            needs: parsed.needs || [],
+            purpose: parsed.purpose || '',
+            sort_order,
+          }
+        } else {
+          converted = { type: content_type, sort_order }
+        }
+      } catch (e) {
+        Logger.warn('画册预览页', '解析页面内容失败', { content_type, error: e })
+        converted = { type: content_type, sort_order }
+      }
+
+      convertedPages.push(converted)
+    })
+
+    return convertedPages
+  },
+
   /** 尝试从Storage读取刚刚创建的名片，兜底防止内容不匹配 */
   tryLoadFromStorage() {
     try {
       const cached = wx.getStorageSync('last_brochure')
       if (cached && cached.pages && Array.isArray(cached.pages) && cached.pages.length > 0) {
         Logger.info('画册预览页', '从Storage读取缓存名片', { id: cached.id, pagesCount: cached.pages.length })
-        this.setBrochureData(cached.pages)
+        // 缓存数据是原始API格式，需要经过相同的字段映射转换
+        const convertedPages = this.convertBrochurePages(cached)
+        this.setBrochureData(convertedPages)
         return
       }
     } catch (e) {

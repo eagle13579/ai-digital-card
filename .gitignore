@@ -63,6 +63,21 @@ _service_logs/
 *.key
 certs/
 
+# Large binaries / model files
+*.exe
+k6/
+backend/~/.cache/
+backend/models/*.pt
+backend/models/*.npy
+backend/models/*.json
+backend/models/online_checkpoint_*.json
+backend/data/models/*.pt
+backend/data/models/*.npy
+
+# Backups
+*.bak
+*.bak.*
+
 # 敏感数据文件
 backend/data/*.json
 training_data/*.jsonl

@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+"""
+Cron-triggered online learning runner.
+Bypasses app/__init__.py (which imports FastAPI) by using importlib to
+directly load the ai modules.
+"""
+import sys, os, importlib.util
+
+backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, backend_dir)
+os.chdir(backend_dir)
+
+# Parse min_feedback
+min_feedback = 5
+for arg in sys.argv[1:]:
+    if arg.startswith("--min-feedback="):
+        min_feedback = int(arg.split("=")[1])
+
+# ── Direct-import app.ai modules without triggering app/__init__.py ──
+
+def _load_module(name, path):
+    """Load a Python module directly from file path, bypassing package __init__."""
+    spec = importlib.util.spec_from_file_location(name, path, submodule_search_locations=[])
+    mod = importlib.util.module_from_spec(spec)
+    # Pretend it's already part of app.ai hierarchy so relative imports work
+    mod.__package__ = "app.ai"
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+# Load feedback_loop module directly
+fb_path = os.path.join(backend_dir, "app", "ai", "feedback_loop.py")
+feedback_mod = _load_module("app.ai.feedback_loop", fb_path)
+
+# Load online_learning module directly
+ol_path = os.path.join(backend_dir, "app", "ai", "online_learning.py")
+online_mod = _load_module("app.ai.online_learning", ol_path)
+
+# Now use the loaded modules
+get_feedback_loop = feedback_mod.get_feedback_loop
+
+# 1. Feedback stats
+loop = get_feedback_loop()
+stats = loop.get_global_stats()
+total = stats.get("total_feedback", 0)
+positive = stats.get("positive_feedback", 0)
+negative = stats.get("negative_feedback", 0)
+
+print(f"反馈统计: total={total}, positive={positive}, negative={negative}")
+
+if total < min_feedback:
+    print(f"\n状态: skipped")
+    print(f"反馈数 {total} < min_feedback {min_feedback}, 跳过学习")
+    sys.exit(0)
+
+# 2. Current weights
+get_all_online_weights = online_mod.get_all_online_weights
+_DEFAULT_WEIGHTS = online_mod._DEFAULT_WEIGHTS
+weights_before = get_all_online_weights()
+print(f"\n当前全局调整系数: {weights_before.get('global_adjustment', 1.0):.4f}")
+print(f"当前权重 (原始): tag_match={_DEFAULT_WEIGHTS.get('tag_match',0)} graph={_DEFAULT_WEIGHTS.get('graph',0)} semantic={_DEFAULT_WEIGHTS.get('semantic',0)}")
+print(f"当前权重 (调整后): {weights_before}")
+
+# 3. Run learning
+get_online_learning_engine = online_mod.get_online_learning_engine
+engine = get_online_learning_engine()
+report = engine.run_learning_cycle()
+
+# 4. Updated weights
+weights_after = get_all_online_weights()
+
+# 5. Report
+print(f"\n状态: {report.get('status', 'completed')}")
+print(f"学习周期: #{report.get('cycle', 0)}")
+print(f"耗时: {report.get('duration_seconds', 0):.3f}s")
+print(f"处理反馈数: total={report['feedback_stats']['total']}, "
+      f"positive={report['feedback_stats']['positive']}, "
+      f"negative={report['feedback_stats']['negative']}, "
+      f"新增={report['feedback_stats']['new_since_last']}")
+
+wc = report.get('weight_changes', {})
+print(f"\n权重变化:")
+old_adj = wc.get('old_global_adjustment', 1.0)
+new_adj = wc.get('new_global_adjustment', 1.0)
+print(f"  全局调整系数: {old_adj:.4f} → {new_adj:.4f} (变化: {new_adj - old_adj:+.4f})")
+for key in ['tag_match', 'graph', 'semantic']:
+    old_w = wc.get('old_weights', {}).get(key, 'N/A')
+    new_w = wc.get('new_weights', {}).get(key, 'N/A')
+    if isinstance(old_w, (int, float)) and isinstance(new_w, (int, float)):
+        print(f"  {key}: {old_w:.4f} → {new_w:.4f} (变化: {new_w - old_w:+.4f})")
+    else:
+        print(f"  {key}: {old_w} → {new_w}")
+
+net_adjust = wc.get('net_adjust', 0)
+if abs(net_adjust) < 0.0001:
+    print(f"\n⚠ 净调整接近零 — 正负反馈基本平衡或暂无新增反馈")
+else:
+    direction = "↑ 推荐强度增加" if net_adjust > 0 else "↓ 推荐强度降低"
+    print(f"\n✅ 权重已更新: 净调整={net_adjust:+.4f} {direction}")

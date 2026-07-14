@@ -7,7 +7,7 @@
  * 
  * 参考: D:\AI询赋拆解\frontend\src\services\api.ts
  */
-const { get, post, put, del } = require('./request')
+const { get, post, put, del, API_BASE_URL } = require('./request')
 
 // ===== 认证模块 =====
 const authApi = {
@@ -94,6 +94,35 @@ const brochureApi = {
   },
   getTemplate(purpose) {
     return get(`/api/brochures/template/${purpose}`, {}, { noAuth: true })
+  },
+  uploadCover(filePath) {
+    // 上传封面图片 → 返回HTTPS URL
+    // filePath: wx.chooseAvatar() 返回的 wxfile:// 临时路径
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: `${API_BASE_URL}/api/brochures/upload-cover`,
+        filePath: filePath,
+        name: 'file',
+        header: {
+          'Authorization': `Bearer ${store.getState().token}`,
+        },
+        success(res) {
+          try {
+            const body = JSON.parse(res.data)
+            if (res.statusCode === 200 && body.url) {
+              resolve(body.url)
+            } else {
+              reject(new Error(body.detail || '上传失败'))
+            }
+          } catch (e) {
+            reject(new Error('上传响应解析失败'))
+          }
+        },
+        fail(err) {
+          reject(new Error(err.errMsg || '网络上传失败'))
+        },
+      })
+    })
   },
 }
 
