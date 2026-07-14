@@ -1,4 +1,5 @@
 {
+  "entryPagePath": "pages/login/index",
   "pages": [
     "pages/login/index",
     "pages/index/index",
@@ -37,7 +38,6 @@
     "pages/organization/create/index"
   ],
   "window": {
-    "entryPagePath": "pages/login/index",
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "AI数智名片",
     "navigationBarBackgroundColor": "#0f0f1a",
