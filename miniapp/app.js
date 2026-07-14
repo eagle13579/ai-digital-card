@@ -14,6 +14,11 @@ App({
     const { token } = store.getState()
     console.log('[App] onLaunch, isLoggedIn:', !!token)
 
+    // 开发/测试阶段：总是从登录页开始（覆盖entryPagePath和旧token）
+    setTimeout(() => {
+      wx.reLaunch({ url: '/pages/login/index' })
+    }, 100)
+
     // 检查小程序更新
     this._checkUpdate()
   },
