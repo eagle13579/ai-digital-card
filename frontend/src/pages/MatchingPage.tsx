@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, Loader2, RefreshCw, ExternalLink,
   Search, Filter, ArrowUpDown, TrendingUp,
-  Target, Package, CheckCircle2,
+  Target, Package, CheckCircle2, Handshake,
 } from 'lucide-react';
 import { api } from '../api/client';
 import { useT } from '../i18n';
@@ -40,6 +40,7 @@ export default function MatchingPage() {
   const [filter, setFilter] = useState<'all' | 'need' | 'product'>('all');
   const [sortBy, setSortBy] = useState<'score' | 'title'>('score');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [connectingId, setConnectingId] = useState<number | null>(null);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -109,6 +110,29 @@ export default function MatchingPage() {
       setMatchLoading(false);
     }
   }, [selectedCardId, showToast]);
+
+  // ============================================================
+  // 发起连接（交换名片）
+  // ============================================================
+  const handleConnect = useCallback(async (targetUserId: number) => {
+    setConnectingId(targetUserId);
+    try {
+      const res = await api.post('/api/business-card/connections/request', {
+        target_user_id: targetUserId,
+        message: '来自智能匹配',
+        source: 'match',
+      });
+      if (res.code === 200 || res.code === 201) {
+        showToast(t('match.connectSuccess'), 'success');
+      } else {
+        showToast(res.message || t('match.connectFailed'), 'error');
+      }
+    } catch {
+      showToast(t('match.connectFailed'), 'error');
+    } finally {
+      setConnectingId(null);
+    }
+  }, [showToast, t]);
 
   // ============================================================
   // 过滤 & 排序
@@ -292,6 +316,21 @@ export default function MatchingPage() {
                   )}
                 </div>
                 <ExternalLink className="w-4 h-4 text-text-muted shrink-0 mt-1" />
+              </div>
+              {/* 交换名片按钮 */}
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleConnect(item.id); }}
+                  disabled={connectingId === item.id}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {connectingId === item.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Handshake className="w-3.5 h-3.5" />
+                  )}
+                  {t('match.exchangeCard')}
+                </button>
               </div>
             </div>
           ))}
