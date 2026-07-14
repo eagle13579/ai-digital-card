@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_standards import PaginatedResponse, paginate_cursor
@@ -214,7 +215,13 @@ async def create_brochure(
         db.add(page)
 
     await db.commit()
-    await db.refresh(brochure)
+    
+    # 重新查询以加载 pages 关系（避免 MissingGreenlet）
+    result = await db.execute(
+        select(Brochure).where(Brochure.id == brochure.id)
+        .options(selectinload(Brochure.pages))
+    )
+    brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
