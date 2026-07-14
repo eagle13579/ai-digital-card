@@ -32,7 +32,32 @@ Page({
     }
   },
 
-  // ========== 微信授权登录 ==========
+  // ========== 微信按钮授权登录（推荐方式，兼容新版微信） ==========
+  onGetUserInfo(e) {
+    if (!e.detail.userInfo) {
+      wx.showToast({ title: '需要授权才能使用', icon: 'none' })
+      return
+    }
+    this.setData({ loading: true })
+    const userInfo = e.detail.userInfo
+    wx.login({
+      success: (res) => {
+        if (res.code) {
+          this._handleLoginWithProfile(res.code, userInfo)
+        } else {
+          wx.showToast({ title: '微信登录失败', icon: 'none' })
+          this.setData({ loading: false })
+        }
+      },
+      fail: (err) => {
+        console.error('[Login] wx.login 失败:', err)
+        wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+        this.setData({ loading: false })
+      },
+    })
+  },
+
+  // ========== 微信授权登录（旧版备用） ==========
   wxLogin() {
     this.setData({ loading: true })
 
