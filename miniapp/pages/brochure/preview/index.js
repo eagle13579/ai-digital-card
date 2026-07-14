@@ -43,7 +43,14 @@ Page({
     if (brochureId) {
       this.data.brochureId = brochureId
       Logger.info('画册预览页', '加载指定画册', { brochureId })
-      this.loadBrochure(brochureId)
+      // 优先检查是否是刚创建的名片（从storage读取）
+      const cached = wx.getStorageSync('last_brochure')
+      if (cached && cached.id === brochureId) {
+        Logger.info('画册预览页', '刚创建的名片，直接从storage加载')
+        this.tryLoadFromStorageOrMock(brochureId)
+      } else {
+        this.loadBrochure(brochureId)
+      }
     } else {
       Logger.info('画册预览页', '无画册ID，加载默认画册')
       this.loadMockBrochure()
@@ -57,17 +64,63 @@ Page({
       // API客户端可能返回 {code, data} 包装，也可能直接返回数据
       const brochure = resp && resp.data ? resp.data : resp
       if (brochure && brochure.pages) {
-        const convertedPages = this.convertBrochurePages(brochure)
-        this.setBrochureData(convertedPages)
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
       } else {
-        this.tryLoadFromStorage()
+        await this.tryLoadFromStorageOrMock(brochureId)
       }
       wx.hideLoading()
     } catch (err) {
       wx.hideLoading()
       Logger.error('画册预览页', '加载画册失败', err)
-      this.tryLoadFromStorage()
+      await this.tryLoadFromStorageOrMock(brochureId)
     }
+  },
+
+  async tryLoadFromStorageOrMock(brochureId) {
+    try {
+      const cached = wx.getStorageSync('last_brochure')
+      if (cached && cached.id === brochureId) {
+        Logger.info('画册预览页', '从Storage读取缓存名片', { id: cached.id, pagesCount: cached.pages ? cached.pages.length : 0 })
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        if (cached.pages && Array.isArray(cached.pages) && cached.pages.length > 0) {
+          const firstPage = cached.pages[0]
+          if (firstPage.type && !firstPage.content_type) {
+            this.setBrochureData(cached.pages)
+          } else {
+            const convertedPages = this.convertBrochurePages(cached)
+            this.setBrochureData(convertedPages)
+          }
+          return
+        }
+      }
+    } catch (e) {
+      Logger.warn('画册预览页', '读取Storage失败', e)
+    }
+    // 没有缓存数据或缓存不匹配，尝试从Mock获取
+    try {
+      const brochure = await MockService.getBrochureById(brochureId)
+      if (brochure && brochure.pages) {
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+        return
+      }
+    } catch (e) {
+      Logger.warn('画册预览页', '从Mock获取失败', e)
+    }
+    // 最后的兜底：使用默认数据
+    this.setBrochureData(this.getDefaultPages())
   },
 
   /**
@@ -148,23 +201,7 @@ Page({
     return convertedPages
   },
 
-  /** 尝试从Storage读取刚刚创建的名片，兜底防止内容不匹配 */
-  tryLoadFromStorage() {
-    try {
-      const cached = wx.getStorageSync('last_brochure')
-      if (cached && cached.pages && Array.isArray(cached.pages) && cached.pages.length > 0) {
-        Logger.info('画册预览页', '从Storage读取缓存名片', { id: cached.id, pagesCount: cached.pages.length })
-        // 缓存数据是原始API格式，需要经过相同的字段映射转换
-        const convertedPages = this.convertBrochurePages(cached)
-        this.setBrochureData(convertedPages)
-        return
-      }
-    } catch (e) {
-      Logger.warn('画册预览页', '读取Storage失败', e)
-    }
-    // 没有缓存数据，回退到默认Mock数据
-    this.loadMockBrochure()
-  },
+  
 
   async loadMockBrochure() {
     Logger.info('画册预览页', '加载默认画册示例')
@@ -182,7 +219,14 @@ Page({
       Logger.info('画册预览页', '选中画册', { brochure: brochure ? { id: brochure.id, title: brochure.title, pageCount: brochure.pages ? brochure.pages.length : 0 } : null })
       
       if (brochure && brochure.pages) {
-        this.setBrochureData(brochure.pages)
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
       } else {
         Logger.info('画册预览页', '使用默认画册数据')
         this.setBrochureData(this.getDefaultPages())

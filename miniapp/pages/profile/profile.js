@@ -21,7 +21,7 @@ Page({
     deleteConfirmText: '',
     // i18n
     _t: {},
-    useRealApi: true,
+    useRealApi: false,
   },
 
   onLoad() {
@@ -45,18 +45,21 @@ Page({
     this.setData({ loading: true })
     try {
       const useReal = this.data.useRealApi
-      const [profile, brochures, trustNet, visitorStats] = await Promise.all([
+      const [profileRes, brochuresRes, trustNetRes, visitorStatsRes] = await Promise.all([
         getProfile(useReal),
         getBrochures(useReal),
         getTrustNetwork(useReal),
         getVisitorStats(useReal),
       ])
 
-      const brochureList = Array.isArray(brochures) ? brochures : (brochures.data || [])
+      const profile = profileRes && profileRes.data ? profileRes.data : profileRes
+      const brochureList = Array.isArray(brochuresRes) ? brochuresRes : (brochuresRes.data || [])
       const brochure = brochureList[0]
+      const trustNet = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
+      const visitorStats = visitorStatsRes && visitorStatsRes.data ? visitorStatsRes.data : visitorStatsRes
 
       const { getLevelText } = require('../../utils/levels')
-      const memberLevel = profile.member_level || 'free'
+      const memberLevel = profile.member_level || profile.memberLevel || 'free'
       const memberLevelText = getLevelText(memberLevel)
 
       let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
@@ -64,14 +67,17 @@ Page({
 
       const trustCount = (trustNet.trusting || []).length
 
+      const storedUserInfo = store.getState().userInfo || {}
+      const userInfo = {
+        id: profile.id || storedUserInfo.id,
+        name: profile.name || storedUserInfo.name || storedUserInfo.nickName || '',
+        avatar: profile.avatar || storedUserInfo.avatar || storedUserInfo.avatarUrl || '',
+        company: profile.company || storedUserInfo.company || '',
+        title: profile.title || storedUserInfo.title || '',
+      }
+
       this.setData({
-        userInfo: {
-          id: profile.id,
-          name: profile.name || '',
-          avatar: profile.avatar || '',
-          company: profile.company || '',
-          title: profile.title || '',
-        },
+        userInfo,
         memberLevel,
         memberLevelText,
         memberExpire: profile.member_expire || '',
@@ -81,7 +87,7 @@ Page({
         loading: false,
       })
 
-      store.updateUserInfo(this.data.userInfo)
+      store.updateUserInfo(userInfo)
       store.updateMemberLevel(memberLevel)
     } catch (err) {
       console.error('加载个人数据失败:', err)

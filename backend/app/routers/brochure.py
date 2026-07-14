@@ -517,6 +517,7 @@ async def smart_search(
 
 import os
 from pathlib import Path
+from app.config import settings
 
 
 class CoverUploadResponse(BaseModel):
@@ -575,7 +576,8 @@ async def upload_cover(
     dest_path.write_bytes(content)
 
     # 5. 返回可访问 URL
-    url = f"https://card.liankebao.top/uploads/covers/{safe_name}"
+    base = settings.BASE_URL.rstrip("/")
+    url = f"{base}/uploads/covers/{safe_name}"
 
     logger.info(
         "封面图片已上传: orig=%s, saved=%s, size=%d, user_id=%d",

@@ -43,6 +43,20 @@ Page({
   onLoad(options) {
     Logger.info('首页', '页面加载')
     this._loadI18n()
+    
+    const state = store.getState()
+    Logger.info('首页', '当前状态', { 
+      isLoggedIn: state.isLoggedIn, 
+      hasUserInfo: !!state.userInfo,
+      userName: state.userInfo?.name || state.userInfo?.nickName || '无'
+    })
+    
+    // 登录守卫：未登录时跳转登录页
+    if (!state.isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    
     this.loadPageData()
     this.loadPlatformRecommend()
   },
@@ -102,21 +116,74 @@ Page({
     }
   },
 
+  /** 带超时和重试的数据获取包装 */
+  async _fetchWithRetry(fn, fallback, maxRetries = 2, timeoutMs = 8000) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await Promise.race([
+          fn(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`timeout after ${timeoutMs}ms`)), timeoutMs)
+          ),
+        ])
+        if (attempt > 1) Logger.info('首页', `第${attempt}次重试成功`)
+        return result
+      } catch (err) {
+        Logger.warn('首页', `第${attempt}/${maxRetries}次失败`, err.message || err)
+        if (attempt < maxRetries) {
+          const delay = Math.min(500 * Math.pow(2, attempt - 1), 3000)
+          await new Promise(r => setTimeout(r, delay))
+        }
+      }
+    }
+    Logger.warn('首页', '已耗尽重试次数，使用降级数据')
+    return fallback
+  },
+
   async loadPageData() {
     this.setData({ loading: true })
+    
+    const storedState = store.getState()
+    const storedUserInfo = storedState.userInfo || {}
+    
     try {
-      const [profile, brochures, trustNet, recommend] = await Promise.all([
-        MockService.getUserProfile().catch(() => ({ userInfo: {}, memberLevel: 'free' })),
-        MockService.getBrochures().catch(() => []),
-        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
-        MockService.getRecommendList().catch(() => []),
-      ])
+      Logger.info('首页', '开始加载数据')
+      
+      let profileRes, brochuresRes, trustNetRes, recommendRes
+      try {
+        [profileRes, brochuresRes, trustNetRes, recommendRes] = await Promise.all([
+          this._fetchWithRetry(
+            () => MockService.getUserProfile(),
+            { data: { userInfo: {}, memberLevel: 'free' } },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getBrochures(),
+            { data: [] },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getTrustNetwork(),
+            { data: { trusting: [], trusted_by: [] } },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getRecommendList(),
+            { data: [] },
+          ),
+        ])
+        Logger.info('首页', 'API数据加载完成')
+      } catch (apiErr) {
+        Logger.warn('首页', 'API加载失败，使用本地数据', apiErr)
+        profileRes = { data: { userInfo: {}, memberLevel: 'free' } }
+        brochuresRes = { data: [] }
+        trustNetRes = { data: { trusting: [], trusted_by: [] } }
+        recommendRes = { data: [] }
+      }
+
+      const profile = profileRes && profileRes.data ? profileRes.data : profileRes
+      const brochuresList = brochuresRes && brochuresRes.data ? brochuresRes.data : brochuresRes
+      const trustData = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
+      const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
 
       const userInfoData = profile.userInfo || profile
-      const brochuresList = brochures
-      const trustData = trustNet
-      const recommendData = recommend
-
       const brochure = Array.isArray(brochuresList) ? brochuresList[0] : null
 
       const trustList = trustData.trusting || []
@@ -125,7 +192,11 @@ Page({
       let stats = { visitors: 0, matches: recommendData.length, trust: trustCount }
 
       if (brochure) {
-        MockService.getVisitorStats().then(vStats => {
+        this._fetchWithRetry(
+          () => MockService.getVisitorStats(),
+          { data: { total_visits: 0, total: 0 } },
+        ).then(vStatsRes => {
+          const vStats = vStatsRes && vStatsRes.data ? vStatsRes.data : vStatsRes
           if (vStats) {
             this.setData({
               stats: { ...this.data.stats, visitors: vStats.total_visits || vStats.total || 0 },
@@ -134,23 +205,20 @@ Page({
         }).catch(() => {})
       }
 
-      const store = require('../../utils/store')
-      const storedUserInfo = store.getState().userInfo || {}
       const userInfo = {
-        name: storedUserInfo.name || storedUserInfo.nickName || userInfoData.name || '',
+        name: storedUserInfo.name || storedUserInfo.nickName || userInfoData.name || '微信用户',
         avatar: storedUserInfo.avatar || storedUserInfo.avatarUrl || userInfoData.avatar || '',
         company: storedUserInfo.company || userInfoData.company || '',
         title: storedUserInfo.title || userInfoData.title || '',
       }
 
       const { getLevelText } = require('../../utils/levels')
-      const memberLevel = profile.memberLevel || 'free'
+      const memberLevel = profile.memberLevel || storedState.memberLevel || 'free'
       const memberLevelText = getLevelText(memberLevel)
 
       store.updateUserInfo(userInfo)
       store.updateMemberLevel(memberLevel)
 
-      // Free用户访客≥3时显示升级提示
       const showUpgradeHint = memberLevel === 'free' && (stats.visitors >= 3 || recommendData.length >= 3)
 
       this.setData({
@@ -175,13 +243,38 @@ Page({
           loading: false,
         })
 
-      Logger.info('首页', '数据加载完成')
+      Logger.info('首页', '数据加载完成', { userName: userInfo.name, hasAvatar: !!userInfo.avatar })
 
-      // 加载完成后检查新手引导
       this._checkOnboarding()
     } catch (err) {
       Logger.error('首页', '加载失败', err)
-      this.setData({ loading: false })
+      console.error('[首页] loadPageData 错误:', err)
+      
+      const userInfo = {
+        name: storedUserInfo.name || storedUserInfo.nickName || '微信用户',
+        avatar: storedUserInfo.avatar || storedUserInfo.avatarUrl || '',
+        company: storedUserInfo.company || '',
+        title: storedUserInfo.title || '',
+      }
+      
+      const { getLevelText } = require('../../utils/levels')
+      const memberLevel = storedState.memberLevel || 'free'
+      const memberLevelText = getLevelText(memberLevel)
+      
+      this.setData({
+        userInfo,
+        memberLevel,
+        memberLevelText,
+        stats: { visitors: 0, matches: 0, trust: 0 },
+        brochure: null,
+        trustCount: 0,
+        trustList: [],
+        recommendList: [],
+        showEmpty: true,
+        showUpgradeHint: false,
+        visitorList: [],
+        loading: false,
+      })
     }
   },
 

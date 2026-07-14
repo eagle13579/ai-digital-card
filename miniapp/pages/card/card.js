@@ -39,11 +39,14 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     try {
-      const [brochure, recommendData, trustNet] = await Promise.all([
+      const [brochure, recommendRes, trustNetRes] = await Promise.all([
         MockService.getBrochureById(cardId),
-        MockService.getRecommendList().catch(() => []),
-        MockService.getTrustNetwork().catch(() => ({ trusting: [], trusted_by: [] })),
+        MockService.getRecommendList().catch(() => ({ data: [] })),
+        MockService.getTrustNetwork().catch(() => ({ data: { trusting: [], trusted_by: [] } })),
       ])
+      
+      const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
+      const trustNet = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
       
       let card = null
       if (brochure) {
@@ -74,13 +77,13 @@ Page({
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await MockService.getVisitorStats(cardId)
+        const vStatsRes = await MockService.getVisitorStats(cardId)
+        const vStats = vStatsRes && vStatsRes.data ? vStatsRes.data : vStatsRes
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
-        const recommendList = Array.isArray(recommendData) ? recommendData : (recommendData?.data || [])
+        const recommendList = Array.isArray(recommendData) ? recommendData : []
         stats.matches = recommendList.length || 0
-        const trustData = trustNet.data || trustNet
-        stats.trust = (trustData.trusting?.length || 0) + (trustData.trusted_by?.length || 0)
+        stats.trust = (trustNet.trusting?.length || 0) + (trustNet.trusted_by?.length || 0)
       }
 
       this.setData({

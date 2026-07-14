@@ -2,7 +2,7 @@
  * 安全合规 — 统一API桥接
  */
 const { authApi, brochureApi, trustApi, visitorApi } = require('./api')
-const { MockService } = require('../../utils/mockService')
+const { MockService } = require('./mockService')
 
 async function getProfile(useRealApi) {
   return useRealApi ? authApi.getProfile() : MockService.getProfile()

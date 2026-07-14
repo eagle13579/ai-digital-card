@@ -658,6 +658,17 @@
   border: none;
 }
 
+.btn-test {
+  flex: 1;
+  height: 48px;
+  background: rgba(255, 165, 0, 0.15);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  color: #ffa500;
+  border-radius: var(--radius-sm, 8px);
+  font-size: var(--text-sm, 14px);
+  font-weight: var(--weight-medium, 500);
+}
+
 /* ====== 草稿状态 ====== */
 .draft-status {
   position: fixed;

@@ -1,5 +1,5 @@
 <view class="page-container">
-  <loading visible="{{loading}}" text="{{_t.loading}}" />
+  <loading visible="{{loading}}" text="{{_t && _t.loading || '加载中...'}}" />
 
   <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
 

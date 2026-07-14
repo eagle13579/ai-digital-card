@@ -139,7 +139,7 @@ Page({
 
     // ====== 草稿 ======
     draftSaved: false,
-    useRealApi: true,
+    useRealApi: false,
   },
 
   _draftTimer: null,
@@ -149,6 +149,37 @@ Page({
     Logger.info('画册创建页', '页面加载')
     this._setupAutoSave()
     this._checkDraft()
+  },
+
+  fillTestData() {
+    const testData = {
+      name: '测试用户',
+      title: '产品经理',
+      company: '测试科技公司',
+      phone: '13800138000',
+      email: 'test@example.com',
+      wechat: 'test_wechat',
+      bio: '这是一段测试用的个人简介，用于验证名片预览功能是否正常工作。拥有丰富的产品经验，擅长用户增长和数据分析。',
+      school: '测试大学',
+      major: '计算机科学',
+      education: '本科',
+      skillTags: ['产品设计', '用户研究', '数据分析'],
+      provides: ['产品设计', '用户增长策略', '数据分析'],
+      needs: ['技术开发', '投资合作', '市场推广'],
+      purposes: ['partner', 'investor'],
+      companyName: '测试科技公司',
+      industry: 'tech',
+      companySize: '51-100人',
+      companyDesc: '测试科技公司专注于互联网产品研发和创新，致力于为用户提供优质的数字化解决方案。',
+      development: '2020年：公司成立\n2022年：获得天使轮融资\n2024年：产品用户突破1000万',
+      style: 'professional',
+    }
+    this.setData({
+      formData: testData,
+      currentStep: 4,
+    })
+    wx.showToast({ title: '测试数据已填充', icon: 'success', duration: 1500 })
+    Logger.info('画册创建页', '填充测试数据')
   },
 
   onUnload() {
@@ -671,9 +702,15 @@ Page({
         ],
       }
 
-      const result = this.data.useRealApi
-        ? await brochureApi.create(pageData)
-        : await MockService.createBrochure(pageData)
+      let result
+      if (this.data.useRealApi) {
+        result = await brochureApi.create(pageData)
+      } else {
+        const origMockFlag = MockService.USE_MOCK
+        MockService.USE_MOCK = true
+        result = await MockService.createBrochure(pageData)
+        MockService.USE_MOCK = origMockFlag
+      }
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
 
       if (result && result.id) {

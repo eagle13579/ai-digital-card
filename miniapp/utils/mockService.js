@@ -13,7 +13,7 @@ const { get, post, put, del } = require('./request')
 const { userApi, brochureApi, authApi, miniappApi, matchApi, tagApi, visitorApi, trustApi, aiApi, sixDegreesApi, organizationApi, platformApi } = require('./api')
 
 const MockService = {
-  USE_MOCK: false,
+  USE_MOCK: true,
 
   async mockDelay(min = 100, max = 300) {
     return new Promise(resolve => setTimeout(resolve, Math.random() * (max - min) + min))

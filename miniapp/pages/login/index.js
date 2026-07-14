@@ -44,35 +44,16 @@ Page({
     })
   },
 
-  // ========== 微信授权登录 ==========
-  wxLogin() {
+  // ========== 微信授权登录（新版 getUserInfo 流程） ==========
+  /** 新版 getUserInfo 事件处理 */
+  onGetUserInfo(e) {
     this.setData({ loading: true })
 
-    if (wx.getUserProfile) {
-      wx.getUserProfile({
-        desc: '用于完善会员资料',
-        success: (userRes) => {
-          this._handleUserProfile(userRes.userInfo)
-        },
-        fail: () => {
-          wx.login({
-            success: (res) => {
-              if (res.code) {
-                this._handleLogin(res.code)
-              } else {
-                wx.showToast({ title: '微信登录失败', icon: 'none' })
-                this.setData({ loading: false })
-              }
-            },
-            fail: (err) => {
-              console.error('[Login] wx.login 失败:', err)
-              wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
-              this.setData({ loading: false })
-            },
-          })
-        },
-      })
+    if (e.detail.userInfo) {
+      // 用户授权了个人信息，走含用户信息的登录流程
+      this._handleUserProfile(e.detail.userInfo)
     } else {
+      // 用户拒绝授权，降级为仅 code 登录
       wx.login({
         success: (res) => {
           if (res.code) {
@@ -89,6 +70,26 @@ Page({
         },
       })
     }
+  },
+
+  /** 降级 / 重试用：直接走 wx.login → code 登录（不获取用户信息） */
+  wxLogin() {
+    this.setData({ loading: true })
+    wx.login({
+      success: (res) => {
+        if (res.code) {
+          this._handleLogin(res.code)
+        } else {
+          wx.showToast({ title: '微信登录失败', icon: 'none' })
+          this.setData({ loading: false })
+        }
+      },
+      fail: (err) => {
+        console.error('[Login] wx.login 失败:', err)
+        wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+        this.setData({ loading: false })
+      },
+    })
   },
 
   _handleUserProfile(userInfo) {

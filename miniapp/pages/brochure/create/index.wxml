@@ -351,6 +351,10 @@
       class="btn-submit"
       bindtap="submitForm"
     >发布名片</button>
+    <button
+      class="btn-test"
+      bindtap="fillTestData"
+    >填充测试数据</button>
   </view>
 
   <!-- 草稿保存状态 -->
