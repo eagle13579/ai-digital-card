@@ -125,7 +125,7 @@
         <!-- 技能标签 -->
         <view class="form-item">
           <text class="form-label">技能标签</text>
-          <input class="form-input" placeholder="多个技能用逗号分隔" value="{{formData.skillTags && formData.skillTags.join(',')}}" bindinput="onSkillTagsInput" data-field="skillTags" />
+          <input class="form-input" placeholder="多个技能用逗号分隔" value="{{skillTagsRaw}}" bindinput="onSkillTagsInput" bindblur="onSkillTagsBlur" data-field="skillTags" />
           <view class="tags-list" wx:if="{{formData.skillTags && formData.skillTags.length > 0}}">
             <view wx:for="{{formData.skillTags}}" wx:key="index" class="tag-item skill-tag">
               <text class="tag-text">{{item}}</text>

@@ -100,6 +100,7 @@ Page({
     },
     newProvide: '',
     newNeed: '',
+    skillTagsRaw: '',
 
     // ====== 行业模板 ======
     industryOptions: [
@@ -375,7 +376,14 @@ Page({
 
   onSkillTagsInput(e) {
     const value = e.detail.value
-    const tags = value ? value.split(/[,，]/).map(t => t.trim()).filter(t => t) : []
+    this.setData({
+      skillTagsRaw: value,
+    })
+  },
+
+  onSkillTagsBlur() {
+    const raw = this.data.skillTagsRaw || ''
+    const tags = raw ? raw.split(/[,，]/).map(t => t.trim()).filter(t => t) : []
     this.setData({
       'formData.skillTags': tags,
     })
