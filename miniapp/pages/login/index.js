@@ -101,8 +101,8 @@ Page({
     if (this.data.useRealApi) {
       authApi.wxMiniLogin(code, userInfo)
         .then(result => {
-          const token = result.token
-          const mergedUserInfo = { ...(result.userInfo || {}), ...userInfo }
+          const token = result.access_token
+          const mergedUserInfo = { ...(result.user || {}), ...userInfo }
 
           if (!token) {
             throw new Error('后端未返回 token')
@@ -165,9 +165,9 @@ Page({
   _realApiLogin(code) {
     authApi.wxMiniLogin(code)
       .then(result => {
-        // request.js 已解包，result 即后端响应中的 data 字段
-        const token = result.token
-        const userInfo = result.userInfo || {}
+        // request.js 已解包，result 即后端响应体
+        const token = result.access_token
+        const userInfo = result.user || {}
 
         if (!token) {
           throw new Error('后端未返回 token')
