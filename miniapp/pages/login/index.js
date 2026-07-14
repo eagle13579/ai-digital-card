@@ -198,14 +198,39 @@ Page({
         // 更新全局状态
         store.setAuth(token, userInfo)
 
-        wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
-        setTimeout(() => {
-          wx.switchTab({ url: '/pages/index/index' })
-        }, 1500)
+        // 新版微信头像昵称策略：wx.chooseAvatar() 获取真实头像
+        const userName = userInfo.name || userInfo.nickName || ''
+        if (!userName || userName === '微信用户' || userName.startsWith('小程序用户')) {
+          wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+            setTimeout(() => {
+              wx.showModal({
+                title: '完善资料',
+                content: '是否现在设置您的微信头像？',
+                success: (res) => {
+                  if (res.confirm) {
+                    wx.chooseAvatar({
+                      success: (avatarRes) => {
+                        store.updateUserInfo({ avatar: avatarRes.avatarUrl })
+                        wx.setStorageSync('pendingAvatarUpdate', avatarRes.avatarUrl)
+                        wx.showToast({ title: '头像已更新', icon: 'success' })
+                      }
+                    })
+                  }
+                }
+              })
+            }, 1000)
+          }, 1500)
+        } else {
+          wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+          }, 1500)
+        }
       })
       .catch(err => {
         console.error('[Login] API 登录失败:', err)
-        // 如果使用了 noToast: true，这里需要手动提示
         if (err && err.message) {
           wx.showToast({ title: err.message, icon: 'none' })
         }
@@ -213,9 +238,9 @@ Page({
       })
   },
 
-  /**
-   * Mock 登录（开发/降级用）
-   */
+  /**                                                                                                                                                                          
+   * Mock 登录（开发/降级用）                                                                                                                                                   
+   */                                                                                                                                                                         
   _mockLogin(code) {
     MockService.login({ code })
       .then(result => {
