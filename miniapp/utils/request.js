@@ -13,20 +13,24 @@ const store = require('./store')
 
 // API baseURL
 // 微信小程序API基础URL — 自动检测环境
-// 开发工具中用本机IP，真机调试用实际服务器地址
+// 开发工具：http://localhost:8201（本地后端）
+// 真机调试/体验版/正式版：https://card.liankebao.top（生产服务器，通过Nginx代理到8201）
+const PROD_API = 'https://card.liankebao.top'
+const DEV_API = 'http://localhost:8201'
+
 const API_BASE_URL = (function() {
-  // 微信开发者工具中可以用 localhost 或本机IP
-  // 真机/预览时必须用实际IP或域名
-  const DEV_IP = '192.168.7.48'   // 请替换为你的服务器IP（当前为开发机IP）
-  const DEV_PORT = '8201'              // AI数智名片后端端口
-  
-  // __wxConfig 是微信开发者工具注入的全局变量
   try {
-    if (typeof __wxConfig !== 'undefined' && __wxConfig && __wxConfig.envVersion === 'develop') {
-      return `http://${DEV_IP}:${DEV_PORT}`
+    if (typeof __wxConfig !== 'undefined' && __wxConfig) {
+      const env = __wxConfig.envVersion
+      // develop = 微信开发者工具（开发版）
+      // trial = 体验版
+      // release = 正式版
+      if (env === 'develop') {
+        return DEV_API
+      }
     }
   } catch(e) {}
-  return `http://${DEV_IP}:${DEV_PORT}`
+  return PROD_API
 })()
 
 // 请求超时时间(ms)

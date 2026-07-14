@@ -18,7 +18,7 @@ Page({
   data: {
     loading: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    useRealApi: false,   // 开发测试用false走Mock；上线前改为true
+    useRealApi: true,
     showError: false,
     errorTitle: '',
     errorDesc: '',
