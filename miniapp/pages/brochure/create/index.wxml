@@ -175,7 +175,7 @@
         <view class="form-item">
           <text class="form-label">合作意向</text>
           <view class="purpose-options">
-            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purpose === item.value ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
+            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purposes.includes(item.value) ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
               <text class="purpose-icon">{{item.icon}}</text>
               <text class="purpose-label">{{item.label}}</text>
             </view>

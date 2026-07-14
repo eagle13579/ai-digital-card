@@ -77,7 +77,8 @@ Page({
       bio: '',
       provides: [],
       needs: [],
-      purpose: 'partner',
+      purpose: '',
+      purposes: [],
       // Step3 公司信息
       companyName: '',
       industry: '',
@@ -433,8 +434,15 @@ Page({
 
   selectPurpose(e) {
     const value = e.currentTarget.dataset.value
+    const purposes = [...(this.data.formData.purposes || [])]
+    const idx = purposes.indexOf(value)
+    if (idx === -1) {
+      purposes.push(value)
+    } else {
+      purposes.splice(idx, 1)
+    }
     this.setData({
-      'formData.purpose': value,
+      'formData.purposes': purposes,
     })
   },
 
