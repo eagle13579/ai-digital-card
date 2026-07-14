@@ -4,6 +4,7 @@
  * 支持行业模板自动匹配
  */
 const { MockService } = require('../../../utils/mockService')
+const { brochureApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 const store = require('../../../utils/store')
 const i18n = require('../../../utils/i18n')
@@ -134,6 +135,7 @@ Page({
 
     // ====== 草稿 ======
     draftSaved: false,
+    useRealApi: true,
   },
 
   _draftTimer: null,
@@ -579,7 +581,9 @@ Page({
         industry: data.industry,
       })
 
-      const result = await MockService.createBrochure(data)
+      const result = this.data.useRealApi
+        ? await brochureApi.create(data)
+        : await MockService.createBrochure(data)
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
 
       if (result && result.id) {
