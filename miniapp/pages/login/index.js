@@ -22,80 +22,61 @@ Page({
     showError: false,
     errorTitle: '',
     errorDesc: '',
-    avatarPreview: '',
-    userNickname: '',
   },
 
   onLoad() {
-    // 登录页不自动跳转 — 让用户自主决定登录或跳过
-    // （旧逻辑: 检测到已登录就跳首页，但测试阶段需要始终显示登录页）
-  },
-
-  // ========== 微信按钮授权登录（推荐方式，兼容新版微信） ==========
-  onGetUserInfo(e) {
-    if (!e.detail.userInfo) {
-      wx.showToast({ title: '需要授权才能使用', icon: 'none' })
-      return
-    }
-    this.setData({ loading: true })
-    const userInfo = e.detail.userInfo
-    wx.login({
-      success: (res) => {
-        if (res.code) {
-          this._handleLoginWithProfile(res.code, userInfo)
-        } else {
-          wx.showToast({ title: '微信登录失败', icon: 'none' })
-          this.setData({ loading: false })
-        }
-      },
-      fail: (err) => {
-        console.error('[Login] wx.login 失败:', err)
-        wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
-        this.setData({ loading: false })
-      },
-    })
-  },
-
-  // ========== 微信头像选择器（新版chooseAvatar API） ==========
-  onChooseAvatar(e) {
-    const { avatarUrl } = e.detail
-    this.setData({ avatarPreview: avatarUrl })
-    if (this.data.userNickname) {
-      wx.setStorageSync('pendingUserInfo', { nickName: this.data.userNickname, avatarUrl })
+    // 检查是否已登录
+    const { isLoggedIn } = store.getState()
+    if (isLoggedIn) {
+      wx.switchTab({ url: '/pages/index/index' })
     }
   },
 
-  // ========== 微信昵称输入 | ==========
-  onNicknameChange(e) {
-    const nickname = e.detail.value
-    this.setData({ userNickname: nickname })
-    if (this.data.avatarPreview) {
-      wx.setStorageSync('pendingUserInfo', { nickName: nickname, avatarUrl: this.data.avatarPreview })
-    }
-  },
-
-  // ========== 一键登录 ==========
+  // ========== 微信授权登录 ==========
   wxLogin() {
     this.setData({ loading: true })
-    wx.login({
-      success: (res) => {
-        if (res.code) {
-          // 收集用户在页面上设置的微信头像和昵称
-          const userInfo = {}
-          if (this.data.userNickname) userInfo.nickName = this.data.userNickname
-          if (this.data.avatarPreview) userInfo.avatarUrl = this.data.avatarPreview
-          this._handleLoginWithProfile(res.code, userInfo)
-        } else {
-          wx.showToast({ title: '微信登录失败', icon: 'none' })
+
+    if (wx.getUserProfile) {
+      wx.getUserProfile({
+        desc: '用于完善会员资料',
+        success: (userRes) => {
+          this._handleUserProfile(userRes.userInfo)
+        },
+        fail: () => {
+          wx.login({
+            success: (res) => {
+              if (res.code) {
+                this._handleLogin(res.code)
+              } else {
+                wx.showToast({ title: '微信登录失败', icon: 'none' })
+                this.setData({ loading: false })
+              }
+            },
+            fail: (err) => {
+              console.error('[Login] wx.login 失败:', err)
+              wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
+              this.setData({ loading: false })
+            },
+          })
+        },
+      })
+    } else {
+      wx.login({
+        success: (res) => {
+          if (res.code) {
+            this._handleLogin(res.code)
+          } else {
+            wx.showToast({ title: '微信登录失败', icon: 'none' })
+            this.setData({ loading: false })
+          }
+        },
+        fail: (err) => {
+          console.error('[Login] wx.login 失败:', err)
+          wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
           this.setData({ loading: false })
-        }
-      },
-      fail: (err) => {
-        console.error('[Login] wx.login 失败:', err)
-        wx.showToast({ title: '微信服务异常，请重试', icon: 'none' })
-        this.setData({ loading: false })
-      },
-    })
+        },
+      })
+    }
   },
 
   _handleUserProfile(userInfo) {
@@ -184,9 +165,9 @@ Page({
   _realApiLogin(code) {
     authApi.wxMiniLogin(code)
       .then(result => {
-        // request.js 已解包，result 即后端响应体
-        const token = result.access_token
-        const userInfo = result.user || {}
+        // request.js 已解包，result 即后端响应中的 data 字段
+        const token = result.token
+        const userInfo = result.userInfo || {}
 
         if (!token) {
           throw new Error('后端未返回 token')
@@ -202,6 +183,7 @@ Page({
       })
       .catch(err => {
         console.error('[Login] API 登录失败:', err)
+        // 如果使用了 noToast: true，这里需要手动提示
         if (err && err.message) {
           wx.showToast({ title: err.message, icon: 'none' })
         }
@@ -209,9 +191,9 @@ Page({
       })
   },
 
-  /**                                                                                                                                                                          
-   * Mock 登录（开发/降级用）                                                                                                                                                   
-   */                                                                                                                                                                         
+  /**
+   * Mock 登录（开发/降级用）
+   */
   _mockLogin(code) {
     MockService.login({ code })
       .then(result => {
@@ -236,11 +218,38 @@ Page({
   },
 
   goAgreement() {
-    wx.navigateTo({ url: '/pages/agreement/user' })
+    wx.showToast({ title: '用户协议', icon: 'none' })
   },
 
   goPrivacy() {
-    wx.navigateTo({ url: '/pages/agreement/privacy/index' })
+    wx.showToast({ title: '隐私政策', icon: 'none' })
+  },
+
+  mockWechatLogin() {
+    this.setData({ loading: true })
+    const mockUserInfo = {
+      nickName: '微信用户',
+      avatarUrl: '',
+      name: '微信用户',
+      avatar: '',
+    }
+    MockService.login({ code: 'test_code' })
+      .then(result => {
+        if (result.token) {
+          const mergedUserInfo = { ...(result.userInfo || {}), ...mockUserInfo }
+          store.setAuth(result.token, mergedUserInfo)
+          wx.showToast({ title: '模拟登录成功', icon: 'success', duration: 1500 })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/index/index' })
+          }, 1500)
+        } else {
+          this.showErrorModal('登录失败', '无法获取登录凭证，请重试')
+        }
+      })
+      .catch(err => {
+        console.error('[Login] Mock 登录失败:', err)
+        this.showErrorModal('网络连接失败', '无法连接服务器，请检查网络设置后重试')
+      })
   },
 
   showErrorModal(title, desc) {
@@ -259,21 +268,5 @@ Page({
   retryLogin() {
     this.hideError()
     this.wxLogin()
-  },
-
-  /** 弹出微信头像选择器，选完后刷新当前页 */
-  _promptAvatarPicker() {
-    const pages = getCurrentPages()
-    const currentPage = pages.length > 0 ? pages[pages.length - 1] : null
-    wx.chooseAvatar({
-      success: (avatarRes) => {
-        store.updateUserInfo({ avatar: avatarRes.avatarUrl })
-        store.markDataDirty()
-        if (currentPage && typeof currentPage.loadPageData === 'function') {
-          currentPage.loadPageData()
-        }
-        wx.showToast({ title: '头像已更新', icon: 'success' })
-      }
-    })
   },
 })
