@@ -3,7 +3,7 @@
  * 所有方法返回格式与 MockService 一致（{ data: ... }），
  * 上层页面无需感知 useRealApi 开关变化。
  */
-const { platformApi, connectionApi } = require('../../utils/api')
+const { platformApi, connectionApi } = require('./api')
 const { MockService } = require('../../utils/mockService')
 
 async function listPlatforms(params, useRealApi) {

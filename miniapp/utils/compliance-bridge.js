@@ -1,7 +1,7 @@
 /**
  * 安全合规 — 统一API桥接
  */
-const { authApi, brochureApi, trustApi, visitorApi } = require('../../utils/api')
+const { authApi, brochureApi, trustApi, visitorApi } = require('./api')
 const { MockService } = require('../../utils/mockService')
 
 async function getProfile(useRealApi) {
