@@ -144,13 +144,7 @@ Page({
                   content: '是否现在设置您的微信头像？',
                   success: (r) => {
                     if (r.confirm) {
-                      wx.chooseAvatar({
-                        success: (avatarRes) => {
-                          store.updateUserInfo({ avatar: avatarRes.avatarUrl })
-                          wx.setStorageSync('pendingAvatarUpdate', avatarRes.avatarUrl)
-                          wx.showToast({ title: '头像已更新', icon: 'success' })
-                        }
-                      })
+                      this._promptAvatarPicker()
                     }
                   }
                 })
@@ -236,13 +230,7 @@ Page({
                 content: '是否现在设置您的微信头像？',
                 success: (res) => {
                   if (res.confirm) {
-                    wx.chooseAvatar({
-                      success: (avatarRes) => {
-                        store.updateUserInfo({ avatar: avatarRes.avatarUrl })
-                        wx.setStorageSync('pendingAvatarUpdate', avatarRes.avatarUrl)
-                        wx.showToast({ title: '头像已更新', icon: 'success' })
-                      }
-                    })
+                    this._promptAvatarPicker()
                   }
                 }
               })
@@ -314,5 +302,21 @@ Page({
   retryLogin() {
     this.hideError()
     this.wxLogin()
+  },
+
+  /** 弹出微信头像选择器，选完后刷新当前页 */
+  _promptAvatarPicker() {
+    const pages = getCurrentPages()
+    const currentPage = pages.length > 0 ? pages[pages.length - 1] : null
+    wx.chooseAvatar({
+      success: (avatarRes) => {
+        store.updateUserInfo({ avatar: avatarRes.avatarUrl })
+        store.markDataDirty()
+        if (currentPage && typeof currentPage.loadPageData === 'function') {
+          currentPage.loadPageData()
+        }
+        wx.showToast({ title: '头像已更新', icon: 'success' })
+      }
+    })
   },
 })
