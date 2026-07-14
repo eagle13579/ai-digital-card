@@ -1,5 +1,4 @@
-const { MockService } = require('../../../utils/mockService')
-const { aiApi } = require('../../../utils/api')
+const { chat } = require('../../../utils/ai-bridge')
 const store = require('../../../utils/store')
 const CHAT_STORAGE_KEY = 'ai_chat_messages'
 
@@ -11,14 +10,15 @@ Page({
     userAvatar: '',
     canSend: false,
     isLoggedIn: false,
+    useRealApi: true,
   },
 
   async onLoad() {
-    // 恢复聊天记录
+    // 恢复聊天记录（最多最近20条）
     try {
       const saved = wx.getStorageSync(CHAT_STORAGE_KEY)
       if (saved && saved.length > 0) {
-        this.setData({ messages: saved })
+        this.setData({ messages: saved.slice(-20) })
       } else {
         this.setData({
           messages: [{role:'ai',content:'你好！我是AI助手，有什么可以帮助你的？'}]
@@ -34,23 +34,16 @@ Page({
     const isLoggedIn = store.getState().isLoggedIn
     
     if (isLoggedIn) {
-      try {
-        const res = await MockService.getUserProfile()
-        const profile = res?.data || {}
-        const userAvatar = profile.avatar || ''
-        this.setData({ userAvatar, isLoggedIn })
-      } catch (e) {
-        this.setData({ userAvatar: '', isLoggedIn })
-      }
+      this.setData({ userAvatar: '', isLoggedIn })
     } else {
       this.setData({ userAvatar: '', isLoggedIn })
     }
   },
 
   onUnload() {
-    // 持久化聊天记录
+    // WR-015: 退出时清空存储的聊天记录（只存最近20条 + 退出清空）
     try {
-      wx.setStorageSync(CHAT_STORAGE_KEY, this.data.messages)
+      wx.removeStorageSync(CHAT_STORAGE_KEY)
     } catch (e) {
       // ignore storage error
     }
@@ -78,20 +71,20 @@ Page({
     this.setData({ messages: msgs, inputValue: '', loading: true, canSend: false })
 
     try {
-      // 调用后端真实API — 即使后端没有LLM也会返回规则匹配的结构化回复
+      // 通过桥接层调用（根据useRealApi自动选择真实API或Mock）
       const history = msgs.map(m => ({ role: m.role, content: m.content }))
-      const res = await aiApi.chat(text, history.slice(0, -1))
+      const res = await chat(text, history.slice(0, -1), this.data.useRealApi)
       
-      // aiApi.chat 通过 request.js 自动解包，res 就是 ChatResponse 的 data 字段
+      // chat 桥接返回 ChatResponse 结构
       const reply = res.reply || res.content || '抱歉，我没有理解您的意思，请换个问题试试。'
       const replyType = res.type || 'text'
 
       const newMsgs = [...msgs, {role: 'ai', content: reply, type: replyType}]
       this.setData({ messages: newMsgs, loading: false })
       
-      // 持久化
+      // WR-015: 只存最近20条
       try {
-        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
+        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs.slice(-20))
       } catch (e) {}
     } catch (err) {
       console.error('[AI Chat] 请求失败:', err)
@@ -102,7 +95,7 @@ Page({
       this.setData({ messages: newMsgs, loading: false })
       
       try {
-        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs)
+        wx.setStorageSync(CHAT_STORAGE_KEY, newMsgs.slice(-20))
       } catch (e) {}
     }
   },

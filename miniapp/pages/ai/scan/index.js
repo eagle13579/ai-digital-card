@@ -1,4 +1,4 @@
-const { ocrApi } = require('../../../utils/api')
+const { scanImage: bridgeScan } = require('../../../utils/ai-bridge')
 
 /**
  * 解析扫码结果协议
@@ -39,6 +39,7 @@ Page({
     showResult: false,
     scanCount: 0,
     maxScans: 3,
+    useRealApi: true,
     // 扫码模式
     scanMode: 'ocr', // ocr | qrcode
     qrResult: null,
@@ -100,8 +101,8 @@ Page({
 
   async scanImage(imagePath) {
     try {
-      // 调用真实 OCR API
-      const res = await ocrApi.scan(imagePath)
+      // 通过桥接层调用（根据useRealApi自动选择真实OCR或Mock）
+      const res = await bridgeScan(imagePath, this.data.useRealApi)
 
       // 解析响应
       // 后端返回 { raw_text, contact: {phone,email,wechat}, business: {company_name,position,address,website} }
