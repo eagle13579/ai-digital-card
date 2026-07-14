@@ -2,8 +2,8 @@
  * AI匹配推荐 - 智能匹配筛选 (i18n enabled)
  * P2-10: 匹配推荐池扩充 — 支持翻页/加载更多
  */
-const { MockService } = require('../../../utils/mockService')
-const { matchApi, connectionApi } = require('../../../utils/api')
+const { getRecommend } = require('../../../utils/ai-bridge')
+const { connectionApi } = require('../../../utils/api')
 const i18n = require('../../../utils/i18n')
 
 const PAGE_SIZE = 10 // 每页10条
@@ -23,6 +23,7 @@ Page({
     page: 1,
     hasMore: true,
     loadingMore: false,
+    useRealApi: true,
 
     // 解锁详情
     showDetail: false,
@@ -60,25 +61,14 @@ Page({
   async loadRecommend() {
     this.setData({ loading: true, page: 1, hasMore: true })
     try {
-      if (MockService.USE_MOCK) {
-        const res = await MockService.getRecommendList(1, PAGE_SIZE)
-        const list = res.data || res
-        this.setData({
-          matches: list,
-          filteredMatches: list,
-          loading: false,
-          hasMore: list.length >= PAGE_SIZE,
-        })
-      } else {
-        const res = await matchApi.getRecommendList(1, PAGE_SIZE)
-        const list = res.data || res || []
-        this.setData({
-          matches: list,
-          filteredMatches: list,
-          loading: false,
-          hasMore: list.length >= PAGE_SIZE,
-        })
-      }
+      const res = await getRecommend({ page: 1, pageSize: PAGE_SIZE }, this.data.useRealApi)
+      const list = res.data || res || []
+      this.setData({
+        matches: list,
+        filteredMatches: list,
+        loading: false,
+        hasMore: list.length >= PAGE_SIZE,
+      })
     } catch (e) {
       console.error('获取匹配列表失败', e)
       this.setData({ loading: false })
@@ -91,14 +81,8 @@ Page({
     this.setData({ loadingMore: true })
     const nextPage = this.data.page + 1
     try {
-      let newItems = []
-      if (MockService.USE_MOCK) {
-        const res = await MockService.getRecommendList(nextPage, PAGE_SIZE)
-        newItems = res.data || res || []
-      } else {
-        const res = await matchApi.getRecommendList(nextPage, PAGE_SIZE)
-        newItems = res.data || res || []
-      }
+      const res = await getRecommend({ page: nextPage, pageSize: PAGE_SIZE }, this.data.useRealApi)
+      const newItems = res.data || res || []
       const merged = [...this.data.matches, ...newItems]
       this.setData({
         matches: merged,

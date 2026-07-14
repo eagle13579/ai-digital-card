@@ -1,5 +1,6 @@
 const { MockService } = require('../../../utils/mockService')
-
+const { generate } = require('../../../utils/ai-bridge')
+const { Logger } = require('../../../utils/util')
 const CONTENT_TYPES = [
   {
     id: 'intro',
@@ -77,11 +78,13 @@ Page({
     generated: false,
     result: '',
     loading: false,
+    useRealApi: true,
     charCount: 0,
   },
 
   onLoad() {
-    const profile = MockService.getUserProfile()
+    const store = require('../../../utils/store')
+    const profile = store.getState().userInfo || {}
     if (profile) {
       this.setData({
         inputData: {
@@ -122,10 +125,25 @@ Page({
     this.setData({ inputData })
   },
 
-  doGenerate() {
-    const { type, subtype, inputData } = this.data
+  async doGenerate() {
+    const { type, subtype, inputData, useRealApi } = this.data
     
     this.setData({ loading: true })
+
+    if (useRealApi) {
+      try {
+        const result = await generate({ type, subtype, ...inputData }, true)
+        this.setData({
+          result: result.content || result.text || result,
+          generated: true,
+          loading: false,
+          charCount: (result.content || result.text || result).length,
+        })
+        return
+      } catch (e) {
+        console.error('[AI生成] API失败，降级到模板:', e)
+      }
+    }
 
     setTimeout(() => {
       const templates = GENERATE_TEMPLATES[type] || {}
