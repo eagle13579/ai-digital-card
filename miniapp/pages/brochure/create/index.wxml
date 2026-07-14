@@ -206,6 +206,12 @@
           </view>
         </view>
 
+        <!-- 自定义行业输入 -->
+        <view wx:if="{{formData.industry === 'other'}}" class="form-item">
+          <text class="form-label">自定义行业</text>
+          <input class="form-input" placeholder="请输入您的行业领域" value="{{formData.industryCustom}}" bindinput="onInput" data-field="industryCustom" />
+        </view>
+
         <!-- 行业模板扩展字段 -->
         <view wx:if="{{templateExtraFields && templateExtraFields.length > 0}}" class="template-section">
           <view class="template-divider"></view>

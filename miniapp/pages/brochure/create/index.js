@@ -86,6 +86,7 @@ Page({
       companyDesc: '',
       development: '',
       companyImages: [],
+      industryCustom: '',
       // Step4 预览 - 风格
       style: 'professional',
       // 行业模板扩展字段
@@ -110,6 +111,7 @@ Page({
       { value: 'education', label: '教育', icon: '📚' },
       { value: 'medical', label: '医疗', icon: '🏥' },
       { value: 'manufacturing', label: '制造', icon: '🏭' },
+      { value: 'other', label: '其他', icon: '✏️' },
     ],
     currentTemplate: null,
     templateExtraFields: [],
@@ -517,6 +519,14 @@ Page({
    */
   selectIndustry(e) {
     const value = e.currentTarget.dataset.value
+    if (value === 'other') {
+      this.setData({
+        'formData.industry': 'other',
+        currentTemplate: null,
+        templateExtraFields: [],
+      })
+      return
+    }
     const template = this._getIndustryTemplate(value)
     const templateExtraFields = template ? template.extraFields : []
 
