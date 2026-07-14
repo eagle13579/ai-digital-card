@@ -12,26 +12,10 @@
 const store = require('./store')
 
 // API baseURL
-// 微信小程序API基础URL — 自动检测环境
-// 开发工具：http://localhost:8201（本地后端）
-// 真机调试/体验版/正式版：https://card.liankebao.top（生产服务器，通过Nginx代理到8201）
-const PROD_API = 'https://card.liankebao.top'
-const DEV_API = 'http://localhost:8201'
-
-const API_BASE_URL = (function() {
-  try {
-    if (typeof __wxConfig !== 'undefined' && __wxConfig) {
-      const env = __wxConfig.envVersion
-      // develop = 微信开发者工具（开发版）
-      // trial = 体验版
-      // release = 正式版
-      if (env === 'develop') {
-        return DEV_API
-      }
-    }
-  } catch(e) {}
-  return PROD_API
-})()
+// 统一使用生产域名（https）
+// 微信开发者工具中请勾选「不校验合法域名」：
+//   设置 → 项目设置 → 本地设置 → 不校验合法域名
+const API_BASE_URL = 'https://card.liankebao.top'
 
 // 请求超时时间(ms)
 const REQUEST_TIMEOUT = 8000
