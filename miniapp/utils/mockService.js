@@ -100,7 +100,14 @@ const MockService = {
   async createBrochure(data) {
     if (this.USE_MOCK) {
       await this.mockDelay()
-      const pages = this.generatePagesFromForm(data)
+      let pages = []
+      // 判断数据格式：如果已经是API格式（pages数组中包含content_type字段），直接使用
+      if (data.pages && Array.isArray(data.pages) && data.pages.length > 0 && data.pages[0].content_type) {
+        pages = data.pages
+      } else {
+        // 否则使用原始表单格式生成页面
+        pages = this.generatePagesFromForm(data)
+      }
       const brochure = {
         id: `b${Date.now()}`,
         ...data,
