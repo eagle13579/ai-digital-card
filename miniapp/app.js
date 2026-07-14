@@ -14,6 +14,13 @@ App({
     const { token } = store.getState()
     console.log('[App] onLaunch, isLoggedIn:', !!token)
 
+    // 冷启动未登录 → 跳转登录页（处理开发者工具编译后默认进首页）
+    if (!token) {
+      setTimeout(() => {
+        wx.redirectTo({ url: '/pages/login/index' })
+      }, 50)
+    }
+
     // 检查小程序更新
     this._checkUpdate()
   },
