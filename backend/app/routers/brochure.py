@@ -235,7 +235,7 @@ async def list_brochures(
     db: AsyncSession = Depends(get_db),
 ):
     """获取画册列表（cursor 分页）"""
-    query = select(Brochure)
+    query = select(Brochure).options(selectinload(Brochure.pages))
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
