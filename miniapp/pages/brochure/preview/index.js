@@ -3,6 +3,7 @@
  * 展示可横向翻页的AI数智名片画册
  */
 const { MockService } = require('../../../utils/mockService')
+const { brochureApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 
 Page({
@@ -52,7 +53,7 @@ Page({
   async loadBrochure(brochureId) {
     wx.showLoading({ title: '加载中...' })
     try {
-      const brochure = await MockService.getBrochureById(brochureId)
+      const brochure = await brochureApi.getById(brochureId)
       if (brochure && brochure.pages) {
         this.setBrochureData(brochure.pages)
       } else {
