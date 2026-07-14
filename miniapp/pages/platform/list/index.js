@@ -1,10 +1,12 @@
 const { MockService } = require('../../../utils/mockService')
-
+const { listPlatforms } = require('../../../utils/platform-bridge')
+const i18n = require('../../../utils/i18n')
 Page({
   data: {
     loading: true,
     platforms: [],
     showEmpty: false,
+    useRealApi: true,
   },
 
   onLoad() {
@@ -14,7 +16,7 @@ Page({
   async loadData() {
     this.setData({ loading: true })
     try {
-      const res = await MockService.getPlatformList()
+      const res = await listPlatforms({ keyword: '', skip: 0, limit: 20 }, this.data.useRealApi)
       const platforms = (res.data || []).map((p, index) => ({
         ...p,
         rank: index + 1,

@@ -1,4 +1,4 @@
-const { MockService } = require('../../../utils/mockService')
+const { getPlatform, getMembers, getApplications, getCoverage, getRanking } = require('../../../utils/platform-bridge')
 const { connectionApi } = require('../../../utils/api')
 
 const ROLE_MAP = {
@@ -20,6 +20,7 @@ Page({
     linkableCount: 1,
     pendingApplications: 0,
     pendingConnections: 0,
+    useRealApi: true,
   },
 
   onLoad(options) {
@@ -40,13 +41,14 @@ Page({
 
   async loadData() {
     this.setData({ loading: true })
+    const { platformId, useRealApi } = this.data
     try {
       const [platform, membersRes, appsRes, coverageRes, rankingRes] = await Promise.all([
-        MockService.getPlatformDetail(this.data.platformId),
-        MockService.getPlatformMembers(this.data.platformId),
-        MockService.getPlatformApplications(this.data.platformId),
-        MockService.getResourceCoverage(this.data.platformId),
-        MockService.getResourceRanking(this.data.platformId),
+        getPlatform(platformId, useRealApi),
+        getMembers(platformId, useRealApi),
+        getApplications(platformId, useRealApi),
+        getCoverage(platformId, useRealApi),
+        getRanking(platformId, useRealApi),
       ])
 
       const members = membersRes.data || []
@@ -58,7 +60,7 @@ Page({
       const pendingConnections = Math.floor(Math.random() * 5)
 
       this.setData({
-        platform,
+        platform: platform.data || platform,
         members,
         applications,
         coverage,

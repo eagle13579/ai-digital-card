@@ -1,4 +1,4 @@
-const { MockService } = require('../../../utils/mockService')
+const { getPlatform, getMembers, getResourceUnits, getOpportunities, joinPlatform } = require('../../../utils/platform-bridge')
 const store = require('../../../utils/store')
 
 Page({
@@ -14,6 +14,7 @@ Page({
     showInviteModal: false,
     resourceUnits: [],
     opportunities: [],
+    useRealApi: true,
   },
 
   onLoad(options) {
@@ -28,13 +29,16 @@ Page({
 
   async loadData() {
     this.setData({ loading: true })
+    const { platformId, useRealApi } = this.data
     try {
-      const [platform, membersRes, unitsRes, oppsRes] = await Promise.all([
-        MockService.getPlatformDetail(this.data.platformId),
-        MockService.getPlatformMembers(this.data.platformId),
-        MockService.getResourceUnits(this.data.platformId),
-        MockService.getPlatformOpportunities(this.data.platformId),
+      const [platformRes, membersRes, unitsRes, oppsRes] = await Promise.all([
+        getPlatform(platformId, useRealApi),
+        getMembers(platformId, useRealApi),
+        getResourceUnits(platformId, useRealApi),
+        getOpportunities(platformId, useRealApi),
       ])
+
+      const platform = platformRes.data || platformRes
       if (!platform) {
         wx.showToast({ title: '平台不存在', icon: 'none' })
         wx.navigateBack()
@@ -128,9 +132,9 @@ Page({
     wx.showLoading({ title: '加入中...' })
 
     try {
-      const result = await MockService.joinPlatform(this.data.platformId)
+      const result = await joinPlatform(this.data.platformId, this.data.useRealApi)
       wx.hideLoading()
-      wx.showToast({ title: result.message, icon: 'success' })
+      wx.showToast({ title: result.data?.message || '加入成功', icon: 'success' })
       this.setData({
         alreadyJoined: true,
         joining: false,
