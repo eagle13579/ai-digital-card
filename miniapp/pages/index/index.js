@@ -67,12 +67,16 @@ Page({
   },
 
   onShow() {
-    const { isLoggedIn, dataDirty } = store.getState()
-    if (isLoggedIn) {
-      if (dataDirty || !this.data.loading) {
-        store.clearDataDirty()
-        this.loadPageData()
-      }
+    const state = store.getState()
+    const { isLoggedIn } = state
+    // 全局登录守卫（第二层）：页面级 — 未登录时跳回登录页
+    if (!isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    if (state.dataDirty || !this.data.loading) {
+      store.clearDataDirty()
+      this.loadPageData()
     }
     this._loadI18n()
   },
