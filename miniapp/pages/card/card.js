@@ -18,12 +18,35 @@ Page({
 
   onLoad(options) {
     this._loadI18n()
+    // 登录守卫
+    const store = require('../../utils/store')
+    if (!store.getState().isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     const cardId = options.id
     if (cardId) {
       this.loadCardDetail(cardId)
     } else {
-      wx.showToast({ title: i18n.t('paramError'), icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 1500)
+      // 从tab进入时没有传id，加载用户自己的名片
+      this.loadMyCard()
+    }
+  },
+
+  async loadMyCard() {
+    this.setData({ loading: true })
+    try {
+      const brochures = await MockService.getMyBrochures()
+      const list = Array.isArray(brochures) ? brochures : (brochures?.data?.items || [])
+      if (list.length > 0) {
+        this.loadCardDetail(list[0].id)
+      } else {
+        this.setData({ loading: false, card: null })
+        wx.showToast({ title: i18n.t('noCardYet') || '暂无名片', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('加载我的名片失败:', err)
+      this.setData({ loading: false })
     }
   },
 
@@ -38,6 +61,8 @@ Page({
 
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
+    const store = require('../../utils/store')
+    const { userInfo } = store.getState()
     try {
       const [brochure, recommendRes, trustNetRes] = await Promise.all([
         MockService.getBrochureById(cardId),
@@ -59,10 +84,10 @@ Page({
           status: brochure.status,
           share_token: brochure.share_token,
           view_count: brochure.view_count || 0,
-          user_name: brochure.user_name || brochure.name || '',
-          user_company: brochure.user_company || brochure.company || '',
-          user_title: brochure.user_title || brochure.title || '',
-          user_avatar: brochure.user_avatar || brochure.avatar || '',
+          user_name: userInfo?.name || brochure.name || '',
+          user_company: userInfo?.company || brochure.company || '',
+          user_title: userInfo?.title || '',
+          user_avatar: userInfo?.avatar || userInfo?.avatarUrl || brochure.avatar || '',
         }
       }
 
@@ -100,37 +125,16 @@ Page({
 
   goPreview() {
     const card = this.data.card
-    if (card) {
+    if (card && card.id) {
       wx.navigateTo({ url: `/pages/brochure/preview/index?id=${card.id}` })
+    } else {
+      wx.navigateTo({ url: '/pages/brochure/create/index' })
     }
   },
 
   shareCard() {
     const card = this.data.card
-    if (typeof wx.shareAppMessage === 'function') {
-      wx.shareAppMessage({
-        title: (card?.user_name || '') + '的AI数智名片',
-        path: card ? `/pages/brochure/preview/index?id=${card.id}` : '/pages/index/index',
-      })
-    } else {
-      wx.showToast({ title: '当前版本不支持主动分享', icon: 'none' })
-    }
-  },
-
-  async generateQRCode() {
-    const card = this.data.card
-    if (!card) return
-    try {
-      const { miniappApi } = require('../../utils/api')
-      const res = await miniappApi.getQRCode(card.share_token)
-      if (res?.qrcode_url) {
-        wx.previewImage({ urls: [res.qrcode_url] })
-      } else {
-        wx.showToast({ title: '生成失败', icon: 'none' })
-      }
-    } catch (err) {
-      console.error('生成二维码失败:', err)
-    }
+    wx.showToast({ title: '请点击右上角"..."分享', icon: 'none' })
   },
 
   onShareAppMessage() {

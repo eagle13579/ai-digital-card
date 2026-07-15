@@ -3,7 +3,6 @@
  * 4步引导：基本信息 → 专业信息 → 公司信息 → 预览发布
  * 支持行业模板自动匹配
  */
-const { MockService } = require('../../../utils/mockService')
 const { brochureApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 const store = require('../../../utils/store')
@@ -86,6 +85,7 @@ Page({
       companyDesc: '',
       development: '',
       companyImages: [],
+      attachmentFile: null,
       industryCustom: '',
       // Step4 预览 - 风格
       style: 'professional',
@@ -139,7 +139,7 @@ Page({
 
     // ====== 草稿 ======
     draftSaved: false,
-    useRealApi: false,
+    useRealApi: true,
   },
 
   _draftTimer: null,
@@ -147,39 +147,13 @@ Page({
 
   onLoad() {
     Logger.info('画册创建页', '页面加载')
+    // 登录守卫
+    if (!store.getState().isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     this._setupAutoSave()
     this._checkDraft()
-  },
-
-  fillTestData() {
-    const testData = {
-      name: '测试用户',
-      title: '产品经理',
-      company: '测试科技公司',
-      phone: '13800138000',
-      email: 'test@example.com',
-      wechat: 'test_wechat',
-      bio: '这是一段测试用的个人简介，用于验证名片预览功能是否正常工作。拥有丰富的产品经验，擅长用户增长和数据分析。',
-      school: '测试大学',
-      major: '计算机科学',
-      education: '本科',
-      skillTags: ['产品设计', '用户研究', '数据分析'],
-      provides: ['产品设计', '用户增长策略', '数据分析'],
-      needs: ['技术开发', '投资合作', '市场推广'],
-      purposes: ['partner', 'investor'],
-      companyName: '测试科技公司',
-      industry: 'tech',
-      companySize: '51-100人',
-      companyDesc: '测试科技公司专注于互联网产品研发和创新，致力于为用户提供优质的数字化解决方案。',
-      development: '2020年：公司成立\n2022年：获得天使轮融资\n2024年：产品用户突破1000万',
-      style: 'professional',
-    }
-    this.setData({
-      formData: testData,
-      currentStep: 4,
-    })
-    wx.showToast({ title: '测试数据已填充', icon: 'success', duration: 1500 })
-    Logger.info('画册创建页', '填充测试数据')
   },
 
   onUnload() {
@@ -339,10 +313,11 @@ Page({
         errors.company = '请输入公司名称'
         valid = false
       }
-      if (!formData.email || !formData.email.trim()) {
-        errors.email = '请输入邮箱'
+      if (!formData.phone || !formData.phone.trim()) {
+        errors.phone = '请输入手机号码'
         valid = false
       }
+      // 邮箱非必填
     } else if (step === 2) {
       // 技能标签、合作意向不是严格必填，但bio建议至少50字
       if (formData.bio && formData.bio.length < 10) {
@@ -535,6 +510,45 @@ Page({
     })
   },
 
+  // ==================== 附件文件上传 ====================
+
+  chooseAttachment() {
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['pdf', 'ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx', 'zip'],
+      success: (res) => {
+        const file = res.tempFiles[0]
+        // 文件大小限制 10MB
+        if (file.size > 10 * 1024 * 1024) {
+          wx.showToast({ title: '文件超过10MB限制', icon: 'none' })
+          return
+        }
+        this.setData({
+          'formData.attachmentFile': {
+            name: file.name,
+            size: file.size,
+            sizeLabel: this._formatFileSize(file.size),
+            path: file.path,
+          },
+        })
+      },
+    })
+  },
+
+  removeAttachment() {
+    this.setData({
+      'formData.attachmentFile': null,
+    })
+  },
+
+  _formatFileSize(bytes) {
+    if (!bytes) return ''
+    if (bytes < 1024) return bytes + 'B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + 'MB'
+  },
+
   // ==================== 行业模板 ====================
 
   /**
@@ -652,64 +666,118 @@ Page({
         }
       }
 
+      // 上传公司图片
+      let companyImageUrls = []
+      if (fd.companyImages && fd.companyImages.length > 0) {
+        wx.showLoading({ title: '上传图片...' })
+        for (const imgPath of fd.companyImages) {
+          if (imgPath && imgPath.startsWith('wxfile://')) {
+            try {
+              const url = await brochureApi.uploadCover(imgPath)
+              companyImageUrls.push(url)
+            } catch (e) {
+              Logger.warn('画册创建页', '公司图片上传失败', e)
+              // 上传失败，跳过该图片
+            }
+          } else if (imgPath) {
+            companyImageUrls.push(imgPath)
+          }
+        }
+      }
+
       // 构建后端期望的 brochure/pages 结构
       const industry = fd.industry === 'other' ? fd.industryCustom : fd.industry
       const skillTags = fd.skillTags || []
       const purposes = (fd.purposes && fd.purposes.length > 0)
         ? fd.purposes.join(',')
         : (fd.purpose || '')
+      const pages = [
+        {
+          content_type: 'profile',
+          content: JSON.stringify({
+            name: fd.name || '',
+            title: fd.title || '',
+            company: fd.company || '',
+            email: fd.email || '',
+            phone: fd.phone || '',
+            wechat: fd.wechat || '',
+            bio: fd.bio || '',
+            education: fd.education || '',
+            school: fd.school || '',
+            major: fd.major || '',
+            industry: industry || '',
+            companySize: fd.companySize || '',
+            companyDesc: fd.companyDesc || '',
+            development: fd.development || '',
+            style: fd.style || 'professional',
+          }),
+          sort_order: 0,
+        },
+        {
+          content_type: 'skills',
+          content: JSON.stringify(skillTags),
+          sort_order: 1,
+        },
+        {
+          content_type: 'contact',
+          content: JSON.stringify({
+            provides: fd.provides || [],
+            needs: fd.needs || [],
+            purpose: purposes,
+          }),
+          sort_order: 2,
+        },
+      ]
+
+      // 如果有公司信息，添加公司介绍页
+      const companyName = fd.companyName || fd.company || ''
+      const companyDesc = fd.companyDesc || ''
+      const development = fd.development || ''
+
+      // 上传附件文件
+      let attachmentData = null
+      if (fd.attachmentFile && fd.attachmentFile.path) {
+        wx.showLoading({ title: '上传文件...' })
+        try {
+          const uploadResult = await brochureApi.uploadFile(fd.attachmentFile.path)
+          attachmentData = {
+            name: fd.attachmentFile.name,
+            url: uploadResult.url,
+            size: fd.attachmentFile.size,
+          }
+        } catch (e) {
+          Logger.warn('画册创建页', '附件上传失败（不阻断流程）', e)
+          // 附件上传失败不阻断画册创建
+        }
+      }
+
+      if (companyName || companyDesc || development || companyImageUrls.length > 0 || attachmentData) {
+        pages.push({
+          content_type: 'company',
+          content: JSON.stringify({
+            name: companyName,
+            desc: companyDesc,
+            development: development,
+            industry: industry || '',
+            size: fd.companySize || '',
+            images: companyImageUrls,
+            attachments: attachmentData ? [attachmentData] : [],
+          }),
+          sort_order: 3,
+        })
+      }
+
       const pageData = {
         title: (fd.name || '未知') + '的电子名片',
         cover: coverUrl,
         purpose: purposes,
         album_meta: null,
-        pages: [
-          {
-            content_type: 'profile',
-            content: JSON.stringify({
-              name: fd.name || '',
-              title: fd.title || '',
-              company: fd.company || '',
-              email: fd.email || '',
-              phone: fd.phone || '',
-              wechat: fd.wechat || '',
-              bio: fd.bio || '',
-              education: fd.education || '',
-              school: fd.school || '',
-              major: fd.major || '',
-              industry: industry || '',
-              companySize: fd.companySize || '',
-              companyDesc: fd.companyDesc || '',
-              development: fd.development || '',
-              style: fd.style || 'professional',
-            }),
-            sort_order: 0,
-          },
-          {
-            content_type: 'skills',
-            content: JSON.stringify(skillTags),
-            sort_order: 1,
-          },
-          {
-            content_type: 'contact',
-            content: JSON.stringify({
-              provides: fd.provides || [],
-              needs: fd.needs || [],
-              purpose: purposes,
-            }),
-            sort_order: 2,
-          },
-        ],
+        pages,
       }
 
       let result
       if (this.data.useRealApi) {
         result = await brochureApi.create(pageData)
-      } else {
-        const origMockFlag = MockService.USE_MOCK
-        MockService.USE_MOCK = true
-        result = await MockService.createBrochure(pageData)
-        MockService.USE_MOCK = origMockFlag
       }
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
 
@@ -719,12 +787,12 @@ Page({
 
       if (result && result.id) {
         wx.hideLoading()
-        this._clearDraft()
+        // 生成成功后保留草稿(不清除)，方便用户再次修改
         wx.showToast({ title: '生成成功', icon: 'success' })
         store.markDataDirty()
         setTimeout(() => {
           wx.navigateTo({
-            url: `/pages/brochure/preview/index?id=${result.id}`,
+            url: `/pages/brochure/preview/index?id=${result.id}&created=1`,
           })
         }, 1500)
       } else {

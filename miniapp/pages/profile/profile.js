@@ -16,21 +16,25 @@ Page({
     trustCount: 0,
     newVisitorCount: 0,
     stats: { visitors: 0, matches: 0, unlocks: 0, views: 0 },
+    brochureId: null,
+    hasBrochure: false,
     // 注销账号弹窗
     showDeleteModal: false,
     deleteConfirmText: '',
     // i18n
     _t: {},
-    useRealApi: false,
+    useRealApi: true,
   },
 
   onLoad() {
     this._loadI18n()
+    this.setData({ _profileLoadedAt: Date.now() })
     this.loadProfile()
   },
 
   onShow() {
-    if (!this.data.loading) {
+    // 避免tab切换时重复加载导致闪动（30秒内不重载）
+    if (!this.data.loading && (Date.now() - (this.data._profileLoadedAt || 0)) > 30000) {
       this.loadProfile()
     }
     this._loadI18n()
@@ -84,7 +88,10 @@ Page({
         trustCount,
         newVisitorCount,
         stats,
+        brochureId: brochure ? brochure.id : null,
+        hasBrochure: !!brochure,
         loading: false,
+        _profileLoadedAt: Date.now(),
       })
 
       store.updateUserInfo(userInfo)
@@ -114,12 +121,21 @@ Page({
 
   // 编辑名片
   goEditCard() {
-    wx.navigateTo({ url: '/pages/brochure/create/index' })
+    // 有画册 → 去预览(可在此编辑)，无画册 → 创建
+    if (this.data.hasBrochure && this.data.brochureId) {
+      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${this.data.brochureId}` })
+    } else {
+      wx.navigateTo({ url: '/pages/brochure/create/index' })
+    }
   },
 
   // 画册管理
   goAlbum() {
-    wx.navigateTo({ url: '/pages/brochure/create/index' })
+    if (this.data.hasBrochure && this.data.brochureId) {
+      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${this.data.brochureId}` })
+    } else {
+      wx.navigateTo({ url: '/pages/brochure/create/index' })
+    }
   },
 
   // 会员中心

@@ -8,6 +8,7 @@ const { Logger } = require('../../../utils/util')
 
 Page({
   data: {
+    showGuidance: false,
     brochureId: '',
     pages: [],
     currentPage: 0,
@@ -23,21 +24,51 @@ Page({
     },
   },
 
-  /** 根据页面类型返回不同背景色 */
-  getPageBackground(type) {
-    const bgMap = {
-      cover: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
-      profile: '#F8FAFC',
-      resources: '#EEF2FF',
-      company: '#ffffff',
-      case: '#FAFAFA',
-      contact: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+  /** 根据页面类型和风格返回不同背景色 */
+  getPageBackground(type, style = 'professional') {
+    const styleColors = {
+      professional: {
+        dark: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+        card: '#1e1b4b',
+        cardAlt: '#1a1a2e',
+      },
+      creative: {
+        dark: 'linear-gradient(135deg, #831843 0%, #9D174D 100%)',
+        card: '#2d1b2e',
+        cardAlt: '#1a1a2e',
+      },
+      minimal: {
+        dark: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+        card: '#1e293b',
+        cardAlt: '#1a1a2e',
+      },
     }
-    return bgMap[type] || '#ffffff'
+    const colors = styleColors[style] || styleColors.professional
+    const bgMap = {
+      cover: colors.dark,
+      profile: colors.card,
+      resources: colors.cardAlt,
+      company: colors.card,
+      case: colors.cardAlt,
+      contact: colors.dark,
+    }
+    return bgMap[type] || '#0f0f1a'
   },
 
   onLoad(options) {
     Logger.info('画册预览页', '页面加载开始', { options: options || {} })
+    
+    // 登录守卫
+    const app = getApp()
+    if (!app.getState().isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    
+    // 检测是否刚从创建页跳转过来
+    if (options && options.created === '1') {
+      this.setData({ showGuidance: true })
+    }
     
     const brochureId = options && options.id
     if (brochureId) {
@@ -187,6 +218,19 @@ Page({
             purpose: parsed.purpose || '',
             sort_order,
           }
+        } else if (content_type === 'company') {
+          const parsed = JSON.parse(content)
+          converted = {
+            type: 'company',
+            name: parsed.name || '',
+            industry: parsed.industry || '',
+            size: parsed.size || '',
+            desc: parsed.desc || '',
+            development: parsed.development || '',
+            images: parsed.images || [],
+            attachments: parsed.attachments || [],
+            sort_order,
+          }
         } else {
           converted = { type: content_type, sort_order }
         }
@@ -310,19 +354,35 @@ Page({
   setBrochureData(pages) {
     Logger.info('画册预览页', '设置画册数据', { pageCount: pages ? pages.length : 0 })
     
-    const firstPage = pages && pages[0]
-    const pageBackgrounds = pages ? pages.map(p => this.getPageBackground(p.type)) : []
+    // 如果是刚创建的名片，在末尾追加操作引导页
+    let finalPages = pages
+    if (this.data.showGuidance && Array.isArray(pages)) {
+      finalPages = [...pages, { type: 'action' }]
+    }
+    
+    const firstPage = finalPages && finalPages[0]
+    
+    // 从profile页面提取风格设置
+    let style = 'professional'
+    if (finalPages && Array.isArray(finalPages)) {
+      const profilePage = finalPages.find(p => p.type === 'profile')
+      if (profilePage && profilePage.style) {
+        style = profilePage.style
+      }
+    }
+    
+    const pageBackgrounds = finalPages ? finalPages.map(p => this.getPageBackground(p.type, style)) : []
     
     this.setData({
-      pages,
-      totalPages: pages ? pages.length : 0,
+      pages: finalPages,
+      totalPages: finalPages ? finalPages.length : 0,
       currentPage: 0,
       pageBackgrounds,
-      pageBackground: pageBackgrounds[0] || '#ffffff',
+      pageBackground: pageBackgrounds[0] || '#0f0f1a',
       pageType: firstPage && firstPage.type ? firstPage.type : '',
     })
     
-    Logger.info('画册预览页', '画册数据设置完成', { totalPages: pages ? pages.length : 0, firstPageType: firstPage && firstPage.type ? firstPage.type : 'none' })
+    Logger.info('画册预览页', '画册数据设置完成', { totalPages: finalPages ? finalPages.length : 0, firstPageType: firstPage && firstPage.type ? firstPage.type : 'none' })
   },
 
   onSwiperChange(e) {
@@ -370,27 +430,38 @@ Page({
     }
   },
 
-  shareBrochure() {
-    wx.showActionSheet({
-      itemList: ['分享给朋友', '生成海报', '复制链接'],
-      success: (res) => {
-        if (res.tapIndex === 0) {
-          if (typeof wx.shareAppMessage === 'function') {
-            wx.shareAppMessage()
-          } else {
-            wx.showToast({ title: '当前版本不支持主动分享', icon: 'none' })
-          }
-        } else {
-          wx.showToast({ title: '功能开发中', icon: 'none' })
-        }
+  openAttachment(e) {
+    const url = e.currentTarget.dataset.url
+    wx.downloadFile({
+      url,
+      success(res) {
+        wx.openDocument({ filePath: res.tempFilePath })
+      },
+      fail() {
+        wx.showToast({ title: '下载失败', icon: 'none' })
       },
     })
   },
 
   onShareAppMessage() {
+    const brochureId = this.data.brochureId || ''
+    const pages = this.data.pages || []
+    const coverPage = pages[0]
     return {
-      title: 'AI数智名片',
-      path: '/pages/brochure/preview/index',
+      title: coverPage && coverPage.title ? coverPage.title : 'AI数智名片',
+      path: brochureId ? `/pages/brochure/preview/index?id=${brochureId}` : '/pages/brochure/preview/index',
+      imageUrl: coverPage && coverPage.avatar ? coverPage.avatar : '',
+    }
+  },
+
+  onShareTimeline() {
+    const brochureId = this.data.brochureId || ''
+    const pages = this.data.pages || []
+    const coverPage = pages[0]
+    return {
+      title: coverPage && coverPage.title ? coverPage.title : 'AI数智名片',
+      query: brochureId ? `id=${brochureId}` : '',
+      imageUrl: coverPage && coverPage.avatar ? coverPage.avatar : '',
     }
   },
 })
