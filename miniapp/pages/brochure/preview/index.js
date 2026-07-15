@@ -13,7 +13,7 @@ Page({
     pages: [],
     currentPage: 0,
     totalPages: 0,
-    pageBackground: '#ffffff',
+    pageBackground: '#0f0f1a',
     pageBackgrounds: [],
     pageType: '',
     purposeMap: {
@@ -26,33 +26,18 @@ Page({
 
   /** 根据页面类型和风格返回不同背景色 */
   getPageBackground(type, style = 'professional') {
-    const styleColors = {
-      professional: {
-        dark: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
-        card: '#1e1b4b',
-        cardAlt: '#1a1a2e',
-      },
-      creative: {
-        dark: 'linear-gradient(135deg, #831843 0%, #9D174D 100%)',
-        card: '#2d1b2e',
-        cardAlt: '#1a1a2e',
-      },
-      minimal: {
-        dark: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
-        card: '#1e293b',
-        cardAlt: '#1a1a2e',
-      },
+    // 所有页面统一深色背景，风格只影响强调色（顶部线条/按钮等）
+    const styleAccents = {
+      professional: { header: 'linear-gradient(135deg, #4F46E5, #7C3AED)', accent: '#7C3AED' },
+      creative: { header: 'linear-gradient(135deg, #831843, #9D174D)', accent: '#9D174D' },
+      minimal: { header: 'linear-gradient(135deg, #475569, #1E293B)', accent: '#334155' },
     }
-    const colors = styleColors[style] || styleColors.professional
-    const bgMap = {
-      cover: colors.dark,
-      profile: colors.card,
-      resources: colors.cardAlt,
-      company: colors.card,
-      case: colors.cardAlt,
-      contact: colors.dark,
+    const s = styleAccents[style] || styleAccents.professional
+    // cover和contact用强调色渐变背景，其他用统一深色
+    if (type === 'cover' || type === 'contact' || type === 'action') {
+      return s.header
     }
-    return bgMap[type] || '#0f0f1a'
+    return '#0f0f1a'
   },
 
   onLoad(options) {
