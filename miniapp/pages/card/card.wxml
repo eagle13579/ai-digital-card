@@ -78,8 +78,8 @@
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
-      <button wx:if="{{card}}" class="btn-primary" bindtap="goPreview">{{_t.previewAlbum}}</button>
-      <button wx:else class="btn-primary" bindtap="goPreview">{{_t.editCard || '创建名片'}}</button>
+      <button wx:if="{{card}}" class="btn-primary" bindtap="goPreview">{{_t.editCard || '编辑名片'}}</button>
+      <button wx:else class="btn-primary" bindtap="goPreview">{{_t.createCard || '创建名片'}}</button>
       <button class="btn-secondary" open-type="share" style="margin-top: 12px;">{{_t.shareCard}}</button>
     </view>
 

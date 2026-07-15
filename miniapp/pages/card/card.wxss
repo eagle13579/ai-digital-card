@@ -93,6 +93,7 @@
   align-items: center;
 }
 .status-badge-wrap {
-  flex: 1;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0;
 }
