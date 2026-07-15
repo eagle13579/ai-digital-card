@@ -145,7 +145,7 @@ Page({
   _draftTimer: null,
   _storageKey: 'brochure_create_draft',
 
-  onLoad() {
+  onLoad(options) {
     Logger.info('画册创建页', '页面加载')
     // 登录守卫
     if (!store.getState().isLoggedIn) {
@@ -154,6 +154,66 @@ Page({
     }
     this._setupAutoSave()
     this._checkDraft()
+    
+    // 编辑模式：如果有 edit=id，先从 API 加载完整数据预填
+    if (options && options.edit) {
+      Logger.info('画册创建页', '编辑模式', { editId: options.edit })
+      this.setData({ editId: options.edit })
+      this._loadBrochureForEdit(options.edit)
+    }
+  },
+
+  /** 编辑模式：加载画册数据并预填表单 */
+  async _loadBrochureForEdit(brochureId) {
+    try {
+      const { brochureApi } = require('../../../utils/api')
+      const resp = await brochureApi.getById(brochureId)
+      const data = resp && resp.data ? resp.data : resp
+      if (!data || !data.pages) return
+      const profilePage = data.pages.find(p => p.content_type === 'profile')
+      if (profilePage) {
+        const content = JSON.parse(profilePage.content)
+        const formData = {
+          avatar: data.cover || content.avatar || '',
+          name: content.name || '',
+          title: content.title || '',
+          company: content.company || '',
+          phone: content.phone || '',
+          email: content.email || '',
+          wechat: content.wechat || '',
+          school: content.school || '',
+          major: content.major || '',
+          education: content.education || '',
+          skillTags: content.skillTags || [],
+          bio: content.bio || '',
+          provides: content.provides || [],
+          needs: content.needs || [],
+          purpose: content.purpose || '',
+          purposes: content.purpose ? content.purpose.split(',') : [],
+          companyName: content.company || '',
+          industry: content.industry || '',
+          companySize: content.companySize || content.size || '',
+          companyDesc: content.companyDesc || content.desc || '',
+          development: content.development || '',
+          style: content.style || 'professional',
+        }
+        this.setData({ formData })
+        wx.showToast({ title: '已加载名片数据', icon: 'success', duration: 1500 })
+      }
+      // 加载公司图片页
+      const companyPage = data.pages.find(p => p.content_type === 'company')
+      if (companyPage) {
+        const c = JSON.parse(companyPage.content)
+        this.setData({
+          'formData.companyName': c.name || this.data.formData.companyName,
+          'formData.companyDesc': c.desc || '',
+          'formData.development': c.development || '',
+          'formData.companyImages': c.images || [],
+        })
+      }
+    } catch (e) {
+      Logger.warn('画册创建页', '加载编辑数据失败', e)
+    }
   },
 
   onUnload() {
@@ -772,7 +832,12 @@ Page({
 
       let result
       if (this.data.useRealApi) {
-        result = await brochureApi.create(pageData)
+        if (this.data.editId) {
+          // 编辑模式：更新已有画册
+          result = await brochureApi.update(this.data.editId, pageData)
+        } else {
+          result = await brochureApi.create(pageData)
+        }
       }
       Logger.info('画册创建页', '画册生成完成', { result: result ? { id: result.id, title: result.title } : null })
 

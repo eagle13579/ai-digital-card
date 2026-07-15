@@ -36,15 +36,14 @@ Page({
   async loadMyCard() {
     this.setData({ loading: true })
     try {
-      const brochures = await MockService.getMyBrochures()
-      const list = Array.isArray(brochures) ? brochures : (brochures?.data?.items || [])
+      // 使用 getBrochures（原 getMyBrochures 不存在）
+      const brochures = await MockService.getBrochures()
+      const list = Array.isArray(brochures) ? brochures : (brochures?.data?.items || brochures?.data || [])
       if (list.length > 0) {
-        // 已有画册，直接跳转到预览页（同首页名片预览的指向）
-        const first = list[0]
-        wx.redirectTo({ url: `/pages/brochure/preview/index?id=${first.id}` })
+        this.loadCardDetail(list[0].id)
       } else {
-        // 无名片，跳转创建页
-        wx.redirectTo({ url: '/pages/brochure/create/index' })
+        this.setData({ loading: false, card: null })
+        wx.showToast({ title: i18n.t('noCardYet') || '暂无名片', icon: 'none' })
       }
     } catch (err) {
       console.error('加载我的名片失败:', err)
@@ -145,7 +144,27 @@ Page({
   goPreview() {
     const card = this.data.card
     if (card && card.id) {
-      wx.navigateTo({ url: `/pages/brochure/preview/index?id=${card.id}` })
+      // 将名片数据保存为草稿，编辑时预填
+      if (card.id) {
+        wx.setStorageSync('edit_brochure_id', card.id)
+        // 存一份到 create 页的草稿格式
+        try {
+          const draft = {
+            formData: {
+              name: card.user_name || '',
+              title: card.user_title || '',
+              company: card.user_company || '',
+              avatar: card.user_avatar || card.cover || '',
+              // 其他字段从 brochure.pages 中解析
+            },
+            savedAt: Date.now(),
+          }
+          wx.setStorageSync('brochure_create_draft', draft)
+        } catch (e) {
+          console.warn('保存编辑草稿失败', e)
+        }
+      }
+      wx.navigateTo({ url: `/pages/brochure/create/index?edit=${card.id}` })
     } else {
       wx.navigateTo({ url: '/pages/brochure/create/index' })
     }

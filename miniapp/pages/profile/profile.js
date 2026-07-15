@@ -48,19 +48,25 @@ Page({
   async loadProfile() {
     this.setData({ loading: true })
     try {
-      const useReal = this.data.useRealApi
-      const [profileRes, brochuresRes, trustNetRes, visitorStatsRes] = await Promise.all([
-        getProfile(useReal),
-        getBrochures(useReal),
-        getTrustNetwork(useReal),
-        getVisitorStats(useReal),
+      // 直接使用 MockService（USE_MOCK=false 时会路由到真实API，且自动处理参数）
+      const [profileRes, brochuresRes, trustNetRes] = await Promise.all([
+        MockService.getUserProfile(),
+        MockService.getBrochures(),
+        MockService.getTrustNetwork(),
       ])
 
       const profile = profileRes && profileRes.data ? profileRes.data : profileRes
       const brochureList = Array.isArray(brochuresRes) ? brochuresRes : (brochuresRes.data || [])
       const brochure = brochureList[0]
       const trustNet = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
-      const visitorStats = visitorStatsRes && visitorStatsRes.data ? visitorStatsRes.data : visitorStatsRes
+      // visitorStats 通过 brochureId 单独获取（避免无ID时404）
+      let visitorStats = {}
+      if (brochure && brochure.id) {
+        try {
+          const vRes = await MockService.getVisitorStats()
+          visitorStats = vRes && vRes.data ? vRes.data : vRes
+        } catch (e) {}
+      }
 
       const { getLevelText } = require('../../utils/levels')
       const memberLevel = profile.member_level || profile.memberLevel || 'free'

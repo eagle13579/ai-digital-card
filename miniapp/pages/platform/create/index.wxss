@@ -1,5 +1,13 @@
+.page-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-primary, #0f0f1a);
+}
+
 .form-scroll {
-  height: calc(100vh - 60px - 80px);
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 .form-section {
