@@ -676,8 +676,9 @@ Page({
               const url = await brochureApi.uploadCover(imgPath)
               companyImageUrls.push(url)
             } catch (e) {
-              Logger.warn('画册创建页', '公司图片上传失败', e)
-              // 上传失败，跳过该图片
+              Logger.warn('画册创建页', '公司图片上传失败，使用本地路径', e)
+              // 上传失败用原路径降级（仅上传者设备可见）
+              companyImageUrls.push(imgPath)
             }
           } else if (imgPath) {
             companyImageUrls.push(imgPath)
@@ -735,8 +736,13 @@ Page({
             size: fd.attachmentFile.size,
           }
         } catch (e) {
-          Logger.warn('画册创建页', '附件上传失败（不阻断流程）', e)
-          // 附件上传失败不阻断画册创建
+          Logger.warn('画册创建页', '附件上传失败，使用本地路径', e)
+          // 上传失败用本地路径降级（仅上传者设备可打开）
+          attachmentData = {
+            name: fd.attachmentFile.name,
+            url: fd.attachmentFile.path,
+            size: fd.attachmentFile.size,
+          }
         }
       }
 

@@ -24,9 +24,23 @@ Page({
     },
   },
 
-  /** 所有页面统一深色背景 */
+  /** 将purpose值转为中文显示（支持逗号分隔的多个意向） */
+  _getPurposeText(purpose) {
+    if (!purpose) return '合作意向'
+    const purposeMap = this.data.purposeMap || {}
+    const parts = purpose.split(',').filter(p => p.trim())
+    const chineseParts = parts.map(p => purposeMap[p.trim()] || p.trim())
+    return chineseParts.join('、')
+  },
+
+  /** 根据风格返回页面背景色（所有页面统一纯色，封面/动作页不使用渐变） */
   getPageBackground(type, style = 'professional') {
-    return '#0f0f1a'
+    const styleColors = {
+      professional: '#1e1b4b',
+      creative: '#2d1b2e',
+      minimal: '#1f2937',
+    }
+    return styleColors[style] || styleColors.professional
   },
 
   onLoad(options) {
@@ -44,7 +58,22 @@ Page({
       this.setData({ showGuidance: true })
     }
     
-    const brochureId = options && options.id
+    // 处理从二维码扫码进来的情况（scene 参数传 share_token）
+    let brochureId = options && options.id
+    if (!brochureId && options && options.scene) {
+      // 微信小程序码将 scene 放入 options.scene（已编码），解码后即 share_token
+      try {
+        const scene = decodeURIComponent(options.scene)
+        if (scene) {
+          Logger.info('画册预览页', '从二维码扫码进入', { scene })
+          this.loadBrochureByToken(scene)
+          return
+        }
+      } catch (e) {
+        Logger.warn('画册预览页', 'scene 解码失败', e)
+      }
+    }
+    
     if (brochureId) {
       this.data.brochureId = brochureId
       Logger.info('画册预览页', '加载指定画册', { brochureId })
@@ -59,6 +88,33 @@ Page({
     } else {
       Logger.info('画册预览页', '无画册ID，加载默认画册')
       this.loadMockBrochure()
+    }
+  },
+
+  /** 通过 share_token 加载画册（二维码扫码进入） */
+  async loadBrochureByToken(token) {
+    wx.showLoading({ title: '加载中...' })
+    try {
+      const resp = await brochureApi.getByShareToken(token)
+      const brochure = resp && resp.data ? resp.data : resp
+      if (brochure && brochure.id) {
+        this.data.brochureId = brochure.id
+        const firstPage = brochure.pages && brochure.pages[0]
+        if (firstPage && firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+      } else {
+        wx.hideLoading()
+        wx.showToast({ title: '名片不存在', icon: 'none' })
+      }
+      wx.hideLoading()
+    } catch (err) {
+      wx.hideLoading()
+      Logger.error('画册预览页', '通过share_token加载画册失败', err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
     }
   },
 
@@ -366,9 +422,23 @@ Page({
     }
   },
 
+  /** 预览公司图片 */
+  previewCompanyImage(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    // 从当前 page 数据中获取所有图片
+    const page = this.data.pages && this.data.pages[this.data.currentPage]
+    const images = (page && page.images) || [url]
+    wx.previewImage({ urls: images, current: url })
+  },
+
   openAttachment(e) {
     const url = e.currentTarget.dataset.url
     const name = e.currentTarget.dataset.name
+    if (!url) {
+      wx.showToast({ title: '文件不可用', icon: 'none' })
+      return
+    }
     wx.showLoading({ title: '下载中...' })
     wx.downloadFile({
       url,

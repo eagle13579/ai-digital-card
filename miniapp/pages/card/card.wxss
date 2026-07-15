@@ -97,3 +97,13 @@
   align-items: center;
   margin-left: 0;
 }
+
+/* 状态标签文本垂直居中 */
+.status-badge-wrap .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 3px 10px;
+  min-height: 24px;
+}

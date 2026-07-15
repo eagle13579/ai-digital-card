@@ -22,11 +22,27 @@ Page({
     showError: false,
     errorTitle: '',
     errorDesc: '',
+    // 登录后完善信息
+    showNicknameSetup: false,
+    setupInfo: { nickName: '', avatar: '' },
   },
 
-  onLoad() {
+  onLoad(options) {
     // 登录页始终显示，不自动跳转
     // 登录态由各受保护页面的三层守卫处理
+    
+    // 如果从首页跳转过来完善信息（setup=1），已有登录态则直接弹出设置对话框
+    if (options && options.setup === '1') {
+      const store = require('../../utils/store')
+      const state = store.getState()
+      if (state.isLoggedIn) {
+        const userName = state.userInfo?.name || state.userInfo?.nickName || ''
+        const userAvatar = state.userInfo?.avatar || state.userInfo?.avatarUrl || ''
+        if (!userName || userName === '微信用户' || !userAvatar) {
+          this.setData({ showNicknameSetup: true })
+        }
+      }
+    }
   },
 
   // 开发测试用：清除登录态回到登录页
@@ -122,11 +138,7 @@ Page({
           }
 
           store.setAuth(token, mergedUserInfo)
-
-          wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
-          setTimeout(() => {
-            wx.switchTab({ url: '/pages/index/index' })
-          }, 1500)
+          this._checkAndSetupUserInfo(mergedUserInfo, token)
         })
         .catch(err => {
           console.error('[Login] API 登录失败:', err)
@@ -146,10 +158,7 @@ Page({
               avatar: result.userInfo?.avatar || userInfo.avatarUrl || userInfo.avatar,
             }
             store.setAuth(result.token, mergedUserInfo)
-            wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
-            setTimeout(() => {
-              wx.switchTab({ url: '/pages/index/index' })
-            }, 1500)
+            this._checkAndSetupUserInfo(mergedUserInfo, result.token)
           } else {
             wx.showToast({ title: '登录失败', icon: 'none' })
             this.setData({ loading: false })
@@ -194,10 +203,7 @@ Page({
         // 更新全局状态
         store.setAuth(token, userInfo)
 
-        wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
-        setTimeout(() => {
-          wx.switchTab({ url: '/pages/index/index' })
-        }, 1500)
+        this._checkAndSetupUserInfo(userInfo, token)
       })
       .catch(err => {
         console.error('[Login] API 登录失败:', err)
@@ -266,5 +272,72 @@ Page({
   retryLogin() {
     this.hideError()
     this.wxLogin()
+  },
+
+  /** 登录成功后检查并完善用户信息 */
+  _checkAndSetupUserInfo(mergedUserInfo, token) {
+    const name = mergedUserInfo.name || mergedUserInfo.nickName || ''
+    const avatar = mergedUserInfo.avatar || mergedUserInfo.avatarUrl || ''
+    
+    // 如果已有真实姓名和头像，直接跳首页
+    if (name && name !== '微信用户' && avatar) {
+      wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/index/index' })
+      }, 1500)
+      return
+    }
+    
+    // 无真实信息，弹出设置对话框
+    this.setData({ showNicknameSetup: true, loading: false })
+  },
+
+  /** 选择头像（真实微信头像，基础库>=2.21.2） */
+  chooseAvatar() {
+    wx.chooseAvatar({
+      success: (res) => {
+        this.setData({ 'setupInfo.avatar': res.avatarUrl })
+      },
+    })
+  },
+
+  /** 输入昵称（使用 type=nickname 获取真实微信昵称） */
+  onNicknameInput(e) {
+    this.setData({ 'setupInfo.nickName': e.detail.value })
+  },
+
+  /** 完成信息设置 */
+  confirmSetup() {
+    const nickName = (this.data.setupInfo.nickName || '').trim()
+    const avatar = this.data.setupInfo.avatar
+    
+    if (!nickName) {
+      wx.showToast({ title: '请输入昵称', icon: 'none' })
+      return
+    }
+    if (!avatar) {
+      wx.showToast({ title: '请选择头像', icon: 'none' })
+      return
+    }
+    
+    // 更新store
+    const state = store.getState()
+    const userInfo = { ...state.userInfo, name: nickName, nickName: nickName, avatar, avatarUrl: avatar }
+    store.updateUserInfo(userInfo)
+    
+    this.setData({ showNicknameSetup: false })
+    wx.showToast({ title: '设置成功', icon: 'success', duration: 1500 })
+    setTimeout(() => {
+      wx.switchTab({ url: '/pages/index/index' })
+    }, 1500)
+  },
+
+  /** 跳过设置（使用"微信用户"作为默认名） */
+  skipSetup() {
+    this.setData({ showNicknameSetup: false })
+    wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+    setTimeout(() => {
+      wx.switchTab({ url: '/pages/index/index' })
+    }, 1500)
   },
 })

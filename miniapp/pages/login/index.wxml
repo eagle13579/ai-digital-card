@@ -35,6 +35,35 @@
     <text class="link" bindtap="goPrivacy">《隐私政策》</text>
   </view>
 
+  <!-- ===== 登录后完善信息弹窗 ===== -->
+  <view class="nickname-overlay {{showNicknameSetup ? 'visible' : ''}}" wx:if="{{showNicknameSetup}}">
+    <view class="nickname-card">
+      <text class="nickname-title">完善个人信息</text>
+      <text class="nickname-desc">请选择头像和输入昵称</text>
+      
+      <!-- 头像选择 -->
+      <view class="avatar-choose-area" bindtap="chooseAvatar">
+        <image wx:if="{{setupInfo.avatar}}" src="{{setupInfo.avatar}}" mode="aspectFill" class="setup-avatar" />
+        <view wx:else class="setup-avatar-placeholder">
+          <text class="setup-avatar-icon">📷</text>
+          <text class="setup-avatar-text">点击选择头像</text>
+        </view>
+      </view>
+
+      <!-- 昵称输入（type=nickname 获取真实微信昵称） -->
+      <view class="nickname-input-area">
+        <text class="input-label">昵称</text>
+        <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{setupInfo.nickName}}" />
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="nickname-actions">
+        <button class="btn-nickname-secondary" bindtap="skipSetup">跳过</button>
+        <button class="btn-nickname-primary" bindtap="confirmSetup">完成设置</button>
+      </view>
+    </view>
+  </view>
+
   <!-- 调试用：清除登录态回到登录页 -->
   <view class="dev-tools" bindtap="clearLogin">
     <text style="font-size:24rpx;color:#999;margin-top:20rpx;display:block;text-align:center;">清除登录态</text>

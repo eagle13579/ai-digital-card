@@ -57,6 +57,15 @@ Page({
       return
     }
     
+    // 检测用户信息是否为空（"微信用户"/空姓名/空头像），跳转登录页触发完善信息
+    const userName = state.userInfo?.name || state.userInfo?.nickName || ''
+    const userAvatar = state.userInfo?.avatar || state.userInfo?.avatarUrl || ''
+    if (!userName || userName === '微信用户' || !userAvatar) {
+      Logger.info('首页', '用户信息不完整，跳转完善信息', { userName, hasAvatar: !!userAvatar })
+      wx.redirectTo({ url: '/pages/login/index?setup=1' })
+      return
+    }
+    
     this.loadPageData()
     this.loadPlatformRecommend()
   },
@@ -90,7 +99,7 @@ Page({
       wx.redirectTo({ url: '/pages/login/index' })
       return
     }
-    if (state.dataDirty || !this.data.loading) {
+    if (state.dataDirty) {
       store.clearDataDirty()
       this.loadPageData()
     }
@@ -331,7 +340,12 @@ Page({
   },
 
   goQrCode() {
-    wx.navigateTo({ url: '/pages/qrcode/index' })
+    const brochure = this.data.brochure
+    if (brochure && brochure.id) {
+      wx.navigateTo({ url: `/pages/qrcode/index?id=${brochure.id}` })
+    } else {
+      wx.navigateTo({ url: '/pages/qrcode/index' })
+    }
   },
 
   // 跳转升级会员

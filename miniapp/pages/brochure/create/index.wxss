@@ -386,7 +386,7 @@
 }
 
 .purpose-option.active {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.35);
   border-color: #a78bfa;
   box-shadow: 0 0 30rpx rgba(139, 92, 246, 0.3);
 }

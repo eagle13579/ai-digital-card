@@ -58,7 +58,8 @@
         <view class="action-icon">◇</view>
         <text class="action-label">{{_t.aiSmart}}</text>
       </view>
-      <view class="action-item" bindtap="shareCard">
+      <view class="action-item" style="position:relative;">
+        <button open-type="share" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;z-index:1;"></button>
         <view class="action-icon">↗</view>
         <text class="action-label">{{_t.share}}</text>
       </view>

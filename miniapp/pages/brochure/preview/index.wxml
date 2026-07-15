@@ -67,6 +67,20 @@
               <text class="bio-title">个人简介</text>
               <text class="bio-content">{{page.bio}}</text>
             </view>
+            <view class="skill-tags-section" wx:if="{{page.skillTags && page.skillTags.length > 0}}">
+              <text class="section-tag-title">技能标签</text>
+              <view class="tags-wrap">
+                <text wx:for="{{page.skillTags}}" wx:key="index" class="tag skill-tag">{{item}}</text>
+              </view>
+            </view>
+            <view class="education-section" wx:if="{{page.school || page.major || page.education}}">
+              <text class="section-tag-title">教育背景</text>
+              <view class="education-row">
+                <text wx:if="{{page.school}}" class="edu-text">{{page.school}}</text>
+                <text wx:if="{{page.major}}" class="edu-text">{{page.major}}</text>
+                <text wx:if="{{page.education}}" class="edu-text">{{page.education}}</text>
+              </view>
+            </view>
             <view class="profile-contact">
               <view class="contact-item" wx:if="{{page.contact.phone}}" bindtap="copyText" data-text="{{page.contact.phone}}">
                 <text class="contact-icon">📞</text>
@@ -95,7 +109,7 @@
             </view>
             <view class="purpose-badge" wx:if="{{page.purpose}}">
               <text class="purpose-icon">🎯</text>
-              <text class="purpose-text">{{purposeMap[page.purpose] || page.purpose || '合作意向'}}</text>
+              <text class="purpose-text">{{_getPurposeText(page.purpose)}}</text>
             </view>
           </view>
 
@@ -115,7 +129,7 @@
               <text class="development-content">{{page.development}}</text>
             </view>
             <view wx:if="{{page.images && page.images.length > 0}}" class="company-images">
-              <image wx:for="{{page.images}}" wx:key="index" src="{{item}}" class="company-image" mode="aspectFill" />
+              <image wx:for="{{page.images}}" wx:key="index" src="{{item}}" class="company-image" mode="aspectFill" bindtap="previewCompanyImage" data-url="{{item}}" />
             </view>
             <view wx:if="{{page.attachments && page.attachments.length > 0}}" class="attachment-section">
               <text class="section-title-text">资料文件</text>
@@ -176,7 +190,7 @@
               <text class="action-desc-sub">可以分享给朋友或返回首页</text>
               <view class="action-buttons">
                 <button open-type="share" class="action-btn action-btn-share">📤 分享给好友</button>
-                <button open-type="share" share-type="2" class="action-btn action-btn-share">🌐 分享到朋友圈</button>
+                <button open-type="share" class="action-btn action-btn-share">🌐 分享到朋友圈</button>
                 <button class="action-btn action-btn-home" bindtap="goHome">🏠 返回首页</button>
                 <button class="action-btn action-btn-back" bindtap="goBack">⬅ 返回修改</button>
               </view>

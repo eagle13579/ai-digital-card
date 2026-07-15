@@ -39,10 +39,12 @@ Page({
       const brochures = await MockService.getMyBrochures()
       const list = Array.isArray(brochures) ? brochures : (brochures?.data?.items || [])
       if (list.length > 0) {
-        this.loadCardDetail(list[0].id)
+        // 已有画册，直接跳转到预览页（同首页名片预览的指向）
+        const first = list[0]
+        wx.redirectTo({ url: `/pages/brochure/preview/index?id=${first.id}` })
       } else {
-        this.setData({ loading: false, card: null })
-        wx.showToast({ title: i18n.t('noCardYet') || '暂无名片', icon: 'none' })
+        // 无名片，跳转创建页
+        wx.redirectTo({ url: '/pages/brochure/create/index' })
       }
     } catch (err) {
       console.error('加载我的名片失败:', err)
@@ -62,7 +64,7 @@ Page({
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
     const store = require('../../utils/store')
-    const { userInfo } = store.getState()
+    const { userInfo: storeUserInfo } = store.getState()
     try {
       const [brochure, recommendRes, trustNetRes] = await Promise.all([
         MockService.getBrochureById(cardId),
@@ -72,6 +74,23 @@ Page({
       
       const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
       const trustNet = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
+      
+      // 从画册的 profile 页面 content 中提取用户信息
+      let profileName = '', profileAvatar = '', profileCompany = '', profileTitle = ''
+      if (brochure && brochure.pages && Array.isArray(brochure.pages)) {
+        const profilePage = brochure.pages.find(p => p.content_type === 'profile')
+        if (profilePage && profilePage.content) {
+          try {
+            const parsed = JSON.parse(profilePage.content)
+            profileName = parsed.name || ''
+            profileAvatar = ''  // avatar 存在 brochure.cover 中，不在 content 里
+            profileCompany = parsed.company || ''
+            profileTitle = parsed.title || ''
+          } catch (e) {}
+        }
+      }
+      // avatar 优先用 brochure.cover，其次 store
+      const avatar = brochure?.cover || storeUserInfo?.avatar || storeUserInfo?.avatarUrl || ''
       
       let card = null
       if (brochure) {
@@ -84,10 +103,10 @@ Page({
           status: brochure.status,
           share_token: brochure.share_token,
           view_count: brochure.view_count || 0,
-          user_name: userInfo?.name || brochure.name || '',
-          user_company: userInfo?.company || brochure.company || '',
-          user_title: userInfo?.title || '',
-          user_avatar: userInfo?.avatar || userInfo?.avatarUrl || brochure.avatar || '',
+          user_name: profileName || storeUserInfo?.name || storeUserInfo?.nickName || '',
+          user_company: profileCompany || storeUserInfo?.company || '',
+          user_title: profileTitle || storeUserInfo?.title || '',
+          user_avatar: avatar,
         }
       }
 

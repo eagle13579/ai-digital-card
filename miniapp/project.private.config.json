@@ -9,7 +9,7 @@
     "preloadBackgroundData": false,
     "autoAudits": false,
     "showShadowRootInWxmlPanel": true,
-    "compileHotReLoad": false,
+    "compileHotReLoad": true,
     "bigPackageSizeSupport": false,
     "useApiHook": true,
     "useStaticServer": false,

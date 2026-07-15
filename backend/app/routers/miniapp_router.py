@@ -533,7 +533,7 @@ async def get_miniapp_qrcode(
                         "scene": share_token,
                         "width": width,
                         "auto_color": False,
-                        "page": "pages/brochure/share",
+                        "page": "pages/brochure/preview/index",
                     },
                 )
                 # 如果返回的是图片二进制（content-type 含 image），直接使用

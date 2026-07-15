@@ -60,10 +60,10 @@ Page({
     try {
       const res = await miniappApi.getQRCode(shareToken, width)
       
-      if (res && res.data) {
-        // 后端返回的是Base64编码的图片
+      // request.js 已解包 body.data，res 是 data_url 字符串（如 "data:image/png;base64,..."）
+      if (res && typeof res === 'string' && res.startsWith('data:image')) {
         this.setData({
-          qrcodeImageUrl: res.data,
+          qrcodeImageUrl: res,
           generating: false,
         })
         wx.showToast({ title: '二维码已就绪', icon: 'success' })
@@ -278,14 +278,18 @@ Page({
   onShareAppMessage() {
     const b = this.data.brochure
     return { 
-      title: (b && b.title) || '名片二维码', 
-      path: '/pages/qrcode/index?id=' + ((b && b.id) || ''),
+      title: (b && b.title) || 'AI数智名片', 
+      path: b && b.id ? `/pages/brochure/preview/index?id=${b.id}` : '/pages/index/index',
       imageUrl: (b && b.cover) || '',
     }
   },
 
   onShareTimeline() {
     const b = this.data.brochure
-    return { title: (b && b.title) || '名片二维码' }
+    return { 
+      title: (b && b.title) || 'AI数智名片',
+      query: b && b.id ? `id=${b.id}` : '',
+      imageUrl: (b && b.cover) || '',
+    }
   },
 })
