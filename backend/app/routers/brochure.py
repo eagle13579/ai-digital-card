@@ -516,8 +516,11 @@ async def smart_search(
 
 
 import os
+import logging
 from pathlib import Path
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class CoverUploadResponse(BaseModel):
@@ -585,6 +588,74 @@ async def upload_cover(
     )
 
     return CoverUploadResponse(
+        url=url,
+        original_name=file.filename or "",
+        size=len(content),
+    )
+
+
+# ── 文件上传 ─────────────────────────────────────────────
+
+
+class FileUploadResponse(BaseModel):
+    url: str
+    original_name: str
+    size: int
+
+
+FILE_ALLOWED_EXTENSIONS: set[str] = {".pdf", ".ppt", ".pptx", ".doc", ".docx", ".xls", ".xlsx", ".zip"}
+FILE_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+
+
+@router.post("/upload-file", response_model=FileUploadResponse)
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """上传资料文件（PDF/PPT/DOC/Excel/ZIP），返回可访问的 HTTPS URL
+
+    文件格式: pdf/ppt/pptx/doc/docx/xls/xlsx/zip
+    大小限制: 10MB
+    存储路径: uploads/files/{uuid}.{ext}
+    返回URL:  {BASE_URL}/uploads/files/{filename}
+    免费限制: 每个用户1个免费文件（TODO: 待实现配额检查）
+    """
+    # 1. 验证扩展名
+    filename = file.filename or "file.bin"
+    ext = Path(filename).suffix.lower()
+    if ext not in FILE_ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的文件格式: {ext}，允许格式: {', '.join(sorted(FILE_ALLOWED_EXTENSIONS))}",
+        )
+
+    # 2. 检查大小（先读内存再检查）
+    content = await file.read()
+    if len(content) > FILE_MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {FILE_MAX_SIZE / 1024 / 1024:.0f}MB",
+        )
+
+    # 3. 保存文件
+    file_dir = Path(settings.UPLOAD_DIR) / "files"
+    file_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    dest_path = file_dir / safe_name
+    dest_path.write_bytes(content)
+
+    # 4. 返回可访问 URL
+    base = settings.BASE_URL.rstrip("/")
+    url = f"{base}/uploads/files/{safe_name}"
+
+    # 5. 日志记录
+    logger.info(
+        "资料文件已上传: orig=%s, saved=%s, size=%d, user_id=%d",
+        file.filename, safe_name, len(content), current_user.id,
+    )
+
+    return FileUploadResponse(
         url=url,
         original_name=file.filename or "",
         size=len(content),
