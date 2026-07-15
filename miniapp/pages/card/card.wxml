@@ -38,7 +38,7 @@
         </view>
         <view class="info-row">
           <text class="info-label">{{_t.statusInfo}}</text>
-          <text class="info-value badge badge-{{card.status === 'published' ? 'gold' : 'free'}}">
+          <text class="badge {{card.status === 'published' ? 'badge-gold' : 'badge-free'}}">
             {{card.status === 'published' ? _t.published : _t.draft}}
           </text>
         </view>
@@ -76,9 +76,9 @@
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
-      <button class="btn-primary" bindtap="goPreview">{{_t.previewAlbum}}</button>
-      <button class="btn-secondary" bindtap="shareCard" style="margin-top: 12px;">{{_t.shareCard}}</button>
-      <button class="btn-secondary" bindtap="generateQRCode" style="margin-top: 12px; border-color: var(--success); color: var(--success);">{{_t.generateQR}}</button>
+      <button wx:if="{{card}}" class="btn-primary" bindtap="goPreview">{{_t.previewAlbum}}</button>
+      <button wx:else class="btn-primary" bindtap="goPreview">{{_t.editCard || '创建名片'}}</button>
+      <button class="btn-secondary" open-type="share" style="margin-top: 12px;">{{_t.shareCard}}</button>
     </view>
 
     <!-- 底部占位 -->

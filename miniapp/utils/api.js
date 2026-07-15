@@ -124,6 +124,32 @@ const brochureApi = {
       })
     })
   },
+  /** 上传附件文件 → 返回 { url, name, size } */
+  uploadFile(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.uploadFile({
+        url: `${API_BASE_URL}/api/brochures/upload-file`,
+        filePath: filePath,
+        name: 'file',
+        header: {
+          'Authorization': `Bearer ${store.getState().token}`,
+        },
+        success(res) {
+          try {
+            const body = JSON.parse(res.data)
+            if (res.statusCode === 200 && body.url) {
+              resolve(body)
+            } else {
+              reject(new Error(body.detail || '上传失败'))
+            }
+          } catch (e) {
+            reject(new Error('解析失败'))
+          }
+        },
+        fail: reject,
+      })
+    })
+  },
 }
 
 // ===== 标签模块 =====

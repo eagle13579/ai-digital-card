@@ -184,7 +184,25 @@ Page({
       const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
 
       const userInfoData = profile.userInfo || profile
-      const brochure = Array.isArray(brochuresList) ? brochuresList[0] : null
+      let brochure = Array.isArray(brochuresList) ? brochuresList[0] : null
+      // 如果API无数据，尝试从本地存储恢复
+      if (!brochure) {
+        try {
+          const lastBrochure = wx.getStorageSync('last_brochure')
+          if (lastBrochure && lastBrochure.id) {
+            brochure = {
+              id: lastBrochure.id,
+              cover: lastBrochure.cover,
+              title: lastBrochure.title,
+              viewCount: lastBrochure.view_count || lastBrochure.viewCount || 0,
+              pageCount: lastBrochure.pages_count || lastBrochure.pageCount || (lastBrochure.pages ? lastBrochure.pages.length : 0),
+            }
+            Logger.info('首页', '从本地存储恢复画册', { id: brochure.id, title: brochure.title })
+          }
+        } catch (e) {
+          Logger.warn('首页', '读取本地存储失败', e)
+        }
+      }
 
       const trustList = trustData.trusting || []
       const trustCount = trustList.length
