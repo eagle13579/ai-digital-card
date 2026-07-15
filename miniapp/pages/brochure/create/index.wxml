@@ -3,32 +3,27 @@
 
   <!-- ====== 顶部步骤指示器 ====== -->
   <view class="stepper-header">
-    <view class="stepper-progress">
-      <view
-        wx:for="{{4}}"
-        wx:for-index="idx"
-        wx:key="idx"
-        class="step-dot {{idx+1 < currentStep ? 'completed' : ''}} {{idx+1 === currentStep ? 'active' : ''}}"
-        data-step="{{idx+1}}"
-        bindtap="goToStep"
-      >
-        <view class="dot-inner">
-          <text wx:if="{{idx+1 < currentStep}}" class="dot-check">✓</text>
-          <text wx:elif="{{idx+1 === currentStep}}" class="dot-num">{{idx+1}}</text>
-          <text wx:else class="dot-num">{{idx+1}}</text>
+    <view class="stepper-track">
+      <block wx:for="{{4}}" wx:for-index="idx" wx:key="idx">
+        <view class="step-group" data-step="{{idx+1}}" bindtap="goToStep">
+          <view class="step-dot {{idx+1 < currentStep ? 'completed' : ''}} {{idx+1 === currentStep ? 'active' : ''}}">
+            <view class="dot-inner">
+              <text wx:if="{{idx+1 < currentStep}}" class="dot-check">✓</text>
+              <text wx:elif="{{idx+1 === currentStep}}" class="dot-num">{{idx+1}}</text>
+              <text wx:else class="dot-num">{{idx+1}}</text>
+            </view>
+          </view>
+          <text class="step-label {{idx+1 === currentStep ? 'active' : ''}}">
+            <text wx:if="{{idx===0}}">基本信息</text>
+            <text wx:elif="{{idx===1}}">专业信息</text>
+            <text wx:elif="{{idx===2}}">公司信息</text>
+            <text wx:else>预览发布</text>
+          </text>
         </view>
-      </view>
-      <view class="step-line" wx:for="{{3}}" wx:for-index="idx" wx:key="idx">
-        <view class="step-line-fill {{idx+1 < currentStep ? 'filled' : ''}}"></view>
-      </view>
-    </view>
-    <view class="step-labels">
-      <text class="step-label {{idx+1 === currentStep ? 'active' : ''}}" wx:for="{{4}}" wx:for-index="idx" wx:key="idx" data-step="{{idx+1}}" bindtap="goToStep">
-        <text wx:if="{{idx===0}}">基本信息</text>
-        <text wx:elif="{{idx===1}}">专业信息</text>
-        <text wx:elif="{{idx===2}}">公司信息</text>
-        <text wx:else>预览发布</text>
-      </text>
+        <view wx:if="{{idx < 3}}" class="step-line">
+          <view class="step-line-fill {{idx+1 < currentStep ? 'filled' : ''}}"></view>
+        </view>
+      </block>
     </view>
   </view>
 
@@ -74,16 +69,15 @@
         </view>
 
         <!-- 邮箱 -->
-        <view class="form-item {{stepErrors[1].email ? 'has-error' : ''}}">
-          <text class="form-label">邮箱<text class="required">*</text></text>
+        <view class="form-item">
+          <text class="form-label">邮箱</text>
           <input class="form-input" placeholder="请输入邮箱" value="{{formData.email}}" bindinput="onInput" data-field="email" type="email" />
-          <text wx:if="{{stepErrors[1].email}}" class="error-text">{{stepErrors[1].email}}</text>
         </view>
 
         <!-- 手机号 + 微信号 -->
         <view class="form-row">
           <view class="form-item flex-1">
-            <text class="form-label">手机号码</text>
+            <text class="form-label">手机号码<text class="required">*</text></text>
             <input class="form-input" placeholder="请输入手机号" value="{{formData.phone}}" bindinput="onInput" data-field="phone" type="number" />
           </view>
           <view class="form-item flex-1">
@@ -175,7 +169,7 @@
         <view class="form-item">
           <text class="form-label">合作意向</text>
           <view class="purpose-options">
-            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purposes.includes(item.value) ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}">
+            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purposes.indexOf(item.value) !== -1 ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}" hover-class="purpose-option-hover">
               <text class="purpose-icon">{{item.icon}}</text>
               <text class="purpose-label">{{item.label}}</text>
             </view>
@@ -262,6 +256,23 @@
               <text class="image-add-icon">+</text>
               <text class="image-add-text">添加图片</text>
             </view>
+          </view>
+        </view>
+
+        <!-- 上传资料文件 -->
+        <view class="form-item">
+          <text class="form-label">上传资料文件（选填，1个免费文件，10MB以内）</text>
+          <view wx:if="{{formData.attachmentFile}}" class="file-card">
+            <text class="file-icon">📄</text>
+            <view class="file-info">
+              <text class="file-name">{{formData.attachmentFile.name}}</text>
+              <text class="file-size">{{formData.attachmentFile.sizeLabel}}</text>
+            </view>
+            <text class="file-remove" bindtap="removeAttachment">×</text>
+          </view>
+          <view wx:else class="file-upload-btn" bindtap="chooseAttachment">
+            <text class="file-upload-icon">+</text>
+            <text class="file-upload-text">选择文件</text>
           </view>
         </view>
       </view>
@@ -351,15 +362,6 @@
       class="btn-submit"
       bindtap="submitForm"
     >发布名片</button>
-    <button
-      class="btn-test"
-      bindtap="fillTestData"
-    >填充测试数据</button>
   </view>
 
-  <!-- 草稿保存状态 -->
-  <view class="draft-status" wx:if="{{draftSaved}}">
-    <text class="draft-icon">💾</text>
-    <text class="draft-text">草稿已自动保存</text>
-  </view>
 </view>
