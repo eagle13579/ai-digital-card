@@ -382,13 +382,8 @@
 }
 
 /* ==============================
-   资源对接页 (resources)
+   个人资料页 (profile) — 含联系方式/资源供需/合作意向
    ============================== */
-.resources-content {
-  width: 100%;
-  max-width: 640rpx;
-}
-
 .section-title-text {
   font-size: 36rpx;
   font-weight: 700;
@@ -742,6 +737,14 @@
 .action-desc {
   font-size: 28rpx;
   color: rgba(255,255,255,0.6);
+  text-align: center;
+  margin-bottom: 8rpx;
+  line-height: 1.5;
+}
+
+.action-desc-sub {
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.4);
   text-align: center;
   margin-bottom: 60rpx;
   line-height: 1.5;

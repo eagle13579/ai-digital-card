@@ -81,10 +81,6 @@
                 <text class="contact-text">{{page.contact.wechat}}</text>
               </view>
             </view>
-          </view>
-
-          <view wx:elif="{{page.type === 'resources'}}" class="resources-content">
-            <text class="section-title-text">资源对接</text>
             <view class="resources-section" wx:if="{{page.provides && page.provides.length > 0}}">
               <text class="resources-label provides-label">我能提供</text>
               <view class="tags-wrap">
@@ -97,9 +93,9 @@
                 <text wx:for="{{page.needs}}" wx:key="index" class="tag needs-tag">{{item}}</text>
               </view>
             </view>
-            <view class="purpose-badge">
+            <view class="purpose-badge" wx:if="{{page.purpose}}">
               <text class="purpose-icon">🎯</text>
-              <text class="purpose-text">{{_purposeMap[page.purpose] || page.purpose || '合作意向'}}</text>
+              <text class="purpose-text">{{purposeMap[page.purpose] || page.purpose || '合作意向'}}</text>
             </view>
           </view>
 
@@ -176,7 +172,8 @@
             <view class="action-inner">
               <text class="action-icon">🎉</text>
               <text class="action-title">名片已就绪</text>
-              <text class="action-desc">您的AI数智名片已完成，可以分享给朋友或返回首页</text>
+              <text class="action-desc">您的AI数智名片已完成</text>
+              <text class="action-desc-sub">可以分享给朋友或返回首页</text>
               <view class="action-buttons">
                 <button open-type="share" class="action-btn action-btn-share">📤 分享给好友</button>
                 <button open-type="share" share-type="2" class="action-btn action-btn-share">🌐 分享到朋友圈</button>

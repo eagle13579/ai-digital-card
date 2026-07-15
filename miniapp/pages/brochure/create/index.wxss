@@ -386,9 +386,9 @@
 }
 
 .purpose-option.active {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.3);
   border-color: #a78bfa;
-  box-shadow: 0 0 20rpx rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 30rpx rgba(139, 92, 246, 0.3);
 }
 
 .purpose-option-hover {

@@ -24,19 +24,8 @@ Page({
     },
   },
 
-  /** 根据页面类型和风格返回不同背景色 */
+  /** 所有页面统一深色背景 */
   getPageBackground(type, style = 'professional') {
-    // 所有页面统一深色背景，风格只影响强调色（顶部线条/按钮等）
-    const styleAccents = {
-      professional: { header: 'linear-gradient(135deg, #4F46E5, #7C3AED)', accent: '#7C3AED' },
-      creative: { header: 'linear-gradient(135deg, #831843, #9D174D)', accent: '#9D174D' },
-      minimal: { header: 'linear-gradient(135deg, #475569, #1E293B)', accent: '#334155' },
-    }
-    const s = styleAccents[style] || styleAccents.professional
-    // cover和contact用强调色渐变背景，其他用统一深色
-    if (type === 'cover' || type === 'contact' || type === 'action') {
-      return s.header
-    }
     return '#0f0f1a'
   },
 
@@ -143,9 +132,8 @@ Page({
    * 将后端API格式的brochure pages转换为WXML模板期望的页面数据格式
    * 字段映射对照：
    *   封面：brochure.cover → page.avatar
-   *   资料：content解析后 phone/email/wechat → contact对象嵌套
-   *   技能：content数组 → page.provides
-   *   联系：content的provides/needs/purpose + profileData回退contact info
+   *   资料：content解析后 phone/email/wechat/provides/needs/purpose → 合并到profile
+   *   公司：content解析后 name/desc/images/attachments
    */
   convertBrochurePages(brochure) {
     const convertedPages = []
@@ -178,15 +166,9 @@ Page({
               email: parsed.email || '',
               wechat: parsed.wechat || '',
             },
-            sort_order,
-          }
-        } else if (content_type === 'skills') {
-          const parsed = JSON.parse(content)
-          converted = {
-            type: 'resources',
-            provides: Array.isArray(parsed) ? parsed : [],
-            needs: [],
-            purpose: '',
+            provides: parsed.provides || [],
+            needs: parsed.needs || [],
+            purpose: parsed.purpose || '',
             sort_order,
           }
         } else if (content_type === 'contact') {
@@ -285,9 +267,6 @@ Page({
           email: 'lina@example.com',
           wechat: 'lina_finance',
         },
-      },
-      {
-        type: 'resources',
         provides: ['资金投资', '并购重组', '资源对接', '投后管理'],
         needs: ['优质项目', '技术人才', '合作伙伴'],
         purpose: 'investor',
@@ -304,34 +283,6 @@ Page({
           'https://neeko-copilot.bytedance.net/api/text2image?prompt=investment%20meeting%20boardroom%20professional%20business%20people&image_size=landscape_4_3',
           'https://neeko-copilot.bytedance.net/api/text2image?prompt=stock%20market%20financial%20charts%20data%20visualization&image_size=landscape_4_3',
         ],
-      },
-      {
-        type: 'case',
-        index: 1,
-        name: '科技企业A轮投资',
-        date: '2023年',
-        desc: '主导投资某科技创新企业A轮融资，投资金额5000万元。通过专业的投后管理，帮助企业实现技术突破和市场拓展，企业估值在两年内增长了300%。',
-        images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=tech%20startup%20team%20celebrating%20funding%20success&image_size=landscape_4_3',
-        ],
-      },
-      {
-        type: 'case',
-        index: 2,
-        name: '跨境并购项目',
-        date: '2024年',
-        desc: '成功完成某跨境并购项目，帮助国内企业收购海外优质资产。项目总金额达2亿美元，实现了企业国际化战略布局。',
-        images: [
-          'https://neeko-copilot.bytedance.net/api/text2image?prompt=international%20business%20merger%20cross%20border%20deal&image_size=landscape_4_3',
-        ],
-      },
-      {
-        type: 'contact',
-        name: '李娜',
-        phone: '13900139000',
-        email: 'lina@example.com',
-        wechat: 'lina_finance',
-        company: '金融投资集团',
       },
     ]
   },
@@ -417,14 +368,22 @@ Page({
 
   openAttachment(e) {
     const url = e.currentTarget.dataset.url
+    const name = e.currentTarget.dataset.name
+    wx.showLoading({ title: '下载中...' })
     wx.downloadFile({
       url,
       success(res) {
-        wx.openDocument({ filePath: res.tempFilePath })
+        wx.hideLoading()
+        wx.openDocument({
+          filePath: res.tempFilePath,
+          success: () => console.log('打开成功'),
+          fail: () => wx.showToast({ title: '打开失败', icon: 'none' })
+        })
       },
       fail() {
+        wx.hideLoading()
         wx.showToast({ title: '下载失败', icon: 'none' })
-      },
+      }
     })
   },
 

@@ -702,6 +702,9 @@ Page({
             phone: fd.phone || '',
             wechat: fd.wechat || '',
             bio: fd.bio || '',
+            provides: fd.provides || [],
+            needs: fd.needs || [],
+            purpose: purposes,
             education: fd.education || '',
             school: fd.school || '',
             major: fd.major || '',
@@ -712,20 +715,6 @@ Page({
             style: fd.style || 'professional',
           }),
           sort_order: 0,
-        },
-        {
-          content_type: 'skills',
-          content: JSON.stringify(skillTags),
-          sort_order: 1,
-        },
-        {
-          content_type: 'contact',
-          content: JSON.stringify({
-            provides: fd.provides || [],
-            needs: fd.needs || [],
-            purpose: purposes,
-          }),
-          sort_order: 2,
         },
       ]
 
@@ -763,7 +752,7 @@ Page({
             images: companyImageUrls,
             attachments: attachmentData ? [attachmentData] : [],
           }),
-          sort_order: 3,
+          sort_order: 1,
         })
       }
 
