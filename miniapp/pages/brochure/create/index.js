@@ -789,6 +789,13 @@ Page({
         wx.hideLoading()
         // 生成成功后保留草稿(不清除)，方便用户再次修改
         wx.showToast({ title: '生成成功', icon: 'success' })
+        // 同步用户信息到store，确保头像/姓名在全站更新
+        store.updateUserInfo({
+          name: fd.name || '',
+          avatar: coverUrl || fd.avatar || '',
+          company: fd.company || '',
+          title: fd.title || '',
+        })
         store.markDataDirty()
         setTimeout(() => {
           wx.navigateTo({

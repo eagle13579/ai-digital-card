@@ -36,11 +36,13 @@
           <text class="info-label">{{_t.coopIntention}}</text>
           <text class="info-value tag provide">{{purposeText}}</text>
         </view>
-        <view class="info-row">
+        <view class="info-row status-row">
           <text class="info-label">{{_t.statusInfo}}</text>
-          <text class="badge {{card.status === 'published' ? 'badge-gold' : 'badge-free'}}">
-            {{card.status === 'published' ? _t.published : _t.draft}}
-          </text>
+          <view class="status-badge-wrap">
+            <text class="badge {{card.status === 'published' ? 'badge-gold' : 'badge-free'}}">
+              {{card.status === 'published' ? _t.published : _t.draft}}
+            </text>
+          </view>
         </view>
         <view class="info-row">
           <text class="info-label">{{_t.viewsInfo}}</text>

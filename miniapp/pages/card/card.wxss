@@ -86,3 +86,13 @@
 .bottom-placeholder {
   height: 60px;
 }
+
+/* 状态标签行 */
+.status-row {
+  display: flex;
+  align-items: center;
+}
+.status-badge-wrap {
+  flex: 1;
+  text-align: center;
+}

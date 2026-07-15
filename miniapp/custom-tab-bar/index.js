@@ -58,12 +58,7 @@ Component({
     switchTab(e) {
       const data = e.currentTarget.dataset
       const url = '/' + data.path
-      const index = parseInt(data.index)
-      const current = this.data.selected
-
-      if (index === current) return
-
-      wx.switchTab({ url })
+      wx.reLaunch({ url })
     }
   }
 })
