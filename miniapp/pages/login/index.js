@@ -331,9 +331,12 @@ Page({
     }, 1500)
   },
 
-  /** 跳过设置（使用"微信用户"作为默认名） */
+  /** 跳过设置（已登录，后续可在个人中心补充） */
   skipSetup() {
     this.setData({ showNicknameSetup: false })
+    // 更新store：标记已完成初始引导，避免首页守卫再次拉回
+    const current = store.getState().userInfo || {}
+    store.updateUserInfo({ ...current, _onboardingDone: true })
     wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
     setTimeout(() => {
       wx.switchTab({ url: '/pages/index/index' })
