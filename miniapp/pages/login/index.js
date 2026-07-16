@@ -298,6 +298,10 @@ Page({
       success: (res) => {
         this.setData({ 'setupInfo.avatar': res.avatarUrl })
       },
+      fail: (err) => {
+        console.error('[Login] wx.chooseAvatar failed:', err)
+        wx.showToast({ title: '头像选择失败，请重试', icon: 'none' })
+      },
     })
   },
 
