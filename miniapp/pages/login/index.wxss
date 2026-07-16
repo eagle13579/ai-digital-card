@@ -266,13 +266,18 @@
 .avatar-choose-btn {
   width: 80px;
   height: 80px;
+  min-width: 80px;
+  min-height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
   padding: 0;
   border: none;
   background: transparent;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .avatar-choose-btn::after {
   border: none;
@@ -282,9 +287,11 @@
 .setup-avatar {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
 }
 
 .setup-avatar-placeholder {
+  border-radius: 50%;
   width: 100%;
   height: 100%;
   display: flex;
