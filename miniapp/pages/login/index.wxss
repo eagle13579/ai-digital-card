@@ -278,8 +278,6 @@
   border: none;
 }
 
-  opacity: 0.7;
-}
 
 .setup-avatar {
   width: 100%;
