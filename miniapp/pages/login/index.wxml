@@ -41,14 +41,14 @@
       <text class="nickname-title">完善个人信息</text>
       <text class="nickname-desc">请选择头像和输入昵称</text>
       
-      <!-- 头像选择 -->
-      <view class="avatar-choose-area" bindtap="chooseAvatar">
+      <!-- 头像选择（button open-type=chooseAvatar 更稳定） -->
+      <button class="avatar-choose-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <image wx:if="{{setupInfo.avatar}}" src="{{setupInfo.avatar}}" mode="aspectFill" class="setup-avatar" />
         <view wx:else class="setup-avatar-placeholder">
           <text class="setup-avatar-icon">📷</text>
           <text class="setup-avatar-text">点击选择头像</text>
         </view>
-      </view>
+      </button>
 
       <!-- 昵称输入（type=nickname 获取真实微信昵称） -->
       <view class="nickname-input-area">

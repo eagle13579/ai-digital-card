@@ -293,16 +293,11 @@ Page({
   },
 
   /** 选择头像（真实微信头像，基础库>=2.21.2） */
-  chooseAvatar() {
-    wx.chooseAvatar({
-      success: (res) => {
-        this.setData({ 'setupInfo.avatar': res.avatarUrl })
-      },
-      fail: (err) => {
-        console.error('[Login] wx.chooseAvatar failed:', err)
-        wx.showToast({ title: '头像选择失败，请重试', icon: 'none' })
-      },
-    })
+  onChooseAvatar(e) {
+    const avatarUrl = e.detail.avatarUrl
+    if (avatarUrl) {
+      this.setData({ 'setupInfo.avatar': avatarUrl })
+    }
   },
 
   /** 输入昵称（使用 type=nickname 获取真实微信昵称） */

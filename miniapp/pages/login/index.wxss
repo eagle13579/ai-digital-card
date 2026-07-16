@@ -263,16 +263,21 @@
 }
 
 /* 头像选择 */
-.avatar-choose-area {
+.avatar-choose-btn {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 20px;
-  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: transparent;
+  line-height: 1;
+}
+.avatar-choose-btn::after {
+  border: none;
 }
 
-.avatar-choose-area:active {
   opacity: 0.7;
 }
 
