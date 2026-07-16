@@ -24,9 +24,8 @@ async function getPlatform(id, useRealApi) {
 
 async function createPlatform(data, useRealApi) {
   if (useRealApi) {
-    // 平台创建走 list 验证连通性后返回前端数据
-    await platformApi.list()
-    return { data }
+    const result = await platformApi.create(data)
+    return { data: result }
   }
   return MockService.createPlatform(data)
 }

@@ -37,7 +37,7 @@ Page({
   onLoad() {
     this._loadI18n()
     // 登录守卫
-    const store = require('../../utils/store')
+    const store = require('../../../utils/store')
     if (!store.getState().isLoggedIn) {
       wx.redirectTo({ url: '/pages/login/index' })
       return

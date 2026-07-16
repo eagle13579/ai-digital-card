@@ -113,7 +113,7 @@ const MockService = {
       const brochure = TEST_BROCHURES.find(b => b.id === id)
       return brochure || TEST_BROCHURES[0]
     }
-    return brochureApi.get(id)
+    return brochureApi.getById(id)
   },
 
   async createBrochure(data) {
@@ -240,12 +240,12 @@ const MockService = {
     return tagApi.list()
   },
 
-  async getVisitorStats() {
+  async getVisitorStats(brochureId) {
     if (this.USE_MOCK) {
       await this.mockDelay()
       return { data: TEST_VISITOR_STATS }
     }
-    return visitorApi.getStats()
+    return visitorApi.getStats(brochureId)
   },
 
   async getTrustNetwork() {
