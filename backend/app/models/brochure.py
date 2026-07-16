@@ -32,9 +32,9 @@ class Brochure(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
     # 关系
-    owner = relationship("User", backref="brochures")
+    owner = relationship("User", backref="brochures", lazy="joined")
     pages = relationship("Page", backref="brochure", cascade="all, delete-orphan",
-                         order_by="Page.sort_order")
+                         order_by="Page.sort_order", lazy="selectin")
 
 
 class Page(Base):
