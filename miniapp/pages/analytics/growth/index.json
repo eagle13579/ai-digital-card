@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "skeleton": "/components/skeleton/index"
+  },
+  "navigationBarTitleText": "增长分析",
+  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#0f0f1a",
+  "backgroundColor": "#0f0f1a"
+}

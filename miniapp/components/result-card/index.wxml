@@ -1,0 +1,21 @@
+<view class="result-card" catchtap="onTap">
+  <image
+    class="result-card-avatar"
+    src="{{avatar || defaultAvatar}}"
+    mode="aspectFill"
+    binderror="onAvatarError"
+  />
+  <view class="result-card-body">
+    <view class="result-card-row">
+      <text class="result-card-name">{{name}}</text>
+      <view class="result-card-match" wx:if="{{showMatch}}">
+        <text class="result-card-score">{{matchScore}}%</text>
+      </view>
+    </view>
+    <text class="result-card-company" wx:if="{{company || title}}">{{company}}{{company && title ? ' · ' : ''}}{{title}}</text>
+    <view class="result-card-tags" wx:if="{{tags && tags.length > 0}}">
+      <text class="result-card-tag" wx:for="{{tags.slice(0, 3)}}" wx:key="index">{{item}}</text>
+    </view>
+    <text class="result-card-extra" wx:if="{{extra}}">{{extra}}</text>
+  </view>
+</view>

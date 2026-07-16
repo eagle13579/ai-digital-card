@@ -1,0 +1,110 @@
+/* Action Sheet 底部操作面板 */
+.action-sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.action-sheet-mask.visible {
+  opacity: 1;
+}
+
+.action-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-modal);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0 var(--space-3) env(safe-area-inset-bottom, 12px);
+}
+
+.action-sheet.visible {
+  transform: translateY(0);
+}
+
+.action-sheet-container {
+  background: var(--surface-glass-strong);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.action-sheet-title {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.action-sheet-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.action-sheet-item:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.action-sheet-item:last-child {
+  border-bottom: none;
+}
+
+.action-sheet-item-icon {
+  font-size: 22px;
+  margin-right: var(--space-3);
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.action-sheet-item-content {
+  flex: 1;
+}
+
+.action-sheet-item-name {
+  display: block;
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.action-sheet-item-desc {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+.action-sheet-cancel {
+  text-align: center;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  padding: var(--space-4);
+  margin-top: var(--space-2);
+  background: var(--surface-glass-strong);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+}
+
+.action-sheet-cancel:active {
+  background: rgba(255, 255, 255, 0.06);
+}

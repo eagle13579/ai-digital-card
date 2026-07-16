@@ -1,0 +1,258 @@
+# ==============================================================================
+# AI数智名片 — L5 CI/CD 完整部署流水线
+# ==============================================================================
+# 触发: push 到 main | PR → main
+# 步骤: lint → test → build(Docker语法验证) → deploy → health check → rollback
+# 环境: staging / production
+# ==============================================================================
+name: AI数智名片 CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 环境变量
+env:
+  APP_NAME: ai-digital-card
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+  PYTHON_VERSION: "3.12"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Job 1: Lint & Test ──────────────────────────────────────────────
+  lint-and-test:
+    name: 🔍 Lint + Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 📦 Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+          pip install ruff pytest httpx
+
+      - name: 🔬 Run Ruff linter
+        working-directory: ./backend
+        continue-on-error: false
+        run: ruff check app/ --output-format=github
+
+      - name: 🧪 Run tests (pytest)
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://testuser:testpass@localhost:5432/testdb
+        run: python -m pytest tests/ -v --tb=short -x
+
+  # ─── Job 2: Docker Build (syntax validation) ────────────────────────
+  docker-build:
+    name: 🐳 Docker Build Validate
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: ✅ Validate Dockerfile build
+        working-directory: ./backend
+        run: docker build -f Dockerfile . -t ${{ env.APP_NAME }}:validate --no-cache
+
+      - name: 🧹 Cleanup
+        run: docker rmi ${{ env.APP_NAME }}:validate || true
+
+  # ─── Job 3: Deploy (environment matrix) ─────────────────────────────
+  deploy:
+    name: 🚀 Deploy to ${{ matrix.environment }}
+    needs: docker-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        environment: [staging, production]
+      max-parallel: 1
+
+    environment:
+      name: ${{ matrix.environment }}
+      url: ${{ matrix.environment == 'production' && 'https://api.aicard.example.com' || 'https://staging-api.aicard.example.com' }}
+
+    env:
+      DEPLOY_HOST: ${{ secrets[format('{0}_HOST', matrix.environment)] }}
+      DEPLOY_USER: ${{ secrets[format('{0}_USER', matrix.environment)] }}
+      DEPLOY_KEY: ${{ secrets[format('{0}_SSH_KEY', matrix.environment)] }}
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Build & push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.environment }}-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📄 Generate deploy manifest
+        id: manifest
+        run: |
+          cat <<EOF > deploy-manifest.json
+          {
+            "app": "${{ env.APP_NAME }}",
+            "image": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}",
+            "environment": "${{ matrix.environment }}",
+            "commit": "${{ github.sha }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          echo "manifest_created=true" >> $GITHUB_OUTPUT
+
+      - name: 🚢 Deploy via SSH
+        continue-on-error: false
+        run: |
+          echo "::group::🚢 Deploying to ${{ matrix.environment }}"
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          echo "Host: ${{ env.DEPLOY_HOST }}"
+          echo ""
+          echo "=== 部署指令 ==="
+          echo "ssh -i \$DEPLOY_KEY \$DEPLOY_USER@\$DEPLOY_HOST '"
+          echo "  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} &&"
+          echo "  docker stop ${{ env.APP_NAME }}-${{ matrix.environment }} || true &&"
+          echo "  docker rm ${{ env.APP_NAME }}-${{ matrix.environment }} || true &&"
+          echo "  docker run -d --name ${{ env.APP_NAME }}-${{ matrix.environment }} \\"
+          echo "    -p 8201:8201 \\"
+          echo "    --env-file .env.${{ matrix.environment }} \\"
+          echo "    --restart unless-stopped \\"
+          echo "    ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}'"
+          echo ""
+          echo "⚠️  替换上方 SSH 为实际部署命令"
+          echo "::endgroup::"
+
+      - name: ✅ Health Check
+        id: health_check
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          echo "::group::✅ Health Check — ${{ matrix.environment }}"
+          ENDPOINT="${{ matrix.environment == 'production' && 'https://api.aicard.example.com/health' || 'https://staging-api.aicard.example.com/health' }}"
+          echo "Endpoint: $ENDPOINT"
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 10 "$ENDPOINT" 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check passed (attempt $i/12)"
+              echo "status=passed" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "⏳ Waiting... attempt $i/12 (HTTP $STATUS)"
+            sleep 10
+          done
+          echo "❌ Health check FAILED after 12 attempts"
+          echo "status=failed" >> $GITHUB_OUTPUT
+          exit 1
+          echo "::endgroup::"
+
+      - name: ⏪ Rollback (on failure)
+        if: steps.health_check.outputs.status == 'failed' || failure()
+        run: |
+          echo "::group::⏪ Rollback for ${{ matrix.environment }}"
+          echo "❌ Deployment to ${{ matrix.environment }} failed — initiating rollback"
+          echo ""
+          echo "=== 回滚指令 ==="
+          echo "ssh -i \$DEPLOY_KEY \$DEPLOY_USER@\$DEPLOY_HOST '"
+          echo "  PREVIOUS_TAG=\$(docker images --format '{{.Tag}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} | grep '${{ matrix.environment }}-' | sort -V | tail -2 | head -1)"
+          echo "  if [ -n \"\$PREVIOUS_TAG\" ]; then"
+          echo "    docker stop ${{ env.APP_NAME }}-${{ matrix.environment }} || true"
+          echo "    docker rm ${{ env.APP_NAME }}-${{ matrix.environment }} || true"
+          echo "    docker run -d --name ${{ env.APP_NAME }}-${{ matrix.environment }} \\"
+          echo "      -p 8201:8201 \\"
+          echo "      --env-file .env.${{ matrix.environment }} \\"
+          echo "      --restart unless-stopped \\"
+          echo "      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\$PREVIOUS_TAG"
+          echo "  else"
+          echo "    echo '⚠️  No previous image found — manual rollback required'"
+          echo "  fi'"
+          echo ""
+          echo "⚠️  替换上方命令为实际回滚方式"
+          echo "::endgroup::"
+
+      - name: 📬 Notification (placeholder)
+        if: always()
+        run: |
+          echo "::group::📬 Deployment Notification — ${{ matrix.environment }}"
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "success" ]; then
+            echo "🟢 Deployment to ${{ matrix.environment }} SUCCEEDED (commit: ${{ github.sha }})"
+          elif [ "$STATUS" = "cancelled" ]; then
+            echo "🟡 Deployment to ${{ matrix.environment }} CANCELLED"
+          else
+            echo "🔴 Deployment to ${{ matrix.environment }} FAILED — rollback triggered"
+          fi
+          echo ""
+          echo "# ============================================================"
+          echo "# 集成通知: Slack / Discord / Email / Feishu / Webhook"
+          echo "# 示例 (Slack):"
+          echo '#   - name: Send Slack notification'
+          echo '#     uses: slackapi/slack-github-action@v1'
+          echo "#     with:"
+          echo "#       payload: '{\"text\":\"${{ env.APP_NAME }} deploy to ${{ matrix.environment }}: ${{ job.status }}\"}'"
+          echo "#     env:"
+          echo "#       SLACK_WEBHOOK_URL: \${{ secrets.SLACK_WEBHOOK_URL }}"
+          echo "# ============================================================"
+          echo "::endgroup::"

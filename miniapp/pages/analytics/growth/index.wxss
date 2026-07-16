@@ -1,0 +1,269 @@
+/* 用户增长分析页面 - 暗色主题玻璃拟态风格 */
+
+/* ===== Page Header ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-primary);
+}
+
+.page-header .title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+/* ===== 时间切换 ===== */
+.time-switch {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.time-option {
+  padding: 4px 14px;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  transition: all 0.2s;
+}
+
+.time-option.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: var(--weight-semibold);
+}
+
+/* ===== KPI 指标网格 ===== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.kpi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) 0;
+}
+
+.kpi-num {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.kpi-num.accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.kpi-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* ===== 增长漏斗 ===== */
+.funnel-body {
+  padding: 0 var(--space-4) var(--space-5);
+}
+
+.funnel-step {
+  margin-bottom: var(--space-4);
+}
+
+.funnel-step:last-child {
+  margin-bottom: 0;
+}
+
+.funnel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.funnel-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.funnel-users {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.funnel-bar-wrap {
+  height: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.funnel-bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, #22c55e, #a78bfa, #ef4444);
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.funnel-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}
+
+.funnel-rate {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.funnel-dropoff {
+  font-size: var(--text-xs);
+  color: var(--danger);
+}
+
+/* ===== 留存率表格 ===== */
+.retention-table {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.retention-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--space-2);
+}
+
+.retention-row.header {
+  margin-bottom: var(--space-3);
+}
+
+.retention-cell {
+  flex: 1;
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.retention-cell.label {
+  color: var(--text-tertiary);
+  font-weight: var(--weight-medium);
+}
+
+.retention-cell.value {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+.retention-cell.value.high {
+  color: var(--success);
+}
+
+.retention-cell.value.mid {
+  color: var(--warning);
+}
+
+.retention-cell.value.low {
+  color: var(--danger);
+}
+
+.retention-row.bars {
+  align-items: flex-end;
+  height: 60px;
+  padding-top: var(--space-2);
+}
+
+.retention-bar-cell {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.retention-bar {
+  width: 60%;
+  min-height: 4px;
+  transition: height 0.6s ease;
+}
+
+/* ===== 事件分布 ===== */
+.event-list {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.event-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.event-item:last-child {
+  margin-bottom: 0;
+}
+
+.event-left {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.event-name {
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-bar-track {
+  flex: 1;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: 0 var(--space-2);
+}
+
+.event-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.event-right {
+  width: 90px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.event-percent {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.event-count {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* ===== 底部占位 ===== */
+.bottom-placeholder {
+  height: var(--space-10);
+}

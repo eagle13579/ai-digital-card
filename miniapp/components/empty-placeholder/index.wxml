@@ -1,0 +1,15 @@
+<view class="empty-placeholder">
+  <!-- 插画区域 -->
+  <view class="empty-illustration">
+    <text class="empty-icon">{{icon}}</text>
+  </view>
+
+  <!-- 引导文字 -->
+  <text class="empty-title" wx:if="{{title}}">{{title}}</text>
+  <text class="empty-desc">{{desc}}</text>
+
+  <!-- CTA按钮 -->
+  <view class="empty-cta" wx:if="{{showCta && ctaText}}" catchtap="onCta">
+    <text class="empty-cta-text">{{ctaText}}</text>
+  </view>
+</view>

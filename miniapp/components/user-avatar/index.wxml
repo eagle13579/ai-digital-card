@@ -1,0 +1,10 @@
+<view class="user-avatar-wrap size-{{size}} level-{{memberLevel}}" catchtap="onTap">
+  <image
+    class="user-avatar-img"
+    src="{{imageUrl}}"
+    mode="aspectFill"
+    binderror="onError"
+  />
+  <view class="user-avatar-status {{status}}" wx:if="{{status}}"></view>
+  <view class="user-avatar-border" wx:if="{{memberLevel}}"></view>
+</view>

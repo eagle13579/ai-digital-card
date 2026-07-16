@@ -1,0 +1,122 @@
+<view class="page-container">
+
+  <!-- ===== 骨架屏加载态 ===== -->
+  <skeleton loading="{{loading}}" type="details" count="3" wx:if="{{loading}}" />
+
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
+
+    <!-- ===== 顶部标题栏 ===== -->
+    <view class="page-header">
+      <text class="title">{{_t.growthAnalysisTitle}}</text>
+      <view class="time-switch">
+        <text
+          class="time-option {{days === 7 ? 'active' : ''}}"
+          data-days="7"
+          bindtap="switchTimeRange"
+        >{{_t.timeRange7d}}</text>
+        <text
+          class="time-option {{days === 30 ? 'active' : ''}}"
+          data-days="30"
+          bindtap="switchTimeRange"
+        >{{_t.timeRange30d}}</text>
+      </view>
+    </view>
+
+    <!-- ===== 1. 关键指标卡片 ===== -->
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">{{_t.dataOverview}}</text>
+      </view>
+      <view class="kpi-grid">
+        <view class="kpi-item">
+          <text class="kpi-num accent">{{dau}}</text>
+          <text class="kpi-label">{{_t.dau}}</text>
+        </view>
+        <view class="kpi-item">
+          <text class="kpi-num accent">{{wau}}</text>
+          <text class="kpi-label">{{_t.wau}}</text>
+        </view>
+        <view class="kpi-item">
+          <text class="kpi-num accent">{{mau}}</text>
+          <text class="kpi-label">{{_t.mau}}</text>
+        </view>
+        <view class="kpi-item">
+          <text class="kpi-num accent">{{totalReg}}</text>
+          <text class="kpi-label">{{_t.totalRegistrations}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 2. 用户增长漏斗 ===== -->
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">{{_t.userFunnel}}</text>
+      </view>
+      <view class="funnel-body">
+        <view class="funnel-step" wx:for="{{funnel}}" wx:key="index">
+          <view class="funnel-header">
+            <text class="funnel-label">{{item.label}}</text>
+            <text class="funnel-users">{{item.users}}{{_t.users}}</text>
+          </view>
+          <view class="funnel-bar-wrap">
+            <view class="funnel-bar" style="width: {{item.rate}}%"></view>
+          </view>
+          <view class="funnel-footer">
+            <text class="funnel-rate">{{_t.conversionRate}}: {{item.rate}}%</text>
+            <text class="funnel-dropoff" wx:if="{{item.dropoff > 0}}">{{_t.dropoffRate}}: {{item.dropoff}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 3. 留存率 ===== -->
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">{{_t.retentionTitle}}</text>
+      </view>
+      <view class="retention-table">
+        <view class="retention-row header">
+          <text class="retention-cell label" wx:for="{{retention}}" wx:key="index">{{item.label}}</text>
+        </view>
+        <view class="retention-row">
+          <view
+            class="retention-cell value {{item.rate >= 50 ? 'high' : (item.rate >= 20 ? 'mid' : 'low')}}"
+            wx:for="{{retention}}" wx:key="index"
+          >{{item.rate}}%</view>
+        </view>
+        <!-- 条形图行 -->
+        <view class="retention-row bars">
+          <view class="retention-bar-cell" wx:for="{{retention}}" wx:key="index">
+            <view class="retention-bar" style="height: {{item.rate * 2}}px; background: var(--accent); border-radius: 4px 4px 0 0;"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 4. 事件分布 ===== -->
+    <view class="glass-card">
+      <view class="glass-card-header">
+        <text class="title">{{_t.eventDistribution}}</text>
+      </view>
+      <view class="event-list" wx:if="{{events.length > 0}}">
+        <view class="event-item" wx:for="{{events}}" wx:key="index">
+          <view class="event-left">
+            <text class="event-name">{{item.name}}</text>
+          </view>
+          <view class="event-bar-track">
+            <view class="event-bar-fill" style="width: {{item.percentage}}%"></view>
+          </view>
+          <view class="event-right">
+            <text class="event-percent">{{item.percentage}}%</text>
+            <text class="event-count">{{item.count}}{{_t.count}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <text class="text">{{_t.noData}}</text>
+      </view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

@@ -1,0 +1,12 @@
+<view class="tag-list type-{{type}}">
+  <view
+    class="tag-list-item {{selected.indexOf(tag) !== -1 ? 'selected' : ''}}"
+    wx:for="{{tags}}"
+    wx:key="index"
+    data-index="{{index}}"
+    catchtap="onTap"
+    wx:if="{{maxItems === 0 || index < maxItems}}"
+  >
+    <text class="tag-list-text">{{tag}}</text>
+  </view>
+</view>

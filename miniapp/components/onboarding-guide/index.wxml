@@ -1,0 +1,37 @@
+<view class="onboarding-overlay {{visible ? 'visible' : ''}}" wx:if="{{visible}}">
+  <!-- 半透明遮罩 -->
+  <view class="onboarding-mask" catchtap="skip"></view>
+
+  <!-- 引导卡片 -->
+  <view class="onboarding-card" catchtap="noop">
+    <!-- 步骤指示器 -->
+    <view class="onboarding-dots">
+      <view class="onboarding-dot {{currentStep >= 1 ? 'active' : ''}}"></view>
+      <view class="onboarding-dot {{currentStep >= 2 ? 'active' : ''}}"></view>
+      <view class="onboarding-dot {{currentStep >= 3 ? 'active' : ''}}"></view>
+    </view>
+
+    <!-- 步骤内容 -->
+    <view class="onboarding-content">
+      <view class="onboarding-icon">{{steps[currentStep - 1].icon}}</view>
+      <text class="onboarding-title">{{steps[currentStep - 1].title}}</text>
+      <text class="onboarding-desc">{{steps[currentStep - 1].desc}}</text>
+    </view>
+
+    <!-- 按钮栏 -->
+    <view class="onboarding-actions">
+      <view class="onboarding-btn secondary" catchtap="skip">
+        {{_t.skipGuide || '跳过引导'}}
+      </view>
+
+      <view class="onboarding-btn-row">
+        <view class="onboarding-btn prev" wx:if="{{currentStep > 1}}" catchtap="prevStep">
+          {{_t.prevStep || '上一步'}}
+        </view>
+        <view class="onboarding-btn primary" catchtap="nextStep">
+          {{currentStep < 3 ? (_t.nextStep || '下一步') : (_t.startUse || '开始使用')}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
