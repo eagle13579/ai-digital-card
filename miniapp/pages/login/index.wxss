@@ -263,7 +263,7 @@
 }
 
 /* 头像选择 */
-.avatar-choose-btn {
+.avatar-choose-area {
   width: 80px;
   height: 80px;
   min-width: 80px;
@@ -271,15 +271,17 @@
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 20px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-.avatar-choose-btn::after {
+.avatar-choose-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  z-index: 1;
+  padding: 0; margin: 0;
+  border: none; background: transparent;
+}
+.avatar-choose-overlay::after {
   border: none;
 }
 
