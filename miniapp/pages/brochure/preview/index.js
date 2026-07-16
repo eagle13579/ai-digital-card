@@ -46,13 +46,6 @@ Page({
   onLoad(options) {
     Logger.info('画册预览页', '页面加载开始', { options: options || {} })
     
-    // 登录守卫
-    const app = getApp()
-    if (!app.getState().isLoggedIn) {
-      wx.redirectTo({ url: '/pages/login/index' })
-      return
-    }
-    
     // 检测是否刚从创建页跳转过来
     if (options && options.created === '1') {
       this.setData({ showGuidance: true })
