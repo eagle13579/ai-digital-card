@@ -1,3 +1,4 @@
+// STUB: 后端AI模块未就绪，页面使用Mock数据
 /**
  * A/B测试管理 - 实验方案列表与状态
  * 支持 MockService 数据源 (useRealApi 开关)

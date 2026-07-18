@@ -310,6 +310,19 @@ def create_app():
     # Startup
     @app.on_event("startup")
     async def startup():
+        # ── JWT_SECRET 安全校验 ──────────────────────────────────────
+        jwt_secret = cfg.JWT_SECRET
+        if not jwt_secret:
+            logger.critical("JWT_SECRET 未配置！应用将退出")
+            sys.exit(1)
+        if jwt_secret in ("change-me", "default", "changeme"):
+            logger.critical("JWT_SECRET 使用了占位值 '%s'！请配置强随机密钥。应用将退出", jwt_secret)
+            sys.exit(1)
+        if len(jwt_secret) < 32:
+            logger.critical("JWT_SECRET 长度不足32位（当前 %d 位），安全强度不够！应用将退出", len(jwt_secret))
+            sys.exit(1)
+        logger.info("JWT_SECRET 安全校验通过 (%d 位)", len(jwt_secret))
+
         data_dir = os.path.join(os.path.dirname(BASE_DIR), "data")
         os.makedirs(data_dir, exist_ok=True)
         async with engine.begin() as conn:

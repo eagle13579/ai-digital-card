@@ -45,6 +45,22 @@ class UserResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class UserPublicResponse(BaseModel):
+    """公开用户信息（不含 phone 等敏感字段），用于搜索/列表等公共场景"""
+    id: int
+    username: Optional[str] = None
+    name: str
+    avatar: str
+    company: str
+    title: str
+    intro: str
+    role: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     avatar: Optional[str] = None

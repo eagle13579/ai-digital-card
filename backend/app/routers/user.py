@@ -7,7 +7,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.tag import UserTag
 from app.routers.auth import get_current_user
-from app.schemas import UserResponse, UserUpdate
+from app.schemas import UserPublicResponse, UserResponse, UserUpdate
 
 router = APIRouter(prefix="/api/users", tags=["用户"])
 
@@ -58,7 +58,7 @@ async def get_user(
     return UserResponse.model_validate(user)
 
 
-@router.get("/search/list", response_model=PaginatedResponse[UserResponse])
+@router.get("/search/list", response_model=PaginatedResponse[UserPublicResponse])
 async def search_users(
     q: str = Query("", description="关键词搜索 name/company/title/intro"),
     industry: str = Query("", description="行业标签筛选"),
@@ -114,4 +114,4 @@ async def search_users(
         query = query.where(User.id.in_(select(region_sub.c.user_id)))
 
     query = query.order_by(User.id)
-    return await paginate(db, query, page, page_size, UserResponse)
+    return await paginate(db, query, page, page_size, UserPublicResponse)

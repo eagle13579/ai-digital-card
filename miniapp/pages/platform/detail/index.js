@@ -1,4 +1,5 @@
 const { getPlatform, getMembers, getResourceUnits, getOpportunities, joinPlatform } = require('../../../utils/platform-bridge')
+const { connectionApi } = require('../../../utils/api')
 const store = require('../../../utils/store')
 
 Page({
@@ -15,6 +16,10 @@ Page({
     resourceUnits: [],
     opportunities: [],
     useRealApi: true,
+    // 邀请表单
+    invitePhone: '',
+    inviteName: '',
+    inviting: false,
   },
 
   onLoad(options) {
@@ -90,7 +95,7 @@ Page({
   },
 
   openInviteModal() {
-    this.setData({ showInviteModal: true })
+    this.setData({ showInviteModal: true, invitePhone: '', inviteName: '' })
   },
 
   closeInviteModal() {
@@ -104,21 +109,71 @@ Page({
     wx.makePhoneCall({ phoneNumber: phone })
   },
 
-  inviteFromApp() {
-    wx.showToast({ title: '选择询赋好友邀请', icon: 'none' })
-    this.closeInviteModal()
+  /** 邀请询赋好友 — 通过手机号发送连接请求 */
+  async inviteFromApp() {
+    const { inviteName, invitePhone, platformId, inviting } = this.data
+    if (inviting) return
+
+    if (!inviteName.trim() && !invitePhone.trim()) {
+      // 如果没有已填写的信息，展示输入框让用户输入
+      wx.showModal({
+        title: '邀请好友加入平台',
+        content: '请输入好友的手机号或姓名',
+        editable: true,
+        placeholderText: '手机号或姓名',
+        success: async (res) => {
+          if (res.confirm && res.content.trim()) {
+            this.setData({ inviting: true })
+            wx.showLoading({ title: '发送邀请...' })
+            try {
+              await connectionApi.request(platformId, `邀请加入平台: ${platformId}`, 'platform')
+              wx.hideLoading()
+              wx.showToast({ title: '邀请已发送', icon: 'success' })
+              this.closeInviteModal()
+            } catch (err) {
+              wx.hideLoading()
+              wx.showToast({ title: err.message || '邀请失败', icon: 'none' })
+            } finally {
+              this.setData({ inviting: false })
+            }
+          }
+        },
+      })
+      return
+    }
+
+    this.setData({ inviting: true })
+    wx.showLoading({ title: '发送邀请...' })
+    try {
+      await connectionApi.request(platformId, `邀请加入平台: ${inviteName || invitePhone}`, 'platform')
+      wx.hideLoading()
+      wx.showToast({ title: '邀请已发送', icon: 'success' })
+      this.closeInviteModal()
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: err.message || '邀请失败', icon: 'none' })
+    } finally {
+      this.setData({ inviting: false })
+    }
   },
 
+  /** 从微信邀请 — 分享给微信好友 */
   inviteFromWechat() {
-    wx.showToast({ title: '选择微信好友邀请', icon: 'none' })
     this.closeInviteModal()
+    // 使用微信原生分享
+    wx.shareAppMessage?.({
+      title: `邀请你加入 ${this.data.platform?.name || '资源平台'}`,
+      path: `/pages/platform/detail/index?id=${this.data.platformId}`,
+    })
   },
 
+  /** 展示平台二维码 */
   showQRCode() {
-    wx.showToast({ title: '展示平台二维码', icon: 'none' })
     this.closeInviteModal()
+    wx.showToast({ title: '展示平台二维码', icon: 'none' })
   },
 
+  /** 加入平台（当前用户） */
   async handleJoin() {
     if (this.data.joining) return
 
@@ -146,5 +201,15 @@ Page({
       wx.showToast({ title: '加入失败，请重试', icon: 'none' })
       this.setData({ joining: false })
     }
+  },
+
+  /** 输入邀请姓名 */
+  onInviteNameInput(e) {
+    this.setData({ inviteName: e.detail.value })
+  },
+
+  /** 输入邀请手机号 */
+  onInvitePhoneInput(e) {
+    this.setData({ invitePhone: e.detail.value })
   },
 })

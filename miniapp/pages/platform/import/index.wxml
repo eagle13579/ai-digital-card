@@ -1,0 +1,39 @@
+<view class="page-container">
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">一键导入会员</text>
+  </view>
+
+  <view class="import-card">
+    <text class="card-desc">届时可通过表格批量导入或直接邀请会员加入平台。</text>
+  </view>
+
+  <view class="mode-switch">
+    <view class="mode-btn {{importMode === 'manual' ? 'active' : ''}}" data-mode="manual" bindtap="switchImportMode">手动输入</view>
+    <view class="mode-btn {{importMode === 'file' ? 'active' : ''}}" data-mode="file" bindtap="switchImportMode">文件导入</view>
+  </view>
+
+  <view class="form-section" wx:if="{{importMode === 'manual'}}">
+    <text class="section-label">请输入会员信息（每行一个，格式：姓名,手机号）</text>
+    <textarea class="input-area" placeholder="张三,13800138001&#10;李四,13900139002" value="{{manualInput}}" bindinput="onManualInput" maxlength="2000" />
+  </view>
+
+  <view class="form-section" wx:if="{{importMode === 'file'}}">
+    <view class="file-upload" bindtap="chooseFile">
+      <text class="upload-icon">📁</text>
+      <text class="upload-text" wx:if="{{!selectedFile}}">点击选择 Excel 或 CSV 文件</text>
+      <text class="upload-text" wx:else>{{selectedFile.name}}</text>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="btn-primary" bindtap="startImport" disabled="{{importing}}">{{importing ? '导入中...' : '开始导入'}}</button>
+  </view>
+
+  <view class="result-card" wx:if="{{importResult}}">
+    <text class="result-title">导入结果</text>
+    <text class="result-line">总计: {{importResult.total}} 人</text>
+    <text class="result-line success">成功: {{importResult.success}} 人</text>
+    <text class="result-line fail" wx:if="{{importResult.failed > 0}}">失败: {{importResult.failed}} 人</text>
+  </view>
+</view>

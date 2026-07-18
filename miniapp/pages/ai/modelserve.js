@@ -1,3 +1,4 @@
+// STUB: 后端AI模块未就绪，页面使用Mock数据
 /**
  * 模型服务管理 - 在线/离线状态监控
  * 支持 MockService 数据源 (useRealApi 开关)

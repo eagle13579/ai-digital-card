@@ -2,7 +2,7 @@
  * 聊天详情页 - 消息气泡 + 底部输入框
  * 轮询每5s拉取新消息
  */
-const { messageApi } = require('../../../utils/api')
+const { messageApi, userApi } = require('../../../utils/api')
 const store = require('../../../utils/store')
 
 Page({
@@ -33,9 +33,21 @@ Page({
       conversationId: conversation_id || '',
       otherUserId: parseInt(other_user_id) || 0,
       otherUserName: decodeURIComponent(other_user_name || ''),
-      otherAvatar: userInfo.avatar || this.data.defaultAvatar,
+      otherAvatar: this.data.defaultAvatar,
       myUserId: userInfo.id || 0,
+      myAvatar: userInfo.avatar || '',
     })
+
+    // 异步获取对方头像
+    const otherId = parseInt(other_user_id) || 0
+    if (otherId) {
+      userApi.getUser(otherId).then(res => {
+        const otherUser = res && res.data ? res.data : res
+        if (otherUser && (otherUser.avatar || otherUser.avatarUrl)) {
+          this.setData({ otherAvatar: otherUser.avatar || otherUser.avatarUrl })
+        }
+      }).catch(() => {})
+    }
 
     if (conversation_id) {
       this._loadMessages()

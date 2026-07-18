@@ -292,8 +292,12 @@ const connectionApi = {
   request(targetUserId, message = '', source = 'platform') {
     return post('/api/business-card/connections/request', { target_user_id: targetUserId, message, source })
   },
-  review(connectionId, approved) {
-    return put(`/api/business-card/connections/${connectionId}/review`, { approved })
+  review(connectionId, approved, rejectReason = '') {
+    const data = { approved }
+    if (!approved && rejectReason) {
+      data.reject_reason = rejectReason
+    }
+    return put(`/api/business-card/connections/${connectionId}/review`, data)
   },
   list(status) {
     const params = status ? { status } : {}
@@ -451,6 +455,26 @@ const teamApi = {
 }
 
 // ===== 六度人脉模块 =====
+/** 分析统计API */
+const analyticsApi = {
+  /** 活跃用户数 */
+  getActiveUsers(days = 7) {
+    return get(`/api/analytics/active-users?days=${days}`)
+  },
+  /** 漏斗分析 */
+  getFunnel(name) {
+    return get(`/api/analytics/funnel/${name}`)
+  },
+  /** 留存分析 */
+  getRetention(days = 30) {
+    return get(`/api/analytics/retention?days=${days}`)
+  },
+  /** 事件统计 */
+  getEventStats(days = 7) {
+    return get(`/api/analytics/events?days=${days}`)
+  },
+}
+
 const sixDegreesApi = {
   /** 获取人脉网络图谱 */
   network(userId, maxDepth = 3) {
@@ -540,4 +564,5 @@ module.exports = {
   teamApi,
   sixDegreesApi,
   organizationApi,
+  analyticsApi,
 }

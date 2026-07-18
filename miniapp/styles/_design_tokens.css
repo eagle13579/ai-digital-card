@@ -1,0 +1,254 @@
+/**
+ * ============================================================
+ *  AI数智名片 — Design Tokens v3.0 (AI原生暗色)
+ *  基于PRD定义的AI暗色设计Token方向
+ *  梯度主色: #06b6d4 → #8b5cf6 (青→紫)
+ *  玻璃质感三层体系
+ *  字体层级: 13级
+ *  间距: 4px基准 (4→96px)
+ *  圆角: 6级
+ * ============================================================
+ */
+
+/* ===== 颜色系统 / Color System ===== */
+
+:root, page {
+  /* --- 品牌色 / Brand --- */
+  --brand-cyan:          #06b6d4;
+  --brand-purple:        #8b5cf6;
+  --brand-purple-light:  #a78bfa;
+  --brand-purple-dark:   #6d28d9;
+
+  /* 梯度主色 (PRD定义: cyan→purple) */
+  --gradient-primary:    linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  --gradient-primary-reverse: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+  --gradient-warm:       linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  --gradient-gold:       linear-gradient(135deg, #f5a623 0%, #f7d94c 100%);
+  --gradient-card:       linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.08));
+  --gradient-header:     linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.04));
+
+  /* --- 语义色 / Semantic --- */
+  --color-primary:       #8b5cf6;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark:  #6d28d9;
+  --color-success:       #22c55e;
+  --color-success-light: rgba(34, 197, 94, 0.12);
+  --color-warning:       #f59e0b;
+  --color-warning-light: rgba(245, 158, 11, 0.12);
+  --color-error:         #ef4444;
+  --color-error-light:   rgba(239, 68, 68, 0.12);
+  --color-info:          #06b6d4;
+  --color-info-light:    rgba(6, 182, 212, 0.12);
+
+  /* --- 表面色 / Surface (AI暗色体系) --- */
+  --surface-primary:     #0f0f1a;
+  --surface-secondary:   #1a1a2e;
+  --surface-tertiary:    #252540;
+  --surface-elevated:    #2a2a48;
+
+  /* 玻璃质感三层体系 (PRD定义) */
+  --glass-1:             rgba(30, 30, 50, 0.4);   /* 最透 — 背景装饰层 */
+  --glass-2:             rgba(30, 30, 50, 0.6);   /* 中透 — 卡片/容器层 */
+  --glass-3:             rgba(30, 30, 50, 0.95);  /* 实透 — 导航/弹窗层 */
+  --glass-border:        rgba(255, 255, 255, 0.06);
+
+  /* --- 文本色 / Text --- */
+  --text-primary:        #ffffff;
+  --text-secondary:      rgba(255, 255, 255, 0.72);
+  --text-tertiary:       rgba(255, 255, 255, 0.45);
+  --text-disabled:       rgba(255, 255, 255, 0.2);
+  --text-on-accent:      #ffffff;
+  --text-on-dark:        rgba(255, 255, 255, 0.85);
+
+  /* --- 边框色 / Border --- */
+  --border-subtle:       rgba(255, 255, 255, 0.06);
+  --border-default:      rgba(255, 255, 255, 0.1);
+  --border-strong:       rgba(255, 255, 255, 0.18);
+  --border-accent:       rgba(139, 92, 246, 0.3);
+
+  /* --- 阴影 / Shadow --- */
+  --shadow-xs:  0 1px 4px  rgba(0, 0, 0, 0.15);
+  --shadow-sm:  0 2px 8px  rgba(0, 0, 0, 0.2);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-glow:   0 0 20px rgba(139, 92, 246, 0.25);
+  --shadow-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+/* ===== 字体层级 / Typography Scale (13级) ===== */
+
+:root, page {
+  /* --- 标题级 / Headings --- */
+  --h1:       40px;
+  --h2:       34px;
+  --h3:       28px;
+  --h4:       24px;
+  --h5:       20px;
+  --h6:       18px;
+
+  /* --- 正文级 / Body --- */
+  --body-xl:  17px;
+  --body-lg:  16px;
+  --body:     15px;
+  --body-sm:  14px;
+  --body-xs:  13px;
+
+  /* --- 辅助级 / Caption & Label --- */
+  --caption:  12px;
+  --micro:    11px;
+
+  /* --- 字重 / Weights --- */
+  --weight-thin:      300;
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  --weight-black:     800;
+
+  /* --- 行高 / Line Height --- */
+  --leading-tight:    1.2;
+  --leading-normal:   1.5;
+  --leading-relaxed:  1.8;
+}
+
+/* ===== 文本辅助类 / Text Utility Classes ===== */
+
+/* 标题类 */
+.h1 { font-size: var(--h1); font-weight: var(--weight-bold);   line-height: var(--leading-tight);  letter-spacing: -0.5px; }
+.h2 { font-size: var(--h2); font-weight: var(--weight-bold);   line-height: var(--leading-tight);  letter-spacing: -0.4px; }
+.h3 { font-size: var(--h3); font-weight: var(--weight-semibold); line-height: 1.25; }
+.h4 { font-size: var(--h4); font-weight: var(--weight-semibold); line-height: 1.3; }
+.h5 { font-size: var(--h5); font-weight: var(--weight-semibold); line-height: 1.35; }
+.h6 { font-size: var(--h6); font-weight: var(--weight-semibold); line-height: 1.4; }
+
+/* 正文类 */
+.body-xl  { font-size: var(--body-xl);  font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.body-lg  { font-size: var(--body-lg);  font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.body     { font-size: var(--body);     font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.body-sm  { font-size: var(--body-sm);  font-weight: var(--weight-regular); line-height: var(--leading-relaxed); }
+.body-xs  { font-size: var(--body-xs);  font-weight: var(--weight-regular); line-height: var(--leading-relaxed); }
+
+/* 辅助类 */
+.caption  { font-size: var(--caption);  font-weight: var(--weight-medium);  line-height: var(--leading-normal); letter-spacing: 0.2px; }
+.micro    { font-size: var(--micro);    font-weight: var(--weight-medium);  line-height: var(--leading-normal); letter-spacing: 0.3px; }
+
+/* 梯度文字 (金色/品牌色高亮) */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-accent {
+  color: var(--color-primary);
+}
+
+/* ===== 间距系统 / Spacing (4px基准) ===== */
+
+:root, page {
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-9:   36px;
+  --space-10:  40px;
+  --space-11:  44px;
+  --space-12:  48px;
+  --space-13:  52px;
+  --space-14:  56px;
+  --space-15:  60px;
+  --space-16:  64px;
+  --space-18:  72px;
+  --space-20:  80px;
+  --space-22:  88px;
+  --space-24:  96px;
+}
+
+/* ===== 圆角系统 / Border Radius (6级) ===== */
+
+:root, page {
+  --radius-none:  0;
+  --radius-xs:    4px;
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --radius-xl:    20px;
+  --radius-2xl:   24px;
+  --radius-full:  999px;
+}
+
+/* ===== Z-index 层级 ===== */
+
+:root, page {
+  --z-base:      1;
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-overlay:   300;
+  --z-modal:     400;
+  --z-toast:     500;
+  --z-loader:    600;
+}
+
+/* ===== 动画 / Animation ===== */
+
+:root, page {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:  150ms;
+  --duration-normal: 250ms;
+  --duration-slow:  400ms;
+}
+
+/* ===== 玻璃质感组件 / Glass Components ===== */
+
+/* 透明玻璃层 (glass-1) — 适合纯背景装饰 */
+.glass-1 {
+  background: var(--glass-1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* 标准玻璃层 (glass-2) — 适合卡片/容器 */
+.glass-2, .glass-card {
+  background: var(--glass-2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* 实心玻璃层 (glass-3) — 适合导航/弹窗 */
+.glass-3 {
+  background: var(--glass-3);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ===== 渐变装饰 / Gradient Decoration ===== */
+
+.glow-cyan {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+}
+
+.glow-purple {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+}
+
+.glow-dual {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.10) 0%, transparent 50%);
+}

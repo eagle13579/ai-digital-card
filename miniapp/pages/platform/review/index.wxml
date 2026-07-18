@@ -1,0 +1,101 @@
+<view class="page-container">
+  <!-- ===== 页面顶部导航 ===== -->
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">建联审核</text>
+    <view class="header-right" />
+  </view>
+
+  <!-- ===== Tab 切换 ===== -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'pending' ? 'active' : ''}}" bindtap="switchTab" data-tab="pending">
+      <text class="tab-text">待审核</text>
+      <view class="tab-badge" wx:if="{{pendingCount > 0}}">{{pendingCount > 99 ? '99+' : pendingCount}}</view>
+    </view>
+    <view class="tab-item {{activeTab === 'established' ? 'active' : ''}}" bindtap="switchTab" data-tab="established">
+      <text class="tab-text">已建联</text>
+    </view>
+    <view class="tab-indicator" style="left: {{activeTab === 'pending' ? '0%' : '50%'}};"></view>
+  </view>
+
+  <!-- ===== 加载状态 ===== -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{!loading}}">
+    <!-- ===== 待审核 Tab ===== -->
+    <view class="tab-content" wx:if="{{activeTab === 'pending'}}">
+      <!-- 列表 -->
+      <view class="card-list" wx:if="{{pendingList.length > 0}}">
+        <view class="review-card" wx:for="{{pendingList}}" wx:key="id" data-id="{{item.id}}">
+          <view class="card-header">
+            <view class="user-avatar">{{item.name ? item.name[0].toUpperCase() : '?'}}</view>
+            <view class="user-info">
+              <text class="user-name">{{item.name || '未知用户'}}</text>
+              <text class="user-company" wx:if="{{item.company}}">{{item.company}}</text>
+              <text class="user-time">{{item.created_at || item.request_time || ''}}</text>
+            </view>
+            <view class="status-badge pending">待审核</view>
+          </view>
+          <view class="card-message" wx:if="{{item.message}}">
+            <text class="message-label">附言：</text>
+            <text class="message-text">{{item.message}}</text>
+          </view>
+          <view class="card-actions">
+            <button class="btn-approve" bindtap="approveConnection" data-id="{{item.id}}">✓ 批准</button>
+            <button class="btn-reject" bindtap="showRejectModal" data-id="{{item.id}}">✕ 拒绝</button>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{pendingList.length === 0}}">
+        <text class="empty-icon">📋</text>
+        <text class="empty-text">暂无待审核的建联请求</text>
+      </view>
+    </view>
+
+    <!-- ===== 已建联 Tab ===== -->
+    <view class="tab-content" wx:if="{{activeTab === 'established'}}">
+      <view class="card-list" wx:if="{{establishedList.length > 0}}">
+        <view class="contact-card" wx:for="{{establishedList}}" wx:key="id">
+          <view class="contact-avatar">{{item.name ? item.name[0].toUpperCase() : '?'}}</view>
+          <view class="contact-info">
+            <text class="contact-name">{{item.name || '未知用户'}}</text>
+            <text class="contact-company" wx:if="{{item.company}}">{{item.company}}</text>
+          </view>
+          <text class="contact-time">{{item.connected_at || ''}}</text>
+        </view>
+      </view>
+
+      <view class="empty-state" wx:if="{{establishedList.length === 0}}">
+        <text class="empty-icon">🔗</text>
+        <text class="empty-text">暂无已建立的连接</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 拒绝原因弹窗 ===== -->
+  <view class="modal-overlay" wx:if="{{showRejectModal}}" bindtap="cancelReject">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">拒绝建联</text>
+        <text class="modal-close" bindtap="cancelReject">✕</text>
+      </view>
+      <view class="modal-body">
+        <text class="modal-label">请输入拒绝原因（选填）</text>
+        <textarea class="modal-textarea" placeholder="请输入拒绝原因..." value="{{rejectReason}}" bindinput="onRejectReasonInput" maxlength="200" auto-height />
+        <text class="char-count">{{rejectReason.length}}/200</text>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-reject-confirm" bindtap="confirmReject">确认拒绝</button>
+        <button class="btn-cancel" bindtap="cancelReject">取消</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 底部安全区 ===== -->
+  <view class="bottom-placeholder" />
+</view>

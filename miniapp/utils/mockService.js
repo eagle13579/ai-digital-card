@@ -453,6 +453,14 @@ const MockService = {
     return this.getUserProfile()
   },
 
+  async submitFeedback(data) {
+    if (this.USE_MOCK) {
+      await this.mockDelay(500, 1000)
+      return { success: true, message: '反馈提交成功', data: { id: `fb_${Date.now()}`, ...data } }
+    }
+    return post('/api/v1/feedback', data)
+  },
+
   async getResourceCoverage(platformId) {
     if (this.USE_MOCK) {
       await this.mockDelay(300, 500)

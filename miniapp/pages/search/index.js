@@ -146,7 +146,7 @@ Page({
   goUserDetail(e) {
     const user = e.currentTarget.dataset.user
     if (user && user.id) {
-      wx.navigateTo({ url: `/pages/card/card?id=${user.id}` })
+      wx.navigateTo({ url: `/pages/card/card?userId=${user.id}` })
     }
   },
 })

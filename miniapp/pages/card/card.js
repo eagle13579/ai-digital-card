@@ -3,7 +3,7 @@
  * 展示单张名片的详细信息与统计数据 (i18n enabled)
  */
 const { MockService } = require('../../utils/mockService')
-const { miniappApi } = require('../../utils/api')
+const { miniappApi, userApi, brochureApi } = require('../../utils/api')
 const i18n = require('../../utils/i18n')
 
 Page({
@@ -25,8 +25,12 @@ Page({
       return
     }
     const cardId = options.id
+    const userId = options.userId
     if (cardId) {
       this.loadCardDetail(cardId)
+    } else if (userId) {
+      // 从搜索页传入 userId，先获取用户的个人信息，再匹配画册
+      this.loadCardByUserId(userId)
     } else {
       // 从tab进入时没有传id，加载用户自己的名片
       this.loadMyCard()
@@ -48,6 +52,45 @@ Page({
     } catch (err) {
       console.error('加载我的名片失败:', err)
       this.setData({ loading: false })
+    }
+  },
+
+  /** 根据 userId 加载对方名片（搜索结果跳转） */
+  async loadCardByUserId(userId) {
+    this.setData({ loading: true })
+    try {
+      // 获取用户信息
+      const userRes = await userApi.getUser(userId)
+      const user = userRes && userRes.data ? userRes.data : userRes
+      // 查找该用户的画册
+      const brochureRes = await brochureApi.list({ user_id: userId })
+      const brochures = Array.isArray(brochureRes) ? brochureRes : (brochureRes?.data?.items || brochureRes?.data || [])
+      if (brochures.length > 0) {
+        this.loadCardDetail(brochures[0].id)
+      } else if (user) {
+        // 无名片的用户，用用户信息构造简单卡片
+        this.setData({
+          card: {
+            id: null,
+            user_id: user.id || userId,
+            title: '',
+            cover: user.avatar || '',
+            user_name: user.name || user.nickName || '',
+            user_company: user.company || '',
+            user_title: user.title || '',
+            user_avatar: user.avatar || '',
+          },
+          stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
+          loading: false,
+        })
+      } else {
+        this.setData({ loading: false, card: null })
+        wx.showToast({ title: i18n.t('noCardYet') || '未找到名片', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('[Card] 加载用户名片失败:', err)
+      this.setData({ loading: false })
+      wx.showToast({ title: '加载失败', icon: 'none' })
     }
   },
 

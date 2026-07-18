@@ -69,7 +69,7 @@ Page({
       }
 
       const { getLevelText } = require('../../utils/levels')
-      const memberLevel = profile.member_level || profile.memberLevel || 'free'
+      const memberLevel = profile.membership_tier || 'free'
       const memberLevelText = getLevelText(memberLevel)
 
       let stats = { visitors: visitorStats.total_visits || 0, matches: 0, unlocks: 0, views: visitorStats.view_count || 0 }
@@ -90,7 +90,7 @@ Page({
         userInfo,
         memberLevel,
         memberLevelText,
-        memberExpire: profile.member_expire || '',
+        memberExpire: profile.membership_expires_at || '',
         trustCount,
         newVisitorCount,
         stats,

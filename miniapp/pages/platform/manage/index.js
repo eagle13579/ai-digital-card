@@ -43,21 +43,23 @@ Page({
     this.setData({ loading: true })
     const { platformId, useRealApi } = this.data
     try {
-      const [platform, membersRes, appsRes, coverageRes, rankingRes] = await Promise.all([
+      const [platform, membersRes, appsRes, coverageRes, rankingRes, pendingRes] = await Promise.all([
         getPlatform(platformId, useRealApi),
         getMembers(platformId, useRealApi),
         getApplications(platformId, useRealApi),
         getCoverage(platformId, useRealApi),
         getRanking(platformId, useRealApi),
+        // 从API获取真实的待审核建联数
+        connectionApi.listPending().catch(() => []),
       ])
 
       const members = membersRes.data || []
       const applications = appsRes.data || []
       const coverage = coverageRes.data || {}
       const ranking = rankingRes.data || []
+      const pendingConnectionsCount = Array.isArray(pendingRes) ? pendingRes.length : (pendingRes?.length || 0)
 
       const pendingApplications = applications.filter(a => a.status === 'pending').length
-      const pendingConnections = Math.floor(Math.random() * 5)
 
       this.setData({
         platform: platform.data || platform,
@@ -67,7 +69,7 @@ Page({
         ranking: ranking.slice(0, 3),
         linkableCount: coverage.linkableCities || 1,
         pendingApplications,
-        pendingConnections,
+        pendingConnections: pendingConnectionsCount,
         loading: false,
       })
     } catch (err) {
@@ -106,35 +108,33 @@ Page({
     this.closeInviteModal()
   },
 
+  /** 跳转成员管理 — 修复：改为跳转到 team/manage（真正的成员管理页） */
   goToMemberManage() {
     const platformId = this.data.platformId
     if (platformId) {
-      wx.navigateTo({ url: `/pages/platform/detail/index?id=${platformId}` })
+      wx.navigateTo({ url: `/pages/team/manage/index?platformId=${platformId}` })
     }
   },
 
   handleImportMembers() {
-    wx.showModal({
-      title: '一键导入会员',
-      content: '功能即将上线，敬请期待。届时可通过Excel批量导入或从询赋App中直接邀请会员加入平台。',
-      showCancel: false,
-      confirmText: '知道了',
-    })
+    const platformId = this.data.platformId
+    if (platformId) {
+      wx.navigateTo({ url: `/pages/platform/import/index?id=${platformId}` })
+    }
   },
 
   goToMessage() {
-    wx.showModal({
-      title: '消息发布/管理',
-      content: '功能即将上线，敬请期待。届时可向平台成员群发通知、活动邀请及行业资讯。',
-      showCancel: false,
-      confirmText: '知道了',
-    })
+    const platformId = this.data.platformId
+    if (platformId) {
+      wx.navigateTo({ url: `/pages/platform/message/index?id=${platformId}` })
+    }
   },
 
+  /** 跳转新人审核 — 修复：改为跳转到 platform/review（真正的审核页） */
   goToNewMemberReview() {
     const platformId = this.data.platformId
     if (platformId) {
-      wx.navigateTo({ url: `/pages/platform/detail/index?id=${platformId}` })
+      wx.navigateTo({ url: `/pages/platform/review/index?id=${platformId}` })
     }
   },
 

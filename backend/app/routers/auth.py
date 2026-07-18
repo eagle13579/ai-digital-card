@@ -233,6 +233,10 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
     secret = settings.WECHAT_MINI_SECRET
 
     if not appid or not secret:
+        # 生产环境禁止 mock 降级
+        import os
+        if os.getenv("ENV", "").lower() in ("production", "prod"):
+            raise HTTPException(status_code=500, detail="微信小程序未配置，请设置 WECHAT_MINI_APPID/SECRET")
         # 降级：使用 mock 方式（开发/演示模式）
         _logger.warning("微信小程序未配置 WECHAT_MINI_APPID/SECRET，使用 mock 模式")
         mock_openid = f"mock_mini_{uuid.uuid4().hex[:12]}"
