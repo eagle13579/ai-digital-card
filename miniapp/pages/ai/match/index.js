@@ -5,8 +5,11 @@
 const { getRecommend } = require('../../../utils/ai-bridge')
 const { connectionApi } = require('../../../utils/api')
 const i18n = require('../../../utils/i18n')
+const cache = require('../../../utils/cache')
 
 const PAGE_SIZE = 10 // 每页10条
+const MATCH_CACHE_KEY = 'match:recommend' // 推荐列表缓存键
+const MATCH_CACHE_TTL = 30 * 60 * 1000 // 30分钟过期
 
 Page({
   data: {
@@ -63,12 +66,17 @@ Page({
     })
   },
 
-  /** 加载推荐列表 */
+  /** 加载推荐列表（缓存优先策略） */
   async loadRecommend() {
     this.setData({ loading: true, page: 1, hasMore: true })
     try {
-      const res = await getRecommend({ page: 1, pageSize: PAGE_SIZE }, this.data.useRealApi)
-      const list = res.data || res || []
+      // 使用 cacheFirst 策略：先返回缓存，后台静默刷新
+      const list = await cache.cacheFirst(MATCH_CACHE_KEY, async () => {
+        const res = await getRecommend({ page: 1, pageSize: PAGE_SIZE }, this.data.useRealApi)
+        const items = res.data || res || []
+        return items
+      }, { ttl: MATCH_CACHE_TTL })
+
       this.setData({
         matches: list,
         filteredMatches: list,
@@ -78,17 +86,27 @@ Page({
     } catch (e) {
       console.error('获取匹配列表失败', e)
       this.setData({ loading: false })
+      // 尝试从独立缓存键读取（兜底）
+      const fallback = cache.get('match:list_v1', { ignoreExpiry: true })
+      if (fallback && fallback.length > 0) {
+        console.log('[Match] 兜底缓存命中')
+        this.setData({ matches: fallback, filteredMatches: fallback, loading: false })
+      }
     }
   },
 
-  /** 加载更多（翻页） */
+  /** 加载更多（翻页 + 网络优先策略） */
   async loadMore() {
     if (this.data.loadingMore || !this.data.hasMore) return
     this.setData({ loadingMore: true })
     const nextPage = this.data.page + 1
     try {
-      const res = await getRecommend({ page: nextPage, pageSize: PAGE_SIZE }, this.data.useRealApi)
-      const newItems = res.data || res || []
+      const cacheKey = `${MATCH_CACHE_KEY}:page:${nextPage}`
+      const newItems = await cache.networkFirst(cacheKey, async () => {
+        const res = await getRecommend({ page: nextPage, pageSize: PAGE_SIZE }, this.data.useRealApi)
+        return res.data || res || []
+      }, { ttl: MATCH_CACHE_TTL })
+
       const merged = [...this.data.matches, ...newItems]
       this.setData({
         matches: merged,

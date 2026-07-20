@@ -42,6 +42,7 @@ from app.routers.platform_router import router as platform_router
 from app.routers.connection_router import router as connection_router
 from app.routers.ocr_router import router as ocr_router
 from app.routers.escrow_router import router as escrow_router
+from app.routers.progressive_search_router import router as progressive_search_router
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -86,4 +87,5 @@ __all__ = [
     "connection_router",
     "ocr_router",
     "escrow_router",
+    "progressive_search_router",
 ]

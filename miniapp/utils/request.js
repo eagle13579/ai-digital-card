@@ -10,6 +10,7 @@
  */
 
 const store = require('./store')
+const cache = require('./cache')
 
 // API baseURL
 // 统一使用生产域名（https）
@@ -33,6 +34,20 @@ const HTTP_ERROR_MAP = {
 }
 
 /**
+ * 生成缓存键（用于请求缓存的回退）
+ * @param {string} method
+ * @param {string} url
+ * @param {object} data
+ * @returns {string}
+ */
+function _buildCacheKey(method, url, data) {
+  const dataStr = data && typeof data === 'object' && Object.keys(data).length > 0
+    ? JSON.stringify(data)
+    : ''
+  return `req:${method}:${url}:${dataStr}`
+}
+
+/**
  * 发起HTTP请求
  * @param {string} method - 请求方法 (GET/POST/PUT/DELETE)
  * @param {string} url - 请求路径（相对于 baseURL）
@@ -40,6 +55,7 @@ const HTTP_ERROR_MAP = {
  * @param {object} options - 额外选项
  * @param {boolean} options.noAuth - 是否不需要token（默认 false）
  * @param {boolean} options.noToast - 是否不自动弹Toast（默认 false）
+ * @param {boolean} options.skipCache - 是否跳过缓存回退（默认 false）
  * @returns {Promise<any>} 成功时直接返回 data 字段
  */
 function request(method, url, data = {}, options = {}) {
@@ -78,8 +94,14 @@ function request(method, url, data = {}, options = {}) {
           // 统一响应格式: { code, message, data }
           if (body && typeof body === 'object' && 'code' in body) {
             if (body.code === 0) {
-              // ✅ 业务成功 → 直接返回 data
-              resolve(body.data !== undefined ? body.data : body)
+              // ✅ 业务成功 → 直接返回 data，并写入缓存
+              const result = body.data !== undefined ? body.data : body
+              // GET 请求缓存结果（供离线回退）
+              if (method === 'GET') {
+                const cacheKey = _buildCacheKey(method, url, data)
+                cache.set(cacheKey, result)
+              }
+              resolve(result)
             } else {
               // ❌ 业务错误 → Toast 错误信息
               const errMsg = body.message || '请求失败'
@@ -90,6 +112,10 @@ function request(method, url, data = {}, options = {}) {
             }
           } else {
             // 非标准格式（旧接口兼容），直接返回
+            if (method === 'GET') {
+              const cacheKey = _buildCacheKey(method, url, data)
+              cache.set(cacheKey, body)
+            }
             resolve(body)
           }
           return
@@ -117,6 +143,19 @@ function request(method, url, data = {}, options = {}) {
       fail(err) {
         // 网络层失败（断网、超时、DNS解析失败）
         const errMsg = err.errMsg || '网络连接失败，请检查网络'
+
+        // ---- 缓存回退：网络异常时从缓存读取数据 ----
+        const cacheKey = _buildCacheKey(method, url, data)
+        const cachedData = cache.get(cacheKey, { ignoreExpiry: true })
+        if (cachedData !== null) {
+          console.log('[Request] 网络异常，命中请求缓存:', url, cacheKey)
+          if (!options.noToast) {
+            wx.showToast({ title: '网络异常，已加载离线缓存', icon: 'none', duration: 2000 })
+          }
+          resolve(cachedData)
+          return
+        }
+
         if (!options.noToast) {
           wx.showToast({ title: errMsg, icon: 'none' })
         }

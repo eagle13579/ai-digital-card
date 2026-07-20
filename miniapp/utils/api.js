@@ -459,19 +459,19 @@ const teamApi = {
 const analyticsApi = {
   /** 活跃用户数 */
   getActiveUsers(days = 7) {
-    return get(`/api/analytics/active-users?days=${days}`)
+    return get(`/api/v1/growth/metrics?days=${days}`)
   },
-  /** 漏斗分析 */
+  /** 漏斗分析 (Mock-only) */
   getFunnel(name) {
-    return get(`/api/analytics/funnel/${name}`)
+    return get(`/api/v1/growth/funnel/${name}`)
   },
   /** 留存分析 */
   getRetention(days = 30) {
-    return get(`/api/analytics/retention?days=${days}`)
+    return get(`/api/v1/growth/retention?days=${days}`)
   },
-  /** 事件统计 */
+  /** 事件统计 (Mock-only) */
   getEventStats(days = 7) {
-    return get(`/api/analytics/events?days=${days}`)
+    return get(`/api/v1/growth/events?days=${days}`)
   },
 }
 

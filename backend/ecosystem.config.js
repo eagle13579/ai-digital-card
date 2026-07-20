@@ -24,11 +24,12 @@ module.exports = {
   apps: [{
     name: 'ai-card',
     script: 'main.py',
-    interpreter: process.env.PYTHON || 'python',
+    interpreter: process.env.PYTHONW || 'pythonw',
     cwd: __dirname,
 
     instances: 1,
     exec_mode: 'fork',
+    windowsHide: true,
 
     // ── 环境变量 ──
     env: {

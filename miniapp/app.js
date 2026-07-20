@@ -7,12 +7,16 @@
  * 参考: D:\AI询赋拆解\frontend\src\store\index.ts
  */
 const store = require('./utils/store')
+const cache = require('./utils/cache')
 
 App({
   onLaunch() {
     // store 构造时已自动从 Storage 恢复 token/userInfo
     const { token } = store.getState()
     console.log('[App] onLaunch, isLoggedIn:', !!token)
+
+    // 初始化离线缓存层 & 网络状态监听
+    cache.initNetworkListener()
 
     // 开发/测试阶段：总是从登录页开始（覆盖entryPagePath和旧token）
     setTimeout(() => {

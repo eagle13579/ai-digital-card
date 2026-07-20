@@ -1,9 +1,7 @@
 <view class="page-container">
   <!-- 页头 + Tab切换 -->
   <view class="connections__header">
-    <view class="connections__header-title">
-      <text>社交关系</text>
-    </view>
+    <page-header title="社交关系" />
     <view class="connections__tabs">
       <view class="connections__tab {{activeTab=='connections'?'connections__tab--active':''}}" data-tab="connections" bindtap="switchTab">
         <text class="connections__tab-label">我的连接</text>

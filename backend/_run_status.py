@@ -6,7 +6,8 @@ script = r"D:\向海容的知识库\wiki\wiki\记忆宫殿\scripts\employee_evol
 
 result = subprocess.run(
     [sys.executable, script, "--status"],
-    capture_output=True, text=True, timeout=120
+    capture_output=True, text=True, timeout=120,
+creationflags=subprocess.CREATE_NO_WINDOW,
 )
 print("STDOUT:")
 print(result.stdout)

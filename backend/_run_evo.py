@@ -58,7 +58,8 @@ except Exception as e:
     import subprocess
     result = subprocess.run(
         [sys.executable, os.path.join(SCRIPTS_DIR, "employee_evolution_engine.py"), "--status"],
-        capture_output=True, text=True, timeout=120
+        capture_output=True, text=True, timeout=120,
+    creationflags=subprocess.CREATE_NO_WINDOW,
     )
     print("STDOUT:", result.stdout)
     print("STDERR:", result.stderr)

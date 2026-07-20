@@ -16,7 +16,8 @@ for i in range(1, 11):
     # Reset singleton each time to avoid duplication
     subprocess.run(
         [sys.executable, "scripts/reset_online_service.py"],
-        capture_output=True, text=True
+        capture_output=True, text=True,
+    creationflags=subprocess.CREATE_NO_WINDOW,
     )
     
     result = subprocess.run(
@@ -24,7 +25,8 @@ for i in range(1, 11):
          "--weights-only", "--min-feedback", "1"],
         capture_output=True, text=True,
         cwd=backend_dir,
-        env={**os.environ, "no_proxy": "*"}
+        env={**os.environ, "no_proxy": "*"},
+    creationflags=subprocess.CREATE_NO_WINDOW,
     )
     
     # Extract key lines

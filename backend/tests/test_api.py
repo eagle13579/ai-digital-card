@@ -38,6 +38,7 @@ class TestHealth:
 
 # ── Auth / Registration & Login ──────────────────────────────────────────────
 
+@pytest.mark.db
 class TestAuth:
     REGISTER_URL = "/api/auth/register"
     LOGIN_URL = "/api/auth/login"
@@ -93,6 +94,7 @@ class TestAuth:
 
 # ── Brochure CRUD ───────────────────────────────────────────────────────────
 
+@pytest.mark.db
 class TestBrochure:
     BASE_URL = "/api/brochures"
 
@@ -166,6 +168,7 @@ class TestBrochure:
 
 # ── Brochure Publish & Share ─────────────────────────────────────────────────
 
+@pytest.mark.db
 class TestBrochurePublishShare:
     BASE_URL = "/api/brochures"
 
@@ -216,6 +219,7 @@ class TestBrochurePublishShare:
 
 # ── Tag CRUD ─────────────────────────────────────────────────────────────────
 
+@pytest.mark.db
 class TestTags:
     BASE_URL = "/api/tags"
 
@@ -286,6 +290,7 @@ class TestTags:
 
 # ── Trust Network ────────────────────────────────────────────────────────────
 
+@pytest.mark.db
 class TestTrustNetwork:
     BASE_URL = "/api/trust"
 
@@ -343,6 +348,7 @@ class TestTrustNetwork:
 
 # ── User Profile ─────────────────────────────────────────────────────────────
 
+@pytest.mark.db
 class TestUserProfile:
     BASE_URL = "/api/users"
 
