@@ -77,6 +77,11 @@
         <text class="menu-value">{{trustCount}}人</text>
         <text class="menu-arrow">›</text>
       </view>
+      <view class="menu-item" bindtap="goConnections">
+        <view class="menu-icon">🤝</view>
+        <text class="menu-label">我的连接</text>
+        <text class="menu-arrow">›</text>
+      </view>
       <view class="menu-item" bindtap="goAICenter">
         <view class="menu-icon">◇</view>
         <text class="menu-label">{{_t.aiCenterMenu}}</text>

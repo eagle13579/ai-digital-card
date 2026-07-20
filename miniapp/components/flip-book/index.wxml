@@ -1,0 +1,45 @@
+<view class="flipbook {{flipped?'flipbook--flipped':''}} {{className}}" catchtap="handleFlip">
+  <view class="flipbook__inner">
+    <!-- 正面 -->
+    <view class="flipbook__face flipbook__face--front" style="background:{{bgStyle}}">
+      <view class="flipbook__front-content" wx:if="{{cardData && !loading}}">
+        <image class="flipbook__avatar" src="{{cardData.avatar || ''}}" mode="aspectFill" />
+        <text class="flipbook__name">{{cardData.name || '未设置姓名'}}</text>
+        <text class="flipbook__company">{{[cardData.company, cardData.title].filter(Boolean).join(' · ') || '未设置公司信息'}}</text>
+        <view class="flipbook__divider"></view>
+        <view class="flipbook__contact">
+          <text class="flipbook__contact-item" wx:if="{{cardData.phone}}">📞 {{cardData.phone}}</text>
+          <text class="flipbook__contact-item" wx:if="{{cardData.email}}">📧 {{cardData.email}}</text>
+        </view>
+      </view>
+      <!-- 加载骨架 -->
+      <view class="flipbook__skeleton" wx:elif="{{loading}}">
+        <view class="flipbook__skeleton-avatar"></view>
+        <view class="flipbook__skeleton-line flipbook__skeleton-line--short"></view>
+        <view class="flipbook__skeleton-line flipbook__skeleton-line--medium"></view>
+        <view class="flipbook__skeleton-line flipbook__skeleton-line--long"></view>
+      </view>
+      <!-- 空名片 -->
+      <view class="flipbook__empty" wx:else>
+        <text class="flipbook__empty-icon">📇</text>
+        <text class="flipbook__empty-text">暂无名片</text>
+        <text class="flipbook__empty-hint">点击创建您的数字名片</text>
+      </view>
+      <text class="flipbook__hint" wx:if="{{flippable && cardData}}">点击翻转</text>
+    </view>
+
+    <!-- 背面 -->
+    <view class="flipbook__face flipbook__face--back">
+      <view class="flipbook__back-content">
+        <text class="flipbook__back-title">微信联系我</text>
+        <image class="flipbook__qrcode" src="{{cardData.wechat_qrcode}}" mode="aspectFit" wx:if="{{cardData && cardData.wechat_qrcode}}" />
+        <view class="flipbook__qrcode-placeholder" wx:else>
+          <text class="flipbook__qrcode-placeholder-icon">📱</text>
+          <text class="flipbook__qrcode-placeholder-text">暂未设置微信二维码</text>
+        </view>
+        <text class="flipbook__back-hint">扫码添加微信</text>
+      </view>
+      <text class="flipbook__hint" wx:if="{{flippable && cardData}}">点击翻转</text>
+    </view>
+  </view>
+</view>

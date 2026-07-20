@@ -1,0 +1,93 @@
+<view class="page-container">
+  <!-- 页头 + Tab切换 -->
+  <view class="connections__header">
+    <view class="connections__header-title">
+      <text>社交关系</text>
+    </view>
+    <view class="connections__tabs">
+      <view class="connections__tab {{activeTab=='connections'?'connections__tab--active':''}}" data-tab="connections" bindtap="switchTab">
+        <text class="connections__tab-label">我的连接</text>
+      </view>
+      <view class="connections__tab {{activeTab=='pending'?'connections__tab--active':''}}" data-tab="pending" bindtap="switchTab">
+        <text class="connections__tab-label">待审核</text>
+        <view class="connections__tab-badge" wx:if="{{pendingList.length>0}}">
+          <text class="connections__tab-badge-text">{{pendingList.length>99?'99+':pendingList.length}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="connections__skeleton" wx:if="{{status=='loading'}}">
+    <view class="connections__skeleton-item" wx:for="{{[1,2,3,4]}}" wx:key="index">
+      <view class="connections__skeleton-avatar"></view>
+      <view class="connections__skeleton-info">
+        <view class="connections__skeleton-line connections__skeleton-line--name"></view>
+        <view class="connections__skeleton-line connections__skeleton-line--company"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 错误状态 -->
+  <view class="connections__error" wx:elif="{{status=='error'}}">
+    <text class="connections__error-icon">😵</text>
+    <text class="connections__error-title">加载失败</text>
+    <text class="connections__error-msg">{{errorMsg || '请检查网络后重试'}}</text>
+    <button class="connections__error-btn" bindtap="loadAll">重新加载</button>
+  </view>
+
+  <!-- 我的连接 Tab -->
+  <scroll-view scroll-y class="connections__scroll" wx:elif="{{activeTab=='connections'}}" enhanced show-scrollbar="{{false}}">
+    <view class="connections__empty" wx:if="{{connections.length===0 && connectionsLoaded}}">
+      <text class="connections__empty-icon">🤝</text>
+      <text class="connections__empty-title">暂无连接</text>
+      <text class="connections__empty-desc">去匹配页面找人交换名片吧</text>
+      <button class="connections__empty-btn" bindtap="goToMatch">前往匹配</button>
+    </view>
+    <view class="connections__list" wx:else>
+      <view class="connections__card" wx:for="{{connections}}" wx:key="connection_id" data-id="{{item.id}}" bindtap="goToCardDetail" hover-class="connections__card--active">
+        <image class="connections__avatar" src="{{item.avatar || ''}}" mode="aspectFill" />
+        <view class="connections__card-body">
+          <view class="connections__card-top">
+            <text class="connections__card-name">{{item.name}}</text>
+            <view class="connections__card-label" wx:if="{{item.label}}">
+              <text class="connections__card-label-text">{{item.label}}</text>
+            </view>
+          </view>
+          <text class="connections__card-meta">{{[item.company,item.title].filter(Boolean).join(' · ')}}</text>
+          <text class="connections__card-time">建立于 {{item.created_at ? item.created_at.slice(0,10) : ''}}</text>
+        </view>
+        <text class="connections__card-arrow">›</text>
+      </view>
+    </view>
+    <view class="connections__bottom-spacer"></view>
+  </scroll-view>
+
+  <!-- 待审核 Tab -->
+  <scroll-view scroll-y class="connections__scroll" wx:elif="{{activeTab=='pending'}}" enhanced show-scrollbar="{{false}}">
+    <view class="connections__empty" wx:if="{{pendingList.length===0 && pendingLoaded}}">
+      <text class="connections__empty-icon">📬</text>
+      <text class="connections__empty-title">暂无待审核请求</text>
+      <text class="connections__empty-desc">当有人向您发起建联时，会显示在这里</text>
+    </view>
+    <view class="connections__list" wx:else>
+      <view class="connections__card" wx:for="{{pendingList}}" wx:key="connection_id" data-id="{{item.user_id}}" bindtap="goToUserDetail" hover-class="connections__card--active">
+        <image class="connections__avatar" src="{{item.avatar || ''}}" mode="aspectFill" />
+        <view class="connections__card-body">
+          <view class="connections__card-top">
+            <text class="connections__card-name">{{item.name}}</text>
+            <view class="connections__card-source" wx:if="{{item.source}}">
+              <text class="connections__card-source-text">来自{{item.source === 'platform' ? '资源平台' : item.source}}</text>
+            </view>
+          </view>
+          <text class="connections__card-meta">{{[item.company,item.title].filter(Boolean).join(' · ')}}</text>
+          <view class="connections__card-actions">
+            <button class="connections__action-btn connections__action-btn--approve" data-id="{{item.connection_id}}" catchtap="handleApprove">批准</button>
+            <button class="connections__action-btn connections__action-btn--reject" data-id="{{item.connection_id}}" catchtap="handleReject">拒绝</button>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="connections__bottom-spacer"></view>
+  </scroll-view>
+</view>

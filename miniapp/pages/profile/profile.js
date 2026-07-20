@@ -159,6 +159,11 @@ Page({
     wx.navigateTo({ url: '/pages/network/graph/index' })
   },
 
+  // 我的连接
+  goConnections() {
+    wx.navigateTo({ url: '/pages/connections/index' })
+  },
+
   // AI智能中心
   goAICenter() {
     wx.navigateTo({ url: '/pages/ai/index/index' })

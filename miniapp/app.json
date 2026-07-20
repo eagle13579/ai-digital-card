@@ -35,7 +35,8 @@
     "pages/team/manage/index",
     "pages/organization/list/index",
     "pages/organization/detail/index",
-    "pages/organization/create/index"
+    "pages/organization/create/index",
+    "pages/connections/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -74,7 +75,8 @@
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
     "empty-state": "/components/empty-state/index",
-    "network-mini-map": "/components/network-mini-map/index"
+    "network-mini-map": "/components/network-mini-map/index",
+    "flip-book": "/components/flip-book/index"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
