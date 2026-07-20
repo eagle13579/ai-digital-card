@@ -39,9 +39,13 @@
           <text class="match-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
         </view>
       </view>
-      <view class="match-score-wrap">
-        <text class="match-score-num">{{item.matchScore}}%</text>
-        <text class="match-score-label">{{_t.matchLabel}}</text>
+      <view class="match-right">
+        <view class="match-score-wrap">
+          <text class="match-score-num">{{item.matchScore}}%</text>
+          <text class="match-score-label">{{_t.matchLabel}}</text>
+        </view>
+        <button class="btn-connect-mini" data-id="{{item.id}}" bindtap="exchangeFromList" catchtap="exchangeFromList" wx:if="{{!item._requestSent}}">{{_t.exchangeCard}}</button>
+        <text class="request-sent-tag" wx:if="{{item._requestSent}}">{{_t.requestSent}}</text>
       </view>
     </view>
   </view>

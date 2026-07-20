@@ -236,3 +236,36 @@
   text-align: center;
   padding: 60px 16px;
 }
+
+/* ===== 直接交换名片按钮 (列表卡片) ===== */
+.match-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--space-2);
+  gap: 6px;
+}
+
+.btn-connect-mini {
+  font-size: 11px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #ffffff;
+  border-radius: var(--radius-full);
+  border: none;
+  line-height: 1.8;
+  min-width: 74px;
+  text-align: center;
+  font-weight: var(--weight-medium);
+}
+
+.btn-connect-mini::after {
+  border: none;
+}
+
+.request-sent-tag {
+  font-size: 10px;
+  color: var(--success);
+  white-space: nowrap;
+}

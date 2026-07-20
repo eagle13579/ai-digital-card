@@ -162,4 +162,29 @@ Page({
       console.error('交换名片失败', e)
     }
   },
+
+  /** 从列表直接发起交换名片（无需解锁） */
+  async exchangeFromList(e) {
+    const id = e.currentTarget.dataset.id
+    const item = this.data.filteredMatches.find(m => m.id === id)
+    if (!item) return
+    try {
+      await connectionApi.request(id, '', 'match')
+      // 标记该卡片已发送请求
+      const matches = [...this.data.matches]
+      const idx = matches.findIndex(m => m.id === id)
+      if (idx > -1) {
+        matches[idx] = { ...matches[idx], _requestSent: true }
+      }
+      const filtered = [...this.data.filteredMatches]
+      const fidx = filtered.findIndex(m => m.id === id)
+      if (fidx > -1) {
+        filtered[fidx] = { ...filtered[fidx], _requestSent: true }
+      }
+      this.setData({ matches, filteredMatches: filtered })
+      wx.showToast({ title: i18n.t('requestSent'), icon: 'success' })
+    } catch (e) {
+      console.error('直接交换名片失败', e)
+    }
+  },
 })
