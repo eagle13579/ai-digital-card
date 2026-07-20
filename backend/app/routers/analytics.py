@@ -56,7 +56,7 @@ async def get_funnel(db: AsyncSession = Depends(get_db)):
             (SELECT COUNT(*) FROM brochures WHERE status='active') AS card_created,
             (SELECT COUNT(DISTINCT user_a_id) FROM match_records) AS matched_users,
             (SELECT COUNT(*) FROM connections) AS connected,
-            (SELECT COUNT(*) FROM users WHERE updated_at > NOW() - INTERVAL '7 days') AS active_7d
+            (SELECT COUNT(*) FROM users WHERE updated_at > datetime('now', '-7 days')) AS active_7d
     """))
     row = result.fetchone()
     return {
@@ -71,9 +71,9 @@ async def get_funnel(db: AsyncSession = Depends(get_db)):
                 "active_7d": row[4]
             },
             "conversion_rates": {
-                "register_to_card": f"{row[1]/max(row[0],1)*100:.1f}%",
-                "card_to_match": f"{row[2]/max(row[1],1)*100:.1f}%",
-                "match_to_connect": f"{row[3]/max(row[2],1)*100:.1f}%"
+                "register_to_card": f"{row[1]/max(row[0],1)*100:.1f}",
+                "card_to_match": f"{row[2]/max(row[1],1)*100:.1f}",
+                "match_to_connect": f"{row[3]/max(row[2],1)*100:.1f}"
             }
         }
     }

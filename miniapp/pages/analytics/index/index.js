@@ -63,10 +63,17 @@ Page({
         connected: 0,
         active_7d: 0,
       }
-      const conversionRates = rawData.conversion_rates || {
-        register_to_card: 0,
-        card_to_match: 0,
-        match_to_connect: 0,
+      const rawRates = rawData.conversion_rates || {}
+      // 后端可能返回纯数字 (45.2) 或带%的字符串 ("45.2%")
+      const parseRate = (v) => {
+        if (v === null || v === undefined) return 0
+        if (typeof v === 'number') return v
+        return parseFloat(String(v).replace('%', '')) || 0
+      }
+      const conversionRates = {
+        register_to_card: parseRate(rawRates.register_to_card),
+        card_to_match: parseRate(rawRates.card_to_match),
+        match_to_connect: parseRate(rawRates.match_to_connect),
       }
 
       // 计算各步骤相对于注册数的百分比（进度条基准）
