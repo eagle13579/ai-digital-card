@@ -54,32 +54,51 @@ def get_recent_logs(lines: int = 100) -> list[dict]:
 @mcp.tool()
 def check_service_health() -> dict:
     """
-    健康检查：检测后端服务是否运行
+    健康检查：检测后端服务是否运行（本地+生产双路检查）
     """
     import socket
-
-    host = "127.0.0.1"
-    port = 8201
+    import urllib.request
+    import urllib.error
 
     result = {
         "service": "AI数智名片后端 (port 8201)",
         "timestamp": datetime.now().isoformat(),
+        "checks": {},
     }
 
+    # 检查1：本地端口
+    local_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    local_sock.settimeout(3)
+    local_code = local_sock.connect_ex(("127.0.0.1", 8201))
+    local_sock.close()
+    result["checks"]["local_8201"] = "running" if local_code == 0 else "stopped"
+
+    # 检查2：生产公网
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)
-        code = sock.connect_ex((host, port))
-        sock.close()
-        if code == 0:
-            result["status"] = "running"
-            result["message"] = "服务运行中"
-        else:
-            result["status"] = "stopped"
-            result["message"] = f"端口 {port} 未监听，服务未启动"
+        req = urllib.request.Request(
+            "https://card.liankebao.top/api/health",
+            method="GET",
+            headers={"User-Agent": "MCP-HealthCheck/1.0"}
+        )
+        resp = urllib.request.urlopen(req, timeout=5)
+        result["checks"]["card.liankebao.top/api/health"] = f"HTTP_{resp.status}"
+        resp.close()
+    except urllib.error.HTTPError as e:
+        result["checks"]["card.liankebao.top/api/health"] = f"HTTP_{e.code}"
     except Exception as e:
+        result["checks"]["card.liankebao.top/api/health"] = str(e)
+    
+    # 综合状态
+    results = list(result["checks"].values())
+    if all(r == "running" or r.startswith("HTTP_2") for r in results):
+        result["status"] = "running"
+        result["message"] = "所有检查通过"
+    elif any(r == "stopped" for r in results):
+        result["status"] = "degraded"
+        result["message"] = "部分服务未运行"
+    else:
         result["status"] = "error"
-        result["message"] = str(e)
+        result["message"] = "所有检查均失败"
 
     return result
 
