@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "loading": "/components/loading/index"
+  },
+  "navigationBarTitleText": "增长看板",
+  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#0f0f1a",
+  "backgroundColor": "#0f0f13",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

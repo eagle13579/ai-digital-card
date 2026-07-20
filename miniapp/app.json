@@ -36,7 +36,8 @@
     "pages/organization/list/index",
     "pages/organization/detail/index",
     "pages/organization/create/index",
-    "pages/connections/index"
+    "pages/connections/index",
+    "pages/analytics/index/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",

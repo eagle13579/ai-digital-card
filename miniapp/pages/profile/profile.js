@@ -164,6 +164,11 @@ Page({
     wx.navigateTo({ url: '/pages/connections/index' })
   },
 
+  // 增长看板
+  goAnalytics() {
+    wx.navigateTo({ url: '/pages/analytics/index/index' })
+  },
+
   // AI智能中心
   goAICenter() {
     wx.navigateTo({ url: '/pages/ai/index/index' })

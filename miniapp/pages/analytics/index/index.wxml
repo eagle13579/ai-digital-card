@@ -1,0 +1,150 @@
+<!-- 增长看板 - AI数智名片 -->
+<view class="page-container">
+  <loading visible="{{loading}}" />
+
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
+
+    <!-- ===== 顶部标题 ===== -->
+    <view class="section-header">
+      <text class="section-title">用户增长漏斗</text>
+      <text class="section-subtitle">注册 → 名片 → 匹配 → 连接</text>
+    </view>
+
+    <!-- ===== 漏斗图 - 进度条可视化 ===== -->
+    <view class="funnel-card">
+      <!-- 注册 -->
+      <view class="funnel-step">
+        <view class="step-info">
+          <text class="step-label">注册用户</text>
+          <text class="step-value">{{funnel.registered}}</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></view>
+        </view>
+        <text class="step-rate">100%</text>
+      </view>
+
+      <!-- 名片 -->
+      <view class="funnel-step">
+        <view class="step-info">
+          <text class="step-label">创建名片</text>
+          <text class="step-value">{{funnel.card_created}}</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{funnelPercentages.cardCreated}}%; background: linear-gradient(90deg, #7c3aed, #8b5cf6);"></view>
+        </view>
+        <text class="step-rate">{{conversionRates.register_to_card}}%</text>
+      </view>
+
+      <!-- 匹配 -->
+      <view class="funnel-step">
+        <view class="step-info">
+          <text class="step-label">匹配用户</text>
+          <text class="step-value">{{funnel.matched_users}}</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{funnelPercentages.match}}%; background: linear-gradient(90deg, #6d28d9, #7c3aed);"></view>
+        </view>
+        <text class="step-rate">{{conversionRates.card_to_match}}%</text>
+      </view>
+
+      <!-- 连接 -->
+      <view class="funnel-step" style="border-bottom: none;">
+        <view class="step-info">
+          <text class="step-label">已连接</text>
+          <text class="step-value">{{funnel.connected}}</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{funnelPercentages.connect}}%; background: linear-gradient(90deg, #5b21b6, #6d28d9);"></view>
+        </view>
+        <text class="step-rate">{{conversionRates.match_to_connect}}%</text>
+      </view>
+    </view>
+
+    <!-- ===== 核心指标卡片 ===== -->
+    <view class="metrics-section">
+      <text class="section-title">核心指标</text>
+
+      <view class="metrics-grid">
+        <view class="metric-card">
+          <view class="metric-icon icon-register">👥</view>
+          <text class="metric-num">{{funnel.registered}}</text>
+          <text class="metric-label">注册用户</text>
+        </view>
+        <view class="metric-card">
+          <view class="metric-icon icon-card">📇</view>
+          <text class="metric-num">{{funnel.card_created}}</text>
+          <text class="metric-label">名片数</text>
+        </view>
+        <view class="metric-card">
+          <view class="metric-icon icon-match">🤝</view>
+          <text class="metric-num">{{funnel.matched_users}}</text>
+          <text class="metric-label">匹配人数</text>
+        </view>
+        <view class="metric-card">
+          <view class="metric-icon icon-connect">🔗</view>
+          <text class="metric-num">{{funnel.connected}}</text>
+          <text class="metric-label">连接数</text>
+        </view>
+        <view class="metric-card metric-card-wide">
+          <view class="metric-icon icon-active">🔥</view>
+          <text class="metric-num">{{funnel.active_7d}}</text>
+          <text class="metric-label">7日活跃</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 转化率百分比 ===== -->
+    <view class="conversion-section">
+      <text class="section-title">转化率</text>
+
+      <view class="conversion-card">
+        <view class="conversion-item">
+          <view class="conversion-left">
+            <view class="conversion-dot" style="background: #a78bfa;"></view>
+            <text class="conversion-label">注册→名片</text>
+          </view>
+          <view class="conversion-right">
+            <text class="conversion-value accent">{{conversionRates.register_to_card}}%</text>
+            <view class="conversion-bar-mini">
+              <view class="conversion-bar-fill" style="width: {{conversionRates.register_to_card}}%; background: #a78bfa;"></view>
+            </view>
+          </view>
+        </view>
+        <view class="conversion-item">
+          <view class="conversion-left">
+            <view class="conversion-dot" style="background: #7c3aed;"></view>
+            <text class="conversion-label">名片→匹配</text>
+          </view>
+          <view class="conversion-right">
+            <text class="conversion-value accent">{{conversionRates.card_to_match}}%</text>
+            <view class="conversion-bar-mini">
+              <view class="conversion-bar-fill" style="width: {{conversionRates.card_to_match}}%; background: #7c3aed;"></view>
+            </view>
+          </view>
+        </view>
+        <view class="conversion-item" style="border-bottom: none;">
+          <view class="conversion-left">
+            <view class="conversion-dot" style="background: #6d28d9;"></view>
+            <text class="conversion-label">匹配→连接</text>
+          </view>
+          <view class="conversion-right">
+            <text class="conversion-value accent">{{conversionRates.match_to_connect}}%</text>
+            <view class="conversion-bar-mini">
+              <view class="conversion-bar-fill" style="width: {{conversionRates.match_to_connect}}%; background: #6d28d9;"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 转化率总结 -->
+      <view class="conversion-summary">
+        <text class="summary-text">整体转化率</text>
+        <text class="summary-value">{{overallConversionRate}}%</text>
+        <text class="summary-sub">注册用户→连接</text>
+      </view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>
