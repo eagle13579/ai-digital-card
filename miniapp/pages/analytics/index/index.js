@@ -5,7 +5,7 @@
  * 展示用户增长漏斗、核心指标和转化率
  * 调用: GET /api/analytics/funnel
  */
-const { get } = require('../../utils/request')
+const { get } = require('../../../utils/request')
 
 Page({
   data: {
