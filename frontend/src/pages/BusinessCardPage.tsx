@@ -262,9 +262,9 @@ export default function BusinessCardPage() {
   const fetchTrustNetwork = useCallback(async (id: number) => {
     setTrustNetworkLoading(true);
     try {
-      const res = await api.get(`/api/v1/trust/network`);
+      const res = await api.get<{trusting: TrustNetworkUser[]}>(`/api/v1/trust/network`);
       if (res.code === 200 && Array.isArray(res.data?.trusting)) {
-        setTrustNetwork(res.data.trusting as TrustNetworkUser[]);
+        setTrustNetwork(res.data.trusting);
       } else {
         setTrustNetwork([]);
       }

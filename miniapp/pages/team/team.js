@@ -1,0 +1,1 @@
+Page({\n  data: {},\n  onLoad() {},\n  onShow() {}\n})\n

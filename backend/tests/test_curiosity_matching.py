@@ -4,7 +4,7 @@
 import math
 import time
 import pytest
-from curiosity_matching_service import (
+from app.services.curiosity_matching_service import (
     CuriosityMode,
     CuriosityParams,
     CuriosityMetrics,

@@ -1,0 +1,1 @@
+<view class="page-container">\n  <view class="page-header">\n    <text class="page-title">资源平台</text>\n  </view>\n  <view class="empty-state">\n    <text class="empty-icon">📋</text>\n    <text class="empty-text">资源平台功能即将上线</text>\n  </view>\n</view>\n
