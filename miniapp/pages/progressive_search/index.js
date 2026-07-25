@@ -97,6 +97,17 @@ Page({
       }
 
       const resultData = res.data;
+      // 为每个结果项计算样式class
+      if (resultData.phase1_wide) {
+        resultData.phase1_wide.forEach(item => {
+          item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
+        });
+      }
+      if (resultData.phase2_deep) {
+        resultData.phase2_deep.forEach(item => {
+          item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
+        });
+      }
       const transitionInfo = resultData.transition || null;
 
       this.setData({

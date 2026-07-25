@@ -86,7 +86,7 @@
           </view>
         </view>
         <view class="contact-score">
-          <text class="score-value {{item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low'}}">
+          <text class="score-value {{item.scoreClass}}">
             {{(item.match_score * 100).toFixed(0)}}%
           </text>
         </view>
@@ -128,7 +128,7 @@
           </view>
         </view>
         <view class="contact-score">
-          <text class="score-value {{item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low'}}">
+          <text class="score-value {{item.scoreClass}}">
             {{(item.match_score * 100).toFixed(0)}}%
           </text>
         </view>
