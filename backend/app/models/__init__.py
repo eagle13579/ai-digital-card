@@ -67,6 +67,20 @@ from app.models.compression import (
 )
 # ── F12 Prompt分治模板库 ──
 from app.models.prompt import PromptCategory, PromptTemplate
+# ── F14 工具规则装饰器 ──
+from app.models.tool_rules import (
+    BoundaryAction,
+    BoundaryHandler,
+    ConditionOperator,
+    ConditionSeverity,
+    CostDeclaration,
+    CostUnit,
+    PostCondition,
+    PreCondition,
+    ToolRuleDef,
+    ToolRuleStats,
+    ValidationResult,
+)
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
@@ -119,4 +133,16 @@ __all__ = [
     # F12 Prompt分治模板库
     "PromptCategory",
     "PromptTemplate",
+    # F14 工具规则装饰器
+    "BoundaryAction",
+    "BoundaryHandler",
+    "ConditionOperator",
+    "ConditionSeverity",
+    "CostDeclaration",
+    "CostUnit",
+    "PostCondition",
+    "PreCondition",
+    "ToolRuleDef",
+    "ToolRuleStats",
+    "ValidationResult",
 ]

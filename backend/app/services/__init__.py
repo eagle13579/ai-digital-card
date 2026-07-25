@@ -90,6 +90,19 @@ from app.services.prompt_templates import (
     get_template_registry,
 )
 
+# ── F14 工具规则装饰器 ─────────────────
+from app.services.tool_rules import (
+    ToolRuleDecorator,
+    ToolRuleRegistry,
+    tool_rule_registry,
+    validate_with_rules,
+    parse_rule_from_docstring,
+    PreConditionError,
+    PostConditionError,
+    BoundaryRejectError,
+    CostOverrunError,
+)
+
 __all__ = [
     "BrochureService",
     "TagService",
@@ -187,4 +200,14 @@ __all__ = [
     "TemplateRenderer",
     "VersionManager",
     "get_template_registry",
+    # F14 工具规则装饰器
+    "ToolRuleDecorator",
+    "ToolRuleRegistry",
+    "tool_rule_registry",
+    "validate_with_rules",
+    "parse_rule_from_docstring",
+    "PreConditionError",
+    "PostConditionError",
+    "BoundaryRejectError",
+    "CostOverrunError",
 ]

@@ -199,6 +199,8 @@ def create_app():
     from app.routers.token_budget_router import router as token_budget_router
     # ── F12 Prompt分治模板库 ──
     from app.routers.prompt_router import router as prompt_router
+    # ── F14 工具规则装饰器 ──
+    from app.routers.tool_rules_router import router as tool_rules_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -282,6 +284,8 @@ def create_app():
     app.include_router(token_budget_router)
     # ── F12 Prompt分治模板库 ──
     app.include_router(prompt_router)
+    # ── F14 工具规则装饰器 ──
+    app.include_router(tool_rules_router)
     # ── F10 智能Agent指挥官调度层 ──
     app.include_router(commander_router)
 
