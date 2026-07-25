@@ -41,7 +41,7 @@ class TokenBudgetRule:
         self,
         name: str,
         token_limit: int = 4096,
-        degrade_strategy: DegradeStrategy = DegradeStrategy.TRUNICATE,
+        degrade_strategy: DegradeStrategy = DegradeStrategy.TRUNCATE,
         warn_threshold: float = 0.8,
         description: str = "",
         tags: list[str] | None = None,
@@ -51,8 +51,8 @@ class TokenBudgetRule:
             raise ValueError("token_limit 必须 >= 1")
         if not 0.0 < warn_threshold <= 1.0:
             raise ValueError("warn_threshold 必须在 (0.0, 1.0] 范围内")
-        if degrade_strategy == DegradeStrategy.TRUNICATE:
-            degrade_strategy = DegradeStrategy.TRUNICATE
+        if degrade_strategy == DegradeStrategy.TRUNCATE:
+            degrade_strategy = DegradeStrategy.TRUNCATE
 
         self.name: str = name
         self.token_limit: int = token_limit

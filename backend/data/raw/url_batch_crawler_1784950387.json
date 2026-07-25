@@ -1,0 +1,23 @@
+{
+  "source_id": "url_batch_crawler",
+  "collected_at": "2026-07-25T03:33:07.747155",
+  "count": 2,
+  "items": [
+    {
+      "url": "https://httpbin.org/html",
+      "source": "url_batch_crawler",
+      "status_code": 200,
+      "content_length": 3739,
+      "content_preview": "<!DOCTYPE html>\n<html>\n  <head>\n  </head>\n  <body>\n      <h1>Herman Melville - Moby-Dick</h1>\n\n      <div>\n        <p>\n          Availing himself of the mild, summer-cool weather that now reigned in these latitudes, and in preparation for the peculiarly active pursuits shortly to be anticipated, Perth, the begrimed, blistered old blacksmith, had not removed his portable forge to the hold again, after concluding his contributory work for Ahab's leg, but still retained it on deck, fast lashed to r",
+      "collected_at": "2026-07-25T03:33:07.068337"
+    },
+    {
+      "url": "https://example.com",
+      "source": "url_batch_crawler",
+      "status_code": 200,
+      "content_length": 559,
+      "content_preview": "<!doctype html><html lang=\"en\"><head><title>Example Domain</title><link rel=\"icon\" href=\"data:,\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>body{background:#eee;width:60vw;margin:15vh auto;font-family:system-ui,sans-serif}h1{font-size:1.5em}div{opacity:0.8}a:link,a:visited{color:#348}</style></head><body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://iana.o",
+      "collected_at": "2026-07-25T03:33:07.746216"
+    }
+  ]
+}

@@ -81,6 +81,35 @@ from app.models.tool_rules import (
     ToolRuleStats,
     ValidationResult,
 )
+# ── F17 灰度发布平台 (彩虹部署) ──
+from app.models.canary import (
+    CanaryDeployment,
+    CanaryEvent,
+    CanaryGroup,
+    CanaryRule,
+    CanaryStatus,
+    CanaryStrategy,
+    TrafficAllocationMode,
+)
+# ── F21 Agent化任务决策矩阵 ──
+from app.models.decision_matrix import (
+    DecisionQuadrant,
+    ComplexityFactors,
+    RepetitionFactors,
+    TaskEvaluationResult,
+    EvaluationRequest,
+    BatchEvaluationRequest,
+    BatchEvaluationResult,
+    MatrixStats,
+    AgentReadinessCategory,
+)
+# ── F19 Token 消耗分析仪表盘 ──
+from app.models.token_analytics import (
+    TokenConsumptionRecord,
+    TokenBudgetAlert,
+    TokenSummaryStats,
+    AgentTokenSummary,
+)
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
@@ -145,4 +174,27 @@ __all__ = [
     "ToolRuleDef",
     "ToolRuleStats",
     "ValidationResult",
+    # F21 Agent化任务决策矩阵
+    "DecisionQuadrant",
+    "ComplexityFactors",
+    "RepetitionFactors",
+    "TaskEvaluationResult",
+    "EvaluationRequest",
+    "BatchEvaluationRequest",
+    "BatchEvaluationResult",
+    "MatrixStats",
+    "AgentReadinessCategory",
+    # F17 灰度发布平台 (彩虹部署)
+    "CanaryDeployment",
+    "CanaryEvent",
+    "CanaryGroup",
+    "CanaryRule",
+    "CanaryStatus",
+    "CanaryStrategy",
+    "TrafficAllocationMode",
+    # F19 Token 消耗分析仪表盘
+    "TokenConsumptionRecord",
+    "TokenBudgetAlert",
+    "TokenSummaryStats",
+    "AgentTokenSummary",
 ]

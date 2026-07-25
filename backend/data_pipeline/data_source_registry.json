@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "统一数据源注册表 — 所有爬虫/采集能力在此注册",
+    "last_updated": "2026-07-25"
+  },
+  "sources": {
+    "enterprise_websites": {
+      "name": "企业官网采集",
+      "type": "web_scraping",
+      "engine": "cloak_scraper",
+      "enabled": true,
+      "frequency_min": 60,
+      "max_age_hours": 24,
+      "description": "CloakBrowser智能爬虫，抓取名片客户的官方网站获取企业信息",
+      "models_fed": ["matching_model_v2", "user_tower_pretrained", "data_augmentation", "enhance_user_data"],
+      "endpoint": "POST /api/mingpian/scrape",
+      "capabilities": ["企业简介提取", "业务标签提取", "联系方式获取", "行业分类"],
+      "daily_capacity": "500+ URL/日"
+    },
+    "url_batch_crawler": {
+      "name": "URL批量爬虫",
+      "type": "web_scraping",
+      "engine": "crawler",
+      "enabled": true,
+      "frequency_min": 30,
+      "max_age_hours": 12,
+      "description": "AI解析URL → 结构化名片信息，支持批量采集",
+      "models_fed": ["prepare_v2_training_data", "matching_model_v2", "training_data_generator"],
+      "endpoint": "POST /api/crawler/scrape + /api/crawler/batch",
+      "capabilities": ["HTML抓取", "AI结构化解析", "批量采集", "名片信息提取"],
+      "daily_capacity": "1000+ URL/日"
+    },
+    "xiaohongshu": {
+      "name": "小红书内容采集",
+      "type": "social_media",
+      "engine": "xiaohongshu-openclaw",
+      "enabled": true,
+      "frequency_min": 180,
+      "max_age_hours": 48,
+      "description": "小红书真实用户内容采集 — 用于训练用户行为理解和内容推荐",
+      "models_fed": ["online_learning", "recommendation", "training_pipeline", "rag_pipeline"],
+      "script": "scripts/baidu_search_xhs.py",
+      "capabilities": ["笔记搜索", "用户画像", "热门话题", "行业趋势"],
+      "daily_capacity": "200+ 笔记/日"
+    },
+    "qichacha": {
+      "name": "企查查企业数据",
+      "type": "business_data",
+      "engine": "qichacha_client",
+      "enabled": true,
+      "frequency_min": 1440,
+      "max_age_hours": 168,
+      "description": "企业工商注册信息、司法风险、知识产权等结构化数据",
+      "models_fed": ["data_augmentation", "enhance_user_data", "sales_prediction"],
+      "script": "app/services/qichacha_client.py",
+      "capabilities": ["企业档案", "工商信息", "司法风险", "知识产权"],
+      "daily_capacity": "100+ 企业/日"
+    },
+    "baidu_search": {
+      "name": "百度搜索采集",
+      "type": "search_engine",
+      "engine": "web_search",
+      "enabled": true,
+      "frequency_min": 60,
+      "max_age_hours": 24,
+      "description": "搜索引擎结果采集，用于行业趋势和市场情报",
+      "models_fed": ["gaia_evolution_brain", "recommendation", "rag_pipeline"],
+      "capabilities": ["行业搜索", "竞品监测", "热点追踪", "市场情报"],
+      "daily_capacity": "500+ 搜索/日"
+    },
+    "user_behavior_feedback": {
+      "name": "用户行为反馈流",
+      "type": "user_behavior",
+      "engine": "feedback_loop",
+      "enabled": true,
+      "frequency_min": 5,
+      "max_age_hours": 1,
+      "description": "用户点击/点赞/分享/评分反馈 → 在线学习",
+      "models_fed": ["online_learning", "bandit_engine", "recommendation", "gaia_trainer"],
+      "endpoint": "POST /api/recommend/{item_id}/feedback",
+      "capabilities": ["👍/👎反馈", "⭐1-5评分", "点击跟踪", "分享追踪"],
+      "daily_capacity": "实时流"
+    },
+    "crm_matching_data": {
+      "name": "CRM匹配数据",
+      "type": "business_transaction",
+      "engine": "crm_pipeline",
+      "enabled": true,
+      "frequency_min": 30,
+      "max_age_hours": 6,
+      "description": "名片CRM中的真实匹配、交易、转化数据",
+      "models_fed": ["matching_model_v2", "sales_prediction", "gaia_evolution_brain", "bandit_engine"],
+      "capabilities": ["匹配记录", "转化数据", "成交分析", "用户标签"],
+      "daily_capacity": "持续流"
+    },
+    "knowledge_base": {
+      "name": "知识库数据",
+      "type": "structured_knowledge",
+      "engine": "knowledge_model_service",
+      "enabled": true,
+      "frequency_min": 1440,
+      "max_age_hours": 168,
+      "description": "心智模型/行业知识/合规知识库结构化数据",
+      "models_fed": ["knowledge_graph", "rag_pipeline", "smart_matcher", "embedding_service"],
+      "capabilities": ["心智模型", "行业知识", "合规规则", "最佳实践"],
+      "daily_capacity": "增量更新"
+    },
+    "web_pages_rag": {
+      "name": "网页RAG数据",
+      "type": "web_content",
+      "engine": "rag_pipeline",
+      "enabled": true,
+      "frequency_min": 120,
+      "max_age_hours": 24,
+      "description": "从网页抓取的RAG知识库数据",
+      "models_fed": ["rag_pipeline", "knowledge_graph", "vector_search"],
+      "capabilities": ["网页抓取", "文本提取", "向量化", "索引构建"],
+      "daily_capacity": "500+ 文档/日"
+    }
+  },
+  "data_quality_rules": {
+    "min_confidence": 0.3,
+    "dedup_window_minutes": 60,
+    "max_staleness_hours": 168,
+    "require_structured_output": true
+  }
+}

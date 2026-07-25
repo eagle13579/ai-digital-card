@@ -12,7 +12,7 @@ import subprocess
 from typing import Dict, List, Optional
 
 # 路径修复
-BACKEND_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+BACKEND_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, BACKEND_DIR)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")

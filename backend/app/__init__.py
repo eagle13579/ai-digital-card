@@ -201,6 +201,14 @@ def create_app():
     from app.routers.prompt_router import router as prompt_router
     # ── F14 工具规则装饰器 ──
     from app.routers.tool_rules_router import router as tool_rules_router
+    # ── F21 Agent化任务决策矩阵 ──
+    from app.routers.decision_matrix_router import router as decision_matrix_router
+    # ── IM 桥接适配器 (企微 / 钉钉) ──
+    from app.routers.im_bridge import router as im_bridge_router
+    # ── F19 Token 消耗分析仪表盘 ──
+    from app.routers.token_analytics_router import router as token_analytics_router
+    # ── F17 灰度发布平台 (彩虹部署) ──
+    from app.routers.canary_router import router as canary_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -286,8 +294,16 @@ def create_app():
     app.include_router(prompt_router)
     # ── F14 工具规则装饰器 ──
     app.include_router(tool_rules_router)
+    # ── F21 Agent化任务决策矩阵 ──
+    app.include_router(decision_matrix_router)
     # ── F10 智能Agent指挥官调度层 ──
     app.include_router(commander_router)
+    # ── IM 桥接适配器 (企微 / 钉钉) ──
+    app.include_router(im_bridge_router)
+    # ── F17 灰度发布平台 (彩虹部署) ──
+    app.include_router(canary_router)
+    # ── F19 Token 消耗分析仪表盘 ──
+    app.include_router(token_analytics_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

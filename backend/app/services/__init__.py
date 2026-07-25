@@ -103,6 +103,22 @@ from app.services.tool_rules import (
     CostOverrunError,
 )
 
+# ── F21 Agent化任务决策矩阵 ─────────────────
+from app.services.decision_matrix import (
+    DecisionMatrixEngine,
+    get_decision_matrix,
+    COMPLEXITY_THRESHOLD,
+    REPETITION_THRESHOLD,
+)
+
+# ── F17 灰度发布平台 (彩虹部署) ─────────────────
+from app.services.canary_service import (
+    CanaryService,
+    CanaryRegistry,
+    canary_registry,
+    CanaryError,
+)
+
 __all__ = [
     "BrochureService",
     "TagService",
@@ -210,4 +226,14 @@ __all__ = [
     "PostConditionError",
     "BoundaryRejectError",
     "CostOverrunError",
+    # F21 Agent化任务决策矩阵
+    "DecisionMatrixEngine",
+    "get_decision_matrix",
+    "COMPLEXITY_THRESHOLD",
+    "REPETITION_THRESHOLD",
+    # F17 灰度发布平台 (彩虹部署)
+    "CanaryService",
+    "CanaryRegistry",
+    "canary_registry",
+    "CanaryError",
 ]

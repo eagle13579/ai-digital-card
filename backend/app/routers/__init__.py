@@ -48,6 +48,8 @@ from app.routers.token_budget_router import router as token_budget_router
 from app.routers.prompt_router import router as prompt_router
 # ── F14 工具规则装饰器 ──
 from app.routers.tool_rules_router import router as tool_rules_router
+# ── F21 Agent化任务决策矩阵 ──
+from app.routers.decision_matrix_router import router as decision_matrix_router
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -98,4 +100,6 @@ __all__ = [
     "prompt_router",
     # F14 工具规则装饰器
     "tool_rules_router",
+    # F21 Agent化任务决策矩阵
+    "decision_matrix_router",
 ]

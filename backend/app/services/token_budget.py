@@ -125,7 +125,7 @@ class TokenBudget:
         self._rule: TokenBudgetRule = rule or TokenBudgetRule(
             name=name,
             token_limit=DEFAULT_TOKEN_LIMIT,
-            degrade_strategy=DegradeStrategy.TRUNICATE,
+            degrade_strategy=DegradeStrategy.TRUNCATE,
         )
         self._lock = threading.Lock()
 
@@ -322,7 +322,7 @@ class TokenBudget:
                 with self._lock:
                     self._total_downgrades += 1
 
-            elif strategy == DegradeStrategy.TRUNICATE:
+            elif strategy == DegradeStrategy.TRUNCATE:
                 truncated = True
                 status = "truncated"
                 allowed_tokens = max(64, self._rule.token_limit - current_usage_before - estimate_tokens(instruction))
@@ -505,7 +505,7 @@ _default_rules = [
     TokenBudgetRule(
         name="openai_embedding",
         token_limit=8192,
-        degrade_strategy=DegradeStrategy.TRUNICATE,
+        degrade_strategy=DegradeStrategy.TRUNCATE,
         warn_threshold=0.85,
         description="OpenAI Embedding 预算",
         tags=["embedding", "openai"],
@@ -522,7 +522,7 @@ _default_rules = [
     TokenBudgetRule(
         name="instruction_default",
         token_limit=2048,
-        degrade_strategy=DegradeStrategy.TRUNICATE,
+        degrade_strategy=DegradeStrategy.TRUNCATE,
         warn_threshold=0.9,
         description="通用指令预算",
         tags=["default"],
