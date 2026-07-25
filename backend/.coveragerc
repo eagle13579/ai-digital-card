@@ -1,7 +1,7 @@
 ; ──────────────────────────────────────────────
 ; Coverage 配置 — CI门禁 (渐进式)
 ; ──────────────────────────────────────────────
-; fail_under=40 (渐进式目标, 当前实测37%, 后续逐步提高至80%+)
+; fail_under=50 (渐进式目标, 从40→50, 当前37%)
 ; 覆盖 pyproject.toml 中的 fail_under=80 (当前尚不可达)
 
 [run]
@@ -15,8 +15,8 @@ omit =
     */__pycache__/*
 
 [report]
-; 最小覆盖率门禁 — 40% 渐进目标
-fail_under = 40
+; 最小覆盖率门禁 — 50% 渐进目标
+fail_under = 50
 show_missing = true
 skip_covered = false
 skip_empty = true
