@@ -250,6 +250,7 @@ def create_app():
     app.include_router(tag_router)
     app.include_router(ai_assist_router)
     app.include_router(match_router)
+    app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)
     app.include_router(card_alias_router)
     app.include_router(miniapp_router)

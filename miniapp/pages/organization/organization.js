@@ -1,1 +1,5 @@
-Page({\n  data: {},\n  onLoad() {},\n  onShow() {}\n})\n
+Page({
+  data: {},
+  onLoad() {},
+  onShow() {}
+})
