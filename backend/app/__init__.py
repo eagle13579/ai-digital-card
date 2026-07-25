@@ -101,6 +101,7 @@ def create_app():
         CsrfMiddleware,
         get_metrics_instance,
         init_otel,
+        SentryExceptionMiddleware,
     )
     from app.middleware.api_version import APIVersionRedirectMiddleware
 
@@ -131,6 +132,8 @@ def create_app():
         allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
     )
     app.add_middleware(CsrfMiddleware)
+    # Sentry 异常捕获中间件 — 兜底捕获所有未处理异常并上报 Sentry
+    app.add_middleware(SentryExceptionMiddleware)
     app.add_middleware(LoggingMiddleware)
 
     # FastAPI 集成 (OpenTelemetry) — instrument_app 会在内部跳过若未初始化
@@ -181,8 +184,12 @@ def create_app():
     from app.routers.escrow_router import router as escrow_router
     from app.routers.ocr_router import router as ocr_router
     from app.routers.pdf_router import router as pdf_router
+    from app.routers.security_scan import router as security_scan_router
+    from app.routers.skill_registry import router as skill_registry_router
+    # ── CloakBrowser 智能爬虫 ──
+    from app.routers.cloak_scraper import router as cloak_scraper_router
 
-    # ── 惰性注册：knowledge_models_router ──────────────────────────
+    # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
     def _register_knowledge_models(app):
         from app.routers.knowledge_models_router import router as km_router
@@ -206,6 +213,7 @@ def create_app():
     app.include_router(escrow_router)
     app.include_router(ocr_router)
     app.include_router(pdf_router)
+    app.include_router(security_scan_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)
@@ -251,6 +259,9 @@ def create_app():
     app.include_router(invoice_router)
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
+    app.include_router(skill_registry_router)
+    # ── CloakBrowser 智能爬虫 ──
+    app.include_router(cloak_scraper_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -330,6 +341,13 @@ def create_app():
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("数据库表创建/验证完成 (async)")
+
+        # Sentry 状态确认
+        sentry_dsn = cfg.SENTRY_DSN
+        if sentry_dsn:
+            logger.info("Sentry 生产监控已启用 (DSN 已配置)")
+        else:
+            logger.info("Sentry 生产监控未启用 (未配置 SENTRY_DSN，如需启用请在 .env 中设置)")
 
         # 初始化 Redis 缓存层
         try:

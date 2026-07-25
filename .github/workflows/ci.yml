@@ -1,14 +1,14 @@
 # ──────────────────────────────────────────────
 # CI 流水线 — lint + test + build
-# 每次 push / PR 到 main 分支时触发
+# 每次 push / PR 到 master 或 develop 分支时触发
 # ──────────────────────────────────────────────
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master, develop]
   pull_request:
-    branches: [main]
+    branches: [master, develop]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -51,20 +51,6 @@ jobs:
       run:
         working-directory: backend
 
-    services:
-      # 如果有外部依赖（如 PostgreSQL），可在此定义
-      # postgres:
-      #   image: postgres:16-alpine
-      #   env:
-      #     POSTGRES_DB: test
-      #     POSTGRES_USER: test
-      #     POSTGRES_PASSWORD: test
-      #   options: >-
-      #     --health-cmd pg_isready
-      #     --health-interval 10s
-      #     --health-timeout 5s
-      #     --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -79,7 +65,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests with coverage gate (≥80%) — CI mode (skip DB tests)
+      - name: Run tests with coverage gate (≥80%) — skip DB tests
         run: python -m pytest -v --tb=short --cov --cov-fail-under=80 -m "not db"
 
   frontend-lint:

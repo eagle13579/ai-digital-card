@@ -78,11 +78,27 @@ jobs:
         continue-on-error: false
         run: ruff check app/ --output-format=github
 
-      - name: 🧪 Run tests (pytest)
+      - name: 🧪 Run tests with coverage
         working-directory: ./backend
         env:
           DATABASE_URL: postgresql+asyncpg://testuser:testpass@localhost:5432/testdb
-        run: python -m pytest tests/ -v --tb=short -x
+        run: |
+          python -m pytest tests/ -v --tb=short -x \
+            --cov=app \
+            --cov-config=.coveragerc \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml
+
+      - name: 📊 Coverage gate (fail_under=40)
+        working-directory: ./backend
+        if: success() || failure()
+        run: |
+          echo "═══════════════════════════════════════════"
+          echo "  📊 Coverage Gate — fail_under=40%"
+          echo "  (progressive threshold, will increase)"
+          echo "═══════════════════════════════════════════"
+          python -m coverage report --fail-under=40
+          echo "✅ Coverage gate passed"
 
   # ─── Job 2: Docker Build (syntax validation) ────────────────────────
   docker-build:

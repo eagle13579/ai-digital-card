@@ -54,7 +54,12 @@ def get_recent_logs(lines: int = 100) -> list[dict]:
 @mcp.tool()
 def check_service_health() -> dict:
     """
-    健康检查：检测后端服务是否运行（本地+生产双路检查）
+    健康检查：检测后端服务是否运行（本地dev + 生产SSH + 生产公网 三路检查）
+    
+    三路确认:
+    - local_8201: 本地开发环境端口
+    - ssh_prod_8201: SSH直连生产服务器 localhost:8201（最准确）
+    - card.liankebao.top: 生产公网域名（走Nginx）
     """
     import socket
     import urllib.request
@@ -73,32 +78,59 @@ def check_service_health() -> dict:
     local_sock.close()
     result["checks"]["local_8201"] = "running" if local_code == 0 else "stopped"
 
-    # 检查2：生产公网
+    # 检查2：生产服务器 SSH 直连 (最准确的健康检查)
+    try:
+        ssh_check = subprocess.run(
+            ["ssh", "-o", "ConnectTimeout=5", "-o", "StrictHostKeyChecking=no",
+             "root@47.116.116.87",
+             "curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:8201/health"],
+            capture_output=True, text=True, timeout=10
+        )
+        if ssh_check.returncode == 0 and ssh_check.stdout.strip().startswith("2"):
+            result["checks"]["ssh_prod_8201"] = f"HTTP_{ssh_check.stdout.strip()}"
+        elif ssh_check.returncode == 0 and ssh_check.stdout.strip():
+            result["checks"]["ssh_prod_8201"] = f"HTTP_{ssh_check.stdout.strip()}"
+        else:
+            stderr = ssh_check.stderr.strip()
+            result["checks"]["ssh_prod_8201"] = f"ssh_error: {stderr[:80]}" if stderr else "ssh_failed"
+    except subprocess.TimeoutExpired:
+        result["checks"]["ssh_prod_8201"] = "ssh_timeout"
+    except FileNotFoundError:
+        result["checks"]["ssh_prod_8201"] = "ssh_not_available"
+    except Exception as e:
+        result["checks"]["ssh_prod_8201"] = f"error: {str(e)[:60]}"
+
+    # 检查3：生产公网（走Nginx，可能被链客宝劫持）
     try:
         req = urllib.request.Request(
-            "https://card.liankebao.top/api/health",
+            "https://card.liankebao.top/api/brochures/visible",
             method="GET",
             headers={"User-Agent": "MCP-HealthCheck/1.0"}
         )
         resp = urllib.request.urlopen(req, timeout=5)
-        result["checks"]["card.liankebao.top/api/health"] = f"HTTP_{resp.status}"
+        result["checks"]["card.liankebao.top"] = f"HTTP_{resp.status}"
         resp.close()
     except urllib.error.HTTPError as e:
-        result["checks"]["card.liankebao.top/api/health"] = f"HTTP_{e.code}"
+        result["checks"]["card.liankebao.top"] = f"HTTP_{e.code}"
     except Exception as e:
-        result["checks"]["card.liankebao.top/api/health"] = str(e)
+        result["checks"]["card.liankebao.top"] = str(e)
     
-    # 综合状态
-    results = list(result["checks"].values())
-    if all(r == "running" or r.startswith("HTTP_2") for r in results):
+    # 综合状态（SSH直连最权威）
+    ssh_ok = result["checks"].get("ssh_prod_8201", "").startswith("HTTP_2")
+    local_ok = result["checks"]["local_8201"] == "running"
+    
+    if ssh_ok and local_ok:
         result["status"] = "running"
-        result["message"] = "所有检查通过"
-    elif any(r == "stopped" for r in results):
+        result["message"] = "生产+本地均正常"
+    elif ssh_ok:
+        result["status"] = "running"
+        result["message"] = "生产正常，本地dev未运行"
+    elif local_ok:
         result["status"] = "degraded"
-        result["message"] = "部分服务未运行"
+        result["message"] = "本地dev正常，生产异常"
     else:
-        result["status"] = "error"
-        result["message"] = "所有检查均失败"
+        result["status"] = "stopped"
+        result["message"] = "生产与本地均不可用"
 
     return result
 
