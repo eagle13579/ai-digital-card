@@ -18,6 +18,10 @@ class CircuitState(str, Enum):
     HALF_OPEN = "half_open"    # 半开，允许试探性请求
 
 
+# 兼容名 — models/__init__.py 通过此名引用
+CircuitBreakerState = CircuitState
+
+
 class CircuitBreakerRule:
     """
     熔断规则配置。

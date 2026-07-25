@@ -20,7 +20,7 @@ API 列表:
 from __future__ import annotations
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from pydantic import BaseModel, Field
 
 from app.models.commander import (
@@ -115,8 +115,8 @@ async def submit_task(req: SubmitTaskRequest):
 @router.get("/tasks", summary="查询任务列表")
 async def list_tasks(
     status: Optional[str] = None,
-    page: int = Field(default=1, ge=1),
-    page_size: int = Field(default=20, ge=1, le=100),
+    page: int = Query(default=1, ge=1, description="页码"),
+    page_size: int = Query(default=20, ge=1, le=100, description="每页数量"),
 ):
     """查询所有任务（支持按状态筛选和分页）"""
     commander = get_commander()
