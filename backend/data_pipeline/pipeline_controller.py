@@ -52,7 +52,7 @@ class PipelineController:
         # ─── Phase 1: 数据采集 ───
         t0 = time.time()
         logger.info("📡 Phase 1: 数据采集...")
-        from .crawler_orchestrator import CrawlerOrchestrator
+        from crawler_orchestrator import CrawlerOrchestrator
         crawler = CrawlerOrchestrator()
         crawl_results = crawler.collect_all_due()
         self._phase_times["crawl"] = time.time() - t0
@@ -63,7 +63,7 @@ class PipelineController:
         # ─── Phase 2: 数据清洗 ───
         t1 = time.time()
         logger.info("🧹 Phase 2: 数据清洗（去重+标准化）...")
-        from .data_curator import get_curator
+        from data_curator import get_curator
         curator = get_curator()
 
         cleaned_count = 0
@@ -134,7 +134,7 @@ class PipelineController:
         # ─── Phase 3: 模型训练 ───
         t2 = time.time()
         logger.info("🧠 Phase 3: 模型训练...")
-        from .model_feeder import ModelFeeder
+        from model_feeder import ModelFeeder
         feeder = ModelFeeder()
         train_results = feeder.feed_all_due()
         self._phase_times["training"] = time.time() - t2
@@ -147,7 +147,7 @@ class PipelineController:
         # ─── Phase 4: 质量监控 ───
         t3 = time.time()
         logger.info("📊 Phase 4: 质量监控...")
-        from .pipeline_quality_monitor import QualityMonitor, PipelineQualityState
+        from pipeline_quality_monitor import QualityMonitor, PipelineQualityState
         qstate = PipelineQualityState()
 
         # 记录采集结果到质量状态
@@ -173,12 +173,29 @@ class PipelineController:
         # ─── Phase 5: 智能调度 ───
         t4 = time.time()
         logger.info("⚡ Phase 5: 智能调度分析...")
-        from .pipeline_scheduler import SmartScheduler
+        from pipeline_scheduler import SmartScheduler
         scheduler = SmartScheduler()
         schedule_analysis = scheduler.analyze()
-        scheduler.apply(dry_run=True)  # dry-run模式，只分析不生效
+        scheduler.apply(dry_run=True)
         self._phase_times["scheduler"] = time.time() - t4
         logger.info(f"  → 建议调整: {schedule_analysis.get('total_adjustments', 0)} 项")
+
+        # ─── Phase 6: 数据清理 ───
+        t5 = time.time()
+        logger.info("🧹 Phase 6: 数据清理（旋转旧raw文件）...")
+        cleaned_bytes = 0
+        if os.path.exists(RAW_DATA_DIR):
+            for f in os.listdir(RAW_DATA_DIR):
+                fpath = os.path.join(RAW_DATA_DIR, f)
+                if not f.endswith(".json"):
+                    continue
+                age = time.time() - os.path.getmtime(fpath)
+                if age > 72 * 3600:
+                    cleaned_bytes += os.path.getsize(fpath)
+                    os.remove(fpath)
+        self._phase_times["cleanup"] = time.time() - t5
+        if cleaned_bytes > 0:
+            logger.info(f"  → 清理 {cleaned_bytes/1024:.0f}KB 旧raw文件")
 
         report = {
             "timestamp": datetime.datetime.utcnow().isoformat(),
@@ -225,7 +242,7 @@ class PipelineController:
 
     def run_collect_only(self) -> dict:
         """仅采集"""
-        from .crawler_orchestrator import CrawlerOrchestrator
+        from crawler_orchestrator import CrawlerOrchestrator
         crawler = CrawlerOrchestrator()
         results = crawler.collect_all_due()
         return {
@@ -236,7 +253,7 @@ class PipelineController:
 
     def run_train_only(self) -> dict:
         """仅训练"""
-        from .model_feeder import ModelFeeder
+        from model_feeder import ModelFeeder
         feeder = ModelFeeder()
         results = feeder.feed_all_due()
         return {
@@ -278,8 +295,8 @@ def main():
     elif args.mode == "train":
         report = controller.run_train_only()
     elif args.mode == "status":
-        from .crawler_orchestrator import CrawlerOrchestrator
-        from .model_feeder import ModelFeeder
+        from crawler_orchestrator import CrawlerOrchestrator
+        from model_feeder import ModelFeeder
         report = {
             "crawler": CrawlerOrchestrator().get_status_report(),
             "feeder": ModelFeeder().get_status_report(),

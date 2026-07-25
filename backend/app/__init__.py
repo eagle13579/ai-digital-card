@@ -209,6 +209,12 @@ def create_app():
     from app.routers.token_analytics_router import router as token_analytics_router
     # ── F17 灰度发布平台 (彩虹部署) ──
     from app.routers.canary_router import router as canary_router
+    # ── F18 Agent质量评估看板 ──
+    from app.routers.quality_router import router as quality_router
+    # ── F16 异步任务 Checkpoint 恢复 ──
+    from app.routers.checkpoint_router import router as checkpoint_router
+    # ── F20 名片Agent准确率门禁 ──
+    from app.routers.accuracy_gate_router import router as accuracy_gate_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -302,8 +308,14 @@ def create_app():
     app.include_router(im_bridge_router)
     # ── F17 灰度发布平台 (彩虹部署) ──
     app.include_router(canary_router)
+    # ── F18 Agent质量评估看板 ──
+    app.include_router(quality_router)
     # ── F19 Token 消耗分析仪表盘 ──
     app.include_router(token_analytics_router)
+    # ── F16 异步任务 Checkpoint 恢复 ──
+    app.include_router(checkpoint_router)
+    # ── F20 名片Agent准确率门禁 ──
+    app.include_router(accuracy_gate_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

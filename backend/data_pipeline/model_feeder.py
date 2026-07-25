@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from .model_registry import ModelRegistry, ModelTrainingConfig
+from model_registry import ModelRegistry, ModelTrainingConfig
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger("ModelFeeder")

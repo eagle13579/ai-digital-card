@@ -110,6 +110,35 @@ from app.models.token_analytics import (
     TokenSummaryStats,
     AgentTokenSummary,
 )
+# ── F18 Agent质量评估看板 ──
+from app.models.quality import (
+    QualityDimension,
+    QualitySample,
+    QualityBaseline,
+    QualityEvalJob,
+    EvalMethod,
+    EvalStatus,
+)
+
+# ── F16 异步任务 Checkpoint 恢复 ──
+from app.models.checkpoint import (
+    CheckpointStatus,
+    StepRecord,
+    StepStatus,
+    TaskCheckpoint,
+)
+
+# ── F20 名片Agent准确率门禁 ──
+from app.models.accuracy_gate import (
+    AccuracyBaseline,
+    AccuracyCheckRecord,
+    AccuracyCalibrationRecord,
+    AccuracyGateConfig,
+    GateDecision,
+    CalibrationType,
+    CalibrationStatus,
+    GateCheckSource,
+)
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
@@ -197,4 +226,25 @@ __all__ = [
     "TokenBudgetAlert",
     "TokenSummaryStats",
     "AgentTokenSummary",
+    # F16 异步任务 Checkpoint 恢复
+    "CheckpointStatus",
+    "StepRecord",
+    "StepStatus",
+    "TaskCheckpoint",
+    # F18 Agent质量评估看板
+    "QualityDimension",
+    "QualitySample",
+    "QualityBaseline",
+    "QualityEvalJob",
+    "EvalMethod",
+    "EvalStatus",
+    # F20 名片Agent准确率门禁
+    "AccuracyBaseline",
+    "AccuracyCheckRecord",
+    "AccuracyCalibrationRecord",
+    "AccuracyGateConfig",
+    "GateDecision",
+    "CalibrationType",
+    "CalibrationStatus",
+    "GateCheckSource",
 ]

@@ -296,7 +296,7 @@ class QualityMonitor:
     def check_model_staleness(self) -> List[dict]:
         """检查模型是否过时"""
         issues = []
-        from .model_registry import ModelRegistry
+        from model_registry import ModelRegistry
         reg = ModelRegistry()
 
         for model in reg.all():

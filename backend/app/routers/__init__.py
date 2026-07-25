@@ -50,6 +50,10 @@ from app.routers.prompt_router import router as prompt_router
 from app.routers.tool_rules_router import router as tool_rules_router
 # ── F21 Agent化任务决策矩阵 ──
 from app.routers.decision_matrix_router import router as decision_matrix_router
+# ── F18 Agent质量评估看板 ──
+from app.routers.quality_router import router as quality_router
+# ── F20 名片Agent准确率门禁 ──
+from app.routers.accuracy_gate_router import router as accuracy_gate_router
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -102,4 +106,8 @@ __all__ = [
     "tool_rules_router",
     # F21 Agent化任务决策矩阵
     "decision_matrix_router",
+    # F18 Agent质量评估看板
+    "quality_router",
+    # F20 名片Agent准确率门禁
+    "accuracy_gate_router",
 ]

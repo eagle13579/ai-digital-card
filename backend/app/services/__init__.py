@@ -119,6 +119,24 @@ from app.services.canary_service import (
     CanaryError,
 )
 
+# ── F18 Agent质量评估看板 ─────────────────
+from app.services.quality_evaluator import (
+    QualityEvaluator,
+    quality_evaluator,
+    QualityEvalError,
+    EvalResult,
+    BaselineStats,
+)
+
+# ── F20 名片Agent准确率门禁 ─────────────────
+from app.services.accuracy_gate import (
+    AccuracyGate,
+    accuracy_gate,
+    AccuracyGateError,
+    GateCheckResult,
+    CalibrationResult,
+)
+
 __all__ = [
     "BrochureService",
     "TagService",
@@ -236,4 +254,16 @@ __all__ = [
     "CanaryRegistry",
     "canary_registry",
     "CanaryError",
+    # F18 Agent质量评估看板
+    "QualityEvaluator",
+    "quality_evaluator",
+    "QualityEvalError",
+    "EvalResult",
+    "BaselineStats",
+    # F20 名片Agent准确率门禁
+    "AccuracyGate",
+    "accuracy_gate",
+    "AccuracyGateError",
+    "GateCheckResult",
+    "CalibrationResult",
 ]
