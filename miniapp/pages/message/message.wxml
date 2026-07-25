@@ -1,1 +1,1 @@
-<view class="page-container">\n  <view class="page-header">\n    <text class="page-title">站内消息</text>\n  </view>\n  <view class="empty-state">\n    <text class="empty-icon">📋</text>\n    <text class="empty-text">站内消息功能即将上线</text>\n  </view>\n</view>\n
+<view class="page-container"></view>

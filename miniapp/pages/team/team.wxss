@@ -1,1 +1,1 @@
-.page-container { padding: 20rpx; min-height: 100vh; background: #1a1a2e; }\n.page-header { padding: 30rpx 0; }\n.page-title { font-size: 36rpx; font-weight: 600; color: #e0e0e0; }\n.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 200rpx; }\n.empty-icon { font-size: 80rpx; margin-bottom: 30rpx; }\n.empty-text { font-size: 28rpx; color: #888; }\n
+.page-container { padding: 20rpx; min-height: 100vh; background: #1a1a2e; }

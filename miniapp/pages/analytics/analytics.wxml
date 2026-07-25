@@ -1,1 +1,13 @@
-<view class="page-container">\n  <view class="page-header">\n    <text class="page-title">数据分析</text>\n  </view>\n  <view class="empty-state">\n    <text class="empty-icon">📋</text>\n    <text class="empty-text">数据分析功能即将上线</text>\n  </view>\n</view>\n
+<view class="page-container">
+  <text class="page-title">数据分析</text>
+  <view class="section">
+    <view class="stat-card">
+      <text class="stat-label">总访问量</text>
+      <text class="stat-value">0</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-label">活跃用户</text>
+      <text class="stat-value">0</text>
+    </view>
+  </view>
+</view>
