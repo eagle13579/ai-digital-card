@@ -193,6 +193,12 @@ def create_app():
     # ── F10 智能Agent指挥官调度层 ──
     from app.routers.commander_router import router as commander_router
     from app.routers.circuit_breaker_router import router as circuit_breaker_router
+    # ── F11 分制-压缩流水线 ──
+    from app.routers.compression_router import router as compression_router
+    # ── F13 Token 预算指令系统 ──
+    from app.routers.token_budget_router import router as token_budget_router
+    # ── F12 Prompt分治模板库 ──
+    from app.routers.prompt_router import router as prompt_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -270,6 +276,12 @@ def create_app():
     app.include_router(progressive_search_router)
     app.include_router(task_slicer_router)
     app.include_router(circuit_breaker_router)
+    # ── F11 分制-压缩流水线 ──
+    app.include_router(compression_router)
+    # ── F13 Token 预算指令系统 ──
+    app.include_router(token_budget_router)
+    # ── F12 Prompt分治模板库 ──
+    app.include_router(prompt_router)
     # ── F10 智能Agent指挥官调度层 ──
     app.include_router(commander_router)
 

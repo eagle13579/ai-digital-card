@@ -69,10 +69,26 @@ from app.services.importer import ImportEngine
 from app.services.llm_service import get_llm_client, get_llm_client_async, generate_matching_reason, summarize_lead
 from app.services.matching_client import MatchingClient
 from app.services.organization_service import create_organization, get_organization, get_user_orgs, add_member, create_invite, accept_invite
+from app.services.token_budget import (
+    TokenBudget,
+    TokenBudgetRegistry,
+    token_budget_registry,
+    estimate_tokens,
+    estimate_instruction_tokens,
+    truncate_to_limit,
+)
 from app.services.qichacha_client import QichachaClient
 from app.services.scoring_ab_test import ScoreABTest
 from app.services.six_degrees import RelationGraph, PathCacheManager, find_shortest_path, find_network, compute_trust_score
 from app.services.training_data_generator import generate_training_data, save_augmented_data
+
+# ── F12 Prompt分治模板库 ─────────────────
+from app.services.prompt_templates import (
+    TemplateRegistry,
+    TemplateRenderer,
+    VersionManager,
+    get_template_registry,
+)
 
 __all__ = [
     "BrochureService",
@@ -155,8 +171,20 @@ __all__ = [
     "get_llm_client", "get_llm_client_async", "generate_matching_reason", "summarize_lead",
     "MatchingClient",
     "create_organization", "get_organization", "get_user_orgs", "add_member", "create_invite", "accept_invite",
+    # Token 预算指令系统
+    "TokenBudget",
+    "TokenBudgetRegistry",
+    "token_budget_registry",
+    "estimate_tokens",
+    "estimate_instruction_tokens",
+    "truncate_to_limit",
     "QichachaClient",
     "ScoreABTest",
     "RelationGraph", "PathCacheManager", "find_shortest_path", "find_network", "compute_trust_score",
     "generate_training_data", "save_augmented_data",
+    # F12 Prompt分治模板库
+    "TemplateRegistry",
+    "TemplateRenderer",
+    "VersionManager",
+    "get_template_registry",
 ]

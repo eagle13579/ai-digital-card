@@ -23,13 +23,6 @@ from app.models.gaia import (
 # Lazy import to avoid circular chain:
 # models.__init__ → crm.crm_models → crm.__init__ → crm_router → routers.auth → services → ai → vector_search → models.tag (loop!)
 # Import directly from the module when needed: from app.crm.crm_models import CrmContact
-# from app.crm.crm_models import (
-#     CrmContact,
-#     CrmDeal,
-#     CrmPipelineStage, 
-#     CrmActivity,
-#     CrmNote,
-# )
 
 # ── 链客宝合并模型 (27个新文件) ─────────────────
 # 注意: CrmContact 等 CRM 类由 app.crm.crm_models 已有实现提供，此处不重复导入
@@ -56,9 +49,24 @@ from app.models.review import Review
 from app.models.revoked_token import RevokedToken
 from app.models.six_degrees import UserRelation, RelationEvent, SixDegreePathCache, ReferralLink
 from app.models.subscription import Subscription
+from app.models.token_budget import (
+    DegradeStrategy,
+    TokenBudgetRule,
+    TokenBudgetEvent,
+    TokenBudgetStatus,
+)
 from app.models.user_event import UserEvent
 from app.models.wallet import Wallet, WalletTransaction
 from app.models.withdrawal import Withdrawal
+# ── F11 分制-压缩流水线 ──
+from app.models.compression import (
+    CompressionMode,
+    CompressionConfig,
+    CompressionResult,
+    CompressionStats,
+)
+# ── F12 Prompt分治模板库 ──
+from app.models.prompt import PromptCategory, PromptTemplate
 
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
@@ -99,7 +107,16 @@ __all__ = [
     "RevokedToken",
     "UserRelation", "RelationEvent", "SixDegreePathCache", "ReferralLink",
     "Subscription",
+    "DegradeStrategy", "TokenBudgetRule", "TokenBudgetEvent", "TokenBudgetStatus",
     "UserEvent",
     "Wallet", "WalletTransaction",
     "Withdrawal",
+    # F11 压缩流水线
+    "CompressionMode",
+    "CompressionConfig",
+    "CompressionResult",
+    "CompressionStats",
+    # F12 Prompt分治模板库
+    "PromptCategory",
+    "PromptTemplate",
 ]
