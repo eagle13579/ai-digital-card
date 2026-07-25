@@ -40,81 +40,79 @@
       </view>
       <view class="config-item">
         <text class="config-label">最低匹配分 (min_score)</text>
-        <slider min="0" max="1" step="0.1" value="{{minScore * 10}}" bindchange="onMinScoreChange" show-value />
+        <slider min="0" max="1" step="0.1" value="{{minScoreTimes10}}" bindchange="onMinScoreChange" show-value />
       </view>
     </view>
   </view>
 
   <!-- 过渡条件信息 -->
-  <view wx:if="{{transitionInfo}}" class="transition-banner {{transitionInfo.should_deep ? 'ready' : 'waiting'}}">
+  <view wx:if="{{showTransitionBanner}}" class="transition-banner {{transitionBannerClass}}">
     <view class="transition-title">
-      <text>{{transitionInfo.should_deep ? '🚀 进入深度挖掘' : '⏳ 广度撒网中'}}</text>
+      <text>{{transitionBannerText}}</text>
     </view>
     <view class="transition-detail">
-      <text>模式: {{transitionInfo.transition_mode}} | 结果: {{transitionInfo.total_wide}}条 | 最高分: {{transitionInfo.max_score}}</text>
+      <text>{{transitionDetailText}}</text>
     </view>
   </view>
 
   <!-- 空状态 -->
-  <view wx:if="{{!searching && result === null}}" class="empty-state">
+  <view wx:if="{{showEmptyState}}" class="empty-state">
     <text class="empty-icon">🤝</text>
     <text class="empty-text">输入关键词，搜索人脉网络</text>
     <text class="empty-hint">两阶段智能搜索 · 广度撒网 → 深度挖掘</text>
   </view>
 
   <!-- 搜索结果 -->
-  <view wx:if="{{result !== null}}" class="result-container">
+  <view wx:if="{{showResults}}" class="result-container">
 
     <!-- Phase 1: 广度撒网 -->
     <view class="phase-section">
       <view class="phase-header">
         <text class="phase-badge wide">Phase 1</text>
         <text class="phase-title">广度撒网</text>
-        <text class="phase-count">{{result.phase1_wide.length}} 条结果</text>
+        <text class="phase-count">{{phase1Count}}</text>
       </view>
-      <view wx:if="{{result.phase1_wide.length === 0}}" class="phase-empty">
+      <view wx:if="{{phase1Empty}}" class="phase-empty">
         <text>未找到广度匹配结果</text>
       </view>
-      <view wx:for="{{result.phase1_wide}}" wx:key="user_id" class="contact-card wide">
+      <view wx:for="{{phase1List}}" wx:key="user_id" class="contact-card wide">
         <view class="contact-avatar">{{'👤'}}</view>
         <view class="contact-info">
           <view class="contact-name">{{item.name}}</view>
-          <view class="contact-title">{{item.title || '未知职位'}}</view>
-          <view class="contact-company">{{item.company || ''}}</view>
+          <view class="contact-title">{{item.title}}</view>
+          <view class="contact-company">{{item.company}}</view>
           <view class="contact-tags">
             <text wx:for="{{item.tags}}" wx:key="*this" class="tag">{{item}}</text>
           </view>
         </view>
         <view class="contact-score">
-          <text class="score-value {{item.scoreClass}}">
-            {{item.scoreDisplay}}%
-          </text>
+          <text class="score-value {{item.scoreClass}}">{{item.scoreDisplay}}%</text>
         </view>
       </view>
     </view>
 
     <!-- 过渡状态 -->
-    <view wx:if="{{transitionInfo}}" class="transition-divider">
+    <view wx:if="{{showTransitionDivider}}" class="transition-divider">
       <view class="divider-line"></view>
       <view class="divider-label">
-        <text>{{transitionInfo.should_deep ? '⬇️ 过渡至深度挖掘' : '🤔 条件未满足'}}</text>
+        <text>{{transitionDividerText}}</text>
       </view>
       <view class="divider-line"></view>
     </view>
 
     <!-- Phase 2: 深度挖掘 -->
-    <view class="phase-section" wx:if="{{result.phase2_deep.length > 0}}">
+    <view class="phase-section" wx:if="{{phase2NotEmpty}}">
       <view class="phase-header">
         <text class="phase-badge deep">Phase 2</text>
         <text class="phase-title">深度挖掘</text>
-        <text class="phase-count">{{result.phase2_deep.length}} 条结果</text>
+        <text class="phase-count">{{phase2Count}}</text>
       </view>
-      <view wx:for="{{result.phase2_deep}}" wx:key="user_id" class="contact-card deep">
+      <view wx:for="{{phase2List}}" wx:key="user_id" class="contact-card deep">
         <view class="contact-avatar">{{'🔗'}}</view>
         <view class="contact-info">
           <view class="contact-name">{{item.name}}</view>
-          <view class="contact-title">{{item.title || '未知职位'}}</view>
-          <view class="contact-company">{{item.company || ''}}</view>
+          <view class="contact-title">{{item.title}}</view>
+          <view class="contact-company">{{item.company}}</view>
           <view class="contact-tags">
             <text wx:for="{{item.tags}}" wx:key="*this" class="tag">{{item}}</text>
           </view>
@@ -122,37 +120,35 @@
             <text class="path-label">连接路径: </text>
             <text wx:for="{{item.path}}" wx:key="*this" class="path-node">{{item}}</text>
           </view>
-          <view class="contact-via" wx:if="{{item.via}}">
-            <text class="via-label">通过: {{item.via}}</text>
-            <text class="trust-score" wx:if="{{item.trust_score !== undefined}}">信任分: {{(item.trust_score * 100).toFixed(0)}}%</text>
+          <view class="contact-via" wx:if="{{item.hasTrustScore}}">
+            <text class="via-label">通过: {{item.viaName}}</text>
+            <text class="trust-score">信任分: {{item.trustScoreDisplay}}%</text>
           </view>
         </view>
         <view class="contact-score">
-          <text class="score-value {{item.scoreClass}}">
-            {{item.scoreDisplay}}%
-          </text>
+          <text class="score-value {{item.scoreClass}}">{{item.scoreDisplay}}%</text>
         </view>
       </view>
     </view>
 
     <!-- 搜索统计 -->
     <view class="search-stats">
-      <text class="stats-label">搜索耗时: {{result.elapsed_ms}}ms | 共 {{result.total_found}} 条结果</text>
-      <text class="stats-id">ID: {{result.search_id}}</text>
+      <text class="stats-label">{{searchStatsText}}</text>
+      <text class="stats-id">{{searchIdText}}</text>
     </view>
   </view>
 
   <!-- 加载状态 -->
-  <view wx:if="{{searching && result === null}}" class="loading-state">
+  <view wx:if="{{searching}}" class="loading-state">
     <view class="loading-animation">
       <view class="phase-indicator wide-active">🌐 广度撒网...</view>
-      <view class="phase-indicator {{transitionReady ? 'deep-active' : 'dim'}}">🔍 深度挖掘...</view>
+      <view class="phase-indicator {{phase2IndicatorClass}}">🔍 深度挖掘...</view>
     </view>
   </view>
 
   <!-- 错误状态 -->
-  <view wx:if="{{error}}" class="error-banner">
-    <text>{{error}}</text>
+  <view wx:if="{{hasError}}" class="error-banner">
+    <text>{{errorMessage}}</text>
     <button class="retry-btn" bindtap="onSearch">重试</button>
   </view>
 

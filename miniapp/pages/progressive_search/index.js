@@ -4,22 +4,16 @@
  * 两阶段搜索:
  *   Phase 1 (广度撒网): 标签/关键词匹配
  *   Phase 2 (深度挖掘): 多层关系扩展
- *
- * API 路径: GET /api/search/progressive
- *   参数: q, depth, max_wide, min_score, mode
  */
 
 const app = getApp();
 
 Page({
   data: {
-    // 搜索
     query: '',
     searching: false,
     result: null,
     error: null,
-    transitionReady: false,
-    transitionInfo: null,
 
     // 配置
     configExpanded: false,
@@ -27,16 +21,31 @@ Page({
     modeIndex: 0,
     maxWide: 20,
     depth: 3,
-    minScore: 3,  // 0.3 * 10
+    minScoreTimes10: 3,
 
-    // 后端 API 基础路径
-    apiBase: app.globalData?.apiBase || '/api',
+    // 预计算视图变量（避免WXML中出现.属性访问和方法调用）
+    showEmptyState: true,
+    showResults: false,
+    showTransitionBanner: false,
+    showTransitionDivider: false,
+    hasError: false,
+    errorMessage: '',
+    phase1List: [],
+    phase1Count: '',
+    phase1Empty: false,
+    phase2List: [],
+    phase2Count: '',
+    phase2NotEmpty: false,
+    transitionBannerClass: 'waiting',
+    transitionBannerText: '',
+    transitionDetailText: '',
+    transitionDividerText: '',
+    searchStatsText: '',
+    searchIdText: '',
+    phase2IndicatorClass: 'dim',
   },
 
-  /* ── 生命周期 ─────────────────────────── */
-
   onLoad(options) {
-    // 如果从外部传入搜索参数
     if (options.q) {
       this.setData({ query: options.q });
       this.onSearch();
@@ -45,18 +54,14 @@ Page({
 
   onPullDownRefresh() {
     if (this.data.query) {
-      this.onSearch().then(() => {
-        wx.stopPullDownRefresh();
-      });
+      this.onSearch().then(() => wx.stopPullDownRefresh());
     } else {
       wx.stopPullDownRefresh();
     }
   },
 
-  /* ── 搜索逻辑 ─────────────────────────── */
-
   async onSearch() {
-    const { query, maxWide, depth, modeIndex, minScore } = this.data;
+    const { query, maxWide, depth, modeIndex, minScoreTimes10 } = this.data;
     const q = query.trim();
 
     if (!q) {
@@ -66,22 +71,21 @@ Page({
 
     this.setData({
       searching: true,
-      error: null,
-      result: null,
-      transitionInfo: null,
-      transitionReady: false,
+      hasError: false,
+      errorMessage: '',
+      showEmptyState: false,
+      showResults: false,
     });
 
     try {
-      // 构建设置 AP I URL
       const params = new URLSearchParams();
       params.set('q', q);
       params.set('max_wide', String(maxWide));
       params.set('depth', String(depth));
-      params.set('min_score', String(minScore / 10));
+      params.set('min_score', String(minScoreTimes10 / 10));
       params.set('mode', this._getModeValue(modeIndex));
 
-      const url = `${this.data.apiBase}/search/progressive?${params.toString()}`;
+      const url = `${this.data.apiBase || '/api'}/search/progressive?${params.toString()}`;
 
       const res = await new Promise((resolve, reject) => {
         wx.request({
@@ -93,53 +97,86 @@ Page({
       });
 
       if (res.code !== 0) {
-        throw new Error(res.message || `搜索失败 (${res.code})`);
+        throw new Error(res.message || '搜索失败 (' + res.code + ')');
       }
 
-      const resultData = res.data;
-      // 为每个结果项计算样式class
-      if (resultData.phase1_wide) {
-        resultData.phase1_wide.forEach(item => {
-          item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
-          item.scoreDisplay = (item.match_score * 100).toFixed(0);
-        });
-      }
-      if (resultData.phase2_deep) {
-        resultData.phase2_deep.forEach(item => {
-          item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
-          item.scoreDisplay = (item.match_score * 100).toFixed(0);
-        });
-      }
-      const transitionInfo = resultData.transition || null;
-
-      this.setData({
-        result: resultData,
-        transitionInfo,
-        transitionReady: transitionInfo?.should_deep || false,
-        searching: false,
-      });
+      this._updateView(res.data);
 
     } catch (err) {
       console.error('[ProgressiveSearch] 搜索失败:', err);
       this.setData({
         searching: false,
-        error: err.message || '搜索请求失败，请检查网络连接',
+        hasError: true,
+        errorMessage: err.message || '搜索请求失败',
       });
     }
   },
 
-  /* ── 输入事件 ─────────────────────────── */
+  _updateView(data) {
+    // 预处理列表项
+    const phase1List = (data.phase1_wide || []).map(item => this._processItem(item));
+    const phase2List = (data.phase2_deep || []).map(item => this._processItem(item));
+
+    const trans = data.transition || null;
+
+    this.setData({
+      result: data,
+      searching: false,
+      showResults: true,
+      showEmptyState: false,
+
+      // Phase 1
+      phase1List: phase1List,
+      phase1Count: phase1List.length + ' 条结果',
+      phase1Empty: phase1List.length === 0,
+
+      // Phase 2
+      phase2List: phase2List,
+      phase2Count: phase2List.length + ' 条结果',
+      phase2NotEmpty: phase2List.length > 0,
+
+      // 过渡横幅
+      showTransitionBanner: trans !== null,
+      transitionBannerClass: trans && trans.should_deep ? 'ready' : 'waiting',
+      transitionBannerText: trans && trans.should_deep ? '🚀 进入深度挖掘' : '⏳ 广度撒网中',
+
+      showTransitionDivider: trans !== null,
+      transitionDividerText: trans && trans.should_deep ? '⬇️ 过渡至深度挖掘' : '🤔 条件未满足',
+      transitionDetailText: trans
+        ? '模式: ' + trans.transition_mode + ' | 结果: ' + trans.total_wide + '条 | 最高分: ' + (trans.max_score || 0)
+        : '',
+
+      // 统计
+      searchStatsText: '搜索耗时: ' + (data.elapsed_ms || 0) + 'ms | 共 ' + (data.total_found || 0) + ' 条结果',
+      searchIdText: 'ID: ' + (data.search_id || ''),
+
+      // 加载状态
+      phase2IndicatorClass: trans && trans.should_deep ? 'deep-active' : 'dim',
+    });
+  },
+
+  _processItem(item) {
+    if (!item) return item;
+    item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
+    item.scoreDisplay = (item.match_score * 100).toFixed(0);
+    item.hasTrustScore = item.trust_score !== undefined;
+    item.trustScoreDisplay = item.hasTrustScore ? (item.trust_score * 100).toFixed(0) : '0';
+    item.viaName = item.via || '';
+    item.title = item.title || '未知职位';
+    item.company = item.company || '';
+    return item;
+  },
+
+  _getModeValue(index) {
+    return ['hybrid', 'score', 'count'][index] || 'hybrid';
+  },
 
   onQueryInput(e) {
     this.setData({ query: e.detail.value });
   },
 
-  /* ── 配置事件 ─────────────────────────── */
-
   toggleConfig() {
-    this.setData({
-      configExpanded: !this.data.configExpanded,
-    });
+    this.setData({ configExpanded: !this.data.configExpanded });
   },
 
   onModeChange(e) {
@@ -155,23 +192,14 @@ Page({
   },
 
   onMinScoreChange(e) {
-    this.setData({ minScore: e.detail.value });
+    this.setData({ minScoreTimes10: e.detail.value });
   },
-
-  /* ── 工具函数 ─────────────────────────── */
-
-  _getModeValue(index) {
-    const modes = ['hybrid', 'score', 'count'];
-    return modes[index] || 'hybrid';
-  },
-
-  /* ── 分享 ─────────────────────────────── */
 
   onShareAppMessage() {
-    const { query } = this.data;
+    const q = this.data.query;
     return {
-      title: query ? `渐进式人脉搜索: ${query}` : '渐进式人脉搜索',
-      path: `/pages/progressive_search/index${query ? `?q=${encodeURIComponent(query)}` : ''}`,
+      title: q ? '渐进式人脉搜索: ' + q : '渐进式人脉搜索',
+      path: '/pages/progressive_search/index' + (q ? '?q=' + encodeURIComponent(q) : ''),
     };
   },
 });
