@@ -87,7 +87,7 @@
         </view>
         <view class="contact-score">
           <text class="score-value {{item.scoreClass}}">
-            {{(item.match_score * 100).toFixed(0)}}%
+            {{item.scoreDisplay}}%
           </text>
         </view>
       </view>
@@ -129,7 +129,7 @@
         </view>
         <view class="contact-score">
           <text class="score-value {{item.scoreClass}}">
-            {{(item.match_score * 100).toFixed(0)}}%
+            {{item.scoreDisplay}}%
           </text>
         </view>
       </view>

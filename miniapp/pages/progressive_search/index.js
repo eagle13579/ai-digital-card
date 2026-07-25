@@ -101,11 +101,13 @@ Page({
       if (resultData.phase1_wide) {
         resultData.phase1_wide.forEach(item => {
           item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
+          item.scoreDisplay = (item.match_score * 100).toFixed(0);
         });
       }
       if (resultData.phase2_deep) {
         resultData.phase2_deep.forEach(item => {
           item.scoreClass = item.match_score >= 0.7 ? 'high' : item.match_score >= 0.4 ? 'mid' : 'low';
+          item.scoreDisplay = (item.match_score * 100).toFixed(0);
         });
       }
       const transitionInfo = resultData.transition || null;
