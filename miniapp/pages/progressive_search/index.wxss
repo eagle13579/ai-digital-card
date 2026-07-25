@@ -1,0 +1,430 @@
+/* progressive_search/index.wxss — 渐进式人脉搜索页面样式 */
+
+.page-container {
+  min-height: 100vh;
+  padding: 16px 16px 32px;
+  background: #0f0f1a;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ── 搜索栏 ──────────────────────────── */
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  background: #1a1a2e;
+  border: 1px solid #2e2e4a;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+.search-btn {
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #7c6be8, #6b5bd8);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn:active {
+  opacity: 0.85;
+}
+
+/* ── 配置面板 ────────────────────────── */
+
+.config-panel {
+  background: #1a1a2e;
+  border: 1px solid #2e2e4a;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.config-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #aaa;
+}
+
+.toggle-icon {
+  font-size: 12px;
+  color: #888;
+}
+
+.config-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid #2e2e4a;
+}
+
+.config-item {
+  margin-top: 14px;
+}
+
+.config-label {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.picker-value {
+  padding: 8px 12px;
+  background: #22223a;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* ── 过渡横幅 ────────────────────────── */
+
+.transition-banner {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.transition-banner.ready {
+  background: linear-gradient(135deg, #1a3a2a, #1a2a3a);
+  border: 1px solid #2a4a3a;
+}
+
+.transition-banner.waiting {
+  background: #1a1a2e;
+  border: 1px solid #3a3020;
+}
+
+.transition-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.transition-detail {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ── 空状态 ──────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.empty-hint {
+  font-size: 13px;
+  color: #555;
+}
+
+/* ── 结果区 ──────────────────────────── */
+
+.phase-section {
+  margin-bottom: 16px;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a2a3e;
+}
+
+.phase-badge {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.phase-badge.wide {
+  background: #2a3a6a;
+  color: #60a5fa;
+}
+
+.phase-badge.deep {
+  background: #3a2a5a;
+  color: #a78bfa;
+}
+
+.phase-title {
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.phase-count {
+  font-size: 12px;
+  color: #888;
+}
+
+.phase-empty {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ── 联系人卡片 ──────────────────────── */
+
+.contact-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: #1a1a2e;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #2a2a3e;
+  transition: all 0.2s;
+}
+
+.contact-card:active {
+  background: #22223a;
+}
+
+.contact-card.deep {
+  border-left: 3px solid #7c6be8;
+}
+
+.contact-card.wide {
+  border-left: 3px solid #3b82f6;
+}
+
+.contact-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: #22223a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.contact-title {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 2px;
+}
+
+.contact-company {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.contact-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  padding: 2px 8px;
+  background: #22223a;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #7c6be8;
+  border: 1px solid #2e2e4a;
+}
+
+.contact-path {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6b7280;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.path-label {
+  color: #888;
+}
+
+.path-node {
+  padding: 1px 5px;
+  background: #2a2a3e;
+  border-radius: 4px;
+  color: #60a5fa;
+  font-size: 10px;
+}
+
+.contact-via {
+  margin-top: 4px;
+  font-size: 11px;
+  display: flex;
+  gap: 10px;
+}
+
+.via-label {
+  color: #a78bfa;
+}
+
+.trust-score {
+  color: #4ade80;
+}
+
+.contact-score {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.score-value {
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 45px;
+  text-align: right;
+}
+
+.score-value.high { color: #4ade80; }
+.score-value.mid  { color: #fbbf24; }
+.score-value.low  { color: #f87171; }
+
+/* ── 过渡分割线 ──────────────────────── */
+
+.transition-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #2a2a3e;
+}
+
+.divider-label {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* ── 搜索统计 ────────────────────────── */
+
+.search-stats {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #1a1a2e;
+  border-radius: 10px;
+  border: 1px solid #2a2a3e;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #555;
+}
+
+/* ── 加载状态 ────────────────────────── */
+
+.loading-state {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.phase-indicator {
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.wide-active {
+  background: #1a2a4a;
+  color: #60a5fa;
+  border: 1px solid #2a4a7a;
+}
+
+.deep-active {
+  background: #2a1a4a;
+  color: #a78bfa;
+  border: 1px solid #4a2a7a;
+}
+
+.dim {
+  color: #555;
+  background: #1a1a2e;
+  border: 1px solid #2a2a3e;
+}
+
+/* ── 错误状态 ────────────────────────── */
+
+.error-banner {
+  padding: 20px;
+  background: #3a1a1a;
+  border: 1px solid #5a2a2a;
+  border-radius: 10px;
+  text-align: center;
+  color: #f87171;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.retry-btn {
+  margin-top: 12px;
+  padding: 8px 24px;
+  background: #5a2a2a;
+  border: 1px solid #7a3a3a;
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 14px;
+}

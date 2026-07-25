@@ -54,6 +54,11 @@ class HealthResponse(BaseModel):
     playwright_installed: bool = False
 
 
+class SmartScrapeRequest(BaseModel):
+    """NL命令模式请求: {"text": "帮我爬https://xxx"}"""
+    text: str
+
+
 # ── 端点 ──────────────────────────────────────────────────────
 
 
@@ -89,3 +94,52 @@ async def scrape(request: ScrapeRequest):
 async def scrape_health():
     """爬虫服务健康状态 — 检查 CloakBrowser / Playwright 是否已安装。"""
     return HealthResponse(**scraper_health())
+
+
+# ── 新增: 进化5 全自动策略引擎端点 ──────────────────────────
+
+
+@router.post("/scrape/smart", summary="NL命令模式 — 自动解析自然语言指令并爬取")
+async def scrape_smart(body: SmartScrapeRequest):
+    """
+    接受自然语言指令，自动解析URL并执行爬取。
+
+    示例请求:
+        {"text": "帮我爬https://example.com"}
+        {"text": "抓取 https://example.com 的标题"}
+
+    使用 baize_libs.SmartScraper 解析NL并执行。
+    """
+    from baize_libs import SmartScraper
+
+    smart = SmartScraper()
+    result = smart.execute(body.text)
+
+    if result.get("status") == "error":
+        raise HTTPException(status_code=500, detail=result.get("error", "智能解析+爬取失败"))
+
+    return {"status": "ok", "data": result}
+
+
+@router.get("/scrape/auto-detect", summary="探测指定URL的bot防护级别")
+async def auto_detect(url: str = ""):
+    """
+    探测指定URL的bot检测/防护级别。
+
+    使用 baize_libs.AutoDetect 检测：
+    - Cloudflare 防护
+    - reCAPTCHA / hCaptcha
+    - WAF
+    - JS Challenge
+
+    Query参数: ?url=https://example.com
+    """
+    if not url.strip():
+        raise HTTPException(status_code=400, detail="URL不能为空")
+
+    from baize_libs import AutoDetect
+
+    detector = AutoDetect()
+    result = detector.detect(url)
+
+    return {"status": "ok", "url": url, "detection": result}

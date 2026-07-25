@@ -188,6 +188,8 @@ def create_app():
     from app.routers.skill_registry import router as skill_registry_router
     # ── CloakBrowser 智能爬虫 ──
     from app.routers.cloak_scraper import router as cloak_scraper_router
+    from app.routers.progressive_search_router import router as progressive_search_router
+    from app.routers.task_slicer_router import router as task_slicer_router
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -262,6 +264,8 @@ def create_app():
     app.include_router(skill_registry_router)
     # ── CloakBrowser 智能爬虫 ──
     app.include_router(cloak_scraper_router)
+    app.include_router(progressive_search_router)
+    app.include_router(task_slicer_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
