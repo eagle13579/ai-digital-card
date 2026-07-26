@@ -26,7 +26,12 @@
   "compileType": "miniprogram",
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {"type": "folder", "value": "_archive"},
+      {"type": "file", "value": "_verify_build.js"},
+      {"type": "file", "value": "test-*.js"},
+      {"type": "folder", "value": "docs"}
+    ],
     "include": []
   },
   "appid": "wxb4f6d89904200fd2",
