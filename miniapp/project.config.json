@@ -27,10 +27,22 @@
   "simulatorPluginLibVersion": {},
   "packOptions": {
     "ignore": [
-      {"type": "folder", "value": "_archive"},
-      {"type": "file", "value": "_verify_build.js"},
-      {"type": "file", "value": "test-*.js"},
-      {"type": "folder", "value": "docs"}
+      {
+        "value": "_archive",
+        "type": "folder"
+      },
+      {
+        "value": "_verify_build.js",
+        "type": "file"
+      },
+      {
+        "value": "test-*.js",
+        "type": "file"
+      },
+      {
+        "value": "docs",
+        "type": "folder"
+      }
     ],
     "include": []
   },
