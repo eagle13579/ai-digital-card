@@ -67,8 +67,8 @@
     </view>
     <view class="card-body">
       <view class="qr-info">
-        <text class="qr-type-badge" wx:if="{{qrResult.type !== 'text'}}">
-          {{qrResult.type === 'user' ? '👤 用户名片' : qrResult.type === 'platform' ? '🏢 平台' : '📦 资源'}}
+        <text class="qr-type-badge" wx:if="{{qrResult.type != 'text'}}">
+          {{qrResult.type == 'user' ? '👤 用户名片' : qrResult.type == 'platform' ? '🏢 平台' : '📦 资源'}}
         </text>
         <text class="qr-id">ID: {{qrResult.id}}</text>
         <text class="qr-raw" wx:if="{{qrResult.raw}}">原始内容: {{qrResult.raw}}</text>
@@ -77,7 +77,7 @@
   </view>
 
   <view class="save-area" wx:if="{{showQrResult && qrResult}}">
-    <button class="btn-primary" catchtap="searchText" wx:if="{{qrResult.type === 'text'}}">搜索"{{qrResult.id}}"</button>
-    <text class="auto-jump-hint" wx:if="{{qrResult.type !== 'text'}}">正在自动跳转...</text>
+    <button class="btn-primary" catchtap="searchText" wx:if="{{qrResult.type == 'text'}}">搜索"{{qrResult.id}}"</button>
+    <text class="auto-jump-hint" wx:if="{{qrResult.type != 'text'}}">正在自动跳转...</text>
   </view>
 </view>

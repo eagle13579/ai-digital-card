@@ -24,7 +24,7 @@
       <view class="section-title">行业标签</view>
       <view class="tag-list">
         <view 
-          class="tag-item {{selectedIndustries.includes(item) ? 'selected' : ''}}" 
+          class="tag-item {{selectedSet[item] ? 'selected' : ''}}" 
           wx:for="{{industryOptions}}" 
           wx:key="item"
           bindtap="toggleIndustry"
@@ -90,14 +90,14 @@
       </view>
       <scroll-view scroll-y class="picker-list">
         <view 
-          class="picker-item {{item === pickerValue ? 'selected' : ''}}" 
+          class="picker-item {{item == pickerValue ? 'selected' : ''}}" 
           wx:for="{{pickerOptions}}" 
           wx:key="item"
           bindtap="selectPickerItem"
           data-value="{{item}}"
         >
           {{item}}
-          <text class="picker-check" wx:if="{{item === pickerValue}}">✓</text>
+          <text class="picker-check" wx:if="{{item == pickerValue}}">✓</text>
         </view>
       </scroll-view>
     </view>

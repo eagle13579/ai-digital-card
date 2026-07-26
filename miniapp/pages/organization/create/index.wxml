@@ -36,13 +36,13 @@
 
       <view class="form-group">
         <text class="form-label">组织规模</text>
-        <picker mode="selector" range="{{['1-10','11-50','51-200','201-500','500+']}}" value="{{['1-10','11-50','51-200','201-500','500+'].indexOf(formData.size)}}" bindchange="onSizeChange">
+        <picker mode="selector" range="{{['1-10','11-50','51-200','201-500','500+']}}" value="{{sizeIndex}}" bindchange="onSizeChange">
           <view class="picker-value">
-            <text wx:if="{{formData.size === '1-10'}}">1-10人</text>
-            <text wx:elif="{{formData.size === '11-50'}}">11-50人</text>
-            <text wx:elif="{{formData.size === '51-200'}}">51-200人</text>
-            <text wx:elif="{{formData.size === '201-500'}}">201-500人</text>
-            <text wx:elif="{{formData.size === '500+'}}">500人以上</text>
+            <text wx:if="{{formData.size == '1-10'}}">1-10人</text>
+            <text wx:elif="{{formData.size == '11-50'}}">11-50人</text>
+            <text wx:elif="{{formData.size == '51-200'}}">51-200人</text>
+            <text wx:elif="{{formData.size == '201-500'}}">201-500人</text>
+            <text wx:elif="{{formData.size == '500+'}}">500人以上</text>
             <text wx:else>{{formData.size}}</text>
           </view>
         </picker>

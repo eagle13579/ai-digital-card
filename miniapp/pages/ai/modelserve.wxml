@@ -34,7 +34,7 @@
 
     <!-- 刷新按钮 -->
     <view class="ms-refresh-row">
-      <text class="ms-filter-label">当前筛选：{{filterStatus === 'all' ? '全部' : filterStatus === 'online' ? '在线' : filterStatus === 'degraded' ? '降级' : '离线'}}</text>
+      <text class="ms-filter-label">当前筛选：{{filterStatus == 'all' ? '全部' : filterStatus == 'online' ? '在线' : filterStatus == 'degraded' ? '降级' : '离线'}}</text>
       <view class="ms-refresh-btn" bindtap="refresh">
         <text>🔄 刷新</text>
       </view>
@@ -43,12 +43,12 @@
     <!-- 服务列表 -->
     <view class="ms-service-list">
       <view class="ms-service-card" wx:for="{{services}}" wx:key="id"
-        wx:if="{{filterStatus === 'all' || item.status === filterStatus}}">
+        wx:if="{{filterStatus == 'all' || item.status == filterStatus}}">
         <!-- 头部 -->
         <view class="ms-svc-header">
           <view class="ms-svc-name-row">
             <view class="ms-svc-icon" style="background:{{getStatusColor(item.status)}}20;">
-              <text style="font-size:20px;">{{item.status === 'online' ? '✅' : item.status === 'degraded' ? '⚠️' : '❌'}}</text>
+              <text style="font-size:20px;">{{item.status == 'online' ? '✅' : item.status == 'degraded' ? '⚠️' : '❌'}}</text>
             </view>
             <view class="ms-svc-info">
               <text class="ms-svc-name">{{item.name}}</text>
@@ -87,7 +87,7 @@
             <text class="ms-ver-label">版本</text>
             <text class="ms-ver-value">{{item.version}}</text>
           </view>
-          <view class="ms-svc-actions" wx:if="{{item.status !== 'online'}}">
+          <view class="ms-svc-actions" wx:if="{{item.status != 'online'}}">
             <button class="ms-restart-btn" data-name="{{item.name}}" bindtap="restartService">重启</button>
           </view>
         </view>
@@ -95,7 +95,7 @@
     </view>
 
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{services.length === 0}}">
+    <view class="empty-state" wx:if="{{services.length == 0}}">
       <text class="empty-icon">⚙️</text>
       <text class="empty-text">暂无模型服务数据</text>
     </view>

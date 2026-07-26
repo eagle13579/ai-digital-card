@@ -198,6 +198,12 @@ Page({
           style: content.style || 'professional',
         }
         this.setData({ formData })
+        // 计算选中集合用于WXML
+        const selectedPurposesSet = {}
+        if (formData.purposes && Array.isArray(formData.purposes)) {
+          formData.purposes.forEach(v => { selectedPurposesSet[v] = true })
+        }
+        this.setData({ formData, selectedPurposesSet })
         wx.showToast({ title: '已加载名片数据', icon: 'success', duration: 1500 })
       }
       // 加载公司图片页
@@ -254,10 +260,16 @@ Page({
             success: (res) => {
               if (res.confirm) {
                 const formData = draft.formData
+                // 计算选中集合用于WXML
+                const selectedPurposesSet = {}
+                if (formData.purposes && Array.isArray(formData.purposes)) {
+                  formData.purposes.forEach(v => { selectedPurposesSet[v] = true })
+                }
                 // 同步行业模板
                 const templateData = this._getIndustryTemplate(formData.industry)
                 this.setData({
                   formData,
+                  selectedPurposesSet,
                   currentTemplate: templateData,
                   templateExtraFields: templateData ? templateData.extraFields : [],
                   draftSaved: true,
@@ -509,8 +521,12 @@ Page({
     } else {
       purposes.splice(idx, 1)
     }
+    // 计算选中集合用于WXML
+    const selectedPurposesSet = {}
+    purposes.forEach(v => { selectedPurposesSet[v] = true })
     this.setData({
       'formData.purposes': purposes,
+      selectedPurposesSet,
     })
   },
 

@@ -27,7 +27,7 @@
           <text class="member-expire" wx:if="{{memberExpire}}">{{_t.expireDate}}{{memberExpire}}</text>
         </view>
         <view class="member-right">
-          <text class="member-upgrade" wx:if="{{memberLevel === 'free'}}">{{_t.upgradeMember}}</text>
+          <text class="member-upgrade" wx:if="{{memberLevel == 'free'}}">{{_t.upgradeMember}}</text>
           <text class="member-upgrade" wx:else>{{_t.viewBenefits}}</text>
         </view>
       </view>
@@ -146,7 +146,7 @@
         </view>
         <view class="modal-footer">
           <button class="modal-btn cancel" bindtap="hideDeleteConfirm">{{_t.deleteCancelBtn}}</button>
-          <button class="modal-btn confirm {{deleteConfirmText === '确认注销' ? 'active' : ''}}" disabled="{{deleteConfirmText !== '确认注销'}}" bindtap="confirmDeleteAccount">{{_t.deleteConfirmBtn}}</button>
+          <button class="modal-btn confirm {{deleteConfirmText == '确认注销' ? 'active' : ''}}" disabled="{{deleteConfirmText != '确认注销'}}" bindtap="confirmDeleteAccount">{{_t.deleteConfirmBtn}}</button>
         </view>
       </view>
     </view>

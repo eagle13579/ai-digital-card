@@ -29,8 +29,8 @@
         hover-class="item-hover"
       >
         <!-- 排名 -->
-        <view class="rank-badge {{item.rank === 1 ? 'rank-first' : ''}}">
-          <text class="rank-text" wx:if="{{item.rank === 1}}">👑</text>
+        <view class="rank-badge {{item.rank == 1 ? 'rank-first' : ''}}">
+          <text class="rank-text" wx:if="{{item.rank == 1}}">👑</text>
           <text class="rank-num" wx:else>{{item.rank}}</text>
         </view>
 
@@ -44,7 +44,7 @@
           <view class="platform-name-row">
             <text class="platform-name">{{item.name}}</text>
             <!-- 第1名显示官方认证标签 -->
-            <text class="cert-badge" wx:if="{{item.rank === 1}}">官方认证</text>
+            <text class="cert-badge" wx:if="{{item.rank == 1}}">官方认证</text>
           </view>
           <view class="platform-meta">
             <text class="meta-item">{{item.resource_count || 0}} 资源单位</text>

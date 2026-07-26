@@ -90,7 +90,7 @@
           <text class="friend-list-title">快速选择好友</text>
           <scroll-view scroll-x class="friend-scroll">
             <view
-              class="friend-chip {{targetUserId === item.id ? 'selected' : ''}}"
+              class="friend-chip {{targetUserId == item.id ? 'selected' : ''}}"
               wx:for="{{friendList}}"
               wx:key="id"
               bindtap="selectFriendTarget"
@@ -132,8 +132,8 @@
               data-id="{{item.id}}"
               data-name="{{item.name}}"
             >
-              <view class="step-node {{item.id === 'self' ? 'step-self' : ''}}">
-                <text class="step-node-text">{{item.name.slice(0, 1)}}</text>
+              <view class="step-node {{item.id == 'self' ? 'step-self' : ''}}">
+                <text class="step-node-text">{{item.initial}}</text>
               </view>
               <view class="step-info">
                 <text class="step-name">{{item.name}}</text>
@@ -169,7 +169,7 @@
       <view class="info-body">
         <view class="info-avatar-row">
           <view class="info-avatar {{selectedNode.isSelf ? 'avatar-self' : ''}}">
-            <text class="avatar-text">{{selectedNode.name.slice(0, 1)}}</text>
+            <text class="avatar-text">{{selectedInitial}}</text>
           </view>
           <view class="info-name-area">
             <text class="info-name">{{selectedNode.name}}</text>

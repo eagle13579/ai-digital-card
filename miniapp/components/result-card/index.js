@@ -52,6 +52,16 @@ Component({
     },
   },
 
+  observers: {
+    'tags': function (tags) {
+      if (tags && tags.length > 0) {
+        this.setData({ displayTags: tags.slice(0, 3) })
+      } else {
+        this.setData({ displayTags: [] })
+      }
+    },
+  },
+
   methods: {
     onTap() {
       this.triggerEvent('tap')

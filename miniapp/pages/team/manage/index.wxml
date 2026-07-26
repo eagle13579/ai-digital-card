@@ -26,19 +26,19 @@
 
     <!-- Tab切换 -->
     <view class="tab-bar">
-      <view class="tab-item {{activeTab === 'members' ? 'active' : ''}}" data-tab="members" bindtap="switchTab">
+      <view class="tab-item {{activeTab == 'members' ? 'active' : ''}}" data-tab="members" bindtap="switchTab">
         成员 ({{members.length}})
       </view>
-      <view class="tab-item {{activeTab === 'invites' ? 'active' : ''}}" data-tab="invites" bindtap="switchTab">
+      <view class="tab-item {{activeTab == 'invites' ? 'active' : ''}}" data-tab="invites" bindtap="switchTab">
         邀请 ({{invites.length}})
       </view>
-      <view class="tab-item {{activeTab === 'approvals' ? 'active' : ''}}" data-tab="approvals" bindtap="switchTab">
+      <view class="tab-item {{activeTab == 'approvals' ? 'active' : ''}}" data-tab="approvals" bindtap="switchTab">
         审批 ({{approvalRequests.length}})
       </view>
     </view>
 
     <!-- 成员列表 -->
-    <view class="tab-content" wx:if="{{activeTab === 'members'}}">
+    <view class="tab-content" wx:if="{{activeTab == 'members'}}">
       <view class="member-list">
         <view class="member-item" wx:for="{{members}}" wx:key="id">
           <view class="member-avatar">
@@ -54,7 +54,7 @@
             <text class="member-sub" wx:if="{{item.company}}">{{item.company}} · {{item.title_in_team || item.title || ''}}</text>
             <text class="member-sub" wx:else>{{item.title_in_team || item.title || '团队成员'}}</text>
           </view>
-          <view class="member-actions" wx:if="{{canManage() && item.role !== 'owner'}}">
+          <view class="member-actions" wx:if="{{canManage() && item.role != 'owner'}}">
             <view class="action-btn danger" bindtap="removeMember" data-user-id="{{item.user_id}}" data-name="{{item.name}}">移除</view>
           </view>
         </view>
@@ -62,38 +62,38 @@
     </view>
 
     <!-- 邀请列表 -->
-    <view class="tab-content" wx:if="{{activeTab === 'invites'}}">
+    <view class="tab-content" wx:if="{{activeTab == 'invites'}}">
       <view class="invite-list">
         <view class="invite-item" wx:for="{{invites}}" wx:key="id">
           <view class="invite-icon">📩</view>
           <view class="invite-detail">
             <text class="invite-target">{{item.invitee_email || item.invitee_phone || '未知'}}</text>
-            <text class="invite-role">{{getRoleLabel(item.role).label}} · {{item.status === 'pending' ? '待接受' : item.status}}</text>
+            <text class="invite-role">{{getRoleLabel(item.role).label}} · {{item.status == 'pending' ? '待接受' : item.status}}</text>
           </view>
-          <text class="invite-status {{item.status}}">{{item.status === 'pending' ? '等待中' : item.status === 'accepted' ? '已接受' : '已过期'}}</text>
+          <text class="invite-status {{item.status}}">{{item.status == 'pending' ? '等待中' : item.status == 'accepted' ? '已接受' : '已过期'}}</text>
         </view>
-        <view class="empty-invite" wx:if="{{invites.length === 0}}">
+        <view class="empty-invite" wx:if="{{invites.length == 0}}">
           <text class="empty-text">暂无邀请记录</text>
         </view>
       </view>
     </view>
 
     <!-- 审批请求列表 -->
-    <view class="tab-content" wx:if="{{activeTab === 'approvals'}}">
+    <view class="tab-content" wx:if="{{activeTab == 'approvals'}}">
       <view class="approval-list">
         <view class="approval-item" wx:for="{{approvalRequests}}" wx:key="id">
           <view class="approval-icon">📋</view>
           <view class="approval-detail">
-            <text class="approval-action">申请: {{item.action === 'join' ? '加入团队' : item.action === 'invite' ? '邀请成员' : item.action === 'upgrade' ? '升级角色' : '移除成员'}}</text>
+            <text class="approval-action">申请: {{item.action == 'join' ? '加入团队' : item.action == 'invite' ? '邀请成员' : item.action == 'upgrade' ? '升级角色' : '移除成员'}}</text>
             <text class="approval-reason" wx:if="{{item.reason}}">{{item.reason}}</text>
           </view>
-          <view class="approval-actions" wx:if="{{item.status === 'pending' && canManage()}}">
+          <view class="approval-actions" wx:if="{{item.status == 'pending' && canManage()}}">
             <view class="action-btn approve" bindtap="approveRequest" data-req-id="{{item.id}}">通过</view>
             <view class="action-btn reject" bindtap="rejectRequest" data-req-id="{{item.id}}">拒绝</view>
           </view>
-          <text class="approval-status" wx:else>{{item.status === 'approved' ? '已通过' : item.status === 'rejected' ? '已拒绝' : item.status}}</text>
+          <text class="approval-status" wx:else>{{item.status == 'approved' ? '已通过' : item.status == 'rejected' ? '已拒绝' : item.status}}</text>
         </view>
-        <view class="empty-approval" wx:if="{{approvalRequests.length === 0}}">
+        <view class="empty-approval" wx:if="{{approvalRequests.length == 0}}">
           <text class="empty-text">暂无待处理的审批请求</text>
         </view>
       </view>
@@ -119,7 +119,7 @@
         <view class="form-group">
           <text class="form-label">角色</text>
           <picker mode="selector" range="{{['member','admin','viewer']}}" value="0" bindchange="onInviteRoleChange">
-            <view class="picker-value">{{inviteForm.role === 'admin' ? '管理员' : inviteForm.role === 'viewer' ? '观察者' : '成员'}}</view>
+            <view class="picker-value">{{inviteForm.role == 'admin' ? '管理员' : inviteForm.role == 'viewer' ? '观察者' : '成员'}}</view>
           </picker>
         </view>
         <view class="form-group">

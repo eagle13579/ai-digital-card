@@ -36,8 +36,13 @@ Page({
     try {
       const res = await connectionApi.list('approved')
       const list = res.data || res || []
+      const processed = Array.isArray(list) ? list.map(item => ({
+        ...item,
+        meta: [item.company, item.title].filter(Boolean).join(' · '),
+        createdDate: item.created_at ? item.created_at.slice(0,10) : ''
+      })) : []
       this.setData({
-        connections: Array.isArray(list) ? list : [],
+        connections: processed,
         connectionsLoaded: true,
       })
     } catch {
@@ -50,8 +55,12 @@ Page({
     try {
       const res = await connectionApi.listPending()
       const list = res.data || res || []
+      const processed = Array.isArray(list) ? list.map(item => ({
+        ...item,
+        meta: [item.company, item.title].filter(Boolean).join(' · '),
+      })) : []
       this.setData({
-        pendingList: Array.isArray(list) ? list : [],
+        pendingList: processed,
         pendingLoaded: true,
       })
     } catch {

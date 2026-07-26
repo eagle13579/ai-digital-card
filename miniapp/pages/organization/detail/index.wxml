@@ -34,16 +34,16 @@
 
     <!-- Tab切换 -->
     <view class="tab-bar">
-      <view class="tab-item {{activeTab === 'members' ? 'active' : ''}}" data-tab="members" bindtap="switchTab">
+      <view class="tab-item {{activeTab == 'members' ? 'active' : ''}}" data-tab="members" bindtap="switchTab">
         成员 ({{members.length}})
       </view>
-      <view class="tab-item {{activeTab === 'invites' ? 'active' : ''}}" data-tab="invites" bindtap="switchTab">
+      <view class="tab-item {{activeTab == 'invites' ? 'active' : ''}}" data-tab="invites" bindtap="switchTab">
         邀请 ({{invites.length}})
       </view>
     </view>
 
     <!-- 成员列表 -->
-    <view class="tab-content" wx:if="{{activeTab === 'members'}}">
+    <view class="tab-content" wx:if="{{activeTab == 'members'}}">
       <view class="member-list">
         <view class="member-item" wx:for="{{members}}" wx:key="id">
           <view class="member-avatar">
@@ -59,7 +59,7 @@
             <text class="member-sub" wx:if="{{item.company}}">{{item.company}} · {{item.title || ''}}</text>
             <text class="member-sub" wx:else>{{item.title || '组织成员'}}</text>
           </view>
-          <view class="member-actions" wx:if="{{isOwner() && item.role !== 'owner'}}">
+          <view class="member-actions" wx:if="{{isOwner() && item.role != 'owner'}}">
             <view class="action-btn danger" bindtap="removeMember" data-user-id="{{item.user_id}}" data-name="{{item.name}}">移除</view>
           </view>
         </view>
@@ -67,17 +67,17 @@
     </view>
 
     <!-- 邀请列表 -->
-    <view class="tab-content" wx:if="{{activeTab === 'invites'}}">
+    <view class="tab-content" wx:if="{{activeTab == 'invites'}}">
       <view class="invite-list">
         <view class="invite-item" wx:for="{{invites}}" wx:key="id">
           <view class="invite-icon">📩</view>
           <view class="invite-detail">
             <text class="invite-target">{{item.invitee_email || item.invitee_phone || '未知'}}</text>
-            <text class="invite-role">{{item.status === 'pending' ? '待接受' : item.status}}</text>
+            <text class="invite-role">{{item.status == 'pending' ? '待接受' : item.status}}</text>
           </view>
-          <text class="invite-status {{item.status}}">{{item.status === 'pending' ? '等待中' : item.status === 'accepted' ? '已接受' : '已过期'}}</text>
+          <text class="invite-status {{item.status}}">{{item.status == 'pending' ? '等待中' : item.status == 'accepted' ? '已接受' : '已过期'}}</text>
         </view>
-        <view class="empty-invite" wx:if="{{invites.length === 0}}">
+        <view class="empty-invite" wx:if="{{invites.length == 0}}">
           <text class="empty-text">暂无邀请记录</text>
         </view>
       </view>

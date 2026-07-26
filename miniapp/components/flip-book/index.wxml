@@ -5,7 +5,7 @@
       <view class="flipbook__front-content" wx:if="{{cardData && !loading}}">
         <image class="flipbook__avatar" src="{{cardData.avatar || ''}}" mode="aspectFill" />
         <text class="flipbook__name">{{cardData.name || '未设置姓名'}}</text>
-        <text class="flipbook__company">{{[cardData.company, cardData.title].filter(Boolean).join(' · ') || '未设置公司信息'}}</text>
+        <text class="flipbook__company">{{companyInfo || '未设置公司信息'}}</text>
         <view class="flipbook__divider"></view>
         <view class="flipbook__contact">
           <text class="flipbook__contact-item" wx:if="{{cardData.phone}}">📞 {{cardData.phone}}</text>

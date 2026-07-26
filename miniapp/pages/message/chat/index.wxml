@@ -16,18 +16,18 @@
     </view>
 
     <!-- 消息气泡 -->
-    <view class="msg-item {{item.sender_id === myUserId ? 'self' : 'other'}}" 
+    <view class="msg-item {{item.sender_id == myUserId ? 'self' : 'other'}}" 
           wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
-      <image class="msg-avatar" src="{{item.sender_id === myUserId ? myAvatar : otherAvatar}}" 
-             mode="aspectFill" wx:if="{{item.sender_id !== myUserId}}"></image>
+      <image class="msg-avatar" src="{{item.sender_id == myUserId ? myAvatar : otherAvatar}}" 
+             mode="aspectFill" wx:if="{{item.sender_id != myUserId}}"></image>
       <view class="msg-bubble-wrap">
-        <view class="msg-bubble {{item.sender_id === myUserId ? 'self' : 'other'}}">
+        <view class="msg-bubble {{item.sender_id == myUserId ? 'self' : 'other'}}">
           <text class="msg-content">{{item.content}}</text>
         </view>
         <text class="msg-time" wx:if="{{showTime(item, index)}}">{{formatTime(item.created_at)}}</text>
       </view>
-      <image class="msg-avatar" src="{{item.sender_id === myUserId ? myAvatar : otherAvatar}}" 
-             mode="aspectFill" wx:if="{{item.sender_id === myUserId}}"></image>
+      <image class="msg-avatar" src="{{item.sender_id == myUserId ? myAvatar : otherAvatar}}" 
+             mode="aspectFill" wx:if="{{item.sender_id == myUserId}}"></image>
     </view>
 
     <view class="bottom-placeholder" id="scroll-bottom"></view>

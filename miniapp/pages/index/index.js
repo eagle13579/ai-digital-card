@@ -253,7 +253,11 @@ Page({
           } : null,
           trustCount,
           trustList: trustList.slice(0, 10),
-          recommendList: Array.isArray(recommendData) ? recommendData.slice(0, 3) : [],
+          trustListDisplay: trustList.slice(0, 5),
+          recommendList: Array.isArray(recommendData) ? recommendData.slice(0, 3).map(item => ({
+            ...item,
+            displayTags: item.commonTags ? item.commonTags.slice(0, 2) : []
+          })) : [],
           showEmpty: !brochure && (!Array.isArray(recommendData) || recommendData.length === 0),
           showUpgradeHint,
           upgradeHintText: i18n.t('upgradeHint', { count: stats.visitors }),

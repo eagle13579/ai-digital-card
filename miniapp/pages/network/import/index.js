@@ -46,12 +46,21 @@ Page({
 
   // ==================== 联系人存储 ====================
 
+  /** 为联系人数组添加首字母字段 */
+  _processContacts(contacts) {
+    if (!contacts || !Array.isArray(contacts)) return []
+    return contacts.map(c => ({
+      ...c,
+      initial: c.name ? c.name.slice(0, 1) : ''
+    }))
+  },
+
   _loadContacts() {
     try {
       const saved = wx.getStorageSync(this.data._contactsKey)
       if (saved && Array.isArray(saved)) {
         this.setData({
-          contacts: saved,
+          contacts: this._processContacts(saved),
         })
       }
     } catch (e) {
@@ -136,6 +145,7 @@ Page({
       phone: phone.trim(),
       createdAt: Date.now(),
       source: 'manual',
+      initial: name.trim().slice(0, 1),
     }
 
     const contacts = [...this.data.contacts, newContact]
@@ -168,6 +178,7 @@ Page({
           source: 'qrcode',
           scanResult: scanResult,
           createdAt: Date.now(),
+          initial: (scanResult.slice(0, 20) || '扫码联系人').slice(0, 1),
         }
 
         const contacts = [...this.data.contacts, newContact]

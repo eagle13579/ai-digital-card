@@ -6,17 +6,17 @@
     <view class="stepper-track">
       <block wx:for="{{4}}" wx:for-index="idx" wx:key="idx">
         <view class="step-group" data-step="{{idx+1}}" bindtap="goToStep">
-          <view class="step-dot {{idx+1 < currentStep ? 'completed' : ''}} {{idx+1 === currentStep ? 'active' : ''}}">
+          <view class="step-dot {{idx+1 < currentStep ? 'completed' : ''}} {{idx+1 == currentStep ? 'active' : ''}}">
             <view class="dot-inner">
               <text wx:if="{{idx+1 < currentStep}}" class="dot-check">✓</text>
-              <text wx:elif="{{idx+1 === currentStep}}" class="dot-num">{{idx+1}}</text>
+              <text wx:elif="{{idx+1 == currentStep}}" class="dot-num">{{idx+1}}</text>
               <text wx:else class="dot-num">{{idx+1}}</text>
             </view>
           </view>
-          <text class="step-label {{idx+1 === currentStep ? 'active' : ''}}">
-            <text wx:if="{{idx===0}}">基本信息</text>
-            <text wx:elif="{{idx===1}}">专业信息</text>
-            <text wx:elif="{{idx===2}}">公司信息</text>
+          <text class="step-label {{idx+1 == currentStep ? 'active' : ''}}">
+            <text wx:if="{{idx==0}}">基本信息</text>
+            <text wx:elif="{{idx==1}}">专业信息</text>
+            <text wx:elif="{{idx==2}}">公司信息</text>
             <text wx:else>预览发布</text>
           </text>
         </view>
@@ -28,7 +28,7 @@
   </view>
 
   <!-- ====== Step 1: 基本信息 ====== -->
-  <view wx:if="{{currentStep === 1}}" class="step-content">
+  <view wx:if="{{currentStep == 1}}" class="step-content">
     <view class="section-card">
       <view class="section-header">
         <view class="section-icon-wrap">
@@ -107,7 +107,7 @@
   </view>
 
   <!-- ====== Step 2: 专业信息 ====== -->
-  <view wx:if="{{currentStep === 2}}" class="step-content">
+  <view wx:if="{{currentStep == 2}}" class="step-content">
     <view class="section-card">
       <view class="section-header">
         <view class="section-icon-wrap">
@@ -169,7 +169,7 @@
         <view class="form-item">
           <text class="form-label">合作意向</text>
           <view class="purpose-options">
-            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{formData.purposes.indexOf(item.value) !== -1 ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}" hover-class="purpose-option-hover">
+            <view wx:for="{{purposeOptions}}" wx:key="value" class="purpose-option {{selectedPurposesSet[item.value] ? 'active' : ''}}" bindtap="selectPurpose" data-value="{{item.value}}" hover-class="purpose-option-hover">
               <text class="purpose-icon">{{item.icon}}</text>
               <text class="purpose-label">{{item.label}}</text>
             </view>
@@ -180,7 +180,7 @@
   </view>
 
   <!-- ====== Step 3: 公司信息（含行业模板） ====== -->
-  <view wx:if="{{currentStep === 3}}" class="step-content">
+  <view wx:if="{{currentStep == 3}}" class="step-content">
     <view class="section-card">
       <view class="section-header">
         <view class="section-icon-wrap">
@@ -193,7 +193,7 @@
         <view class="form-item">
           <text class="form-label">行业领域</text>
           <view class="industry-options">
-            <view wx:for="{{industryOptions}}" wx:key="value" class="industry-option {{formData.industry === item.value ? 'active' : ''}}" bindtap="selectIndustry" data-value="{{item.value}}">
+            <view wx:for="{{industryOptions}}" wx:key="value" class="industry-option {{formData.industry == item.value ? 'active' : ''}}" bindtap="selectIndustry" data-value="{{item.value}}">
               <text class="industry-icon">{{item.icon}}</text>
               <text class="industry-label">{{item.label}}</text>
             </view>
@@ -201,7 +201,7 @@
         </view>
 
         <!-- 自定义行业输入 -->
-        <view wx:if="{{formData.industry === 'other'}}" class="form-item">
+        <view wx:if="{{formData.industry == 'other'}}" class="form-item">
           <text class="form-label">自定义行业</text>
           <input class="form-input" placeholder="请输入您的行业领域" value="{{formData.industryCustom}}" bindinput="onInput" data-field="industryCustom" />
         </view>
@@ -215,8 +215,8 @@
           <view wx:for="{{templateExtraFields}}" wx:for-item="field" wx:key="field.key">
             <view class="form-item">
               <text class="form-label">{{field.label}}</text>
-              <input wx:if="{{field.type === 'text'}}" class="form-input" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" />
-              <textarea wx:if="{{field.type === 'textarea'}}" class="form-textarea" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" maxlength="500" />
+              <input wx:if="{{field.type == 'text'}}" class="form-input" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" />
+              <textarea wx:if="{{field.type == 'textarea'}}" class="form-textarea" placeholder="{{field.placeholder}}" value="{{formData[field.key]}}" bindinput="onInput" data-field="{{field.key}}" maxlength="500" />
             </view>
           </view>
         </view>
@@ -280,7 +280,7 @@
   </view>
 
   <!-- ====== Step 4: 预览发布 ====== -->
-  <view wx:if="{{currentStep === 4}}" class="step-content">
+  <view wx:if="{{currentStep == 4}}" class="step-content">
     <!-- 预览卡片 -->
     <view class="section-card">
       <view class="section-header">
@@ -291,7 +291,7 @@
       </view>
       <view class="form-content">
         <view class="style-options">
-          <view wx:for="{{styleOptions}}" wx:key="value" class="style-option {{formData.style === item.value ? 'active' : ''}}" bindtap="selectStyle" data-value="{{item.value}}">
+          <view wx:for="{{styleOptions}}" wx:key="value" class="style-option {{formData.style == item.value ? 'active' : ''}}" bindtap="selectStyle" data-value="{{item.value}}">
             <view class="style-preview" style="background: {{item.preview}}"></view>
             <text class="style-name">{{item.name}}</text>
             <text class="style-desc">{{item.desc}}</text>
@@ -358,7 +358,7 @@
       bindtap="goNextStep"
     >下一步</button>
     <button
-      wx:if="{{currentStep === totalSteps}}"
+      wx:if="{{currentStep == totalSteps}}"
       class="btn-submit"
       bindtap="submitForm"
     >发布名片</button>

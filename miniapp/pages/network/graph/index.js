@@ -487,6 +487,7 @@ Page({
           trustScore: 100,
           isSelf: true,
         },
+        selectedInitial: node.name ? node.name.slice(0, 1) : '',
       })
       return
     }
@@ -502,6 +503,7 @@ Page({
         trustScore: contactData.trustScore || 0,
         isSelf: false,
       },
+      selectedInitial: node.name ? node.name.slice(0, 1) : '',
     })
   },
 
@@ -696,6 +698,13 @@ Page({
   },
 
   _handlePathResult(result) {
+    // 预计算首字母用于WXML
+    if (result.path && Array.isArray(result.path)) {
+      result.path = result.path.map(item => ({
+        ...item,
+        initial: item.name ? item.name.slice(0, 1) : ''
+      }))
+    }
     this.setData({
       searchingPath: false,
       pathResult: result,

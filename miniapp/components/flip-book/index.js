@@ -26,8 +26,14 @@ Component({
   },
 
   observers: {
-    'cardData': function () {
+    'cardData': function (data) {
       this._updateBg()
+      if (data) {
+        const companyInfo = [data.company, data.title].filter(Boolean).join(' · ')
+        this.setData({ companyInfo })
+      } else {
+        this.setData({ companyInfo: '' })
+      }
     },
   },
 

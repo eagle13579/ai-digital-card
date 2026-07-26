@@ -46,18 +46,18 @@
     </view>
 
     <view class="tab-bar">
-      <view class="tab-item {{activeTab === 'info' ? 'active' : ''}}" bindtap="switchTab" data-tab="info">
+      <view class="tab-item {{activeTab == 'info' ? 'active' : ''}}" bindtap="switchTab" data-tab="info">
         <text class="tab-text">介绍</text>
       </view>
-      <view class="tab-item {{activeTab === 'resources' ? 'active' : ''}}" bindtap="switchTab" data-tab="resources">
+      <view class="tab-item {{activeTab == 'resources' ? 'active' : ''}}" bindtap="switchTab" data-tab="resources">
         <text class="tab-text">资源单位</text>
       </view>
-      <view class="tab-item {{activeTab === 'opportunities' ? 'active' : ''}}" bindtap="switchTab" data-tab="opportunities">
+      <view class="tab-item {{activeTab == 'opportunities' ? 'active' : ''}}" bindtap="switchTab" data-tab="opportunities">
         <text class="tab-text">平台商机</text>
       </view>
     </view>
 
-    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'info'}}">
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab == 'info'}}">
       <view class="creator-card">
         <view class="creator-avatar">
           <text class="avatar-text">{{platform.creator_name ? platform.creator_name[0] : '?'}}</text>
@@ -99,12 +99,12 @@
         </view>
       </view>
 
-      <view class="empty-state" wx:if="{{opportunities.length === 0}}">
+      <view class="empty-state" wx:if="{{opportunities.length == 0}}">
         <text class="empty-text">平台暂无发布商机</text>
       </view>
     </scroll-view>
 
-    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'resources'}}">
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab == 'resources'}}">
       <view class="resource-list" wx:if="{{resourceUnits.length > 0}}">
         <view class="resource-item" wx:for="{{resourceUnits}}" wx:key="id">
           <view class="resource-avatar">
@@ -124,7 +124,7 @@
       </view>
     </scroll-view>
 
-    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab === 'opportunities'}}">
+    <scroll-view scroll-y class="tab-content" wx:if="{{activeTab == 'opportunities'}}">
       <view class="opportunity-list" wx:if="{{opportunities.length > 0}}">
         <view class="opportunity-card" wx:for="{{opportunities}}" wx:key="id">
           <view class="card-header">

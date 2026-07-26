@@ -39,8 +39,8 @@
         <view class="info-row status-row">
           <text class="info-label">{{_t.statusInfo}}</text>
           <view class="status-badge-wrap">
-            <view class="badge {{card.status === 'published' ? 'badge-gold' : 'badge-free'}}">
-              {{card.status === 'published' ? _t.published : _t.draft}}
+            <view class="badge {{card.status == 'published' ? 'badge-gold' : 'badge-free'}}">
+              {{card.status == 'published' ? _t.published : _t.draft}}
             </view>
           </view>
         </view>

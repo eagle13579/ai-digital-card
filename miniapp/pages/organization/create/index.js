@@ -1,6 +1,8 @@
 const { organizationApi } = require('../../../utils/api')
 const { MockService } = require('../../../utils/mockService')
 
+const SIZE_OPTIONS = ['1-10','11-50','51-200','201-500','500+']
+
 Page({
   data: {
     isEdit: false,
@@ -13,6 +15,7 @@ Page({
       industry: '',
       size: '1-10',
     },
+    sizeIndex: 0,
   },
 
   onLoad(options) {
@@ -46,6 +49,7 @@ Page({
           industry: org.industry || '',
           size: org.size || '1-10',
         },
+        sizeIndex: SIZE_OPTIONS.indexOf(org.size || '1-10'),
         loading: false,
       })
     } catch (err) {
@@ -75,9 +79,10 @@ Page({
   },
 
   onSizeChange(e) {
-    const sizes = ['1-10', '11-50', '51-200', '201-500', '500+']
+    const size = SIZE_OPTIONS[e.detail.value]
     this.setData({
-      'formData.size': sizes[e.detail.value],
+      'formData.size': size,
+      sizeIndex: SIZE_OPTIONS.indexOf(size),
     })
   },
 

@@ -28,6 +28,16 @@ Component({
     },
   },
 
+  observers: {
+    'selected': function (selected) {
+      const selectedMap = {}
+      if (selected && Array.isArray(selected)) {
+        selected.forEach(item => { selectedMap[item] = true })
+      }
+      this.setData({ selectedMap })
+    },
+  },
+
   methods: {
     onTap(e) {
       const index = e.currentTarget.dataset.index

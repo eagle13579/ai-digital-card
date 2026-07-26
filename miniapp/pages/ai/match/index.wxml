@@ -73,7 +73,7 @@
   </view>
 
   <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{!loading && filteredMatches.length === 0}}">
+  <view class="empty-state" wx:if="{{!loading && filteredMatches.length == 0}}">
     <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
     <text class="text">{{_t.noMatchResults}}</text>
   </view>

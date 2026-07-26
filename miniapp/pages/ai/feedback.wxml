@@ -7,12 +7,12 @@
 
   <!-- Tab 切换 -->
   <view class="tab-bar">
-    <view class="tab-item {{currentTab === 'submit' ? 'active' : ''}}" data-tab="submit" bindtap="switchTab">📝 提交反馈</view>
-    <view class="tab-item {{currentTab === 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">📋 历史记录</view>
+    <view class="tab-item {{currentTab == 'submit' ? 'active' : ''}}" data-tab="submit" bindtap="switchTab">📝 提交反馈</view>
+    <view class="tab-item {{currentTab == 'history' ? 'active' : ''}}" data-tab="history" bindtap="switchTab">📋 历史记录</view>
   </view>
 
   <!-- 提交反馈 -->
-  <view class="submit-section" wx:if="{{currentTab === 'submit'}}">
+  <view class="submit-section" wx:if="{{currentTab == 'submit'}}">
     <view class="fb-card">
       <view class="form-group">
         <text class="form-label">反馈类型</text>
@@ -42,7 +42,7 @@
   </view>
 
   <!-- 历史记录 -->
-  <view class="history-section" wx:if="{{currentTab === 'history'}}">
+  <view class="history-section" wx:if="{{currentTab == 'history'}}">
     <view class="history-list">
       <view class="history-item" wx:for="{{history}}" wx:key="id">
         <view class="hi-header">
@@ -66,7 +66,7 @@
       </view>
     </view>
 
-    <view class="empty-state" wx:if="{{!historyLoading && history.length === 0}}">
+    <view class="empty-state" wx:if="{{!historyLoading && history.length == 0}}">
       <text class="empty-icon">💬</text>
       <text class="empty-text">暂无反馈记录</text>
     </view>

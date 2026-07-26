@@ -85,22 +85,26 @@ Page({
   },
 
   toggleIndustry(e) {
-    const industry = e.currentTarget.dataset.industry
-    const selectedIndustries = [...this.data.selectedIndustries]
-    const index = selectedIndustries.indexOf(industry)
+  const industry = e.currentTarget.dataset.industry
+  const selectedIndustries = [...this.data.selectedIndustries]
+  const index = selectedIndustries.indexOf(industry)
     
-    if (index > -1) {
-      selectedIndustries.splice(index, 1)
+  if (index > -1) {
+    selectedIndustries.splice(index, 1)
+  } else {
+    if (selectedIndustries.length < 3) {
+      selectedIndustries.push(industry)
     } else {
-      if (selectedIndustries.length < 3) {
-        selectedIndustries.push(industry)
-      } else {
-        wx.showToast({ title: '最多选择3个行业', icon: 'none' })
-        return
-      }
+      wx.showToast({ title: '最多选择3个行业', icon: 'none' })
+      return
     }
+  }
     
-    this.setData({ selectedIndustries })
+  // 计算选中集合用于WXML
+  const selectedSet = {}
+  selectedIndustries.forEach(item => { selectedSet[item] = true })
+    
+  this.setData({ selectedIndustries, selectedSet })
   },
 
   pickProvince() {

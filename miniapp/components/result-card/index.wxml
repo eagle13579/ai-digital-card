@@ -14,7 +14,7 @@
     </view>
     <text class="result-card-company" wx:if="{{company || title}}">{{company}}{{company && title ? ' · ' : ''}}{{title}}</text>
     <view class="result-card-tags" wx:if="{{tags && tags.length > 0}}">
-      <text class="result-card-tag" wx:for="{{tags.slice(0, 3)}}" wx:key="index">{{item}}</text>
+      <text class="result-card-tag" wx:for="{{displayTags}}" wx:key="index">{{item}}</text>
     </view>
     <text class="result-card-extra" wx:if="{{extra}}">{{extra}}</text>
   </view>

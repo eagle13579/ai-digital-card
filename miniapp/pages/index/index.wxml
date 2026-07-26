@@ -72,21 +72,21 @@
         <text class="more">{{sceneModeExpanded ? _t.collapse : _t.expand}}</text>
       </view>
       <view wx:if="{{sceneModeExpanded}}" class="scene-mode-content">
-        <view class="scene-option {{sceneMode === 'personal' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="personal">
+        <view class="scene-option {{sceneMode == 'personal' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="personal">
           <view class="scene-icon">◉</view>
           <view>
             <text class="scene-label">{{_t.personalScene}}</text>
             <text class="scene-desc">{{_t.personalSceneDesc}}</text>
           </view>
         </view>
-        <view class="scene-option {{sceneMode === 'business' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="business">
+        <view class="scene-option {{sceneMode == 'business' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="business">
           <view class="scene-icon">◆</view>
           <view>
             <text class="scene-label">{{_t.businessScene}}</text>
             <text class="scene-desc">{{_t.businessSceneDesc}}</text>
           </view>
         </view>
-        <view class="scene-option {{sceneMode === 'social' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="social">
+        <view class="scene-option {{sceneMode == 'social' ? 'active' : ''}}" bindtap="selectSceneMode" data-mode="social">
           <view class="scene-icon">●</view>
           <view>
             <text class="scene-label">{{_t.socialScene}}</text>
@@ -134,8 +134,8 @@
       <view class="platform-recommend-list">
         <view class="platform-rec-item" wx:for="{{platformRecommend}}" wx:key="id"
           data-id="{{item.id}}" bindtap="goPlatformDetail">
-          <view class="platform-rec-rank {{item.rank === 1 ? 'rank-gold' : ''}}">
-            <text wx:if="{{item.rank === 1}}">👑</text>
+          <view class="platform-rec-rank {{item.rank == 1 ? 'rank-gold' : ''}}">
+            <text wx:if="{{item.rank == 1}}">👑</text>
             <text wx:else>{{item.rank}}</text>
           </view>
           <view class="platform-rec-logo">
@@ -144,7 +144,7 @@
           <view class="platform-rec-info">
             <view class="platform-rec-name-row">
               <text class="platform-rec-name">{{item.name}}</text>
-              <text class="platform-rec-tag" wx:if="{{item.rank === 1}}">{{_t.officialTag}}</text>
+              <text class="platform-rec-tag" wx:if="{{item.rank == 1}}">{{_t.officialTag}}</text>
             </view>
             <text class="platform-rec-desc">{{item.resourceCount}} {{_t.resourceUnits}}</text>
           </view>
@@ -162,7 +162,7 @@
       <view class="trust-summary">
         <text class="trust-count">{{trustCount}}位信任伙伴</text>
         <view class="trust-avatars" wx:if="{{trustList.length > 0}}">
-          <image class="trust-avatar" wx:for="{{trustList.slice(0, 5)}}" wx:key="id"
+          <image class="trust-avatar" wx:for="{{trustListDisplay}}" wx:key="id"
             src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
           <view class="trust-more" wx:if="{{trustCount > 5}}">+{{trustCount - 5}}</view>
         </view>
@@ -176,14 +176,14 @@
         <text class="more" bindtap="goMatch">{{_t.viewAll}}</text>
       </view>
       <view class="recommend-list">
-        <view class="recommend-item" wx:for="{{recommendList.slice(0, 3)}}" wx:key="id"
+        <view class="recommend-item" wx:for="{{recommendList}}" wx:key="id"
           data-id="{{item.id}}" bindtap="goMatchDetail">
           <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="rec-avatar" />
           <view class="rec-info">
             <text class="rec-name">{{item.name}}</text>
             <text class="rec-company">{{item.company}}</text>
             <view class="rec-tags" wx:if="{{item.commonTags}}">
-              <text class="rec-tag" wx:for="{{item.commonTags.slice(0, 2)}}" wx:key="index">{{item}}</text>
+              <text class="rec-tag" wx:for="{{item.displayTags}}" wx:key="index">{{item}}</text>
             </view>
           </view>
           <view class="rec-score">

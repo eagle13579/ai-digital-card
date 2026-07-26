@@ -14,17 +14,17 @@
 
     <!-- 状态筛选 -->
     <view class="filter-tabs">
-      <view class="filter-tab {{filterStatus === 'all' ? 'active' : ''}}" data-status="all" bindtap="filterByStatus">全部</view>
-      <view class="filter-tab {{filterStatus === 'running' ? 'active' : ''}}" data-status="running" bindtap="filterByStatus">运行中</view>
-      <view class="filter-tab {{filterStatus === 'completed' ? 'active' : ''}}" data-status="completed" bindtap="filterByStatus">已完成</view>
-      <view class="filter-tab {{filterStatus === 'paused' ? 'active' : ''}}" data-status="paused" bindtap="filterByStatus">已暂停</view>
-      <view class="filter-tab {{filterStatus === 'draft' ? 'active' : ''}}" data-status="draft" bindtap="filterByStatus">草稿</view>
+      <view class="filter-tab {{filterStatus == 'all' ? 'active' : ''}}" data-status="all" bindtap="filterByStatus">全部</view>
+      <view class="filter-tab {{filterStatus == 'running' ? 'active' : ''}}" data-status="running" bindtap="filterByStatus">运行中</view>
+      <view class="filter-tab {{filterStatus == 'completed' ? 'active' : ''}}" data-status="completed" bindtap="filterByStatus">已完成</view>
+      <view class="filter-tab {{filterStatus == 'paused' ? 'active' : ''}}" data-status="paused" bindtap="filterByStatus">已暂停</view>
+      <view class="filter-tab {{filterStatus == 'draft' ? 'active' : ''}}" data-status="draft" bindtap="filterByStatus">草稿</view>
     </view>
 
     <!-- 实验列表 -->
     <view class="experiment-list">
       <view class="experiment-card" wx:for="{{experiments}}" wx:key="id"
-        wx:if="{{filterStatus === 'all' || item.status === filterStatus}}"
+        wx:if="{{filterStatus == 'all' || item.status == filterStatus}}"
         data-id="{{item.id}}" bindtap="viewDetail">
         <!-- 头部 -->
         <view class="exp-header">
@@ -46,7 +46,7 @@
               <text class="variant-value" wx:if="{{item.conversion > 0}}">{{item.conversion}}%</text>
             </view>
             <view class="variant-bar-track">
-              <view class="variant-bar" style="width:{{item.conversion > 0 ? (item.conversion / 30 * 100) : 0}}%;background:{{item.winner === 'B' && index === 1 ? 'linear-gradient(90deg,#0EA5E9,#22C55E)' : 'linear-gradient(90deg,#8b5cf6,#0EA5E9)'}}"></view>
+              <view class="variant-bar" style="width:{{item.conversion > 0 ? (item.conversion / 30 * 100) : 0}}%;background:{{item.winner == 'B' && index == 1 ? 'linear-gradient(90deg,#0EA5E9,#22C55E)' : 'linear-gradient(90deg,#8b5cf6,#0EA5E9)'}}"></view>
             </view>
             <view class="variant-stats">
               <text class="variant-traffic">{{item.traffic}}% 流量</text>
@@ -64,7 +64,7 @@
     </view>
 
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{experiments.length === 0}}">
+    <view class="empty-state" wx:if="{{experiments.length == 0}}">
       <text class="empty-icon">🧪</text>
       <text class="empty-text">暂无实验数据</text>
       <button class="btn-primary small" bindtap="createExperiment">创建实验</button>

@@ -6,7 +6,7 @@
     <view class="glass-card-body">
       <view class="type-tabs">
         <view 
-          class="type-tab {{type === item.id ? 'active' : ''}}" 
+          class="type-tab {{type == item.id ? 'active' : ''}}" 
           wx:for="{{types}}" wx:key="id"
           data-type="{{item.id}}" bindtap="onTypeChange">
           {{item.name}}
@@ -15,7 +15,7 @@
       
       <view class="subtype-chips">
         <view 
-          class="subtype-chip {{subtype === st ? 'active' : ''}}" 
+          class="subtype-chip {{subtype == st ? 'active' : ''}}" 
           wx:for="{{currentSubtypes}}" wx:key="*this"
           wx:for-item="st"
           data-subtype="{{st}}" bindtap="onSubtypeChange">
