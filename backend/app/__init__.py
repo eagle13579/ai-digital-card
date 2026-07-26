@@ -102,6 +102,7 @@ def create_app():
         get_metrics_instance,
         init_otel,
         SentryExceptionMiddleware,
+        DetailToMessageMiddleware,
     )
     from app.middleware.api_version import APIVersionRedirectMiddleware
 
@@ -134,6 +135,7 @@ def create_app():
     app.add_middleware(CsrfMiddleware)
     # Sentry 异常捕获中间件 — 兜底捕获所有未处理异常并上报 Sentry
     app.add_middleware(SentryExceptionMiddleware)
+    app.add_middleware(DetailToMessageMiddleware)
     app.add_middleware(LoggingMiddleware)
 
     # FastAPI 集成 (OpenTelemetry) — instrument_app 会在内部跳过若未初始化
@@ -190,6 +192,8 @@ def create_app():
     from app.routers.cloak_scraper import router as cloak_scraper_router
     from app.routers.progressive_search_router import router as progressive_search_router
     from app.routers.task_slicer_router import router as task_slicer_router
+    # ── Crawlee 名片爬虫服务 ──
+    from app.routers.crawlee_router import router as crawlee_router
     # ── F10 智能Agent指挥官调度层 ──
     from app.routers.commander_router import router as commander_router
     from app.routers.circuit_breaker_router import router as circuit_breaker_router
@@ -215,6 +219,20 @@ def create_app():
     from app.routers.checkpoint_router import router as checkpoint_router
     # ── F20 名片Agent准确率门禁 ──
     from app.routers.accuracy_gate_router import router as accuracy_gate_router
+    # ── Dify 工具插件 + 应用编排服务 ──
+    from app.routers.dify_tool_routes import router as dify_tool_router
+
+    # ── ds2api 服务模块 — SSE引擎 + 工具调用服务 ──
+    from services.sse_engine import SseEngineService, SSEStreamEngine, SSEParser
+    from services.tool_call_service import ToolCallService, ToolCallPipeline
+
+    # ── ds4 服务模块 — Engine-Session + 单工作者队列 ──
+    from services.ds4_engine_service import ModelEngine, InferenceSession
+    from services.ds4_worker_service import WorkerQueue
+
+    # ── DSX 白泽推理引擎 — 7大能力集成 ──
+    from services.dsx_service import register_dsx_routes, get_dsx_available
+    register_dsx_routes(app)
 
     # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
@@ -250,7 +268,7 @@ def create_app():
     app.include_router(tag_router)
     app.include_router(ai_assist_router)
     app.include_router(match_router)
-from app.routers.inference_gateway import router as inference_gateway_router
+    from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)
     app.include_router(card_alias_router)
@@ -293,6 +311,8 @@ from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(cloak_scraper_router)
     app.include_router(progressive_search_router)
     app.include_router(task_slicer_router)
+    # ── Crawlee 名片爬虫服务 ──
+    app.include_router(crawlee_router)
     app.include_router(circuit_breaker_router)
     # ── F11 分制-压缩流水线 ──
     app.include_router(compression_router)
@@ -318,6 +338,41 @@ from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(checkpoint_router)
     # ── F20 名片Agent准确率门禁 ──
     app.include_router(accuracy_gate_router)
+    # ── Dify 工具插件 + 应用编排服务 ──
+    app.include_router(dify_tool_router)
+    # ── F0 多AI Provider Driver 路由 ──
+    from app.ai.gateway.provider_router import router as provider_router
+    app.include_router(provider_router)
+
+    # ── ds2api 服务健康检查 ──
+    from fastapi import APIRouter
+    _ds2api_router = APIRouter(prefix="/api/v1/ds2api")
+
+    @_ds2api_router.get("/sse-engine/health")
+    async def ds2api_sse_health():
+        """SSE引擎服务健康检查"""
+        return {
+            "status": "ok",
+            "service": "sse_engine",
+            "version": "1.0.0",
+            "loaded": True,
+        }
+
+    @_ds2api_router.get("/tool-call/health")
+    async def ds2api_toolcall_health():
+        """工具调用服务健康检查"""
+        return {
+            "status": "ok",
+            "service": "tool_call_service",
+            "version": "1.0.0",
+            "loaded": True,
+        }
+
+    app.include_router(_ds2api_router)
+
+    # ── MiniMax AI 多模态 ──
+    from app.routers.minimax_router import router as minimax_router
+    app.include_router(minimax_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -417,6 +472,14 @@ from app.routers.inference_gateway import router as inference_gateway_router
             )
         except Exception as e:
             logger.warning("Redis 初始化失败（降级运行）: %s", e)
+
+        # 初始化多AI Provider Driver 注册表
+        try:
+            from app.ai.gateway.provider_manager import init_provider_drivers
+            init_provider_drivers()
+            logger.info("多AI Provider Driver 注册表初始化完成")
+        except Exception as e:
+            logger.warning("Provider Driver 初始化失败（降级运行）: %s", e)
 
     # Shutdown
     @app.on_event("shutdown")

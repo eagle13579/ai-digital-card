@@ -18,11 +18,6 @@ App({
     // 初始化离线缓存层 & 网络状态监听
     cache.initNetworkListener()
 
-    // 开发/测试阶段：总是从登录页开始（覆盖entryPagePath和旧token）
-    setTimeout(() => {
-      wx.reLaunch({ url: '/pages/login/index' })
-    }, 100)
-
     // 检查小程序更新
     this._checkUpdate()
   },
@@ -33,7 +28,7 @@ App({
     const currentRoute = pages.length > 0 ? pages[pages.length - 1].route : ''
     const state = this.getState()
     if (!state.isLoggedIn && currentRoute !== 'pages/login/index') {
-      wx.navigateTo({ url: '/pages/login/index' })
+      wx.redirectTo({ url: '/pages/login/index' })
     }
   },
 

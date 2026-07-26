@@ -54,6 +54,8 @@ from app.routers.decision_matrix_router import router as decision_matrix_router
 from app.routers.quality_router import router as quality_router
 # ── F20 名片Agent准确率门禁 ──
 from app.routers.accuracy_gate_router import router as accuracy_gate_router
+# ── F0 多AI Provider Driver 路由 ──
+from app.ai.gateway.provider_router import router as provider_router
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -110,4 +112,6 @@ __all__ = [
     "quality_router",
     # F20 名片Agent准确率门禁
     "accuracy_gate_router",
+    # F0 多AI Provider Driver 路由
+    "provider_router",
 ]

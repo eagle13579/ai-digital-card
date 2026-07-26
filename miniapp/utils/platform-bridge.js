@@ -4,7 +4,7 @@
  * 上层页面无需感知 useRealApi 开关变化。
  */
 const { platformApi, connectionApi } = require('./api')
-const { MockService } = require('../../utils/mockService')
+const { MockService } = require('./mockService')
 
 async function listPlatforms(params, useRealApi) {
   if (useRealApi) {

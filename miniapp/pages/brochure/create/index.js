@@ -706,6 +706,23 @@ Page({
     wx.showLoading({ title: '生成中...' })
     try {
       const fd = this.data.formData
+
+      // 检查是否使用模拟登录token，提示用户真实登录
+      const token = store.getState().token || ''
+      if (token.startsWith('mock_skip_login_')) {
+        wx.hideLoading()
+        wx.showModal({
+          title: '需要真实登录',
+          content: '你当前使用的是游客模式，创建名片需要微信授权登录。是否前往登录？',
+          success: (res) => {
+            if (res.confirm) {
+              wx.redirectTo({ url: '/pages/login/index' })
+            }
+          },
+        })
+        return
+      }
+
       Logger.info('画册创建页', '开始生成画册', {
         name: fd.name,
         company: fd.company,
@@ -870,8 +887,23 @@ Page({
       wx.hideLoading()
       console.error('[BrochureCreate] 提交失败详情:', err)
       Logger.error('画册创建页', '提交失败', err)
-      const errMsg = err.message || (err.data && err.data.message) || '提交失败'
-      wx.showToast({ title: errMsg, icon: 'none' })
+      
+      // 解析后端错误：FastAPI返回 {detail: "..."} 或 [{...}]
+      let errMsg = ''
+      if (typeof err === 'string') {
+        errMsg = err
+      } else if (err && err.detail) {
+        errMsg = Array.isArray(err.detail)
+          ? err.detail.map(d => d.msg || d.message || '').filter(Boolean).join('; ')
+          : err.detail
+      } else if (err && err.message) {
+        errMsg = err.message
+      } else if (err && err.data && err.data.message) {
+        errMsg = err.data.message
+      } else {
+        errMsg = '提交失败，请稍后重试'
+      }
+      wx.showToast({ title: errMsg, icon: 'none', duration: 3000 })
     }
   },
 })

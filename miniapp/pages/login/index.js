@@ -245,6 +245,9 @@ Page({
 
   // ======== 跳过登录（游客模式） ========
   skipLogin() {
+    // 生成一个本地 mock token，使首页守卫不会弹回登录页
+    const mockToken = 'mock_skip_login_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    store.setAuth(mockToken, { name: '游客', nickName: '游客' })
     wx.switchTab({ url: '/pages/index/index' })
   },
 

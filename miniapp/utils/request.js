@@ -11,15 +11,15 @@
 
 const store = require('./store')
 const cache = require('./cache')
+const CONFIG = require('../config')
 
-// API baseURL
-// 统一使用生产域名（https）
+// API baseURL — 从统一配置读取
 // 微信开发者工具中请勾选「不校验合法域名」：
 //   设置 → 项目设置 → 本地设置 → 不校验合法域名
-const API_BASE_URL = 'https://card.liankebao.top'
+const API_BASE_URL = CONFIG.API_BASE_URL
 
-// 请求超时时间(ms)
-const REQUEST_TIMEOUT = 8000
+// 请求超时时间(ms) — 从统一配置读取
+const REQUEST_TIMEOUT = CONFIG.API_TIMEOUT
 
 // HTTP状态码 → 用户提示
 const HTTP_ERROR_MAP = {
@@ -123,12 +123,13 @@ function request(method, url, data = {}, options = {}) {
 
         // ---- HTTP 层失败 ----
         if (statusCode === 401) {
-          // Token 过期 → 清除登录态 → 跳转登录页
-          store.logout()
+          // Token 无效 — 不清除登录态，让调用方决定如何处理
+          // 页面可以降级使用Mock数据，而不是被强制踢出
+          const errMsg = '登录验证失败，部分功能可能不可用'
           if (!options.noToast) {
-            wx.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
+            wx.showToast({ title: errMsg, icon: 'none', duration: 2000 })
           }
-          reject(body || { code: 401, message: '登录已过期' })
+          reject(body || { code: 401, message: '登录验证失败' })
         } else {
           const errMsg = HTTP_ERROR_MAP[statusCode]
             || (body && body.message)

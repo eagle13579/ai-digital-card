@@ -7,7 +7,9 @@
  * 
  * 参考: D:\AI询赋拆解\frontend\src\services\api.ts
  */
-const { get, post, put, del, API_BASE_URL } = require('./request')
+const { get, post, put, del } = require('./request')
+const CONFIG = require('../config')
+const API_BASE_URL = CONFIG.API_BASE_URL
 
 // ===== 认证模块 =====
 const authApi = {
@@ -341,7 +343,7 @@ const ocrApi = {
   scan(filePath) {
     return new Promise((resolve, reject) => {
       wx.uploadFile({
-        url: `${getApiBaseUrl()}/api/ocr/scan`,
+        url: `${API_BASE_URL}/api/ocr/scan`,
         filePath,
         name: 'file',
         header: {
@@ -365,13 +367,6 @@ const ocrApi = {
       })
     })
   },
-}
-
-/** 获取 API base URL */
-function getApiBaseUrl() {
-  const store = require('./store')
-  const state = store.getState()
-  return state.apiBaseUrl || 'http://192.168.7.48:8201'
 }
 
 /** 获取 token */

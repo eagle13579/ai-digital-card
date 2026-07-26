@@ -3,7 +3,7 @@
  * 根据 useRealApi 自动选择真实API或MockService
  */
 const { aiApi, matchApi, ocrApi } = require('./api')
-const { MockService } = require('../../utils/mockService')
+const { MockService } = require('./mockService')
 
 /** AI对话 — 发送消息 */
 async function chat(message, history, useRealApi) {
