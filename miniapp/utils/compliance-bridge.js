@@ -16,8 +16,8 @@ async function getTrustNetwork(useRealApi) {
   return useRealApi ? trustApi.getNetwork() : MockService.getTrustNetwork()
 }
 
-async function getVisitorStats(useRealApi) {
-  return useRealApi ? visitorApi.getStats() : MockService.getVisitorStats()
+async function getVisitorStats(useRealApi, brochureId) {
+  return useRealApi ? visitorApi.getStats(brochureId) : MockService.getVisitorStats(brochureId)
 }
 
 module.exports = { getProfile, getBrochures, getTrustNetwork, getVisitorStats }
