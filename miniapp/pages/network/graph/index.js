@@ -205,8 +205,8 @@ Page({
   initCanvas() {
     const query = wx.createSelectorQuery()
     query.select('#graphCanvas').node((res) => {
+      if (!res || !res.node) return
       const canvas = res.node
-      if (!canvas) return
 
       const ctx = canvas.getContext('2d')
 

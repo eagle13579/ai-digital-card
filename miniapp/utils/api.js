@@ -7,6 +7,7 @@
  * 
  * 参考: D:\AI询赋拆解\frontend\src\services\api.ts
  */
+const store = require('./store')
 const { get, post, put, del } = require('./request')
 const CONFIG = require('../config')
 const API_BASE_URL = CONFIG.API_BASE_URL
@@ -265,6 +266,9 @@ const paymentApi = {
 
 // ===== 平台/组织管理模块 =====
 const platformApi = {
+  create(data) {
+    return post('/api/business-card/platforms', data)
+  },
   list(keyword, skip, limit) {
     const params = {}
     if (keyword !== undefined) params.keyword = keyword

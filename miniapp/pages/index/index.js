@@ -211,7 +211,7 @@ Page({
 
       if (brochure) {
         this._fetchWithRetry(
-          () => MockService.getVisitorStats(),
+          () => MockService.getVisitorStats(brochure.id),
           { data: { total_visits: 0, total: 0 } },
         ).then(vStatsRes => {
           const vStats = vStatsRes && vStatsRes.data ? vStatsRes.data : vStatsRes
