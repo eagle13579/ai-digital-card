@@ -164,3 +164,79 @@ async def test_provider(req: TestProviderRequest):
     except Exception as exc:
         logger.exception("Failed to test provider")
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+# ======================================================================
+# free-claude-code Proxy 健康检查
+# ======================================================================
+
+
+class FreeClaudeProxyHealthResponse(BaseModel):
+    success: bool
+    proxy_url: str = "http://localhost:5080"
+    status: str = "unknown"
+    latency_ms: float | None = None
+    proxy_version: str | None = None
+    error: str | None = None
+
+
+_FREE_CLAUDE_PROXY_URL = os.getenv("FREE_CLAUDE_PROXY_URL", "http://localhost:5080")
+
+
+@router.get(
+    "/free-claude/health",
+    summary="Check free-claude-code proxy health",
+    description="Probe the local free-claude-code-proxy SSE microservice health endpoint. "
+                "Returns connectivity status, latency, and proxy version info.",
+    response_model=FreeClaudeProxyHealthResponse,
+)
+async def free_claude_proxy_health():
+    """GET /api/v1/providers/free-claude/health — Proxy 健康检查。
+
+    探测本地 free-claude-code-proxy 微服务 (:5080) 的 /health 端点。
+    用于监控面板和自动恢复脚本。
+    """
+    import httpx
+    import time
+
+    start = time.monotonic()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(f"{_FREE_CLAUDE_PROXY_URL}/health")
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+
+        if resp.status_code == 200:
+            data = resp.json()
+            return FreeClaudeProxyHealthResponse(
+                success=True,
+                proxy_url=_FREE_CLAUDE_PROXY_URL,
+                status="healthy",
+                latency_ms=round(elapsed_ms, 1),
+                proxy_version=data.get("version", "unknown"),
+            )
+        else:
+            return FreeClaudeProxyHealthResponse(
+                success=False,
+                proxy_url=_FREE_CLAUDE_PROXY_URL,
+                status="degraded",
+                latency_ms=round(elapsed_ms, 1),
+                error=f"HTTP {resp.status_code}: {resp.text[:200]}",
+            )
+    except httpx.ConnectError:
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+        return FreeClaudeProxyHealthResponse(
+            success=False,
+            proxy_url=_FREE_CLAUDE_PROXY_URL,
+            status="unreachable",
+            latency_ms=round(elapsed_ms, 1),
+            error=f"无法连接到 {_FREE_CLAUDE_PROXY_URL}。请运行: python scripts/run_free_claude_proxy.py",
+        )
+    except Exception as exc:
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+        return FreeClaudeProxyHealthResponse(
+            success=False,
+            proxy_url=_FREE_CLAUDE_PROXY_URL,
+            status="error",
+            latency_ms=round(elapsed_ms, 1),
+            error=str(exc),
+        )

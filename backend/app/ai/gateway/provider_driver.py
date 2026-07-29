@@ -345,6 +345,174 @@ class AnthropicDriver(ProviderDriver):
 
 
 # ======================================================================
+# free-claude-code Proxy Driver
+# ======================================================================
+
+
+class FreeClaudeProxyDriver(ProviderDriver):
+    """Provider Driver for free-claude-code-proxy SSE 微服务。
+
+    将 Anthropic Messages API 格式请求转发到本地的 free-claude-code-proxy
+    (http://localhost:5080)，由 proxy 完成 DeepSeek 上游 ↔ Anthropic 格式转换。
+
+    典型用途:
+        - AI名片前端通过此 Driver 直接调用 "Claude Code" 能力
+        - 无需 Anthropic API Key，通过本地 SSE proxy 中转
+        - 支持流式 (SSE) 和非流式响应
+    """
+
+    def __init__(
+        self,
+        proxy_url: str = "http://localhost:5080",
+        proxy_api_key: str = "free-claude-key",
+        upstream_key: str = "",
+        upstream_url: str = "https://api.deepseek.com/v1/chat/completions",
+        upstream_model: str = "deepseek-chat",
+        adapter: AIGatewayProtocol | None = None,
+    ) -> None:
+        self._proxy_url = proxy_url.rstrip("/")
+        self._proxy_api_key = proxy_api_key
+        self._upstream_key = upstream_key
+        self._upstream_url = upstream_url
+        self._upstream_model = upstream_model
+        self._adapter = adapter
+        self._connected: bool = False
+
+    @property
+    def name(self) -> str:
+        return "free-claude-proxy"
+
+    @property
+    def display_name(self) -> str:
+        return "Free Claude Code Proxy"
+
+    async def chat(self, request: AIRequest) -> AIResponse:
+        """通过 free-claude-code-proxy 发送聊天请求。
+
+        将 AIRequest 转为 Anthropic Messages API 格式，
+        通过 SSE proxy 转发到上游 (DeepSeek)，返回 AIResponse。
+        """
+        import httpx
+        import time
+
+        if self._adapter is not None:
+            return await self._adapter.chat(request)
+
+        # 构建 Anthropic Messages API 兼容请求体
+        messages = []
+        for msg in request.messages or []:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            messages.append({"role": role, "content": content})
+
+        if not messages:
+            messages = [{"role": "user", "content": request.prompt or "Hello"}]
+
+        payload: dict[str, Any] = {
+            "model": request.model or "claude-sonnet-4-20250514",
+            "max_tokens": request.max_tokens or 4096,
+            "messages": messages,
+            "stream": False,
+            "temperature": request.temperature or 0.7,
+        }
+        if request.system_prompt:
+            payload["system"] = [{"type": "text", "text": request.system_prompt}]
+        if request.tools:
+            payload["tools"] = request.tools
+
+        # 发送到本地 proxy
+        start = time.monotonic()
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(
+                f"{self._proxy_url}/v1/messages",
+                json=payload,
+                headers={
+                    "x-api-key": self._proxy_api_key,
+                    "Content-Type": "application/json",
+                },
+            )
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+
+        if resp.status_code != 200:
+            raise ConnectionError(
+                f"FreeClaudeProxy error {resp.status_code}: {resp.text[:500]}"
+            )
+
+        data = resp.json()
+
+        # 从 SSE 响应中提取文本
+        content = ""
+        if isinstance(data, dict):
+            content = data.get("content", [{}])[0].get("text", "") if data.get("content") else ""
+            if not content and "error" in data:
+                content = f"[Proxy Error] {data['error']}"
+
+        return AIResponse(
+            content=content,
+            model=payload["model"],
+            usage={
+                "prompt_tokens": len(str(payload)) // 4,
+                "completion_tokens": len(content) // 4,
+                "total_tokens": (len(str(payload)) + len(content)) // 4,
+            },
+            latency_ms=round(elapsed_ms, 1),
+            finish_reason="stop",
+            request_id=request.request_id,
+        )
+
+    async def test_connection(self) -> dict[str, Any]:
+        """通过 proxy 的 /health 端点测试连接。"""
+        import httpx
+        import time
+
+        start = time.monotonic()
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.get(f"{self._proxy_url}/health")
+            elapsed_ms = (time.monotonic() - start) * 1000.0
+
+            if resp.status_code == 200:
+                self._connected = True
+                data = resp.json()
+                return {
+                    "success": True,
+                    "latency_ms": round(elapsed_ms, 1),
+                    "proxy_version": data.get("version", "unknown"),
+                }
+            else:
+                return {
+                    "success": False,
+                    "latency_ms": round(elapsed_ms, 1),
+                    "error": f"HTTP {resp.status_code}: {resp.text[:200]}",
+                }
+        except httpx.ConnectError:
+            elapsed_ms = (time.monotonic() - start) * 1000.0
+            return {
+                "success": False,
+                "latency_ms": round(elapsed_ms, 1),
+                "error": f"无法连接到 free-claude-code-proxy ({self._proxy_url})",
+            }
+        except Exception as exc:
+            elapsed_ms = (time.monotonic() - start) * 1000.0
+            return {
+                "success": False,
+                "latency_ms": round(elapsed_ms, 1),
+                "error": str(exc),
+            }
+
+    def get_config(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "display_name": self.display_name,
+            "proxy_url": self._proxy_url,
+            "upstream_url": self._upstream_url,
+            "upstream_model": self._upstream_model,
+            "connected": self._connected,
+            "has_adapter": self._adapter is not None,
+        }
+
+
+# ======================================================================
 # Thread‑Local Driver Registry
 # ======================================================================
 

@@ -11,6 +11,11 @@
 
 import logging
 import os
+import sys
+sys.path.insert(0, r'D:\__archive\enterprise-rag')
+from baize_libs.cb_registry import get, Outcome
+
+CB = get('ai_card_api')
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +43,12 @@ class MatchingClient:
             logger.error("requests not installed, cannot call matching engine")
             return []
 
+        # 电路断路器检查
+        err = CB.check()
+        if err:
+            logger.warning("匹配引擎断路器拒绝: retry_after=%.1fs", err.retry_after)
+            return []
+
         payload = {"product": product, "need": need, "top_k": top_k}
         if user_id:
             payload["user_id"] = str(user_id)
@@ -50,24 +61,34 @@ class MatchingClient:
                 timeout=self._timeout,
             )
             if resp.status_code == 200:
+                CB.record(Outcome.Success)
                 data = resp.json()
                 return data.get("data", [])
             else:
+                CB.record(Outcome.Failure if resp.status_code >= 500 else Outcome.Success)
                 logger.error(f"Match API error: {resp.status_code} {resp.text[:200]}")
                 return []
         except requests.Timeout:
+            CB.record(Outcome.Failure)
             logger.error(f"Matching engine timeout ({self._timeout}s)")
             return []
         except requests.ConnectionError:
+            CB.record(Outcome.Failure)
             logger.error(f"Cannot connect to matching engine at {self.base_url}")
             return []
         except Exception as e:
+            CB.record(Outcome.Failure)
             logger.error(f"Match API failed: {e}")
             return []
 
     def feedback(self, product_id: int, action: str, user_id: int | None = None) -> bool:
         """记录反馈"""
         if not HAS_REQUESTS:
+            return False
+        # 电路断路器检查
+        err = CB.check()
+        if err:
+            logger.warning("匹配引擎断路器拒绝(反馈): retry_after=%.1fs", err.retry_after)
             return False
         try:
             payload = {"product_id": product_id, "action": action}
@@ -79,8 +100,11 @@ class MatchingClient:
                 headers=self._headers,
                 timeout=self._timeout,
             )
-            return resp.status_code == 200
+            success = resp.status_code == 200
+            CB.record(Outcome.Success if success else Outcome.Failure)
+            return success
         except Exception as e:
+            CB.record(Outcome.Failure)
             logger.error(f"Feedback failed: {e}")
             return False
 

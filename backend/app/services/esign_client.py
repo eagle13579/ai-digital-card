@@ -26,9 +26,14 @@ import hashlib
 import json
 import logging
 import os
+import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any
+sys.path.insert(0, r'D:\__archive\enterprise-rag')
+from baize_libs.cb_registry import get, Outcome
+
+CB = get('ai_card_api')
 
 import requests
 
@@ -202,6 +207,11 @@ class EsignClient:
         url = f"{self.host}{path}"
         headers = self._build_headers()
 
+        # 电路断路器检查
+        err = CB.check()
+        if err:
+            raise EsignError(f"断路器拒绝 {method} {path}: retry_after={err.retry_after:.1f}s")
+
         try:
             if files:
                 # 文件上传 — 使用 multipart/form-data
@@ -211,8 +221,10 @@ class EsignClient:
                 )
             else:
                 resp = self._session.request(method, url, params=params, json=json_data, headers=headers, timeout=30)
+            CB.record(Outcome.Success)
             return self._handle_response(resp)
         except requests.RequestException as e:
+            CB.record(Outcome.Failure)
             raise EsignError(f"API 请求失败 [{method} {path}]: {e}") from e
 
     @staticmethod

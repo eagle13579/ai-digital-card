@@ -28,10 +28,15 @@ Phase 3 实现: 信任网络 → 企盟匹配桥接
 import json
 import logging
 import os
+import sys
 from datetime import datetime
 from typing import Optional
 from urllib import request as urllib_request
 from urllib.error import URLError, HTTPError
+sys.path.insert(0, r'D:\__archive\enterprise-rag')
+from baize_libs.cb_registry import get, Outcome
+
+CB = get('ai_card_api')
 
 logger = logging.getLogger("chainke_bridge")
 
@@ -72,6 +77,12 @@ def _http_request(method: str, url: str, data: Optional[dict] = None,
         解析后的 JSON 响应 dict，或 None（请求失败）
     """
     try:
+        # 电路断路器检查
+        err = CB.check()
+        if err:
+            logger.warning("链客宝断路器拒绝: retry_after=%.1fs", err.retry_after)
+            return None
+
         body_bytes = None
         if data is not None:
             body_bytes = json.dumps(data, ensure_ascii=False).encode("utf-8")
@@ -93,11 +104,13 @@ def _http_request(method: str, url: str, data: Optional[dict] = None,
 
         with urllib_request.urlopen(req, timeout=timeout) as resp:
             resp_body = resp.read().decode("utf-8")
+            CB.record(Outcome.Success)
             if resp_body:
                 return json.loads(resp_body)
             return {"status": "ok", "code": 200}
 
     except HTTPError as e:
+        CB.record(Outcome.Failure if e.code in (429, 500, 502, 503, 504) else Outcome.Success)
         logger.warning("链客宝 HTTP 错误 [%s]: %s %s", e.code, url, e.reason)
         try:
             err_body = e.read().decode("utf-8")
@@ -106,12 +119,15 @@ def _http_request(method: str, url: str, data: Optional[dict] = None,
             pass
         return None
     except URLError as e:
+        CB.record(Outcome.Failure)
         logger.warning("链客宝不可达 [%s]: %s", url, e.reason)
         return None
     except json.JSONDecodeError as e:
+        CB.record(Outcome.Failure)
         logger.warning("链客宝响应解析失败: %s", e)
         return None
     except Exception as e:
+        CB.record(Outcome.Failure)
         logger.warning("链客宝请求异常 [%s]: %s", url, e)
         return None
 

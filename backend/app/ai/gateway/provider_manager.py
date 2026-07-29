@@ -103,6 +103,44 @@ def init_provider_drivers(
             "Set env var ANTHROPIC_API_KEY to enable."
         )
 
+    # ── free-claude-code Proxy Driver ─────────────────────────────
+    free_claude_proxy_url = os.environ.get(
+        "FREE_CLAUDE_PROXY_URL", "http://localhost:5080"
+    )
+    free_claude_api_key = os.environ.get("PROXY_API_KEY", "free-claude-key")
+    upstream_key = os.environ.get("UPSTREAM_KEY", "")
+    upstream_url = os.environ.get(
+        "UPSTREAM_URL", "https://api.deepseek.com/v1/chat/completions"
+    )
+    upstream_model = os.environ.get("UPSTREAM_MODEL", "deepseek-chat")
+
+    try:
+        from app.ai.gateway.provider_driver import FreeClaudeProxyDriver
+
+        driver = FreeClaudeProxyDriver(
+            proxy_url=free_claude_proxy_url,
+            proxy_api_key=free_claude_api_key,
+            upstream_key=upstream_key,
+            upstream_url=upstream_url,
+            upstream_model=upstream_model,
+        )
+        registry.register("free-claude-proxy", driver)
+        logger.info(
+            "FreeClaude Proxy Driver registered (proxy_url=%s, upstream=%s)",
+            free_claude_proxy_url,
+            upstream_model,
+        )
+    except ImportError as exc:
+        logger.warning(
+            "FreeClaude Proxy Driver registration skipped: %s. "
+            "Install httpx and fastapi to enable.",
+            exc,
+        )
+    except Exception as exc:
+        logger.warning(
+            "FreeClaude Proxy Driver registration failed: %s", exc
+        )
+
     # Log summary
     total = len(registry)
     if total == 0:

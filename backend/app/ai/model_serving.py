@@ -7,8 +7,13 @@
 """
 
 import logging
+import sys
 import time
 from typing import List, Optional
+sys.path.insert(0, r'D:\__archive\enterprise-rag')
+from baize_libs.cb_registry import get, Outcome
+
+CB = get('ai_card_api')
 
 import requests
 
@@ -37,6 +42,10 @@ class ModelServingClient:
 
     def _infer_mlx(self, texts: List[str]) -> Optional[List[List[float]]]:
         """调用本地 MLX 推理服务 (vLLM / llama.cpp 兼容格式)。"""
+        err = CB.check()
+        if err:
+            logger.warning("MLX 断路器拒绝: retry_after=%.1fs", err.retry_after)
+            return None
         try:
             resp = requests.post(
                 f"{self.mlx_base_url}/v1/embeddings",
@@ -45,6 +54,7 @@ class ModelServingClient:
             )
             resp.raise_for_status()
             data = resp.json()
+            CB.record(Outcome.Success)
             # 兼容多种返回格式
             if "data" in data:
                 embeddings = [d["embedding"] for d in sorted(data["data"], key=lambda x: x["index"])]
@@ -54,6 +64,7 @@ class ModelServingClient:
             logger.warning("MLX 返回格式未知: %s", list(data.keys()))
             return None
         except Exception as e:
+            CB.record(Outcome.Failure)
             logger.warning("MLX 推理失败 (%s)，尝试降级", e)
             return None
 
@@ -63,6 +74,10 @@ class ModelServingClient:
         """调用 HuggingFace Inference API。"""
         if not self.hf_api_token:
             logger.warning("未配置 HuggingFace API Token，跳过")
+            return None
+        err = CB.check()
+        if err:
+            logger.warning("HuggingFace 断路器拒绝: retry_after=%.1fs", err.retry_after)
             return None
         try:
             headers = {"Authorization": f"Bearer {self.hf_api_token}"}
@@ -75,10 +90,12 @@ class ModelServingClient:
             )
             resp.raise_for_status()
             data = resp.json()
+            CB.record(Outcome.Success)
             if isinstance(data, list) and len(data) > 0:
                 return data
             return None
         except Exception as e:
+            CB.record(Outcome.Failure)
             logger.warning("HuggingFace API 推理失败 (%s)，尝试降级", e)
             return None
 

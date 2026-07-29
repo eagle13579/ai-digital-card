@@ -6,11 +6,16 @@ import io
 import json
 import os
 import re
+import sys
 import uuid
 import logging
 import urllib.request
 import urllib.error
 from typing import Any, Dict, List, Optional, Tuple
+sys.path.insert(0, r'D:\__archive\enterprise-rag')
+from baize_libs.cb_registry import get, Outcome
+
+CB = get('ai_card_api')
 
 from app.services.dedup import (
     detect_duplicates,
@@ -495,18 +500,28 @@ def _call_deepseek_api(prompt: str) -> Optional[str]:
         method="POST",
     )
 
+    # 电路断路器检查
+    err = CB.check()
+    if err:
+        logger.warning("DeepSeek API 断路器拒绝: retry_after=%.1fs", err.retry_after)
+        return None
+
     try:
         with urllib.request.urlopen(req, timeout=DEEPSEEK_TIMEOUT) as resp:
             result = json.loads(resp.read().decode("utf-8"))
         content = result["choices"][0]["message"]["content"]
+        CB.record(Outcome.Success)
         return content
     except urllib.error.HTTPError as e:
+        CB.record(Outcome.Failure if e.code in (429, 500, 502, 503, 504) else Outcome.Success)
         logger.error(f"DeepSeek API HTTP 错误: {e.code} {e.reason}")
         return None
     except urllib.error.URLError as e:
+        CB.record(Outcome.Failure)
         logger.error(f"DeepSeek API 连接失败: {e.reason}")
         return None
     except (json.JSONDecodeError, KeyError, IndexError) as e:
+        CB.record(Outcome.Failure)
         logger.error(f"DeepSeek API 响应解析失败: {e}")
         return None
     except Exception as e:

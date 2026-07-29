@@ -344,6 +344,10 @@ def create_app():
     from app.ai.gateway.provider_router import router as provider_router
     app.include_router(provider_router)
 
+    # ── notification 行业动态推送路由 ──
+    from app.routers.notification_router import router as notification_router
+    app.include_router(notification_router)
+
     # ── ds2api 服务健康检查 ──
     from fastapi import APIRouter
     _ds2api_router = APIRouter(prefix="/api/v1/ds2api")

@@ -627,3 +627,24 @@ async def card_qrcode_alias(
 ):
     """获取名片二维码（别名路由 — 暂未实现 QR 码生成）"""
     raise HTTPException(status_code=501, detail="二维码生成功能暂未实现")
+
+
+# ── PLT 2-cycle enhanced matching ────────────────────────────
+@router.post("/plt-match")
+async def plt_enhanced_match(
+    user_id: int = Query(..., description="当前用户ID"),
+    top_k: int = Query(10, description="返回推荐数"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="只能查询自己的匹配")
+    from app.services.matching_engine import MatchEngine
+    candidates = await MatchEngine.get_daily_recommendations(db=db, current_user_id=user_id, limit=top_k)
+    if not candidates:
+        return {"matches": [], "plt_metadata": {"rounds": 1, "top_refined": 0}}
+    refined = await MatchEngine.plt_rerank(db=db, user_a_id=user_id, top_candidates=candidates)
+    return {
+        "matches": refined[:top_k],
+        "plt_metadata": {"rounds": 2, "top_refined": min(5, len(refined)), "plt_version": "1.0.0"},
+    }
