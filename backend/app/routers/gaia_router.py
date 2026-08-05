@@ -77,6 +77,7 @@ async def ingest_knowledge(
         tags=data.tags,
         confidence=data.confidence,
     )
+    await db.commit()
     return {
         "code": 200,
         "message": "知识已摄取",
@@ -134,6 +135,7 @@ async def ingest_feedback(
         source=data.source,
         comment=data.comment,
     )
+    await db.commit()
     return {
         "code": 200,
         "message": "反馈已记录" + (" 并生成知识" if knowledge else ""),
