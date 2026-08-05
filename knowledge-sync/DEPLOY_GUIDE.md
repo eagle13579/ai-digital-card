@@ -1,15 +1,28 @@
 # 盖娅知识库双向同步 — 本地电脑部署指南
 
-## 一、部署（只需做一次）
+## 一、部署（只需做一次，约1分钟）
 
-1. 把 `backend/scripts/gaia_sync_local.py` 复制到本地电脑任意目录（如 `D:\AI数智名片\scripts\`）
-2. 打开文件确认顶部路径配置正确：
+**推荐方式（v1.1 起）：直接复用本地已有的 AI数智名片 开发仓库**
+
+1. 本地 `D:\AI数智名片` 已是 git 仓库（开发仓库，GitHub 凭据已缓存）：
+   ```
+   cd D:\AI数智名片
+   git pull origin master
+   ```
+   然后复制 `backend\scripts\gaia_sync_local.py` 到 `D:\AI数智名片\scripts\` 即可。
+   （v1.1 脚本会自动复用 D:\AI数智名片 仓库，不再重新 clone）
+
+2. 或从服务器直接下载（公网可达）：
+   ```
+   powershell -Command "Invoke-WebRequest -Uri https://47.116.116.87/gaia_sync_local.py -OutFile D:/AI数智名片/scripts/gaia_sync_local.py -SkipCertificateCheck"
+   ```
+
+3. 打开文件确认顶部路径配置正确：
    ```python
    LOCAL_PALACE = Path(r"D:\向海容的知识库\wiki\wiki\记忆宫殿")
    LOCAL_ANALYSIS = Path(r"D:\AI数智名片\backend\analysis")
    LOCAL_PROJECT = Path(r"D:\AI数智名片")
    ```
-3. 确认本地已安装 git（`git --version`）
 
 ## 二、使用（每次本地开机后）
 
@@ -48,3 +61,9 @@ python gaia_sync_local.py --both
 
 服务器：`python3 backend/scripts/gaia_bidirectional_sync.py --check`
 本地：`python gaia_sync_local.py --check`
+
+## 六、v1.1 变更记录
+
+- 复用本地已有开发仓库（D:\AI数智名片）做 git 工作区，凭据已缓存，避免重新 clone 卡 SSH 认证
+- push/pull 强制在 master 分支操作，避免误推开发分支
+- 无本地仓库时仍自动 clone 到 knowledge-sync/（兼容旧场景）
