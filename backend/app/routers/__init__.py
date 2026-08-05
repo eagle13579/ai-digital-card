@@ -5,7 +5,6 @@ from app.routers.brochure import router as brochure_router
 from app.routers.tag import router as tag_router
 from app.routers.match import router as match_router
 from app.routers.match import brochure_alias_router
-from app.routers.match import card_alias_router
 from app.routers.visitor import router as visitor_router
 from app.routers.trust import router as trust_router
 from app.routers.i18n import router as i18n_router
@@ -38,24 +37,15 @@ from app.crm.crm_router import router as crm_router
 from app.routers.bot_router import router as bot_router
 from app.routers.document import router as document_router
 from app.routers.analytics import router as analytics_router
-from app.routers.platform_router import router as platform_router
-from app.routers.connection_router import router as connection_router
-from app.routers.ocr_router import router as ocr_router
-from app.routers.escrow_router import router as escrow_router
-from app.routers.progressive_search_router import router as progressive_search_router
-from app.routers.token_budget_router import router as token_budget_router
-# ── F12 Prompt分治模板库 ──
-from app.routers.prompt_router import router as prompt_router
-# ── F14 工具规则装饰器 ──
-from app.routers.tool_rules_router import router as tool_rules_router
-# ── F21 Agent化任务决策矩阵 ──
-from app.routers.decision_matrix_router import router as decision_matrix_router
-# ── F18 Agent质量评估看板 ──
-from app.routers.quality_router import router as quality_router
-# ── F20 名片Agent准确率门禁 ──
-from app.routers.accuracy_gate_router import router as accuracy_gate_router
-# ── F0 多AI Provider Driver 路由 ──
-from app.ai.gateway.provider_router import router as provider_router
+from app.routers.social_connect_router import router as social_connect_router
+from app.routers.resource_platform_router import router as resource_platform_router
+from app.routers.nfc import router as nfc_router
+from app.routers.token_pricing_router import router as token_pricing_router
+from app.routers.membership import router as membership_router
+from app.routers.health import router as health_router
+from app.routers.metrics_dashboard import router as metrics_dashboard_router
+from app.routers.health import router as health_router
+
 __all__ = [
     "ai_assist_router",
     "auth_router",
@@ -64,7 +54,6 @@ __all__ = [
     "tag_router",
     "match_router",
     "brochure_alias_router",
-    "card_alias_router",
     "visitor_router",
     "trust_router",
     "i18n_router",
@@ -96,22 +85,13 @@ __all__ = [
     "bot_router",
     "document_router",
     "analytics_router",
-    "platform_router",
-    "connection_router",
-    "ocr_router",
-    "escrow_router",
-    "progressive_search_router",
-    "token_budget_router",
-    # F12 Prompt分治模板库
-    "prompt_router",
-    # F14 工具规则装饰器
-    "tool_rules_router",
-    # F21 Agent化任务决策矩阵
-    "decision_matrix_router",
-    # F18 Agent质量评估看板
-    "quality_router",
-    # F20 名片Agent准确率门禁
-    "accuracy_gate_router",
-    # F0 多AI Provider Driver 路由
-    "provider_router",
+    "social_connect_router",
+    "resource_platform_router",
+    "nfc_router",
+    "token_pricing_router",
+    "membership_router",
+    "health_router",
+    "metrics_dashboard_router",
+
+    "health_router",
 ]

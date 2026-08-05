@@ -33,9 +33,9 @@ class ResourcePlatform(Base):
     updated_at: Mapped[int] = mapped_column(Integer, default=unixepoch, onupdate=unixepoch)
 
 
-class PlatformMember(Base):
-    """平台成员"""
-    __tablename__ = "platform_members"
+class ResourcePlatformMember(Base):
+    """资源平台成员"""
+    __tablename__ = "resource_platform_members"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     platform_id: Mapped[int] = mapped_column(Integer, ForeignKey("resource_platforms.id"), nullable=False)
@@ -43,7 +43,7 @@ class PlatformMember(Base):
     role: Mapped[str] = mapped_column(String(20), default="member", comment="secretary_general / secretariat / member")
     joined_at: Mapped[int] = mapped_column(Integer, default=unixepoch)
 
-    __table_args__ = (UniqueConstraint("platform_id", "user_id", name="uq_platform_user"),)
+    __table_args__ = (UniqueConstraint("platform_id", "user_id", name="uq_resource_platform_user"),)
 
 
 class PlatformOpportunity(Base):

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.models.resource_platform import (
-    PlatformMember,
+    ResourcePlatformMember,
     PlatformOpportunity,
     ResourcePlatform,
 )
@@ -68,7 +68,7 @@ class ResourcePlatformService:
         await db.flush()  # 获取 platform.id
 
         # 创建者自动成为秘书长
-        member = PlatformMember(
+        member = ResourcePlatformMember(
             platform_id=platform.id,
             user_id=creator_id,
             role="secretary_general",
@@ -102,10 +102,10 @@ class ResourcePlatformService:
         # 子查询: 各平台成员数
         member_count_subq = (
             select(
-                PlatformMember.platform_id,
-                func.count(PlatformMember.id).label("member_count"),
+                ResourcePlatformMember.platform_id,
+                func.count(ResourcePlatformMember.id).label("member_count"),
             )
-            .group_by(PlatformMember.platform_id)
+            .group_by(ResourcePlatformMember.platform_id)
             .subquery()
         )
 
@@ -187,8 +187,8 @@ class ResourcePlatformService:
 
         # 成员数
         result = await db.execute(
-            select(func.count(PlatformMember.id)).where(
-                PlatformMember.platform_id == platform_id
+            select(func.count(ResourcePlatformMember.id)).where(
+                ResourcePlatformMember.platform_id == platform_id
             )
         )
         member_count = result.scalar() or 0
@@ -239,10 +239,10 @@ class ResourcePlatformService:
         """
         # 验证权限
         result = await db.execute(
-            select(PlatformMember).where(
-                PlatformMember.platform_id == platform_id,
-                PlatformMember.user_id == user_id,
-                PlatformMember.role == "secretary_general",
+            select(ResourcePlatformMember).where(
+                ResourcePlatformMember.platform_id == platform_id,
+                ResourcePlatformMember.user_id == user_id,
+                ResourcePlatformMember.role == "secretary_general",
             )
         )
         if result.scalars().first() is None:
@@ -308,8 +308,8 @@ class ResourcePlatformService:
 
         # 检查成员上限
         result = await db.execute(
-            select(func.count(PlatformMember.id)).where(
-                PlatformMember.platform_id == platform_id
+            select(func.count(ResourcePlatformMember.id)).where(
+                ResourcePlatformMember.platform_id == platform_id
             )
         )
         current_count = result.scalar() or 0
@@ -318,9 +318,9 @@ class ResourcePlatformService:
 
         # 检查是否已加入
         result = await db.execute(
-            select(PlatformMember).where(
-                PlatformMember.platform_id == platform_id,
-                PlatformMember.user_id == user_id,
+            select(ResourcePlatformMember).where(
+                ResourcePlatformMember.platform_id == platform_id,
+                ResourcePlatformMember.user_id == user_id,
             )
         )
         if result.scalars().first() is not None:
@@ -344,7 +344,7 @@ class ResourcePlatformService:
                     f"用户 {user_id} 加入平台 {platform_id} 需支付年费 {platform.annual_fee}分"
                 )
 
-        member = PlatformMember(
+        member = ResourcePlatformMember(
             platform_id=platform_id,
             user_id=user_id,
             role="member",
@@ -377,24 +377,24 @@ class ResourcePlatformService:
         """
         # 角色排序: 秘书长排最前，然后是秘书处，最后是会员
         role_order = case(
-            (PlatformMember.role == "secretary_general", 0),
-            (PlatformMember.role == "secretariat", 1),
+            (ResourcePlatformMember.role == "secretary_general", 0),
+            (ResourcePlatformMember.role == "secretariat", 1),
             else_=2,
         )
 
         # 总量
         total_result = await db.execute(
-            select(func.count(PlatformMember.id)).where(
-                PlatformMember.platform_id == platform_id
+            select(func.count(ResourcePlatformMember.id)).where(
+                ResourcePlatformMember.platform_id == platform_id
             )
         )
         total = total_result.scalar() or 0
 
         query = (
-            select(PlatformMember, User.name, User.company)
-            .join(User, PlatformMember.user_id == User.id)
-            .where(PlatformMember.platform_id == platform_id)
-            .order_by(role_order, PlatformMember.joined_at)
+            select(ResourcePlatformMember, User.name, User.company)
+            .join(User, ResourcePlatformMember.user_id == User.id)
+            .where(ResourcePlatformMember.platform_id == platform_id)
+            .order_by(role_order, ResourcePlatformMember.joined_at)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )
@@ -441,8 +441,8 @@ class ResourcePlatformService:
 
         # 成员数
         result = await db.execute(
-            select(func.count(PlatformMember.id)).where(
-                PlatformMember.platform_id == platform_id
+            select(func.count(ResourcePlatformMember.id)).where(
+                ResourcePlatformMember.platform_id == platform_id
             )
         )
         member_count = result.scalar() or 0
@@ -494,21 +494,21 @@ class ResourcePlatformService:
         # 成员资源排名（按各成员发布的商机数排名）
         result = await db.execute(
             select(
-                PlatformMember.user_id,
+                ResourcePlatformMember.user_id,
                 User.name,
                 User.company,
                 func.count(PlatformOpportunity.id).label("opportunity_count"),
             )
-            .join(User, PlatformMember.user_id == User.id)
+            .join(User, ResourcePlatformMember.user_id == User.id)
             .outerjoin(
                 PlatformOpportunity,
                 and_(
                     PlatformOpportunity.platform_id == platform_id,
-                    PlatformOpportunity.creator_id == PlatformMember.user_id,
+                    PlatformOpportunity.creator_id == ResourcePlatformMember.user_id,
                 ),
             )
-            .where(PlatformMember.platform_id == platform_id)
-            .group_by(PlatformMember.user_id, User.name, User.company)
+            .where(ResourcePlatformMember.platform_id == platform_id)
+            .group_by(ResourcePlatformMember.user_id, User.name, User.company)
             .order_by(func.count(PlatformOpportunity.id).desc())
         )
         member_ranking = [
@@ -567,9 +567,9 @@ class ResourcePlatformService:
 
         # 检查发布者是否为平台成员
         result = await db.execute(
-            select(PlatformMember).where(
-                PlatformMember.platform_id == platform_id,
-                PlatformMember.user_id == creator_id,
+            select(ResourcePlatformMember).where(
+                ResourcePlatformMember.platform_id == platform_id,
+                ResourcePlatformMember.user_id == creator_id,
             )
         )
         if result.scalars().first() is None:
@@ -677,9 +677,9 @@ class ResourcePlatformService:
             dict or None: {role, joined_at} 或 None（非成员）
         """
         result = await db.execute(
-            select(PlatformMember).where(
-                PlatformMember.platform_id == platform_id,
-                PlatformMember.user_id == user_id,
+            select(ResourcePlatformMember).where(
+                ResourcePlatformMember.platform_id == platform_id,
+                ResourcePlatformMember.user_id == user_id,
             )
         )
         pm = result.scalars().first()
