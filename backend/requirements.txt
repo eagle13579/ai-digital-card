@@ -46,3 +46,4 @@ sentry-sdk>=2.0.0
 
 # ── CloakBrowser 智能爬虫 ──────────────────────────────────
 cloakbrowser>=0.1.0
+pdf-inspector>=0.1.0
