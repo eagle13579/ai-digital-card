@@ -62,13 +62,20 @@ def psql_query(sql: str, timeout: int = 60) -> subprocess.CompletedProcess:
 
 
 def git_pull():
-    """从 GitHub 拉取仓库最新（含本地推送的知识）"""
-    # 先 stash 未提交的脚本改动（避免 pull rebase 冲突）
-    run(["git", "-C", str(REPO_DIR), "stash", "--include-untracked"], timeout=60)
-    r = run(["git", "-C", str(REPO_DIR), "pull", "origin", "master", "--rebase"])
+    """从 GitHub 拉取仓库最新（含本地推送的知识）
+
+    只更新 knowledge-sync/ 同步目录，绝不 stash/pop 项目代码：
+    旧实现 stash --include-untracked → pull --rebase → stash pop 会把
+    未提交的项目代码也卷入，pop 冲突时把冲突标记写进生产代码
+    （曾导致 backend/app/* 6 个文件 UU 冲突，服务存在 SyntaxError 风险）。
+    """
+    r = run(["git", "-C", str(REPO_DIR), "fetch", "origin"], timeout=120)
     if r.returncode != 0:
-        r = run(["git", "-C", str(REPO_DIR), "pull", "origin", "main", "--rebase"])
-    run(["git", "-C", str(REPO_DIR), "stash", "pop"], timeout=60)
+        return r
+    # 用远端版本覆盖同步目录（本地推送的知识 / 服务器导出的知识都在此目录）
+    r = run(["git", "-C", str(REPO_DIR), "checkout", "origin/master", "--", SYNC_SUBDIR], timeout=60)
+    if r.returncode != 0:
+        r = run(["git", "-C", str(REPO_DIR), "checkout", "origin/main", "--", SYNC_SUBDIR], timeout=60)
     return r
 
 
