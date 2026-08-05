@@ -278,8 +278,8 @@ class GaiaEvolutionBrain:
                 weights_count=weights_count,
                 vector_index_size=vector_index_size,
                 duration_ms=elapsed_ms,
-                started_at=datetime.now(timezone.utc),
-                completed_at=datetime.now(timezone.utc),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                completed_at=datetime.now(timezone.utc).replace(tzinfo=None),
             )
             db.add(training_run)
             await db.flush()
@@ -333,8 +333,8 @@ class GaiaEvolutionBrain:
                 trigger=trigger,
                 duration_ms=elapsed_ms,
                 error_message=str(e),
-                started_at=datetime.now(timezone.utc),
-                completed_at=datetime.now(timezone.utc),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                completed_at=datetime.now(timezone.utc).replace(tzinfo=None),
             )
             db.add(training_run)
 

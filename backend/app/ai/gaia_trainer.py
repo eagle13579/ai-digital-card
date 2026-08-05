@@ -501,7 +501,7 @@ class GaiaTrainer:
         training_run = GaiaTrainingRun(
             status="running",
             trigger=trigger,
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         db.add(training_run)
         await db.flush()
@@ -548,7 +548,7 @@ class GaiaTrainer:
             training_run.weights_count = deployed
             training_run.vector_index_size = vector_index_size
             training_run.duration_ms = elapsed_ms
-            training_run.completed_at = datetime.now(timezone.utc)
+            training_run.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
             training_run.metrics = {
                 "knowledge_types": training_data["knowledge_types"],
                 "knowledge_sources": training_data["knowledge_sources"],
@@ -601,7 +601,7 @@ class GaiaTrainer:
             training_run.status = "failed"
             training_run.duration_ms = elapsed_ms
             training_run.error_message = str(e)
-            training_run.completed_at = datetime.now(timezone.utc)
+            training_run.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
             # 记录失败事件
             event = GaiaEvolutionEvent(
