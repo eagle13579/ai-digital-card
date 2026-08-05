@@ -1,0 +1,53 @@
+# 盖娅知识导出 20260805_1549
+# 来源: gaia_knowledge
+
+- id: 5136
+  type: insight
+  title: 测试：本地知识同步链路验证
+  content: |
+    # 测试：本地知识同步链路验证 / > 本文件模拟本地电脑 push 的知识，验证 服务器 pull → 盖娅导入 闭环 /  / ## 背景 / 验证双向同步机制：本地(Windows) → GitHub → 服务器 → 盖娅大脑 /  / ## 内容 / 这是一条测试知识，用于验证 knowledge-sync/local 目录的增量导入。 / 
+- id: 5149
+  type: pattern
+  title: 盖娅知识库双向增量同步机制落地
+  content: |
+    背景: 用户要求本地电脑开机后把最新成果双边同步, 之后只要有新的就同步两边。发现: 本地Windows无法直接SSH(8799是HTTP隧道), 本地记忆宫殿在D:\向海容的知识库\wiki\wiki\记忆宫殿, 服务器有knowledge_models.db备份4724条; API限流100/min; 数据库唯一索引uq_gaia_knowledge_source_id导致重复source_id写入触发500 Mock降级(实际是幂等保护)。方案: 复用ai-digital-card仓库knowledge-sync/目录作双向中转; 本地gaia_sync_local.py(Windows push记忆宫殿profiles/五池/analysis); 服务器gaia_bidirectional_sync.py(cron每15分钟pull导入+每小时export推送); sync_pull预查source_id幂等跳过; psql用PGPASSWORD env+-c参数避开密码特殊字符。效果: 端到端链路验证通过(本地知识→GitHub→服务器→盖娅大脑), 测试知识成功导入。教训: 双向同步用GitHub中转最可靠; 唯一索引冲突要优雅处理; psql参数化调用注意特殊字符。
+- id: 5150
+  type: pattern
+  title: 远程值守三线交付：本地同步部署就绪/九步法预跑/飞书命令表固化
+  content: |
+    远程分身完成三项收尾：(1)本地侧 gaia_sync_local.py 已就绪并通过飞书交付部署指引，服务器侧 crontab(15min pull + 1h export)运行正常，盖娅知识量 4823 条；(2)九步法自主学习 cron(每日02:00)已注册且手动预跑触发成功，依赖检查通过(API 200/skill就绪/采集脚本就绪)；(3)飞书快捷命令表(同步/九步法/巡检/反哺/重启/部署/日志)固化进 SOUL.md，实现消息即命令。模式：远程值守任务优先做'预验证'而非被动等定时结果，能提前暴露依赖问题。
+- id: 5151
+  type: pattern
+  title: 多模态DeepResearch双瓶颈与解耦感知-探索流水线
+  content: |
+    【洞察】Video-DeepResearch论文揭示多模态agent两大关键瓶颈：(1) modality bias——agent倾向绕过视觉工具直接走文本搜索；(2) parametric knowledge leakage——模型依赖内部记忆而非真正的工具增强执行。【方案】解耦感知-探索流水线：分阶段工具解锁(stage-wise tool unlocking)，强制先做穷尽式跨帧视觉锚定再做web检索；训练用SFT+GRPO两段式打破模仿学习天花板。【可复用】情报采集/多模态调研类agent应显式设计'先感知后探索'的流水线门禁，并监控工具调用率防止退化；32B-A3B紧凑架构达到64%准确率超越Claude-4.5-Sonnet，证明小模型+强流水线可胜过大模型。
+- id: 5152
+  type: pattern
+  title: 测试时扩展三结构regime与协议匹配报告
+  content: |
+    【洞察】Test-Time Scaling论文形式化推理LLM的测试时扩展为前缀树上的预算推理，区分三种结构regime：single-trajectory顺序扩展、leaf-level终端归约、prefix-level前缀扩展。三种算法统计结构、算账方式和失败模式都不同，不能混为一谈。【方案】评估对象应是整个推理系统而非单模型：端到端系统性能与候选库诊断(candidate-bank diagnostics)分离；报告必须协议匹配(protocol-matched)——报accuracy必须同时报推理协议与算力预算；可复现性区分精确重放与分布可复现。【可复用】盖娅模型评估/进化循环应记录推理协议(采样数/投票机制/验证器)而非只报分数，否则跨研究无法比较；可据此设计评估profile标准化报告模板。
+- id: 5153
+  type: insight
+  title: 共享本地记忆中枢memmy-agent
+  content: |
+    【洞察】memmy-agent(577★,TypeScript)是跨agent本地记忆中枢：给Claude Code/Codex/OpenClaw/Hermes等所有AI agent一个共享、完全受控的记忆与持久上下文，'所有AI记住同一个你'。【方案】本地hub模式：所有agent通过统一接口读写同一记忆存储，避免每个agent各自维护孤立上下文；用户完全掌控数据。【可复用】与盖娅记忆宫殿/知识反哺体系同构——验证了'集中式记忆中枢+多agent共享'是行业共识方向；可对比memmy-agent的接口设计优化盖娅双向同步与知识库API；Hermes Agent原生支持该生态，后续可接入联调。
+- id: 5154
+  type: pattern
+  title: TurnSight 回合级 hindsight 自蒸馏
+  content: |
+    【洞察】工具集成推理(TIR)的RL训练中，轨迹级监督粒度太粗无法做细粒度信用分配，token级监督又丢失工具交互的回合结构。TurnSight提出回合级hindsight自蒸馏：监督直接来自执行条件化hindsight，而非ground-truth答案或检索技能。 / 【方案】构造多个不同展望视野(lookahead horizon)的hindsight视图，通过跨视野方向一致性(cross-horizon directional agreement)筛选可靠监督；监督信号在兄弟rollout间归一化后自适应调节RL优势，保持原始优化方向。 / 【可复用】对Agent工具调用训练与反思机制设计有直接价值：用执行后回看构造稠密监督信号，叠加多视野一致性投票过滤噪声，比单一hindsight更稳健；可借鉴到盖娅agent的自我反思与偏好学习管线。
+- id: 5155
+  type: pattern
+  title: AI安全红队自动化平台模式
+  content: |
+    【洞察】T3MP3ST(5432★)是自主红队平台，本质是multi-agent offensive-security meta-harness；open-kritt(1393★)编排多个AI agent在代码中查找真实漏洞。两者共同趋势：安全测试从单agent脚本走向多agent编排的自主攻防元框架。 / 【方案】关键设计：多agent分工（侦察/攻击/验证/报告）+ 元框架统一编排 + 结果可复现验证。T3MP3ST用TypeScript实现跨平台harness，open-kritt聚焦代码库漏洞挖掘的agent编排。 / 【可复用】对AI数智名片/链客宝的安全测试自动化有直接借鉴：可构建多agent安全巡检编排——一个agent扫描依赖与配置、一个agent审计代码模式、一个agent验证利用路径，统一报告；也可用于盖娅知识库的代码资产安全扫描。
+- id: 5156
+  type: insight
+  title: 自托管多用户多智能体助手架构
+  content: |
+    【洞察】TencentCloud/Octop(687★,Python)是自托管AI助手，核心卖点是multi-user + multi-agent：一个实例服务多个用户，每个用户可拥有多个协作agent。相比单用户单agent的本地助手，这是企业级私有化部署的差异化形态。 / 【方案】自托管(数据不出域) + 多用户隔离 + 多agent协同三层架构；Python实现适合快速集成到现有FastAPI生态。 / 【可复用】与AI数智名片的私有化部署场景高度契合：可评估将多用户多agent能力作为企业版卖点；架构上复用现有FastAPI多租户设计，叠加agent管理子服务；链客宝也可借鉴多agent协同做会员运营自动化。
+- id: 5157
+  type: pattern
+  title: AI SRE AgenticOps 运维范式
+  content: |
+    【洞察】Flawless(862★,Python)提出AI SRE AgenticOps：用agent接管Kubernetes与云基础设施的运维，将传统告警-人工-修复流程升级为感知-诊断-自主修复闭环。 / 【方案】核心是agentic闭环：基础设施状态感知(metrics/events) → agent诊断根因 → 自主执行修复动作 → 验证恢复；Python实现运维agent编排。 / 【可复用】对服务器7x24值守体系(hermes-remote-gateway)有直接启发：当前watchdog是定时自愈，可演进为agentic诊断——服务异常时自动拉取日志、对比最近变更(git log)、定位根因并给出修复建议甚至自动回滚；先以诊断建议模式落地，再逐步开放自动修复权限。
