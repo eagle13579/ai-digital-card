@@ -1,5 +1,1 @@
-{
-  "navigationStyle": "custom",
-  "navigationBarTitleText": "AI生成",
-  "usingComponents": {}
-}
+{ "navigationBarTitleText": "AI生成", "usingComponents": {} }

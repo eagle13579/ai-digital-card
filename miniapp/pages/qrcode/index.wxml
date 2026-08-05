@@ -1,38 +1,13 @@
-<view class="page-wrap">
-  <!-- 卡片区域 -->
-  <view class="qrcode-card glass-tier-2">
-    <!-- 用户信息 -->
-    <view class="user-section">
-      <image wx:if="{{userAvatar}}" class="user-avatar" src="{{userAvatar}}" mode="aspectFill" />
-      <view wx:else class="user-avatar-placeholder">
-        <text class="avatar-emoji">👤</text>
-      </view>
-      <text class="user-name">{{userName || 'AI数智名片'}}</text>
-      <text class="user-desc">{{userCompany}}{{userCompany && userTitle ? ' · ' : ''}}{{userTitle}}</text>
+<view class="page-container qr-page">
+  <view class="qr-card">
+    <view class="qr-header">{{(brochure && brochure.title) || 'AI数智名片'}}</view>
+    <view class="qr-canvas-wrapper">
+      <!-- 真实API模式：显示后端生成的二维码图片 -->
+      <image wx:if="{{qrcodeImageUrl}}" src="{{qrcodeImageUrl}}" class="qr-image" mode="aspectFit"></image>
+      <!-- Mock模式：使用Canvas绘制模拟二维码 -->
+      <canvas wx:else type="2d" id="qrcodeCanvas" class="qr-canvas"></canvas>
     </view>
-
-    <!-- 二维码 -->
-    <view class="qrcode-section">
-      <view class="qrcode-wrapper">
-        <image wx:if="{{qrcodeUrl}}" class="qrcode-img" src="{{qrcodeUrl}}" mode="aspectFit" />
-        <view wx:else class="qrcode-placeholder">
-          <text class="placeholder-icon">📱</text>
-          <text class="placeholder-text">加载中...</text>
-        </view>
-      </view>
-      <text class="qrcode-tip">扫一扫上面的二维码，查看我的数智名片</text>
-    </view>
-  </view>
-
-  <!-- 操作按钮 -->
-  <view class="action-section">
-    <button class="action-btn primary-btn" bindtap="saveQRCode">
-      <text class="btn-icon">💾</text>
-      <text class="btn-text">保存到相册</text>
-    </button>
-    <button class="action-btn secondary-btn" bindtap="shareCard">
-      <text class="btn-icon">📤</text>
-      <text class="btn-text">分享名片</text>
-    </button>
+    <text class="qr-hint">扫一扫上面的二维码，查看我的画册</text>
+    <button class="btn-secondary small" bindtap="saveQR">保存二维码</button>
   </view>
 </view>

@@ -1,0 +1,61 @@
+/* Status Badge 状态标记 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-badge-dot {
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.status-badge-text {
+  font-weight: var(--weight-medium);
+}
+
+/* Size variants */
+.status-badge.size-small .status-badge-dot {
+  width: 7px;
+  height: 7px;
+}
+
+.status-badge.size-small .status-badge-text {
+  font-size: var(--text-xs);
+}
+
+.status-badge.size-medium .status-badge-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.status-badge.size-medium .status-badge-text {
+  font-size: var(--text-sm);
+}
+
+/* Status variants */
+.status-badge.status-online .status-badge-dot {
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+
+.status-badge.status-online .status-badge-text {
+  color: var(--success);
+}
+
+.status-badge.status-busy .status-badge-dot {
+  background: var(--warning);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.status-badge.status-busy .status-badge-text {
+  color: var(--warning);
+}
+
+.status-badge.status-offline .status-badge-dot {
+  background: var(--text-disabled);
+}
+
+.status-badge.status-offline .status-badge-text {
+  color: var(--text-tertiary);
+}

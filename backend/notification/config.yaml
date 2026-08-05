@@ -1,0 +1,44 @@
+# ────────────────────────────────────────────────────────────────────
+# 行业动态推送配置 — notification/config.yaml
+# 用于 UnifiedPushService 的后端初始化和推送模式路由。
+# ────────────────────────────────────────────────────────────────────
+
+# ── 推送渠道定义 ────────────────────────────────────────────────────
+# method: 支持 "stdout" | "telegram" | "email"
+# enabled: false 表示禁用该渠道（不会初始化后端）
+# 扩展字段由各后端识读:
+#   telegram: chatId, bot_token(优先取 TELEGRAM_BOT_TOKEN 环境变量)
+#   email:    to, from (from 默认 digest@resend.dev, api_key 取 RESEND_API_KEY 环境变量)
+channels:
+  - method: stdout
+    enabled: true
+
+  - method: telegram
+    enabled: false
+    chatId: ""                   # 需填写 Telegram Chat ID
+
+  - method: email
+    enabled: false
+    to: ""                       # 接收邮箱
+    from: "digest@resend.dev"    # 发件地址（需在 Resend 验证）
+
+# ── 推送模式路由 ────────────────────────────────────────────────────
+# 每种模式可独立启用/禁用，并指定使用的渠道列表。
+modes:
+  # 实时推送 — API 请求时即时发送（新匹配、新消息等）
+  realtime:
+    enabled: true
+    channels:
+      - stdout
+
+  # 定时推送 — 每日摘要 / 定时动态汇总
+  scheduled:
+    enabled: true
+    channels:
+      - stdout
+
+  # 主动拉取 — 用户查看名片时触发通知
+  pull:
+    enabled: true
+    channels:
+      - stdout

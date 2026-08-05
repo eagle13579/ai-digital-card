@@ -1,50 +1,26 @@
-import asyncio
-import html
 import json
-import logging
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-logger = logging.getLogger(__name__)
-
 from app.api_standards import PaginatedResponse, paginate_cursor
-from app.agents.agent_runtime import AgentRuntime
 from app.database import get_db
-from app.dependencies import get_agent_runtime
-from app.middleware.tenant import tenant_id_var
 from app.models.brochure import Brochure, Page
 from app.models.user import User
 from app.models.tag import UserTag
 from app.routers.auth import get_current_user
-from app.schemas import BrochureCreate, BrochureUpdate, BrochureResponse, PageSchema, VisibilityUpdate
+from app.schemas import BrochureCreate, BrochureUpdate, BrochureResponse, PageSchema
 from app.services.matching_engine import MatchEngine
 from app.services.brochure import BrochureService
-from sqlalchemy.orm import selectinload
 from app.ai.vector_search import VectorSearchEngine
 from app.services.media_service import MediaService
-from app.services.visibility_service import VisibilityService, VISIBILITY_LEVELS
 
-router = APIRouter(prefix="/api/v1/brochures", tags=["画册"])
-
-
-# ── 租户ID提取工具 ──────────────────────────────────────────
-def _get_tenant_id(request: Request) -> int | None:
-    """从请求中提取 tenant_id，优先 request.state，回退 ContextVar。"""
-    try:
-        tid = getattr(request.state, "tenant_id", None)
-        if tid is not None:
-            return int(tid)
-    except Exception:
-        pass
-    try:
-        return tenant_id_var.get()
-    except Exception:
-        return None
+router = APIRouter(prefix="/api/brochures", tags=["画册"])
 
 
 # ── 用途推荐模板配置 ──────────────────────────────────
@@ -213,25 +189,16 @@ async def create_brochure(
     data: BrochureCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    agent_runtime: AgentRuntime = Depends(get_agent_runtime),
-    request: Request = None,
 ):
     """创建画册"""
     brochure = Brochure(
         user_id=current_user.id,
-        title=html.escape(data.title),
-        cover=html.escape(data.cover),
+        title=data.title,
+        cover=data.cover,
         purpose=data.purpose,
-        album_meta=html.escape(data.album_meta) if data.album_meta else None,
+        album_meta=data.album_meta,
         pages_count=len(data.pages),
     )
-    # 多租户：自动填充 tenant_id
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            brochure.tenant_id = tid
-    except Exception as exc:
-        logger.warning("租户ID填充失败（向后兼容）: %s", exc)
     db.add(brochure)
     await db.flush()
 
@@ -240,7 +207,7 @@ async def create_brochure(
             brochure_id=brochure.id,
             sort_order=page_data.sort_order or idx,
             content_type=page_data.content_type,
-            content=html.escape(page_data.content),
+            content=page_data.content,
             image_url=page_data.image_url,
             media_url=page_data.media_url or "",
             ai_summary=page_data.ai_summary,
@@ -248,26 +215,14 @@ async def create_brochure(
         db.add(page)
 
     await db.commit()
-
-    # 重新查询（含pages关系）
+    
+    # 重新查询以加载 pages 关系（避免 MissingGreenlet）
     result = await db.execute(
         select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure.id)
     )
     brochure = result.scalars().first()
     resp = BrochureResponse.model_validate(brochure)
-    resp.pages = [PageSchema.model_validate(p) for p in (brochure.pages or [])]
-
-    # 创建画册后自动触发匹配池（异步执行，不阻塞响应）
-    asyncio.create_task(_trigger_matching_pool(db, current_user.id))
-
-    # ── Agent: 异步通知 DesignQAAgent 做设计质量检查 ──
-    asyncio.create_task(_notify_design_qa_agent(
-        agent_runtime=agent_runtime,
-        brochure_id=brochure.id,
-        user_id=current_user.id,
-        pages_count=brochure.pages_count,
-    ))
-
+    resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
 
 
@@ -275,70 +230,16 @@ async def create_brochure(
 async def list_brochures(
     cursor: str | None = Query(None, description="分页游标（首次请求不传）"),
     page_size: int = Query(20, ge=1, le=100, description="每页条数"),
-    user_id: int | None = Query(None, description="按用户ID筛选（仅管理员可用）"),
+    user_id: int | None = Query(None, description="按用户ID筛选"),
     status: str | None = Query(None, description="按状态筛选(draft|published)"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    request: Request = None,
 ):
     """获取画册列表（cursor 分页）"""
     query = select(Brochure).options(selectinload(Brochure.pages))
-
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-
-    # 普通用户只能查看自己的画册，防止水平越权
-    if current_user.role == "admin":
-        if user_id:
-            query = query.where(Brochure.user_id == user_id)
-    else:
-        query = query.where(Brochure.user_id == current_user.id)
-
+    if user_id:
+        query = query.where(Brochure.user_id == user_id)
     if status:
         query = query.where(Brochure.status == status)
-    return await paginate_cursor(
-        db, query, cursor=cursor, page_size=page_size,
-        cursor_column=Brochure.id, response_model=BrochureResponse,
-    )
-
-
-@router.get("/visible", response_model=PaginatedResponse[BrochureResponse])
-async def get_visible_brochures(
-    cursor: str | None = Query(None, description="分页游标（首次请求不传）"),
-    page_size: int = Query(20, ge=1, le=100, description="每页条数"),
-    status: str | None = Query(None, description="按状态筛选(draft|published)"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    request: Request = None,
-):
-    """获取当前用户可见的画册列表（基于四级可见性权限系统）"""
-    from sqlalchemy import text
-
-    query = select(Brochure).options(selectinload(Brochure.pages))
-
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-
-    # 应用可见性过滤
-    where_sql, params = VisibilityService.build_visibility_filter(
-        viewer_id=current_user.id,
-        table_alias=Brochure.__tablename__,
-    )
-    query = query.where(text(where_sql).bindparams(**params))
-
-    if status:
-        query = query.where(Brochure.status == status)
-
     return await paginate_cursor(
         db, query, cursor=cursor, page_size=page_size,
         cursor_column=Brochure.id, response_model=BrochureResponse,
@@ -348,25 +249,13 @@ async def get_visible_brochures(
 @router.get("/{brochure_id}", response_model=BrochureResponse)
 async def get_brochure(
     brochure_id: int,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    request: Request = None,
 ):
     """获取画册详情（含页面数据）"""
-    query = select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权访问此画册")
 
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
@@ -379,9 +268,7 @@ async def get_brochure_by_share_token(
     db: AsyncSession = Depends(get_db),
 ):
     """通过分享token获取画册（公开访问）"""
-    result = await db.execute(
-        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.share_token == share_token)
-    )
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.share_token == share_token))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在或链接已失效")
@@ -401,19 +288,9 @@ async def update_brochure(
     data: BrochureUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    agent_runtime: AgentRuntime = Depends(get_agent_runtime),
-    request: Request = None,
 ):
     """更新画册"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -424,8 +301,6 @@ async def update_brochure(
     pages_data = update_data.pop("pages", None)
 
     for field, value in update_data.items():
-        if field in ("title", "cover", "album_meta"):
-            value = html.escape(value) if value else value
         setattr(brochure, field, value)
 
     if pages_data is not None:
@@ -440,7 +315,7 @@ async def update_brochure(
                 brochure_id=brochure.id,
                 sort_order=page_data.sort_order or idx,
                 content_type=page_data.content_type,
-                content=html.escape(page_data.content),
+                content=page_data.content,
                 image_url=page_data.image_url,
                 media_url=page_data.media_url or "",
                 ai_summary=page_data.ai_summary,
@@ -450,23 +325,9 @@ async def update_brochure(
         brochure.pages_count = len(pages_data)
 
     await db.commit()
-
-    # 重新查询（含pages关系）
-    result = await db.execute(
-        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
-    )
-    brochure = result.scalars().first()
+    await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
-
-    # ── Agent: 异步通知 DesignQAAgent 做设计质量检查 ──
-    asyncio.create_task(_notify_design_qa_agent(
-        agent_runtime=agent_runtime,
-        brochure_id=brochure.id,
-        user_id=current_user.id,
-        pages_count=brochure.pages_count,
-    ))
-
     return resp
 
 
@@ -475,18 +336,9 @@ async def delete_brochure(
     brochure_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    request: Request = None,
 ):
     """删除画册"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -503,18 +355,9 @@ async def publish_brochure(
     brochure_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    request: Request = None,
 ):
     """发布画册"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -525,50 +368,10 @@ async def publish_brochure(
     # 刷新分享token
     brochure.share_token = uuid.uuid4().hex[:16]
     await db.commit()
-
-    # 重新查询（含pages关系）
-    result = await db.execute(
-        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id)
-    )
-    brochure = result.scalars().first()
+    await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
-
-    # 发布画册后自动触发匹配池
-    asyncio.create_task(_trigger_matching_pool(db, current_user.id))
-
     return resp
-
-
-@router.get("/{brochure_id}/share-link")
-async def get_share_link(
-    brochure_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    request: Request = None,
-):
-    """获取画册分享链接（如无token则自动生成）"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权操作此画册")
-
-    if not brochure.share_token:
-        brochure.share_token = uuid.uuid4().hex[:16]
-        await db.commit()
-
-    share_link = f"/brochure/share/{brochure.share_token}"
-    return {"share_token": brochure.share_token, "share_link": share_link}
 
 
 @router.post("/{brochure_id}/refresh-token")
@@ -576,18 +379,9 @@ async def refresh_share_token(
     brochure_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-    request: Request = None,
 ):
     """刷新分享token"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
+    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="画册不存在")
@@ -597,123 +391,6 @@ async def refresh_share_token(
     brochure.share_token = uuid.uuid4().hex[:16]
     await db.commit()
     return {"share_token": brochure.share_token}
-
-
-# ── 可见性管理 ──────────────────────────────────────────
-
-
-class VisibilityResponse(BaseModel):
-    """可见性更新响应"""
-    brochure_id: int
-    visibility: str
-    message: str
-
-
-@router.put("/{brochure_id}/visibility", response_model=VisibilityResponse)
-async def update_brochure_visibility(
-    brochure_id: int,
-    data: VisibilityUpdate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    request: Request = None,
-):
-    """更新画册可见性级别: public(公开) / platform(平台) / network(关系网) / private(私有)"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    # 多租户过滤
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权修改此画册的可见性")
-
-    brochure.visibility = data.visibility
-    await db.commit()
-
-    return VisibilityResponse(
-        brochure_id=brochure.id,
-        visibility=brochure.visibility,
-        message=f"可见性已更新为: {data.visibility}",
-    )
-
-
-@router.get("/{brochure_id}/visibility")
-async def get_brochure_visibility(
-    brochure_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    request: Request = None,
-):
-    """获取画册的可见性设置"""
-    query = select(Brochure).where(Brochure.id == brochure_id)
-    try:
-        tid = _get_tenant_id(request) if request else None
-        if tid is not None:
-            query = query.where(Brochure.tenant_id == tid)
-    except Exception as exc:
-        logger.warning("租户过滤失败（向后兼容）: %s", exc)
-    result = await db.execute(query)
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权查看此画册的可见性")
-
-    return {
-        "brochure_id": brochure.id,
-        "visibility": brochure.visibility,
-        "visibility_label": {
-            "public": "公开 - 所有人可见",
-            "platform": "平台 - 同一企业成员可见",
-            "network": "关系网 - 已建联好友可见",
-            "private": "私有 - 仅自己可见",
-        }.get(brochure.visibility, brochure.visibility),
-        "valid_levels": VISIBILITY_LEVELS,
-    }
-
-
-@router.get("/visibility/levels")
-async def get_visibility_levels():
-    """获取所有可见性级别定义"""
-    return {
-        "levels": [
-            {"key": "public", "label": "公开", "description": "所有人可见"},
-            {"key": "platform", "label": "平台", "description": "同一平台/企业内成员可见"},
-            {"key": "network", "label": "关系网", "description": "已建联的好友可见"},
-            {"key": "private", "label": "私有", "description": "仅自己可见"},
-        ],
-    }
-
-
-# ── 匹配池自动触发 ──────────────────────────────────
-
-
-async def _trigger_matching_pool(db: AsyncSession, user_id: int) -> None:
-    """创建/发布画册后自动触发匹配池：计算该用户与其他用户的匹配度。
-
-    异步执行，不阻塞 API 响应。
-    使用独立会话以避免跨任务共享会话。
-    """
-    try:
-        from app.database import AsyncSessionLocal
-        from app.services.matching_engine import MatchEngine
-
-        async with AsyncSessionLocal() as session:
-            await MatchEngine.get_daily_recommendations(
-                db=session,
-                user_id=user_id,
-                limit=20,
-                min_score=0.1,
-            )
-            logger.info("匹配池已触发: user_id=%s", user_id)
-    except Exception as exc:
-        logger.warning("匹配池触发失败（降级）: user_id=%s, error=%s", user_id, exc)
 
 
 # ── 智能搜索（自然语言搜索名片）─────────────────────────────────────────
@@ -835,6 +512,156 @@ async def smart_search(
     )
 
 
+# ── 封面图片上传 ─────────────────────────────────────────────
+
+
+import os
+import logging
+from pathlib import Path
+from app.config import settings
+
+logger = logging.getLogger(__name__)
+
+
+class CoverUploadResponse(BaseModel):
+    url: str
+    original_name: str
+    size: int
+
+
+COVER_ALLOWED_EXTENSIONS: set[str] = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
+COVER_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+
+
+@router.post("/upload-cover", response_model=CoverUploadResponse)
+async def upload_cover(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """上传画册封面图片，返回可访问的 HTTPS URL
+
+    文件格式: jpg/jpeg/png/gif/webp/bmp
+    大小限制: 10MB
+    存储路径: uploads/covers/{uuid}.{ext}
+    返回URL:  https://card.liankebao.top/uploads/covers/{filename}
+    """
+    # 1. 验证扩展名
+    filename = file.filename or "cover.png"
+    ext = Path(filename).suffix.lower()
+    if ext not in COVER_ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的图片格式: {ext}，允许格式: {', '.join(sorted(COVER_ALLOWED_EXTENSIONS))}",
+        )
+
+    # 2. 验证 MIME 类型
+    content_type = file.content_type or ""
+    if content_type and not content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件类型错误: {content_type}，仅允许图片文件",
+        )
+
+    # 3. 检查大小
+    content = await file.read()
+    if len(content) > COVER_MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"图片文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {COVER_MAX_SIZE / 1024 / 1024:.0f}MB",
+        )
+
+    # 4. 保存文件
+    cover_dir = Path(settings.UPLOAD_DIR) / "covers"
+    cover_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    dest_path = cover_dir / safe_name
+    dest_path.write_bytes(content)
+
+    # 5. 返回可访问 URL
+    base = settings.BASE_URL.rstrip("/")
+    url = f"{base}/uploads/covers/{safe_name}"
+
+    logger.info(
+        "封面图片已上传: orig=%s, saved=%s, size=%d, user_id=%d",
+        file.filename, safe_name, len(content), current_user.id,
+    )
+
+    return CoverUploadResponse(
+        url=url,
+        original_name=file.filename or "",
+        size=len(content),
+    )
+
+
+# ── 文件上传 ─────────────────────────────────────────────
+
+
+class FileUploadResponse(BaseModel):
+    url: str
+    original_name: str
+    size: int
+
+
+FILE_ALLOWED_EXTENSIONS: set[str] = {".pdf", ".ppt", ".pptx", ".doc", ".docx", ".xls", ".xlsx", ".zip"}
+FILE_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+
+
+@router.post("/upload-file", response_model=FileUploadResponse)
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """上传资料文件（PDF/PPT/DOC/Excel/ZIP），返回可访问的 HTTPS URL
+
+    文件格式: pdf/ppt/pptx/doc/docx/xls/xlsx/zip
+    大小限制: 10MB
+    存储路径: uploads/files/{uuid}.{ext}
+    返回URL:  {BASE_URL}/uploads/files/{filename}
+    免费限制: 每个用户1个免费文件（TODO: 待实现配额检查）
+    """
+    # 1. 验证扩展名
+    filename = file.filename or "file.bin"
+    ext = Path(filename).suffix.lower()
+    if ext not in FILE_ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的文件格式: {ext}，允许格式: {', '.join(sorted(FILE_ALLOWED_EXTENSIONS))}",
+        )
+
+    # 2. 检查大小（先读内存再检查）
+    content = await file.read()
+    if len(content) > FILE_MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {FILE_MAX_SIZE / 1024 / 1024:.0f}MB",
+        )
+
+    # 3. 保存文件
+    file_dir = Path(settings.UPLOAD_DIR) / "files"
+    file_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    dest_path = file_dir / safe_name
+    dest_path.write_bytes(content)
+
+    # 4. 返回可访问 URL
+    base = settings.BASE_URL.rstrip("/")
+    url = f"{base}/uploads/files/{safe_name}"
+
+    # 5. 日志记录
+    logger.info(
+        "资料文件已上传: orig=%s, saved=%s, size=%d, user_id=%d",
+        file.filename, safe_name, len(content), current_user.id,
+    )
+
+    return FileUploadResponse(
+        url=url,
+        original_name=file.filename or "",
+        size=len(content),
+    )
+
+
 # ── 视频上传 ──────────────────────────────────────────────────
 
 
@@ -857,28 +684,6 @@ async def upload_video(
         transcode=True,
     )
     return VideoUploadResponse(**result)
-
-
-# ── 图片上传 ──────────────────────────────────────────────────
-
-
-class ImageUploadResponse(BaseModel):
-    url: str
-    original_name: str
-    size: int
-
-
-@router.post("/upload-image", response_model=ImageUploadResponse)
-async def upload_image(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
-):
-    """上传图片文件（jpg/png/webp，≤5MB），返回可访问的图片 URL"""
-    result = await MediaService.handle_image_upload(
-        file=file,
-        user_id=current_user.id,
-    )
-    return ImageUploadResponse(**result)
 
 
 @router.post("/batch-import")

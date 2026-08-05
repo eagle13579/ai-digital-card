@@ -1,0 +1,20 @@
+<!-- 错误边界 -->
+<view class="error-boundary">
+  <!-- 正常内容 -->
+  <view wx:if="{{!hasError}}">
+    <slot />
+  </view>
+
+  <!-- 错误降级 UI -->
+  <view class="error-boundary__fallback" wx:else>
+    <view class="error-boundary__icon">😵</view>
+    <text class="error-boundary__title">{{fallbackTitle}}</text>
+    <text class="error-boundary__desc">{{fallbackDesc}}</text>
+    <text class="error-boundary__detail" wx:if="{{errorInfo}}">{{errorInfo}}</text>
+    <button
+      class="error-boundary__btn"
+      wx:if="{{showRetry}}"
+      bindtap="onRetry"
+    >{{retryText}}</button>
+  </view>
+</view>

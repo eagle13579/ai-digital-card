@@ -1,115 +1,83 @@
-<view class="scan-page">
-  <!-- 顶部导航 -->
-  <view class="scan-header" style="padding-top: {{statusBarHeight}}px">
-    <view class="back-btn" bindtap="goBack">
-      <text class="icon">‹</text>
+<view class="page-container scan-page">
+  <view class="scan-guide" wx:if="{{!showResult && !showQrResult}}">
+    <text class="scan-icon">📷</text>
+    <text class="scan-text">拍摄或选择名片图片，AI自动识别</text>
+    <view class="scan-tip">本月剩余扫描次数：{{maxScans - scanCount}}/{{maxScans}}</view>
+    <button class="btn-primary" bindtap="takePhoto">拍照/选择图片</button>
+
+    <view class="scan-divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">或</text>
+      <view class="divider-line"></view>
     </view>
-    <view class="header-title">
-      <text class="title">名片扫描</text>
-      <text class="subtitle">AI智能识别 · 一键录入</text>
-    </view>
-    <view class="scan-badge">
-      <text>📷 拍照</text>
-    </view>
+
+    <view class="scan-icon">📱</view>
+    <text class="scan-text">扫描名片二维码/平台协议码</text>
+    <button class="btn-secondary" bindtap="scanQRCode">扫一扫</button>
   </view>
 
-  <!-- 扫描区域（未识别时显示） -->
-  <view class="scan-area" wx:if="{{!showResult && !analyzing}}">
-    <!-- AI原生暗色扫描框 — 渐变边框 + 四角标记 + 扫描线动画 -->
-    <view class="scan-frame" bindtap="onScan">
-      <!-- 四角装饰 -->
-      <view class="corner-tl"></view>
-      <view class="corner-tr"></view>
-      <view class="corner-bl"></view>
-      <view class="corner-br"></view>
-      <!-- 动态扫描线 -->
-      <view class="scan-line"></view>
-      <!-- 中心内容 -->
-      <view class="scan-camera-icon">📸</view>
-      <text class="scan-hint">点击选择名片照片</text>
-      <text class="scan-sub-hint">支持拍照或从相册选取</text>
-    </view>
-    <view class="scan-btn" bindtap="onScan">
-      <text class="scan-btn-text">选择名片照片</text>
-    </view>
+  <view class="scan-loading" wx:if="{{scanning}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">识别中...</text>
   </view>
 
-  <!-- 识别中 — AI分析动画（3层旋转Orb + spring动效） -->
-  <view class="analyzing-section" wx:if="{{analyzing}}">
-    <view class="analyzing-animation">
-      <view class="analyzing-orb">
-        <view class="analyzing-orb-glow"></view>
-        <view class="analyzing-ring analyzing-ring-1"></view>
-        <view class="analyzing-ring analyzing-ring-2"></view>
-        <view class="analyzing-ring analyzing-ring-3"></view>
-      </view>
-      <text class="analyzing-text">AI 智能识别中</text>
-      <text class="analyzing-hint">正在分析名片信息</text>
-      <text class="analyzing-confidence-text" wx:if="{{confidence}}">置信度 {{confidence}}%</text>
+  <!-- OCR 识别结果 -->
+  <view class="card" wx:if="{{showResult && result}}">
+    <view class="card-header">
+      <text class="title">📇 识别结果</text>
+      <text class="re-scan" bindtap="reScan">重新扫描</text>
     </view>
-  </view>
-
-  <!-- AI识别结果 -->
-  <view class="result-section" wx:if="{{showResult}}">
-    <view class="section-title">
-      <view class="accent-dot"></view>
-      <text>AI识别结果</text>
-      <text class="section-tag">{{confidence || 95}}% 匹配</text>
-    </view>
-    <view class="card-preview">
-      <view class="card-field">
-        <text class="field-label">姓名</text>
-        <text class="field-value {{!cardData.name ? 'field-empty' : ''}}">{{cardData.name || '未识别'}}</text>
+    <view class="card-body">
+      <view class="scan-field">
+        <text class="scan-label">姓名</text>
+        <input class="scan-input" placeholder="姓名" value="{{result.name}}" data-field="name" bindinput="editField" />
       </view>
-      <view class="card-field">
-        <text class="field-label">职位</text>
-        <text class="field-value {{!cardData.title ? 'field-empty' : ''}}">{{cardData.title || '未识别'}}</text>
+      <view class="scan-field">
+        <text class="scan-label">职位</text>
+        <input class="scan-input" placeholder="职位" value="{{result.title}}" data-field="title" bindinput="editField" />
       </view>
-      <view class="card-field">
-        <text class="field-label">公司</text>
-        <text class="field-value {{!cardData.company ? 'field-empty' : ''}}">{{cardData.company || '未识别'}}</text>
+      <view class="scan-field">
+        <text class="scan-label">公司</text>
+        <input class="scan-input" placeholder="公司" value="{{result.company}}" data-field="company" bindinput="editField" />
       </view>
-      <view class="card-field">
-        <text class="field-label">手机</text>
-        <text class="field-value {{!cardData.phone ? 'field-empty' : ''}}">{{cardData.phone || '未识别'}}</text>
+      <view class="scan-field">
+        <text class="scan-label">电话</text>
+        <input class="scan-input" placeholder="电话" value="{{result.phone}}" data-field="phone" bindinput="editField" />
       </view>
-      <view class="card-field">
-        <text class="field-label">邮箱</text>
-        <text class="field-value {{!cardData.email ? 'field-empty' : ''}}">{{cardData.email || '未识别'}}</text>
+      <view class="scan-field">
+        <text class="scan-label">邮箱</text>
+        <input class="scan-input" placeholder="邮箱" value="{{result.email}}" data-field="email" bindinput="editField" />
       </view>
-      <view class="card-field">
-        <text class="field-label">地址</text>
-        <text class="field-value {{!cardData.address ? 'field-empty' : ''}}">{{cardData.address || '未识别'}}</text>
-      </view>
-    </view>
-    <view class="result-actions">
-      <view class="action-btn save-btn" bindtap="onSave">
-        <text>保存到名片夹</text>
-      </view>
-      <view class="action-btn retry-btn" bindtap="onRetry">
-        <text>重新扫描</text>
+      <view class="scan-field">
+        <text class="scan-label">地址</text>
+        <input class="scan-input" placeholder="地址" value="{{result.address}}" data-field="address" bindinput="editField" />
       </view>
     </view>
   </view>
 
-  <!-- 扫描历史 -->
-  <view class="history-section" wx:if="{{!showResult && !analyzing}}">
-    <view class="section-title">
-      <view class="accent-dot"></view>
-      <text>最近扫描</text>
+  <view class="save-area" wx:if="{{showResult && result}}">
+    <button class="btn-primary" bindtap="saveCard">保存为名片</button>
+  </view>
+
+  <!-- 二维码扫码结果 -->
+  <view class="card" wx:if="{{showQrResult && qrResult}}">
+    <view class="card-header">
+      <text class="title">📱 扫码结果</text>
+      <text class="re-scan" bindtap="reScan">重新扫码</text>
     </view>
-    <view class="history-list" wx:if="{{scanHistory.length > 0}}">
-      <view class="history-item" wx:for="{{scanHistory}}" wx:key="index" data-item="{{item}}">
-        <view class="history-icon">📇</view>
-        <view class="history-info">
-          <text class="history-name">{{item.name}}</text>
-          <text class="history-company" wx:if="{{item.company}}">{{item.company}}</text>
-        </view>
-        <text class="history-time">{{item.time}}</text>
+    <view class="card-body">
+      <view class="qr-info">
+        <text class="qr-type-badge" wx:if="{{qrResult.type != 'text'}}">
+          {{qrResult.type == 'user' ? '👤 用户名片' : qrResult.type == 'platform' ? '🏢 平台' : '📦 资源'}}
+        </text>
+        <text class="qr-id">ID: {{qrResult.id}}</text>
+        <text class="qr-raw" wx:if="{{qrResult.raw}}">原始内容: {{qrResult.raw}}</text>
       </view>
     </view>
-    <view class="history-empty" wx:else>
-      <text class="empty-text">暂无扫描记录，点击上方按钮开始扫描</text>
-    </view>
+  </view>
+
+  <view class="save-area" wx:if="{{showQrResult && qrResult}}">
+    <button class="btn-primary" catchtap="searchText" wx:if="{{qrResult.type == 'text'}}">搜索"{{qrResult.id}}"</button>
+    <text class="auto-jump-hint" wx:if="{{qrResult.type != 'text'}}">正在自动跳转...</text>
   </view>
 </view>

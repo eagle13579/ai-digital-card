@@ -1,113 +1,85 @@
-<view class="match-page">
-  <!-- 顶部导航 — 玻璃层3 -->
-  <view class="match-header" style="padding-top: {{statusBarHeight}}px">
-    <view class="back-btn" bindtap="goBack">
-      <text class="icon">‹</text>
+<view class="page-container">
+  <view class="section-header">
+    <text class="section-title">{{_t.matchTitle}}</text>
+    <text class="section-subtitle">{{_t.matchSubtitle}}</text>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-item">
+      <text class="filter-label">{{_t.filterIndustry}}</text>
+      <picker mode="selector" range="{{industries}}" value="{{selectedIndustryIndex}}" bindchange="onIndustryChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedIndustry}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
     </view>
-    <view class="header-title">
-      <text class="title">人脉匹配</text>
-      <text class="subtitle">AI智能推荐 · 精准连接</text>
-    </view>
-    <view class="match-badge">
-      <text>🤝 匹配</text>
+    <view class="filter-divider"></view>
+    <view class="filter-item">
+      <text class="filter-label">{{_t.filterRegion}}</text>
+      <picker mode="selector" range="{{regions}}" value="{{selectedRegionIndex}}" bindchange="onRegionChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedRegion}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
     </view>
   </view>
 
-  <!-- 匹配偏好设置 — 玻璃卡片 -->
-  <view class="preference-section">
-    <text class="section-title">匹配偏好</text>
-    <view class="preference-list">
-      <view class="preference-item">
-        <text class="pref-label">行业</text>
-        <view class="pref-tags">
-          <view class="pref-tag {{preferences.industry === 'tech' ? 'active' : ''}}" data-type="industry" data-value="tech" bindtap="onPreferenceChange">科技</view>
-          <view class="pref-tag {{preferences.industry === 'finance' ? 'active' : ''}}" data-type="industry" data-value="finance" bindtap="onPreferenceChange">金融</view>
-          <view class="pref-tag {{preferences.industry === 'edu' ? 'active' : ''}}" data-type="industry" data-value="edu" bindtap="onPreferenceChange">教育</view>
-          <view class="pref-tag {{preferences.industry === 'medical' ? 'active' : ''}}" data-type="industry" data-value="medical" bindtap="onPreferenceChange">医疗</view>
+  <!-- 匹配列表 -->
+  <view class="match-list" wx:if="{{!showDetail && filteredMatches.length > 0}}">
+    <view class="match-item" wx:for="{{filteredMatches}}" wx:key="id" data-id="{{item.id}}" bindtap="unlock">
+      <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="match-avatar" />
+      <view class="match-info">
+        <text class="match-name">{{item.name}}</text>
+        <text class="match-company">{{item.company}}</text>
+        <text class="match-position" wx:if="{{item.title}}">{{item.title}}</text>
+        <view class="match-tags">
+          <text class="match-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
         </view>
       </view>
-      <view class="preference-item">
-        <text class="pref-label">地区</text>
-        <view class="pref-tags">
-          <view class="pref-tag {{preferences.region === 'bj' ? 'active' : ''}}" data-type="region" data-value="bj" bindtap="onPreferenceChange">北京</view>
-          <view class="pref-tag {{preferences.region === 'sh' ? 'active' : ''}}" data-type="region" data-value="sh" bindtap="onPreferenceChange">上海</view>
-          <view class="pref-tag {{preferences.region === 'sz' ? 'active' : ''}}" data-type="region" data-value="sz" bindtap="onPreferenceChange">深圳</view>
-          <view class="pref-tag {{preferences.region === 'hz' ? 'active' : ''}}" data-type="region" data-value="hz" bindtap="onPreferenceChange">杭州</view>
+      <view class="match-right">
+        <view class="match-score-wrap">
+          <text class="match-score-num">{{item.matchScore}}%</text>
+          <text class="match-score-label">{{_t.matchLabel}}</text>
         </view>
-      </view>
-      <view class="preference-item">
-        <text class="pref-label">职位</text>
-        <view class="pref-tags">
-          <view class="pref-tag {{preferences.position === 'manager' ? 'active' : ''}}" data-type="position" data-value="manager" bindtap="onPreferenceChange">经理</view>
-          <view class="pref-tag {{preferences.position === 'director' ? 'active' : ''}}" data-type="position" data-value="director" bindtap="onPreferenceChange">总监</view>
-          <view class="pref-tag {{preferences.position === 'ceo' ? 'active' : ''}}" data-type="position" data-value="ceo" bindtap="onPreferenceChange">CEO</view>
-          <view class="pref-tag {{preferences.position === 'cto' ? 'active' : ''}}" data-type="position" data-value="cto" bindtap="onPreferenceChange">CTO</view>
-        </view>
+        <button class="btn-connect-mini" data-id="{{item.id}}" bindtap="exchangeFromList" catchtap="exchangeFromList" wx:if="{{!item._requestSent}}">{{_t.exchangeCard}}</button>
+        <text class="request-sent-tag" wx:if="{{item._requestSent}}">{{_t.requestSent}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 加载状态 -->
-  <view class="loading-section" wx:if="{{loading && !refreshing}}">
-    <view class="loading-spinner"></view>
-    <text class="loading-text">正在为您智能匹配...</text>
-  </view>
-
-  <!-- 错误状态 -->
-  <view class="error-section" wx:if="{{error && !loading}}">
-    <view class="error-icon">⚠️</view>
-    <text class="error-text">{{errorMsg || '获取推荐失败'}}</text>
-    <view class="retry-btn" bindtap="onRetry">
-      <text>点击重试</text>
+  <!-- 解锁详情 -->
+  <view class="unlock-detail" wx:if="{{showDetail && unlockedItem}}">
+    <view class="detail-header">
+      <image src="{{unlockedItem.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="detail-avatar" />
+      <text class="detail-name">{{unlockedItem.name}}</text>
+      <text class="detail-company">{{unlockedItem.company}}</text>
+      <text class="detail-title" wx:if="{{unlockedItem.title}}">{{unlockedItem.title}}</text>
+      <view class="detail-score">
+        <text class="detail-score-num">{{unlockedItem.matchScore}}%</text>
+        <text class="detail-score-label">{{_t.matchScoreLabel}}</text>
+      </view>
+    </view>
+    <view class="detail-tags" wx:if="{{unlockedItem.tags && unlockedItem.tags.length > 0}}">
+      <text class="detail-tag" wx:for="{{unlockedItem.tags}}" wx:key="index">{{item}}</text>
+    </view>
+    <view class="detail-actions">
+      <button class="btn-primary small" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">{{_t.exchangeCard}}</button>
+      <button class="btn-secondary small" wx:if="{{exchangeDone}}" disabled>{{_t.requestSent}}</button>
+      <button class="btn-secondary small" bindtap="backToList" style="margin-top:8px;">{{_t.backToList}}</button>
     </view>
   </view>
 
   <!-- 空状态 -->
-  <view class="empty-section" wx:if="{{empty && !loading && !error}}">
-    <view class="empty-icon">🔍</view>
-    <text class="empty-text">暂无匹配推荐</text>
-    <text class="empty-hint">调整偏好或稍后再来</text>
+  <view class="empty-state" wx:if="{{!loading && filteredMatches.length == 0}}">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
+    <text class="text">{{_t.noMatchResults}}</text>
   </view>
 
-  <!-- 推荐人脉列表 — 玻璃卡片 -->
-  <view class="recommend-section" wx:if="{{!loading && !error && !empty}}">
-    <view class="section-title">
-      <text>推荐人脉</text>
-      <text class="match-count">共 {{recommendations.length}} 位</text>
-    </view>
-    <scroll-view class="recommend-scroll" scroll-y="true" refresher-enabled="true" bindrefresherrefresh="onPullDownRefresh" refresher-triggered="{{refreshing}}">
-      <view class="recommend-list">
-        <view class="recommend-card" wx:for="{{recommendations}}" wx:key="id">
-          <view class="card-top">
-            <view class="card-avatar">
-              <image wx:if="{{item.avatar}}" src="{{item.avatar}}" mode="aspectFill" />
-              <text wx:else>{{item.name ? item.name[0] : '?'}}</text>
-            </view>
-            <view class="card-info">
-              <text class="card-name">{{item.name}}</text>
-              <text class="card-title" wx:if="{{item.title}}">{{item.title}}</text>
-              <text class="card-company" wx:if="{{item.company}}">{{item.company}}</text>
-            </view>
-            <view class="match-score">
-              <view class="score-bar">
-                <view class="score-fill" style="height: {{item.matchScore}}%;"></view>
-              </view>
-              <text class="score-value">{{item.matchScore}}%</text>
-            </view>
-          </view>
-          <view class="card-tags" wx:if="{{item.tags && item.tags.length > 0}}">
-            <text class="card-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
-          </view>
-          <view class="card-actions">
-            <view class="card-action connect-btn {{item.connected ? 'connected' : ''}}" data-id="{{item.id}}" bindtap="onConnect">
-              <text>{{item.connected ? '已连接' : '交换名片'}}</text>
-            </view>
-            <view class="card-action chat-btn {{!item.connected ? 'disabled' : ''}}" data-id="{{item.id}}" bindtap="onChat">
-              <text>在线沟通</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </scroll-view>
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="spinner"></view>
+    <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">{{_t.loadingText}}</text>
   </view>
 </view>

@@ -1,0 +1,24 @@
+<view class="action-sheet-mask {{visible ? 'visible' : ''}}" wx:if="{{visible}}" catchtap="onClose"></view>
+<view class="action-sheet {{visible ? 'visible' : ''}}" wx:if="{{visible}}">
+  <view class="action-sheet-container" catchtap="noop">
+    <view class="action-sheet-title" wx:if="{{title}}">{{title}}</view>
+    <view class="action-sheet-items">
+      <view
+        class="action-sheet-item"
+        wx:for="{{items}}"
+        wx:key="index"
+        data-index="{{index}}"
+        catchtap="onSelect"
+      >
+        <text class="action-sheet-item-icon" wx:if="{{item.icon}}">{{item.icon}}</text>
+        <view class="action-sheet-item-content">
+          <text class="action-sheet-item-name">{{item.name}}</text>
+          <text class="action-sheet-item-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="action-sheet-cancel" wx:if="{{showCancel}}" catchtap="onClose">
+      {{cancelText || _t.cancel || '取消'}}
+    </view>
+  </view>
+</view>

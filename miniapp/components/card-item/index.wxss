@@ -1,25 +1,30 @@
+/* Card Item 组件 - v2.0 Dark Minimal */
+
 .card-item {
   display: flex;
   align-items: center;
-  padding: 32rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24rpx;
+  padding: var(--space-4);
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
 }
 
 .card-item:active {
-  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .card-avatar {
   position: relative;
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 56rpx;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   flex-shrink: 0;
-  margin-right: 24rpx;
+  margin-right: var(--space-3);
+  border: 1px solid var(--border-subtle);
 }
 
 .card-avatar-img {
@@ -29,14 +34,14 @@
 
 .member-badge {
   position: absolute;
-  bottom: -4rpx;
+  bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 18rpx;
-  padding: 2rpx 6px;
-  border-radius: 16rpx;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
   white-space: nowrap;
-  border: 1.5px solid #fff;
+  border: 1.5px solid var(--surface-primary);
 }
 
 .card-info {
@@ -45,22 +50,22 @@
 }
 
 .card-name {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 4rpx;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: 2px;
 }
 
 .card-company {
-  font-size: 26rpx;
-  color: #666;
-  margin-bottom: 2rpx;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: 1px;
 }
 
 .card-title {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
 }
 
 .card-tags {
@@ -69,8 +74,8 @@
 }
 
 .card-tags .tag {
-  font-size: 22rpx;
-  padding: 4rpx 8px;
+  font-size: var(--text-xs);
+  padding: 2px 8px;
   margin: 0 4px 4px 0;
 }
 
@@ -79,30 +84,30 @@
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
-  margin-left: 16rpx;
+  margin-left: var(--space-2);
 }
 
 .match-score {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 4px;
 }
 
 .score-value {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #07c160;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--success);
 }
 
 .score-label {
-  font-size: 20rpx;
-  color: #999;
+  font-size: 10px;
+  color: var(--text-tertiary);
 }
 
 .unlock-btn {
-  font-size: 24rpx !important;
-  height: 56rpx !important;
-  padding: 0 12px !important;
-  min-width: 112rpx;
+  font-size: var(--text-xs) !important;
+  height: 28px !important;
+  padding: 0 var(--space-3) !important;
+  min-width: 56px;
 }

@@ -1,0 +1,54 @@
+/* Tag List 标签列表 */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.tag-list-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: rgba(139, 92, 246, 0.10);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  color: var(--accent-light);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  margin: 0 6px 6px 0;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.tag-list-item:active {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.tag-list-item.selected {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+/* Type variants */
+.tag-list.type-provide .tag-list-item {
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.tag-list.type-provide .tag-list-item.selected {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: var(--success);
+}
+
+.tag-list.type-need .tag-list-item {
+  background: rgba(245, 158, 11, 0.10);
+  border-color: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.tag-list.type-need .tag-list-item.selected {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: var(--warning);
+}

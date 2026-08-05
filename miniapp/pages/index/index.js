@@ -1,14 +1,16 @@
 /**
  * 首页 - 名片列表 + 推荐
- * 增加：Free用户使用接近上限时显示智能升级提示条
+ * 使用MockService获取数据
  */
 const { MockService } = require('../../utils/mockService')
+const { brochureApi, platformApi } = require('../../utils/api')
+const store = require('../../utils/store')
+const i18n = require('../../utils/i18n')
 const { Logger } = require('../../utils/util')
 
 Page({
   data: {
     loading: true,
-    _dataLoaded: false,
     userInfo: {},
     memberLevel: 'free',
     memberLevelText: 'Free',
@@ -17,169 +19,306 @@ Page({
     trustCount: 0,
     trustList: [],
     recommendList: [],
+    showEmpty: false,
     visitorList: [],
-
-    // 升级提示
     showUpgradeHint: false,
-    upgradeHintText: '',
 
-    // 场景模式
-    showSceneSelector: true,
-    currentScene: 'online',
+    sceneMode: 'personal',
+    sceneModeExpanded: false,
+    showBusinessCards: true,
+    showPlatform: false,
+    showTrustNetwork: false,
+    platformRecommend: [],
+    platformLoading: false,
 
-    // 平台推荐（静态UI数据，非后端数据）
-    platformRecommend: [
-      { id: 1, name: 'AI技术合作平台', desc: 'AI技术开发·模型训练·数据标注', icon: '🤖', bg: 'linear-gradient(135deg, #667eea, #764ba2)' },
-      { id: 2, name: '供应链资源平台', desc: '供应商对接·物流配送·仓储服务', icon: '🚚', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-      { id: 3, name: '投融资对接平台', desc: '天使投资·VC融资·并购重组', icon: '💰', bg: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
-      { id: 4, name: '市场营销平台', desc: '品牌推广·渠道拓展·流量获客', icon: '📢', bg: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
-    ],
+    // 新手引导
+    showOnboarding: false,
+    onboardingStep: 1,
+    onboardingSteps: [],
+
+    // i18n
+    _t: {},
   },
 
   onLoad(options) {
-    const app = getApp()
-    // 未登录时跳转登录页
-    if (!app.globalData.token) {
-      Logger.info('首页', '未登录, 跳转登录页')
-      wx.reLaunch({ url: '/pages/login/index' })
+    Logger.info('首页', '页面加载')
+    this._loadI18n()
+    
+    const state = store.getState()
+    Logger.info('首页', '当前状态', { 
+      isLoggedIn: state.isLoggedIn, 
+      hasUserInfo: !!state.userInfo,
+      userName: state.userInfo?.name || state.userInfo?.nickName || '无'
+    })
+    
+    // 登录守卫：未登录时跳转登录页
+    if (!state.isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
       return
-    } else {
-      Logger.info('首页', '页面加载')
-      // 恢复场景偏好
-      const scenePrefs = wx.getStorageSync('scene_prefs')
-      if (scenePrefs && scenePrefs.scene) {
-        this.setData({ currentScene: scenePrefs.scene })
-      }
-      // 首次使用弹出场景建议
-      const firstTime = wx.getStorageSync('scene_first_time')
-      if (firstTime === '' || firstTime === undefined || firstTime === null) {
-        wx.showModal({
-          title: '场景模式',
-          content: '欢迎使用！您可以选择适合您的场景模式，我们将为您提供更贴心的服务。',
-          confirmText: '去选择',
-          success: (res) => {
-            if (res.confirm) {
-              wx.setStorageSync('scene_first_time', false)
-            }
-          }
-        })
-      }
-      this.loadPageData()
+    }
+    
+    this.loadPageData()
+    this.loadPlatformRecommend()
+  },
+
+  async loadPlatformRecommend() {
+    this.setData({ platformLoading: true })
+    try {
+      const res = await platformApi.list()
+      const data = Array.isArray(res) ? res : (res.data || [])
+      const platforms = data.slice(0, 4).map((p, index) => ({
+        id: p.id,
+        name: p.name,
+        desc: p.description || '',
+        logoLetter: p.name ? p.name[0] : 'P',
+        resourceCount: p.resource_count || 0,
+        annualFee: p.annual_fee,
+        rank: index + 1,
+      }))
+      this.setData({ platformRecommend: platforms, platformLoading: false })
+    } catch (err) {
+      console.error('[首页] 加载平台推荐失败:', err)
+      this.setData({ platformLoading: false })
     }
   },
 
   onShow() {
-    const app = getApp()
-    if (app.globalData.token) {
-      // 检查是否有数据更新标记（如从创建页返回）
-      if (app.globalData._dataDirty) {
-        app.globalData._dataDirty = false
-        this.loadPageData()
-      } else if (!this.data._dataLoaded) {
-        this.loadPageData()
-      }
+    const state = store.getState()
+    const { isLoggedIn } = state
+    // 全局登录守卫（第二层）：页面级 — 未登录时跳回登录页
+    if (!isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    if (state.dataDirty) {
+      store.clearDataDirty()
+      this.loadPageData()
+    }
+    this._loadI18n()
+  },
+
+  /** 加载国际化翻译 */
+  _loadI18n() {
+    this.setData({
+      _t: i18n.getTranslations(),
+      onboardingSteps: [
+        { icon: '✎', title: i18n.t('guideStep1Title'), desc: i18n.t('guideStep1Desc') },
+        { icon: '◇', title: i18n.t('guideStep2Title'), desc: i18n.t('guideStep2Desc') },
+        { icon: '↗', title: i18n.t('guideStep3Title'), desc: i18n.t('guideStep3Desc') },
+      ],
+    })
+  },
+
+  /** 检查是否需要展示新手引导 */
+  _checkOnboarding() {
+    if (store.isOnboardingNeeded() && !this.data.showOnboarding) {
+      this.setData({ showOnboarding: true, onboardingStep: 1 })
     }
   },
 
-  /**
-   * 加载首页全部数据
-   * 并行请求：用户信息、名片、信任网络、推荐列表
-   */
+  /** 带超时和重试的数据获取包装 */
+  async _fetchWithRetry(fn, fallback, maxRetries = 2, timeoutMs = 8000) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await Promise.race([
+          fn(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`timeout after ${timeoutMs}ms`)), timeoutMs)
+          ),
+        ])
+        if (attempt > 1) Logger.info('首页', `第${attempt}次重试成功`)
+        return result
+      } catch (err) {
+        Logger.warn('首页', `第${attempt}/${maxRetries}次失败`, err.message || err)
+        if (attempt < maxRetries) {
+          const delay = Math.min(500 * Math.pow(2, attempt - 1), 3000)
+          await new Promise(r => setTimeout(r, delay))
+        }
+      }
+    }
+    Logger.warn('首页', '已耗尽重试次数，使用降级数据')
+    return fallback
+  },
+
   async loadPageData() {
     this.setData({ loading: true })
+    
+    const storedState = store.getState()
+    const storedUserInfo = storedState.userInfo || {}
+    
     try {
-      const [profile, brochures, trustNet, recommend] = await Promise.all([
-        MockService.getUserProfile(),
-        MockService.getBrochures(),
-        MockService.getTrustNetwork(),
-        MockService.getRecommendList(),
-      ])
-
-      const profileData = profile.data !== undefined ? profile.data : profile
-      const userInfoData = profileData.userInfo || profileData || {}
-
-      const userInfo = {
-        name: userInfoData.name || '',
-        avatar: userInfoData.avatar || '',
-        company: userInfoData.company || '',
-        title: userInfoData.title || '',
+      Logger.info('首页', '开始加载数据')
+      
+      let profileRes, brochuresRes, trustNetRes, recommendRes
+      try {
+        [profileRes, brochuresRes, trustNetRes, recommendRes] = await Promise.all([
+          this._fetchWithRetry(
+            () => MockService.getUserProfile(),
+            { data: { userInfo: {}, memberLevel: 'free' } },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getBrochures(),
+            { data: [] },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getTrustNetwork(),
+            { data: { trusting: [], trusted_by: [] } },
+          ),
+          this._fetchWithRetry(
+            () => MockService.getRecommendList(),
+            { data: [] },
+          ),
+        ])
+        Logger.info('首页', 'API数据加载完成')
+      } catch (apiErr) {
+        Logger.warn('首页', 'API加载失败，使用本地数据', apiErr)
+        profileRes = { data: { userInfo: {}, memberLevel: 'free' } }
+        brochuresRes = { data: [] }
+        trustNetRes = { data: { trusting: [], trusted_by: [] } }
+        recommendRes = { data: [] }
       }
 
-      const memberLevel = profileData.memberLevel || userInfoData.memberLevel || 'free'
-      const memberLevelText = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }[memberLevel] || 'Free'
+      const profile = profileRes && profileRes.data ? profileRes.data : profileRes
+      const brochuresList = brochuresRes && brochuresRes.data ? brochuresRes.data : brochuresRes
+      const trustData = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
+      const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
 
-      const app = getApp()
-      app.updateUserInfo(userInfo)
-      app.updateMemberLevel(memberLevel)
-
-      let brochuresList = []
-      if (Array.isArray(brochures)) {
-        brochuresList = brochures
-      } else if (brochures.data && Array.isArray(brochures.data)) {
-        brochuresList = brochures.data
-      }
-      const brochure = brochuresList.length > 0 ? brochuresList[0] : null
-
-      const trustData = trustNet.data !== undefined ? trustNet.data : (trustNet || {})
-      const trustList = trustData.trusting || []
-      const trustCount = trustList.length
-
-      let recommendData = []
-      if (Array.isArray(recommend)) {
-        recommendData = recommend
-      } else if (recommend.data && Array.isArray(recommend.data)) {
-        recommendData = recommend.data
-      }
-
-      let visitors = 0
-      if (brochure) {
+      const userInfoData = profile.userInfo || profile
+      let brochure = Array.isArray(brochuresList) ? brochuresList[0] : null
+      // 如果API无数据，尝试从本地存储恢复
+      if (!brochure) {
         try {
-          const vStatsRes = await MockService.getVisitorStats()
-          const vStats = vStatsRes.data !== undefined ? vStatsRes.data : vStatsRes
-          visitors = vStats.total_visits || vStats.total || vStats.visitors || 0
+          const lastBrochure = wx.getStorageSync('last_brochure')
+          if (lastBrochure && lastBrochure.id) {
+            brochure = {
+              id: lastBrochure.id,
+              cover: lastBrochure.cover,
+              title: lastBrochure.title,
+              viewCount: lastBrochure.view_count || lastBrochure.viewCount || 0,
+              pageCount: lastBrochure.pages_count || lastBrochure.pageCount || (lastBrochure.pages ? lastBrochure.pages.length : 0),
+            }
+            Logger.info('首页', '从本地存储恢复画册', { id: brochure.id, title: brochure.title })
+          }
         } catch (e) {
-          Logger.warn('首页', '获取访客统计失败', e)
+          Logger.warn('首页', '读取本地存储失败', e)
         }
       }
 
-      let showUpgradeHint = false
-      let upgradeHintText = ''
+      const trustList = trustData.trusting || []
+      const trustCount = trustList.length
 
-      // ===== 7. 组装统计数据 =====
-      const stats = {
-        visitors: visitors,
-        matches: recommendData.length,
-        trust: trustCount,
+      let stats = { visitors: 0, matches: recommendData.length, trust: trustCount }
+
+      if (brochure) {
+        this._fetchWithRetry(
+          () => MockService.getVisitorStats(brochure.id),
+          { data: { total_visits: 0, total: 0 } },
+        ).then(vStatsRes => {
+          const vStats = vStatsRes && vStatsRes.data ? vStatsRes.data : vStatsRes
+          if (vStats) {
+            this.setData({
+              stats: { ...this.data.stats, visitors: vStats.total_visits || vStats.total || 0 },
+            })
+          }
+        }).catch(() => {})
       }
 
-      // ===== 8. 更新页面数据 =====
-      this.setData({
-        userInfo,
-        memberLevel: memberLevel,
-        memberLevelText: { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }[memberLevel] || 'Free',
-        stats,
-        brochure: brochure ? {
-          id: brochure.id,
-          cover: brochure.cover,
-          title: brochure.title,
-          viewCount: brochure.view_count || brochure.viewCount || 0,
-          pageCount: brochure.pages_count || brochure.pageCount || 0,
-        } : null,
-        trustCount,
-        trustList: trustList.slice(0, 10),
-        recommendList: recommendData.slice(0, 3),
-        visitorList: [],
-        showUpgradeHint,
-        upgradeHintText,
-        loading: false,
-        _dataLoaded: true,
-      })
+      const userInfo = {
+        name: storedUserInfo.name || storedUserInfo.nickName || userInfoData.name || '微信用户',
+        avatar: storedUserInfo.avatar || storedUserInfo.avatarUrl || userInfoData.avatar || '',
+        company: storedUserInfo.company || userInfoData.company || '',
+        title: storedUserInfo.title || userInfoData.title || '',
+      }
 
-      Logger.info('首页', '数据加载完成', { stats, recommendCount: recommendData.length })
+      const { getLevelText } = require('../../utils/levels')
+      const memberLevel = profile.memberLevel || storedState.memberLevel || 'free'
+      const memberLevelText = getLevelText(memberLevel)
+
+      store.updateUserInfo(userInfo)
+      store.updateMemberLevel(memberLevel)
+
+      const showUpgradeHint = memberLevel === 'free' && (stats.visitors >= 3 || recommendData.length >= 3)
+
+      this.setData({
+          userInfo,
+          memberLevel,
+          memberLevelText,
+          stats,
+          brochure: brochure ? {
+            id: brochure.id,
+            cover: brochure.cover,
+            title: brochure.title,
+            viewCount: brochure.view_count || brochure.viewCount || 0,
+            pageCount: brochure.pages_count || brochure.pageCount || 0,
+          } : null,
+          trustCount,
+          trustList: trustList.slice(0, 10),
+          trustListDisplay: trustList.slice(0, 5),
+          recommendList: Array.isArray(recommendData) ? recommendData.slice(0, 3).map(item => ({
+            ...item,
+            displayTags: item.commonTags ? item.commonTags.slice(0, 2) : []
+          })) : [],
+          showEmpty: !brochure && (!Array.isArray(recommendData) || recommendData.length === 0),
+          showUpgradeHint,
+          upgradeHintText: i18n.t('upgradeHint', { count: stats.visitors }),
+          visitorList: [],
+          loading: false,
+        })
+
+      Logger.info('首页', '数据加载完成', { userName: userInfo.name, hasAvatar: !!userInfo.avatar })
+
+      this._checkOnboarding()
     } catch (err) {
       Logger.error('首页', '加载失败', err)
-      this.setData({ loading: false })
+      console.error('[首页] loadPageData 错误:', err)
+      
+      const userInfo = {
+        name: storedUserInfo.name || storedUserInfo.nickName || '微信用户',
+        avatar: storedUserInfo.avatar || storedUserInfo.avatarUrl || '',
+        company: storedUserInfo.company || '',
+        title: storedUserInfo.title || '',
+      }
+      
+      const { getLevelText } = require('../../utils/levels')
+      const memberLevel = storedState.memberLevel || 'free'
+      const memberLevelText = getLevelText(memberLevel)
+      
+      this.setData({
+        userInfo,
+        memberLevel,
+        memberLevelText,
+        stats: { visitors: 0, matches: 0, trust: 0 },
+        brochure: null,
+        trustCount: 0,
+        trustList: [],
+        recommendList: [],
+        showEmpty: true,
+        showUpgradeHint: false,
+        visitorList: [],
+        loading: false,
+      })
     }
+  },
+
+  toggleSceneMode() {
+    this.setData({
+      sceneModeExpanded: !this.data.sceneModeExpanded,
+    })
+  },
+
+  selectSceneMode(e) {
+    const mode = e.currentTarget.dataset.mode
+    const sceneConfig = {
+      personal: { showBusinessCards: true, showPlatform: false, showTrustNetwork: false, showRecommend: true },
+      business: { showBusinessCards: true, showPlatform: true, showTrustNetwork: false, showRecommend: true },
+      social: { showBusinessCards: false, showPlatform: false, showTrustNetwork: true, showRecommend: true },
+    }
+    this.setData({
+      sceneMode: mode,
+      ...sceneConfig[mode],
+    })
+    const modeNames = { personal: i18n.t('modePersonal'), business: i18n.t('modeBusiness'), social: i18n.t('modeSocial') }
+    wx.showToast({ title: i18n.t('switchedTo') + modeNames[mode] + i18n.t('modeSuffix'), icon: 'none' })
   },
 
   goEditCard() {
@@ -196,11 +335,28 @@ Page({
   },
 
   goQrCode() {
-    wx.navigateTo({ url: '/pages/qrcode/index' })
+    const brochure = this.data.brochure
+    if (brochure && brochure.id) {
+      wx.navigateTo({ url: `/pages/qrcode/index?id=${brochure.id}` })
+    } else {
+      wx.navigateTo({ url: '/pages/qrcode/index' })
+    }
+  },
+
+  // 跳转升级会员
+  goMembership() {
+    wx.navigateTo({ url: '/pages/membership/index' })
   },
 
   shareCard() {
-    wx.showShareMenu({ withShareTicket: true })
+    if (typeof wx.shareAppMessage === 'function') {
+      wx.shareAppMessage({
+        title: this.data.userInfo.name + '的AI数智名片',
+        path: this.data.brochure ? `/pages/brochure/preview/index?id=${this.data.brochure.id}` : '/pages/index/index',
+      })
+    } else {
+      wx.showToast({ title: '当前版本不支持主动分享', icon: 'none' })
+    }
   },
 
   goTrust() {
@@ -223,34 +379,49 @@ Page({
 
   // 平台推荐详情
   goPlatformDetail(e) {
-    const name = e.currentTarget.dataset.url || e.currentTarget.dataset.item
-    wx.showModal({
-      title: '提示',
-      content: '平台详情功能即将开放，敬请期待',
-      showCancel: false
-    })
+    const id = e.currentTarget.dataset.id
+    if (id) {
+      wx.navigateTo({ url: `/pages/platform/detail/index?id=${id}` })
+    }
   },
 
-  // 跳转会员中心
-  goUpgrade() {
-    wx.navigateTo({ url: '/pages/membership/membership' })
+  // 查看更多平台
+  goPlatformList() {
+    wx.navigateTo({ url: '/pages/platform/list/index' })
   },
 
-  /** 跳转AI能力中心 */
-  goAiCenter() {
-    wx.navigateTo({ url: '/pages/ai/index' })
+  goAICenter() {
+    wx.navigateTo({ url: '/pages/ai/index/index' })
   },
 
-  // 关闭升级提示
-  closeUpgradeHint() {
-    this.setData({ showUpgradeHint: false })
+  /** 新手引导 - 下一步 */
+  nextStep() {
+    const next = this.data.onboardingStep + 1
+    if (next > 3) {
+      this.closeOnboarding()
+    } else {
+      this.setData({ onboardingStep: next })
+    }
   },
 
-  // 场景模式切换
-  onSceneChange(e) {
-    const sceneType = e.detail.scene_type
-    this.setData({ currentScene: sceneType })
-    wx.setStorageSync('scene_prefs', { scene: sceneType })
+  /** 新手引导 - 上一步 */
+  prevStep() {
+    if (this.data.onboardingStep > 1) {
+      this.setData({ onboardingStep: this.data.onboardingStep - 1 })
+    }
+  },
+
+  /** 新手引导 - 关闭并标记完成 */
+  closeOnboarding() {
+    this.setData({ showOnboarding: false, onboardingStep: 1 })
+    store.setOnboardingDone()
+  },
+
+  /** 新手引导 - 跳过 */
+  skipOnboarding() {
+    this.setData({ showOnboarding: false, onboardingStep: 1 })
+    store.setOnboardingDone()
+    wx.showToast({ title: i18n.t('guideSkipped'), icon: 'none' })
   },
 
   onShareAppMessage() {

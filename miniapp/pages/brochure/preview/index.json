@@ -1,7 +1,5 @@
 {
   "navigationStyle": "custom",
   "navigationBarTitleText": "画册预览",
-  "usingComponents": {
-    "loading": "/components/loading/index"
-  }
+  "backgroundColor": "#1a1a2e"
 }

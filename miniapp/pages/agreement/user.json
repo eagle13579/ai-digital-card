@@ -1,8 +1,4 @@
 {
   "navigationBarTitleText": "用户协议",
-  "navigationBarBackgroundColor": "#0F0F13",
-  "navigationBarTextStyle": "white",
-  "usingComponents": {},
-  "disableScroll": false,
-  "backgroundColor": "#0A0A18"
+  "usingComponents": {}
 }

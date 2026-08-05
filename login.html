@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI数智名片 — 登录</title>
+<link rel="stylesheet" href="_design_tokens.css">
+<style>
+/* ===== Reset & Base ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-deep, #0a0e27);
+  color: var(--text-primary, #e2e8f0);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md, 16px);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== 背景网格装饰 ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== 主容器 ===== */
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  max-width: 960px;
+  min-height: 560px;
+  background: var(--bg-card, #1a1f3a);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,0.5));
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  overflow: hidden;
+}
+
+/* ===== 左侧: 登录表单 ===== */
+.login-form-panel {
+  flex: 1;
+  padding: var(--spacing-xl, 48px) var(--spacing-lg, 24px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 320px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  margin-bottom: var(--spacing-lg, 24px);
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  border-radius: var(--radius-sm, 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs, 4px);
+}
+
+.form-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: var(--spacing-xl, 48px);
+}
+
+/* ===== 表单字段 ===== */
+.form-group {
+  margin-bottom: var(--spacing-lg, 24px);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: var(--spacing-sm, 8px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px var(--spacing-md, 16px);
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary, #e2e8f0);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: var(--text-secondary, #94a3b8);
+  opacity: 0.6;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary, #06b6d4);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+}
+
+/* ===== 表单延伸 ===== */
+.form-extras {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg, 24px);
+  font-size: 0.85rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: var(--color-primary, #06b6d4);
+}
+
+.forgot-link {
+  color: var(--color-primary-light, #38d9f0);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: var(--color-primary, #06b6d4);
+  text-decoration: underline;
+}
+
+/* ===== 登录按钮 ===== */
+.btn-login {
+  width: 100%;
+  padding: 15px;
+  background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+/* ===== 注册跳转 ===== */
+.register-hint {
+  margin-top: var(--spacing-lg, 24px);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.register-hint a {
+  color: var(--color-primary-light, #38d9f0);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-hint a:hover {
+  color: var(--color-primary, #06b6d4);
+  text-decoration: underline;
+}
+
+/* 社交登录分隔线 */
+.social-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+  margin-top: var(--spacing-lg, 24px);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.8rem;
+}
+
+.social-divider::before,
+.social-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.social-btns {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+  margin-top: var(--spacing-sm, 8px);
+}
+
+.social-btn {
+  flex: 1;
+  padding: 10px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  text-align: center;
+}
+
+.social-btn:hover {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* ===== 右侧: 产品预览 ===== */
+.login-preview-panel {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(139, 92, 246, 0.08));
+  padding: var(--spacing-xl, 48px) var(--spacing-lg, 24px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-left: 1px solid rgba(148, 163, 184, 0.1);
+  position: relative;
+  overflow: hidden;
+  min-width: 320px;
+}
+
+/* 右侧装饰光效 */
+.login-preview-panel::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-preview-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.preview-badge {
+  position: relative;
+  z-index: 1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-primary-light, #38d9f0);
+  margin-bottom: var(--spacing-md, 16px);
+  background: rgba(6, 182, 212, 0.1);
+  padding: 6px 14px;
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+/* ===== CSS 模拟仪表盘 ===== */
+.dashboard-mock {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 320px;
+  background: var(--bg-card, #1a1f3a);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--spacing-md, 16px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.4));
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* 模拟顶栏 */
+.mock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md, 16px);
+  padding-bottom: var(--spacing-sm, 8px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.mock-dot-group {
+  display: flex;
+  gap: 6px;
+}
+
+.mock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mock-dot.red { background: #ef4444; }
+.mock-dot.yellow { background: #f59e0b; }
+.mock-dot.green { background: #22c55e; }
+
+.mock-header-title {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  font-weight: 600;
+}
+
+/* 模拟统计卡片 */
+.mock-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm, 8px);
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.mock-stat-card {
+  background: rgba(148, 163, 184, 0.06);
+  padding: 12px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.mock-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 4px;
+}
+
+.mock-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary, #e2e8f0);
+}
+
+.mock-stat-value.cyan { color: var(--color-primary, #06b6d4); }
+.mock-stat-value.purple { color: #8b5cf6; }
+
+/* 模拟列表 */
+.mock-list-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #94a3b8);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-sm, 8px);
+}
+
+.mock-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+}
+
+.mock-list-item:last-child {
+  border-bottom: none;
+}
+
+.mock-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.mock-avatar.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.mock-avatar.cyan { background: linear-gradient(135deg, #06b6d4, #0284a7); }
+
+.mock-list-text {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-primary, #e2e8f0);
+}
+
+.mock-list-sub {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.mock-list-status {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 999px);
+  font-weight: 600;
+}
+
+.mock-list-status.match {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+
+.mock-list-status.pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+    max-width: 440px;
+    min-height: auto;
+  }
+
+  .login-form-panel {
+    padding: var(--spacing-lg, 24px) var(--spacing-md, 16px);
+    min-width: auto;
+  }
+
+  .login-preview-panel {
+    padding: var(--spacing-lg, 24px) var(--spacing-md, 16px);
+    min-width: auto;
+    border-left: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  .dashboard-mock {
+    max-width: 280px;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-wrapper {
+    border-radius: var(--radius-md, 8px);
+  }
+
+  .login-form-panel,
+  .login-preview-panel {
+    padding: var(--spacing-md, 16px);
+  }
+
+  .social-btns {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- ===== 左侧: 登录表单 ===== -->
+  <div class="login-form-panel">
+    <div class="logo">
+      <div class="logo-icon">AI</div>
+      <span class="logo-text">AI数智名片</span>
+    </div>
+
+    <h1 class="form-title">欢迎回来</h1>
+    <p class="form-subtitle">登录您的账号，开启智能匹配</p>
+
+    <form onsubmit="event.preventDefault(); alert('🎉 登录功能即将上线！');">
+      <div class="form-group">
+        <label class="form-label" for="email">邮箱地址</label>
+        <input class="form-input" type="email" id="email" placeholder="you@company.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">密码</label>
+        <input class="form-input" type="password" id="password" placeholder="••••••••" required>
+      </div>
+
+      <div class="form-extras">
+        <label class="remember-me">
+          <input type="checkbox" checked> 记住我
+        </label>
+        <a href="#" class="forgot-link">忘记密码？</a>
+      </div>
+
+      <button class="btn-login" type="submit">登录</button>
+    </form>
+
+    <div class="register-hint">
+      还没有账号？ <a href="#" onclick="alert('📝 注册页面即将上线！')">立即注册 →</a>
+    </div>
+
+    <div class="social-divider">其他登录方式</div>
+    <div class="social-btns">
+      <button class="social-btn">🅦 微信</button>
+      <button class="social-btn">💬 飞书</button>
+    </div>
+  </div>
+
+  <!-- ===== 右侧: 产品界面预览 ===== -->
+  <div class="login-preview-panel">
+    <div class="preview-badge">📊 产品预览</div>
+
+    <div class="dashboard-mock">
+      <!-- 模拟窗口控制条 -->
+      <div class="mock-header">
+        <div class="mock-dot-group">
+          <span class="mock-dot red"></span>
+          <span class="mock-dot yellow"></span>
+          <span class="mock-dot green"></span>
+        </div>
+        <span class="mock-header-title">AI 匹配面板</span>
+      </div>
+
+      <!-- 模拟统计卡片 -->
+      <div class="mock-stats">
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">智能匹配</div>
+          <div class="mock-stat-value cyan">1,284</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">转化率</div>
+          <div class="mock-stat-value purple">+23.5%</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">活跃客户</div>
+          <div class="mock-stat-value">342</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">商机金额</div>
+          <div class="mock-stat-value">¥2.8M</div>
+        </div>
+      </div>
+
+      <!-- 模拟推荐列表 -->
+      <div class="mock-list-label">🔥 今日推荐匹配</div>
+      <div class="mock-list-item">
+        <div class="mock-avatar purple">王</div>
+        <div>
+          <div class="mock-list-text">王小明 · 科技公司CEO</div>
+          <div class="mock-list-sub">高匹配度 · 智能制造</div>
+        </div>
+        <span class="mock-list-status match">匹配</span>
+      </div>
+      <div class="mock-list-item">
+        <div class="mock-avatar cyan">李</div>
+        <div>
+          <div class="mock-list-text">李华 · 跨境贸易总监</div>
+          <div class="mock-list-sub">中等匹配 · 进出口</div>
+        </div>
+        <span class="mock-list-status pending">待定</span>
+      </div>
+      <div class="mock-list-item">
+        <div class="mock-avatar purple">张</div>
+        <div>
+          <div class="mock-list-text">张伟 · 供应链VP</div>
+          <div class="mock-list-sub">高匹配度 · 物流</div>
+        </div>
+        <span class="mock-list-status match">匹配</span>
+      </div>
+    </div>
+
+    <p style="position:relative;z-index:1;margin-top:16px;font-size:0.8rem;color:var(--text-secondary,#94a3b8);text-align:center;">
+      AI 驱动 · 精准匹配 · 高效转化
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>
