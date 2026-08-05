@@ -63,9 +63,12 @@ def psql_query(sql: str, timeout: int = 60) -> subprocess.CompletedProcess:
 
 def git_pull():
     """从 GitHub 拉取仓库最新（含本地推送的知识）"""
+    # 先 stash 未提交的脚本改动（避免 pull rebase 冲突）
+    run(["git", "-C", str(REPO_DIR), "stash", "--include-untracked"], timeout=60)
     r = run(["git", "-C", str(REPO_DIR), "pull", "origin", "master", "--rebase"])
     if r.returncode != 0:
         r = run(["git", "-C", str(REPO_DIR), "pull", "origin", "main", "--rebase"])
+    run(["git", "-C", str(REPO_DIR), "stash", "pop"], timeout=60)
     return r
 
 
@@ -92,11 +95,66 @@ def sync_pull():
 
     n_files = sum(1 for _ in local_dir.rglob("*") if _.is_file() and _.suffix.lower() in (".md", ".yaml", ".yml"))
     print(f"=== [2/2] 增量导入盖娅 (本地知识 {n_files} 文件) ===")
-    # 用 backfeed 批量导入（幂等）
-    r = run([sys.executable, str(IMPORT_SCRIPT), "--check"], timeout=60)
-    print(r.stdout[-500:])
-    print("\n提示: 完整导入请运行: python3 backend/scripts/gaia_backfeed.py")
-    print("（knowledge-sync/local 已在 backfeed 扫描范围内时自动处理）")
+    if n_files == 0:
+        print("无新知识文件")
+        return
+
+    # 逐文件调用 gaia_reflect 导入（幂等，source_id=文件路径hash）
+    imported = 0
+    failed = 0
+    skipped = 0
+    # 预查已存在的 source_id，避免唯一约束冲突
+    existing = set()
+    r_exist = psql_query("SELECT source_id FROM gaia_knowledge WHERE source_id LIKE 'sync:%'")
+    if r_exist.returncode == 0:
+        for line in r_exist.stdout.strip().splitlines():
+            if line.strip():
+                existing.add(line.strip())
+    for f in sorted(local_dir.rglob("*")):
+        if not f.is_file() or f.suffix.lower() not in (".md", ".yaml", ".yml"):
+            continue
+        if f.name.startswith((".", "_index")):
+            continue
+        rel = str(f.relative_to(local_dir))
+        sid = "sync:%s" % rel
+        if sid in existing:
+            skipped += 1
+            continue
+        content = f.read_text(encoding="utf-8", errors="ignore")
+        if len(content.strip()) < 50:
+            skipped += 1
+            continue
+        title = f.stem
+        for line in content.splitlines()[:10]:
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+        cmd = [
+            sys.executable, str(IMPORT_SCRIPT), "--ingest",
+            "--title", title[:200],
+            "--content", content[:3000],
+            "--type", "insight",
+            "--tags", "同步,本地知识," + rel.split("/")[0],
+            "--source-id", sid,
+            "--source", "system",
+        ]
+        rr = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        try:
+            resp = json.loads(rr.stdout) if rr.stdout.strip() else {"code": 500}
+        except json.JSONDecodeError:
+            resp = {"code": 500}
+        if resp.get("code") == 200:
+            imported += 1
+            existing.add(sid)
+            print(f"  [✓] {rel}")
+        else:
+            failed += 1
+            print(f"  [✗] {rel}: {resp.get('message', 'unknown')}")
+        if imported >= 100:
+            print("  ...达到单轮上限100条，剩余下轮同步")
+            break
+
+    print(f"\n导入完成: {imported} 成功, {skipped} 跳过(已存在), {failed} 失败")
 
 
 def sync_export():
