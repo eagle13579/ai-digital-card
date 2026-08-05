@@ -1,0 +1,96 @@
+# =============================================================================
+# AI数智名片 — Docker Compose 开发/测试编排
+# =============================================================================
+# 使用方式:
+#   docker compose up -d              # 启动全部服务
+#   docker compose up -d backend      # 只启动后端
+#   docker compose logs -f            # 查看日志
+#   docker compose down               # 停止并清理
+# =============================================================================
+
+version: "3.8"
+
+services:
+  # ── Backend (FastAPI) ───────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-digital-card-backend:${APP_VERSION:-latest}
+    container_name: ai-digital-card-backend
+    ports:
+      - "8201:8201"
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - APP_ENV=${APP_ENV:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # SQLite 本地数据库文件映射到 volume
+      - DATABASE_URL=sqlite+aiosqlite:///./data/digital_brochure.db
+    volumes:
+      - backend-data:/app/data
+      - backend-logs:/app/logs
+      - backend-uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - ai-card-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://127.0.0.1:8201/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # ── Redis (缓存/会话) ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ai-digital-card-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - ai-card-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  backend-data:
+    driver: local
+  backend-logs:
+    driver: local
+  backend-uploads:
+    driver: local
+  redis-data:
+    driver: local
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  ai-card-net:
+    driver: bridge

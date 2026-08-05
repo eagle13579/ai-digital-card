@@ -1,0 +1,80 @@
+/* AI生成页 - v2.0 Dark Minimal */
+
+.type-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  overflow-x: auto;
+}
+
+.type-tab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.type-tab.active {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-light);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.subtype-chips {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.subtype-chip {
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.subtype-chip.active {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--accent-light);
+}
+
+.result-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  display: block;
+  white-space: pre-wrap;
+  padding: 4px 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.result-char-count {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+}
+
+.result-copy-btn {
+  font-size: var(--text-sm);
+  color: var(--accent);
+}
+
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) 0;
+}

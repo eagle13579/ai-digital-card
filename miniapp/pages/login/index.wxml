@@ -1,37 +1,84 @@
-<view class="login-container">
-  <view class="login-card">
-    <view class="logo-area">
-      <image class="logo" src="/images/logo.png" mode="aspectFit" />
-      <text class="title">AI数智名片</text>
-      <text class="subtitle">让每一次连接都有价值</text>
+<view class="page-container login-page">
+  <view class="login-header">
+    <text class="login-logo">AI数智名片</text>
+    <text class="login-slogan">让每一次连接都有价值</text>
+  </view>
+  
+  <view class="feature-list">
+    <view class="feature-item">
+      <view class="feature-icon">◇</view>
+      <text class="feature-text">智能对话</text>
     </view>
-
-    <view class="features">
-      <view class="feature-item">
-        <text class="feature-icon">📇</text>
-        <text class="feature-text">智能名片创建</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-icon">🤝</text>
-        <text class="feature-text">信任网络连接</text>
-      </view>
-      <view class="feature-item">
-        <text class="feature-icon">🎯</text>
-        <text class="feature-text">AI精准匹配</text>
-      </view>
+    <view class="feature-item">
+      <view class="feature-icon">◎</view>
+      <text class="feature-text">信任网络</text>
     </view>
+    <view class="feature-item">
+      <view class="feature-icon">✦</view>
+      <text class="feature-text">精准匹配</text>
+    </view>
+  </view>
 
-    <button class="login-btn" bindtap="wxLogin" loading="{{loading}}" disabled="{{loading}}">
-      <image class="wechat-icon" src="/images/wechat.png" mode="aspectFit" />
-      微信授权登录
+  <view class="login-form">
+    <button class="btn-wechat" bindtap="wxLogin" loading="{{loading}}">
+      <view class="wechat-icon">💚</view>
+      <text class="wechat-text">{{loading ? '登录中...' : '一键登录'}}</text>
     </button>
+    <view class="login-alternative" bindtap="skipLogin">
+      <text>暂不登录，先看看</text>
+    </view>
+  </view>
 
-    <view class="skip-btn" bindtap="skipLogin">暂不登录，先看看</view>
+  <view class="login-footer">
+    <text>登录即代表同意</text>
+    <text class="link" bindtap="goAgreement">《用户协议》</text>
+    <text class="link" bindtap="goPrivacy">《隐私政策》</text>
+  </view>
 
-    <view class="agreement">
-      <text>登录即表示同意</text>
-      <text class="link">《用户协议》</text>
-      <text class="link">《隐私政策》</text>
+  <!-- ===== 登录后完善信息弹窗 ===== -->
+  <view class="nickname-overlay {{showNicknameSetup ? 'visible' : ''}}" wx:if="{{showNicknameSetup}}">
+    <view class="nickname-card">
+      <text class="nickname-title">完善个人信息</text>
+      <text class="nickname-desc">请选择头像和输入昵称</text>
+      
+      <!-- 头像选择（view+button覆盖，确保正圆形） -->
+      <view class="avatar-choose-area" style="position:relative;">
+        <button open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" class="avatar-choose-overlay"></button>
+        <image wx:if="{{setupInfo.avatar}}" src="{{setupInfo.avatar}}" mode="aspectFill" class="setup-avatar" />
+        <view wx:else class="setup-avatar-placeholder">
+          <text class="setup-avatar-icon">📷</text>
+          <text class="setup-avatar-text">点击选择头像</text>
+        </view>
+      </view>
+
+      <!-- 昵称输入（type=nickname 获取真实微信昵称） -->
+      <view class="nickname-input-area">
+        <text class="input-label">昵称</text>
+        <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{setupInfo.nickName}}" />
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="nickname-actions">
+        <button class="btn-nickname-secondary" bindtap="skipSetup">跳过</button>
+        <button class="btn-nickname-primary" bindtap="confirmSetup">完成设置</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 调试用：清除登录态回到登录页 -->
+  <view class="dev-tools" bindtap="clearLogin">
+    <text style="font-size:24rpx;color:#999;margin-top:20rpx;display:block;text-align:center;">清除登录态</text>
+  </view>
+
+  <view class="error-modal" wx:if="{{showError}}" catchtap="hideError">
+    <view class="error-card" catchtap="">
+      <view class="error-icon">⚠️</view>
+      <text class="error-title">{{errorTitle}}</text>
+      <text class="error-desc">{{errorDesc}}</text>
+      <view class="error-actions">
+        <button class="btn-error-secondary" bindtap="hideError">取消</button>
+        <button class="btn-error-primary" bindtap="retryLogin">重试</button>
+      </view>
     </view>
   </view>
 </view>

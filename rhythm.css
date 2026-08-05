@@ -1,0 +1,115 @@
+/* ============================================================
+   AI数智名片 — 节奏 / Section Break (DS-03 / DS-06)
+   分隔线 + 区域节奏系统
+   配合 _design_tokens.css 使用
+   ============================================================ */
+
+/* ===== Section Break: 分隔线 ===== */
+.section-break {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--border-default, rgba(148, 163, 184, 0.15)) 10%,
+    var(--border-default, rgba(148, 163, 184, 0.15)) 50%,
+    transparent 100%
+  );
+  margin: var(--space-12, 48px) 0;
+  position: relative;
+}
+
+/* 装饰亮点 */
+.section-break::after {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.6rem;
+  color: var(--color-primary-light, #38d9f0);
+  background: var(--surface-secondary, #1a1f3a);
+  padding: 0 var(--space-4, 16px);
+  opacity: 0.6;
+}
+
+/* ===== Section Break 变体 ===== */
+
+/* 渐变 — 光晕风格 */
+.section-break--glow {
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(6, 182, 212, 0.3) 20%,
+    rgba(139, 92, 246, 0.3) 50%,
+    rgba(6, 182, 212, 0.3) 80%,
+    transparent 100%
+  );
+  border-radius: 2px;
+}
+
+.section-break--glow::after {
+  content: '';
+  display: none;
+}
+
+/* 简洁 — 无装饰 */
+.section-break--simple {
+  height: 1px;
+  background: var(--border-subtle, rgba(148, 163, 184, 0.08));
+  margin: var(--space-8, 32px) 0;
+}
+
+.section-break--simple::after {
+  display: none;
+}
+
+/* 宽松间距 */
+.section-break--spacious {
+  margin: var(--space-16, 64px) 0;
+}
+
+/* 紧凑间距 */
+.section-break--compact {
+  margin: var(--space-6, 24px) 0;
+}
+
+/* ===== 区域节奏容器 ===== */
+.section {
+  padding: var(--space-12, 48px) 0;
+}
+
+.section--hero {
+  padding: var(--space-20, 80px) 0 var(--space-12, 48px);
+}
+
+.section--narrow {
+  padding: var(--space-8, 32px) 0;
+}
+
+.section--wide {
+  padding: var(--space-16, 64px) 0;
+}
+
+/* 区域标题装饰线 */
+.section-title-decor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin-bottom: var(--space-6, 24px);
+}
+
+.section-title-decor::before {
+  content: '';
+  width: 3px;
+  height: 20px;
+  background: var(--gradient-primary, linear-gradient(135deg, #06b6d4, #8b5cf6));
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* 区域间的纵向间距 */
+.section + .section {
+  margin-top: var(--space-8, 32px);
+}

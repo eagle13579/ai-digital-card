@@ -26,10 +26,27 @@
   "compileType": "miniprogram",
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "value": "_archive",
+        "type": "folder"
+      },
+      {
+        "value": "_verify_build.js",
+        "type": "file"
+      },
+      {
+        "value": "test-*.js",
+        "type": "file"
+      },
+      {
+        "value": "docs",
+        "type": "folder"
+      }
+    ],
     "include": []
   },
-  "appid": "wxfbe2bae2f95941db",
+  "appid": "wxb4f6d89904200fd2",
   "editorSetting": {},
   "libVersion": "3.16.1"
 }

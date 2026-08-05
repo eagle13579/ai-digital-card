@@ -101,6 +101,8 @@ def create_app():
         CsrfMiddleware,
         get_metrics_instance,
         init_otel,
+        SentryExceptionMiddleware,
+        DetailToMessageMiddleware,
     )
     from app.middleware.api_version import APIVersionRedirectMiddleware
 
@@ -131,6 +133,9 @@ def create_app():
         allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
     )
     app.add_middleware(CsrfMiddleware)
+    # Sentry 异常捕获中间件 — 兜底捕获所有未处理异常并上报 Sentry
+    app.add_middleware(SentryExceptionMiddleware)
+    app.add_middleware(DetailToMessageMiddleware)
     app.add_middleware(LoggingMiddleware)
 
     # FastAPI 集成 (OpenTelemetry) — instrument_app 会在内部跳过若未初始化
@@ -144,16 +149,17 @@ def create_app():
 
     # Routers
     from app.routers import (auth_router, user_router, brochure_router, tag_router,
-                             match_router, brochure_alias_router, visitor_router,
-                             trust_router, i18n_router, public_router, payment_router,
-                             integration_router, export_router, webhook_router,
-                             recommend_router, ab_test_router, api_keys_router,
-                             docs_router, web_vitals_router, graphql_router,
-                             oauth_router, admin_router)
+                                 match_router, brochure_alias_router, card_alias_router, visitor_router,
+                            trust_router, i18n_router, public_router, payment_router,
+                            integration_router, export_router, webhook_router,
+                            recommend_router, ab_test_router, api_keys_router,
+                            docs_router, web_vitals_router, graphql_router,
+                            oauth_router, admin_router, ai_assist_router)
     from app.routers.miniapp_router import (
         router as miniapp_router,
         exchange_alt_router as miniapp_exchange_router,
         recommend_router as miniapp_recommend_router,
+        miniapp_code_router,
     )
     from app.routers.graphql_route import strawberry_app
     from app.routers.tenant_api import router as tenant_router
@@ -172,8 +178,63 @@ def create_app():
     from app.crm.form_capture_router import router as form_capture_router
     from app.routers.document import router as document_router
     from app.routers.analytics import router as analytics_router
+    from app.routers.platform_router import router as platform_router
+    from app.routers.connection_router import router as connection_router
+    # ── 链客宝合并路由 ──
+    from app.routers.organization_router import router as organization_router
+    from app.routers.six_degrees_router import router as six_degrees_router
+    from app.routers.escrow_router import router as escrow_router
+    from app.routers.ocr_router import router as ocr_router
+    from app.routers.pdf_router import router as pdf_router
+    from app.routers.security_scan import router as security_scan_router
+    from app.routers.skill_registry import router as skill_registry_router
+    # ── CloakBrowser 智能爬虫 ──
+    from app.routers.cloak_scraper import router as cloak_scraper_router
+    from app.routers.progressive_search_router import router as progressive_search_router
+    from app.routers.task_slicer_router import router as task_slicer_router
+    # ── Crawlee 名片爬虫服务 ──
+    from app.routers.crawlee_router import router as crawlee_router
+    # ── F10 智能Agent指挥官调度层 ──
+    from app.routers.commander_router import router as commander_router
+    from app.routers.circuit_breaker_router import router as circuit_breaker_router
+    # ── F11 分制-压缩流水线 ──
+    from app.routers.compression_router import router as compression_router
+    # ── F13 Token 预算指令系统 ──
+    from app.routers.token_budget_router import router as token_budget_router
+    # ── F12 Prompt分治模板库 ──
+    from app.routers.prompt_router import router as prompt_router
+    # ── F14 工具规则装饰器 ──
+    from app.routers.tool_rules_router import router as tool_rules_router
+    # ── F21 Agent化任务决策矩阵 ──
+    from app.routers.decision_matrix_router import router as decision_matrix_router
+    # ── IM 桥接适配器 (企微 / 钉钉) ──
+    from app.routers.im_bridge import router as im_bridge_router
+    # ── F19 Token 消耗分析仪表盘 ──
+    from app.routers.token_analytics_router import router as token_analytics_router
+    # ── F17 灰度发布平台 (彩虹部署) ──
+    from app.routers.canary_router import router as canary_router
+    # ── F18 Agent质量评估看板 ──
+    from app.routers.quality_router import router as quality_router
+    # ── F16 异步任务 Checkpoint 恢复 ──
+    from app.routers.checkpoint_router import router as checkpoint_router
+    # ── F20 名片Agent准确率门禁 ──
+    from app.routers.accuracy_gate_router import router as accuracy_gate_router
+    # ── Dify 工具插件 + 应用编排服务 ──
+    from app.routers.dify_tool_routes import router as dify_tool_router
 
-    # ── 惰性注册：knowledge_models_router ──────────────────────────
+    # ── ds2api 服务模块 — SSE引擎 + 工具调用服务 ──
+    from services.sse_engine import SseEngineService, SSEStreamEngine, SSEParser
+    from services.tool_call_service import ToolCallService, ToolCallPipeline
+
+    # ── ds4 服务模块 — Engine-Session + 单工作者队列 ──
+    from services.ds4_engine_service import ModelEngine, InferenceSession
+    from services.ds4_worker_service import WorkerQueue
+
+    # ── DSX 白泽推理引擎 — 7大能力集成 ──
+    from services.dsx_service import register_dsx_routes, get_dsx_available
+    register_dsx_routes(app)
+
+    # ── 惰性注册：knowledge_models_router
     # 故意不加入 routers/__init__.py 以避免 via ai_assist → auth 的循环依赖
     def _register_knowledge_models(app):
         from app.routers.knowledge_models_router import router as km_router
@@ -189,6 +250,15 @@ def create_app():
     _register_knowledge_models(app)  # 惰性注册，避免 routers/__init__.py 循环依赖
     app.include_router(design_qa_router)
     app.include_router(gaia_router)
+    app.include_router(platform_router)
+    app.include_router(connection_router)
+    # ── 链客宝合并路由 ──
+    app.include_router(organization_router)
+    app.include_router(six_degrees_router)
+    app.include_router(escrow_router)
+    app.include_router(ocr_router)
+    app.include_router(pdf_router)
+    app.include_router(security_scan_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)
@@ -196,11 +266,22 @@ def create_app():
     app.include_router(user_router)
     app.include_router(brochure_router)
     app.include_router(tag_router)
+    app.include_router(ai_assist_router)
     app.include_router(match_router)
+    from app.routers.matching import router as matching_router
+    app.include_router(matching_router)
+    from app.routers.k3_router import router as k3_router
+    app.include_router(k3_router)
+    from app.routers.transphee import router as transphee_router
+    app.include_router(transphee_router)
+    from app.routers.inference_gateway import router as inference_gateway_router
+    app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)
+    app.include_router(card_alias_router)
     app.include_router(miniapp_router)
     app.include_router(miniapp_exchange_router)
     app.include_router(miniapp_recommend_router)
+    app.include_router(miniapp_code_router)
     app.include_router(visitor_router)
     app.include_router(trust_router)
     app.include_router(i18n_router)
@@ -211,6 +292,11 @@ def create_app():
     app.include_router(webhook_router)
     app.include_router(recommend_router)
     app.include_router(ab_test_router)
+    try:
+        from app.routers.xinsen_match import router as xinsen_router
+        app.include_router(xinsen_router)
+    except ModuleNotFoundError:
+        logger.warning("xinsen_match 路由未找到，跳过")
     app.include_router(api_keys_router)
     app.include_router(docs_router)
     app.include_router(web_vitals_router)
@@ -226,6 +312,77 @@ def create_app():
     app.include_router(invoice_router)
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
+    app.include_router(skill_registry_router)
+    # ── CloakBrowser 智能爬虫 ──
+    app.include_router(cloak_scraper_router)
+    app.include_router(progressive_search_router)
+    app.include_router(task_slicer_router)
+    # ── Crawlee 名片爬虫服务 ──
+    app.include_router(crawlee_router)
+    app.include_router(circuit_breaker_router)
+    # ── F11 分制-压缩流水线 ──
+    app.include_router(compression_router)
+    # ── F13 Token 预算指令系统 ──
+    app.include_router(token_budget_router)
+    # ── F12 Prompt分治模板库 ──
+    app.include_router(prompt_router)
+    # ── F14 工具规则装饰器 ──
+    app.include_router(tool_rules_router)
+    # ── F21 Agent化任务决策矩阵 ──
+    app.include_router(decision_matrix_router)
+    # ── F10 智能Agent指挥官调度层 ──
+    app.include_router(commander_router)
+    # ── IM 桥接适配器 (企微 / 钉钉) ──
+    app.include_router(im_bridge_router)
+    # ── F17 灰度发布平台 (彩虹部署) ──
+    app.include_router(canary_router)
+    # ── F18 Agent质量评估看板 ──
+    app.include_router(quality_router)
+    # ── F19 Token 消耗分析仪表盘 ──
+    app.include_router(token_analytics_router)
+    # ── F16 异步任务 Checkpoint 恢复 ──
+    app.include_router(checkpoint_router)
+    # ── F20 名片Agent准确率门禁 ──
+    app.include_router(accuracy_gate_router)
+    # ── Dify 工具插件 + 应用编排服务 ──
+    app.include_router(dify_tool_router)
+    # ── F0 多AI Provider Driver 路由 ──
+    from app.ai.gateway.provider_router import router as provider_router
+    app.include_router(provider_router)
+
+    # ── notification 行业动态推送路由 ──
+    from app.routers.notification_router import router as notification_router
+    app.include_router(notification_router)
+
+    # ── ds2api 服务健康检查 ──
+    from fastapi import APIRouter
+    _ds2api_router = APIRouter(prefix="/api/v1/ds2api")
+
+    @_ds2api_router.get("/sse-engine/health")
+    async def ds2api_sse_health():
+        """SSE引擎服务健康检查"""
+        return {
+            "status": "ok",
+            "service": "sse_engine",
+            "version": "1.0.0",
+            "loaded": True,
+        }
+
+    @_ds2api_router.get("/tool-call/health")
+    async def ds2api_toolcall_health():
+        """工具调用服务健康检查"""
+        return {
+            "status": "ok",
+            "service": "tool_call_service",
+            "version": "1.0.0",
+            "loaded": True,
+        }
+
+    app.include_router(_ds2api_router)
+
+    # ── MiniMax AI 多模态 ──
+    from app.routers.minimax_router import router as minimax_router
+    app.include_router(minimax_router)
 
     # Static
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -287,11 +444,31 @@ def create_app():
     # Startup
     @app.on_event("startup")
     async def startup():
+        # ── JWT_SECRET 安全校验 ──────────────────────────────────────
+        jwt_secret = cfg.JWT_SECRET
+        if not jwt_secret:
+            logger.critical("JWT_SECRET 未配置！应用将退出")
+            sys.exit(1)
+        if jwt_secret in ("change-me", "default", "changeme"):
+            logger.critical("JWT_SECRET 使用了占位值 '%s'！请配置强随机密钥。应用将退出", jwt_secret)
+            sys.exit(1)
+        if len(jwt_secret) < 20:
+            logger.warning("JWT_SECRET 长度不足20字符（当前 %d 位），建议使用64位随机密钥", len(jwt_secret))
+        else:
+            logger.info("JWT_SECRET 安全校验通过 (%d 位)", len(jwt_secret))
+
         data_dir = os.path.join(os.path.dirname(BASE_DIR), "data")
         os.makedirs(data_dir, exist_ok=True)
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("数据库表创建/验证完成 (async)")
+
+        # Sentry 状态确认
+        sentry_dsn = cfg.SENTRY_DSN
+        if sentry_dsn:
+            logger.info("Sentry 生产监控已启用 (DSN 已配置)")
+        else:
+            logger.info("Sentry 生产监控未启用 (未配置 SENTRY_DSN，如需启用请在 .env 中设置)")
 
         # 初始化 Redis 缓存层
         try:
@@ -305,6 +482,14 @@ def create_app():
             )
         except Exception as e:
             logger.warning("Redis 初始化失败（降级运行）: %s", e)
+
+        # 初始化多AI Provider Driver 注册表
+        try:
+            from app.ai.gateway.provider_manager import init_provider_drivers
+            init_provider_drivers()
+            logger.info("多AI Provider Driver 注册表初始化完成")
+        except Exception as e:
+            logger.warning("Provider Driver 初始化失败（降级运行）: %s", e)
 
     # Shutdown
     @app.on_event("shutdown")

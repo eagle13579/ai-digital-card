@@ -1,0 +1,13 @@
+<view class="page-container">
+  <text class="page-title">数据分析</text>
+  <view class="section">
+    <view class="stat-card">
+      <text class="stat-label">总访问量</text>
+      <text class="stat-value">0</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-label">活跃用户</text>
+      <text class="stat-value">0</text>
+    </view>
+  </view>
+</view>

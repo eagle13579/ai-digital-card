@@ -1,0 +1,4 @@
+<view class="section-header">
+  <text class="section-header-title">{{title}}</text>
+  <text class="section-header-more" wx:if="{{showMore && more}}" catchtap="onMore">{{more}}</text>
+</view>

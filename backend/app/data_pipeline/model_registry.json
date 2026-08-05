@@ -1,0 +1,396 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "模型训练管道注册表 — 每个模型与数据源/训练脚本的映射",
+    "last_updated": "2026-07-25"
+  },
+  "models": {
+    "matching_model_v2": {
+      "model_id": "matching_model_v2",
+      "name": "名片匹配模型v2",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "url_batch_crawler",
+        "crm_matching_data"
+      ],
+      "train_script": "scripts/train_matching_model_v2.py",
+      "model_file": "models/matching_model_v2.pt",
+      "frequency_min": 360,
+      "max_staleness_hours": 24,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "matching_model_v2_mac": {
+      "model_id": "matching_model_v2_mac",
+      "name": "名片匹配模型v2 (Mac MPS)",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "url_batch_crawler",
+        "crm_matching_data"
+      ],
+      "train_script": "scripts/train_matching_model_v2_mac_mps.py",
+      "model_file": "models/matching_model_v2_mac.pt",
+      "frequency_min": 360,
+      "max_staleness_hours": 24,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "prepare_v2_training_data": {
+      "model_id": "prepare_v2_training_data",
+      "name": "V2训练数据准备",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "url_batch_crawler",
+        "xiaohongshu"
+      ],
+      "train_script": "scripts/prepare_v2_training_data.py",
+      "model_file": "data/v2_training_data.json",
+      "frequency_min": 120,
+      "max_staleness_hours": 12,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "user_tower_pretrained": {
+      "model_id": "user_tower_pretrained",
+      "name": "用户塔预训练",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "qichacha",
+        "crm_matching_data"
+      ],
+      "train_script": "scripts/pretrain_user_tower.py",
+      "model_file": "data/models/user_tower_pretrained.pt",
+      "frequency_min": 720,
+      "max_staleness_hours": 72,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "data_augmentation": {
+      "model_id": "data_augmentation",
+      "name": "数据增强管道",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "qichacha",
+        "xiaohongshu"
+      ],
+      "train_script": "scripts/data_augmentation.py",
+      "model_file": "data/augmented_dataset.json",
+      "frequency_min": 240,
+      "max_staleness_hours": 48,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "enhance_user_data": {
+      "model_id": "enhance_user_data",
+      "name": "用户数据增强",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "enterprise_websites",
+        "qichacha",
+        "url_batch_crawler"
+      ],
+      "train_script": "scripts/enhance_user_data.py",
+      "model_file": "data/enhanced_user_data.json",
+      "frequency_min": 240,
+      "max_staleness_hours": 48,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "training_data_generator": {
+      "model_id": "training_data_generator",
+      "name": "训练数据生成器",
+      "priority": "P0",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "url_batch_crawler",
+        "baidu_search"
+      ],
+      "train_script": "app/services/training_data_generator.py",
+      "model_file": "data/training_data.json",
+      "frequency_min": 120,
+      "max_staleness_hours": 12,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "online_learning": {
+      "model_id": "online_learning",
+      "name": "在线学习引擎",
+      "priority": "P1",
+      "training_type": "online",
+      "data_sources": [
+        "user_behavior_feedback",
+        "crm_matching_data",
+        "xiaohongshu"
+      ],
+      "train_script": "app/ai/online_learning.py",
+      "model_file": "data/online_weights.json",
+      "frequency_min": 30,
+      "max_staleness_hours": 2,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "gaia_trainer": {
+      "model_id": "gaia_trainer",
+      "name": "Gaia训练器",
+      "priority": "P1",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "user_behavior_feedback",
+        "knowledge_base",
+        "baidu_search"
+      ],
+      "train_script": "app/ai/gaia_trainer.py",
+      "model_file": "data/models/gaia_weights.json",
+      "frequency_min": 360,
+      "max_staleness_hours": 24,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "gaia_evolution_brain": {
+      "model_id": "gaia_evolution_brain",
+      "name": "Gaia进化脑",
+      "priority": "P1",
+      "training_type": "evolution",
+      "data_sources": [
+        "user_behavior_feedback",
+        "baidu_search",
+        "crm_matching_data"
+      ],
+      "train_script": "app/ai/gaia_evolution_brain.py",
+      "model_file": "data/evolution_state.json",
+      "frequency_min": 60,
+      "max_staleness_hours": 6,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "recommendation": {
+      "model_id": "recommendation",
+      "name": "推荐引擎",
+      "priority": "P1",
+      "training_type": "online",
+      "data_sources": [
+        "user_behavior_feedback",
+        "xiaohongshu",
+        "baidu_search"
+      ],
+      "train_script": "app/ai/recommendation.py",
+      "model_file": "data/recommendation_weights.json",
+      "frequency_min": 30,
+      "max_staleness_hours": 2,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "bandit_engine": {
+      "model_id": "bandit_engine",
+      "name": "多臂赌博机引擎",
+      "priority": "P1",
+      "training_type": "online",
+      "data_sources": [
+        "user_behavior_feedback",
+        "crm_matching_data"
+      ],
+      "train_script": "app/ai/bandit_engine.py",
+      "model_file": "data/bandit_state.json",
+      "frequency_min": 15,
+      "max_staleness_hours": 1,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "sales_prediction": {
+      "model_id": "sales_prediction",
+      "name": "销售预测模型",
+      "priority": "P2",
+      "training_type": "offline_batch",
+      "data_sources": [
+        "crm_matching_data",
+        "qichacha",
+        "enterprise_websites"
+      ],
+      "train_script": "app/services/sales_prediction.py",
+      "model_file": "data/sales_prediction_model.json",
+      "frequency_min": 1440,
+      "max_staleness_hours": 168,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "model_absorb_daemon": {
+      "model_id": "model_absorb_daemon",
+      "name": "模型吸收守护进程",
+      "priority": "P2",
+      "training_type": "self_supervised",
+      "data_sources": [
+        "web_pages_rag",
+        "knowledge_base"
+      ],
+      "train_script": "../gaia-commercial/scripts/model_absorb_daemon.py",
+      "model_file": "../gaia-commercial/data/absorbed_models/",
+      "frequency_min": 1440,
+      "max_staleness_hours": 168,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "rag_pipeline": {
+      "model_id": "rag_pipeline",
+      "name": "RAG知识管道",
+      "priority": "P2",
+      "training_type": "self_supervised",
+      "data_sources": [
+        "web_pages_rag",
+        "xiaohongshu",
+        "knowledge_base"
+      ],
+      "train_script": "app/ai/rag_pipeline.py",
+      "model_file": "data/rag_index/",
+      "frequency_min": 120,
+      "max_staleness_hours": 24,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "embedding_service": {
+      "model_id": "embedding_service",
+      "name": "向量嵌入服务",
+      "priority": "P3",
+      "training_type": "self_supervised",
+      "data_sources": [
+        "web_pages_rag",
+        "knowledge_base"
+      ],
+      "train_script": "app/ai/embedding_service.py",
+      "model_file": "data/embeddings/",
+      "frequency_min": 720,
+      "max_staleness_hours": 168,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    },
+    "knowledge_graph": {
+      "model_id": "knowledge_graph",
+      "name": "知识图谱引擎",
+      "priority": "P3",
+      "training_type": "self_supervised",
+      "data_sources": [
+        "knowledge_base",
+        "enterprise_websites",
+        "web_pages_rag"
+      ],
+      "train_script": "app/ai/knowledge_graph.py",
+      "model_file": "data/knowledge_graph/",
+      "frequency_min": 1440,
+      "max_staleness_hours": 336,
+      "auto_mode": "full_auto",
+      "enabled": true,
+      "last_trained": null,
+      "observability": {
+        "health_check": "",
+        "alert_on_failure": true,
+        "metrics_export": true
+      }
+    }
+  }
+}

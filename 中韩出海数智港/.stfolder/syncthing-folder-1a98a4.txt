@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: china-korea-port
+created: 2026-07-25T18:04:31+08:00

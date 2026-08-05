@@ -8,6 +8,8 @@ from .logging_middleware import LoggingMiddleware, setup_json_logging
 from .otel import init_otel
 from .security_headers import SecurityHeadersMiddleware
 from .csrf_middleware import CsrfMiddleware
+from .sentry_middleware import SentryExceptionMiddleware
+from .detail_to_message import DetailToMessageMiddleware
 
 __all__ = [
     "RequestIDMiddleware", "request_id_var", "RequestIDLogFilter",
@@ -20,4 +22,6 @@ __all__ = [
     "init_otel",
     "SecurityHeadersMiddleware",
     "CsrfMiddleware",
+    "SentryExceptionMiddleware",
+    "DetailToMessageMiddleware",
 ]

@@ -1,8 +1,10 @@
 /**
  * 名片详情页
- * 展示单张名片的详细信息与统计数据
+ * 展示单张名片的详细信息与统计数据 (i18n enabled)
  */
 const { MockService } = require('../../utils/mockService')
+const { miniappApi, userApi, brochureApi } = require('../../utils/api')
+const i18n = require('../../utils/i18n')
 
 Page({
   data: {
@@ -10,22 +12,127 @@ Page({
     card: null,
     stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
     purposeText: '',
+    // i18n
+    _t: {},
   },
 
   onLoad(options) {
+    this._loadI18n()
+    // 登录守卫
+    const store = require('../../utils/store')
+    if (!store.getState().isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
+      return
+    }
     const cardId = options.id
+    const userId = options.userId
     if (cardId) {
       this.loadCardDetail(cardId)
+    } else if (userId) {
+      // 从搜索页传入 userId，先获取用户的个人信息，再匹配画册
+      this.loadCardByUserId(userId)
     } else {
-      wx.showToast({ title: '参数错误', icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 1500)
+      // 从tab进入时没有传id，加载用户自己的名片
+      this.loadMyCard()
     }
+  },
+
+  async loadMyCard() {
+    this.setData({ loading: true })
+    try {
+      // 使用 getBrochures（原 getMyBrochures 不存在）
+      const brochures = await MockService.getBrochures()
+      const list = Array.isArray(brochures) ? brochures : (brochures?.data?.items || brochures?.data || [])
+      if (list.length > 0) {
+        this.loadCardDetail(list[0].id)
+      } else {
+        this.setData({ loading: false, card: null })
+        wx.showToast({ title: i18n.t('noCardYet') || '暂无名片', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('加载我的名片失败:', err)
+      this.setData({ loading: false })
+    }
+  },
+
+  /** 根据 userId 加载对方名片（搜索结果跳转） */
+  async loadCardByUserId(userId) {
+    this.setData({ loading: true })
+    try {
+      // 获取用户信息
+      const userRes = await userApi.getUser(userId)
+      const user = userRes && userRes.data ? userRes.data : userRes
+      // 查找该用户的画册
+      const brochureRes = await brochureApi.list({ user_id: userId })
+      const brochures = Array.isArray(brochureRes) ? brochureRes : (brochureRes?.data?.items || brochureRes?.data || [])
+      if (brochures.length > 0) {
+        this.loadCardDetail(brochures[0].id)
+      } else if (user) {
+        // 无名片的用户，用用户信息构造简单卡片
+        this.setData({
+          card: {
+            id: null,
+            user_id: user.id || userId,
+            title: '',
+            cover: user.avatar || '',
+            user_name: user.name || user.nickName || '',
+            user_company: user.company || '',
+            user_title: user.title || '',
+            user_avatar: user.avatar || '',
+          },
+          stats: { views: 0, visitors: 0, matches: 0, trust: 0 },
+          loading: false,
+        })
+      } else {
+        this.setData({ loading: false, card: null })
+        wx.showToast({ title: i18n.t('noCardYet') || '未找到名片', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('[Card] 加载用户名片失败:', err)
+      this.setData({ loading: false })
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    }
+  },
+
+  onShow() {
+    this._loadI18n()
+  },
+
+  /** 加载国际化翻译 */
+  _loadI18n() {
+    this.setData({ _t: i18n.getTranslations() })
   },
 
   async loadCardDetail(cardId) {
     this.setData({ loading: true })
+    const store = require('../../utils/store')
+    const { userInfo: storeUserInfo } = store.getState()
     try {
-      const brochure = await MockService.getBrochureById(cardId)
+      const [brochure, recommendRes, trustNetRes] = await Promise.all([
+        MockService.getBrochureById(cardId),
+        MockService.getRecommendList().catch(() => ({ data: [] })),
+        MockService.getTrustNetwork().catch(() => ({ data: { trusting: [], trusted_by: [] } })),
+      ])
+      
+      const recommendData = recommendRes && recommendRes.data ? recommendRes.data : recommendRes
+      const trustNet = trustNetRes && trustNetRes.data ? trustNetRes.data : trustNetRes
+      
+      // 从画册的 profile 页面 content 中提取用户信息
+      let profileName = '', profileAvatar = '', profileCompany = '', profileTitle = ''
+      if (brochure && brochure.pages && Array.isArray(brochure.pages)) {
+        const profilePage = brochure.pages.find(p => p.content_type === 'profile')
+        if (profilePage && profilePage.content) {
+          try {
+            const parsed = JSON.parse(profilePage.content)
+            profileName = parsed.name || ''
+            profileAvatar = ''  // avatar 存在 brochure.cover 中，不在 content 里
+            profileCompany = parsed.company || ''
+            profileTitle = parsed.title || ''
+          } catch (e) {}
+        }
+      }
+      // avatar 优先用 brochure.cover，其次 store
+      const avatar = brochure?.cover || storeUserInfo?.avatar || storeUserInfo?.avatarUrl || ''
       
       let card = null
       if (brochure) {
@@ -38,26 +145,31 @@ Page({
           status: brochure.status,
           share_token: brochure.share_token,
           view_count: brochure.view_count || 0,
-          user_name: brochure.user_name || brochure.name || '',
-          user_company: brochure.user_company || brochure.company || '',
-          user_title: brochure.user_title || brochure.title || '',
-          user_avatar: brochure.user_avatar || brochure.avatar || '',
+          user_name: profileName || storeUserInfo?.name || storeUserInfo?.nickName || '',
+          user_company: profileCompany || storeUserInfo?.company || '',
+          user_title: profileTitle || storeUserInfo?.title || '',
+          user_avatar: avatar,
         }
       }
 
-      const purposeText = {
-        partner: '寻找合作伙伴',
-        investor: '寻找投资',
-        employee: '寻找人才',
-        client: '寻找客户',
-        friend: '社交交友',
-      }[card && card.purpose] || (card && card.purpose) || ''
+      const purposeMap = {
+        partner: i18n.t('choosePartner'),
+        investor: i18n.t('chooseInvest'),
+        employee: i18n.t('chooseTalent'),
+        client: i18n.t('chooseClient'),
+        friend: i18n.t('chooseFriend'),
+      }
+      const purposeText = purposeMap[card && card.purpose] || (card && card.purpose) || ''
 
       let stats = { views: 0, visitors: 0, matches: 0, trust: 0 }
       if (card) {
-        const vStats = await MockService.getVisitorStats(cardId)
+        const vStatsRes = await MockService.getVisitorStats(cardId)
+        const vStats = vStatsRes && vStatsRes.data ? vStatsRes.data : vStatsRes
         stats.views = vStats.view_count || 0
         stats.visitors = vStats.total_visits || 0
+        const recommendList = Array.isArray(recommendData) ? recommendData : []
+        stats.matches = recommendList.length || 0
+        stats.trust = (trustNet.trusting?.length || 0) + (trustNet.trusted_by?.length || 0)
       }
 
       this.setData({
@@ -72,62 +184,45 @@ Page({
     }
   },
 
-  // 预览
   goPreview() {
-    if (this.data.card) {
-      wx.navigateTo({ url: `/pages/preview/index?id=${this.data.card.id}` })
-    }
-  },
-
-  // 分享
-  shareCard() {
-    wx.showShareMenu({ withShareTicket: true })
-  },
-
-  // 生成小程序码
-  async generateQRCode() {
-    if (!this.data.card?.share_token) {
-      wx.showToast({ title: '该名片暂不支持生成二维码', icon: 'none' })
-      return
-    }
-    wx.showLoading({ title: '生成中...' })
-    try {
-      const result = await miniappApi.getQRCode(this.data.card.share_token)
-      if (result && result.tempFilePath) {
-        wx.hideLoading()
-        wx.previewImage({ urls: [result.tempFilePath] })
-      } else if (result instanceof ArrayBuffer) {
-        // 如果返回二进制图片数据
-        const fs = wx.getFileSystemManager()
-        const filePath = `${wx.env.USER_DATA_PATH}/qrcode_${this.data.card.share_token}.png`
-        fs.writeFile({
-          filePath,
-          data: result,
-          encoding: 'binary',
-          success() {
-            wx.hideLoading()
-            wx.previewImage({ urls: [filePath] })
-          },
-          fail() {
-            wx.hideLoading()
-            wx.showToast({ title: '二维码生成失败', icon: 'none' })
-          },
-        })
-      } else {
-        wx.hideLoading()
-        wx.showToast({ title: '二维码生成成功', icon: 'success' })
+    const card = this.data.card
+    if (card && card.id) {
+      // 将名片数据保存为草稿，编辑时预填
+      if (card.id) {
+        wx.setStorageSync('edit_brochure_id', card.id)
+        // 存一份到 create 页的草稿格式
+        try {
+          const draft = {
+            formData: {
+              name: card.user_name || '',
+              title: card.user_title || '',
+              company: card.user_company || '',
+              avatar: card.user_avatar || card.cover || '',
+              // 其他字段从 brochure.pages 中解析
+            },
+            savedAt: Date.now(),
+          }
+          wx.setStorageSync('brochure_create_draft', draft)
+        } catch (e) {
+          console.warn('保存编辑草稿失败', e)
+        }
       }
-    } catch (err) {
-      wx.hideLoading()
-      console.error('生成二维码失败:', err)
+      wx.navigateTo({ url: `/pages/brochure/create/index?edit=${card.id}` })
+    } else {
+      wx.navigateTo({ url: '/pages/brochure/create/index' })
     }
+  },
+
+  shareCard() {
+    const card = this.data.card
+    wx.showToast({ title: '请点击右上角"..."分享', icon: 'none' })
   },
 
   onShareAppMessage() {
     const card = this.data.card
     return {
-      title: card?.title || 'AI数智名片',
-      path: card ? `/pages/preview/index?id=${card.id}` : '/pages/index/index',
+      title: (card?.user_name || '') + '的AI数智名片',
+      path: card ? `/pages/brochure/preview/index?id=${card.id}` : '/pages/index/index',
     }
   },
 })

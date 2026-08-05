@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MVP — 产品原型</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 2rem; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    .subtitle { color: #64748b; margin-bottom: 32px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .feature-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148,163,184,0.15); border-radius: 16px; padding: 24px; }
+    .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .feature-desc { font-size: 0.9rem; color: #94a3b8; margin-bottom: 16px; }
+    .btn-mini { padding: 8px 16px; background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
+    .btn-mini:hover { opacity: 0.9; }
+    .status-bar { display: flex; gap: 16px; align-items: center; padding: 16px 20px; background: rgba(30,41,59,0.8); border-radius: 12px; border: 1px solid rgba(148,163,184,0.15); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+    .api-status { color: #94a3b8; font-size: 0.85rem; }
+    footer { margin-top: 40px; text-align: center; color: #475569; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="container" x-data="{
+    apiStatus: '检查中...',
+    init() {
+      fetch('/api/health')
+        .then(r => r.json())
+        .then(d => this.apiStatus = d.status)
+        .catch(() => this.apiStatus = '离线');
+    }
+  }">
+    <h1>MVP 产品原型</h1>
+    <p class="subtitle">自动生成 · 五步法引擎 Step 3</p>
+
+    <div class="feature-grid">
+        <div class="feature-card" x-data="{ count: 0 }">
+          <h3>match</h3>
+          <p class="feature-desc">核心功能 #1</p>
+          <button @click="count++" class="btn-mini">已点击 {count} 次</button>
+        </div>
+        <div class="feature-card" x-data="{ count: 0 }">
+          <h3>search</h3>
+          <p class="feature-desc">核心功能 #2</p>
+          <button @click="count++" class="btn-mini">已点击 {count} 次</button>
+        </div>
+        <div class="feature-card" x-data="{ count: 0 }">
+          <h3>analytics</h3>
+          <p class="feature-desc">核心功能 #3</p>
+          <button @click="count++" class="btn-mini">已点击 {count} 次</button>
+        </div>
+    </div>
+
+    <div class="status-bar">
+      <span class="status-dot"></span>
+      <span class="api-status">API 状态: <span x-text="apiStatus"></span></span>
+    </div>
+
+    <footer>MVP v0.1.0 · 通过五步法引擎自动生成</footer>
+  </div>
+</body>
+</html>

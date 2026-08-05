@@ -1,0 +1,272 @@
+/* 连接管理页 — 深色主题 */
+page {
+  background: #0f0f13;
+}
+
+.connections__header {
+  padding: 16px 16px 0;
+  background: #0f0f13;
+}
+
+.connections__header-title text {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.connections__tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 3px;
+}
+
+.connections__tab {
+  flex: 1;
+  padding: 8px 0;
+  text-align: center;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.connections__tab--active {
+  background: rgba(139,92,246,0.15);
+}
+
+.connections__tab-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+}
+
+.connections__tab--active .connections__tab-label {
+  color: #a78bfa;
+}
+
+.connections__tab-badge {
+  background: #ef4444;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.connections__tab-badge-text {
+  font-size: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.connections__scroll {
+  height: calc(100vh - 140px);
+  padding: 0 16px;
+}
+
+/* 骨架屏 */
+.connections__skeleton {
+  padding: 20px 16px;
+}
+
+.connections__skeleton-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.connections__skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.connections__skeleton-info {
+  flex: 1;
+}
+
+.connections__skeleton-line {
+  height: 12px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.connections__skeleton-line--name { width: 40%; }
+.connections__skeleton-line--company { width: 60%; }
+
+/* 错误 */
+.connections__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+.connections__error-icon { font-size: 40px; }
+.connections__error-title { font-size: 16px; color: #fff; font-weight: 600; margin-top: 12px; }
+.connections__error-msg { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+.connections__error-btn {
+  margin-top: 20px;
+  padding: 8px 28px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+}
+
+/* 空状态 */
+.connections__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+.connections__empty-icon { font-size: 48px; }
+.connections__empty-title { font-size: 16px; color: #fff; font-weight: 600; margin-top: 12px; }
+.connections__empty-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+.connections__empty-btn {
+  margin-top: 20px;
+  padding: 8px 28px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+}
+
+/* 连接列表 */
+.connections__list {
+  padding-top: 12px;
+}
+
+.connections__card {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.connections__card--active {
+  background: rgba(255,255,255,0.08);
+}
+
+.connections__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.connections__card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.connections__card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connections__card-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+}
+
+.connections__card-label {
+  background: rgba(139,92,246,0.12);
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+
+.connections__card-label-text {
+  font-size: 10px;
+  color: #a78bfa;
+}
+
+.connections__card-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connections__card-time {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  display: block;
+  margin-top: 2px;
+}
+
+.connections__card-arrow {
+  font-size: 20px;
+  color: rgba(255,255,255,0.2);
+  margin-left: 8px;
+}
+
+.connections__card-source {
+  background: rgba(59,130,246,0.12);
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+
+.connections__card-source-text {
+  font-size: 10px;
+  color: #60a5fa;
+}
+
+/* 审核按钮 */
+.connections__card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.connections__action-btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 5px 0;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.connections__action-btn--approve {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+}
+
+.connections__action-btn--reject {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.6);
+}
+
+.connections__bottom-spacer {
+  height: 40px;
+}

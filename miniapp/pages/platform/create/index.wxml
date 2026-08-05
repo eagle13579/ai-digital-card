@@ -1,123 +1,105 @@
 <view class="page-container">
-  <!-- 配额提示 -->
-  <view class="quota-bar">
-    <text class="quota-text">📊 今日剩余发布配额：{{quotaRemaining}} 次（{{memberLevel === 'free' ? '免费版' : memberLevel === 'gold' ? '黄金版' : memberLevel === 'diamond' ? '钻石版' : '董事会'}}）</text>
+  <view class="page-header">
+    <view class="back" bindtap="goBack">‹</view>
+    <text class="title">创建资源平台</text>
   </view>
 
-  <!-- 资源类型 -->
-  <view class="form-item">
-    <text class="label">资源类型</text>
-    <view class="type-selector">
-      <view class="type-option {{type === 'supply' ? 'type-option--active' : ''}}" data-type="supply" bindtap="selectType">
-        <text class="type-icon">📤</text>
-        <text class="type-label">我提供资源</text>
+  <scroll-view scroll-y class="form-scroll">
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-group">
+        <text class="form-label">平台名称 *</text>
+        <input class="form-input" placeholder="请输入平台名称" value="{{formData.name}}" bindinput="onInput" data-field="name" />
       </view>
-      <view class="type-option {{type === 'demand' ? 'type-option--active' : ''}}" data-type="demand" bindtap="selectType">
-        <text class="type-icon">📥</text>
-        <text class="type-label">我需求资源</text>
+
+      <view class="form-group">
+        <text class="form-label">平台简介 *</text>
+        <textarea class="form-textarea" placeholder="请输入平台简介（100字以内）" value="{{formData.desc}}" maxlength="100" bindinput="onInput" data-field="desc" />
+        <text class="char-count">{{formData.desc ? formData.desc.length : 0}}/100</text>
       </view>
     </view>
-  </view>
 
-  <!-- 资源标题 -->
-  <view class="form-item">
-    <text class="label">资源标题</text>
-    <input class="input" placeholder="例如：AI技术开发资源、市场营销渠道..." value="{{title}}" bindinput="onTitleInput" />
-  </view>
-
-  <!-- 资源分类 -->
-  <view class="form-item">
-    <text class="label">资源分类</text>
-    <view class="category-list">
-      <view wx:for="{{categories}}" wx:key="*this"
-        class="category-tag {{category === item ? 'category-tag--active' : ''}}"
-        data-cat="{{item}}" bindtap="selectCategory">{{item}}</view>
-    </view>
-  </view>
-
-  <!-- 资源描述 -->
-  <view class="form-item">
-    <text class="label">资源描述</text>
-    <textarea class="textarea" placeholder="请详细描述您提供或需要的资源内容，包括规模、范围、合作方式等..." value="{{description}}" bindinput="onDescInput" maxlength="500" />
-    <text class="char-count">{{description.length}}/500</text>
-  </view>
-
-  <!-- 预算 / 费用 -->
-  <view class="form-item">
-    <text class="label">预算范围（选填）</text>
-    <view class="fee-wrap">
-      <input class="fee-input" placeholder="例如：10-50万" value="{{budget}}" bindinput="onBudgetInput" />
-      <text class="unit">元</text>
-    </view>
-    <text class="fee-hint">不填则表示面议</text>
-  </view>
-
-  <!-- 联系方式 -->
-  <view class="form-item">
-    <text class="label">联系方式</text>
-    <input class="input" placeholder="手机号 / 微信 / 邮箱" value="{{contact}}" bindinput="onContactInput" />
-  </view>
-
-  <!-- 协议勾选 -->
-  <view class="agreement">
-    <checkbox class="checkbox" checked="{{agreed}}" bindtap="toggleAgree" />
-    <text class="agreement-text">
-      我已阅读并同意
-      <text class="agreement-link" bindtap="openPolicy">《资源平台服务协议》</text>
-    </text>
-  </view>
-
-  <!-- 提交按钮 -->
-  <view class="submit-btn {{!canSubmit() || submitting ? 'submit-btn--disabled' : ''}}" bindtap="submit">
-    <text class="submit-text">{{submitting ? '发布中...' : '🚀 发布资源'}}</text>
-  </view>
-
-  <!-- ====== 升级弹窗 ====== -->
-  <view class="modal-mask" wx:if="{{showUpgrade}}" catchtouchmove="preventDefault">
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">⚡ 配额不足</text>
-        <text class="modal-close" bindtap="closeUpgrade">✕</text>
-      </view>
-      <view class="upgrade-content">
-        <view class="upgrade-card">
-          <text class="upgrade-level">🥇 黄金会员</text>
-          <text class="upgrade-price">¥99/月</text>
-          <text class="upgrade-desc">每月10次发布 · AI优先匹配 · 数据分析</text>
-        </view>
-        <view class="upgrade-card">
-          <text class="upgrade-level">💎 钻石会员</text>
-          <text class="upgrade-price">¥299/月</text>
-          <text class="upgrade-desc">每月50次发布 · AI智能推荐 · 专属客服</text>
+    <view class="form-section">
+      <view class="section-title">行业标签</view>
+      <view class="tag-list">
+        <view 
+          class="tag-item {{selectedSet[item] ? 'selected' : ''}}" 
+          wx:for="{{industryOptions}}" 
+          wx:key="item"
+          bindtap="toggleIndustry"
+          data-industry="{{item}}"
+        >
+          {{item}}
         </view>
       </view>
-      <view class="modal-footer">
-        <view class="modal-btn cancel" bindtap="closeUpgrade">再想想</view>
-        <view class="modal-btn confirm" bindtap="goUpgrade">去升级</view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">所在地区</view>
+      
+      <view class="location-row">
+        <view class="location-picker" bindtap="pickProvince">
+          <text class="picker-value">{{province || '请选择省份'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <view class="location-picker" bindtap="pickCity" wx:if="{{province}}">
+          <text class="picker-value">{{city || '请选择城市'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <view class="location-picker" bindtap="pickDistrict" wx:if="{{city}}">
+          <text class="picker-value">{{district || '请选择区/县'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
       </view>
     </view>
+
+    <view class="form-section">
+      <view class="section-title">联系方式</view>
+      
+      <view class="form-group">
+        <text class="form-label">联系人</text>
+        <input class="form-input" placeholder="请输入联系人姓名" value="{{formData.contactName}}" bindinput="onInput" data-field="contactName" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">联系电话</text>
+        <input class="form-input" placeholder="请输入联系电话" type="number" value="{{formData.phone}}" bindinput="onInput" data-field="phone" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">年费（可选）</text>
+        <view class="fee-input-wrap">
+          <text class="fee-prefix">¥</text>
+          <input class="form-input fee-input" placeholder="请输入年费金额" type="number" value="{{formData.fee}}" bindinput="onInput" data-field="fee" />
+          <text class="fee-suffix">/年</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="form-footer">
+    <button class="btn-primary" bindtap="submitForm">提交创建</button>
   </view>
 
-  <!-- ====== 服务协议弹窗 ====== -->
-  <view class="modal-mask" wx:if="{{showPolicy}}" catchtouchmove="preventDefault">
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">📄 服务协议</text>
-        <text class="modal-close" bindtap="closePolicy">✕</text>
+  <view class="picker-modal" wx:if="{{showPicker}}" bindtap="closePicker">
+    <view class="picker-content" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">{{pickerTitle}}</text>
+        <text class="picker-close" bindtap="closePicker">✕</text>
       </view>
-      <view class="policy-content">
-        <text class="policy-text">
-1. 用户发布信息需真实有效，不得虚假宣传。
-2. 平台仅提供信息展示与匹配服务，不参与具体交易。
-3. 用户应自行评估合作方资质与风险。
-4. 禁止发布违法违规内容，违者将封禁账号。
-5. 平台保留对内容的审核与下架权利。
-6. 如有争议，双方应友好协商解决。
-        </text>
-      </view>
-      <view class="modal-footer">
-        <view class="modal-btn confirm" bindtap="closePolicy">我知道了</view>
-      </view>
+      <scroll-view scroll-y class="picker-list">
+        <view 
+          class="picker-item {{item == pickerValue ? 'selected' : ''}}" 
+          wx:for="{{pickerOptions}}" 
+          wx:key="item"
+          bindtap="selectPickerItem"
+          data-value="{{item}}"
+        >
+          {{item}}
+          <text class="picker-check" wx:if="{{item == pickerValue}}">✓</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 </view>

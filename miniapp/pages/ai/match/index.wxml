@@ -1,0 +1,85 @@
+<view class="page-container">
+  <view class="section-header">
+    <text class="section-title">{{_t.matchTitle}}</text>
+    <text class="section-subtitle">{{_t.matchSubtitle}}</text>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-item">
+      <text class="filter-label">{{_t.filterIndustry}}</text>
+      <picker mode="selector" range="{{industries}}" value="{{selectedIndustryIndex}}" bindchange="onIndustryChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedIndustry}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+    <view class="filter-divider"></view>
+    <view class="filter-item">
+      <text class="filter-label">{{_t.filterRegion}}</text>
+      <picker mode="selector" range="{{regions}}" value="{{selectedRegionIndex}}" bindchange="onRegionChange">
+        <view class="filter-select">
+          <text class="filter-value">{{selectedRegion}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 匹配列表 -->
+  <view class="match-list" wx:if="{{!showDetail && filteredMatches.length > 0}}">
+    <view class="match-item" wx:for="{{filteredMatches}}" wx:key="id" data-id="{{item.id}}" bindtap="unlock">
+      <image src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="match-avatar" />
+      <view class="match-info">
+        <text class="match-name">{{item.name}}</text>
+        <text class="match-company">{{item.company}}</text>
+        <text class="match-position" wx:if="{{item.title}}">{{item.title}}</text>
+        <view class="match-tags">
+          <text class="match-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+      <view class="match-right">
+        <view class="match-score-wrap">
+          <text class="match-score-num">{{item.matchScore}}%</text>
+          <text class="match-score-label">{{_t.matchLabel}}</text>
+        </view>
+        <button class="btn-connect-mini" data-id="{{item.id}}" bindtap="exchangeFromList" catchtap="exchangeFromList" wx:if="{{!item._requestSent}}">{{_t.exchangeCard}}</button>
+        <text class="request-sent-tag" wx:if="{{item._requestSent}}">{{_t.requestSent}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 解锁详情 -->
+  <view class="unlock-detail" wx:if="{{showDetail && unlockedItem}}">
+    <view class="detail-header">
+      <image src="{{unlockedItem.avatar || '/images/default-avatar.png'}}" mode="aspectFill" class="detail-avatar" />
+      <text class="detail-name">{{unlockedItem.name}}</text>
+      <text class="detail-company">{{unlockedItem.company}}</text>
+      <text class="detail-title" wx:if="{{unlockedItem.title}}">{{unlockedItem.title}}</text>
+      <view class="detail-score">
+        <text class="detail-score-num">{{unlockedItem.matchScore}}%</text>
+        <text class="detail-score-label">{{_t.matchScoreLabel}}</text>
+      </view>
+    </view>
+    <view class="detail-tags" wx:if="{{unlockedItem.tags && unlockedItem.tags.length > 0}}">
+      <text class="detail-tag" wx:for="{{unlockedItem.tags}}" wx:key="index">{{item}}</text>
+    </view>
+    <view class="detail-actions">
+      <button class="btn-primary small" bindtap="exchangeCard" wx:if="{{!exchangeDone}}">{{_t.exchangeCard}}</button>
+      <button class="btn-secondary small" wx:if="{{exchangeDone}}" disabled>{{_t.requestSent}}</button>
+      <button class="btn-secondary small" bindtap="backToList" style="margin-top:8px;">{{_t.backToList}}</button>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && filteredMatches.length == 0}}">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
+    <text class="text">{{_t.noMatchResults}}</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="spinner"></view>
+    <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">{{_t.loadingText}}</text>
+  </view>
+</view>

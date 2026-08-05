@@ -89,6 +89,25 @@ async def get_current_user(
     return user
 
 
+async def get_optional_user(
+    token: str | None = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """依赖项：可选用户认证 — 有 token 则返回用户，无 token 返回 None（不报错）"""
+    if token is None:
+        return None
+    try:
+        payload = decode_access_token(token)
+        user_id_str: str | None = payload.get("sub")
+        if user_id_str is None:
+            return None
+        user_id = int(user_id_str)
+        result = await db.execute(select(User).where(User.id == user_id))
+        return result.scalars().first()
+    except (JWTError, ValueError, Exception):
+        return None
+
+
 async def authenticate_user(db: AsyncSession, phone: str, password: str) -> User | None:
     result = await db.execute(select(User).where(User.phone == phone))
     user = result.scalars().first()
@@ -214,6 +233,10 @@ async def wx_mini_login(data: WeChatMiniLogin, db: AsyncSession = Depends(get_db
     secret = settings.WECHAT_MINI_SECRET
 
     if not appid or not secret:
+        # 生产环境禁止 mock 降级
+        import os
+        if os.getenv("ENV", "").lower() in ("production", "prod"):
+            raise HTTPException(status_code=500, detail="微信小程序未配置，请设置 WECHAT_MINI_APPID/SECRET")
         # 降级：使用 mock 方式（开发/演示模式）
         _logger.warning("微信小程序未配置 WECHAT_MINI_APPID/SECRET，使用 mock 模式")
         mock_openid = f"mock_mini_{uuid.uuid4().hex[:12]}"
