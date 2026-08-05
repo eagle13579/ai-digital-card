@@ -5,6 +5,8 @@ import pytest
 from datetime import datetime, timedelta
 from sqlalchemy import select
 
+pytestmark = pytest.mark.db
+
 
 class TestUserModel:
     @pytest.mark.asyncio

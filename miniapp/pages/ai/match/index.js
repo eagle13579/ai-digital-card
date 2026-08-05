@@ -1,156 +1,208 @@
-// pages/ai/match/index.js
-const { MockService } = require('../../../utils/mockService')
+/**
+ * AI匹配推荐 - 智能匹配筛选 (i18n enabled)
+ * P2-10: 匹配推荐池扩充 — 支持翻页/加载更多
+ */
+const { getRecommend } = require('../../../utils/ai-bridge')
+const { connectionApi } = require('../../../utils/api')
+const i18n = require('../../../utils/i18n')
+const cache = require('../../../utils/cache')
+
+const PAGE_SIZE = 10 // 每页10条
+const MATCH_CACHE_KEY = 'match:recommend' // 推荐列表缓存键
+const MATCH_CACHE_TTL = 30 * 60 * 1000 // 30分钟过期
 
 Page({
   data: {
-    loading: true,
-    refreshing: false,
-    error: false,
-    errorMsg: '',
-    empty: false,
+    matches: [],
+    filteredMatches: [],
+    industries: ['全部', '科技', '金融', '制造', '教育', '医疗'],
+    regions: ['全部', '北京', '上海', '深圳', '杭州', '广州'],
+    selectedIndustry: '全部',
+    selectedRegion: '全部',
+    selectedIndustryIndex: 0,
+    selectedRegionIndex: 0,
+    loading: false,
+    // 翻页
+    page: 1,
+    hasMore: true,
+    loadingMore: false,
+    useRealApi: true,
 
-    preferences: {
-      industry: 'tech',
-      region: 'bj',
-      position: 'manager'
-    },
+    // 解锁详情
+    showDetail: false,
+    unlockedItem: null,
+    exchangeDone: false,
 
-    recommendations: [],
-
-    // 连接中状态
-    connectingId: null
+    // i18n
+    _t: {},
   },
 
   onLoad() {
-    const sys = wx.getSystemInfoSync()
-    this.setData({ statusBarHeight: sys.statusBarHeight })
-    wx.setNavigationBarTitle({ title: '人脉匹配' })
-    this.loadRecommendations()
-  },
-
-  loadRecommendations() {
-    this.setData({ loading: true, error: false, errorMsg: '', empty: false })
-
-    MockService.getRecommendations({
-      industry: this.data.preferences.industry,
-      region: this.data.preferences.region,
-      position: this.data.preferences.position,
-      limit: 20
-    })
-      .then(res => {
-        const list = res.list || res.data || res.recommendations || res.items || []
-        const normalized = list.map((item, index) => ({
-          id: item.id || item.user_id || index,
-          avatar: item.avatar || item.avatar_url || '',
-          name: item.name || item.nickname || item.username || '未知',
-          title: item.title || item.position || item.job_title || '',
-          company: item.company || item.company_name || '',
-          matchScore: item.matchScore || item.match_score || item.score || 0,
-          tags: item.tags || item.interests || item.skills || [],
-          connected: item.connected || item.is_connected || false
-        }))
-
-        this.setData({
-          loading: false,
-          refreshing: false,
-          recommendations: normalized,
-          empty: normalized.length === 0
-        })
-      })
-      .catch(err => {
-        console.error('[Match] 获取推荐失败', err)
-        this.setData({
-          loading: false,
-          refreshing: false,
-          error: true,
-          errorMsg: err.errMsg || err.message || '获取推荐列表失败'
-        })
-      })
-  },
-
-  /** 下拉刷新 */
-  onPullDownRefresh() {
-    this.setData({ refreshing: true })
-    this.loadRecommendations()
-    wx.stopPullDownRefresh()
-  },
-
-  /** 偏好变更 */
-  onPreferenceChange(e) {
-    const dataset = e.currentTarget.dataset
-    const type = dataset.type || ''
-    const value = dataset.value || ''
-
-    if (!type || !value) return
-
-    const key = `preferences.${type}`
-    this.setData({ [key]: value }, () => {
-      wx.showToast({ title: '偏好已更新', icon: 'none' })
-      // 重新加载推荐
-      this.loadRecommendations()
-    })
-  },
-
-  onConnect(e) {
-    const id = e.currentTarget.dataset.id
-    if (!id) return
-
-    const item = this.data.recommendations.find(r => r.id === id)
-    if (item && item.connected) {
-      wx.showToast({ title: '已是好友', icon: 'none' })
+    this._loadI18n()
+    // 登录守卫
+    const store = require('../../../utils/store')
+    if (!store.getState().isLoggedIn) {
+      wx.redirectTo({ url: '/pages/login/index' })
       return
     }
-
-    this.setData({ connectingId: id })
-    wx.showLoading({ title: '请求中...', mask: true })
-
-    MockService.unlockContact(id)
-      .then(res => {
-        wx.hideLoading()
-        wx.showToast({ title: '名片交换请求已发送', icon: 'success' })
-
-        const list = this.data.recommendations.map(r => {
-          if (r.id === id) r.connected = true
-          return r
-        })
-        this.setData({
-          recommendations: list,
-          connectingId: null
-        })
-      })
-      .catch(err => {
-        wx.hideLoading()
-        this.setData({ connectingId: null })
-        wx.showToast({ title: err.errMsg || '请求失败', icon: 'none' })
-        console.error('[Match] 交换名片失败', err)
-      })
+    this.loadRecommend()
   },
 
-  /** 在线沟通 */
-  onChat(e) {
-    const id = e.currentTarget.dataset.id
-    // 先检查是否已交换名片
-    const item = this.data.recommendations.find(r => r.id === id)
-    if (item && !item.connected) {
-      wx.showToast({ title: '请先交换名片', icon: 'none' })
-      return
-    }
-    wx.navigateTo({
-      url: `/pages/ai/chat/index?targetId=${id}`
+  onShow() {
+    this._loadI18n()
+  },
+
+  /** 加载国际化翻译 */
+  _loadI18n() {
+    this.setData({
+      _t: i18n.getTranslations(),
+      industries: i18n.tArray('industries'),
+      regions: i18n.tArray('regions'),
+    })
+    // 重置选中索引，确保显示的文本正确
+    this.setData({
+      selectedIndustry: this.data.industries[this.data.selectedIndustryIndex] || this.data.industries[0],
+      selectedRegion: this.data.regions[this.data.selectedRegionIndex] || this.data.regions[0],
     })
   },
 
-  /** 重试加载 */
-  onRetry() {
-    this.loadRecommendations()
-  },
+  /** 加载推荐列表（缓存优先策略） */
+  async loadRecommend() {
+    this.setData({ loading: true, page: 1, hasMore: true })
+    try {
+      // 使用 cacheFirst 策略：先返回缓存，后台静默刷新
+      const list = await cache.cacheFirst(MATCH_CACHE_KEY, async () => {
+        const res = await getRecommend({ page: 1, pageSize: PAGE_SIZE }, this.data.useRealApi)
+        const items = res.data || res || []
+        return items
+      }, { ttl: MATCH_CACHE_TTL })
 
-  goBack() {
-    wx.navigateBack({
-      delta: 1,
-      fail: () => {
-        wx.switchTab({ url: '/pages/index/index' })
+      this.setData({
+        matches: list,
+        filteredMatches: list,
+        loading: false,
+        hasMore: list.length >= PAGE_SIZE,
+      })
+    } catch (e) {
+      console.error('获取匹配列表失败', e)
+      this.setData({ loading: false })
+      // 尝试从独立缓存键读取（兜底）
+      const fallback = cache.get('match:list_v1', { ignoreExpiry: true })
+      if (fallback && fallback.length > 0) {
+        console.log('[Match] 兜底缓存命中')
+        this.setData({ matches: fallback, filteredMatches: fallback, loading: false })
       }
+    }
+  },
+
+  /** 加载更多（翻页 + 网络优先策略） */
+  async loadMore() {
+    if (this.data.loadingMore || !this.data.hasMore) return
+    this.setData({ loadingMore: true })
+    const nextPage = this.data.page + 1
+    try {
+      const cacheKey = `${MATCH_CACHE_KEY}:page:${nextPage}`
+      const newItems = await cache.networkFirst(cacheKey, async () => {
+        const res = await getRecommend({ page: nextPage, pageSize: PAGE_SIZE }, this.data.useRealApi)
+        return res.data || res || []
+      }, { ttl: MATCH_CACHE_TTL })
+
+      const merged = [...this.data.matches, ...newItems]
+      this.setData({
+        matches: merged,
+        filteredMatches: merged,
+        page: nextPage,
+        hasMore: newItems.length >= PAGE_SIZE,
+        loadingMore: false,
+      })
+    } catch (e) {
+      console.error('加载更多匹配失败', e)
+      this.setData({ loadingMore: false })
+    }
+  },
+
+  onIndustryChange(e) {
+    const val = this.data.industries[e.detail.value]
+    this.setData({ selectedIndustry: val, selectedIndustryIndex: e.detail.value })
+    this.applyFilters()
+  },
+
+  onRegionChange(e) {
+    const val = this.data.regions[e.detail.value]
+    this.setData({ selectedRegion: val, selectedRegionIndex: e.detail.value })
+    this.applyFilters()
+  },
+
+  applyFilters() {
+    const { matches, selectedIndustry, selectedRegion } = this.data
+    let filtered = [...matches]
+
+    const all = i18n.t('all')
+    if (selectedIndustry !== all) {
+      filtered = filtered.filter(m => m.industry && m.industry.includes(selectedIndustry))
+    }
+    if (selectedRegion !== all) {
+      filtered = filtered.filter(m => m.region && m.region.includes(selectedRegion))
+    }
+
+    this.setData({ filteredMatches: filtered })
+  },
+
+  unlock(e) {
+    const id = e.currentTarget.dataset.id
+    const item = this.data.filteredMatches.find(m => m.id === id)
+    if (!item) {
+      wx.showToast({ title: i18n.t('notFoundUser'), icon: 'none' })
+      return
+    }
+    this.setData({
+      unlockedItem: item,
+      showDetail: true,
+      exchangeDone: false,
     })
-  }
+  },
+
+  backToList() {
+    this.setData({
+      showDetail: false,
+      unlockedItem: null,
+      exchangeDone: false,
+    })
+  },
+
+  async exchangeCard() {
+    if (!this.data.unlockedItem) return
+    try {
+      await connectionApi.request(this.data.unlockedItem.id, '', 'match')
+      this.setData({ exchangeDone: true })
+      wx.showToast({ title: i18n.t('requestSent'), icon: 'success' })
+    } catch (e) {
+      console.error('交换名片失败', e)
+    }
+  },
+
+  /** 从列表直接发起交换名片（无需解锁） */
+  async exchangeFromList(e) {
+    const id = e.currentTarget.dataset.id
+    const item = this.data.filteredMatches.find(m => m.id === id)
+    if (!item) return
+    try {
+      await connectionApi.request(id, '', 'match')
+      // 标记该卡片已发送请求
+      const matches = [...this.data.matches]
+      const idx = matches.findIndex(m => m.id === id)
+      if (idx > -1) {
+        matches[idx] = { ...matches[idx], _requestSent: true }
+      }
+      const filtered = [...this.data.filteredMatches]
+      const fidx = filtered.findIndex(m => m.id === id)
+      if (fidx > -1) {
+        filtered[fidx] = { ...filtered[fidx], _requestSent: true }
+      }
+      this.setData({ matches, filteredMatches: filtered })
+      wx.showToast({ title: i18n.t('requestSent'), icon: 'success' })
+    } catch (e) {
+      console.error('直接交换名片失败', e)
+    }
+  },
 })

@@ -1,36 +1,56 @@
 {
+  "entryPagePath": "pages/login/index",
   "pages": [
+    "pages/login/index",
     "pages/index/index",
     "pages/card/card",
-    "pages/login/index",
     "pages/profile/profile",
+    "pages/search/index",
     "pages/brochure/create/index",
     "pages/brochure/preview/index",
     "pages/platform/create/index",
+    "pages/platform/detail/index",
+    "pages/platform/manage/index",
+    "pages/platform/list/index",
+    "pages/qrcode/index",
+    "pages/membership/index",
+    "pages/agreement/privacy/index",
     "pages/agreement/user",
-    "pages/agreement/privacy/privacy",
-    "pages/ai/chat/index",
-    "pages/ai/index",
-    "pages/ai/generate/index",
-    "pages/ai/scan/index",
+    "pages/network/graph/index",
+    "pages/network/import/index",
     "pages/ai/match/index",
     "pages/ai/insight/index",
+    "pages/ai/scan/index",
+    "pages/ai/chat/index",
+    "pages/ai/generate/index",
     "pages/ai/config/index",
-    "pages/membership/membership",
-    "pages/network/graph/index",
-    "pages/qrcode/index"
+    "pages/ai/index/index",
+    "pages/ai/gaia",
+    "pages/ai/abtest",
+    "pages/ai/feedback",
+    "pages/ai/modelserve",
+    "pages/message/list/index",
+    "pages/message/chat/index",
+    "pages/team/list/index",
+    "pages/team/manage/index",
+    "pages/organization/list/index",
+    "pages/organization/detail/index",
+    "pages/organization/create/index",
+    "pages/connections/index",
+    "pages/analytics/index/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "AI数智名片",
-    "navigationBarBackgroundColor": "#0F0F13",
-    "backgroundColor": "#0A0A18"
+    "navigationBarBackgroundColor": "#0f0f1a",
+    "backgroundColor": "#0f0f1a"
   },
   "tabBar": {
-    "color": "#666677",
+    "custom": true,
+    "color": "rgba(255, 255, 255, 0.4)",
     "selectedColor": "#a78bfa",
-    "backgroundColor": "#0F0F13",
-    "borderStyle": "white",
+    "backgroundColor": "#0f0f1a",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -56,10 +76,12 @@
     "card-item": "/components/card-item/index",
     "loading": "/components/loading/index",
     "empty-state": "/components/empty-state/index",
-    "scene-selector": "/components/scene-selector/index",
     "network-mini-map": "/components/network-mini-map/index",
-    "chat-editor": "/components/chat-editor/index"
+    "flip-book": "/components/flip-book/index",
+    "error-boundary": "/components/error-boundary/index",
+    "page-header": "/components/page-header/index"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

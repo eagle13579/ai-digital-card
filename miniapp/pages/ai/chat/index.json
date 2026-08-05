@@ -1,8 +1,1 @@
-{
-  "navigationBarTitleText": "AI助手",
-  "navigationStyle": "custom",
-  "usingComponents": {},
-  "componentPlaceholder": {
-    "loading": "view"
-  }
-}
+{ "navigationBarTitleText": "AI对话", "usingComponents": {} }

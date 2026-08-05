@@ -1,0 +1,7 @@
+.page-container { padding: 20rpx; min-height: 100vh; background: #1a1a2e; }
+.page-title { font-size: 32rpx; font-weight: 600; color: #e0e0e0; margin-bottom: 20rpx; }
+.stat-card { background: #16213e; border-radius: 12rpx; padding: 20rpx; margin-bottom: 16rpx; }
+.stat-label { font-size: 24rpx; color: #888; }
+.stat-value { font-size: 36rpx; font-weight: 700; color: #4fc3f7; margin-top: 8rpx; }
+.section { margin-top: 30rpx; }
+.sub-text { font-size: 28rpx; color: #888; }

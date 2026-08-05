@@ -1,0 +1,417 @@
+/* ===== 组织详情页 - 深色磨砂玻璃风格 ===== */
+
+.page-container {
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.back {
+  font-size: 24px;
+  color: var(--accent);
+  padding: 4px 8px 4px 0;
+  font-weight: 300;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-btn {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.action-btn.edit {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.action-btn.danger {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+.org-header-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px;
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.org-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.org-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.org-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.org-slug {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+
+.org-meta-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 4px;
+}
+
+.org-desc-card {
+  padding: 16px;
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.desc-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.desc-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.tab-bar {
+  display: flex;
+  padding: 0 16px;
+  background: var(--surface-glass);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tab-item {
+  padding: 12px 0;
+  margin-right: 24px;
+  font-size: 14px;
+  color: var(--text-tertiary);
+  position: relative;
+}
+
+.tab-item.active {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.tab-content {
+  flex: 1;
+}
+
+.member-list {
+  padding: 8px 16px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.member-detail {
+  flex: 1;
+  min-width: 0;
+  margin-left: 12px;
+}
+
+.member-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.role-badge {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.member-sub {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+
+.member-actions {
+  margin-left: 8px;
+}
+
+.action-btn.danger {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  background: transparent;
+}
+
+.invite-list {
+  padding: 8px 16px;
+}
+
+.invite-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.invite-icon {
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+.invite-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.invite-target {
+  font-size: 15px;
+  color: var(--text-primary);
+  display: block;
+}
+
+.invite-role {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2px;
+}
+
+.invite-status {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.invite-status.accepted {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.invite-status.expired {
+  background: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+}
+
+.empty-invite, .empty-text {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+/* 弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  z-index: 100;
+}
+
+.modal-content {
+  width: 100%;
+  max-height: 85vh;
+  background: var(--surface-glass-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  overflow-y: auto;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  font-size: 20px;
+  color: var(--text-tertiary);
+  padding: 4px;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.submit-btn[disabled] {
+  opacity: 0.6;
+}

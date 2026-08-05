@@ -185,6 +185,10 @@ class BaseAgent(abc.ABC):
 
         # Registries
         self.tools: dict[str, ToolFunc] = {}
+        # ── 共享工具: MiniMax 多模态 AI ──
+        self.tools["minimax_health"] = self._minimax_health
+        self.tools["minimax_image"] = self._minimax_generate_image
+        self.tools["minimax_tts"] = self._minimax_synthesize_speech
         self.event_handlers: dict[str, list[Callable[[Any], Coroutine[Any, Any, None]]]] = {}
         self.cron_jobs: list[CronJob] = []
 
@@ -463,6 +467,54 @@ class BaseAgent(abc.ABC):
             self.agent_name,
             name,
         )
+
+    # ── 共享工具: MiniMax 多模态 AI ─────────────────────────────
+
+    def _minimax_health(self) -> str:
+        """检查 MiniMax AI 配置状态 (图片生成 + TTS 语音合成)"""
+        try:
+            from services.employee_minimax_tool import get_minimax_tool
+            return str(get_minimax_tool().health())
+        except ImportError:
+            return "{'error': 'employee_minimax_tool not installed'}"
+        except Exception as e:
+            return f"{{'error': '{e}'}}"
+
+    def _minimax_generate_image(self, prompt: str, ratio: str = "1:1") -> dict:
+        """调用 MiniMax 生成图片
+
+        Args:
+            prompt: 图片描述文本
+            ratio: 宽高比 (1:1, 16:9, 4:3, etc)
+
+        Returns:
+            {"success": True/False, "images": [...], "error": str|null}
+        """
+        try:
+            from services.employee_minimax_tool import get_minimax_tool
+            return get_minimax_tool().generate_image(prompt=prompt, ratio=ratio)
+        except ImportError:
+            return {"success": False, "error": "employee_minimax_tool not installed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def _minimax_synthesize_speech(self, text: str, voice: str = "male-qn-qingse") -> dict:
+        """调用 MiniMax TTS 语音合成
+
+        Args:
+            text: 要合成的文本
+            voice: 音色ID
+
+        Returns:
+            {"success": True/False, "audio_bytes": bytes|null, "error": str|null}
+        """
+        try:
+            from services.employee_minimax_tool import get_minimax_tool
+            return get_minimax_tool().synthesize_speech(text=text, voice=voice)
+        except ImportError:
+            return {"success": False, "error": "employee_minimax_tool not installed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     def register_event_handler(
         self,

@@ -23,12 +23,16 @@ Component({
 
   data: {
     memberLevelText: '',
+    displayTags: [],
   },
 
   observers: {
     'card.memberLevel': function (level) {
       const map = { free: 'Free', gold: 'Gold', diamond: 'Diamond', board: 'Board' }
       this.setData({ memberLevelText: map[level] || 'Free' })
+    },
+    'card.tags': function (tags) {
+      this.setData({ displayTags: (tags || []).slice(0, 3) })
     },
   },
 

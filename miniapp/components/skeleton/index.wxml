@@ -1,0 +1,75 @@
+<view class="skeleton-wrapper" wx:if="{{loading}}">
+  <!-- Card type -->
+  <block wx:if="{{type === 'card'}}">
+    <view class="skeleton-card" wx:for="{{count}}" wx:key="index">
+      <view class="skeleton skeleton-img"></view>
+      <view class="skeleton-card-body">
+        <view class="skeleton skeleton-line w-60"></view>
+        <view class="skeleton skeleton-line w-80"></view>
+        <view class="skeleton skeleton-line w-40"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- List type -->
+  <block wx:elif="{{type === 'list'}}">
+    <view class="skeleton-list-item" wx:for="{{count}}" wx:key="index">
+      <view class="skeleton skeleton-circle"></view>
+      <view class="skeleton-list-body">
+        <view class="skeleton skeleton-line w-50"></view>
+        <view class="skeleton skeleton-line w-70"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Profile type -->
+  <block wx:elif="{{type === 'profile'}}">
+    <view class="skeleton-profile">
+      <view class="skeleton-profile-header">
+        <view class="skeleton skeleton-circle lg"></view>
+        <view class="skeleton-profile-meta">
+          <view class="skeleton skeleton-line w-40"></view>
+          <view class="skeleton skeleton-line w-60"></view>
+        </view>
+      </view>
+      <view class="skeleton-profile-stats">
+        <view class="skeleton skeleton-line w-20" wx:for="{{4}}" wx:key="index"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Details type -->
+  <block wx:elif="{{type === 'details'}}">
+    <view class="skeleton-details">
+      <view class="skeleton skeleton-banner"></view>
+      <view class="skeleton-details-body">
+        <view class="skeleton skeleton-line w-60"></view>
+        <view class="skeleton skeleton-line w-90"></view>
+        <view class="skeleton skeleton-line w-80"></view>
+        <view class="skeleton skeleton-line w-50"></view>
+        <view class="skeleton skeleton-line w-70"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Stats type -->
+  <block wx:elif="{{type === 'stats'}}">
+    <view class="skeleton-stats">
+      <view class="skeleton skeleton-stat-item" wx:for="{{4}}" wx:key="index">
+        <view class="skeleton skeleton-line w-30"></view>
+        <view class="skeleton skeleton-line w-50 sm"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Default: fallback to card -->
+  <block wx:else>
+    <view class="skeleton-card">
+      <view class="skeleton skeleton-img"></view>
+      <view class="skeleton-card-body">
+        <view class="skeleton skeleton-line w-60"></view>
+        <view class="skeleton skeleton-line w-80"></view>
+      </view>
+    </view>
+  </block>
+</view>

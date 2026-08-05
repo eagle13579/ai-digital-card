@@ -14,6 +14,8 @@ Each test uses a fresh in-memory SQLite database.
 import pytest
 from sqlalchemy import select, func
 
+pytestmark = pytest.mark.db
+
 
 class TestUserModel:
     """Tests for the User model."""

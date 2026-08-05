@@ -1,99 +1,96 @@
 /**
  * AI数智名片 - 微信小程序入口
- * 全局状态管理 + 生命周期
- *
- * API 基础地址通过 config/config.js 统一管理（开发/生产双模式切换）
+ * 
+ * 全局状态管理已迁移至 utils/store.js（类 Zustand 模式）。
+ * app.js 保留生命周期 + 便捷方法，具体状态托管给 store 单例。
+ * 
+ * 参考: D:\AI询赋拆解\frontend\src\store\index.ts
  */
-const config = require('./config/config')
+const store = require('./utils/store')
+const cache = require('./utils/cache')
 
 App({
-  globalData: {
-    userInfo: null,
-    token: null,
-    openid: '',
-    memberLevel: 'free',
-    matchCount: 0,
-    visitorCount: 0,
-    trustCount: 0,
-    // API 基础地址 — 从 config.js 读取，开发/生产自动切换
-    apiBaseUrl: config.apiBaseUrl,
-    // 开发模式标志 — 开发环境下跳过登录阻断，方便调试
-    __DEV_MODE__: config.apiBaseUrl === 'http://127.0.0.1:8002',
-  },
-
   onLaunch() {
-    const token = wx.getStorageSync('token')
-    const userInfo = wx.getStorageSync('userInfo')
-    const openid = wx.getStorageSync('openid')
-    if (token) {
-      this.globalData.token = token
-      this.globalData.userInfo = userInfo
-      if (openid) {
-        this.globalData.openid = openid
-      }
-      wx.request({
-        url: this.globalData.apiBaseUrl + '/api/v1/users/me',
-        header: { 'Authorization': 'Bearer ' + token },
-        timeout: 8000,
-        fail: () => {},
-        complete: (res) => {
-          if (res.statusCode === 401) {
-            this.clearLogin()
-            const pages = getCurrentPages()
-            const currentPage = pages[pages.length - 1]
-            if (currentPage && currentPage.route !== 'pages/login/index') {
-              wx.reLaunch({ url: '/pages/login/index' })
-            }
-          }
-        }
-      })
-    }
+    // store 构造时已自动从 Storage 恢复 token/userInfo
+    const { token } = store.getState()
+    console.log('[App] onLaunch, isLoggedIn:', !!token)
+
+    // 初始化离线缓存层 & 网络状态监听
+    cache.initNetworkListener()
+
+    // 检查小程序更新
+    this._checkUpdate()
   },
 
   onShow() {
-    // 小程序切前台时刷新数据
+    // 全局登录守卫：未登录且不在登录页时自动跳转
+    const pages = getCurrentPages()
+    const currentRoute = pages.length > 0 ? pages[pages.length - 1].route : ''
+    const state = this.getState()
+    if (!state.isLoggedIn && currentRoute !== 'pages/login/index') {
+      wx.redirectTo({ url: '/pages/login/index' })
+    }
   },
 
-  // 检查登录态，未登录跳转授权
+  onHide() {
+    // 小程序切后台
+  },
+
+  /**
+   * 检查小程序版本更新
+   */
+  _checkUpdate() {
+    const updateManager = wx.getUpdateManager()
+    updateManager.onUpdateReady(() => {
+      wx.showModal({
+        title: '更新提示',
+        content: '新版本已准备好，是否重启应用？',
+        success: (res) => {
+          if (res.confirm) {
+            updateManager.applyUpdate()
+          }
+        },
+      })
+    })
+  },
+
+  // ========== 便捷方法（代理到 store，向下兼容） ==========
+
+  /** 获取全局状态快照 */
+  getState() {
+    return store.getState()
+  },
+
+  /** 检查登录态，未登录跳转登录页 */
   checkLogin() {
-    if (!this.globalData.token) {
-      wx.navigateTo({ url: '/pages/login/index' })
-      return false
-    }
-    return true
+    return store.checkLogin()
   },
 
-  // 设置登录态
-  setLogin(token, userInfo, memberLevel, openid) {
-    this.globalData.token = token
-    this.globalData.userInfo = userInfo
-    if (memberLevel) {
-      this.globalData.memberLevel = memberLevel
-    }
-    if (openid) {
-      this.globalData.openid = openid
-      wx.setStorageSync('openid', openid)
-    }
-    wx.setStorageSync('token', token)
-    wx.setStorageSync('userInfo', userInfo)
+  /** 设置登录态（token + userInfo） */
+  setLogin(token, userInfo) {
+    store.setAuth(token, userInfo)
   },
 
-  // 清除登录态
+  /** 清除登录态 */
   clearLogin() {
-    this.globalData.token = null
-    this.globalData.userInfo = null
-    wx.removeStorageSync('token')
-    wx.removeStorageSync('userInfo')
+    store.logout()
   },
 
-  // 更新用户信息
+  /** 更新用户信息 */
   updateUserInfo(userInfo) {
-    this.globalData.userInfo = { ...this.globalData.userInfo, ...userInfo }
-    wx.setStorageSync('userInfo', this.globalData.userInfo)
+    store.updateUserInfo(userInfo)
   },
 
-  // 更新会员等级
-  updateMemberLevel(level) {
-    this.globalData.memberLevel = level
+  /** 默认分享配置（页面可覆盖） */
+  onShareAppMessage() {
+    return {
+      title: 'AI数智名片 - 智能商务社交',
+      path: '/pages/index/index',
+    }
+  },
+
+  /** 默认分享到朋友圈 */
+  onShareTimeline() {
+    return { title: 'AI数智名片 - 智能商务社交' }
   },
 })

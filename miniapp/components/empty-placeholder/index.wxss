@@ -1,0 +1,60 @@
+/* Empty Placeholder 空状态占位组件 */
+.empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-5);
+  text-align: center;
+}
+
+.empty-illustration {
+  margin-bottom: var(--space-5);
+}
+
+.empty-icon {
+  font-size: 64px;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.empty-title {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-desc {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 var(--space-6);
+  background: var(--gradient-accent);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-6);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.empty-cta:active {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
+.empty-cta-text {
+  color: #fff;
+}

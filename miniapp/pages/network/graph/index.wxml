@@ -1,46 +1,202 @@
-<!-- 人脉图谱 — Canvas 2D 力导向图（暗色玻璃质感版） -->
-<view class="graph-page dark">
-
-  <!-- ===== 顶部信息栏 玻璃层2 + spring入场 ===== -->
-  <view class="graph-header glass-2 glass-edge animate-spring-in-down">
-    <view class="header-left" bindtap="goBack">
-      <text class="back-icon">‹</text>
-    </view>
-    <view class="header-center">
-      <text class="header-title">人脉网络图谱</text>
-      <text class="header-subtitle">{{nodeCount}}个联系人 · {{edgeCount}}条关系</text>
-    </view>
-    <view class="header-right">
-      <view class="legend-dot orb-cyan"></view>
-      <text class="legend-text">我</text>
+<view class="graph-page">
+  <view class="graph-header">
+    <view class="header-top">
+      <view class="header-back-btn" wx:if="{{isSubNetwork}}" bindtap="goBackToMainNetwork">
+        <text class="back-arrow">←</text>
+        <text class="back-text">返回我的网络</text>
+      </view>
+      <view class="header-title-area">
+        <text class="graph-title" wx:if="{{!isSubNetwork}}">🤝 信任网络图谱</text>
+        <text class="graph-title" wx:if="{{isSubNetwork}}">🌐 {{subNetworkLabel}}的人脉网络</text>
+        <text class="graph-subtitle">{{nodeCount}} 位联系人</text>
+      </view>
     </view>
   </view>
 
-  <!-- ===== 加载状态 玻璃层 + spring ===== -->
-  <view class="loading-layer animate-spring-in" wx:if="{{loading}}">
-    <view class="loading-spinner"></view>
-    <text class="loading-text">加载人脉数据...</text>
+  <view class="graph-container">
+    <canvas 
+      type="2d"
+      id="graphCanvas" 
+      class="graph-canvas"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    ></canvas>
+    <view class="graph-tips" wx:if="{{!hasData}}">
+      <text class="tips-icon">🔗</text>
+      <text class="tips-text">暂无联系人数据</text>
+      <text class="tips-hint">添加联系人后可查看图谱</text>
+    </view>
   </view>
 
-  <!-- ===== Canvas 画布 ===== -->
-  <canvas
-    wx:if="{{!loading}}"
-    class="graph-canvas animate-spring-in-scale"
-    type="2d"
-    id="graphCanvas"
-    bindtouchstart="onTouchStart"
-    bindtouchmove="onTouchMove"
-    bindtouchend="onTouchEnd"
-  />
-
-  <!-- ===== 底部操作提示 玻璃层2 + spring入场 ===== -->
-  <view class="graph-footer glass-1 glass-edge animate-spring-in-up" wx:if="{{!loading}}">
-    <text class="footer-hint">👆 拖拽移动节点 · 双指缩放</text>
-    <text class="footer-count">{{nodeCount}} 人</text>
+  <view class="graph-actions">
+    <view class="action-btn add-btn" bindtap="addContact">
+      <text class="action-icon">+</text>
+      <text class="action-text">添加联系人</text>
+    </view>
+    <view class="action-btn import-btn" bindtap="navigateToImport">
+      <text class="action-icon">📥</text>
+      <text class="action-text">导入名单</text>
+    </view>
+    <view class="action-btn search-btn" bindtap="openPathSearch">
+      <text class="action-icon">🔗</text>
+      <text class="action-text">触达路径</text>
+    </view>
+    <view class="action-btn refresh-btn" bindtap="createRelation">
+      <text class="action-icon">🤝</text>
+      <text class="action-text">建立关系</text>
+    </view>
+    <view class="action-btn refresh-btn" bindtap="refreshGraph">
+      <text class="action-icon">🔄</text>
+      <text class="action-text">刷新图谱</text>
+    </view>
   </view>
 
-  <!-- ===== 背景Orb装饰（光晕替代阴影）= -->
-  <view class="orb-bg-deco orb-bg-1"></view>
-  <view class="orb-bg-deco orb-bg-2"></view>
+  <view class="legend">
+    <view class="legend-item">
+      <view class="legend-dot self"></view>
+      <text class="legend-text">自己</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-dot contact"></view>
+      <text class="legend-text">联系人</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-line"></view>
+      <text class="legend-text">关系连线</text>
+    </view>
+  </view>
 
+  <!-- BFS 路径搜索面板 -->
+  <view class="search-panel" wx:if="{{showPathSearch}}">
+    <view class="search-overlay" bindtap="closePathSearch"></view>
+    <view class="search-card">
+      <view class="search-header">
+        <text class="search-title">🔍 触达路径查找</text>
+        <text class="search-close" bindtap="closePathSearch">✕</text>
+      </view>
+      <view class="search-body">
+        <view class="input-row">
+          <input class="search-input" placeholder="输入目标用户ID" value="{{targetUserId}}" bindinput="onTargetInput" />
+          <button class="search-btn" bindtap="searchPath" wx:if="{{!searchingPath}}">查找</button>
+          <view class="search-spinner" wx:if="{{searchingPath}}">
+            <view class="mini-spinner"></view>
+          </view>
+        </view>
+
+        <!-- 快速选择好友 -->
+        <view class="friend-hint" wx:if="{{loadingFriends}}">加载好友列表...</view>
+        <view class="friend-list" wx:if="{{friendList.length > 0 && !loadingFriends}}">
+          <text class="friend-list-title">快速选择好友</text>
+          <scroll-view scroll-x class="friend-scroll">
+            <view
+              class="friend-chip {{targetUserId == item.id ? 'selected' : ''}}"
+              wx:for="{{friendList}}"
+              wx:key="id"
+              bindtap="selectFriendTarget"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+            >
+              <text class="chip-name">{{item.name}}</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 路径结果显示 -->
+  <view class="info-modal" wx:if="{{showPathResult && pathResult}}">
+    <view class="info-overlay" bindtap="closePathResult"></view>
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">🔗 触达路径</text>
+        <text class="info-close" bindtap="closePathResult">✕</text>
+      </view>
+      <view class="info-body">
+        <block wx:if="{{pathResult.distance >= 0 && pathResult.path && pathResult.path.length > 0}}">
+          <view class="info-detail-row">
+            <text class="detail-label">距离</text>
+            <text class="detail-value" style="color:#06b6d4;font-weight:600;">
+              {{pathResult.distance}} 度
+              <text style="color:rgba(255,255,255,0.5);font-weight:400;">（{{pathResult.path.length}} 个节点）</text>
+            </text>
+          </view>
+          <view class="info-divider"></view>
+          <view class="path-steps">
+            <view
+              class="path-step-item"
+              wx:for="{{pathResult.path}}"
+              wx:key="id"
+              bindtap="onPathNodeTap"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+            >
+              <view class="step-node {{item.id == 'self' ? 'step-self' : ''}}">
+                <text class="step-node-text">{{item.initial}}</text>
+              </view>
+              <view class="step-info">
+                <text class="step-name">{{item.name}}</text>
+                <text class="step-tag">{{item.relation || '关联'}} · {{item.trustScore || 0}}分</text>
+              </view>
+              <text class="step-arrow" wx:if="{{index < pathResult.path.length - 1}}">›</text>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="empty-state" style="padding:32px 0;text-align:center;">
+            <text class="empty-icon" style="font-size:48px;display:block;margin-bottom:12px;">🔍</text>
+            <text class="detail-value" style="text-align:center;display:block;">
+              {{pathResult.message || '未找到触达路径'}}
+            </text>
+          </view>
+        </block>
+      </view>
+      <view class="info-footer">
+        <button class="info-close-btn" bindtap="closePathResult">关闭</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系人信息弹窗 -->
+  <view class="info-modal" wx:if="{{showInfoModal && selectedNode}}">
+    <view class="info-overlay" bindtap="closeInfoModal"></view>
+    <view class="info-card">
+      <view class="info-header">
+        <text class="info-title">👤 联系人信息</text>
+        <text class="info-close" bindtap="closeInfoModal">✕</text>
+      </view>
+      <view class="info-body">
+        <view class="info-avatar-row">
+          <view class="info-avatar {{selectedNode.isSelf ? 'avatar-self' : ''}}">
+            <text class="avatar-text">{{selectedInitial}}</text>
+          </view>
+          <view class="info-name-area">
+            <text class="info-name">{{selectedNode.name}}</text>
+            <text class="info-relation-tag">{{selectedNode.relation}}</text>
+          </view>
+        </view>
+        <view class="info-divider"></view>
+        <view class="info-detail-row">
+          <text class="detail-label">关系</text>
+          <text class="detail-value">{{selectedNode.relation}}</text>
+        </view>
+        <view class="info-detail-row">
+          <text class="detail-label">信任度</text>
+          <view class="trust-score-bar">
+            <view class="trust-score-fill" style="width: {{selectedNode.trustScore}}%"></view>
+          </view>
+          <text class="detail-value trust-score-value">{{selectedNode.trustScore}}分</text>
+        </view>
+      </view>
+      <view class="info-footer">
+        <button
+          class="info-close-btn"
+          bindtap="closeInfoModal"
+        >
+          关闭
+        </button>
+      </view>
+    </view>
+  </view>
 </view>

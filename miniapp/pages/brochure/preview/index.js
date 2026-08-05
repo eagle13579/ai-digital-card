@@ -1,412 +1,387 @@
 /**
  * 画册预览页面
+ * 展示可横向翻页的AI数智名片画册
  */
 const { MockService } = require('../../../utils/mockService')
+const { brochureApi } = require('../../../utils/api')
 const { Logger } = require('../../../utils/util')
 
 Page({
   data: {
+    showGuidance: false,
     brochureId: '',
-    brochure: null,
     pages: [],
     currentPage: 0,
     totalPages: 0,
-    pageBackground: '#ffffff',
+    pageBackground: '#0f0f1a',
+    pageBackgrounds: [],
     pageType: '',
-    shareLink: '',
-    loading: true,
-    error: false,
-    errorMsg: '',
     purposeMap: {
-      partner: '🤝 寻找合作伙伴',
-      client: '🎯 寻找客户',
-      investor: '💰 寻找投资',
-      supplier: '🔧 寻找供应商',
+      partner: '寻找合作伙伴',
+      investor: '寻找投资',
+      employee: '寻找人才',
+      client: '寻找客户',
     },
   },
 
-  onLoad(options) {
-    Logger.info('画册预览页', '页面加载', { options })
+  /** 将purpose值转为中文显示（支持逗号分隔的多个意向） */
+  _getPurposeText(purpose) {
+    if (!purpose) return '合作意向'
+    const purposeMap = this.data.purposeMap || {}
+    const parts = purpose.split(',').filter(p => p.trim())
+    const chineseParts = parts.map(p => purposeMap[p.trim()] || p.trim())
+    return chineseParts.join('、')
+  },
 
-    const brochureId = options && (options.id || options.brochureId)
+  /** 根据风格返回页面背景色（所有页面统一纯色，封面/动作页不使用渐变） */
+  getPageBackground(type, style = 'professional') {
+    const styleColors = {
+      professional: '#1e1b4b',
+      creative: '#2d1b2e',
+      minimal: '#1f2937',
+    }
+    return styleColors[style] || styleColors.professional
+  },
+
+  onLoad(options) {
+    Logger.info('画册预览页', '页面加载开始', { options: options || {} })
+    
+    // 检测是否刚从创建页跳转过来
+    if (options && options.created === '1') {
+      this.setData({ showGuidance: true })
+    }
+    
+    // 处理从二维码扫码进来的情况（scene 参数传 share_token）
+    let brochureId = options && options.id
+    if (!brochureId && options && options.scene) {
+      // 微信小程序码将 scene 放入 options.scene（已编码），解码后即 share_token
+      try {
+        const scene = decodeURIComponent(options.scene)
+        if (scene) {
+          Logger.info('画册预览页', '从二维码扫码进入', { scene })
+          this.loadBrochureByToken(scene)
+          return
+        }
+      } catch (e) {
+        Logger.warn('画册预览页', 'scene 解码失败', e)
+      }
+    }
+    
     if (brochureId) {
-      this.setData({ brochureId: String(brochureId) })
-      this.loadBrochure(String(brochureId))
+      this.data.brochureId = brochureId
+      Logger.info('画册预览页', '加载指定画册', { brochureId })
+      // 优先检查是否是刚创建的名片（从storage读取）
+      const cached = wx.getStorageSync('last_brochure')
+      if (cached && cached.id === brochureId) {
+        Logger.info('画册预览页', '刚创建的名片，直接从storage加载')
+        this.tryLoadFromStorageOrMock(brochureId)
+      } else {
+        this.loadBrochure(brochureId)
+      }
     } else {
-      this.setData({
-        loading: false,
-        error: true,
-        errorMsg: '缺少画册ID参数',
-      })
+      Logger.info('画册预览页', '无画册ID，加载默认画册')
+      this.loadMockBrochure()
     }
   },
 
-  onShow() {
-    // 页面显示时，如果已加载但无分享链接，尝试获取
-    if (this.data.brochure && !this.data.shareLink) {
-      this.fetchShareLink(this.data.brochureId)
+  /** 通过 share_token 加载画册（二维码扫码进入） */
+  async loadBrochureByToken(token) {
+    wx.showLoading({ title: '加载中...' })
+    try {
+      const resp = await brochureApi.getByShareToken(token)
+      const brochure = resp && resp.data ? resp.data : resp
+      if (brochure && brochure.id) {
+        this.data.brochureId = brochure.id
+        const firstPage = brochure.pages && brochure.pages[0]
+        if (firstPage && firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+      } else {
+        wx.hideLoading()
+        wx.showToast({ title: '名片不存在', icon: 'none' })
+      }
+      wx.hideLoading()
+    } catch (err) {
+      wx.hideLoading()
+      Logger.error('画册预览页', '通过share_token加载画册失败', err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
     }
   },
 
   async loadBrochure(brochureId) {
-    wx.showLoading({ title: '加载中...', mask: true })
+    wx.showLoading({ title: '加载中...' })
     try {
-      const brochure = await MockService.getBrochureById(brochureId)
-      Logger.info('画册预览页', '画册数据加载成功', {
-        id: brochure.id,
-        title: brochure.title,
-        pagesCount: brochure.pages ? brochure.pages.length : 0,
-      })
-
-      this.setData({ brochure })
-      this.transformAndRender(brochure)
-
-    } catch (err) {
-      Logger.error('画册预览页', '加载画册失败', err)
-      this.setData({
-        loading: false,
-        error: true,
-        errorMsg: (err && (err.detail || err.errMsg || err.message)) || '画册加载失败',
-      })
-    } finally {
+      const resp = await brochureApi.getById(brochureId)
+      // API客户端可能返回 {code, data} 包装，也可能直接返回数据
+      const brochure = resp && resp.data ? resp.data : resp
+      if (brochure && brochure.pages) {
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+      } else {
+        await this.tryLoadFromStorageOrMock(brochureId)
+      }
       wx.hideLoading()
+    } catch (err) {
+      wx.hideLoading()
+      Logger.error('画册预览页', '加载画册失败', err)
+      await this.tryLoadFromStorageOrMock(brochureId)
     }
   },
 
-  async fetchShareLink(brochureId) {
+  async tryLoadFromStorageOrMock(brochureId) {
     try {
-      const link = `https://example.com/share/${brochureId}`
-      this.setData({ shareLink: link })
-    } catch (err) {
-      Logger.warn('画册预览页', '获取分享链接失败', err)
+      const cached = wx.getStorageSync('last_brochure')
+      if (cached && cached.id === brochureId) {
+        Logger.info('画册预览页', '从Storage读取缓存名片', { id: cached.id, pagesCount: cached.pages ? cached.pages.length : 0 })
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        if (cached.pages && Array.isArray(cached.pages) && cached.pages.length > 0) {
+          const firstPage = cached.pages[0]
+          if (firstPage.type && !firstPage.content_type) {
+            this.setBrochureData(cached.pages)
+          } else {
+            const convertedPages = this.convertBrochurePages(cached)
+            this.setBrochureData(convertedPages)
+          }
+          return
+        }
+      }
+    } catch (e) {
+      Logger.warn('画册预览页', '读取Storage失败', e)
     }
+    // 没有缓存数据或缓存不匹配，尝试从Mock获取
+    try {
+      const brochure = await MockService.getBrochureById(brochureId)
+      if (brochure && brochure.pages) {
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+        return
+      }
+    } catch (e) {
+      Logger.warn('画册预览页', '从Mock获取失败', e)
+    }
+    // 最后的兜底：使用默认数据
+    this.setBrochureData(this.getDefaultPages())
   },
 
   /**
-   * 将后端 BrochureResponse 转换为预览页可渲染的数据
-   * 后端 page schema: { content_type, content, image_url, sort_order }
-   * 预览模板需要：type, name, title, company, bio, contact, provides, needs 等
+   * 将后端API格式的brochure pages转换为WXML模板期望的页面数据格式
+   * 字段映射对照：
+   *   封面：brochure.cover → page.avatar
+   *   资料：content解析后 phone/email/wechat/provides/needs/purpose → 合并到profile
+   *   公司：content解析后 name/desc/images/attachments
    */
-  transformAndRender(brochure) {
-    const pages = brochure.pages || []
+  convertBrochurePages(brochure) {
+    const convertedPages = []
+    let profileData = {}
 
-    // ========== 数据归一化：新格式（type属性）直接透传 ==========
-    if (pages.length > 0 && pages[0].type !== undefined) {
-      const firstPage = pages[0]
-      const isCover = firstPage.type === 'cover'
-      this.setData({
-        pages: pages,
-        totalPages: pages.length,
-        currentPage: 0,
-        loading: false,
-        error: false,
-        pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
-        pageType: firstPage.type || '',
-      })
-      Logger.info('画册预览页', '渲染完成（新格式透传）', { totalPages: pages.length })
-      return
-    }
-
-    // ========== 旧格式（content_type属性）：解析渲染 ==========
-
-    // 解析封面页
-    const coverPage = pages.find(p => p.content_type === 'cover')
-    const coverContent = coverPage ? this.parseCoverContent(coverPage.content) : {}
-    const coverImage = coverPage ? coverPage.image_url : ''
-
-    // 解析文本页内容
-    const textPages = pages.filter(p => p.content_type === 'text')
-
-    // 构建适配模板的 pages 数组
-    const renderedPages = []
-
-    // 第0页：封面
-    renderedPages.push({
-      type: 'cover',
-      title: coverContent.name || brochure.title || 'AI数智名片',
-      subtitle: coverContent.title
-        ? `${coverContent.company ? coverContent.company + ' · ' : ''}${coverContent.title}`
-        : '',
-      avatar: coverImage || '',
-    })
-
-    // 解析各文本页的内容（个人简介、资源供需、公司介绍、案例等）
-    let profileFound = false
-    let resourcesFound = false
-    let companyFound = false
-    let contactFound = false
-
-    for (const page of textPages) {
-      const content = page.content || ''
-      const imageUrl = page.image_url || ''
-
-      // 个人简介页：包含"姓名：""职位：""公司："等
-      if (!profileFound && (content.includes('姓名：') || content.includes('姓名:'))) {
-        profileFound = true
-        const profile = this.parseProfileContent(content)
-        renderedPages.push({
-          type: 'profile',
-          name: profile.name || '',
-          title: profile.title || '',
-          company: profile.company || '',
-          bio: profile.bio || '',
-          contact: {
-            phone: profile.phone || '',
-            email: profile.email || '',
-            wechat: profile.wechat || '',
-          },
-        })
-        continue
-      }
-
-      // 资源供需页
-      if (!resourcesFound && (content.includes('我能提供') || content.includes('我需要的'))) {
-        resourcesFound = true
-        const resources = this.parseResourcesContent(content)
-        renderedPages.push({
-          type: 'resources',
-          provides: resources.provides || [],
-          needs: resources.needs || [],
-          purpose: brochure.purpose || '',
-        })
-        continue
-      }
-
-      // 公司介绍页
-      if (!companyFound && (content.includes('公司简介') || content.includes('发展历程'))) {
-        companyFound = true
-        renderedPages.push({
-          type: 'company',
-          name: brochure.title || '',
-          industry: '',
-          size: '',
-          desc: content,
-          development: '',
-          images: imageUrl ? [imageUrl] : [],
-        })
-        continue
-      }
-
-      // 案例页
-      if (content.includes('案例名称') || content.includes('案例名称：')) {
-        const caseData = this.parseCaseContent(content)
-        renderedPages.push({
-          type: 'case',
-          index: renderedPages.length,
-          name: caseData.name || '',
-          date: caseData.date || '',
-          desc: caseData.desc || '',
-          images: imageUrl ? [imageUrl] : [],
-        })
-        continue
-      }
-
-      // 默认文本页展示
-      if (!contactFound && (content.includes('📞') || content.includes('✉️') || content.includes('💬') || page.content_type === 'image')) {
-        contactFound = true
-        const contact = this.parseContactContent(content)
-        renderedPages.push({
-          type: 'contact',
-          name: contact.name || '',
-          phone: contact.phone || '',
-          email: contact.email || '',
-          wechat: contact.wechat || '',
-          company: contact.company || '',
-        })
-        continue
-      }
-
-      // 兜底：作为通用文本页
-      renderedPages.push({
-        type: 'profile',
-        name: '',
-        title: '',
-        company: '',
-        bio: content,
-        contact: { phone: '', email: '', wechat: '' },
-      })
-    }
-
-    // 如果还没添加联系页，从 pages 中找 image 类型的作为联系页
-    if (!contactFound) {
-      const imagePage = pages.find(p => p.content_type === 'image')
-      if (imagePage) {
-        renderedPages.push({
-          type: 'contact',
-          name: '',
-          phone: imagePage.content || '',
-          email: '',
-          wechat: '',
-          company: '',
-        })
-      }
-    }
-
-    // 处理图片页
-    for (const page of pages) {
-      if (page.content_type === 'image' && page.image_url) {
-        // 如果已经有联系页且此页内容不同，作为独立的页
-        const hasExisting = renderedPages.some(p => p.type === 'contact' && p.phone === page.content)
-        if (!hasExisting) {
-          renderedPages.push({
-            type: 'contact',
-            name: '',
-            phone: page.content || '',
-            email: '',
-            wechat: '',
-            company: '',
-          })
-        }
-      }
-    }
-
-    // 移除重复的空白联系页
-    const filteredPages = renderedPages.filter((p, idx) => {
-      if (p.type === 'contact' && !p.phone && !p.email && !p.wechat) {
-        return idx === renderedPages.length - 1 // 只保留最后一个空联系页
-      }
-      return true
-    })
-
-    // 至少保留一页
-    if (filteredPages.length === 0) {
-      filteredPages.push({
+    // 构建封面页 — create页将用户头像存在brochure.cover字段
+    if (brochure.title) {
+      convertedPages.push({
         type: 'cover',
-        title: brochure.title || 'AI数智名片',
-        subtitle: '',
+        title: brochure.title,
         avatar: brochure.cover || '',
+        subtitle: '',
       })
     }
 
-    const firstPage = filteredPages[0]
-    const isCover = firstPage && firstPage.type === 'cover'
+    // 转换每一页
+    brochure.pages.forEach(page => {
+      const { content_type, content, sort_order } = page
+      let converted = {}
 
+      try {
+        if (content_type === 'profile') {
+          const parsed = JSON.parse(content)
+          profileData = parsed
+          converted = {
+            type: 'profile',
+            ...parsed,
+            contact: {
+              phone: parsed.phone || '',
+              email: parsed.email || '',
+              wechat: parsed.wechat || '',
+            },
+            provides: parsed.provides || [],
+            needs: parsed.needs || [],
+            purpose: parsed.purpose || '',
+            sort_order,
+          }
+        } else if (content_type === 'contact') {
+          const parsed = JSON.parse(content)
+          converted = {
+            type: 'contact',
+            name: profileData.name || '',
+            company: profileData.company || '',
+            phone: profileData.phone || '',
+            email: profileData.email || '',
+            wechat: profileData.wechat || '',
+            provides: parsed.provides || [],
+            needs: parsed.needs || [],
+            purpose: parsed.purpose || '',
+            sort_order,
+          }
+        } else if (content_type === 'company') {
+          const parsed = JSON.parse(content)
+          converted = {
+            type: 'company',
+            name: parsed.name || '',
+            industry: parsed.industry || '',
+            size: parsed.size || '',
+            desc: parsed.desc || '',
+            development: parsed.development || '',
+            images: parsed.images || [],
+            attachments: parsed.attachments || [],
+            sort_order,
+          }
+        } else {
+          converted = { type: content_type, sort_order }
+        }
+      } catch (e) {
+        Logger.warn('画册预览页', '解析页面内容失败', { content_type, error: e })
+        converted = { type: content_type, sort_order }
+      }
+
+      convertedPages.push(converted)
+    })
+
+    return convertedPages
+  },
+
+  
+
+  async loadMockBrochure() {
+    Logger.info('画册预览页', '加载默认画册示例')
+    try {
+      const brochures = await MockService.getBrochures()
+      Logger.info('画册预览页', '获取画册列表成功', { brochureCount: brochures ? (Array.isArray(brochures) ? brochures.length : 0) : 0 })
+      
+      let brochure = null
+      if (brochures && Array.isArray(brochures)) {
+        brochure = brochures[1] || brochures[0]
+      } else if (brochures && brochures.data && Array.isArray(brochures.data)) {
+        brochure = brochures.data[1] || brochures.data[0]
+      }
+      
+      Logger.info('画册预览页', '选中画册', { brochure: brochure ? { id: brochure.id, title: brochure.title, pageCount: brochure.pages ? brochure.pages.length : 0 } : null })
+      
+      if (brochure && brochure.pages) {
+        // 判断数据格式：如果第一个page有type字段（已转换格式），直接使用；否则需要转换
+        const firstPage = brochure.pages[0]
+        if (firstPage.type && !firstPage.content_type) {
+          this.setBrochureData(brochure.pages)
+        } else {
+          const convertedPages = this.convertBrochurePages(brochure)
+          this.setBrochureData(convertedPages)
+        }
+      } else {
+        Logger.info('画册预览页', '使用默认画册数据')
+        this.setBrochureData(this.getDefaultPages())
+      }
+    } catch (err) {
+      Logger.error('画册预览页', '加载Mock画册失败', err)
+      this.setBrochureData(this.getDefaultPages())
+    }
+  },
+
+  getDefaultPages() {
+    return [
+      {
+        type: 'cover',
+        title: '李娜的AI数智名片',
+        subtitle: '金融投资集团 · 投资总监',
+        avatar: 'https://neeko-copilot.bytedance.net/api/text2image?prompt=professional%20asian%20business%20woman%20portrait%20headshot%20elegant%20clean%20white%20background&image_size=square',
+      },
+      {
+        type: 'profile',
+        name: '李娜',
+        title: '投资总监',
+        company: '金融投资集团',
+        bio: '拥有10年金融行业经验，专注于股权投资、并购重组和资产管理领域。曾成功主导多个亿元级投资项目，帮助企业实现跨越式发展。',
+        contact: {
+          phone: '13900139000',
+          email: 'lina@example.com',
+          wechat: 'lina_finance',
+        },
+        provides: ['资金投资', '并购重组', '资源对接', '投后管理'],
+        needs: ['优质项目', '技术人才', '合作伙伴'],
+        purpose: 'investor',
+      },
+      {
+        type: 'company',
+        name: '金融投资集团',
+        industry: '金融投资',
+        size: '501-1000人',
+        desc: '金融投资集团是一家专注于股权投资和并购重组的综合性投资机构，管理资产规模超过500亿元人民币。公司致力于发现和培育具有高成长潜力的企业，为其提供资金支持和战略指导。',
+        development: '2015年：公司成立，获得首轮融资\n2018年：管理规模突破100亿元\n2021年：完成IPO上市\n2024年：管理规模突破500亿元',
+        images: [
+          'https://neeko-copilot.bytedance.net/api/text2image?prompt=luxury%20finance%20company%20office%20building%20modern%20architecture&image_size=landscape_4_3',
+          'https://neeko-copilot.bytedance.net/api/text2image?prompt=investment%20meeting%20boardroom%20professional%20business%20people&image_size=landscape_4_3',
+          'https://neeko-copilot.bytedance.net/api/text2image?prompt=stock%20market%20financial%20charts%20data%20visualization&image_size=landscape_4_3',
+        ],
+      },
+    ]
+  },
+
+  setBrochureData(pages) {
+    Logger.info('画册预览页', '设置画册数据', { pageCount: pages ? pages.length : 0 })
+    
+    // 如果是刚创建的名片，在末尾追加操作引导页
+    let finalPages = pages
+    if (this.data.showGuidance && Array.isArray(pages)) {
+      finalPages = [...pages, { type: 'action' }]
+    }
+    
+    const firstPage = finalPages && finalPages[0]
+    
+    // 从profile页面提取风格设置
+    let style = 'professional'
+    if (finalPages && Array.isArray(finalPages)) {
+      const profilePage = finalPages.find(p => p.type === 'profile')
+      if (profilePage && profilePage.style) {
+        style = profilePage.style
+      }
+    }
+    
+    const pageBackgrounds = finalPages ? finalPages.map(p => this.getPageBackground(p.type, style)) : []
+    
     this.setData({
-      pages: filteredPages,
-      totalPages: filteredPages.length,
+      pages: finalPages,
+      totalPages: finalPages ? finalPages.length : 0,
       currentPage: 0,
-      loading: false,
-      error: false,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
+      pageBackgrounds,
+      pageBackground: pageBackgrounds[0] || '#0f0f1a',
       pageType: firstPage && firstPage.type ? firstPage.type : '',
     })
-
-    Logger.info('画册预览页', '渲染完成', { totalPages: filteredPages.length })
-  },
-
-  /** 解析封面内容：期望格式 "姓名\n职位\n公司" */
-  parseCoverContent(content) {
-    if (!content) return {}
-    const lines = content.split('\n').filter(l => l.trim())
-    return {
-      name: lines[0] || '',
-      title: lines[1] || '',
-      company: lines[2] || '',
-    }
-  },
-
-  /** 解析个人简介：期望含"姓名：""职位：""公司：""电话：""邮箱：""微信：" */
-  parseProfileContent(content) {
-    const profile = { name: '', title: '', company: '', phone: '', email: '', wechat: '', bio: '' }
-    if (!content) return profile
-
-    const lines = content.split('\n')
-    const bioLines = []
-
-    for (const line of lines) {
-      if (line.startsWith('姓名：') || line.startsWith('姓名:')) {
-        profile.name = line.replace(/^姓名[：:]\s*/, '').trim()
-      } else if (line.startsWith('职位：') || line.startsWith('职位:')) {
-        profile.title = line.replace(/^职位[：:]\s*/, '').trim()
-      } else if (line.startsWith('公司：') || line.startsWith('公司:')) {
-        profile.company = line.replace(/^公司[：:]\s*/, '').trim()
-      } else if (line.includes('📞') || line.startsWith('电话：')) {
-        profile.phone = line.replace(/[📞\s]*/, '').replace(/^电话[：:]\s*/, '').trim()
-      } else if (line.includes('✉️') || line.startsWith('邮箱：')) {
-        profile.email = line.replace(/[✉️\s]*/, '').replace(/^邮箱[：:]\s*/, '').trim()
-      } else if (line.includes('💬') || line.startsWith('微信：')) {
-        profile.wechat = line.replace(/[💬\s]*/, '').replace(/^微信[：:]\s*/, '').trim()
-      } else if (line.trim()) {
-        bioLines.push(line.trim())
-      }
-    }
-
-    profile.bio = bioLines.join('\n')
-    return profile
-  },
-
-  /** 解析资源供需：含"我能提供"和"我需要的" */
-  parseResourcesContent(content) {
-    const provides = []
-    const needs = []
-    if (!content) return { provides, needs }
-
-    const sections = content.split('\n\n')
-    for (const section of sections) {
-      if (section.includes('我能提供')) {
-        const items = section.split('\n').filter(l => l.startsWith('•'))
-        items.forEach(item => provides.push(item.replace(/^•\s*/, '').trim()))
-      }
-      if (section.includes('我需要的')) {
-        const items = section.split('\n').filter(l => l.startsWith('•'))
-        items.forEach(item => needs.push(item.replace(/^•\s*/, '').trim()))
-      }
-    }
-
-    return { provides, needs }
-  },
-
-  /** 解析案例内容：含"案例名称""时间"等 */
-  parseCaseContent(content) {
-    const caseData = { name: '', date: '', desc: '' }
-    if (!content) return caseData
-
-    const lines = content.split('\n')
-    const descLines = []
-
-    for (const line of lines) {
-      if (line.startsWith('案例名称：') || line.startsWith('案例名称:')) {
-        caseData.name = line.replace(/^案例名称[：:]\s*/, '').trim()
-      } else if (line.startsWith('时间：') || line.startsWith('时间:')) {
-        caseData.date = line.replace(/^时间[：:]\s*/, '').trim()
-      } else if (line.trim()) {
-        descLines.push(line.trim())
-      }
-    }
-
-    caseData.desc = descLines.join('\n')
-    return caseData
-  },
-
-  /** 解析联系信息 */
-  parseContactContent(content) {
-    const contact = { name: '', phone: '', email: '', wechat: '', company: '' }
-    if (!content) return contact
-
-    const lines = content.split('\n')
-    for (const line of lines) {
-      const clean = line.replace(/[📞✉️💬\s]/g, '').trim()
-      if (clean.startsWith('📞')) contact.phone = clean.replace(/^📞/, '').trim()
-      else if (clean.startsWith('✉️')) contact.email = clean.replace(/^✉️/, '').trim()
-      else if (clean.startsWith('💬')) contact.wechat = clean.replace(/^💬/, '').trim()
-      else if (line.includes('📞')) contact.phone = line.replace(/.*📞\s*/, '').trim()
-      else if (line.includes('✉️')) contact.email = line.replace(/.*✉️\s*/, '').trim()
-      else if (line.includes('💬')) contact.wechat = line.replace(/.*💬\s*/, '').trim()
-    }
-
-    return contact
+    
+    Logger.info('画册预览页', '画册数据设置完成', { totalPages: finalPages ? finalPages.length : 0, firstPageType: firstPage && firstPage.type ? firstPage.type : 'none' })
   },
 
   onSwiperChange(e) {
     const current = e.detail.current
     const page = this.data.pages && this.data.pages[current]
-    const isCover = page && page.type === 'cover'
-
+    const bg = this.data.pageBackgrounds && this.data.pageBackgrounds[current]
+    
     this.setData({
       currentPage: current,
-      pageBackground: isCover ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)' : '#1a1a2e',
+      pageBackground: bg || '#ffffff',
       pageType: page && page.type ? page.type : '',
     })
+    
+    Logger.info('画册预览页', '翻页', { currentPage: current, pageType: page && page.type ? page.type : 'none' })
   },
 
   jumpToPage(e) {
@@ -418,15 +393,21 @@ Page({
     wx.navigateBack()
   },
 
+  goHome() {
+    wx.switchTab({
+      url: '/pages/index/index',
+    })
+  },
+
   goCreate() {
     wx.navigateTo({ url: '/pages/brochure/create/index' })
   },
 
   copyText(e) {
     const text = e.currentTarget.dataset.text
-    if (text) {
+    if (text && text.trim()) {
       wx.setClipboardData({
-        data: text,
+        data: text.trim(),
         success: () => {
           wx.showToast({ title: '已复制', icon: 'success' })
         },
@@ -434,102 +415,60 @@ Page({
     }
   },
 
-  /**
-   * 分享画册：获取分享链接后调用 wx.shareAppMessage
-   */
-  shareBrochure() {
-    const { brochure, brochureId, shareLink } = this.data
-    const title = (brochure && brochure.title) || 'AI数智名片'
+  /** 预览公司图片 */
+  previewCompanyImage(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    // 从当前 page 数据中获取所有图片
+    const page = this.data.pages && this.data.pages[this.data.currentPage]
+    const images = (page && page.images) || [url]
+    wx.previewImage({ urls: images, current: url })
+  },
 
-    const actions = ['分享给朋友', '复制分享链接']
-    if (shareLink) {
-      actions.push('复制网页链接')
+  openAttachment(e) {
+    const url = e.currentTarget.dataset.url
+    const name = e.currentTarget.dataset.name
+    if (!url) {
+      wx.showToast({ title: '文件不可用', icon: 'none' })
+      return
     }
-
-    wx.showActionSheet({
-      itemList: actions,
-      success: (res) => {
-        const action = actions[res.tapIndex]
-        switch (action) {
-          case '分享给朋友':
-            // 微信小程序原生分享由 onShareAppMessage 处理
-            wx.showToast({ title: '点击右上角···分享', icon: 'none' })
-            break
-          case '复制分享链接':
-            this.copyShareLink(title)
-            break
-          case '复制网页链接':
-            this.copyWebLink()
-            break
-        }
+    wx.showLoading({ title: '下载中...' })
+    wx.downloadFile({
+      url,
+      success(res) {
+        wx.hideLoading()
+        wx.openDocument({
+          filePath: res.tempFilePath,
+          success: () => console.log('打开成功'),
+          fail: () => wx.showToast({ title: '打开失败', icon: 'none' })
+        })
       },
-    })
-  },
-
-  /**
-   * 复制小程序分享链接
-   */
-  async copyShareLink(title) {
-    const path = `/pages/brochure/preview/index?id=${this.data.brochureId}`
-    wx.setClipboardData({
-      data: path,
-      success: () => {
-        wx.showToast({ title: '分享路径已复制', icon: 'success' })
-      },
-    })
-  },
-
-  /**
-   * 复制网页分享链接（通过 brochureApi.getShareLink）
-   */
-  async copyWebLink() {
-    let link = this.data.shareLink
-    if (!link) {
-      try {
-        const res = await brochureApi.getShareLink(this.data.brochureId)
-        link = res.url || res.share_url || ''
-        if (link) {
-          this.setData({ shareLink: link })
-        }
-      } catch (err) {
-        Logger.warn('画册预览页', '获取分享链接失败', err)
+      fail() {
+        wx.hideLoading()
+        wx.showToast({ title: '下载失败', icon: 'none' })
       }
-    }
-    if (link) {
-      wx.setClipboardData({
-        data: link,
-        success: () => {
-          wx.showToast({ title: '链接已复制', icon: 'success' })
-        },
-      })
-    } else {
-      wx.showToast({ title: '获取链接失败', icon: 'none' })
-    }
+    })
   },
 
-  /**
-   * 微信小程序原生分享
-   */
   onShareAppMessage() {
-    const { brochure, brochureId } = this.data
-    const title = (brochure && brochure.title) || 'AI数智名片'
+    const brochureId = this.data.brochureId || ''
+    const pages = this.data.pages || []
+    const coverPage = pages[0]
     return {
-      title: title,
-      path: `/pages/brochure/preview/index?id=${brochureId}`,
-      imageUrl: (brochure && brochure.cover) || '',
+      title: coverPage && coverPage.title ? coverPage.title : 'AI数智名片',
+      path: brochureId ? `/pages/brochure/preview/index?id=${brochureId}` : '/pages/brochure/preview/index',
+      imageUrl: coverPage && coverPage.avatar ? coverPage.avatar : '',
     }
   },
 
-  /**
-   * 分享到朋友圈（需基础库 2.11.3+）
-   */
   onShareTimeline() {
-    const { brochure, brochureId } = this.data
-    const title = (brochure && brochure.title) || 'AI数智名片'
+    const brochureId = this.data.brochureId || ''
+    const pages = this.data.pages || []
+    const coverPage = pages[0]
     return {
-      title: title,
-      query: `id=${brochureId}`,
-      imageUrl: (brochure && brochure.cover) || '',
+      title: coverPage && coverPage.title ? coverPage.title : 'AI数智名片',
+      query: brochureId ? `id=${brochureId}` : '',
+      imageUrl: coverPage && coverPage.avatar ? coverPage.avatar : '',
     }
   },
 })

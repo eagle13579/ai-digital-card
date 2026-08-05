@@ -21,8 +21,6 @@ import logging
 import secrets
 from typing import Any
 
-from app.config import settings
-
 logger = logging.getLogger(__name__)
 
 # ── 配置常量 ──────────────────────────────────────────────────────────────────
@@ -42,13 +40,12 @@ EXCLUDED_PATHS = (
     "/api/auth/wx-login",
     "/api/payments/webhook",
     "/api/webhooks/",
-    # API v1 版本（迁移后的路径）
-    "/api/v1/auth/login",
-    "/api/v1/auth/register",
-    "/api/v1/auth/wx-mini-login",
-    "/api/v1/auth/wx-login",
-    "/api/v1/payments/webhook",
-    "/api/v1/webhooks/",
+    "/api/brochures",
+    "/api/brochure/",
+    "/api/match/",
+    "/api/trust/",
+    "/api/card/",
+    "/api/visitors/",
 )
 """不进行 CSRF 校验的路径前缀（登录、注册、第三方回调等）。"""
 
@@ -79,11 +76,6 @@ class CsrfMiddleware:
         method = scope["method"]
         path = scope["path"]
 
-        # ── 全局开关：CSRF_ENABLED=False 时完全跳过 CSRF 保护 ──────────
-        if not settings.CSRF_ENABLED:
-            await self.app(scope, receive, send)
-            return
-
         # ── 处理 CSRF Token 生成请求 ──────────────────────────────────────
         if method == "GET" and path == CSRF_TOKEN_PATH:
             await self._handle_csrf_token(scope, receive, send)
@@ -96,24 +88,6 @@ class CsrfMiddleware:
 
         # ── 排除端点不校验 ────────────────────────────────────────────────
         if path.startswith(EXCLUDED_PATHS):
-            await self.app(scope, receive, send)
-            return
-
-        # ── 开发模式跳过 CSRF（localhost 请求不校验）────────────────────
-        headers_dict = dict(scope.get("headers", []))
-        host = headers_dict.get(b"host", b"").decode()
-        if "localhost" in host or "127.0.0.1" in host:
-            await self.app(scope, receive, send)
-            return
-
-        # ── 带 Bearer token 的请求跳过 CSRF（JWT 本身提供请求完整性）────
-        auth_header = headers_dict.get(b"authorization", b"").decode()
-        if auth_header.startswith("Bearer "):
-            await self.app(scope, receive, send)
-            return
-
-        # ── 带 X-API-Key 的请求跳过 CSRF（API Key 认证本身提供请求完整性）───
-        if b"x-api-key" in headers_dict:
             await self.app(scope, receive, send)
             return
 

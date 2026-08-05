@@ -6,7 +6,6 @@
 
 无需修改小程序代码，只需在 app/__init__.py 中注册此适配路由即可。
 """
-import html
 import json
 import logging
 from typing import Optional
@@ -15,19 +14,21 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models.brochure import Brochure, Page
+from app.models.connection import Connection
+from app.models.platform import PlatformMember
 from app.models.tag import MatchRecord
 from app.models.user import User
-from app.routers.auth import get_current_user
+from app.routers.auth import get_current_user, get_optional_user
 from app.schemas import (
     BrochureCreate,
     BrochureResponse,
     BrochureUpdate,
     PageSchema,
 )
+from app.services.share_service import generate_qr_code, build_share_url
 
 logger = logging.getLogger(__name__)
 
@@ -37,14 +38,14 @@ logger = logging.getLogger(__name__)
 
 # 小程序调用: GET/POST/PUT /api/business-card/cards/...
 # 后端映射:   GET/POST/PUT /api/brochures/...
-router = APIRouter(prefix="/api/v1/business-card/cards", tags=["miniapp"])
+router = APIRouter(prefix="/api/business-card/cards", tags=["miniapp"])
 
 # 小程序也可能调用 POST /api/business-card/exchange（无 /cards 前缀）
-exchange_alt_router = APIRouter(prefix="/api/v1/business-card", tags=["miniapp"])
+exchange_alt_router = APIRouter(prefix="/api/business-card", tags=["miniapp"])
 
 # 小程序调用: GET /api/matching/recommendations
 # 后端映射:   POST /api/match/engine
-recommend_router = APIRouter(prefix="/api/v1/matching", tags=["miniapp"])
+recommend_router = APIRouter(prefix="/api/matching", tags=["miniapp"])
 
 
 # ── 请求/响应模型 ───────────────────────────────────────────────
@@ -83,16 +84,76 @@ class RecommendationResponse(BaseModel):
 async def list_cards(
     user_id: int | None = Query(None, description="按用户ID筛选"),
     status: str | None = Query(None, description="按状态筛选(draft|published)"),
+    visibility: str | None = Query(None, description="按可见性筛选(public|platform|network|private)"),
+    platform_id: int | None = Query(None, description="按平台ID筛选"),
     skip: int = 0,
     limit: int = 50,
     db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
 ):
-    """获取名片列表（适配小程序 GET /api/business-card/cards → GET /api/brochures）"""
-    query = select(Brochure).options(selectinload(Brochure.pages))
+    """获取名片列表（适配小程序 GET /api/business-card/cards → GET /api/brochures）
+
+    支持 4 级可见性矩阵过滤：
+      - public: 所有人可见
+      - platform: 同平台成员可见
+      - network: 好友可见
+      - private: 仅自己可见
+    未登录用户只能看到 public 的资源。
+    """
+    query = select(Brochure)
+
+    # ── 4级可见性矩阵过滤 ────────────────────────────────────────────
+    from sqlalchemy import or_
+
+    visibility_conditions = [Brochure.visibility == "public"]
+
+    if current_user is not None:
+        # 自己的资源全部可见
+        visibility_conditions.append(Brochure.user_id == current_user.id)
+
+        # platform: 同平台成员可见
+        # 查当前用户加入了哪些平台
+        platform_subq = (
+            select(PlatformMember.platform_id)
+            .where(PlatformMember.user_id == current_user.id)
+            .subquery()
+        )
+        visibility_conditions.append(
+            (Brochure.visibility == "platform")
+            & (Brochure.platform_id.in_(select(platform_subq.c.platform_id)))
+        )
+
+        # network: 好友可见
+        friend_subq_1 = (
+            select(Connection.contact_id)
+            .where(Connection.user_id == current_user.id, Connection.status == "approved")
+            .subquery()
+        )
+        friend_subq_2 = (
+            select(Connection.user_id)
+            .where(Connection.contact_id == current_user.id, Connection.status == "approved")
+            .subquery()
+        )
+        all_friends = select(friend_subq_1.c.contact_id).union(
+            select(friend_subq_2.c.user_id)
+        ).subquery()
+        visibility_conditions.append(
+            (Brochure.visibility == "network")
+            & (Brochure.user_id.in_(select(all_friends.c.contact_id)))
+        )
+
+    query = query.where(or_(*visibility_conditions))
+    # ────────────────────────────────────────────────────────────────
+
     if user_id:
         query = query.where(Brochure.user_id == user_id)
     if status:
         query = query.where(Brochure.status == status)
+    if visibility:
+        query = query.where(Brochure.visibility == visibility)
+    if platform_id:
+        query = query.where(Brochure.platform_id == platform_id)
+
     query = query.order_by(Brochure.updated_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
     brochures = result.scalars().all()
@@ -112,11 +173,9 @@ async def create_card(
     db: AsyncSession = Depends(get_db),
 ):
     """创建名片（适配小程序 POST /api/business-card/cards → POST /api/brochures）"""
-    # XSS防护：对标题和页面内容做HTML转义
-    safe_title = html.escape(data.title)
     brochure = Brochure(
         user_id=current_user.id,
-        title=safe_title,
+        title=data.title,
         cover=data.cover,
         purpose=data.purpose,
         album_meta=data.album_meta,
@@ -130,7 +189,7 @@ async def create_card(
             brochure_id=brochure.id,
             sort_order=page_data.sort_order or idx,
             content_type=page_data.content_type,
-            content=html.escape(page_data.content),
+            content=page_data.content,
             image_url=page_data.image_url,
             media_url=page_data.media_url or "",
             ai_summary=page_data.ai_summary,
@@ -138,18 +197,7 @@ async def create_card(
         db.add(page)
 
     await db.commit()
-
-    # 重新查询（含pages关系）
-    # 使用 populate_existing=True 强制从 DB 刷新列属性，
-    # 解决 expire_on_commit=False 下 identity-map 返回旧对象、
-    # 导致 created_at/updated_at 等 server_default 字段为 None 的 500 错误
-    result = await db.execute(
-        select(Brochure)
-        .options(selectinload(Brochure.pages))
-        .where(Brochure.id == brochure.id)
-        .execution_options(populate_existing=True)
-    )
-    brochure = result.scalars().first()
+    await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -161,9 +209,7 @@ async def get_card(
     db: AsyncSession = Depends(get_db),
 ):
     """获取名片详情（适配小程序 GET /api/business-card/cards/{id} → GET /api/brochures/{id}）"""
-    result = await db.execute(
-        select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == card_id)
-    )
+    result = await db.execute(select(Brochure).where(Brochure.id == card_id))
     brochure = result.scalars().first()
     if brochure is None:
         raise HTTPException(status_code=404, detail="名片不存在")
@@ -191,10 +237,7 @@ async def update_card(
     update_data = data.model_dump(exclude_unset=True)
     pages_data = update_data.pop("pages", None)
 
-    ESCAPED_FIELDS = {"title", "cover", "purpose", "album_meta"}
     for field, value in update_data.items():
-        if field in ESCAPED_FIELDS and isinstance(value, str):
-            value = html.escape(value)
         setattr(brochure, field, value)
 
     if pages_data is not None:
@@ -209,7 +252,7 @@ async def update_card(
                 brochure_id=brochure.id,
                 sort_order=page_data.sort_order or idx,
                 content_type=page_data.content_type,
-                content=html.escape(page_data.content),
+                content=page_data.content,
                 image_url=page_data.image_url,
                 media_url=page_data.media_url or "",
                 ai_summary=page_data.ai_summary,
@@ -219,15 +262,7 @@ async def update_card(
         brochure.pages_count = len(pages_data)
 
     await db.commit()
-
-    # 重新查询（含pages关系）
-    result = await db.execute(
-        select(Brochure)
-        .options(selectinload(Brochure.pages))
-        .where(Brochure.id == card_id)
-        .execution_options(populate_existing=True)
-    )
-    brochure = result.scalars().first()
+    await db.refresh(brochure)
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp
@@ -437,3 +472,89 @@ async def get_recommendations(
     await db.commit()
 
     return matches
+
+
+# ═══════════════════════════════════════════════════════════════
+# 小程序码/二维码生成
+# ═══════════════════════════════════════════════════════════════
+
+# 小程序调用: GET /api/v1/miniapp/qrcode → 被中间件重写为 GET /api/miniapp/qrcode
+miniapp_code_router = APIRouter(prefix="/api/miniapp", tags=["miniapp"])
+
+
+@miniapp_code_router.get("/qrcode")
+async def get_miniapp_qrcode(
+    share_token: str = Query(..., description="名片分享 token"),
+    width: int = Query(280, ge=100, le=1000, description="二维码图片宽度（像素）"),
+    current_user: User = Depends(get_optional_user),
+):
+    """生成名片二维码图片（使用 qrcode 库生成真实二维码）
+
+    替代前端基于字符串哈希的伪二维码生成。
+    返回 Base64 编码的 PNG 图片。（前端 request.js 期望 JSON 响应）
+
+    对接微信小程序码（wxacode.getUnlimited）：
+      当设置了 WECHAT_APPID/WECHAT_SECRET 时，自动调用微信API生成小程序码；
+      否则使用标准 QR 码（分享到浏览器查看）。
+    """
+    import base64
+
+    from app.config import settings
+
+    wechat_appid = getattr(settings, "WECHAT_APPID", "") or ""
+    wechat_secret = getattr(settings, "WECHAT_SECRET", "") or ""
+
+    img_bytes = None
+
+    # 尝试调用微信小程序码 API
+    if wechat_appid and wechat_secret:
+        try:
+            import httpx
+
+            # 1. 获取 access_token
+            async with httpx.AsyncClient() as client:
+                token_resp = await client.get(
+                    "https://api.weixin.qq.com/cgi-bin/token",
+                    params={
+                        "grant_type": "client_credential",
+                        "appid": wechat_appid,
+                        "secret": wechat_secret,
+                    },
+                )
+                token_data = token_resp.json()
+                access_token = token_data.get("access_token")
+                if not access_token:
+                    raise ValueError(f"微信 access_token 获取失败: {token_data}")
+
+                # 2. 调用 wxacode.getUnlimited
+                code_resp = await client.post(
+                    f"https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={access_token}",
+                    json={
+                        "scene": share_token,
+                        "width": width,
+                        "auto_color": False,
+                        "page": "pages/brochure/preview/index",
+                    },
+                )
+                # 如果返回的是图片二进制（content-type 含 image），直接使用
+                content_type = code_resp.headers.get("content-type", "")
+                if "image" in content_type:
+                    img_bytes = code_resp.content
+                else:
+                    err_data = code_resp.json()
+                    logger.warning("微信小程序码生成返回错误: %s", err_data)
+        except Exception as e:
+            logger.warning("微信小程序码生成失败，降级到标准 QR 码: %s", e)
+
+    # 降级：使用标准 QR 码（分享到浏览器查看名片）
+    if img_bytes is None:
+        try:
+            img_bytes = generate_qr_code(share_token, box_size=10, border=2)
+        except Exception as e:
+            logger.error("QR 码生成失败: %s", e)
+            raise HTTPException(status_code=500, detail="二维码生成失败")
+
+    # 返回 Base64 编码（前端 request.js 期望 JSON）
+    b64 = base64.b64encode(img_bytes).decode("utf-8")
+    data_url = f"data:image/png;base64,{b64}"
+    return {"code": 0, "message": "success", "data": data_url}

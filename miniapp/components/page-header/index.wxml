@@ -1,0 +1,13 @@
+<!-- 页面标题栏 -->
+<view class="page-header page-header--{{size}}">
+  <view class="page-header__back" wx:if="{{showBack}}" bindtap="onBack">
+    <text class="page-header__back-icon">‹</text>
+  </view>
+  <view class="page-header__content">
+    <view class="page-header__top">
+      <text class="page-header__icon" wx:if="{{icon}}">{{icon}}</text>
+      <text class="page-header__title" style="{{titleStyle}}">{{title}}</text>
+    </view>
+    <text class="page-header__subtitle" wx:if="{{subtitle}}" style="{{subtitleStyle}}">{{subtitle}}</text>
+  </view>
+</view>

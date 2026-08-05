@@ -1,8 +1,7 @@
 {
-  "navigationStyle": "custom",
-  "navigationBarTitleText": "人脉图谱",
-  "navigationBarBackgroundColor": "#0a0a18",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#0a0a18",
-  "disableScroll": true
+  "navigationBarTitleText": "信任网络",
+  "usingComponents": {
+    "network-mini-map": "/components/network-mini-map/index",
+    "path-display": "/components/path-display/index"
+  }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, Loader2, RefreshCw, ExternalLink,
   Search, Filter, ArrowUpDown, TrendingUp,
-  Target, Package, CheckCircle2,
+  Target, Package, CheckCircle2, Handshake,
 } from 'lucide-react';
 import { api } from '../api/client';
 import { useT } from '../i18n';
@@ -40,6 +40,11 @@ export default function MatchingPage() {
   const [filter, setFilter] = useState<'all' | 'need' | 'product'>('all');
   const [sortBy, setSortBy] = useState<'score' | 'title'>('score');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [connectingId, setConnectingId] = useState<number | null>(null);
+  const [loadingRecommend, setLoadingRecommend] = useState(false);
+  const [pltResults, setPltResults] = useState<MatchItem[] | null>(null);
+  const [pltLoading, setPltLoading] = useState(false);
+  const [showPlt, setShowPlt] = useState(false);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -52,7 +57,7 @@ export default function MatchingPage() {
   useEffect(() => {
     const fetchCardList = async () => {
       try {
-        const res = await api.get('/api/v1/brochure/list');
+        const res = await api.get('/api/v1/brochures');
         if (res.code === 200) {
           const items = Array.isArray(res.data) ? res.data : (res.data as any)?.items || [];
           setCardList(items);
@@ -64,6 +69,94 @@ export default function MatchingPage() {
     };
     fetchCardList();
   }, []);
+
+  // ============================================================
+  // 加载预存匹配推荐
+  // ============================================================
+  useEffect(() => {
+    const fetchRecommend = async () => {
+      setLoadingRecommend(true);
+      try {
+        const res = await api.get<{ matches: any[]; total: number }>('/api/match/recommend');
+        if (res.code === 200 && res.data) {
+          const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+            type: 'product' as const,
+            id: m.user_id,
+            title: m.user_name || '',
+            category: m.user_company || '',
+            score: m.score,
+            reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+          }));
+          setMatchResults(items);
+        }
+      } catch {
+        // 静默失败，用户可手动触发匹配
+      } finally {
+        setLoadingRecommend(false);
+      }
+    };
+    fetchRecommend();
+  }, []);
+
+  // ============================================================
+  // 三蛋蛋 · 买家推荐（Transphee 客户匹配）
+  // 输入卖家信息 → 返回潜在买家名单
+  // ============================================================
+  interface BuyerItem {
+    rank: number;
+    cname: string;
+    province?: string;
+    city?: string;
+    url?: string;
+    industryType?: string;
+    industryMain?: string;
+    product?: string;
+    business?: string;
+    typical_customers?: string;
+    source?: string;
+    pinned?: boolean;
+    score?: number;
+    contacts?: Array<{ name_masked?: string; position?: string; email_masked?: string; email_domain_type?: string }>;
+  }
+  const [buyerForm, setBuyerForm] = useState({ product: '', business: '', typical_customers: '', province: '' });
+  const [buyers, setBuyers] = useState<BuyerItem[]>([]);
+  const [buyerTotal, setBuyerTotal] = useState<number | null>(null);
+  const [buyerQuota, setBuyerQuota] = useState<{ used?: number; limit?: number } | null>(null);
+  const [buyerLoading, setBuyerLoading] = useState(false);
+  const [buyerPage, setBuyerPage] = useState(1);
+
+  const handleFindBuyers = useCallback(async (page: number = 1) => {
+    const { product, business, typical_customers } = buyerForm;
+    if (!product.trim() && !business.trim() && !typical_customers.trim()) {
+      showToast('请至少填写「你卖什么」「主营业务」「典型客户」之一', 'error');
+      return;
+    }
+    setBuyerLoading(true);
+    try {
+      const res = await api.post<{ data: any; quota?: any }>('/api/transphee/match', {
+        company_name: product.trim() || business.trim() || typical_customers.trim() || '本公司',
+        product: product.trim(),
+        business: business.trim(),
+        typical_customers: typical_customers.trim(),
+        page,
+        province: buyerForm.province.trim() ? [buyerForm.province.trim()] : undefined,
+      });
+      if (res.code === 200 && res.data) {
+        const d = res.data;
+        setBuyers(d.list || []);
+        setBuyerTotal(d.total ?? null);
+        setBuyerPage(d.page ?? page);
+        if (res.quota) setBuyerQuota(res.quota);
+        if (!d.list || d.list.length === 0) showToast('没有找到匹配买家，换个描述试试', 'success');
+      } else {
+        showToast(res.message || '查询失败', 'error');
+      }
+    } catch {
+      showToast('请求失败，请稍后重试', 'error');
+    } finally {
+      setBuyerLoading(false);
+    }
+  }, [buyerForm, showToast]);
 
   // ============================================================
   // 执行匹配
@@ -78,22 +171,29 @@ export default function MatchingPage() {
     setMatchResults([]);
 
     try {
-      const res = await api.post<{ total: number; items: MatchItem[] }>(
-        `/api/card/${selectedCardId}/match`,
-        {}
+      const res = await api.post<{ matches: any[]; total: number }>(
+        '/api/v1/match/engine',
+        { min_score: 0.3 }
       );
 
-      if (res.code !== 200 || !res.data) {
+      if (res.code === 200 && res.data) {
+        const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+          type: 'product' as const,
+          id: m.user_id,
+          title: m.user_name || '',
+          category: m.user_company || '',
+          score: m.score,
+          reasons: (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+        }));
+        setMatchResults(items);
+        if (items.length === 0) {
+          showToast(t('match.noResults'), 'success');
+        } else {
+          showToast(t('match.foundResults', { n: items.length }), 'success');
+        }
+      } else {
         setMatchResults([]);
         showToast(t('match.failed'), 'error');
-        return;
-      }
-
-      setMatchResults(res.data.items || []);
-      if (res.data.items?.length === 0) {
-        showToast(t('match.noResults'), 'success');
-      } else {
-        showToast(t('match.foundResults', { n: res.data.items.length }), 'success');
       }
     } catch {
       setMatchResults([]);
@@ -102,6 +202,68 @@ export default function MatchingPage() {
       setMatchLoading(false);
     }
   }, [selectedCardId, showToast]);
+
+  // ============================================================
+  // PLT增强匹配（2次并行循环精炼）
+  // ============================================================
+  const handlePltMatch = useCallback(async () => {
+    if (!selectedCardId) {
+      showToast(t('match.selectCardFirst'), 'error');
+      return;
+    }
+
+    setPltLoading(true);
+    setShowPlt(true);
+
+    try {
+      const res = await api.post<{ matches: any[]; plt_metadata: any }>(
+        '/api/match/plt-match',
+        { user_id: selectedCardId, top_k: 10 }
+      );
+
+      if (res.code === 200 && res.data) {
+        const items: MatchItem[] = (res.data.matches || []).map((m: any) => ({
+          type: 'product' as const,
+          id: m.user_id || m.candidate_id,
+          title: m.user_name || '',
+          category: m.user_company || '',
+          score: m.score || m.match_score,
+          reasons: m.reasoning || (m.common_tags || []).map((t: any) => typeof t === 'string' ? t : t.tag || ''),
+        }));
+        setPltResults(items);
+        showToast(`PLT精炼完成: ${items.length}个结果`, 'success');
+      } else {
+        showToast('PLT匹配失败', 'error');
+      }
+    } catch {
+      showToast('PLT请求失败', 'error');
+    } finally {
+      setPltLoading(false);
+    }
+  }, [selectedCardId, showToast]);
+
+  // ============================================================
+  // 发起连接（交换名片）
+  // ============================================================
+  const handleConnect = useCallback(async (targetUserId: number) => {
+    setConnectingId(targetUserId);
+    try {
+      const res = await api.post('/api/business-card/connections/request', {
+        target_user_id: targetUserId,
+        message: '来自智能匹配',
+        source: 'match',
+      });
+      if (res.code === 200 || res.code === 201) {
+        showToast(t('match.connectSuccess'), 'success');
+      } else {
+        showToast(res.message || t('match.connectFailed'), 'error');
+      }
+    } catch {
+      showToast(t('match.connectFailed'), 'error');
+    } finally {
+      setConnectingId(null);
+    }
+  }, [showToast, t]);
 
   // ============================================================
   // 过滤 & 排序
@@ -173,6 +335,143 @@ export default function MatchingPage() {
         )}
       </button>
 
+      {/* PLT增强匹配按钮 */}
+      <button onClick={handlePltMatch} disabled={pltLoading || !selectedCardId}
+        className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 mt-2"
+      >
+        {pltLoading ? (
+          <><Loader2 className="w-5 h-5 animate-spin" /> PLT精炼中...</>
+        ) : (
+          <><Sparkles className="w-5 h-5" /> PLT增强匹配（2次循环精炼）</>
+        )}
+      </button>
+
+      {/* PLT结果标记 */}
+      {pltResults && showPlt && (
+        <div className="flex items-center gap-1.5 px-2 py-1.5 bg-amber-50 rounded-xl border border-amber-200">
+          <Sparkles className="w-4 h-4 text-amber-500" />
+          <span className="text-xs text-amber-700 font-medium">
+            PLT 2次循环精炼 | {pltResults.length}个结果 | 精度+15-20%
+          </span>
+        </div>
+      )}
+
+      {/* ── 三蛋蛋 · 买家推荐 ─────────────────────────────── */}
+      <div className="bg-white rounded-2xl p-4 border border-border-light">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
+            <Package className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-on-surface">买家推荐</h3>
+            <p className="text-[10px] text-text-muted">输入你的产品/主营，从 1000 万企业库匹配潜在买家</p>
+          </div>
+          {buyerQuota && (
+            <span className="text-[10px] text-text-muted bg-slate-100 px-2 py-0.5 rounded-full">
+              今日 {buyerQuota.used ?? '-'}/{buyerQuota.limit ?? '-'}
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-2 mt-2">
+          <input
+            value={buyerForm.product}
+            onChange={(e) => setBuyerForm({ ...buyerForm, product: e.target.value })}
+            placeholder="你卖什么（如：陪护型养老服务机器人）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            value={buyerForm.business}
+            onChange={(e) => setBuyerForm({ ...buyerForm, business: e.target.value })}
+            placeholder="主营业务（选填，如：研发生产销售养老机器人整机及软件）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            value={buyerForm.typical_customers}
+            onChange={(e) => setBuyerForm({ ...buyerForm, typical_customers: e.target.value })}
+            placeholder="典型客户（选填，如：养老院、护理院、康复医院）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <div className="flex gap-2">
+            <input
+              value={buyerForm.province}
+              onChange={(e) => setBuyerForm({ ...buyerForm, province: e.target.value })}
+              placeholder="限定省份（选填，如：江苏省）"
+              className="flex-1 px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <button
+              onClick={() => handleFindBuyers(1)}
+              disabled={buyerLoading}
+              className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+            >
+              {buyerLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+              找买家
+            </button>
+          </div>
+        </div>
+
+        {/* 买家结果 */}
+        {buyerTotal !== null && (
+          <div className="mt-3 text-[10px] text-text-muted">
+            找到 {buyerTotal >= 10000 && buyers.length === 20 ? '10000+' : buyerTotal} 家潜在买家 · 第 {buyerPage} 页
+          </div>
+        )}
+
+        {buyers.length > 0 && (
+          <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
+            {buyers.map((b) => (
+              <div key={`${b.cname}-${b.rank}`}
+                className="rounded-xl border border-border-light p-3 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-text-muted shrink-0 w-5">{b.rank}.</span>
+                  <p className="text-xs font-bold text-on-surface flex-1 truncate">{b.cname}</p>
+                  {b.pinned && (
+                    <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[9px] font-medium">联盟</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mt-1 ml-7">
+                  <span className="text-[10px] text-text-muted">{(b.province || '') + (b.city ? ' ' + b.city : '')}</span>
+                  {b.industryMain && <span className="text-[10px] text-text-muted">· {b.industryMain}</span>}
+                  {b.business && <span className="text-[10px] text-text-muted truncate">· {b.business.slice(0, 24)}</span>}
+                </div>
+                {b.contacts && b.contacts.length > 0 && (
+                  <div className="mt-1.5 ml-7 flex flex-wrap gap-1">
+                    {b.contacts.slice(0, 3).map((c, i) => (
+                      <span key={i} className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[9px]">
+                        {c.name_masked || ''}{c.position ? ` · ${c.position}` : ''}
+                      </span>
+                    ))}
+                    {b.contacts.length > 3 && (
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-text-muted text-[9px]">+{b.contacts.length - 3}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {buyers.length > 0 && (
+          <div className="mt-2 flex items-center justify-between">
+            <button
+              onClick={() => handleFindBuyers(buyerPage - 1)}
+              disabled={buyerPage <= 1 || buyerLoading}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 text-xs text-text-muted hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              上一页
+            </button>
+            <button
+              onClick={() => handleFindBuyers(buyerPage + 1)}
+              disabled={buyerLoading || buyers.length < 20}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 text-xs text-text-muted hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              下一页
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* 概览统计 */}
       {matchResults.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
@@ -215,7 +514,12 @@ export default function MatchingPage() {
       )}
 
       {/* 匹配结果 */}
-      {matchLoading ? (
+      {loadingRecommend ? (
+        <div className="flex flex-col items-center py-16 gap-3">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-sm text-text-muted">{t('match.loadingRecommend')}...</p>
+        </div>
+      ) : matchLoading ? (
         <div className="flex flex-col items-center py-16 gap-3">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
           <p className="text-sm text-text-muted">{t('match.analyzing')}...</p>
@@ -285,6 +589,21 @@ export default function MatchingPage() {
                   )}
                 </div>
                 <ExternalLink className="w-4 h-4 text-text-muted shrink-0 mt-1" />
+              </div>
+              {/* 交换名片按钮 */}
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleConnect(item.id); }}
+                  disabled={connectingId === item.id}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {connectingId === item.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Handshake className="w-3.5 h-3.5" />
+                  )}
+                  {t('match.exchangeCard')}
+                </button>
               </div>
             </div>
           ))}

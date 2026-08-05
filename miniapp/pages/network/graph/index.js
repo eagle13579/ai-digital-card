@@ -1,508 +1,808 @@
-/**
- * 人脉图谱 — Canvas 2D 力导向图
- */
-const { MockService } = require('../../../utils/mockService')
+const { getNetwork, findPath, getRelations, addTrust } = require('../../../utils/network-bridge')
+const store = require('../../../utils/store')
 
-// 力导向算法参数
-const PHYSICS = {
-  REPULSION: 3000,    // 节点间斥力强度
-  ATTRACTION: 0.005,  // 边的弹力系数
-  DAMPING: 0.85,      // 速度衰减
-  CENTER_GRAVITY: 0.01, // 向心力
-  MIN_SPEED: 0.3,     // 停止阈值
-  ITERATIONS: 80,     // 最大迭代帧数
+// Polyfill requestAnimationFrame for WeChat mini-program (Canvas 2D context)
+if (typeof requestAnimationFrame === 'undefined') {
+  var requestAnimationFrame = function (cb) { return setTimeout(function () { cb(Date.now()) }, 16) }
+  var cancelAnimationFrame = function (id) { clearTimeout(id) }
 }
 
-const COLORS = {
-  bg: '#0a0a18',
-  nodeBase: '#06b6d4',
-  nodeMe: '#8b5cf6',
-  edgeLine: 'rgba(139,92,246,0.15)',
-  edgeMe: 'rgba(6,182,212,0.25)',
-  textPrimary: '#e4e4ed',
-  textSecondary: '#8b8b9e',
-  glow: 'rgba(6,182,212,0.1)',
-}
+const ANIMATION_INTERVAL = 16
+const MAX_NODES = 20
 
 Page({
-
   data: {
-    loading: true,
+    useRealApi: true,
     nodeCount: 0,
-    edgeCount: 0,
+    hasData: true,
+    // BFS相关
+    showPathSearch: false,
+    targetUserId: '',
+    searchingPath: false,
+    pathResult: null,
+    showPathResult: false,
+    // 好友列表
+    friendList: [],
+    loadingFriends: false,
+    searchMode: 'navigate', // navigate | quick
+    // 节点信息弹窗
+    showInfoModal: false,
+    selectedNode: null,
+    // 子网络导航
+    isSubNetwork: false,
+    subNetworkLabel: '',
   },
 
-  // ==================================================
-  // 页面生命周期
-  // ==================================================
-  onLoad() {
-    this.graphData = null
-    this.nodes = []
-    this.edges = []
-    this.canvas = null
-    this.ctx = null
-    this.dpr = 1
-    this.animFrame = null
-    this.iteration = 0
+  nodes: [],
+  edges: [],
+  canvasCtx: null,
+  canvasWidth: 0,
+  canvasHeight: 0,
+  dpr: 1,
+  animationId: null,
+  draggingNode: null,
+  // 触摸位置追踪（用于区分点击/拖拽）
+  _touchStartX: 0,
+  _touchStartY: 0,
+  _touchStartTime: 0,
 
-    // 触摸状态
-    this.touch = { x: 0, y: 0, dragging: false, draggedNode: null }
-    this.pinch = { dist: 0, scale: 1 }
-
-    this.loadGraphData()
-  },
-
-  onUnload() {
-    if (this.animFrame) {
-      this.animFrame = null
-    }
+  onLoad(options) {
+    this.loadData()
   },
 
   onReady() {
-    // Canvas 初始化延后到数据加载完成
+    this.initCanvas()
+    setTimeout(() => {
+      if (this.nodes.length > 0) {
+        this.renderGraph()
+        this.startAnimation()
+      }
+    }, 300)
   },
 
-  // ==================================================
-  // 数据加载
-  // ==================================================
-  async loadGraphData() {
-    try {
-      const profile = await MockService.getUserProfile()
-      const profileData = profile.data !== undefined ? profile.data : profile
-      const userName = profileData.name || '我'
-
-      const trustRes = await MockService.getTrustNetwork()
-      const contacts = trustRes.trusting ?? trustRes.data?.trusting ?? trustRes.data ?? []
-
-      this.buildGraph(userName, contacts)
-      this.setData({
-        loading: false,
-        nodeCount: this.nodes.length,
-        edgeCount: this.edges.length,
-      })
-
-      this.initCanvas()
-
-    } catch (err) {
-      console.error('[人脉图谱] 加载失败:', err)
-      this.setData({ loading: false, nodeCount: 0, edgeCount: 0 })
+  onShow() {
+    if (this.canvasCtx && this.nodes.length > 0) {
+      this.startAnimation()
     }
   },
 
-  // ==================================================
-  // 构建图谱
-  // ==================================================
-  buildGraph(userName, contacts) {
-    const nodes = []
-    const edges = []
-    const nodeMap = {}
+  onHide() {
+    this.stopAnimation()
+  },
 
-    // 中心节点 = "我"
-    const meId = '__me__'
-    nodes.push({
-      id: meId,
-      label: userName || '我',
-      sub: '当前用户',
-      isMe: true,
-      x: 0, y: 0,
-      vx: 0, vy: 0,
-      radius: 32,
+  onUnload() {
+    this.stopAnimation()
+  },
+
+  // ====== 导入联系人 ======
+
+  navigateToImport() {
+    wx.navigateTo({
+      url: '/pages/network/import/index',
     })
-    nodeMap[meId] = true
+  },
 
-    // 联系人节点
-    const contactsArr = Array.isArray(contacts) ? contacts : []
-    contactsArr.forEach((c, i) => {
-      const nid = `c-${c.id || i}`
-      nodes.push({
-        id: nid,
-        label: c.name || `联系人${i + 1}`,
-        sub: [c.position, c.company].filter(Boolean).join(' · '),
-        isMe: false,
-        x: 0, y: 0,
-        vx: 0, vy: 0,
+  // ====== 数据加载 ======
+  async loadData() {
+    try {
+      const state = store.getState()
+      const userId = state.userInfo?.id || 'u001'
+      const useRealApi = this.data.useRealApi
+
+      console.log(`[Graph] 开始加载${useRealApi ? '真实API' : 'Mock'}数据（人脉网络）`)
+      const res = await getNetwork(useRealApi)
+      const data = res.data || res || { nodes: [], links: [] }
+      console.log('[Graph] 数据加载完成:', JSON.stringify(data))
+      this._buildGraphFromSixDegrees(data)
+      console.log('[Graph] 图谱构建完成:', this.nodes.length, 'nodes,', this.edges.length, 'edges')
+    } catch (err) {
+      console.error('[Graph] 加载数据失败:', err)
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    }
+  },
+
+  /** 从六度人脉API数据构建图谱（nodes + links格式） */
+  _buildGraphFromSixDegrees(data) {
+    const rawNodes = data.nodes || []
+    const rawLinks = data.links || []
+
+    if (rawNodes.length === 0) {
+      this.nodes = []
+      this.edges = []
+      this.setData({ nodeCount: 0, hasData: false })
+      return
+    }
+
+    // Find the center node (group=0 / depth=0 or first node)
+    const centerNode = rawNodes.find(n => n.depth === 0 || n.group === 0) || rawNodes[0]
+    const centerId = centerNode.id
+
+    this.stopAnimation()
+
+    // Build node map from sixDegrees data
+    const nodeMap = new Map()
+
+    // Center node
+    nodeMap.set(centerId, {
+      id: centerId,
+      name: centerNode.name || '我',
+      company: centerNode.company || '',
+      title: centerNode.title || '',
+      avatar: centerNode.avatar || '',
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 30,
+      isSelf: true,
+      data: centerNode,
+    })
+
+    // Other nodes
+    rawNodes.forEach((n) => {
+      if (n.id === centerId) return
+      if (nodeMap.has(n.id)) return
+      const angle = Math.random() * Math.PI * 2
+      const distance = 100 + Math.random() * 50
+      nodeMap.set(n.id, {
+        id: n.id,
+        name: n.name || n.id,
+        company: n.company || '',
+        title: n.title || '',
+        avatar: n.avatar || '',
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        vx: 0,
+        vy: 0,
         radius: 18,
-        _contact: c,
+        isSelf: false,
+        data: n,
       })
-      nodeMap[nid] = true
-      edges.push({ source: meId, target: nid })
     })
 
-    // 如果有>2个联系人，在相似联系人之间也加边（同公司/同行业）
-    if (contactsArr.length >= 3) {
-      for (let i = 0; i < contactsArr.length; i++) {
-        for (let j = i + 1; j < contactsArr.length; j++) {
-          const ci = contactsArr[i]
-          const cj = contactsArr[j]
-          // 同公司加边
-          if (ci.company && cj.company && ci.company === cj.company) {
-            edges.push({ source: `c-${ci.id || i}`, target: `c-${cj.id || j}` })
+    // Build edges from links
+    const edgeSet = new Set()
+    const newEdges = []
+    rawLinks.forEach((l) => {
+      const src = l.source || l.from
+      const tgt = l.target || l.to
+      if (!src || !tgt) return
+      const key = `${src}-${tgt}`
+      if (edgeSet.has(key)) return
+      edgeSet.add(key)
+      edgeSet.add(`${tgt}-${src}`)
+      if (nodeMap.has(src) && nodeMap.has(tgt)) {
+        newEdges.push({
+          from: src,
+          to: tgt,
+          relation: l.relation || '',
+          trustScore: l.trustScore || 0,
+        })
+      }
+    })
+
+    this.nodes = Array.from(nodeMap.values())
+    this.edges = newEdges
+
+    this.setData({
+      nodeCount: this.nodes.length - 1,
+      hasData: this.nodes.length > 1,
+    })
+
+    if (this.canvasCtx) {
+      this.renderGraph()
+    } else {
+      setTimeout(() => {
+        if (this.canvasCtx) {
+          this.renderGraph()
+          this.startAnimation()
+        }
+      }, 500)
+    }
+  },
+
+  // ====== Canvas 渲染 ======
+  initCanvas() {
+    const query = wx.createSelectorQuery()
+    query.select('#graphCanvas').node((res) => {
+      if (!res || !res.node) return
+      const canvas = res.node
+
+      const ctx = canvas.getContext('2d')
+
+      query.select('.graph-canvas').boundingClientRect((rect2) => {
+        if (!rect2) return
+        this._canvasRect = rect2
+        this.canvasWidth = rect2.width
+        this.canvasHeight = rect2.height
+
+        const sysInfo = wx.getSystemInfoSync ? wx.getSystemInfoSync() : wx.getDeviceInfo()
+        this.dpr = sysInfo.pixelRatio || 2
+
+        canvas.width = this.canvasWidth * this.dpr
+        canvas.height = this.canvasHeight * this.dpr
+        this.canvasCtx = ctx
+        this.renderGraph()
+        if (this.nodes.length > 0) {
+          this.startAnimation()
+        }
+      }).exec()
+    }).exec()
+  },
+
+  renderGraph() {
+    if (!this.canvasCtx) return
+    if (!this.canvasWidth || !this.canvasHeight) return
+    if (this.nodes.length === 0) return
+
+    const ctx = this.canvasCtx
+    const dpr = this.dpr
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+    ctx.strokeStyle = 'rgba(139, 92, 246, 0.2)'
+    ctx.lineWidth = 1
+
+    this.edges.forEach((edge) => {
+      const fromNode = this.nodes.find(n => n.id === edge.from)
+      const toNode = this.nodes.find(n => n.id === edge.to)
+      if (!fromNode || !toNode) return
+      ctx.beginPath()
+      ctx.moveTo(centerX + fromNode.x, centerY + fromNode.y)
+      ctx.lineTo(centerX + toNode.x, centerY + toNode.y)
+      ctx.stroke()
+    })
+
+    this.nodes.forEach((node, index) => {
+      const x = centerX + node.x
+      const y = centerY + node.y
+
+      if (node.isSelf) {
+        ctx.beginPath()
+        ctx.arc(x, y, node.radius, 0, Math.PI * 2)
+        ctx.fillStyle = '#8b5cf6'
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(x, y, node.radius + 4, 0, Math.PI * 2)
+        ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+
+        ctx.fillStyle = '#fff'
+        ctx.font = '12px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('我', x, y)
+      } else {
+        ctx.beginPath()
+        ctx.arc(x, y, node.radius, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(30, 30, 50, 0.9)'
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(139, 92, 246, 0.2)'
+        ctx.lineWidth = 0.5
+        ctx.stroke()
+
+        if (index % 2 === 0) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+          ctx.font = '10px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(node.name, x, y + node.radius + 12)
+        }
+      }
+    })
+  },
+
+  startAnimation() {
+    if (this.animationId) return
+    this._animFrameCount = 0
+    this._isStable = false
+    this._lastRenderTime = Date.now()
+    const animate = () => {
+      this._animFrameCount++
+      if (this._animFrameCount % 4 === 0) {
+        this.simulateForces()
+      }
+      const now = Date.now()
+      if (now - this._lastRenderTime > 100) {
+        this.renderGraph()
+        this._lastRenderTime = now
+      }
+      if (!this._isStable && this._animFrameCount < 120) {
+        this.animationId = requestAnimationFrame(animate)
+      } else if (!this._isStable) {
+        this._isStable = true
+      }
+    }
+    animate()
+  },
+
+  stopAnimation() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId)
+      this.animationId = null
+    }
+  },
+
+  simulateForces() {
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+    const damping = 0.96
+    const repulsion = 2000
+    const attraction = 0.02
+    const maxInteractionDist = 150
+    let totalVelocity = 0
+    let movingCount = 0
+
+    const nodeCount = this.nodes.length
+    for (let i = 0; i < nodeCount; i++) {
+      const node = this.nodes[i]
+      if (node.isSelf) continue
+
+      let fx = -node.x * attraction
+      let fy = -node.y * attraction
+
+      for (let j = 0; j < nodeCount; j++) {
+        if (i === j) continue
+        const other = this.nodes[j]
+        const dx = node.x - other.x
+        const dy = node.y - other.y
+        const distSq = dx * dx + dy * dy
+        if (distSq > maxInteractionDist * maxInteractionDist) continue
+        const dist = Math.sqrt(distSq)
+        const force = repulsion / (distSq + 100)
+        const nx = dx / dist
+        const ny = dy / dist
+        fx += nx * force
+        fy += ny * force
+      }
+
+      node.vx = (node.vx + fx) * damping
+      node.vy = (node.vy + fy) * damping
+      node.x += node.vx
+      node.y += node.vy
+
+      const maxDist = Math.min(this.canvasWidth, this.canvasHeight) / 3
+      const distFromCenter = Math.sqrt(node.x * node.x + node.y * node.y)
+      if (distFromCenter > maxDist) {
+        const ratio = maxDist / distFromCenter
+        node.x *= ratio
+        node.y *= ratio
+        node.vx *= 0.3
+        node.vy *= 0.3
+      }
+
+      const velSq = node.vx * node.vx + node.vy * node.vy
+      totalVelocity += Math.sqrt(velSq)
+      if (velSq > 0.01) movingCount++
+    }
+
+    const avgVelocity = totalVelocity / Math.max(nodeCount - 1, 1)
+    if (avgVelocity < 0.05 && movingCount < 2) {
+      this._isStable = true
+    }
+  },
+
+  onTouchStart(e) {
+    const touch = e.touches[0]
+    const canvasRect = this._canvasRect || { left: 0, top: 0 }
+    const tx = touch.clientX - canvasRect.left
+    const ty = touch.clientY - canvasRect.top
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+
+    // 记录触摸起始位置（用于区分点击/拖拽）
+    this._touchStartX = tx
+    this._touchStartY = ty
+    this._touchStartTime = Date.now()
+
+    for (let i = this.nodes.length - 1; i >= 0; i--) {
+      const node = this.nodes[i]
+      const dx = tx - (centerX + node.x)
+      const dy = ty - (centerY + node.y)
+      if (dx * dx + dy * dy <= node.radius * node.radius * 4) {
+        this.draggingNode = node
+        this.stopAnimation()
+        break
+      }
+    }
+  },
+
+  onTouchMove(e) {
+    if (!this.draggingNode) return
+    const touch = e.touches[0]
+    const canvasRect = this._canvasRect || { left: 0, top: 0 }
+    const tx = touch.clientX - canvasRect.left
+    const ty = touch.clientY - canvasRect.top
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+
+    this.draggingNode.x = tx - centerX
+    this.draggingNode.y = ty - centerY
+    this.renderGraph()
+  },
+
+  onTouchEnd(e) {
+    const wasDragging = this.draggingNode !== null
+
+    if (this.draggingNode) {
+      this.draggingNode = null
+      this.startAnimation()
+    }
+
+    // 检测是否为"点击"而非拖拽：移动距离小且时间短
+    if (!wasDragging) {
+      const touch = e.changedTouches[0]
+      if (touch) {
+        const canvasRect = this._canvasRect || { left: 0, top: 0 }
+        const tx = touch.clientX - canvasRect.left
+        const ty = touch.clientY - canvasRect.top
+        const dx = tx - this._touchStartX
+        const dy = ty - this._touchStartY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const duration = Date.now() - this._touchStartTime
+
+        // 判断为点击：移动距离 < 10px 且 持续时间 < 300ms
+        if (distance < 10 && duration < 300) {
+          const hitNode = this._findNodeAtPosition(tx, ty)
+          if (hitNode) {
+            this.showNodeInfo(hitNode)
+            return
           }
         }
       }
     }
-
-    // 随机初始化位置（围绕中心散开）
-    nodes.forEach((n) => {
-      if (n.isMe) return // 中心节点在原点
-      const angle = Math.random() * Math.PI * 2
-      const dist = 80 + Math.random() * 120
-      n.x = Math.cos(angle) * dist
-      n.y = Math.sin(angle) * dist
-    })
-
-    this.nodes = nodes
-    this.edges = edges
-    this.graphData = { userName, contacts: contactsArr }
   },
 
-  // ==================================================
-  // Canvas 初始化
-  // ==================================================
-  initCanvas() {
-    const query = wx.createSelectorQuery().in(this)
-    query.select('#graphCanvas')
-      .fields({ node: true, size: true })
-      .exec((res) => {
-        if (!res || !res[0]) {
-          console.warn('[人脉图谱] Canvas节点未找到')
-          return
-        }
-        const canvasNode = res[0].node
-        const width = res[0].width
-        const height = res[0].height
-
-        this.dpr = wx.getSystemInfoSync().pixelRatio
-        canvasNode.width = width * this.dpr
-        canvasNode.height = height * this.dpr
-
-        this.canvas = canvasNode
-        this.ctx = canvasNode.getContext('2d')
-        this.canvasWidth = width
-        this.canvasHeight = height
-
-        // 缩放偏移
-        this.offsetX = width / 2
-        this.offsetY = height / 2
-        this.scale = 1
-
-        // 启动物理模拟
-        this.startPhysics()
-      })
-  },
-
-  // ==================================================
-  // 力导向物理模拟
-  // ==================================================
-  startPhysics() {
-    this.iteration = 0
-    this.simulate()
-  },
-
-  simulate() {
-    if (this.iteration >= PHYSICS.ITERATIONS) {
-      this.render()
-      return
-    }
-
-    const nodes = this.nodes
-    const edges = this.edges
-    const n = nodes.length
-
-    // Step 1: 计算斥力（所有节点之间）
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const a = nodes[i]
-        const b = nodes[j]
-        let dx = b.x - a.x
-        let dy = b.y - a.y
-        let dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 5) {
-          dx = Math.random() - 0.5
-          dy = Math.random() - 0.5
-          dist = 5
-        }
-        const force = PHYSICS.REPULSION / (dist * dist)
-        const fx = (dx / dist) * force
-        const fy = (dy / dist) * force
-        a.vx -= fx
-        a.vy -= fy
-        b.vx += fx
-        b.vy += fy
-      }
-    }
-
-    // Step 2: 计算引力（边两端互相吸引）
-    edges.forEach((e) => {
-      const a = nodes.find((n) => n.id === e.source)
-      const b = nodes.find((n) => n.id === e.target)
-      if (!a || !b) return
-      const dx = b.x - a.x
-      const dy = b.y - a.y
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1
-      const force = PHYSICS.ATTRACTION * dist
-      const fx = (dx / dist) * force
-      const fy = (dy / dist) * force
-      a.vx += fx
-      a.vy += fy
-      b.vx -= fx
-      b.vy -= fy
-    })
-
-    // Step 3: 向心力（防止飞出去）
-    nodes.forEach((n) => {
-      if (n.isMe) return
-      n.vx -= n.x * PHYSICS.CENTER_GRAVITY
-      n.vy -= n.y * PHYSICS.CENTER_GRAVITY
-    })
-
-    // Step 4: 更新位置 + 阻尼
-    let totalSpeed = 0
-    nodes.forEach((n) => {
-      n.vx *= PHYSICS.DAMPING
-      n.vy *= PHYSICS.DAMPING
-      n.x += n.vx
-      n.y += n.vy
-      totalSpeed += Math.sqrt(n.vx * n.vx + n.vy * n.vy)
-    })
-
-    this.iteration++
-
-    // Step 5: 渲染当前帧
-    this.render()
-
-    // Step 6: 继续模拟（或停止）
-    if (totalSpeed / n > PHYSICS.MIN_SPEED) {
-      // 用 requestAnimationFrame
-      this.canvas.requestAnimationFrame(() => this.simulate())
-    }
-  },
-
-  // ==================================================
-  // Canvas 渲染
-  // ==================================================
-  render() {
-    const ctx = this.ctx
-    const dpr = this.dpr
-    const w = this.canvasWidth
-    const h = this.canvasHeight
-    const ox = this.offsetX
-    const oy = this.offsetY
-    const sc = this.scale
-
-    // 清空
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    ctx.scale(dpr, dpr)
-
-    // 画边
-    this.edges.forEach((e) => {
-      const a = this.nodes.find((n) => n.id === e.source)
-      const b = this.nodes.find((n) => n.id === e.target)
-      if (!a || !b) return
-
-      ctx.beginPath()
-      ctx.moveTo(ox + a.x * sc, oy + a.y * sc)
-      ctx.lineTo(ox + b.x * sc, oy + b.y * sc)
-
-      if (a.isMe || b.isMe) {
-        ctx.strokeStyle = COLORS.edgeMe
-        ctx.lineWidth = 1.2
-      } else {
-        ctx.strokeStyle = COLORS.edgeLine
-        ctx.lineWidth = 0.8
-      }
-      ctx.stroke()
-    })
-
-    // 画节点
-    this.nodes.forEach((n) => {
-      const cx = ox + n.x * sc
-      const cy = oy + n.y * sc
-      const r = n.radius * sc
-
-      if (n.isMe) {
-        // "我"节点 — 有发光效果
-        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 2)
-        gradient.addColorStop(0, COLORS.glow)
-        gradient.addColorStop(1, 'transparent')
-        ctx.fillStyle = gradient
-        ctx.beginPath()
-        ctx.arc(cx, cy, r * 2, 0, Math.PI * 2)
-        ctx.fill()
-
-        // 外圈
-        ctx.beginPath()
-        ctx.arc(cx, cy, r + 3, 0, Math.PI * 2)
-        ctx.strokeStyle = 'rgba(139,92,246,0.3)'
-        ctx.lineWidth = 1.5
-        ctx.stroke()
-
-        // 主体
-        const ng = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, 0, cx, cy, r)
-        ng.addColorStop(0, '#a78bfa')
-        ng.addColorStop(1, '#8b5cf6')
-        ctx.fillStyle = ng
-        ctx.beginPath()
-        ctx.arc(cx, cy, r, 0, Math.PI * 2)
-        ctx.fill()
-
-        // 文字：我
-        ctx.fillStyle = '#fff'
-        ctx.font = `bold ${Math.max(11, 14 * sc)}px sans-serif`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText('我', cx, cy + 1)
-
-      } else {
-        // 联系人节点
-        const ng = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, 0, cx, cy, r)
-        ng.addColorStop(0, '#38bdf8')
-        ng.addColorStop(1, '#06b6d4')
-        ctx.fillStyle = ng
-        ctx.beginPath()
-        ctx.arc(cx, cy, r, 0, Math.PI * 2)
-        ctx.fill()
-
-        // 光晕
-        ctx.shadowColor = 'rgba(6,182,212,0.15)'
-        ctx.shadowBlur = 8
-        ctx.fill()
-        ctx.shadowBlur = 0
-      }
-    })
-
-    // 画标签（在节点下方）
-    this.nodes.forEach((n) => {
-      const cx = ox + n.x * sc
-      const cy = oy + n.y * sc
-      const r = n.radius * sc
-
-      // 名字
-      ctx.fillStyle = COLORS.textPrimary
-      ctx.font = `${Math.max(10, 11 * sc)}px sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'top'
-      ctx.fillText(n.label.length > 6 ? n.label.slice(0, 6) + '..' : n.label, cx, cy + r + 4)
-
-      // 副标题（如果有）
-      if (n.sub && sc > 0.7) {
-        ctx.fillStyle = COLORS.textSecondary
-        ctx.font = `${Math.max(8, 9 * sc)}px sans-serif`
-        ctx.fillText(n.sub.length > 8 ? n.sub.slice(0, 8) + '..' : n.sub, cx, cy + r + 18 * sc + 4)
-      }
-    })
-
-    // 恢复缩放
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-  },
-
-  // ==================================================
-  // 触摸交互
-  // ==================================================
-  getTouchPos(touch) {
-    const query = wx.createSelectorQuery().in(this)
-    // 直接在事件中计算
-    return { x: touch.x, y: touch.y }
-  },
-
-  findNodeAt(x, y) {
-    const ox = this.offsetX
-    const oy = this.offsetY
-    const sc = this.scale
-    // 从后往前遍历（上层节点优先）
+  _findNodeAtPosition(tx, ty) {
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
     for (let i = this.nodes.length - 1; i >= 0; i--) {
-      const n = this.nodes[i]
-      const cx = ox + n.x * sc
-      const cy = oy + n.y * sc
-      const r = n.radius * sc + 8 // 加8px容差
-      const dx = x - cx
-      const dy = y - cy
-      if (dx * dx + dy * dy <= r * r) {
-        return n
+      const node = this.nodes[i]
+      const dx = tx - (centerX + node.x)
+      const dy = ty - (centerY + node.y)
+      if (dx * dx + dy * dy <= node.radius * node.radius) {
+        return node
       }
     }
     return null
   },
 
-  onTouchStart(e) {
-    if (e.touches.length === 1) {
-      const touch = e.touches[0]
-      const node = this.findNodeAt(touch.x, touch.y)
-      this.tapTarget = node || null
-      this.tapStartTime = Date.now()
-      this.tapStartX = touch.x
-      this.tapStartY = touch.y
-      if (node) {
-        this.touch.dragging = true
-        this.touch.draggedNode = node
-        this.touch.x = touch.x
-        this.touch.y = touch.y
-      }
-    } else if (e.touches.length === 2) {
-      // 双指缩放开始
-      const t1 = e.touches[0], t2 = e.touches[1]
-      this.pinch.dist = Math.sqrt(
-        (t1.x - t2.x) * (t1.x - t2.x) + (t1.y - t2.y) * (t1.y - t2.y)
-      )
+  // ====== 节点信息弹窗 ======
+
+  showNodeInfo(node) {
+    if (node.isSelf) {
+      const userInfo = node.data || {}
+      this.setData({
+        showInfoModal: true,
+        selectedNode: {
+          id: node.id,
+          name: node.name,
+          avatar: userInfo.avatar || '',
+          relation: '自己',
+          trustScore: 100,
+          isSelf: true,
+        },
+        selectedInitial: node.name ? node.name.slice(0, 1) : '',
+      })
+      return
     }
+
+    const contactData = node.data || {}
+    this.setData({
+      showInfoModal: true,
+      selectedNode: {
+        id: node.id,
+        name: node.name,
+        avatar: contactData.avatar || '',
+        relation: contactData.relation || '联系人',
+        trustScore: contactData.trustScore || 0,
+        isSelf: false,
+      },
+      selectedInitial: node.name ? node.name.slice(0, 1) : '',
+    })
   },
 
-  onTouchMove(e) {
-    if (e.touches.length === 1 && this.touch.dragging && this.touch.draggedNode) {
-      // 拖拽节点
-      const touch = e.touches[0]
-      const dx = (touch.x - this.touch.x) / this.scale
-      const dy = (touch.y - this.touch.y) / this.scale
-      this.touch.draggedNode.x += dx
-      this.touch.draggedNode.y += dy
-      this.touch.x = touch.x
-      this.touch.y = touch.y
-      this.render()
-    } else if (e.touches.length === 2) {
-      // 双指缩放
-      const t1 = e.touches[0], t2 = e.touches[1]
-      const dist = Math.sqrt(
-        (t1.x - t2.x) * (t1.x - t2.x) + (t1.y - t2.y) * (t1.y - t2.y)
-      )
-      if (this.pinch.dist > 0) {
-        const delta = dist / this.pinch.dist
-        this.scale = Math.max(0.4, Math.min(2.5, this.scale * delta))
-        this.render()
-      }
-      this.pinch.dist = dist
-    }
+  closeInfoModal() {
+    this.setData({
+      showInfoModal: false,
+      selectedNode: null,
+    })
   },
 
-  onTouchEnd(e) {
-    this.touch.dragging = false
-    this.touch.draggedNode = null
-    this.pinch.dist = 0
-    // 点击检测：移动距离小于10px视为点击
-    if (e && e.changedTouches && e.changedTouches.length > 0) {
-      const deltaX = Math.abs(e.changedTouches[0].x - this.tapStartX)
-      const deltaY = Math.abs(e.changedTouches[0].y - this.tapStartY)
-      if (deltaX < 10 && deltaY < 10 && this.tapTarget) {
-        const node = this.tapTarget
-        // 中心节点（"我"）不跳转
-        if (node.isMe) return
-        // 提取真实联系人ID（node.id格式为 c-{contactId}）
-        const contactId = node._contact?.brochureId || node._contact?.id
-        if (contactId) {
-          wx.navigateTo({ url: `/pages/card/card?id=${contactId}` })
-        }
-      }
-    }
+  stopPropagation() {
   },
 
-  // ==================================================
-  // 导航
-  // ==================================================
-  goBack() {
-    const pages = getCurrentPages()
-    if (pages.length > 1) {
-      wx.navigateBack()
+  goBackToMainNetwork() {
+    if (this._mainNetworkNodes && this._mainNetworkEdges) {
+      this.nodes = JSON.parse(JSON.stringify(this._mainNetworkNodes))
+      this.edges = JSON.parse(JSON.stringify(this._mainNetworkEdges))
+      this._mainNetworkNodes = null
+      this._mainNetworkEdges = null
+      this._mainNetworkCenterId = null
+
+      this.setData({
+        isSubNetwork: false,
+        subNetworkLabel: '',
+      })
+
+      this.renderGraph()
+      this.startAnimation()
     } else {
-      wx.switchTab({ url: '/pages/index/index' })
+      this.loadData()
     }
+  },
+
+  _rebuildGraphWithCenter(centerId, friends) {
+    this.stopAnimation()
+
+    const newNodeMap = new Map()
+
+    const existingNode = this.nodes.find(n => n.id === centerId)
+    const centerData = existingNode ? existingNode.data || {} : {}
+    const centerName = existingNode ? existingNode.name : (centerId === 'self' ? '我' : centerId)
+
+    newNodeMap.set(centerId, {
+      id: centerId,
+      name: centerName,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 30,
+      isSelf: true,
+      data: centerData,
+    })
+
+    const angleStep = (Math.PI * 2) / Math.max(friends.length, 1)
+    friends.forEach((friend, index) => {
+      const friendId = friend.id !== undefined ? String(friend.id) : `node_${index}`
+      if (newNodeMap.has(friendId)) return
+
+      const angle = index * angleStep
+      const distance = 100 + Math.random() * 50
+
+      newNodeMap.set(friendId, {
+        id: friendId,
+        name: friend.name || `联系人${index + 1}`,
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        vx: 0,
+        vy: 0,
+        radius: 18,
+        isSelf: false,
+        data: friend,
+      })
+    })
+
+    const newEdges = []
+    newNodeMap.forEach((node, id) => {
+      if (id !== centerId) {
+        newEdges.push({ from: centerId, to: id })
+      }
+    })
+
+    this.nodes = Array.from(newNodeMap.values())
+    this.edges = newEdges
+
+    this.setData({
+      nodeCount: this.nodes.length - 1,
+      hasData: this.nodes.length > 1,
+    })
+
+    this.renderGraph()
+    this.startAnimation()
+  },
+
+  // ====== BFS 触达路径查找 ======
+  openPathSearch() {
+    this.setData({
+      showPathSearch: true,
+      targetUserId: '',
+      pathResult: null,
+    })
+  },
+
+  closePathSearch() {
+    this.setData({
+      showPathSearch: false,
+      pathResult: null,
+    })
+  },
+
+  onTargetInput(e) {
+    this.setData({ targetUserId: e.detail.value })
+  },
+
+  selectFriendTarget(e) {
+    const { id, name } = e.currentTarget.dataset
+    this.setData({ targetUserId: id })
+    this.searchPath()
+  },
+
+  async searchPath() {
+    const targetId = this.data.targetUserId.trim()
+    if (!targetId) {
+      return wx.showToast({ title: '请输入目标用户ID', icon: 'none' })
+    }
+
+    this.setData({ searchingPath: true })
+
+    try {
+      const state = store.getState()
+      const userId = state.userInfo?.id || 'u001'
+      const useRealApi = this.data.useRealApi
+      const res = await findPath(userId, targetId, undefined, useRealApi)
+      const result = res.data || res || { distance: -1, path: [] }
+      this._handlePathResult(result)
+    } catch (err) {
+      console.error('[Graph] BFS搜索失败:', err)
+      this.setData({
+        searchingPath: false,
+        pathResult: { distance: -1, path: [], message: '搜索失败，请重试' },
+        showPathResult: true,
+      })
+    }
+  },
+
+  // ====== 建立关系 ======
+  async createRelation() {
+    wx.showModal({
+      title: '建立六度人脉关系',
+      content: '输入目标用户ID和关系描述',
+      editable: true,
+      placeholderText: '目标用户ID',
+      success: async (res) => {
+        if (res.confirm && res.content) {
+          const targetUserId = res.content.trim()
+          if (!targetUserId) return wx.showToast({ title: '请输入用户ID', icon: 'none' })
+
+          wx.showModal({
+            title: '关系类型',
+            content: '输入关系描述（如：同事、朋友、合作伙伴）',
+            editable: true,
+            placeholderText: '关系描述',
+            success: async (res2) => {
+              if (!res2.confirm) return
+              const relation = res2.content || '联系人'
+
+              wx.showLoading({ title: '建立关系中...' })
+              try {
+                const state = store.getState()
+                const userId = state.userInfo?.id || 'u001'
+                const payload = {
+                  user_id: userId,
+                  target_user_id: targetUserId,
+                  relation: relation,
+                  trust_score: 80,
+                }
+                await addTrust(payload, this.data.useRealApi)
+                wx.hideLoading()
+                wx.showToast({ title: '关系建立成功', icon: 'success' })
+                // Refresh the graph
+                this.refreshGraph()
+              } catch (err) {
+                wx.hideLoading()
+                console.error('[Graph] 建立关系失败:', err)
+                wx.showToast({ title: '建立失败', icon: 'none' })
+              }
+            },
+          })
+        }
+      },
+    })
+  },
+
+  _handlePathResult(result) {
+    // 预计算首字母用于WXML
+    if (result.path && Array.isArray(result.path)) {
+      result.path = result.path.map(item => ({
+        ...item,
+        initial: item.name ? item.name.slice(0, 1) : ''
+      }))
+    }
+    this.setData({
+      searchingPath: false,
+      pathResult: result,
+      showPathResult: true,
+    })
+
+    if (result.path && result.path.length > 1) {
+      this.highlightPath(result.path)
+    }
+  },
+
+  highlightPath(pathNodes) {
+    if (!this.canvasCtx) return
+
+    const pathIds = new Set(pathNodes.map(n => n.id))
+    const ctx = this.canvasCtx
+    const dpr = this.dpr
+    const centerX = this.canvasWidth / 2
+    const centerY = this.canvasHeight / 2
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    this.renderGraph()
+
+    this.nodes.forEach((node) => {
+      if (!pathIds.has(node.id)) return
+      const x = centerX + node.x
+      const y = centerY + node.y
+
+      ctx.beginPath()
+      ctx.arc(x, y, node.radius + 6, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)'
+      ctx.lineWidth = 3
+      ctx.stroke()
+
+      ctx.beginPath()
+      ctx.arc(x, y, node.radius + 10, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+    })
+  },
+
+  onPathNodeTap(e) {
+    const { id, name } = e.currentTarget.dataset
+    console.log('[Graph] 路径节点点击:', id, name)
+    wx.showToast({ title: `${name} (${id})`, icon: 'none' })
+  },
+
+  closePathResult() {
+    this.setData({ showPathResult: false })
+    this.renderGraph()
+  },
+
+  // ====== 联系人管理 ======
+  addContact() {
+    wx.showModal({
+      title: '添加联系人',
+      editable: true,
+      placeholderText: '请输入联系人姓名',
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const name = res.content.trim()
+          if (name) {
+            const angle = Math.random() * Math.PI * 2
+            const distance = 100 + Math.random() * 50
+            const newNode = {
+              id: `node_${Date.now()}`,
+              name,
+              x: Math.cos(angle) * distance,
+              y: Math.sin(angle) * distance,
+              vx: 0,
+              vy: 0,
+              radius: 18,
+              isSelf: false,
+            }
+            this.nodes.push(newNode)
+            this.edges.push({ from: 'self', to: newNode.id })
+            this.setData({ nodeCount: this.nodes.length - 1, hasData: true })
+            wx.setStorageSync('trust_network', this.nodes)
+            this.renderGraph()
+            wx.showToast({ title: '添加成功', icon: 'success' })
+          }
+        }
+      },
+    })
+  },
+
+  importWechat() {
+    wx.showToast({ title: '功能开发中', icon: 'none' })
+  },
+
+  async refreshGraph() {
+    this.stopAnimation()
+    await this.loadData()
+    setTimeout(() => {
+      this.renderGraph()
+      this.startAnimation()
+    }, 100)
+    wx.showToast({ title: '图谱已刷新', icon: 'success' })
   },
 })

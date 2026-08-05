@@ -1,0 +1,13 @@
+<view class="page-container">
+  <view class="ai-header">
+    <text class="ai-title">{{_t.aiCenterTitle}}</text>
+    <text class="ai-subtitle">{{_t.aiCenterSubtitle}}</text>
+  </view>
+  <view class="ai-grid">
+    <view class="ai-item" wx:for="{{features}}" wx:key="id" data-url="{{item.url}}" bindtap="go">
+      <view class="ai-icon">{{item.icon}}</view>
+      <text class="ai-name">{{item.name}}</text>
+      <text class="ai-desc">{{item.desc}}</text>
+    </view>
+  </view>
+</view>

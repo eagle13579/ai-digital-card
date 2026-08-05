@@ -26,6 +26,8 @@ from app.models.gaia import (
     GaiaModelWeights,
 )
 
+pytestmark = pytest.mark.db
+
 
 # ══════════════════════════════════════════════════════════════════════
 # 1. GaiaKnowledge model

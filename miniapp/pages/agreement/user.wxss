@@ -1,74 +1,48 @@
-/**
- * 用户协议 — AI原生暗色适配
- * 基于 tokens.wxss 设计Token系统
- * 基底: #0A0A18 | 玻璃三层 | Orb光晕 | 三重渐变
- */
-.agreement-container {
-  min-height: 100vh;
-  background: var(--bg-page);
+/* 用户协议页 - v2.0 Dark Minimal */
+
+page {
+  background: var(--surface-primary, #0f0f1a) !important;
+  color: var(--text-primary, #ffffff);
 }
 
-.agreement-header {
-  background: var(--gradient-cyan-purple);
-  padding: var(--space-10) var(--space-8);
+.user-content {
+  padding: var(--space-4, 16px);
+}
+
+.user-title {
+  font-size: var(--text-lg, 20px);
+  font-weight: var(--weight-bold, 700);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: var(--space-4, 16px);
+  display: block;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
-.agreement-header::before {
-  content: '';
-  position: absolute;
-  width: 400rpx;
-  height: 400rpx;
-  top: -120rpx;
-  right: -100rpx;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-  pointer-events: none;
-}
-
-.agreement-title {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: #fff;
+.user-update {
+  font-size: var(--text-xs, 12px);
+  color: var(--text-tertiary, rgba(255,255,255,0.4));
   display: block;
-  margin-bottom: var(--space-3);
-  letter-spacing: var(--tracking-tight);
-  font-family: var(--font-system);
+  text-align: center;
+  margin-bottom: var(--space-4, 16px);
 }
 
-.agreement-subtitle {
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.75);
+.user-section-title {
+  font-size: var(--text-base, 16px);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--text-primary, #ffffff);
+  margin-top: var(--space-4, 16px);
+  margin-bottom: var(--space-2, 8px);
   display: block;
 }
 
-.agreement-content {
-  height: calc(100vh - 240rpx);
-  padding: var(--space-8);
+.user-section-title:first-of-type {
+  margin-top: var(--space-3, 12px);
 }
 
-.article {
-  margin-bottom: var(--space-10);
-}
-
-.article-title {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--text-primary);
-  display: block;
-  margin-bottom: var(--space-4);
-  letter-spacing: var(--tracking-tight);
-}
-
-.article-text {
-  font-size: var(--text-base);
-  color: var(--text-secondary);
+.user-text {
+  font-size: var(--text-sm, 14px);
+  color: var(--text-secondary, rgba(255,255,255,0.72));
   line-height: 1.8;
   display: block;
-  margin-bottom: var(--space-4);
-}
-
-.article-text:last-child {
-  margin-bottom: 0;
+  margin-bottom: var(--space-1, 4px);
 }

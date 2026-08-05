@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "数据管道cron任务注册表",
+    "generated_by": "register_cron.py",
+    "generated_at": "2026-07-25T02:53:23.453214+00:00",
+    "project_root": "D:\\AI数智名片",
+    "backend_dir": "D:\\AI数智名片\\backend",
+    "python": "C:\\Python314\\python.exe",
+    "total_tasks": 5
+  },
+  "crontab_file": "D:\\AI数智名片\\backend\\app\\data_pipeline\\.cron_configs\\crontab",
+  "registered_tasks": [
+    {
+      "id": "data-pipeline-full-cycle",
+      "schedule": "0 * * * *",
+      "description": "完整数据管道 — 采集+治理+训练全周期",
+      "command": "cd D:\\AI数智名片\\backend && C:\\Python314\\python.exe -m app.data_pipeline.pipeline_controller --mode full --json >> D:\\AI数智名片\\logs\\cron_full_cycle.log 2>&1",
+      "registered_at": "2026-07-25T02:53:23.453197+00:00"
+    },
+    {
+      "id": "data-pipeline-collect",
+      "schedule": "*/30 * * * *",
+      "description": "仅数据采集 — 运行所有到期爬虫",
+      "command": "cd D:\\AI数智名片\\backend && C:\\Python314\\python.exe -m app.data_pipeline.pipeline_controller --mode collect --json >> D:\\AI数智名片\\logs\\cron_collect.log 2>&1",
+      "registered_at": "2026-07-25T02:53:23.453204+00:00"
+    },
+    {
+      "id": "data-pipeline-train",
+      "schedule": "*/30 * * * *",
+      "description": "仅模型训练 — 训练所有到期模型",
+      "command": "cd D:\\AI数智名片\\backend && C:\\Python314\\python.exe -m app.data_pipeline.pipeline_controller --mode train --json >> D:\\AI数智名片\\logs\\cron_train.log 2>&1",
+      "registered_at": "2026-07-25T02:53:23.453207+00:00"
+    },
+    {
+      "id": "data-pipeline-health",
+      "schedule": "*/5 * * * *",
+      "description": "数据管道健康检查 — 自动监控管道状态",
+      "command": "cd D:\\AI数智名片\\backend && C:\\Python314\\python.exe -m app.data_pipeline.pipeline_health_check >> D:\\AI数智名片\\logs\\cron_health.log 2>&1",
+      "registered_at": "2026-07-25T02:53:23.453208+00:00"
+    },
+    {
+      "id": "data-online-learning",
+      "schedule": "*/15 * * * *",
+      "description": "在线学习 — 增量模型权重调整 (train_only模式)",
+      "command": "cd D:\\AI数智名片\\backend && C:\\Python314\\python.exe -m app.data_pipeline.pipeline_controller --mode train --json >> D:\\AI数智名片\\logs\\cron_online_learning.log 2>&1",
+      "registered_at": "2026-07-25T02:53:23.453209+00:00"
+    }
+  ]
+}

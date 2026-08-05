@@ -79,8 +79,8 @@ describe('CardPreview', () => {
       <CardPreview fields={{ name: 'Test' }} template="purple" />
     );
 
-    expect(defaultCard.firstChild?.className).toContain('from-blue-500');
-    expect(purpleCard.firstChild?.className).toContain('from-purple-500');
+    expect((defaultCard.firstChild as HTMLElement)?.className).toContain('from-blue-500');
+    expect((purpleCard.firstChild as HTMLElement)?.className).toContain('from-purple-500');
   });
 
   it('falls back to default template for unknown template', () => {
@@ -88,6 +88,6 @@ describe('CardPreview', () => {
       <CardPreview fields={{ name: 'Test' }} template="nonexistent" />
     );
 
-    expect(container.firstChild?.className).toContain('from-blue-500');
+    expect((container.firstChild as HTMLElement)?.className).toContain('from-blue-500');
   });
 });

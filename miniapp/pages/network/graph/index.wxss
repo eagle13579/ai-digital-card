@@ -1,276 +1,606 @@
-/* ============================================================
- * 人脉图谱页 — AI原生暗色 · 玻璃质感 · 光晕Orb · Spring动效
- * 降级方案: 微信低版本不支持backdrop-filter时，使用 rgba(20,20,24,0.85) + filter:blur() 替代
- * ============================================================ */
-
-/* ========== 1. 页面基底 ========== */
 .graph-page {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background: var(--bg-page, #0A0A18);
-  overflow: hidden;
+  min-height: 100vh;
+  background: #0f0f1a;
   display: flex;
   flex-direction: column;
 }
 
-/* ========== 2. 深色模式锚点 ========== */
-.dark {
-  color-scheme: dark;
-}
-
-/* ========== 3. 背景Orb装饰光晕 ========== */
-.orb-bg-deco {
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-  border-radius: 50%;
-}
-.orb-bg-1 {
-  top: -120rpx;
-  right: -80rpx;
-  width: 500rpx;
-  height: 500rpx;
-  background: radial-gradient(circle, rgba(139,92,246,0.12), rgba(6,182,212,0.04), transparent 70%);
-  animation: orb-float 6s ease-in-out infinite;
-}
-.orb-bg-2 {
-  bottom: -100rpx;
-  left: -60rpx;
-  width: 400rpx;
-  height: 400rpx;
-  background: radial-gradient(circle, rgba(6,182,212,0.10), rgba(236,72,153,0.04), transparent 70%);
-  animation: orb-float 8s ease-in-out infinite reverse;
-}
-
-/* ========== 4. 顶部栏 — 玻璃层2 ========== */
 .graph-header {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  padding: var(--space-3, 12rpx) var(--space-6, 24rpx);
-  flex-shrink: 0;
-  /* glass-2: 玻璃质感层2 */
-  background: var(--glass-bg-2, rgba(255,255,255,0.07));
-  backdrop-filter: blur(var(--glass-blur-2, 30px));
-  -webkit-backdrop-filter: blur(var(--glass-blur-2, 30px));
-  border-bottom: var(--glass-border-2, 0.5px solid rgba(255,255,255,0.10));
-  /* 上层微光 */
-  box-shadow: var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255,255,255,0.08)),
-              var(--orb-sm, 0 0 12px rgba(139,92,246,0.15));
-}
-
-.header-left {
-  width: 80rpx;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.back-icon {
-  font-size: 44rpx;
-  color: var(--text-secondary, rgba(255,255,255,0.65));
-  line-height: 1;
-  transition: var(--transition-fade, opacity 250ms ease-out);
-}
-.back-icon:active {
-  opacity: 0.5;
-}
-
-.header-center {
-  flex: 1;
+  padding: 20px 16px;
   text-align: center;
 }
 
-.header-title {
-  font-size: var(--text-lg, 28rpx);
-  font-weight: 600;
-  color: var(--text-primary, rgba(255,255,255,0.92));
-  letter-spacing: var(--tracking-tight, -0.01em);
-}
-
-.header-subtitle {
-  font-size: var(--text-xs, 20rpx);
-  color: var(--text-tertiary, rgba(255,255,255,0.40));
-  display: block;
-  margin-top: 2rpx;
-}
-
-.header-right {
-  width: 80rpx;
+.header-top {
   display: flex;
   align-items: center;
-  gap: 6rpx;
-  justify-content: flex-end;
+  gap: 12px;
 }
 
-.legend-dot {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
-  background: var(--gradient-cyan-purple, linear-gradient(135deg, #06b6d4, #8b5cf6));
-  /* Orb光晕替代原生阴影 */
-  box-shadow: var(--orb-cyan, 0 0 20px rgba(6,182,212,0.20));
+.header-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 20px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  flex-shrink: 0;
 }
 
-.legend-text {
-  font-size: var(--text-xs, 20rpx);
-  color: var(--text-secondary, rgba(255,255,255,0.65));
+.header-back-btn:active {
+  background: rgba(139, 92, 246, 0.25);
 }
 
-/* ========== 5. 加载状态 ========== */
-.loading-layer {
+.back-arrow {
+  font-size: 16px;
+  color: #a78bfa;
+}
+
+.back-text {
+  font-size: 13px;
+  color: #a78bfa;
+  font-weight: 500;
+}
+
+.header-title-area {
+  flex: 1;
+}
+
+.graph-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: block;
+}
+
+.graph-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  display: block;
+}
+
+.graph-container {
+  flex: 1;
   position: relative;
-  z-index: 5;
+  margin: 0 16px;
+  background: rgba(30, 30, 50, 0.5);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.graph-tips {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.tips-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.tips-text {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+}
+
+.tips-hint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 6px;
+  display: block;
+}
+
+.graph-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+
+.action-btn {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 16px 12px;
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.action-btn:active {
+  background: rgba(50, 50, 80, 0.8);
+}
+
+.action-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.action-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.add-btn {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.import-btn {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15));
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.search-btn {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.legend {
+  display: flex;
   justify-content: center;
-  /* 玻璃层1背景 */
-  background: var(--glass-bg-1, rgba(255,255,255,0.04));
+  gap: 24px;
+  padding: 12px 16px 32px;
 }
 
-.loading-spinner {
-  width: 60rpx;
-  height: 60rpx;
-  border: 4rpx solid var(--border-subtle, rgba(255,255,255,0.06));
-  border-top: 4rpx solid var(--cyan, #06b6d4);
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 20rpx;
-  /* Orb光晕 */
-  box-shadow: var(--orb-cyan, 0 0 20px rgba(6,182,212,0.20));
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.legend-dot.self {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
 }
 
-.loading-text {
-  font-size: var(--text-sm, 24rpx);
-  color: var(--text-tertiary, rgba(255,255,255,0.40));
+.legend-dot.contact {
+  background: rgba(30, 30, 50, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
-/* ========== 6. Canvas 画布 ========== */
-.graph-canvas {
+.legend-line {
+  width: 20px;
+  height: 2px;
+  background: rgba(139, 92, 246, 0.4);
+}
+
+.legend-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* BFS路径搜索面板 */
+.search-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.search-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.search-card {
   position: relative;
-  z-index: 3;
-  flex: 1;
   width: 100%;
-  display: block;
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
 }
 
-/* ========== 7. 底部栏 — 玻璃层1 ========== */
-.graph-footer {
-  position: relative;
-  z-index: 10;
+.search-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4, 16rpx) var(--space-7, 28rpx);
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.search-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.search-close {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+}
+
+.search-body {
+  padding: 16px;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 15px;
+  color: #fff;
+}
+
+.search-btn {
   flex-shrink: 0;
-  /* glass-1: 超薄玻璃 */
-  background: var(--glass-bg-1, rgba(255,255,255,0.04));
-  backdrop-filter: blur(var(--glass-blur-1, 20px));
-  -webkit-backdrop-filter: blur(var(--glass-blur-1, 20px));
-  border-top: var(--glass-border-1, 0.5px solid rgba(255,255,255,0.06));
-  box-shadow: var(--shadow-glass-edge, inset 0 0.5px 0 rgba(255,255,255,0.08));
+  height: 44px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #fff;
+  font-size: 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
 }
 
-.footer-hint {
-  font-size: var(--text-xs, 20rpx);
-  color: var(--text-quaternary, rgba(255,255,255,0.20));
+.search-spinner {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.footer-count {
-  font-size: var(--text-sm, 22rpx);
-  color: var(--text-secondary, rgba(255,255,255,0.65));
+.mini-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(139, 92, 246, 0.2);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.friend-hint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 12px;
+  text-align: center;
+}
+
+.friend-list {
+  margin-top: 12px;
+}
+
+.friend-list-title {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.friend-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+
+.friend-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-right: 8px;
+}
+
+.friend-chip.selected {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.chip-name {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.friend-chip.selected .chip-name {
+  color: #a78bfa;
+}
+
+/* ====== 联系人信息弹窗 ====== */
+.info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.info-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.info-card {
+  position: relative;
+  width: 100%;
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.info-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.info-close {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+}
+
+.info-body {
+  padding: 16px;
+}
+
+.info-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.info-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(139, 92, 246, 0.4);
+  flex-shrink: 0;
+}
+
+.info-avatar.avatar-self {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.avatar-text {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.info-name-area {
+  flex: 1;
+}
+
+.info-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.info-relation-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  font-size: 12px;
+  color: #a78bfa;
+}
+
+.info-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 14px 0;
+}
+
+.info-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.trust-score-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.trust-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.trust-score-value {
+  width: 44px;
+  text-align: right;
+  font-weight: 600;
+  color: #a78bfa;
+}
+
+.info-footer {
+  padding: 0 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-action-btn {
+  width: 100%;
+  height: 44px;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #fff;
+  font-size: 15px;
   font-weight: 500;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
 }
 
-/* ========== 8. Spring入场动效系统 ========== */
-
-/* 8a. 从上往下入场 + 弹簧曲线 */
-.animate-spring-in-down {
-  animation: spring-in-down var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+.info-action-btn:active {
+  opacity: 0.8;
 }
 
-@keyframes spring-in-down {
-  from {
-    opacity: 0;
-    transform: translateY(-40rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.info-close-btn {
+  width: 100%;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* 8b. 从下往上入场 */
-.animate-spring-in-up {
-  animation: spring-in-up var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
-  animation-delay: 0.15s;
+.info-close-btn:active {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-@keyframes spring-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(40rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ====== 路径步骤列表 ====== */
+.path-steps {
+  padding: 0;
 }
 
-/* 8c. 淡入缩放入场 */
-.animate-spring-in {
-  animation: spring-in var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
-  animation-delay: 0.1s;
+.path-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  position: relative;
 }
 
-@keyframes spring-in {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.path-step-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* 8d. Canvas缩放入场 — 弹簧回弹 */
-.animate-spring-in-scale {
-  animation: spring-in-scale var(--duration-slow, 400ms) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
-  animation-delay: 0.08s;
+.step-node {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(139, 92, 246, 0.4);
+  flex-shrink: 0;
 }
 
-@keyframes spring-in-scale {
-  from {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  70% {
-    transform: scale(1.03);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.step-node.step-self {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
-/* ========== 9. Orb浮动呼吸动效（复用tokens定义） ========== */
-@keyframes orb-float {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(-15rpx) scale(1.05);
-    opacity: 1;
-  }
+.step-node-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.step-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.step-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.step-tag {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.step-arrow {
+  font-size: 24px;
+  color: rgba(139, 92, 246, 0.5);
+  padding: 0 4px;
+  flex-shrink: 0;
 }

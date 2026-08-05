@@ -1,0 +1,67 @@
+/* AI智能中心 - v2.0 Dark Minimal */
+
+.ai-header {
+  text-align: center;
+  padding: var(--space-8) var(--space-4) var(--space-6);
+}
+
+.ai-title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  display: block;
+}
+
+.ai-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.ai-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-8);
+}
+
+.ai-item {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.ai-item:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ai-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-3);
+  background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.1));
+  border-radius: var(--radius-md);
+  font-size: 22px;
+}
+
+.ai-name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.ai-desc {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  display: block;
+}

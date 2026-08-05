@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI数智名片 - 页面走丢了" />
+  <title>404 - AI数智名片</title>
+  <link rel="stylesheet" href="/_design_tokens.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-deep, #0a0e27);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== 导航栏 ===== */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--bg-card, #1a1f3a);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .navbar .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .navbar .logo-icon {
+      font-size: 24px;
+    }
+    .navbar .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    .navbar .nav-links a {
+      color: var(--text-secondary, #94a3b8);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .navbar .nav-links a:hover {
+      color: var(--color-primary, #06b6d4);
+    }
+
+    /* ===== 404 主内容 ===== */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .error-card {
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+    }
+    .error-code {
+      font-size: 120px;
+      font-weight: 800;
+      line-height: 1;
+      background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+    .error-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary, #e2e8f0);
+      margin-bottom: 12px;
+    }
+    .error-desc {
+      font-size: 16px;
+      color: var(--text-secondary, #94a3b8);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 36px;
+      border: none;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-gradient, linear-gradient(135deg, #06b6d4, #8b5cf6));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-home:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      text-align: center;
+      padding: 20px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: var(--bg-card, #1a1f3a);
+    }
+    .footer p {
+      color: var(--text-secondary, #94a3b8);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .footer a {
+      color: var(--color-primary, #06b6d4);
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="logo">
+      <span class="logo-icon">🪪</span>
+      <span class="logo-text">AI数智名片</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="/">首页</a></li>
+      <li><a href="/#features">功能</a></li>
+      <li><a href="/#about">关于</a></li>
+    </ul>
+  </nav>
+
+  <!-- 404 主内容 -->
+  <div class="main-content">
+    <div class="error-card">
+      <div class="error-code">404</div>
+      <h1 class="error-title">页面走丢了</h1>
+      <p class="error-desc">
+        您访问的页面不存在或已被移除。<br>
+        请检查链接是否正确，或返回首页继续浏览。
+      </p>
+      <a href="/" class="btn-home">
+        <span>←</span>
+        <span>返回首页</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      &copy; 2025-2026 <a href="/">AI数智名片</a>. All rights reserved. &nbsp;|&nbsp;
+      Powered by Bai Ze Legion
+    </p>
+  </footer>
+</body>
+</html>

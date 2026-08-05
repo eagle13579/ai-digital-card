@@ -10,6 +10,23 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
 addopts = "-v --tb=short --strict-markers -p no:warnings"
+markers = [
+    "db: tests that require a real or in-memory database connection",
+    "integration: tests that exercise multiple components together",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "E402"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401"]
+"tests_bak/*" = ["ALL"]
+"alembic/*" = ["ALL"]
 
 [tool.coverage.run]
 source = ["app"]

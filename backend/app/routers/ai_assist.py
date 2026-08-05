@@ -1,7 +1,5 @@
 """AI 助手 API — 文案生成与优化建议"""
 
-import asyncio
-import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -11,16 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.writing_assistant import WritingAssistant
 from app.ai.optimization import OptimizationAnalyzer
-from app.agents.agent_runtime import AgentRuntime
 from app.database import get_db
-from app.dependencies import get_agent_runtime
 from app.models.brochure import Brochure
 from app.models.user import User
 from app.routers.auth import get_current_user
 
-logger = logging.getLogger(__name__)
-
-router = APIRouter(prefix="/api/v1/ai/assist", tags=["AI 助手"])
+router = APIRouter(prefix="/api/ai", tags=["AI 助手"])
 
 
 # ── 请求/响应模型 ──────────────────────────────────────────────────────
@@ -29,8 +23,8 @@ router = APIRouter(prefix="/api/v1/ai/assist", tags=["AI 助手"])
 class WriteRequest(BaseModel):
     purpose: str = Field(
         ...,
-        pattern=r"^(bio|company|company_intro|recommendation|slogan|personal)$",
-        description="文案用途: bio=个人简介, company=公司介绍, company_intro=公司介绍(与company同义), recommendation=推荐语, slogan=名片标语, personal=个人用途",
+        pattern=r"^(bio|company|recommendation|slogan)$",
+        description="文案用途: bio=个人简介, company=公司介绍, recommendation=推荐语, slogan=名片标语",
     )
     name: str = ""
     position: str = ""
@@ -75,6 +69,23 @@ class WriteAllResponse(BaseModel):
     slogan: str = ""
 
 
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="用户输入的聊天消息")
+    history: list[dict] = Field(default_factory=list, description="历史消息列表，每项 {role, content}")
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    type: str = "text"
+
+    model_config = {"json_schema_extra": {
+        "example": {
+            "reply": "你好！我是AI数智名片助手，有什么可以帮助你的？",
+            "type": "text",
+        }
+    }}
+
+
 class OptimizeResponse(BaseModel):
     brochure_id: int
     overall_score: float
@@ -84,33 +95,121 @@ class OptimizeResponse(BaseModel):
     top_priorities: list[str]
 
 
-# ── Agent 通知函数（异步非阻塞） ──────────────────────────────────────
+# ── AI 对话（独立于文案生成）────────────────────────────────────────────
 
 
-async def _assess_copy_quality(
-    agent_runtime: AgentRuntime,
-    user_id: int,
-    purpose: str,
-    content: str,
-) -> None:
-    """异步通知 KnowledgeAgent 做文案质量评估并反馈到 Gaia 学习循环。
+@router.post("/chat", response_model=ChatResponse)
+async def ai_chat(
+    data: ChatRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """AI 智能对话
 
-    非阻塞 — Agent 报错不会影响主 API 响应。
+    用户可以在名片场景中向 AI 助手提问，AI 根据上下文给出回复。
+    支持名片制作建议、文案优化、访客分析等对话场景。
+
+    当 DEEPSEEK_API_KEY 未配置时，使用规则匹配生成结构化回复。
     """
-    try:
-        knowledge = agent_runtime.get_agent("knowledge")
-        if knowledge is None:
-            logger.warning("KnowledgeAgent not found, skipping copy quality assessment")
-            return
-        await knowledge.handle_event({
-            "type": "ai.assist.copy.generated",
-            "user_id": user_id,
-            "purpose": purpose,
-            "content_length": len(content),
-        })
-        logger.info("KnowledgeAgent quality assessment triggered: user_id=%s, purpose=%s", user_id, purpose)
-    except Exception:
-        logger.exception("KnowledgeAgent quality assessment failed (non-blocking, safe to ignore)")
+    from app.config import settings
+
+    message = data.message.strip()
+    history = data.history or []
+
+    # 如果有 DeepSeek API Key，调用真实 LLM
+    if settings.DEEPSEEK_API_KEY:
+        try:
+            import httpx
+
+            # 构建对话历史
+            messages = [{"role": "system", "content": "你是一个AI数智名片助手。你帮助用户生成名片文案、分析匹配度、提供访客数据洞察、推荐标签等。请用中文回答，简洁专业。"}]
+            for msg in history:
+                messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
+            messages.append({"role": "user", "content": message})
+
+            from app.middleware.metrics import track_ai_inference
+
+            async with httpx.AsyncClient(timeout=30) as client:
+                with track_ai_inference(model_name="deepseek-chat"):
+                    resp = await client.post(
+                        settings.DEEPSEEK_API_URL,
+                        headers={
+                            "Authorization": f"Bearer {settings.DEEPSEEK_API_KEY}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "model": "deepseek-chat",
+                            "messages": messages,
+                            "max_tokens": 500,
+                            "temperature": 0.7,
+                        },
+                    )
+                    result = resp.json()
+                    reply = result["choices"][0]["message"]["content"].strip()
+                    return ChatResponse(reply=reply, type="text")
+        except Exception as e:
+            return ChatResponse(reply=f"【AI回复生成失败: {str(e)}，请稍后重试】", type="text")
+
+    # ── 无 DeepSeek API Key — 规则匹配 fallback ─────────────────────────
+    msg_lower = message.lower()
+
+    # 名片/简介相关
+    if any(kw in msg_lower for kw in ["名片", "简介", "介绍", "bio", "文案"]):
+        reply = (
+            "我可以帮您生成专业的名片文案！请提供以下信息：\n\n"
+            "1️⃣ 您的姓名和职位\n"
+            "2️⃣ 公司名称和行业\n"
+            "3️⃣ 主要技能或业务描述\n"
+            "4️⃣ 希望突出的亮点\n\n"
+            "例如：\"我叫张三，是某科技公司的产品总监，擅长用户增长和数据分析\""
+        )
+        return ChatResponse(reply=reply, type="text")
+
+    # 标签相关
+    if any(kw in msg_lower for kw in ["标签", "关键词", "标签推荐", "tag"]):
+        reply = (
+            "根据您的信息，我推荐以下标签方向：\n\n"
+            "🏷️ **职业标签**：产品经理 / 技术专家 / 市场总监\n"
+            "🏷️ **能力标签**：用户增长 / 数据分析 / 战略规划\n"
+            "🏷️ **行业标签**：互联网 / 金融科技 / 企业服务\n\n"
+            "需要我进一步推荐具体标签吗？请告诉我您的行业和职位。"
+        )
+        return ChatResponse(reply=reply, type="text")
+
+    # 匹配/合作伙伴
+    if any(kw in msg_lower for kw in ["匹配", "合作", "伙伴", "推荐", "人脉"]):
+        reply = (
+            "我来帮您分析合作匹配度！请告诉我：\n\n"
+            "🤝 您寻找什么样的合作伙伴？\n"
+            "🎯 您的核心需求是什么？\n"
+            "💼 您能提供什么资源或能力？\n\n"
+            "我会根据您的信息推荐最匹配的人选。"
+        )
+        return ChatResponse(reply=reply, type="text")
+
+    # 访客/数据
+    if any(kw in msg_lower for kw in ["访客", "数据", "统计", "分析", "谁看过"]):
+        reply = (
+            "📊 **访客数据分析**\n\n"
+            "我可以帮您分析名片的访客数据：\n"
+            "• 谁浏览了您的名片\n"
+            "• 访客的行业分布\n"
+            "• 热门浏览时段\n"
+            "• 访客转化建议\n\n"
+            "请前往「访客统计」页面查看详细数据，或告诉我您想了解的具体问题。"
+        )
+        return ChatResponse(reply=reply, type="text")
+
+    # 默认回复
+    reply = (
+        "🤖 **您好！我是AI数智名片助手**\n\n"
+        "我可以帮您：\n\n"
+        "✍️ **生成文案** - 名片简介、公司介绍、推荐语、品牌标语\n"
+        "🏷️ **推荐标签** - 根据职业和行业智能推荐标签\n"
+        "🎯 **合作匹配** - 分析潜在合作伙伴匹配度\n"
+        "📊 **访客洞察** - 分析名片访客数据\n\n"
+        "请告诉我您的需求，我来帮助您！"
+    )
+    return ChatResponse(reply=reply, type="text")
 
 
 # ── API 端点 ──────────────────────────────────────────────────────────
@@ -120,22 +219,18 @@ async def _assess_copy_quality(
 async def generate_copy(
     data: WriteRequest,
     current_user: User = Depends(get_current_user),
-    agent_runtime: AgentRuntime = Depends(get_agent_runtime),
 ):
     """生成名片文案
 
     根据用途和参数生成对应的名片文案。
-    支持以下用途：
+    支持四种用途：
     - bio: 个人简介
-    - company: 公司介绍 (含 company_intro 别名)
+    - company: 公司介绍
     - recommendation: 推荐语
     - slogan: 名片标语
-    - personal: 个人用途
     """
-    # 兼容 company_intro → company
-    actual_purpose = "company" if data.purpose == "company_intro" else data.purpose
     content = await WritingAssistant.generate(
-        purpose=actual_purpose,
+        purpose=data.purpose,
         name=data.name,
         position=data.position,
         company=data.company,
@@ -149,14 +244,6 @@ async def generate_copy(
 
     if content.startswith("【"):
         return WriteResponse(purpose=data.purpose, content="", error=content)
-
-    # ── Agent: 异步通知 KnowledgeAgent 做回答质量评估（反馈到Gaia学习循环）──
-    asyncio.create_task(_assess_copy_quality(
-        agent_runtime=agent_runtime,
-        user_id=current_user.id,
-        purpose=data.purpose,
-        content=content,
-    ))
 
     return WriteResponse(purpose=data.purpose, content=content)
 
