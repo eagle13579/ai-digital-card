@@ -268,6 +268,12 @@ def create_app():
     app.include_router(tag_router)
     app.include_router(ai_assist_router)
     app.include_router(match_router)
+    from app.routers.matching import router as matching_router
+    app.include_router(matching_router)
+    from app.routers.k3_router import router as k3_router
+    app.include_router(k3_router)
+    from app.routers.transphee import router as transphee_router
+    app.include_router(transphee_router)
     from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)

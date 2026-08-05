@@ -455,9 +455,9 @@ class DifyOrchestrator(BaseAppOrchestrator if _BAIZE_DIFY_AVAILABLE else object)
         if _BAIZE_DIFY_AVAILABLE:
             super().__init__(tool_executor=self._tool_executor)
         else:
-            self._composer = SceneComposer(self._tool_executor)
-            self._coordinator = MultiAgentCoordinator(self._tool_executor)
-            self._active_runs: dict[str, OrchestrationResult] = {}
+            self._composer = None
+            self._coordinator = None
+            self._active_runs: dict[str, "OrchestrationResult"] = {}
 
         self._initialized = False
 
@@ -728,8 +728,13 @@ class SceneComposer:
 dify_tool_manager = DifyToolManager()
 
 # 全局 Dify 应用编排器
-dify_orchestrator = DifyOrchestrator(tool_manager=dify_tool_manager)
-
+try:
+    dify_orchestrator = DifyOrchestrator(tool_manager=dify_tool_manager)
+except Exception as e:
+    dify_orchestrator = None
+    import logging
+    logger = logging.getLogger("dify_tool_service")
+    logger.warning("DifyOrchestrator init failed: %s", e)
 
 __all__ = [
     # 单例

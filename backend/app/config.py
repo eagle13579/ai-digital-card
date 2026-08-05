@@ -97,6 +97,16 @@ class Settings(BaseSettings):
     VECTOR_TOP_K: int = 50
     """向量搜索返回数量上限"""
 
+    # ── 三蛋蛋企业匹配引擎 ────────────────────────────────────────────────
+    TRANSHEE_APP_ID: str = ""
+    """三蛋蛋匹配引擎 AppID (形如 app_xxxxxxxxxxxxxxxx, 身份标识非密码)"""
+    TRANSHEE_APP_SECRET: str = ""
+    """三蛋蛋匹配引擎 Secret (密码, 只在创建时给一次, 丢了只能重置)"""
+    TRANSHEE_BASE_URL: str = "https://api.transphee.com:59226/tpmg/entcm"
+    """三蛋蛋匹配引擎 API 基地址"""
+    TRANSHEE_DAILY_QUOTA: int = 100
+    """三蛋蛋匹配引擎每日查询配额 (上游硬限制)"""
+
     # ── Redis 缓存 ────────────────────────────────────────────────────────
     REDIS_HOST: str = "localhost"
     """Redis 服务地址（docker 中为 redis）"""
