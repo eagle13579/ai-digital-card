@@ -92,3 +92,4 @@ backend/_verify_notification.py
 
 # 盖娅反哺管道运行时状态（不入库）
 backend/scripts/.gaia_*.json
+backend/data/self_study/
