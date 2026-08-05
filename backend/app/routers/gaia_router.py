@@ -174,6 +174,8 @@ async def trigger_evolution(
     """
     brain = get_gaia_brain()
     result = await brain.process_evolution_cycle(db, trigger=data.trigger)
+    # 显式提交（get_db 的 finally 只做 close/rollback，不自动 commit）
+    await db.commit()
     status_code = 200 if result.get("status") == "completed" else 500
     return {
         "code": status_code,
@@ -194,6 +196,8 @@ async def trigger_training(
     """
     trainer = get_gaia_trainer()
     result = await trainer.run_training_cycle(db, trigger=trigger)
+    # 显式提交（get_db 的 finally 只做 close/rollback，不自动 commit）
+    await db.commit()
     status_code = 200 if result.get("status") == "completed" else 500
     return {
         "code": status_code,
