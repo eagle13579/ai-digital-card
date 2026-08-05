@@ -1,0 +1,30 @@
+{
+  "training_history": [
+    {
+      "model_id": "test_model",
+      "status": "success",
+      "error": "",
+      "timestamp": "2026-07-25T03:12:27.227446"
+    }
+  ],
+  "collection_history": [
+    {
+      "source_id": "test_source",
+      "items": 5,
+      "status": "success",
+      "timestamp": "2026-07-25T03:12:27.226076"
+    }
+  ],
+  "cleaning_history": [
+    {
+      "source_id": "test_source",
+      "input_count": 10,
+      "kept": 7,
+      "dedup": 3,
+      "timestamp": "2026-07-25T03:12:27.228521"
+    }
+  ],
+  "quality_scores": {},
+  "alerts_sent": [],
+  "last_check": "2026-07-25T03:12:27.234112"
+}

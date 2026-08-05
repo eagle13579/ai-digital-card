@@ -1,0 +1,4 @@
+<view class="status-badge size-{{size}} status-{{status}}">
+  <view class="status-badge-dot"></view>
+  <text class="status-badge-text">{{displayText}}</text>
+</view>

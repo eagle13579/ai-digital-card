@@ -62,3 +62,30 @@ _service_logs/
 *.pem
 *.key
 certs/
+
+# Large binaries / model files
+*.exe
+k6/
+backend/~/.cache/
+backend/models/*.pt
+backend/models/*.npy
+backend/models/*.json
+backend/models/online_checkpoint_*.json
+backend/data/models/*.pt
+backend/data/models/*.npy
+
+# Backups
+*.bak
+*.bak.*
+
+# 敏感数据文件
+backend/data/*.json
+training_data/*.jsonl
+bandit_report.json
+soc2_audit_package/
+backend/=*
+backend/data/learning_log.jsonl
+
+# Sensitive config / temp scripts
+backend/.env.free-claude-proxy
+backend/_verify_notification.py

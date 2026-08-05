@@ -1,0 +1,155 @@
+/* AI扫码页 - v2.0 Dark Minimal (使用设计Token) */
+
+.scan-page {
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+.scan-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 32px;
+  gap: var(--space-4);
+}
+
+.scan-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: var(--radius-xl);
+  font-size: 36px;
+}
+
+.scan-text {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.scan-tip {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: -8px;
+}
+
+.scan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 32px;
+}
+
+.scan-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.divider-text {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  height: 48px;
+  padding: 0 48px;
+  font-size: var(--text-base);
+  margin-top: var(--space-3);
+}
+
+/* 扫码结果卡片 - 使用磨砂玻璃 */
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin: var(--space-4);
+  overflow: hidden;
+}
+
+.re-scan {
+  font-size: var(--text-sm);
+  color: var(--accent);
+}
+
+.scan-field {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.scan-field:last-child {
+  border-bottom: none;
+}
+
+.scan-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.scan-input {
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.save-area {
+  padding: 0 var(--space-4) var(--space-8);
+}
+
+/* 扫码结果卡片 - 二维码 */
+.qr-info {
+  padding: var(--space-4) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.qr-type-badge {
+  font-size: var(--text-sm);
+  padding: 6px 16px;
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: var(--radius-full);
+  color: var(--accent-light);
+}
+
+.qr-id {
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.qr-raw {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  word-break: break-all;
+  text-align: center;
+}
+
+.auto-jump-hint {
+  display: block;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  padding: 14px 0;
+}

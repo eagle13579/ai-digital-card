@@ -1,346 +1,511 @@
-.preview-container {
-  height: 100vh;
-  background: #1a1a2e;
-  display: flex;
-  flex-direction: column;
+/* ==============================
+   AI数智名片 — 画册预览页
+   深色科技感主题
+   ============================== */
+
+/* ----- 基础容器 ----- */
+page {
+  background-color: #0f0f1a;
 }
 
+.preview-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #0f0f1a;
+}
+
+/* ----- 顶部导航栏 ----- */
 .preview-header {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 44px 20px 16px;
-  z-index: 100;
-  background: linear-gradient(to bottom, rgba(26, 26, 46, 0.95), transparent);
+  padding: 80rpx 30rpx 20rpx;
+  background: linear-gradient(180deg, rgba(15,15,26,0.95) 0%, rgba(15,15,26,0) 100%);
 }
 
-.back-btn {
-  width: 44px;
-  height: 44px;
+.back-btn,
+.home-btn,
+.share-btn {
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.08);
+  border: 1rpx solid rgba(255,255,255,0.1);
+}
+
+.back-btn:active,
+.home-btn:active,
+.share-btn:active {
+  background: rgba(167,139,250,0.2);
+  border-color: rgba(167,139,250,0.3);
 }
 
 .back-icon {
-  font-size: 32px;
+  font-size: 40rpx;
   color: #fff;
-  font-weight: 300;
+  line-height: 1;
 }
 
-.page-indicator {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.share-btn {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  backdrop-filter: blur(10px);
+.home-icon {
+  font-size: 32rpx;
+  color: #fff;
+  line-height: 1;
 }
 
 .share-icon {
-  font-size: 24px;
+  font-size: 36rpx;
   color: #fff;
+  line-height: 1;
+  font-weight: bold;
 }
 
+/* 分享按钮只显示图标，去掉椭圆背景 */
+.share-btn {
+  background: transparent !important;
+  border: none !important;
+}
+
+.share-btn:active {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+.page-indicator {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 2rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+/* ----- Swiper 翻页容器 ----- */
 .brochure-swiper {
-  flex: 1;
-  padding-top: 80px;
-  padding-bottom: 80px;
+  width: 100%;
+  height: 100vh;
 }
 
 .brochure-page {
-  width: 90%;
-  height: calc(100vh - 160px);
-  margin: 0 auto;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  padding: 32px;
-  box-sizing: border-box;
-}
-
-.cover-content {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 内层——内容区域 */
+.page-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 160rpx 40rpx 120rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ----- 空状态 ----- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 0 60rpx;
+}
+
+.empty-icon {
+  width: 120rpx;
+  height: 120rpx;
+  font-size: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  border: 2rpx solid rgba(255,255,255,0.1);
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 16rpx;
+  display: block;
   text-align: center;
 }
 
+.empty-desc {
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 48rpx;
+  display: block;
+  text-align: center;
+}
+
+.empty-btn {
+  width: 320rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 44rpx;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a78bfa 100%);
+  box-shadow: 0 8rpx 32rpx rgba(167,139,250,0.3);
+}
+
+.empty-btn:active {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
+.empty-btn-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ==============================
+   封面页 (cover)
+   ============================== */
+.cover-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .cover-avatar-wrap {
-  margin-bottom: 24px;
+  margin-bottom: 36rpx;
+  position: relative;
 }
 
 .cover-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 70px;
-  border: 4px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  display: block;
+  border: 6rpx solid rgba(167,139,250,0.4);
+  box-shadow: 0 0 40rpx rgba(167,139,250,0.2);
 }
 
 .cover-avatar-placeholder {
-  width: 140px;
-  height: 140px;
-  border-radius: 70px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 6rpx solid rgba(167,139,250,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .cover-avatar-emoji {
-  font-size: 56px;
+  font-size: 72rpx;
 }
 
 .cover-title {
-  font-size: 32px;
+  font-size: 44rpx;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 12px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  margin-bottom: 16rpx;
+  display: block;
+  letter-spacing: 2rpx;
+  line-height: 1.3;
 }
 
 .cover-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 24px;
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  margin-bottom: 40rpx;
+  display: block;
+  letter-spacing: 1rpx;
+  line-height: 1.5;
 }
 
 .cover-badge-wrap {
-  margin-top: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .cover-badge {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: rgba(167,139,250,0.9);
+  text-align: center;
+  background: rgba(167,139,250,0.12);
+  padding: 10rpx 28rpx;
+  border-radius: 24rpx;
   display: inline-block;
-  padding: 8px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  font-size: 12px;
-  color: #fff;
-  backdrop-filter: blur(10px);
+  border: 1rpx solid rgba(167,139,250,0.25);
+  letter-spacing: 3rpx;
 }
 
+/* ==============================
+   个人资料页 (profile)
+   ============================== */
 .profile-content {
   width: 100%;
-  height: 100%;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
+  max-width: 640rpx;
 }
 
 .profile-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 36rpx;
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #EEF2FF;
-  margin-right: 16px;
+  flex-shrink: 0;
+  margin-right: 28rpx;
+  border: 4rpx solid rgba(167,139,250,0.35);
+  box-shadow: 0 0 30rpx rgba(167,139,250,0.15);
+}
+
+.profile-avatar image {
+  width: 100%;
+  height: 100%;
 }
 
 .profile-avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: #EEF2FF;
+  background: rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .avatar-emoji {
-  font-size: 32px;
+  font-size: 48rpx;
 }
 
 .profile-info {
   flex: 1;
+  min-width: 0;
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: 36rpx;
   font-weight: 700;
-  color: #1E293B;
+  color: #fff;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
+  letter-spacing: 1rpx;
 }
 
 .profile-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #4F46E5;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.6);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 4rpx;
 }
 
 .profile-company {
-  font-size: 14px;
-  color: #64748B;
+  font-size: 24rpx;
+  color: rgba(167,139,250,0.7);
   display: block;
 }
 
 .profile-bio {
-  margin-bottom: 20px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid rgba(255,255,255,0.06);
 }
 
 .bio-title {
-  font-size: 16px;
+  font-size: 26rpx;
   font-weight: 600;
-  color: #1E293B;
+  color: rgba(167,139,250,0.85);
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 16rpx;
+  letter-spacing: 1rpx;
 }
 
 .bio-content {
-  font-size: 14px;
-  color: #475569;
-  line-height: 1.6;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.7;
+  display: block;
 }
 
 .profile-contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(255,255,255,0.06);
+  overflow: hidden;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background: #EEF2FF;
-  border-radius: 10px;
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid rgba(255,255,255,0.04);
+}
+
+.contact-item:last-child {
+  border-bottom: none;
+}
+
+.contact-item:active {
+  background: rgba(167,139,250,0.08);
 }
 
 .contact-icon {
-  font-size: 18px;
-  margin-right: 8px;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  width: 40rpx;
+  text-align: center;
+  line-height: 1;
 }
 
 .contact-text {
-  font-size: 13px;
-  color: #4F46E5;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.85);
+  flex: 1;
 }
 
-.resources-content {
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-}
-
+/* ==============================
+   个人资料页 (profile) — 含联系方式/资源供需/合作意向
+   ============================== */
 .section-title-text {
-  font-size: 24px;
+  font-size: 36rpx;
   font-weight: 700;
-  color: #1E293B;
+  color: #fff;
+  margin-bottom: 36rpx;
   display: block;
-  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 2rpx;
+}
+
+.section-sub-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: rgba(167,139,250,0.85);
+  margin-bottom: 16rpx;
+  margin-top: 20rpx;
+  display: block;
+  letter-spacing: 1rpx;
 }
 
 .resources-section {
-  margin-bottom: 20px;
+  margin-bottom: 28rpx;
 }
 
 .resources-label {
-  font-size: 14px;
+  font-size: 26rpx;
   font-weight: 600;
+  margin-bottom: 16rpx;
   display: block;
-  margin-bottom: 12px;
+  letter-spacing: 1rpx;
 }
 
 .provides-label {
-  color: #3B82F6;
+  color: #34d399;
 }
 
 .needs-label {
-  color: #F59E0B;
+  color: #f59e0b;
 }
 
 .tags-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14rpx;
 }
 
 .tag {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
+  font-size: 24rpx;
+  padding: 12rpx 28rpx;
+  border-radius: 30rpx;
+  display: inline-block;
+  line-height: 1.2;
 }
 
 .provides-tag {
-  background: #DBEAFE;
-  color: #1D4ED8;
+  color: #34d399;
+  background: rgba(52,211,153,0.1);
+  border: 1rpx solid rgba(52,211,153,0.25);
 }
 
 .needs-tag {
-  background: #FEF3C7;
-  color: #D97706;
+  color: #f59e0b;
+  background: rgba(245,158,11,0.1);
+  border: 1rpx solid rgba(245,158,11,0.25);
 }
 
 .purpose-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background: #F8FAFC;
-  border-radius: 12px;
-  margin-top: 12px;
+  margin-top: 40rpx;
+  padding: 20rpx 32rpx;
+  border-radius: 20rpx;
+  background: rgba(255,255,255,0.04);
+  border: 1rpx solid rgba(255,255,255,0.06);
 }
 
 .purpose-icon {
-  font-size: 20px;
-  margin-right: 8px;
+  font-size: 28rpx;
+  margin-right: 12rpx;
 }
 
 .purpose-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: #4F46E5;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1rpx;
 }
 
+/* ==============================
+   公司介绍页 (company)
+   ============================== */
 .company-content {
   width: 100%;
-  height: 100%;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
+  max-width: 640rpx;
 }
 
 .company-header {
-  margin-bottom: 16px;
+  margin-bottom: 28rpx;
 }
 
 .company-name {
-  font-size: 24px;
+  font-size: 34rpx;
   font-weight: 700;
-  color: #1E293B;
+  color: #fff;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
+  letter-spacing: 1rpx;
 }
 
 .company-meta {
@@ -349,223 +514,366 @@
 }
 
 .meta-item {
-  font-size: 14px;
-  color: #64748B;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.5);
 }
 
 .meta-divider {
-  margin: 0 12px;
-  color: #CBD5E1;
+  margin: 0 14rpx;
+  color: rgba(255,255,255,0.2);
 }
 
 .company-desc {
-  font-size: 14px;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 16px;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.7;
+  display: block;
+  margin-bottom: 28rpx;
+  padding: 24rpx;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(255,255,255,0.05);
 }
 
 .development-section {
-  background: #FEF3C7;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(255,255,255,0.05);
 }
 
 .development-title {
-  font-size: 14px;
+  font-size: 26rpx;
   font-weight: 600;
-  color: #92400E;
+  color: rgba(167,139,250,0.85);
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 14rpx;
+  letter-spacing: 1rpx;
 }
 
 .development-content {
-  font-size: 13px;
-  color: #78350F;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.65);
   line-height: 1.6;
+  display: block;
   white-space: pre-line;
+}
+
+/* 技能标签 */
+.skill-tags-section {
+  padding: 0 28rpx 24rpx;
+}
+.section-tag-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 12rpx;
+  display: block;
+  letter-spacing: 2rpx;
+}
+.tag.skill-tag {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* 教育背景 */
+.education-section {
+  padding: 0 28rpx 24rpx;
+}
+.education-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+.edu-text {
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
 }
 
 .company-images {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 14rpx;
 }
 
 .company-image {
-  flex: 1;
-  height: 100px;
-  border-radius: 8px;
-}
-
-.case-content {
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-}
-
-.case-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1E293B;
+  width: 180rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
   display: block;
-  margin-bottom: 8px;
+  border: 1rpx solid rgba(255,255,255,0.06);
 }
 
-.case-date {
-  font-size: 13px;
-  color: #94A3B8;
-  display: block;
-  margin-bottom: 16px;
+/* ==============================
+   附件文件列表
+   ============================== */
+.attachment-section {
+  margin-top: 28rpx;
 }
 
-.case-desc {
-  font-size: 14px;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-
-.case-images {
+.attachment-item {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: rgba(255,255,255,0.04);
+  border: 1rpx solid rgba(255,255,255,0.08);
+  border-radius: 16rpx;
+  margin-bottom: 14rpx;
+  gap: 20rpx;
 }
 
-.case-image {
+.attachment-item:active {
+  background: rgba(167,139,250,0.08);
+  border-color: rgba(167,139,250,0.2);
+}
+
+.attachment-icon {
+  font-size: 40rpx;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.attachment-info {
   flex: 1;
-  height: 100px;
-  border-radius: 8px;
+  min-width: 0;
 }
 
+.attachment-name {
+  font-size: 26rpx;
+  color: #fff;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.attachment-size {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.35);
+  display: block;
+  margin-top: 4rpx;
+}
+
+.attachment-download {
+  font-size: 24rpx;
+  color: #a78bfa;
+  font-weight: 500;
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border: 1rpx solid rgba(167,139,250,0.3);
+  border-radius: 20rpx;
+  line-height: 1.2;
+}
+
+/* ==============================
+   联系我页 (contact)
+   ============================== */
 .contact-content {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 640rpx;
 }
 
 .contact-card {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 20px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 24rpx;
+  padding: 32rpx 36rpx;
+  margin-bottom: 32rpx;
   text-align: center;
-  margin-bottom: 24px;
-  backdrop-filter: blur(10px);
+  border: 1rpx solid rgba(255,255,255,0.08);
 }
 
 .contact-card-name {
-  font-size: 24px;
+  font-size: 34rpx;
   font-weight: 700;
   color: #fff;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10rpx;
+  letter-spacing: 1rpx;
 }
 
 .contact-card-company {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 26rpx;
+  color: rgba(167,139,250,0.7);
+  display: block;
 }
 
 .contact-list {
-  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  margin-bottom: 24rpx;
 }
 
 .contact-list-item {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 26rpx 28rpx;
+  border-bottom: 1rpx solid rgba(255,255,255,0.04);
+}
+
+.contact-list-item:last-child {
+  border-bottom: none;
+}
+
+.contact-list-item:active {
+  background: rgba(167,139,250,0.08);
 }
 
 .contact-list-icon {
-  font-size: 20px;
-  margin-right: 12px;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  width: 40rpx;
+  text-align: center;
+  line-height: 1;
 }
 
 .contact-list-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  flex: 1;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.45);
+  width: 80rpx;
+  flex-shrink: 0;
 }
 
 .contact-list-value {
-  font-size: 14px;
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.85);
+  flex: 1;
+  text-align: right;
+}
+
+.contact-provides,
+.contact-needs {
+  margin-top: 8rpx;
+}
+
+/* ==============================
+   最后一页操作引导
+   ============================== */
+.action-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+}
+
+.action-icon {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+}
+
+.action-title {
+  font-size: 40rpx;
   font-weight: 600;
+  color: #fff;
+  margin-bottom: 16rpx;
+}
+
+.action-desc {
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  margin-bottom: 8rpx;
+  line-height: 1.5;
+}
+
+.action-desc-sub {
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  margin-bottom: 60rpx;
+  line-height: 1.5;
+}
+
+.action-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.action-btn {
+  width: 480rpx;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.action-btn-share {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
   color: #fff;
 }
 
+.action-btn-home {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.action-btn-back {
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 26rpx;
+}
+
+/* ==============================
+   底部翻页指示器
+   ============================== */
 .preview-footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 20px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(26, 26, 46, 0.95), transparent);
   z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: 32rpx 0 48rpx;
+  background: linear-gradient(0deg, rgba(15,15,26,0.95) 0%, rgba(15,15,26,0) 100%);
+  pointer-events: none;
 }
 
 .dots-wrap {
   display: flex;
-  justify-content: center;
-  gap: 8px;
+  align-items: center;
+  gap: 12rpx;
+  pointer-events: auto;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  transition: all 0.3s;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
 }
 
 .dot.active {
-  width: 24px;
-  background: #fff;
+  width: 40rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(90deg, #6c5ce7, #a78bfa);
+  box-shadow: 0 0 16rpx rgba(167,139,250,0.4);
 }
 
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60rpx 40rpx;
-}
-
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 24rpx;
-}
-
-.empty-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 12rpx;
-}
-
-.empty-desc {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 40rpx;
-}
-
-.empty-btn {
-  padding: 20rpx 60rpx;
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  border-radius: 40rpx;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
-}
-
-.empty-btn-text {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #fff;
+.dot:active {
+  background: rgba(167,139,250,0.5);
 }

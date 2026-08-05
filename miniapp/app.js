@@ -1,64 +1,96 @@
 /**
  * AI数智名片 - 微信小程序入口
- * 全局状态管理 + 生命周期
+ * 
+ * 全局状态管理已迁移至 utils/store.js（类 Zustand 模式）。
+ * app.js 保留生命周期 + 便捷方法，具体状态托管给 store 单例。
+ * 
+ * 参考: D:\AI询赋拆解\frontend\src\store\index.ts
  */
-App({
-  globalData: {
-    userInfo: null,
-    token: null,
-    memberLevel: 'free',
-    matchCount: 0,
-    visitorCount: 0,
-    trustCount: 0,
-  },
+const store = require('./utils/store')
+const cache = require('./utils/cache')
 
+App({
   onLaunch() {
-    // 从本地缓存恢复登录态
-    const token = wx.getStorageSync('token')
-    const userInfo = wx.getStorageSync('userInfo')
-    if (token) {
-      this.globalData.token = token
-      this.globalData.userInfo = userInfo
-    }
+    // store 构造时已自动从 Storage 恢复 token/userInfo
+    const { token } = store.getState()
+    console.log('[App] onLaunch, isLoggedIn:', !!token)
+
+    // 初始化离线缓存层 & 网络状态监听
+    cache.initNetworkListener()
+
+    // 检查小程序更新
+    this._checkUpdate()
   },
 
   onShow() {
-    // 小程序切前台时刷新数据
-  },
-
-  // 检查登录态，未登录跳转授权
-  checkLogin() {
-    if (!this.globalData.token) {
-      wx.navigateTo({ url: '/pages/login/index' })
-      return false
+    // 全局登录守卫：未登录且不在登录页时自动跳转
+    const pages = getCurrentPages()
+    const currentRoute = pages.length > 0 ? pages[pages.length - 1].route : ''
+    const state = this.getState()
+    if (!state.isLoggedIn && currentRoute !== 'pages/login/index') {
+      wx.redirectTo({ url: '/pages/login/index' })
     }
-    return true
   },
 
-  // 设置登录态
+  onHide() {
+    // 小程序切后台
+  },
+
+  /**
+   * 检查小程序版本更新
+   */
+  _checkUpdate() {
+    const updateManager = wx.getUpdateManager()
+    updateManager.onUpdateReady(() => {
+      wx.showModal({
+        title: '更新提示',
+        content: '新版本已准备好，是否重启应用？',
+        success: (res) => {
+          if (res.confirm) {
+            updateManager.applyUpdate()
+          }
+        },
+      })
+    })
+  },
+
+  // ========== 便捷方法（代理到 store，向下兼容） ==========
+
+  /** 获取全局状态快照 */
+  getState() {
+    return store.getState()
+  },
+
+  /** 检查登录态，未登录跳转登录页 */
+  checkLogin() {
+    return store.checkLogin()
+  },
+
+  /** 设置登录态（token + userInfo） */
   setLogin(token, userInfo) {
-    this.globalData.token = token
-    this.globalData.userInfo = userInfo
-    wx.setStorageSync('token', token)
-    wx.setStorageSync('userInfo', userInfo)
+    store.setAuth(token, userInfo)
   },
 
-  // 清除登录态
+  /** 清除登录态 */
   clearLogin() {
-    this.globalData.token = null
-    this.globalData.userInfo = null
-    wx.removeStorageSync('token')
-    wx.removeStorageSync('userInfo')
+    store.logout()
   },
 
-  // 更新用户信息
+  /** 更新用户信息 */
   updateUserInfo(userInfo) {
-    this.globalData.userInfo = { ...this.globalData.userInfo, ...userInfo }
-    wx.setStorageSync('userInfo', this.globalData.userInfo)
+    store.updateUserInfo(userInfo)
   },
 
-  // 更新会员等级
-  updateMemberLevel(level) {
-    this.globalData.memberLevel = level
+  /** 默认分享配置（页面可覆盖） */
+  onShareAppMessage() {
+    return {
+      title: 'AI数智名片 - 智能商务社交',
+      path: '/pages/index/index',
+    }
+  },
+
+  /** 默认分享到朋友圈 */
+  onShareTimeline() {
+    return { title: 'AI数智名片 - 智能商务社交' }
   },
 })

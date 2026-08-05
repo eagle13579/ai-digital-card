@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Mac Mini 数据管道训练器 launchd plist
+  7×24 自动运行: 每30分钟执行 mac_pipeline_trainer.py
+  
+  安装:
+    cp mac_pipeline_trainer.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/mac_pipeline_trainer.plist
+  
+  卸载:
+    launchctl unload ~/Library/LaunchAgents/mac_pipeline_trainer.plist
+  
+  手动触发测试:
+    launchctl start com.gaia.pipeline.trainer
+  
+  查看状态:
+    launchctl list | grep pipeline
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.gaia.pipeline.trainer</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/eagle/pipeline/venv/bin/python3</string>
+        <string>/Users/eagle/pipeline/mac/mac_pipeline_trainer.py</string>
+        <string>--train-only</string>
+    </array>
+
+    <!-- 每30分钟执行一次 -->
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <!-- 开机自动启动 -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- 标准输出/错误重定向到日志 -->
+    <key>StandardOutPath</key>
+    <string>/Users/eagle/pipeline/logs/launchd_stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/eagle/pipeline/logs/launchd_stderr.log</string>
+
+    <!-- 环境变量 -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/eagle/pipeline/venv/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+        <key>JWT_SECRET</key>
+        <string>mac_mini_pipeline_dummy</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/eagle/pipeline</string>
+    </dict>
+
+    <!-- 限制: 最多运行600秒，避免前一轮没跑完后一轮又启动 -->
+    <key>TimeOut</key>
+    <integer>600</integer>
+
+    <!-- 如果进程退出，等待下一次 StartInterval 再启动 -->
+    <key>KeepAlive</key>
+    <false/>
+
+    <!-- 低优先级后台运行 -->
+    <key>Nice</key>
+    <integer>10</integer>
+
+    <!-- 进程类型: 后台 -->
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <!-- 软资源限制 -->
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>65536</integer>
+    </dict>
+</dict>
+</plist>

@@ -1,0 +1,376 @@
+{
+  "mock_switch": {
+    "summary": "mockService.js定义了31个方法，约70%有可直接对应的真实API。主要风险集中在平台管理模块（路径不匹配：mock用/api/v1/platforms/，api.js用/api/business-card/platforms/）和参数差异（如getVisitorStats在mock无brochureId参数）。",
+    "methods": [
+      {
+        "name": "getUserProfile",
+        "risk": "low",
+        "requires_api": "GET /api/users/me (userApi.getProfile)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作，无需修改"
+      },
+      {
+        "name": "login",
+        "risk": "low",
+        "requires_api": "POST /api/auth/login (authApi.login)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "wxMiniLogin",
+        "risk": "low",
+        "requires_api": "POST /api/auth/wx-mini-login (authApi.wxMiniLogin)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "getBrochures",
+        "risk": "low",
+        "requires_api": "GET /api/brochures (brochureApi.list)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "getBrochureById",
+        "risk": "low",
+        "requires_api": "GET /api/brochures/{id} (brochureApi.getById)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "createBrochure",
+        "risk": "low",
+        "requires_api": "POST /api/brochures (brochureApi.create)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "deleteBrochure",
+        "risk": "medium",
+        "requires_api": "DELETE /api/brochures/{id} (brochureApi.delete)",
+        "current_status": "brochureApi中无delete方法, api.js只有list/getById/create/update/getTemplate",
+        "action": "需在api.js中补充brochureApi.delete方法，指向DELETE /api/brochures/{id}"
+      },
+      {
+        "name": "getRecommendList",
+        "risk": "low",
+        "requires_api": "GET /api/match/recommend (matchApi.getRecommendList)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "getMatchDetail",
+        "risk": "low",
+        "requires_api": "GET /api/match/{id} (matchApi.getMatchDetail)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "getTags",
+        "risk": "low",
+        "requires_api": "GET /api/tags (tagApi.list)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "getVisitorStats",
+        "risk": "high",
+        "requires_api": "GET /api/visitors/{brochureId}/stats (visitorApi.getStats)",
+        "current_status": "已定义于api.js，但需brochureId参数；mock版本无参数",
+        "action": "mockService中getVisitorStats未传brochureId给真实API，需修改调用方补传参数；否则会404"
+      },
+      {
+        "name": "getTrustNetwork",
+        "risk": "low",
+        "requires_api": "GET /api/trust/network (trustApi.getNetwork)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "aiChat",
+        "risk": "none",
+        "requires_api": "POST /api/ai/chat (aiApi.chat)",
+        "current_status": "始终调用真实API，mock仅作错误降级；即使无LLM后端也可返回规则匹配回复",
+        "action": "无影响，忽略USE_MOCK标志"
+      },
+      {
+        "name": "aiGenerate",
+        "risk": "low",
+        "requires_api": "POST /api/ai/generate (aiApi.generate)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "createResource",
+        "risk": "high",
+        "requires_api": "POST /api/v1/resources",
+        "current_status": "在mockService中使用通用api.post；api.js中无对应方法，路径未在api.js中注册",
+        "action": "需在api.js中补充resourceApi.create，确认后端路由是否存在"
+      },
+      {
+        "name": "getFriendsList",
+        "risk": "low",
+        "requires_api": "GET /api/trust/network/{userId} (trustApi.getNetworkByUserId)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "findPath",
+        "risk": "low",
+        "requires_api": "GET /api/business-card/connections/path/{targetUserId} (connectionApi.findPath)",
+        "current_status": "已定义于api.js",
+        "action": "USE_MOCK=false直接工作"
+      },
+      {
+        "name": "createPlatform",
+        "risk": "high",
+        "requires_api": "路径不匹配：mock指向POST /api/v1/platforms，但api.js中platformApi无create方法，且平台路由前缀为/api/business-card/platforms/",
+        "current_status": "api.js中platformApi有list/getById/update/getMembers/join/getReport，但无create",
+        "action": "路径修正为/api/business-card/platforms；api.js补充createPlatform(platformApi.create)；确认后端路由POST /api/business-card/platforms已注册"
+      },
+      {
+        "name": "getPlatformList",
+        "risk": "high",
+        "requires_api": "路径不匹配：mock指向GET /api/v1/platforms，api.js中为GET /api/business-card/platforms (platformApi.list)",
+        "current_status": "路径前缀不同：/api/v1 vs /api/business-card",
+        "action": "mockService中真实API路径需改为/api/business-card/platforms，或用现有的platformApi.list()"
+      },
+      {
+        "name": "getPlatformDetail",
+        "risk": "high",
+        "requires_api": "路径不匹配：mock指向/api/v1/platforms/{id}，api.js为/api/business-card/platforms/{id}",
+        "current_status": "同getPlatformList的路径问题",
+        "action": "改为使用platformApi.getById(platformId)"
+      },
+      {
+        "name": "getPlatformMembers",
+        "risk": "high",
+        "requires_api": "路径不匹配：mock指向/api/v1/platforms/{id}/members，api.js为/api/business-card/platforms/{id}/members",
+        "current_status": "但mockService中写的是通用api.get，未用platformApi.getMembers()",
+        "action": "改为使用platformApi.getMembers(platformId)"
+      },
+      {
+        "name": "getPlatformApplications",
+        "risk": "high",
+        "requires_api": "路径不匹配 + api.js中无对应方法",
+        "current_status": "applications管理在api.js中无定义，且后端应用管理路由可能不存在",
+        "action": "需确认后端是否有/c/platforms/{id}/applications路由，并在api.js中补充"
+      },
+      {
+        "name": "reviewApplication",
+        "risk": "high",
+        "requires_api": "路径不匹配 + api.js中无对应方法",
+        "current_status": "api.js无reviewApplication定义",
+        "action": "需确认后端审批路由并补充"
+      },
+      {
+        "name": "inviteMember",
+        "risk": "high",
+        "requires_api": "路径不匹配 + api.js中无直接方法",
+        "current_status": "api.js中平台路由无invite方法",
+        "action": "需确认后端路由并补充"
+      },
+      {
+        "name": "joinPlatform",
+        "risk": "medium",
+        "requires_api": "mock指向POST /api/v1/platforms/{id}/join，api.js有platformApi.join(platformId)指向POST /api/business-card/platforms/{id}/join",
+        "current_status": "路径不匹配但功能存在",
+        "action": "改为使用platformApi.join(platformId)"
+      },
+      {
+        "name": "getPlatformReport",
+        "risk": "medium",
+        "requires_api": "mock指向/api/v1/platforms/{id}/report，api.js有platformApi.getReport()指向/api/business-card/platforms/{id}/report",
+        "current_status": "路径不匹配但功能存在",
+        "action": "改为使用platformApi.getReport(platformId)"
+      },
+      {
+        "name": "getPlatformOpportunities",
+        "risk": "high",
+        "requires_api": "api.js中无对应方法，后端路由存疑",
+        "current_status": "机会管理在api.js中无定义",
+        "action": "需确认后端是否有/opportunities路由，补充api.js"
+      },
+      {
+        "name": "getResourceCoverage",
+        "risk": "high",
+        "requires_api": "api.js中无对应方法",
+        "current_status": "覆盖率统计在api.js中无定义",
+        "action": "需确认后端路由"
+      },
+      {
+        "name": "getResourceRanking",
+        "risk": "high",
+        "requires_api": "api.js中无对应方法",
+        "current_status": "资源排名在api.js中无定义",
+        "action": "需确认后端路由"
+      },
+      {
+        "name": "getResourceUnits",
+        "risk": "high",
+        "requires_api": "api.js中无对应方法",
+        "current_status": "资源单元在api.js中无定义",
+        "action": "需确认后端路由"
+      },
+      {
+        "name": "publishOpportunity",
+        "risk": "high",
+        "requires_api": "api.js中无对应方法",
+        "current_status": "机会发布在api.js中无定义",
+        "action": "需确认后端路由"
+      }
+    ],
+    "overall_risk_summary": "核心流程（用户/画册/匹配/标签/信任/访客/AI）风险低，可直接切换。平台管理模块（platform_router相关）风险高——mock指向/api/v1/platforms/而真实路由为/api/business-card/platforms/，且约10个方法在api.js中无定义。建议分两步：先切换核心模块（低风险），再排查平台管理后端的真实路由覆盖率。"
+  },
+
+  "ocr": {
+    "summary": "后端已有完整的OCRScanner骨架（app/ai/ocr.py），集成PaddleOCR+图像预处理+联系人信息提取，但未暴露为API端点。前端scan.js只返回硬编码mock数据。",
+    "current_backend_status": "app/ai/ocr.py — 已实现370行代码，含PaddleOCR集成、图像预处理、联系电话/邮箱/微信正则提取、企业信息提取",
+    "current_frontend_status": "pages/ai/scan/index.js — scanImage()直接setTimeout返回MOCK_RESULT硬编码数据，无真实API调用",
+    "approach": "三阶段渐进式接入",
+    "phase_1": {
+      "name": "后端API端点（最快1天）",
+      "action": "新增POST /api/ocr/scan端点，接收multipart/form-data上传图片，调OCRScanner处理并结构化返回",
+      "dependency": "需Python环境安装Pillow（已有）+ paddlepaddle + paddleocr"
+    },
+    "phase_2": {
+      "name": "前端对接（0.5天）",
+      "action": "scan.js中scanImage替换为wx.uploadFile → POST /api/ocr/scan，解析返回的contact_info和business_info填充表单"
+    },
+    "phase_3": {
+      "name": "PaddleOCR模型调优（可选，3-5天）",
+      "action": "名片场景微调：收集100+中文名片样例，PP-OCRv4 fine-tune提升识别率",
+      "cost": "GPU训练约¥200-500（AutoDL按量计费）"
+    },
+    "sdk": "PaddleOCR (PP-OCRv4, 推荐)",
+    "sdk_reason": "中文名片识别率最高（>95%），离线部署无需网络，CPU可跑（单张<2s），MIT开源免费。备选：百度OCR API（在线，¥0.01/次，1000次/月免费） / 微信OCR（wx.chooseImage后wx.ocr，微信原生但返回字段有限）",
+    "cost_estimate": {
+      "paddle_self_host": "¥0（开源免费，仅需GPU服务器约¥200-500/月即可离线部署）",
+      "baidu_ocr_api": "¥0.01/次 × 10,000次 = ¥100/月（第一年免费1000次/天）",
+      "wechat_ocr": "¥0（微信原生能力，但依赖微信版本，功能有限）"
+    },
+    "implementation_path": [
+      "Phase1 [1天]: 后端OCR端点 + 图像上传处理",
+      "Phase2 [0.5天]: 前端scan.js对接 + 结果回显",
+      "Phase3 [2天]: 错误处理 + 扫码频次控制（已实现部分逻辑）+ 表单确认编辑",
+      "Phase4 [3-5天]: PaddleOCR模型微调（可选）"
+    ],
+    "effort": "1.5人天（Phase1+Phase2核心路径），5-7人天（含PaddleOCR微调）"
+  },
+
+  "phone_contact": {
+    "summary": "当前画册预览和名片详情页只有复制到剪贴板功能，无一键拨打和vCard导出。",
+    "make_phone_call": {
+      "current": "画册preview页: contact项绑定了copyText(复制到剪贴板)，无wx.makePhoneCall。card.js: 无拨号功能。唯一使用makePhoneCall的是pages/platform/detail/index.js(第100行)。",
+      "plan": "在画册contact页面和名片详情页的电话号码旁添加「拨打」按钮，bindtap触发wx.makePhoneCall({phoneNumber})。需确认号码格式（+86前缀兼容）。",
+      "code_changes": [
+        "brochure/preview/index.wxml: contact-list-item的电话项添加第二个按钮或bindtap改为弹出操作菜单(复制|拨打)",
+        "brochure/preview/index.js: 新增callPhone(e)方法调用wx.makePhoneCall",
+        "card/card.wxml: 在hero区域或info-card区域添加电话拨打按钮",
+        "card/card.js: 新增callPhone方法"
+      ]
+    },
+    "vcard": {
+      "current": "项目中无vCard导出功能。",
+      "plan": "在画册contact页面或名片详情页添加「保存到通讯录」按钮，前端生成.vcf文件字符串并通过wx.getFileSystemManager().writeFile + wx.openDocument或下载链接触发系统保存联系人。",
+      "vcard_format": "BEGIN:VCARD\\nVERSION:3.0\\nFN:{name}\\nTEL;TYPE=CELL:{phone}\\nEMAIL:{email}\\nORG:{company}\\nTITLE:{title}\\nEND:VCARD",
+      "implementation": "前端纯JS实现（无需后端），Contact page数据已包含name/phone/email/company字段。通过wx.setClipboardData + 引导用户手动导入，或wx.downloadFile + wx.openDocument触发系统联系人导入（iOS需.plist配置）。"
+    }
+  },
+
+  "data_export": {
+    "summary": "后端export.py已完整实现JSON和CSV双格式导出（GET /api/export/json, GET /api/export/csv），含用户信息+名片+标签，流式返回文件下载。但前端api.js和profile页面均未对接。",
+    "backend_status": "完全就绪 — export.py已实现，无需后端修改",
+    "api_endpoints": {
+      "json": {
+        "method": "GET",
+        "path": "/api/export/json",
+        "auth": "需要登录",
+        "returns": "application/json, Content-Disposition附件下载",
+        "response_format": "{ user_id, name, phone, company, title, intro, ... brochures: [...], tags: [...] }"
+      },
+      "csv": {
+        "method": "GET",
+        "path": "/api/export/csv",
+        "auth": "需要登录",
+        "returns": "text/csv, Content-Disposition附件下载",
+        "response_format": "每行一个brochure，含20个字段（用户信息+名片详情+标签拼接）"
+      }
+    },
+    "frontend_button": {
+      "location": "pages/profile/profile.wxml — 用户个人中心页面",
+      "design": "在profile页面底部(或设置区域)添加「导出数据」按钮，点击弹出操作菜单选择JSON或CSV",
+      "api_call": "api.js中需补充exportApi: { exportJson: () => get('/api/export/json', {}, { responseType: 'blob' }), exportCsv: () => get('/api/export/csv', {}, { responseType: 'blob' }) }",
+      "download_method": "wx.downloadFile + wx.openDocument (推荐) 或 wx.request + FileSystemManager.writeFile + wx.saveFile",
+      "i18n": "需在profile页面添加_i18n中 exportData exportJson exportCsv 等字段"
+    },
+    "gdpr_compliance": {
+      "data_types_exported": "用户基本信息(名称/手机/公司/职位)、名片(brochures)、标签(tags) — 基本满足GDPR数据可携权要求",
+      "missing": "未导出访客记录(visitor logs)、信任网络(trust network)、支付记录 — 如需完全合规可后续补充",
+      "account_deletion": "已有api.js中authApi.deleteAccount → DEL /api/gdpr/account"
+    },
+    "effort": "0.5人天（前端按钮+api.js扩展+下载逻辑）"
+  },
+
+  "assistant_mode": {
+    "summary": "后端团队管理能力已完整实现（Model + Router + Service三层架构，含角色管理/邀请/审批流），但前端未对接。",
+    "backend_readiness": "100% 就绪",
+    "model_layer": {
+      "team": "Team(团队), TeamMember(成员), TeamInvite(邀请), ApprovalRequest(审批请求)",
+      "roles": "owner(所有者) → admin(管理员) → member(成员) → viewer(只读查看者)",
+      "approval_actions": "join(加入) | invite(邀请) | upgrade(升级) | remove(移除)"
+    },
+    "api_endpoints": {
+      "team_crud": [
+        "POST /api/teams — 创建团队（需登录）",
+        "GET /api/teams — 获取我的团队列表",
+        "GET /api/teams/{id} — 获取团队详情（含成员数）",
+        "PUT /api/teams/{id} — 更新团队（需admin+）",
+        "DELETE /api/teams/{id} — 删除团队（需owner）"
+      ],
+      "member_management": [
+        "GET /api/teams/{id}/members — 成员列表",
+        "PUT .../members/{userId}/role — 修改角色（需admin+，设owner需owner本人）",
+        "PUT .../members/{userId}/title — 修改团队职位（需admin+）",
+        "DELETE .../members/{userId} — 移除成员（需admin+，不能移除owner）"
+      ],
+      "invite_management": [
+        "POST .../invites — 创建邀请（需admin+）",
+        "GET .../invites — 邀请列表（需admin+）",
+        "DELETE .../invites/{id} — 取消邀请（需admin+）",
+        "POST /api/teams/invites/{token}/accept — 接受邀请",
+        "POST /api/teams/invites/{token}/decline — 拒绝邀请"
+      ],
+      "approval_flow": [
+        "POST .../approval-requests — 提交审批请求（需是团队成员）",
+        "GET .../approval-requests — 查看审批列表（需admin+）",
+        "PUT .../approval-requests/{id} — 审批(approve/reject，需admin+)"
+      ]
+    },
+    "frontend_minimal_implementation": {
+      "phase_1": {
+        "scope": "团队列表 + 创建团队",
+        "pages": [
+          "pages/team/list/index (显示已加入团队列表，含创建按钮，调用GET /api/teams 和 POST /api/teams)",
+          "pages/team/create/index (表单：名称/slug/简介/行业/规模)"
+        ],
+        "api_js_additions": "teamApi: { list(), create(data), get(id), update(id, data), delete(id), getMembers(id), updateRole(id, userId, role), updateTitle(id, userId, title), removeMember(id, userId), createInvite(id, data), listInvites(id), cancelInvite(id), acceptInvite(token), declineInvite(token), submitApproval(id, data), listApprovals(id, status), reviewApproval(id, reqId, action) }"
+      },
+      "phase_2": {
+        "scope": "成员管理 + 邀请",
+        "pages": [
+          "pages/team/detail/index (团队详情页：成员列表tab/邀请tab/审批tab)",
+          "pages/team/invite/index (邀请成员表单：输入邮箱/手机号)"
+        ]
+      },
+      "phase_3": {
+        "scope": "审批流程",
+        "pages": [
+          "pages/team/approvals/index (审批请求列表+审批操作按钮)"
+        ]
+      }
+    },
+    "effort": "Phase1 1人天 + Phase2 1.5人天 + Phase3 1人天 = 共3.5人天",
+    "note": "后端代码逻辑完整，但可能缺少数据库迁移脚本(team/team_member/team_invite/approval_request表未创建)。建议先检查数据库迁移文件确认表是否存在。"
+  }
+}

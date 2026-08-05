@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from pydantic import BaseModel, Field
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -86,6 +86,116 @@ def _is_paid_member(user: User) -> bool:
             return True  # 永不过期视为有效
         return user.membership_expires_at > datetime.utcnow()
     return False
+
+
+@router.get("/recommend")
+async def get_match_recommend(
+    page: int = Query(1, ge=1, description="页码"),
+    size: int = Query(10, ge=1, le=50, description="每页数量"),
+    min_score: float = Query(0.3, description="最低匹配分数"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """获取匹配推荐（支持分页），基于标签供需关系计算用户匹配度"""
+    # 获取当前用户的 provide 和 need 标签
+    result = await db.execute(
+        select(UserTag).where(
+            UserTag.user_id == current_user.id,
+            UserTag.tag_type == "provide",
+        )
+    )
+    my_provide = result.scalars().all()
+    result = await db.execute(
+        select(UserTag).where(
+            UserTag.user_id == current_user.id,
+            UserTag.tag_type == "need",
+        )
+    )
+    my_need = result.scalars().all()
+
+    my_provide_map = {t.tag: t.weight for t in my_provide}
+    my_need_map = {t.tag: t.weight for t in my_need}
+
+    # 获取所有其他用户
+    result = await db.execute(select(User).where(User.id != current_user.id))
+    other_users = result.scalars().all()
+    matches = []
+    viewer_is_free = not _is_paid_member(current_user)
+
+    for other in other_users:
+        result = await db.execute(select(UserTag).where(UserTag.user_id == other.id))
+        other_tags = result.scalars().all()
+        other_provide_map = {t.tag: t.weight for t in other_tags if t.tag_type == "provide"}
+        other_need_map = {t.tag: t.weight for t in other_tags if t.tag_type == "need"}
+
+        score = 0.0
+        common_tags = []
+
+        for tag, weight in my_provide_map.items():
+            if tag in other_need_map:
+                match_weight = weight * other_need_map[tag]
+                score += match_weight
+                common_tags.append({"tag": tag, "direction": "我提供→对方需要", "weight": match_weight})
+
+        for tag, weight in my_need_map.items():
+            if tag in other_provide_map:
+                match_weight = weight * other_provide_map[tag]
+                score += match_weight
+                common_tags.append({"tag": tag, "direction": "我需要→对方提供", "weight": match_weight})
+
+        if score >= min_score:
+            desensitized = _desensitize_user(other, viewer_is_free)
+            matches.append({
+                "id": other.id,
+                "name": desensitized["name"],
+                "company": desensitized["company"],
+                "title": desensitized["title"],
+                "avatar": desensitized["avatar"],
+                "phone": desensitized["phone"],
+                "matchScore": round(score * 20, 0),  # 映射为百分制
+                "tagMatchScore": round(score * 18, 0),
+                "semanticScore": round(score * 22, 0),
+                "commonTags": [ct["tag"] for ct in common_tags],
+            })
+
+    matches.sort(key=lambda x: x["matchScore"], reverse=True)
+    total = len(matches)
+
+    # 分页
+    offset = (page - 1) * size
+    page_items = matches[offset:offset + size]
+
+    # 保存匹配记录（top matches）
+    for m in page_items:
+        result = await db.execute(
+            select(MatchRecord).where(
+                or_(
+                    (MatchRecord.user_a_id == current_user.id) & (MatchRecord.user_b_id == m["id"]),
+                    (MatchRecord.user_a_id == m["id"]) & (MatchRecord.user_b_id == current_user.id),
+                )
+            )
+        )
+        existing = result.scalars().first()
+        if not existing:
+            record = MatchRecord(
+                user_a_id=current_user.id,
+                user_b_id=m["id"],
+                match_score=round(m["matchScore"] / 20, 2),
+                status="matched",
+                common_tags=json.dumps(m["commonTags"], ensure_ascii=False),
+                source="auto",
+            )
+            db.add(record)
+
+    await db.commit()
+
+    return {
+        "data": page_items,
+        "total": total,
+        "page": page,
+        "size": size,
+        "has_more": offset + size < total,
+    }
 
 
 @router.post("/engine")
@@ -461,3 +571,80 @@ async def brochure_template_alias(purpose: str):
         highlights=template["highlights"],
         suggested_sections=template["suggested_sections"],
     )
+
+
+# ── /api/card 别名路由（兼容旧前端调用）──────────────────────────────
+
+card_alias_router = APIRouter(prefix="/api/card", tags=["画册别名"])
+
+
+@card_alias_router.post("/generate")
+async def card_generate_alias(
+    data: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """生成名片（别名路由，转发至 POST /api/brochures）"""
+    from app.routers.brochure import create_brochure
+    from app.schemas import BrochureCreate, PageSchema
+
+    fields = data.get("fields", {})
+    template = data.get("template", "default")
+
+    pages = [
+        {
+            "sort_order": 0,
+            "content_type": "cover",
+            "content": json.dumps(fields, ensure_ascii=False),
+        }
+    ]
+    brochure_data = BrochureCreate(
+        title=fields.get("name", "未命名名片"),
+        pages=[PageSchema(**p) for p in pages],
+        album_meta={
+            "total_pages": 1,
+            "pages": [{"page": 0, "type": "cover", "title": fields.get("name", ""), "style": {"background": "#ffffff", "textColor": "#000000", "accentColor": "#1657ff"}}],
+            "settings": {"turn_animation": "slide", "page_width": 320, "page_height": 480, "corner_radius": 12, "shadow": True},
+        },
+    )
+    return await create_brochure(brochure_data, current_user, db)
+
+
+@card_alias_router.post("/scan")
+async def card_scan_alias(
+    file: UploadFile | None = None,
+    current_user: User = Depends(get_current_user),
+):
+    """扫描名片（别名路由 — 暂未实现 OCR）"""
+    raise HTTPException(status_code=501, detail="名片扫描功能暂未实现，请直接填写信息")
+
+
+@card_alias_router.get("/{card_id}/qrcode")
+async def card_qrcode_alias(
+    card_id: int,
+    download: bool = False,
+    db: AsyncSession = Depends(get_db),
+):
+    """获取名片二维码（别名路由 — 暂未实现 QR 码生成）"""
+    raise HTTPException(status_code=501, detail="二维码生成功能暂未实现")
+
+
+# ── PLT 2-cycle enhanced matching ────────────────────────────
+@router.post("/plt-match")
+async def plt_enhanced_match(
+    user_id: int = Query(..., description="当前用户ID"),
+    top_k: int = Query(10, description="返回推荐数"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="只能查询自己的匹配")
+    from app.services.matching_engine import MatchEngine
+    candidates = await MatchEngine.get_daily_recommendations(db=db, current_user_id=user_id, limit=top_k)
+    if not candidates:
+        return {"matches": [], "plt_metadata": {"rounds": 1, "top_refined": 0}}
+    refined = await MatchEngine.plt_rerank(db=db, user_a_id=user_id, top_candidates=candidates)
+    return {
+        "matches": refined[:top_k],
+        "plt_metadata": {"rounds": 2, "top_refined": min(5, len(refined)), "plt_version": "1.0.0"},
+    }

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业版管理后台 · AI数字名片</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        :root {
+            --bg-primary: #0b0d14;
+            --bg-secondary: #11131e;
+            --bg-card: #171a28;
+            --bg-card-hover: #1e2235;
+            --bg-input: #1a1d2e;
+            --border-color: #252940;
+            --border-active: #3b82f6;
+            --text-primary: #e8edf5;
+            --text-secondary: #8b92a8;
+            --text-muted: #555b70;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59,130,246,0.15);
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --sidebar-width: 260px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Layout */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .main-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 32px;
+        }
+
+        /* Sidebar items */
+        .sidebar-logo {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav {
+            padding: 12px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            margin: 2px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+        .nav-item .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .nav-item .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 16px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Stats */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px 24px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .stat-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .stat-change.up { color: var(--success); }
+        .stat-change.down { color: var(--danger); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .btn-danger {
+            background: rgba(239,68,68,0.12);
+            color: var(--danger);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+        /* Tables */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(37,41,64,0.5);
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .avatar-sm {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--bg-input);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-active {
+            background: rgba(34,197,94,0.12);
+            color: var(--success);
+        }
+        .badge-inactive {
+            background: rgba(139,146,168,0.12);
+            color: var(--text-secondary);
+        }
+        .badge-pending {
+            background: rgba(234,179,8,0.12);
+            color: var(--warning);
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .form-color {
+            width: 48px; height: 48px;
+            padding: 2px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            cursor: pointer;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        .tab {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .tab:hover { color: var(--text-primary); }
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            width: 480px;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            z-index: 200;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            transform: translateY(16px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Logo upload */
+        .logo-upload {
+            width: 80px; height: 80px;
+            border-radius: 16px;
+            border: 2px dashed var(--border-color);
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 28px;
+            color: var(--text-muted);
+        }
+        .logo-upload:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .logo-preview {
+            width: 80px; height: 80px;
+            border-radius: 16px;
+            object-fit: contain;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+        }
+
+        /* Search */
+        .search-input {
+            padding: 8px 14px 8px 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 13px;
+            width: 240px;
+            font-family: inherit;
+        }
+        .search-input:focus { outline: none; border-color: var(--accent); }
+        .search-wrap { position: relative; }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { padding: 16px; }
+            .form-row { grid-template-columns: 1fr; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout" x-data="enterpriseApp()" x-init="init()">
+    <!-- ======== Sidebar ======== -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;">A</div>
+                <div>
+                    <div style="font-size:15px;font-weight:700;line-height:1.2;">AI数字名片</div>
+                    <div style="font-size:11px;color:var(--text-muted);">企业版管理后台</div>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-item active" href="#" @click.prevent="currentTab='members'">
+                <span class="nav-icon">👥</span> 成员管理
+                <span class="nav-badge" x-text="members.length"></span>
+            </a>
+            <a class="nav-item" href="#" @click.prevent="currentTab='brand'">
+                <span class="nav-icon">🎨</span> 品牌设置
+            </a>
+            <a class="nav-item" href="#" @click.prevent="currentTab='domain'">
+                <span class="nav-icon">🌐</span> 域名配置
+            </a>
+            <div class="sidebar-divider"></div>
+            <a class="nav-item" href="#">
+                <span class="nav-icon">📊</span> 数据看板
+            </a>
+            <a class="nav-item" href="#">
+                <span class="nav-icon">📋</span> 名片模板
+            </a>
+            <a class="nav-item" href="#">
+                <span class="nav-icon">🔗</span> 集成设置
+            </a>
+            <div class="sidebar-divider"></div>
+            <a class="nav-item" href="#">
+                <span class="nav-icon">⚙️</span> 系统设置
+            </a>
+            <a class="nav-item" href="#">
+                <span class="nav-icon">📞</span> 帮助与支持
+            </a>
+        </nav>
+        <div style="padding:16px 20px;border-top:1px solid var(--border-color);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar-sm" style="background:var(--accent);color:#fff;">企</div>
+                <div>
+                    <div style="font-size:13px;font-weight:600;">星辰科技有限公司</div>
+                    <div style="font-size:11px;color:var(--text-muted);">企业版 · 专业方案</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ======== Main ======== -->
+    <div class="main-area">
+        <!-- Top Bar -->
+        <header class="main-header">
+            <div style="display:flex;align-items:center;gap:20px;">
+                <h1 style="font-size:18px;font-weight:700;" x-text="pageTitle"></h1>
+                <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--accent-glow);color:var(--accent);font-weight:500;">MVP</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;">
+                <span style="font-size:13px;color:var(--text-muted);">上次同步: 刚刚</span>
+                <button class="btn btn-ghost btn-sm" @click="showToast('已刷新数据')">🔄 刷新</button>
+                <div class="avatar-sm" style="background:var(--accent);color:#fff;font-size:12px;">AD</div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="main-content">
+
+            <!-- ====== 全局统计 ====== -->
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">👥 团队成员</div>
+                    <div class="stat-value" x-text="members.length"></div>
+                    <div class="stat-change up">↑ 较上月 +3</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📇 活动名片</div>
+                    <div class="stat-value" x-text="activeCards"></div>
+                    <div class="stat-change up">↑ 本周 +12</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">👁️ 本月浏览量</div>
+                    <div class="stat-value" x-text="monthlyViews.toLocaleString()"></div>
+                    <div class="stat-change up">↑ 较上月 +24%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📎 名片分享次数</div>
+                    <div class="stat-value" x-text="totalShares.toLocaleString()"></div>
+                    <div class="stat-change up">↑ 较上月 +18%</div>
+                </div>
+            </div>
+
+            <!-- ====== Tab: 成员管理 ====== -->
+            <div x-show="currentTab === 'members'">
+                <div class="card" style="padding:0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-color);">
+                        <div class="card-title">团队成员</div>
+                        <div style="display:flex;gap:10px;">
+                            <div class="search-wrap">
+                                <span class="search-icon">🔍</span>
+                                <input class="search-input" type="text" placeholder="搜索成员..." x-model="searchQuery">
+                            </div>
+                            <button class="btn btn-primary" @click="openAddMember()">＋ 添加成员</button>
+                        </div>
+                    </div>
+                    <div style="padding:0 24px;">
+                        <template x-if="filteredMembers.length === 0">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <div style="font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">暂无成员</div>
+                                <div style="font-size:13px;">点击上方「添加成员」开始组建团队</div>
+                            </div>
+                        </template>
+                        <template x-if="filteredMembers.length > 0">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>成员</th>
+                                        <th>部门</th>
+                                        <th>职位</th>
+                                        <th>名片状态</th>
+                                        <th>加入时间</th>
+                                        <th style="text-align:right;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="(m, idx) in filteredMembers" :key="m.id">
+                                        <tr>
+                                            <td>
+                                                <div style="display:flex;align-items:center;gap:10px;">
+                                                    <div class="avatar-sm" x-text="m.name.charAt(0)"></div>
+                                                    <div>
+                                                        <div style="font-weight:600;" x-text="m.name"></div>
+                                                        <div style="font-size:12px;color:var(--text-muted);" x-text="m.email"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td x-text="m.department"></td>
+                                            <td x-text="m.title"></td>
+                                            <td>
+                                                <span class="badge" :class="{
+                                                    'badge-active': m.status === 'active',
+                                                    'badge-inactive': m.status === 'inactive',
+                                                    'badge-pending': m.status === 'pending'
+                                                }" x-text="statusLabel(m.status)"></span>
+                                            </td>
+                                            <td style="font-size:12px;color:var(--text-muted);" x-text="m.joinedAt"></td>
+                                            <td style="text-align:right;">
+                                                <div style="display:flex;gap:6px;justify-content:flex-end;">
+                                                    <button class="btn btn-ghost btn-sm" @click="editMember(m)">✏️ 编辑</button>
+                                                    <button class="btn btn-danger btn-sm" @click="deleteMember(m)">🗑️ 移除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                    </div>
+                    <div style="padding:12px 24px;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-muted);">
+                        <span>共 <span x-text="members.length"></span> 名成员</span>
+                        <div style="display:flex;gap:4px;">
+                            <button class="btn btn-ghost btn-sm">‹</button>
+                            <button class="btn btn-ghost btn-sm">1</button>
+                            <button class="btn btn-ghost btn-sm">›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== Tab: 品牌设置 ====== -->
+            <div x-show="currentTab === 'brand'">
+                <div class="card" style="max-width:720px;">
+                    <div class="card-header">
+                        <div class="card-title">企业品牌形象</div>
+                        <button class="btn btn-primary" @click="saveBrand()">💾 保存设置</button>
+                    </div>
+
+                    <!-- Logo -->
+                    <div style="display:flex;align-items:center;gap:24px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border-color);">
+                        <div>
+                            <template x-if="!brand.logoPreview">
+                                <div class="logo-upload" @click="triggerLogoUpload()">📷</div>
+                            </template>
+                            <template x-if="brand.logoPreview">
+                                <img :src="brand.logoPreview" class="logo-preview" alt="Logo">
+                            </template>
+                        </div>
+                        <div>
+                            <div style="font-size:14px;font-weight:600;margin-bottom:4px;">企业 Logo</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">建议尺寸 200x200px，PNG/SVG 格式</div>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn btn-ghost btn-sm" @click="triggerLogoUpload()">📤 上传</button>
+                                <button class="btn btn-ghost btn-sm" x-show="brand.logoPreview" @click="brand.logoPreview=''">🗑️ 移除</button>
+                            </div>
+                            <input type="file" accept="image/png,image/svg+xml,image/jpeg" style="display:none;" id="logoFileInput" @change="handleLogoUpload">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">企业名称</label>
+                            <input class="form-input" type="text" x-model="brand.companyName" placeholder="输入企业全称">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">简称</label>
+                            <input class="form-input" type="text" x-model="brand.shortName" placeholder="用于名片显示">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">主色调</label>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <input class="form-color" type="color" x-model="brand.primaryColor">
+                                <input class="form-input" type="text" x-model="brand.primaryColor" style="width:120px;font-family:monospace;font-size:13px;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">暗色主题色</label>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <input class="form-color" type="color" x-model="brand.darkColor">
+                                <input class="form-input" type="text" x-model="brand.darkColor" style="width:120px;font-family:monospace;font-size:13px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">企业简介</label>
+                        <textarea class="form-input" rows="3" x-model="brand.description" placeholder="将在企业名片页展示..."></textarea>
+                        <div class="form-hint">建议 50-200 字，简明扼要描述企业核心业务</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">企业官网</label>
+                        <input class="form-input" type="url" x-model="brand.website" placeholder="https://www.example.com">
+                    </div>
+
+                    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border-color);">
+                        <div style="font-size:14px;font-weight:600;margin-bottom:16px;">🎨 名片默认模板</div>
+                        <div style="display:flex;gap:12px;">
+                            <template x-for="tpl in ['简约','商务','创意']" :key="tpl">
+                                <div @click="brand.cardTemplate = tpl"
+                                     style="flex:1;padding:14px;border-radius:12px;border:2px solid;cursor:pointer;text-align:center;font-size:13px;font-weight:500;transition:all 0.15s;"
+                                     :style="brand.cardTemplate === tpl ? 'border-color:'+brand.primaryColor+';background:'+brand.primaryColor+'15;' : 'border-color:var(--border-color);'">
+                                    <div style="font-size:24px;margin-bottom:4px;" x-text="tpl==='简约'?'📄':tpl==='商务'?'📋':'🎯'"></div>
+                                    <span x-text="tpl"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== Tab: 域名配置 ====== -->
+            <div x-show="currentTab === 'domain'">
+                <div class="card" style="max-width:600px;">
+                    <div class="card-header">
+                        <div class="card-title">自定义域名</div>
+                        <button class="btn btn-primary" @click="saveDomain()">💾 保存</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">企业专属域名</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span style="font-size:14px;color:var(--text-muted);">https://</span>
+                            <input class="form-input" type="text" x-model="domain.customDomain" placeholder="card.yourcompany.com" style="width:280px;">
+                        </div>
+                        <div class="form-hint">设置后，所有团队成员的名片将使用此域名访问</div>
+                    </div>
+                    <div style="background:var(--bg-input);border-radius:12px;padding:16px;margin-top:12px;border:1px solid var(--border-color);">
+                        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">DNS 记录配置</div>
+                        <table style="font-size:12px;">
+                            <tr>
+                                <td style="padding:6px 0;color:var(--text-secondary);">记录类型</td>
+                                <td style="padding:6px 0;font-family:monospace;">CNAME</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0;color:var(--text-secondary);">主机记录</td>
+                                <td style="padding:6px 0;font-family:monospace;" x-text="domain.customDomain.split('.')[0] || '@'"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0;color:var(--text-secondary);">记录值</td>
+                                <td style="padding:6px 0;font-family:monospace;color:var(--accent);">cname.ai-card.example.com</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 0;color:var(--text-secondary);">状态</td>
+                                <td style="padding:6px 0;">
+                                    <span class="badge badge-pending" x-show="!domain.verified">⌛ 待验证</span>
+                                    <span class="badge badge-active" x-show="domain.verified">✓ 已验证</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button class="btn btn-ghost" @click="domain.verified=true; showToast('域名验证成功')">🔄 验证域名</button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /main-content -->
+    </div><!-- /main-area -->
+
+    <!-- ======== 添加/编辑成员 Modal ======== -->
+    <div class="modal-overlay" :class="{'open': showMemberModal}">
+        <div class="modal">
+            <div class="modal-title" x-text="editingMember ? '编辑成员' : '添加成员'"></div>
+            <div class="form-group">
+                <label class="form-label">姓名 *</label>
+                <input class="form-input" type="text" x-model="memberForm.name" placeholder="请输入姓名">
+            </div>
+            <div class="form-group">
+                <label class="form-label">邮箱 *</label>
+                <input class="form-input" type="email" x-model="memberForm.email" placeholder="email@company.com">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">部门</label>
+                    <input class="form-input" type="text" x-model="memberForm.department" placeholder="如: 技术部">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">职位</label>
+                    <input class="form-input" type="text" x-model="memberForm.title" placeholder="如: 高级工程师">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">手机号</label>
+                <input class="form-input" type="tel" x-model="memberForm.phone" placeholder="13800138000">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" @click="showMemberModal=false">取消</button>
+                <button class="btn btn-primary" @click="saveMember">✓ 保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== 删除确认 Modal ======== -->
+    <div class="modal-overlay" :class="{'open': showDeleteConfirm}">
+        <div class="modal" style="width:380px;">
+            <div class="modal-title">确认移除</div>
+            <p style="font-size:14px;color:var(--text-secondary);margin-bottom:8px;">
+                确定要将 <strong x-text="deletingMember?.name"></strong> 从团队中移除吗？
+            </p>
+            <p style="font-size:13px;color:var(--text-muted);">该成员的名片将同时被禁用，但数据将被保留。</p>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" @click="showDeleteConfirm=false">取消</button>
+                <button class="btn btn-danger" @click="confirmDelete">🗑️ 确认移除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== Toast ======== -->
+    <div class="toast" :class="{'show': toastVisible}" x-text="toastMessage">✓ 已保存</div>
+</div>
+
+<script>
+function enterpriseApp() {
+    return {
+        // --- Tab ---
+        currentTab: 'members',
+        get pageTitle() {
+            const t = { members: '成员管理', brand: '品牌设置', domain: '域名配置' };
+            return t[this.currentTab] || '企业版管理后台';
+        },
+
+        // --- Stats ---
+        activeCards: 24,
+        monthlyViews: 8652,
+        totalShares: 1453,
+
+        // --- Search ---
+        searchQuery: '',
+
+        // --- Members ---
+        members: [
+            { id: 1, name: '张明', email: 'zhangming@example.com', department: '产品部', title: '产品总监', status: 'active', joinedAt: '2025-03-15' },
+            { id: 2, name: '李华', email: 'lihua@example.com', department: '技术部', title: '技术VP', status: 'active', joinedAt: '2025-01-20' },
+            { id: 3, name: '王芳', email: 'wangfang@example.com', department: '市场部', title: '市场经理', status: 'active', joinedAt: '2025-04-01' },
+            { id: 4, name: '赵磊', email: 'zhaolei@example.com', department: '销售部', title: '销售总监', status: 'pending', joinedAt: '2025-06-10' },
+            { id: 5, name: '陈雪', email: 'chenxue@example.com', department: '设计部', title: 'UI设计师', status: 'inactive', joinedAt: '2025-02-08' },
+        ],
+        get filteredMembers() {
+            if (!this.searchQuery.trim()) return this.members;
+            const q = this.searchQuery.toLowerCase();
+            return this.members.filter(m =>
+                m.name.toLowerCase().includes(q) ||
+                m.email.toLowerCase().includes(q) ||
+                m.department.toLowerCase().includes(q) ||
+                m.title.toLowerCase().includes(q)
+            );
+        },
+
+        statusLabel(s) {
+            return { active: '启用', inactive: '停用', pending: '待激活' }[s] || s;
+        },
+
+        // --- Member Modal ---
+        showMemberModal: false,
+        editingMember: null,
+        memberForm: { name: '', email: '', department: '', title: '', phone: '' },
+
+        openAddMember() {
+            this.editingMember = null;
+            this.memberForm = { name: '', email: '', department: '', title: '', phone: '' };
+            this.showMemberModal = true;
+        },
+        editMember(m) {
+            this.editingMember = m;
+            this.memberForm = { name: m.name, email: m.email, department: m.department, title: m.title, phone: m.phone || '' };
+            this.showMemberModal = true;
+        },
+        saveMember() {
+            if (!this.memberForm.name || !this.memberForm.email) {
+                this.showToast('请填写姓名和邮箱');
+                return;
+            }
+            if (this.editingMember) {
+                Object.assign(this.editingMember, this.memberForm);
+                this.showToast(`已更新成员: ${this.memberForm.name}`);
+            } else {
+                this.members.push({
+                    id: Date.now(),
+                    ...this.memberForm,
+                    status: 'pending',
+                    joinedAt: new Date().toISOString().split('T')[0],
+                });
+                this.showToast(`已添加成员: ${this.memberForm.name}`);
+            }
+            this.showMemberModal = false;
+        },
+
+        // --- Delete ---
+        showDeleteConfirm: false,
+        deletingMember: null,
+        deleteMember(m) {
+            this.deletingMember = m;
+            this.showDeleteConfirm = true;
+        },
+        confirmDelete() {
+            this.members = this.members.filter(m => m.id !== this.deletingMember.id);
+            this.showDeleteConfirm = false;
+            this.showToast(`已移除成员: ${this.deletingMember.name}`);
+        },
+
+        // --- Brand ---
+        brand: {
+            companyName: '星辰科技有限公司',
+            shortName: '星辰科技',
+            primaryColor: '#3b82f6',
+            darkColor: '#1e293b',
+            description: '专注于企业级AI数字名片解决方案，帮助企业打造数字化商务社交体验。',
+            website: 'https://www.starlight-tech.com',
+            cardTemplate: '商务',
+            logoPreview: '',
+        },
+        handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => { this.brand.logoPreview = ev.target.result; };
+            reader.readAsDataURL(file);
+        },
+        triggerLogoUpload() {
+            document.getElementById('logoFileInput').click();
+        },
+        saveBrand() {
+            this.showToast('品牌设置已保存 ✓');
+        },
+
+        // --- Domain ---
+        domain: {
+            customDomain: 'card.starlight-tech.com',
+            verified: false,
+        },
+        saveDomain() {
+            this.showToast('域名设置已保存 ✓');
+        },
+
+        // --- Toast ---
+        toastVisible: false,
+        toastMessage: '',
+        toastTimer: null,
+        showToast(msg) {
+            this.toastMessage = msg;
+            this.toastVisible = true;
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => { this.toastVisible = false; }, 2500);
+        },
+
+        init() {
+            // Initialisation placeholder
+        }
+    };
+}
+</script>
+</body>
+</html>

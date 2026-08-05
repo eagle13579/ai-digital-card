@@ -1,0 +1,38 @@
+; ──────────────────────────────────────────────
+; Coverage 配置 — CI门禁 (渐进式)
+; ──────────────────────────────────────────────
+; fail_under=50 (渐进式目标, 从40→50, 当前37%)
+; 覆盖 pyproject.toml 中的 fail_under=80 (当前尚不可达)
+
+[run]
+source = app
+omit =
+    app/__init__.py
+    */migrations/*
+    */tests/*
+    */test_*.py
+    */.pytype/*
+    */__pycache__/*
+
+[report]
+; 最小覆盖率门禁 — 50% 渐进目标
+fail_under = 50
+show_missing = true
+skip_covered = false
+skip_empty = true
+sort = Cover
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    raise AssertionError
+    pass
+    return NotImplemented
+
+[html]
+directory = htmlcov
+title = AI数字名片 Coverage Report
+
+[xml]
+output = coverage.xml

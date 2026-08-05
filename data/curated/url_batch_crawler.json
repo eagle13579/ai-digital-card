@@ -1,0 +1,24 @@
+[
+  {
+    "name": "",
+    "industry": "",
+    "description": "",
+    "tags": [],
+    "url": "https://httpbin.org/html",
+    "contacts": {},
+    "source": "url_batch_crawler",
+    "collected_at": "2026-07-25T03:25:32.767009",
+    "confidence": 0.5
+  },
+  {
+    "name": "",
+    "industry": "",
+    "description": "",
+    "tags": [],
+    "url": "https://example.com",
+    "contacts": {},
+    "source": "url_batch_crawler",
+    "collected_at": "2026-07-25T03:25:32.767009",
+    "confidence": 0.5
+  }
+]

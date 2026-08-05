@@ -105,6 +105,7 @@ except Exception as e:
             capture_output=True,
             text=True,
             timeout=timeout,
+        creationflags=subprocess.CREATE_NO_WINDOW,
         )
         elapsed = (time.monotonic() - start) * 1000.0
         if result.returncode == 0:

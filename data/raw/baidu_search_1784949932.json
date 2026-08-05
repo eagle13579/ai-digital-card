@@ -1,0 +1,21 @@
+{
+  "source_id": "baidu_search",
+  "collected_at": "2026-07-25T03:25:32.748973",
+  "count": 2,
+  "items": [
+    {
+      "search_term": "AI名片 行业",
+      "source": "baidu_search",
+      "content_length": 0,
+      "content_preview": "",
+      "collected_at": "2026-07-25T03:25:32.613372"
+    },
+    {
+      "search_term": "企业数字化转型 2026",
+      "source": "baidu_search",
+      "content_length": 0,
+      "content_preview": "",
+      "collected_at": "2026-07-25T03:25:32.748973"
+    }
+  ]
+}

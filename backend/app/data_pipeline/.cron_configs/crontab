@@ -1,0 +1,25 @@
+# ════════════════════════════════════════════════════════════
+# 数据管道 cron 任务 — 由 register_cron.py 自动生成
+# 生成时间: 2026-07-25T02:53:23.452256+00:00
+# 项目路径: D:\AI数智名片\backend
+# Python: C:\Python314\python.exe
+# ════════════════════════════════════════════════════════════
+
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin:C:\Python314
+
+# data-pipeline-full-cycle — 完整数据管道 — 采集+治理+训练全周期
+0 * * * * cd D:\AI数智名片\backend && C:\Python314\python.exe -m app.data_pipeline.pipeline_controller --mode full --json >> D:\AI数智名片\logs\cron_full_cycle.log 2>&1
+
+# data-pipeline-collect — 仅数据采集 — 运行所有到期爬虫
+*/30 * * * * cd D:\AI数智名片\backend && C:\Python314\python.exe -m app.data_pipeline.pipeline_controller --mode collect --json >> D:\AI数智名片\logs\cron_collect.log 2>&1
+
+# data-pipeline-train — 仅模型训练 — 训练所有到期模型
+*/30 * * * * cd D:\AI数智名片\backend && C:\Python314\python.exe -m app.data_pipeline.pipeline_controller --mode train --json >> D:\AI数智名片\logs\cron_train.log 2>&1
+
+# data-pipeline-health — 数据管道健康检查 — 自动监控管道状态
+*/5 * * * * cd D:\AI数智名片\backend && C:\Python314\python.exe -m app.data_pipeline.pipeline_health_check >> D:\AI数智名片\logs\cron_health.log 2>&1
+
+# data-online-learning — 在线学习 — 增量模型权重调整 (train_only模式)
+*/15 * * * * cd D:\AI数智名片\backend && C:\Python314\python.exe -m app.data_pipeline.pipeline_controller --mode train --json >> D:\AI数智名片\logs\cron_online_learning.log 2>&1
+

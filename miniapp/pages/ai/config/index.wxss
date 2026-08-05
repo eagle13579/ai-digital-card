@@ -1,0 +1,27 @@
+/* AI配置页 - v2.0 Dark Minimal */
+
+.config-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.config-item:last-child {
+  border-bottom: none;
+}
+
+.config-name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  display: block;
+}
+
+.config-desc {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 2px;
+}

@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "loading": "/components/loading/index",
-    "empty-state": "/components/empty-state/index"
+    "empty-state": "/components/empty-state/index",
+    "custom-tab-bar": "/custom-tab-bar/index"
   },
   "navigationBarTitleText": "名片详情"
 }

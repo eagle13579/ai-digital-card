@@ -1,24 +1,15 @@
+/* Loading 组件 - v2.0 Dark Minimal */
+
 .loading-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 0;
+  padding: var(--space-10) 0;
 }
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e8e8e8;
-  border-top-color: #1657ff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+
 .loading-text {
-  font-size: 13px;
-  color: #999;
-  margin-top: 10px;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
 }

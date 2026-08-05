@@ -31,6 +31,8 @@ from app.models.user import User
 # ── 提前导入 CRM 模型, 确保在 test_db 创建表时注册到 Base.metadata ──
 from app.crm import crm_models  # noqa: F401 — registers CRM tables on Base
 
+pytestmark = pytest.mark.db
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # ═══════════════════════════════════════════════════════════════════════════════
