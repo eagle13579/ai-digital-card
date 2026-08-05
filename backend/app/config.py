@@ -1,6 +1,17 @@
 import os
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
+
+from key_manager import SecretManager
+
+# ── 安全密钥管理器 ─────────────────────────────────────────────────────────
+_secrets = SecretManager()
+
+
+def _secret(key: str, default: str = "") -> str:
+    """从 SecretManager (环境变量 → .env.encrypted) 读取密钥。"""
+    return _secrets.get(key, default)
 
 
 class Settings(BaseSettings):
@@ -8,7 +19,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/digital_brochure.db"
     JWT_SECRET: str  # 必须从环境变量 JWT_SECRET 读取，无默认值 — 生产环境使用 256 位随机密钥
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 60 minutes (security: reduced from 7 days)
 
     # ── RS256 JWT 非对称签名 ──────────────────────────────────────────────────
     JWT_ALGORITHM: str = "RS256"
@@ -78,6 +89,10 @@ class Settings(BaseSettings):
     ALIPAY_PUBLIC_KEY: str = ""
     """支付宝公钥"""
 
+    # ── CSRF 保护 ─────────────────────────────────────────────────────────
+    CSRF_ENABLED: bool = True
+    """是否启用CSRF保护。纯API服务可设为False, 前端SPA推荐开启"""
+
     # ── 向量搜索 ──────────────────────────────────────────────────────────
     USE_VECTOR_SEARCH: bool = True
     """是否启用向量搜索（设为 False 回退到旧版 TF-IDF）"""
@@ -97,15 +112,9 @@ class Settings(BaseSettings):
     VECTOR_TOP_K: int = 50
     """向量搜索返回数量上限"""
 
-    # ── 三蛋蛋企业匹配引擎 ────────────────────────────────────────────────
-    TRANSHEE_APP_ID: str = ""
-    """三蛋蛋匹配引擎 AppID (形如 app_xxxxxxxxxxxxxxxx, 身份标识非密码)"""
-    TRANSHEE_APP_SECRET: str = ""
-    """三蛋蛋匹配引擎 Secret (密码, 只在创建时给一次, 丢了只能重置)"""
-    TRANSHEE_BASE_URL: str = "https://api.transphee.com:59226/tpmg/entcm"
-    """三蛋蛋匹配引擎 API 基地址"""
-    TRANSHEE_DAILY_QUOTA: int = 100
-    """三蛋蛋匹配引擎每日查询配额 (上游硬限制)"""
+    # ── HyDE 检索增强 ────────────────────────────────────────────────────
+    USE_HYDE: bool = True
+    """是否启用 HyDE（Hypothetical Document Embeddings）检索增强。生成假设文档替代原查询进行向量搜索。"""
 
     # ── Redis 缓存 ────────────────────────────────────────────────────────
     REDIS_HOST: str = "localhost"
@@ -129,6 +138,26 @@ class Settings(BaseSettings):
 
     REDIS_CACHE_TTL: int = 300
     """默认缓存过期时间（秒）"""
+
+    # ── 异步任务队列 ─────────────────────────────────────────────────
+    TASK_QUEUE_MAX_WORKERS: int = 4
+    """任务队列并发工作协程数。名片AI扫描/匹配/通知/导出共享此池。"""
+
+    TASK_QUEUE_MAX_SIZE: int = 0
+    """任务队列最大长度（0 = 无限）。生产环境建议设 1000 防止内存溢出。"""
+
+    # ── JWT_SECRET 门禁 ──────────────────────────────────────────────────
+    @field_validator("JWT_SECRET", mode="after")
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        """生产环境强制要求强随机 JWT_SECRET，开发环境可跳过。"""
+        env = _secret("ENV", "development").lower()
+        if env in ("production", "prod"):
+            if not v or v.startswith("change-me"):
+                raise ValueError(
+                    "生产环境必须设置强随机JWT_SECRET,建议openssl rand -hex 32"
+                )
+        return v
 
     @property
     def REDIS_URL(self) -> str:
@@ -177,6 +206,11 @@ class Settings(BaseSettings):
     FEISHU_BOT_NAME: str = "AI数字名片助手"
     """飞书机器人名称"""
 
+    FEISHU_BAIZE_API_URL: str = "https://open.feishu.cn/open-apis/ai/v1/chat/completions"
+    """飞书白泽 API 地址"""
+    FEISHU_BAIZE_DEFAULT_MODEL: str = "baize-4k"
+    """飞书白泽默认模型"""
+
     DINGTALK_WEBHOOK_URL: str = ""
     """钉钉自定义机器人 Webhook URL。为空则降级到日志输出"""
     DINGTALK_SECRET: str = ""
@@ -220,13 +254,25 @@ class Settings(BaseSettings):
     TENCENT_WECHAT_SECRET: str = ""
     """（向后兼容）腾讯会议旧版配置"""
 
+    # ── API 文档暴露控制 ──────────────────────────────────────────────
+    @property
+    def docs_enabled(self) -> bool:
+        """API 文档端点 /docs /redoc /openapi.json 是否启用。
+        生产环境 (ENV=production) 自动禁用。
+        也可通过 DISABLE_DOCS=true 环境变量强制禁用。
+        """
+        env = _secret("ENV", "development").lower()
+        docs_disabled = _secret("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
+        return env not in ("production", "prod") and not docs_disabled
+
     class Config:
-        env_file = ".env"
+        # .env 不再直接加载 — 密钥通过 SecretManager (环境变量 → .env.encrypted) 管理
         env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 settings = Settings()
 
 
-# Sentry DSN (从环境变量读取)
-SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
+# Sentry DSN (从密钥管理器读取)
+SENTRY_DSN: str = _secret("SENTRY_DSN", "")
