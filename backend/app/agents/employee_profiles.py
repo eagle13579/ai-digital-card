@@ -256,8 +256,59 @@ def create_legion_agent(
     # 7. Register shared Gaia learning tool — 一个人学会、全员共享
     agent.register_tool("learn_from_gaia", _make_learn_from_gaia(employee))
 
+    # 8. Register 共享学习协议三件套：share → 广播 → sync
+    #    (a) share_knowledge: 员工主动把新经验写入大脑 + 广播 knowledge.shared 事件
+    agent.register_tool("share_knowledge", _make_share_knowledge(employee, event_bus))
+    #    (b) sync_knowledge: 员工从大脑拉取最新知识并固化到自己的 memory.db
+    agent.register_tool("sync_knowledge", _make_sync_knowledge(employee))
+
+    #    (c) 订阅 knowledge.shared 事件：任何员工共享 → 全员自动同步（一人学会、所有人都会）
+    async def _on_knowledge_shared(event: Any) -> None:
+        try:
+            payload = getattr(event, "payload", {}) or {}
+            source = payload.get("source_agent", getattr(event, "source", "unknown"))
+            title = payload.get("title", "")
+            # 不学习自己广播的知识（避免循环同步）
+            if source == employee.employee_id or source == getattr(agent, "agent_id", ""):
+                return
+            if title:
+                logger.info(
+                    "📚 %s 收到共享知识广播: %s (来自 %s)",
+                    employee.name,
+                    title[:50],
+                    source,
+                )
+            # 同步到自己的记忆
+            sync_fn = agent.tools.get("sync_knowledge")
+            if sync_fn is not None:
+                await sync_fn(limit=3)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Agent '%s' knowledge.shared handler failed: %s",
+                employee.name,
+                repr(exc),
+            )
+
+    agent.register_event_handler("knowledge.shared", _on_knowledge_shared)
+
+    #    (d) 每 30 分钟主动同步一次（不依赖广播，保证时效性）
+    async def _sync_cron() -> None:
+        try:
+            sync_fn = agent.tools.get("sync_knowledge")
+            if sync_fn is not None:
+                await sync_fn(limit=5)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Agent '%s' sync cron failed: %s", employee.name, repr(exc))
+
+    from app.agents.base_agent import CronJob
+    agent.add_cron_job(CronJob(
+        schedule="*/30 * * * *",
+        action=_sync_cron,
+        name="sync_knowledge_30min",
+    ))
+
     logger.info(
-        "Legion agent created: %s → %s (soul=%s, tools=%d, models=%d)",
+        "Legion agent created: %s → %s (soul=%s, tools=%d, models=%d, shared_learning=on)",
         agent_type,
         employee.name,
         employee.employee_id,
@@ -417,6 +468,263 @@ def _make_learn_from_gaia(employee: LegionEmployee):
             return [{"title": f"学习失败（知识库暂不可达）", "content": str(exc), "knowledge_type": "error", "tags": []}]
 
     return learn_from_gaia
+
+
+def _make_share_knowledge(employee: LegionEmployee, event_bus: Any | None = None):
+    """Return a callable tool that shares new learnings with the whole legion.
+
+    共享学习协议 Part 1 — 员工主动共享：
+        1. 将经验写入盖娅大脑知识库（gaia_knowledge，全员可检索）
+        2. 通过 event_bus 广播 knowledge.shared 事件（所有订阅员工收到后自动同步）
+
+    实现「一个人学会、所有人都会」：任何员工的新经验一旦共享，
+    其他 8 位员工通过事件订阅 + 30min cron 自动拉取并固化到各自记忆。
+    """
+
+    async def share_knowledge(
+        title: str,
+        content: str,
+        tags: list[str] | None = None,
+        knowledge_type: str = "insight",
+    ) -> dict[str, Any]:
+        """Share a new learning/experience with the entire legion.
+
+        Args:
+            title: Short title of the learning (e.g. "GitHub Actions 并发限制的规避").
+            content: Detailed experience/lesson content.
+            tags: Optional tags for categorization (e.g. ["devops", "ci"]).
+            knowledge_type: Knowledge type (default "insight").
+
+        Returns:
+            {"success": bool, "source_id": str|None, "broadcast": bool, "error": str|None}
+        """
+        import time as _time
+
+        source_id = f"shared_{employee.employee_id}_{int(_time.time() * 1000)}"
+        tags = tags or []
+        result: dict[str, Any] = {
+            "success": False,
+            "source_id": source_id,
+            "broadcast": False,
+            "error": None,
+        }
+
+        # 1. 写入盖娅大脑知识库
+        try:
+            from app.database import AsyncSessionLocal
+
+            async with AsyncSessionLocal() as db:
+                if employee._brain is not None and hasattr(employee._brain, "ingest_knowledge"):
+                    knowledge = await employee._brain.ingest_knowledge(
+                        db=db,
+                        source=f"agent_share:{employee.employee_id}",
+                        source_id=source_id,
+                        knowledge_type=knowledge_type,
+                        title=title,
+                        content=content,
+                        tags=tags + [employee.name, "shared"],
+                        confidence=0.9,
+                    )
+                    # 立即向量化（否则 vector_embedded=False，语义检索查不到）
+                    try:
+                        await employee._brain._embed_knowledge_batch(db, [knowledge])
+                    except Exception as exc:  # noqa: BLE001
+                        logger.debug(
+                            "share_knowledge immediate embed skipped for %s: %s",
+                            employee.name,
+                            repr(exc),
+                        )
+                    await db.commit()
+                    result["success"] = True
+                else:
+                    result["error"] = "brain unavailable"
+        except Exception as exc:  # noqa: BLE001
+            result["error"] = repr(exc)
+            logger.warning(
+                "share_knowledge ingest failed for %s: %s",
+                employee.name,
+                repr(exc),
+            )
+
+        # 2. 广播 knowledge.shared 事件（无论 ingest 是否成功都广播，让其他员工知道）
+        #    ⚠️ 必须走 runtime.dispatch_event()（它会 deliver 给所有 agent 的 event_handlers），
+        #    仅 event_bus.publish() 只通知 subscribe() 注册的外部 handler，agent 收不到。
+        broadcast_ok = False
+        try:
+            import app.dependencies as _deps_mod
+
+            _get_runtime = getattr(_deps_mod, "get_agent_runtime", None)
+            runtime = _get_runtime() if _get_runtime is not None else None
+            if runtime is not None:
+                from app.events.interfaces import Event, EventPriority
+
+                await runtime.dispatch_event(Event(
+                    type="knowledge.shared",
+                    source=employee.employee_id,
+                    payload={
+                        "title": title,
+                        "content": content[:500],
+                        "tags": tags,
+                        "source_agent": employee.employee_id,
+                        "source_name": employee.name,
+                        "source_id": source_id,
+                    },
+                    priority=EventPriority.NORMAL,
+                ))
+                broadcast_ok = True
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "share_knowledge runtime dispatch failed for %s: %s",
+                employee.name,
+                repr(exc),
+            )
+
+        # 兜底：event_bus.publish（供外部订阅者使用，如飞书通知）
+        if event_bus is not None:
+            try:
+                from app.events.interfaces import Event, EventPriority
+
+                await event_bus.publish(Event(
+                    type="knowledge.shared",
+                    source=employee.employee_id,
+                    payload={
+                        "title": title,
+                        "content": content[:500],
+                        "tags": tags,
+                        "source_agent": employee.employee_id,
+                        "source_name": employee.name,
+                        "source_id": source_id,
+                    },
+                    priority=EventPriority.NORMAL,
+                ))
+                broadcast_ok = True
+            except Exception as exc:  # noqa: BLE001
+                result["error"] = (result["error"] or "") + f" | broadcast failed: {repr(exc)}"
+                logger.warning(
+                    "share_knowledge broadcast failed for %s: %s",
+                    employee.name,
+                    repr(exc),
+                )
+
+        result["broadcast"] = broadcast_ok
+
+        return result
+
+    return share_knowledge
+
+
+def _make_sync_knowledge(employee: LegionEmployee):
+    """Return a callable tool that pulls latest legion knowledge into own memory.
+
+    共享学习协议 Part 2 — 员工同步：
+        1. 按部门关键词从盖娅大脑检索最新知识
+        2. 去重后固化到自己的 memory.db（employee.memorize）
+
+    由 knowledge.shared 事件广播 或 30min cron 触发。
+    """
+
+    async def sync_knowledge(limit: int = 5) -> dict[str, Any]:
+        """Pull the latest shared knowledge and memorize it.
+
+        Strategy:
+            1. Direct DB query for newest shared knowledge
+               (source LIKE 'agent_share%' or tags contain 'shared'),
+               ordered by created_at DESC — bypasses the 8201 process's
+               stale in-memory vector index, so freshly shared knowledge
+               is always visible.
+            2. Fallback: semantic query via :8201 API (dept keywords).
+
+        Args:
+            limit: Max items to fetch (default 5).
+
+        Returns:
+            {"fetched": int, "new": int, "skipped": int, "items": [...]}
+        """
+        items: list[dict[str, Any]] = []
+
+        # 1. Direct DB query — 最新共享知识（绕开 8201 旧向量索引）
+        try:
+            from app.database import AsyncSessionLocal
+            from sqlalchemy import text as _text
+
+            async with AsyncSessionLocal() as db:
+                rows = await db.execute(
+                    _text("""
+                        SELECT id, title, content, knowledge_type, tags, created_at
+                        FROM gaia_knowledge
+                        WHERE (source LIKE 'agent_share%' OR tags::text LIKE '%shared%')
+                          AND is_active = true
+                        ORDER BY created_at DESC, id DESC
+                        LIMIT :lim
+                    """),
+                    {"lim": int(limit)},
+                )
+                for r in rows:
+                    items.append({
+                        "title": r.title or "",
+                        "content": (r.content or "")[:300],
+                        "knowledge_type": r.knowledge_type or "",
+                        "tags": r.tags or [],
+                        "created_at": str(r.created_at or ""),
+                    })
+        except Exception as exc:  # noqa: BLE001
+            logger.debug(
+                "sync_knowledge direct DB query failed for %s (fallback to API): %s",
+                employee.name,
+                repr(exc),
+            )
+
+        # 2. Fallback: 8201 semantic query（部门关键词）
+        if not items:
+            import urllib.parse
+            import urllib.request
+
+            keywords = DEPT_LEARN_KEYWORDS.get(
+                getattr(employee, "role_id", "") or "",
+                DEPT_LEARN_KEYWORDS.get("general", []),
+            )
+            q = " ".join(keywords[:3]) or "AI 军团 学习"
+            base = "http://127.0.0.1:8201"
+            url = f"{base}/api/v1/gaia/knowledge?query={urllib.parse.quote(q)}&limit={int(limit)}"
+            try:
+                req = urllib.request.Request(url, headers={"Accept": "application/json"})
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                items = (data.get("data") or {}).get("items") or []
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("sync_knowledge API fallback failed for %s: %s", employee.name, exc)
+                return {"fetched": 0, "new": 0, "skipped": 0, "error": repr(exc)}
+
+        # 去重：先查自己 memory.db 里是否已有同标题内容
+        new_count = 0
+        skipped = 0
+        synced: list[dict[str, Any]] = []
+        for it in items[: int(limit)]:
+            title = it.get("title", "")
+            content = (it.get("content") or "")[:300]
+            # 用标题去重（content 前缀是 "[共享学习] "，查询时用标题本身）
+            existing = await employee.remember(title, limit=3) if title else []
+            if existing:
+                skipped += 1
+                continue
+            # 写入自己的 memory.db
+            await employee.memorize(
+                content=f"[共享学习] {title}\n{content}",
+                category="shared_learning",
+            )
+            new_count += 1
+            synced.append({"title": title, "knowledge_type": it.get("knowledge_type", "")})
+
+        if new_count:
+            logger.info(
+                "📖 %s 同步了 %d 条军团共享知识 (skipped=%d)",
+                employee.name,
+                new_count,
+                skipped,
+            )
+        return {"fetched": len(items), "new": new_count, "skipped": skipped, "items": synced}
+
+    return sync_knowledge
 
 
 # ── Convenience: Create all agents at once ────────────────────────
