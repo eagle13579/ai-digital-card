@@ -9,6 +9,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 
@@ -77,7 +78,16 @@ async def ingest_knowledge(
         tags=data.tags,
         confidence=data.confidence,
     )
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        # source_id 唯一约束冲突 → 幂等：已存在则返回成功（不再 500 → mock 掩盖）
+        await db.rollback()
+        return {
+            "code": 200,
+            "message": "已存在(幂等跳过)",
+            "data": {"source_id": data.source_id, "exists": True},
+        }
     return {
         "code": 200,
         "message": "知识已摄取",
