@@ -117,6 +117,11 @@ def sync_pull():
         for line in r_exist.stdout.strip().splitlines():
             if line.strip():
                 existing.add(line.strip())
+    else:
+        # 预查失败 → 跳过本轮（盲目 INSERT 会大量 UniqueViolation → 500 mock）
+        print("[WARN] 预查失败，跳过本轮导入: %s" % r_exist.stderr[-200:])
+        print("导入完成: 0 成功, 0 跳过, 0 失败 (预查不可用)")
+        return
     for f in sorted(local_dir.rglob("*")):
         if not f.is_file() or f.suffix.lower() not in (".md", ".yaml", ".yml"):
             continue
