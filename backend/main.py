@@ -17,26 +17,31 @@ import uvicorn
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 2026-08-02 修复: 显式注入 baize_libs 路径 (pth 在 uv venv 下不可靠)
-# 只注入 D:\baize_libs (完整版). 注意: 绝不注入归档版 D:\__archive\...\baize_libs
-# 因为归档版含 secrets.py 会遮蔽 Python 标准库 secrets 模块, 导致 starlette 崩溃
-for _p in (r"D:\baize_libs",):
-    if os.path.isdir(_p) and _p not in sys.path:
-        sys.path.insert(0, _p)
+# 环境感知: 服务器 /var/www/baize_libs, 本地 Windows D:/baize_libs
+# 绝不注入归档版 D:\__archive\...\baize_libs (含 secrets.py 会遮蔽标准库, 导致 starlette 崩溃)
+_BAIZE_CANDIDATES = (
+    r"/var/www/baize_libs",
+    r"D:\baize_libs",
+)
+_BL_ROOT = next((p for p in _BAIZE_CANDIDATES if os.path.isdir(p)), None)
+if _BL_ROOT and _BL_ROOT not in sys.path:
+    sys.path.insert(0, _BL_ROOT)
 
 # 2026-08-02 修复: Python 3.14 包导入行为变化, 手动预注册 baize_libs 父包
 # (否则 from .xxx import 在子模块导入时报 "No module named 'baize_libs'")
-try:
-    import importlib.util as _ilu
-    _spec = _ilu.spec_from_file_location(
-        "baize_libs", os.path.join(r"D:\baize_libs", "__init__.py"),
-        submodule_search_locations=[r"D:\baize_libs"],
-    )
-    if _spec and "baize_libs" not in sys.modules:
-        _mod = _ilu.module_from_spec(_spec)
-        sys.modules["baize_libs"] = _mod
-        _spec.loader.exec_module(_mod)
-except Exception:
-    pass  # 预注册失败则回退到 pth/常规导入
+if _BL_ROOT:
+    try:
+        import importlib.util as _ilu
+        _spec = _ilu.spec_from_file_location(
+            "baize_libs", os.path.join(_BL_ROOT, "__init__.py"),
+            submodule_search_locations=[_BL_ROOT],
+        )
+        if _spec and "baize_libs" not in sys.modules:
+            _mod = _ilu.module_from_spec(_spec)
+            sys.modules["baize_libs"] = _mod
+            _spec.loader.exec_module(_mod)
+    except Exception:
+        pass  # 预注册失败则回退到 pth/常规导入
 
 # Debug: test baize_libs import before app
 try:
