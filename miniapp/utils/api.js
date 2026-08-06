@@ -159,19 +159,19 @@ const brochureApi = {
 const tagApi = {
   getMyTags(tagType) {
     const params = tagType ? { tag_type: tagType } : {}
-    return get('/api/tags/me', params)
+    return get('/api/v1/tags/me', params)
   },
   list() {
-    return get('/api/tags')
+    return get('/api/v1/tags')
   },
   addTags(data) {
-    return post('/api/tags/me', data)
+    return post('/api/v1/tags/me', data)
   },
   deleteTag(tagId) {
-    return del(`/api/tags/me/${tagId}`)
+    return del(`/api/v1/tags/me/${tagId}`)
   },
   getUserTags(userId) {
-    return get(`/api/tags/users/${userId}`)
+    return get(`/api/v1/tags/users/${userId}`)
   },
 }
 

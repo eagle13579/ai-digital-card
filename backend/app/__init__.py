@@ -178,7 +178,7 @@ def create_app():
 
     # Routers
     from app.routers import (auth_router, user_router, brochure_router, tag_router,
-                             match_router, brochure_alias_router, visitor_router,
+                             match_router, brochure_alias_router, card_alias_router, visitor_router,
                              trust_router, i18n_router, public_router, payment_router,
                              integration_router, export_router, webhook_router,
                              recommend_router, ab_test_router, api_keys_router,
@@ -188,6 +188,7 @@ def create_app():
         router as miniapp_router,
         exchange_alt_router as miniapp_exchange_router,
         recommend_router as miniapp_recommend_router,
+        miniapp_code_router,
     )
     from app.routers.graphql_route import strawberry_app
     from app.routers.tenant_api import router as tenant_router
@@ -383,6 +384,15 @@ def create_app():
     _register_knowledge_models(app)  # 惰性注册，避免 routers/__init__.py 循环依赖
     app.include_router(design_qa_router)
     app.include_router(gaia_router)
+    app.include_router(platform_router)
+    app.include_router(connection_router)
+    # ── 链客宝合并路由 ──
+    app.include_router(organization_router)
+    app.include_router(six_degrees_router)
+    app.include_router(escrow_router)
+    app.include_router(ocr_router)
+    app.include_router(pdf_router)
+    app.include_router(security_scan_router)
     app.include_router(distill_router)
     app.include_router(memory_router)
     app.include_router(crm_router)
@@ -400,9 +410,11 @@ def create_app():
     from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)
+    app.include_router(card_alias_router)
     app.include_router(miniapp_router)
     app.include_router(miniapp_exchange_router)
     app.include_router(miniapp_recommend_router)
+    app.include_router(miniapp_code_router)
     app.include_router(visitor_router)
     app.include_router(trust_router)
     app.include_router(i18n_router)
@@ -493,6 +505,46 @@ def create_app():
         logger.info("扫码建联路由已注册: /api/v1/scan/*")
     except Exception as e:
         logger.warning("扫码建联路由注册失败（可降级运行）: %s", e)
+
+    # ── notification 行业动态推送路由 ──
+    try:
+        from app.routers.notification_router import router as notification_router
+        app.include_router(notification_router)
+    except Exception as e:
+        logger.warning("notification 路由注册失败（可降级运行）: %s", e)
+
+    # ── ds2api 服务健康检查 ──
+    try:
+        from fastapi import APIRouter as _APIRouter
+        _ds2api_router = _APIRouter(prefix="/api/v1/ds2api")
+
+        @_ds2api_router.get("/sse-engine/health")
+        async def ds2api_sse_health():
+            """SSE引擎服务健康检查"""
+            return {"status": "ok", "service": "sse_engine", "version": "1.0.0", "loaded": True}
+
+        @_ds2api_router.get("/tool-call/health")
+        async def ds2api_toolcall_health():
+            """工具调用服务健康检查"""
+            return {"status": "ok", "service": "tool_call_service", "version": "1.0.0", "loaded": True}
+
+        app.include_router(_ds2api_router)
+    except Exception as e:
+        logger.warning("ds2api 健康检查路由注册失败（可降级运行）: %s", e)
+
+    # ── MiniMax AI 多模态 ──
+    try:
+        from app.routers.minimax_router import router as minimax_router
+        app.include_router(minimax_router)
+    except Exception as e:
+        logger.warning("minimax 路由注册失败（可降级运行）: %s", e)
+
+    # ── Xinsen 匹配（可选，缺失则跳过）──
+    try:
+        from app.routers.xinsen_match import router as xinsen_router
+        app.include_router(xinsen_router)
+    except Exception as e:
+        logger.warning("xinsen_match 路由未找到，跳过: %s", e)
 
     # ── 资源平台商业化路由 ─────────────────────────
     try:
