@@ -1,6 +1,11 @@
 """SSRF-safe HTTP fetching middleware — GET + POST support."""
+import os
 import sys
-sys.path.insert(0, 'D:/baize_libs')
+
+# baize_libs 路径环境感知（服务器 /var/www，本地 Windows D:/）— 禁止硬编码单平台路径
+_BL_ROOT = "/var/www/baize_libs" if os.path.isdir("/var/www/baize_libs") else "D:/baize_libs"
+if _BL_ROOT not in sys.path:
+    sys.path.insert(0, _BL_ROOT)
 from graph_tools.security_fetch import (
     validate_url as _validate_url,
     safe_fetch as _safe_fetch,
