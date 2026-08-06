@@ -1,0 +1,30 @@
+datapack_id: "DP-PD-CFG-阿米巴创业大赛"
+name: "阿米巴创业大赛·配置"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "阿米巴创业大赛产品的配置参数和部署环境"
+
+source: "L5孵化室/产品开发/阿米巴创业大赛/"
+
+contents: |
+  阿米巴创业大赛的环境变量、部署配置、依赖声明。
+
+data_format: "配置参数YAML"
+
+mount_interface:
+  load: "读取产品配置到部署上下文"
+  query: "查询环境变量/端口/依赖"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做部署规划时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "原子化拆解自产品目录"

@@ -1,0 +1,20 @@
+id: F-CA-SINGLE-15
+name: 单渠道契约检测引擎
+dimension: 💡 创造力
+description: >-
+  基于DB07单渠道契约协议站心智模型构建的检测引擎，识别平台或行业中是否存在前后门双向锁定的单渠道结构。检测维度：前门准入控制、后门清算/信用控制、供给端单向管道程度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB07: 单渠道契约协议站
+products:
+  - 黑河调查局协议分析模块
+  - 平台单渠道锁定评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 䑏疏
+priority: P0
+maturity: design

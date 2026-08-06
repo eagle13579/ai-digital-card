@@ -1,0 +1,17 @@
+name: AI Agent 零信任治理框架
+version: 1.0.0
+status: draft
+dimension: ai-security
+source: github/microsoft/agent-governance-toolkit
+description: "微软AI Agent治理工具包——策略即代码、零信任身份验证、执行沙箱隔离、可靠性工程。完整覆盖OWASP Agentic Top 10全部10项安全风险。"
+atoms:
+  - F-AGOV-01: 零信任Agent架构（永不信任始终验证）
+  - F-AGOV-02: 策略即代码声明式治理
+  - F-AGOV-03: Agent执行沙箱隔离模型
+products:
+  - AI数智军团: 军团安全治理框架
+  - 盖娅之城: AI公民权限与审计系统
+  - 白泽路由协议: Agent安全路由策略
+employees:
+  - 狴犴P8: Agent安全治理落地
+  - 白泽P9: 零信任Agent架构设计

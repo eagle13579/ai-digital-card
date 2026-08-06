@@ -1,0 +1,27 @@
+# 🔀 ProviderOrchestrator - 多Provider自动路由+回退
+id: F-MYTHOS-09
+name: 多Provider自动路由编排器
+dimension: 基础设施
+description: 三层Provider选择策略（自适应评分/确定性哈希/强制指定）+ 指数退避重试 + 熔断器（连续2次失败→5分钟降级）+ 自适应看门狗超时
+atoms:
+  - "Fable5-Mythos5-代码收割/09_ProviderOrchestrator"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: mythos-router/src/providers/orchestrator.ts (lines 160-713)
+
+products:
+  - 通用: 自动匹配
+references:
+  - "评分算法: successRate*100 - avgLatency*0.05 - costPer1k*10 (orchestrator.ts:140-144)"
+  - "熔断器阈值: 连续2次失败 (orchestrator.ts:318)"
+  - "冷却时间: 5分钟 (orchestrator.ts:44)"
+  - "EMA平滑: alpha=0.3 (orchestrator.ts:46)"
+  - "看门狗: max(15s, avgLatency*3) (orchestrator.ts:344-346)"
+
+injection_points:
+  - "selectProvider: 自适应/确定/强制三种路由 (orchestrator.ts:218-287)"
+  - "streamMessage回退链: 候选列表逐个尝试 (orchestrator.ts:420-584)"
+  - "maybeTripCircuitBreaker: 连续失败监控 (orchestrator.ts:315-322)"
+  - "retryWithBackoff: [100ms, 500ms, 1000ms] (orchestrator.ts:349-382)"

@@ -1,0 +1,38 @@
+feature_id: "F-CPC-01_cross-compliance-rag-qa"
+name: "跨境产品合规RAG智能问答"
+description: "自然语言问答界面，输入问题→RAG检索知识库(27条法规)→SAG自校验→LLM格式化输出7要素合规回答。三通道全闭环。"
+products:
+  - "中韩出海数智港/28_合规知识库"
+  - "AI数智名片/合规助手"
+atoms:
+  - "2026-07-06_跨境产品合规_四层AI架构+规则先行"
+  - "2026-07-06_跨境产品合规_合规问答结构化模板+追问优于硬答"
+  - "2026-07-06_跨境产品合规_混合检索+重排序+低置信度兜底"
+capabilities:
+  - RAG: "query_by_keyword_with_sag() 关键词+语义检索，含消费者术语→技术术语映射"
+  - SAG: "时效性校验+冲突检测+可靠性评分+引用标注"
+  - LLM: "7要素合规回答模板结构化输出"
+employees:
+  - 獬豸P8: "法规知识库内容维护"
+  - 徐准P8: "知识库更新流程"
+  - 文鳐P9: "知识条目文档管理"
+status: "已启动 ✅ — :5089"
+deployed_at: "2026-07-07"
+deploy_path: "D:/合规RAG"
+endpoints:
+  - "POST /api/v1/compliance/ask — 合规问答"
+  - "GET / — 前端界面(Tailwind,中英双语)"
+  - "GET /api/v1/compliance/health — 健康检查"
+coverage:
+  total_regulations: 27
+  supported_markets:
+    - "欧盟(电池/玩具/食品接触/家电)"
+    - "中国(3C)"
+    - "美国(FCC)"
+    - "韩国(KC)"
+    - "日本(PSE)"
+sag_capabilities:
+  - "查询扩展(消费者术语→技术术语)"
+  - "SAG自校验(时效/冲突/完整性)"
+  - "可靠性评分+改进建议"
+  - "引用自动标注SAG标签"

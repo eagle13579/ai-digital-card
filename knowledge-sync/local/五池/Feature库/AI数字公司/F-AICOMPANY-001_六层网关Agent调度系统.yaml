@@ -1,0 +1,82 @@
+# ============================================================
+# Feature: AI数字公司六层网关Agent调度系统
+# ============================================================
+id: F-AICOMPANY-001
+name: 六层网关AI Agent调度系统
+product: AI数字公司操作系统
+status: draft
+priority: P0
+owner: AI数字公司
+
+## 标签
+tags:
+  - gateway
+  - agent-orchestration
+  - task-routing
+  - six-layer
+
+## 业务描述
+description: |
+  构建AI数字公司的核心调度基础设施，通过Access/Task/Agent/Model/Data/Tool六层网关，
+  实现从用户请求到AI员工执行的全链路解耦。CEO Agent坐镇其中，基于能力图谱匹配最优Agent执行任务。
+
+## 用户价值
+value: |
+  1. 企业可像管理员工一样管理AI Agent团队
+  2. 新增Agent/工具/模型时无需修改核心调度逻辑
+  3. 六层分离使每层可独立水平扩展
+  4. 能力图谱匹配确保任务被最合适的Agent执行
+
+## 功能点
+features:
+  - id: F-01
+    name: 接入网关(Access Gateway)
+    description: 统一API入口，处理认证鉴权与速率限制
+    status: implemented
+
+  - id: F-02
+    name: 任务网关(Task Gateway)
+    description: 任务解析、拆解为子任务、优先级排序
+    status: implemented
+
+  - id: F-03
+    name: Agent路由网关(Agent Gateway)
+    description: 路由规则引擎，按能力匹配选择Agent，执行与监控
+    status: implemented
+
+  - id: F-04
+    name: 数据网关(Data Gateway)
+    description: 统一数据访问层，集成RAG检索增强生成管道
+    status: implemented
+
+  - id: F-05
+    name: 工具网关(Tool Gateway)
+    description: 工具注册中心、执行引擎、超时控制、安全校验
+    status: implemented
+
+  - id: F-06
+    name: CEO Agent战略调度
+    description: 战略规划→任务拆解→能力匹配→监督执行→结果审核
+    status: designed
+
+## 技术架构
+architecture: |
+  系统层: AccessGateway → TaskGateway → (CEO Agent) → AgentGateway
+  资源层: AgentGateway → ModelGateway | DataGateway | ToolGateway
+
+  核心模式: 网关模式(Gateway Pattern) + 路由规则链(Rule Chain)
+  注册中心: AgentRegistry + ToolRegistry(均可用Map内存实现)
+
+## 依赖
+dependencies:
+  - PostgreSQL 15.0+
+  - Redis 7.0+
+  - Elasticsearch 8.0+
+  - Node.js (Express框架)
+
+## 验收标准
+acceptance:
+  - 用户可通过API创建任务并获取结果
+  - 多Agent可根据路由规则自动分配任务
+  - 工具执行支持超时和并行控制
+  - RAG检索后生成的上下文能增强模型回答

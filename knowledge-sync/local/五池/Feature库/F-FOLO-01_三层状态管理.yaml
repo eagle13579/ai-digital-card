@@ -1,0 +1,15 @@
+name: F-FOLO-01
+version: "1.0.0"
+status: active
+dimension: 架构模式
+source: Folo (RSSNext) - packages/internal/atoms + store + hooks
+atoms:
+  - FOLO-01_三层状态管理架构
+products:
+  - 盖娅之城
+  - AI数字名片
+  - 中韩出海数智港
+description: "Jotai+Zustand+TanStack Query三层状态管理，按作用域和变更频率分层"
+employees:
+  - 前端架构师
+  - 全栈工程师

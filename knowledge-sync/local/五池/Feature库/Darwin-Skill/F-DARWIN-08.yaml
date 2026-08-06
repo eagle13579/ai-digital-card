@@ -1,0 +1,16 @@
+---
+id: F-DARWIN-08
+name: 成果可视化卡片生成
+dimension: 审美
+source_model: DS-11
+
+products:
+  - 通用: 自动匹配
+description: >-
+  优化完成后自动生成3风格(Warm Swiss/Dark Terminal/Newspaper)视觉评分卡片
+sop: |-
+  ① 复制模板 ② 替换占位数据(分数/维度/改进摘要) ③ 随机选风格 ④ screenshot截图 ⑤ 展示给用户
+quality_gate: |-
+  每个skill优化完成和全量汇总后必须各生成一张
+draft: false
+created_at: 2026-06-13

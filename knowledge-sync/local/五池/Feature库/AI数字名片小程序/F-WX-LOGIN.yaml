@@ -1,0 +1,39 @@
+name: "F-WX-LOGIN"
+title: "微信授权登录"
+product: "AI数字名片小程序"
+version: "1.0.0"
+status: "implemented"
+
+description: >
+  通过微信小程序 wx.login() 获取临时 code，发送至后端换取 session token，
+  实现微信生态下的无密码一键登录。支持游客模式跳过登录。
+
+triggers:
+  - 用户首次打开小程序
+  - token 过期或清除后重新打开
+  - 用户手动点击"微信授权登录"按钮
+
+flow:
+  1. 用户点击"微信授权登录"按钮
+  2. 调用 wx.login() 获取临时 code
+  3. 将 code 通过 miniappApi.login({ code }) 发送至后端
+  4. 后端验证 code 并返回 token + 用户信息
+  5. 获取用户微信昵称/头像（wx.getUserProfile）
+  6. 调用 app.setLogin() 持久化 token 和 userInfo 至 storage
+  7. 跳转至首页
+
+fallback:
+  - 用户拒绝授权：仍可登录，使用默认昵称"用户"
+  - 跳过登录：以游客模式浏览首页，不保存任何数据
+
+api_endpoints:
+  - POST /api/v1/miniapp/login (noAuth)
+
+data_flow:
+  wx.login() -> code -> POST /api/v1/miniapp/login -> token -> wx.setStorageSync
+
+components:
+  - pages/login/index.js (登录逻辑)
+  - utils/api.js (miniappApi.login)
+  - utils/request.js (统一请求)
+  - app.js (setLogin/clearLogin)

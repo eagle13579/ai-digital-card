@@ -1,0 +1,25 @@
+name: "F-BH-03_零中间件CDP中继架构"
+description: "纯净的CDP WebSocket中继模式, 无Playwright/Puppeteer/Selenium依赖"
+version: "1.0.0"
+dimension: "体系"
+source: "browser-harness"
+source_model: "五池/模型池/BH-03_零中间件CDP中继架构.md"
+author: "browser-use (MIT)"
+license: "MIT"
+
+mental_models:
+  - "纯中继: JSON-line in → CDP WS → JSON-line out, 零中间层"
+  - "单daemon多命名空间: BU_NAME实现并行独立daemon"
+
+components:
+  - "_ipc.py: AF_UNIX/TCP IPC传输层(84行)"
+  - "daemon.py: CDPClient + asyncio events + dialog追踪"
+  - "admin.py: daemon生命周期管理(ensure/restart/doctor/update)"
+
+products:
+  - "AI数字军团: 轻量浏览器控制基础架构"
+  - "盖娅之城: 浏览器自动化Worker集成"
+
+integration:
+  type: "configuration"
+  setup: "Python 3.11+, cdp-use==1.4.5, Chrome远程调试已开启"

@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-business-metrics
+  name: ai-card-business-metrics
+  description: "6维度业务指标Prometheus采集+Grafana设计"
+  source_project: "AI数字名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数字名片

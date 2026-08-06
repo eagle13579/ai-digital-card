@@ -1,0 +1,14 @@
+# 11维质量门禁框架
+id: "F-BSC-09"
+name: "11维质量门禁框架"
+dimension: "基本功"
+description: >
+  通用11维质量自检系统：开篇钩子/人物欲望/情绪承诺/经典重构合规/冲突升级/对白张力/画面感/反转/结尾余味/去AI味/开篇语义清晰。每维有通过标准和修复触发器。
+atoms:
+  - "QM-08"
+  - "QM-10"
+  - "QM-11"
+status: "active"
+priority: "P1"
+created: "2026-06-15"
+source: "qiaomu-novel-generator"

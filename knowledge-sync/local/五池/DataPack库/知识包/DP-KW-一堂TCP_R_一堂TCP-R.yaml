@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-一堂TCP_R"
+name: "一堂TCP-R"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "原子心智模型集/一堂TCP-R — 包含10个相关心智模型"
+
+source: "L5孵化室/五池/模型池/_原子/一堂TCP-R/"
+
+contents: |
+  10个TR1-TCP-R四要素.md}､TR10-协同互补飞轮.md}､TR2-T教学规模化.md}､TR3-C咨询引导.md}､TR4-P实践执行.md...等心智模型
+
+data_format: "心智模型Markdown"
+
+mount_interface:
+  load: "读取全部10个心智模型到工作内存"
+  query: "按维度/标签/适用场景检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应一堂TCP-R相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自_原子目录"

@@ -1,0 +1,25 @@
+# 👁 分组查询注意力 - GQAttention
+id: F-MYTHOS-05
+name: 分组查询注意力
+dimension: 模型
+description: GQA注意力（Ainslie 2023），n_kv_heads < n_heads减少KV缓存4-8x，支持Flash Attention 2原生GQA和回退手动KV头扩展，RoPE应用于Q和K
+atoms:
+  - "Fable5-Mythos5-代码收割/05_GQAttention"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 177-276)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 投影: wq/wk/wv/wo @ main.py:206-210
+  - KV缓存: k/v.detach() 存储 @ main.py:239-243
+  - Flash Attention路径: flash_attn_func @ main.py:245-258
+  - 回退路径: repeat_interleave + softmax @ main.py:260-274
+
+injection_points:
+  - TransformerBlock根据cfg.attn_type选择: GQAttention或MLAttention @ main.py:649
+  - 配置: n_heads=16, n_kv_heads=4 (groups=4) @ main.py:52-54
+  - 所有prelude/coda/recurrent block共用

@@ -1,0 +1,21 @@
+name: F-XHS-03_页面状态数据提取管道
+version: 1.0.0
+status: active
+dimension: 数据
+source: xiaohongshu-mcp (xpzouying/xiaohongshu-mcp)
+atoms:
+- XHS-05 页面全局状态提取
+- XHS-07 强类型Feed数据模型
+- XHS-08 数据噪音过滤
+description: >
+  从SPA/SSR页面window.__INITIAL_STATE__直接提取结构化数据的管道：
+  单次Eval取全量JSON + Go强类型结构体映射 + 语义化数据噪音过滤。
+  比DOM解析快一个数量级、稳一个数量级。
+products:
+- 中文社交媒体自动化
+- 内容自动化工厂
+- 情报平台
+employees:
+- 数据工程师
+- 爬虫工程师
+- 情报分析师

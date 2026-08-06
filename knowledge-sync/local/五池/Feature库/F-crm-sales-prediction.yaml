@@ -1,0 +1,11 @@
+feature:
+  id: F-crm-sales-prediction
+  name: crm-sales-prediction
+  description: "纯numpy逻辑回归+9维特征+Pipeline预测标签"
+  source_project: "AI数字名片"
+  created_at: "2026-07-02"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数字名片

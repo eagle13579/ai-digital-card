@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-Hermes7级进阶"
+name: "Hermes7级进阶"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "原子心智模型集/Hermes7级进阶 — 包含13个相关心智模型"
+
+source: "L5孵化室/五池/模型池/_原子/Hermes7级进阶/"
+
+contents: |
+  13个H01-七级渐进式架构.md}､H02-技能策展人(Kurator)自动修剪.md}､H03-Kanban驱动多Agent编排.md}､H04-Holographic事实存储.md}､H05-MCP桥接模式.md...等心智模型
+
+data_format: "心智模型Markdown"
+
+mount_interface:
+  load: "读取全部13个心智模型到工作内存"
+  query: "按维度/标签/适用场景检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应Hermes7级进阶相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自_原子目录"

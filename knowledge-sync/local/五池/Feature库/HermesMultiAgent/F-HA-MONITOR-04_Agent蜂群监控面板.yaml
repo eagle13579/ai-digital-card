@@ -1,0 +1,13 @@
+id: F-HA-MONITOR-04
+name: Agent蜂群监控面板
+dimension: 监控/工具
+domain: 系统监控
+atoms:
+  - HA-07 Agent蜂群控制面板
+description: 实时蜂群监控面板，包含血缘图（谁派生了谁）、Token预算追踪、暂停/强杀子代理、任务回放审计等功能。对标Hermes Agent的`hermes --ui`面板。
+products:
+  - 盖娅之城3D指挥中心: 集成Agent血缘图+预算追踪
+  - 白泽控制台: 新增任务调度监控面板
+  - 需求大厅: 集成实时任务状态追踪
+status: active
+priority: P2

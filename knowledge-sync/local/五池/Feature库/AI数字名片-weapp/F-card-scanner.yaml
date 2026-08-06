@@ -1,0 +1,14 @@
+name: AI名片扫描识别
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: AI名片扫描识别模块，支持拍照识别名片信息，自动AI填充字段，提供表单验证功能，提升录入效率
+atoms:
+  - CS-001: 拍照
+  - CS-002: AI填充
+  - CS-003: 表单验证
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

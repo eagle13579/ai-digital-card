@@ -1,0 +1,16 @@
+name: 站内消息与通知
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-conversation: 会话管理
+  - A-message: 消息收发
+  - A-unread-stats: 未读统计
+  - A-mark-read: 标记已读
+  - A-push-notification: 推送通知
+description: 站内消息与通知：会话/消息/未读统计/标记已读
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

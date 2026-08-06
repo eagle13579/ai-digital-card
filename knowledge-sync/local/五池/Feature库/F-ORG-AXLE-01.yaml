@@ -1,0 +1,14 @@
+name: F-ORG-AXLE-01
+title: "拆天轴组织重构工具"
+dimension:
+  layer: "组织"
+  type: "重构"
+  impact: "架构级"
+atoms: ["axle-era-patching-trap", "disassemble-axle-question", "axle-to-flow-five-step"]
+description: "识别组织天轴 → 问拆天轴之问 → 五步法系统化重构。适用于公司、团队、AI军团的组织架构升级"
+status: active
+created: 2026-06-17
+
+products:
+  - 通用: 自动匹配
+creator: 白泽

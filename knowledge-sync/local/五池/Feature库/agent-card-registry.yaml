@@ -1,0 +1,27 @@
+name: agent-card-registry
+description: A2A Agent Card注册表 — 让AI数智军团员工拥有标准化的能力声明、发现和协商机制
+version: 1.0.0
+author: Google A2A Protocol v1.0.0 萃取
+source: github.com/a2aproject/A2A
+license: Apache 2.0
+
+mental_models:
+  - A2A-02: Agent Card能力声明模式
+  - A2A-03: Agent发现双模式
+  - A2A-10: 能力协商模式
+
+components:
+  - agent_card_json: JSON元数据含name/description/url/capabilities/securitySchemes/skills
+  - agent_discovery_wellknown: /.well-known/agent-card.json (RFC 8615)
+  - agent_discovery_registry: 中央注册表API，支持按skills/tags搜索
+  - capability_negotiation: accepted_output_modes + inputModes/outputModes
+
+products:
+  - AI数智军团: 员工能力注册中心
+  - 白泽控制台: Agent能力发现
+  - 统一军团入口: Agent卡片路由
+
+integration:
+  type: specification
+  dependencies: []
+  setup: 将employee.yaml升级为兼容Agent Card格式，扩展skills/capabilities/securitySchemes字段

@@ -1,0 +1,25 @@
+# 🔄 循环深度变压器核心 - RecurrentBlock
+id: F-MYTHOS-01
+name: 循环深度变压器核心
+dimension: 模型
+description: 共享权重的循环TransformerBlock，通过 LTI稳定更新 + ACT自适应计算 + LoRA深度适配 实现任意深度的推理链，支持深度外推（训练N轮测试N+K轮）
+atoms:
+  - "Fable5-Mythos5-代码收割/01_RecurrentBlock"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 788-891)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 循环更新: h_{t+1} = A·h_t + B·e + Transformer(h_t+e, t)
+  - LTI注入: main.py:684-742 — 谱半径<1保证
+  - ACT门控: main.py:750-780 — 自适应计算时间
+  - LoRA适配: main.py:578-619 — 深度级适配
+
+injection_points:
+  - MoEFFN注入: TransformerBlock(use_moe=True) @ main.py:816
+  - 循环索引嵌入: loop_index_embedding @ main.py:541-570
+  - KV缓存每轮独立key: cache_key=f"recurrent_loop_{t}" @ main.py:860

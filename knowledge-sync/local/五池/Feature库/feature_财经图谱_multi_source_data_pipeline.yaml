@@ -1,0 +1,66 @@
+# ============================================================
+# Feature: 多源数据聚合管道
+# 文件名: feature_财经图谱_multi_source_data_pipeline.yaml
+# ============================================================
+名称: 多源数据聚合管道
+
+products:
+  - 通用: 自动匹配
+描述: >
+  对接多个异构数据源（股价行情API、新闻RSS、政策数据库、财报公告），
+  经过ETL清洗、去重、归一化与标准化处理，输出统一格式的事件流，
+  为上层知识图谱与推理引擎提供干净、一致的输入数据。
+
+输入:
+  type: 多源异构数据
+  sources:
+    - 股价API:
+        - 实时行情 (Tick级/分钟级)
+        - 历史K线数据
+      protocol: REST / WebSocket
+    - 新闻RSS:
+        - 财经媒体 (财新/华尔街见闻/Bloomberg)
+        - 行业垂直媒体
+      protocol: RSS/Atom / API
+    - 政策数据库:
+        - 国务院/部委公告
+        - 地方政府政策文件
+      protocol: HTTP / 爬虫
+    - 财报公告:
+        - 上市公司季报/年报
+        - 临时公告 / 重大事项
+      protocol: PDF抓取 / 交易所API
+  volume: 每日 5000-20000 条
+
+输出:
+  type: 统一事件流
+  schema:
+    事件ID: string
+    事件类型: string          # 股价波动 / 新闻 / 政策 / 财报 / 公告
+    标题: string
+    正文摘要: string
+    时间戳: datetime          # 统一为 UTC+8
+    来源标签: string           # 原始数据源标识
+    关联实体: [string]        # 事件中涉及的企业/产品/人物
+    情感标签: string           # 正面 / 负面 / 中性
+    原始数据指纹: string       # 用于去重的MD5/SHA256
+    置信度: float             # 数据质量评分
+
+核心:
+  - ETL (抽取-转换-加载)
+  - 数据去重 (指纹比对 + 语义相似度)
+  - 归一化 (时间/货币/单位/实体名称标准化)
+
+技术栈:
+  - 消息队列: Apache Kafka (峰值吞吐 10万+ msg/s)
+  - ETL框架: Apache Flink / Spark Structured Streaming
+  - 存储: ClickHouse (时序分析) + PostgreSQL (结构化)
+  - 爬虫: Scrapy / Puppeteer
+  - 归一化: 基于规则 + LLM微调 (实体/数值标准化)
+  - 去重: SimHash / MinHash + 布隆过滤器
+  - 监控: Prometheus + AlertManager
+
+关联产品:
+  - 天机系统
+
+成熟度: ⭐⭐⭐⭐ (已有基础设施)

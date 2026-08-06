@@ -1,0 +1,18 @@
+feature:
+  id: F-chainke-architecture-scan
+  name: 链客宝全景架构扫描
+  description: "12维度 × 9全球对标对象 的全量架构扫描与差距分析"
+  source_project: "链客宝"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+  metrics: 
+  overall_score: 7.8
+  dimensions: 12
+  benchmarks: 9
+  p0_gaps: 3
+  p1_gaps: 5
+  p2_gaps: 4
+
+products:
+    - 差距分析

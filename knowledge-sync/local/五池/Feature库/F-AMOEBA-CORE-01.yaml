@@ -1,0 +1,43 @@
+# ⚙️ 阿米巴核心引擎
+id: F-AMOEBA-CORE-01
+name: 阿米巴核心引擎
+dimension: 体系
+description: 将部门映射为独立阿米巴单元，通过调研→产出→复盘三阶段循环实现自主经营
+source_model: 阿米巴三阶段经营闭环
+status: active
+version: "1.0"
+created: 2026-06-14
+
+products:
+  - 通用: 自动匹配
+input:
+  - 部门列表（含名称/图标/描述）
+  - LLM API Key
+  - 持久化存储路径
+
+output:
+  - 调研报告（主题/摘要/关键发现/市场信号）
+  - 付费报告（标题/定价/内容大纲）
+  - 复盘教训
+  - 更新后的KPI
+
+sop: |
+  1. loadState() 加载历史状态
+  2. 选择目标阿米巴单元
+  3. research() AI调研行业热点
+  4. produceReport() 基于调研生成报告
+  5. reviewCycle() 复盘学习
+  6. saveState() 持久化
+  7. 返回循环结果
+
+quality_gate:
+  - AI JSON返回必须经过3层容错解析
+  - 每轮循环必须有复盘输出
+  - 营收数据必须可追溯
+
+evolution:
+  - researchQuality 每轮+0.5
+  - reportQuality 根据review评分调整
+  - conversionRate 随报告质量提升
+
+draft: false

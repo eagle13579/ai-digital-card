@@ -1,0 +1,23 @@
+id: F-LLMC-02
+name: 前向与后向对偶算子模式
+dimension: 体系
+source_model: "Forward-Backward Dual Operator Pattern — llm.c 每个层同时实现encoder_forward和encoder_backward"
+description: "任何需要训练的计算管线，forward+backward成对设计确保梯度正确"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+
+products:
+  - 通用: 自动匹配
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

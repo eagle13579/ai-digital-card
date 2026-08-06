@@ -1,0 +1,11 @@
+name: 源码级参数化 — 参数提取不重新生成
+dimension: 场景
+description: LLM首次生成源码后，用正则/解析器提取可调参数，用户调整时直接修改源码重新编译。零AI调用、零延迟、结果100%一致。
+applies_to:
+  - 盖娅之城建筑参数调整(楼层/颜色/风格)
+  - 任何需要反复调整的AI设计输出
+mental_model: |
+  AI做一次创造，参数化做百次微调。把创造性工作和高频调整工作解耦。
+  parseParameter.ts 用正则识别数值→类型推断→范围计算→生成UI控件。
+source: CADAM (Adam-CAD/CADAM)
+cadam_ref: src/components/parameter/ (ParameterSection.tsx, ParameterSlider.tsx, ParameterInput.tsx)

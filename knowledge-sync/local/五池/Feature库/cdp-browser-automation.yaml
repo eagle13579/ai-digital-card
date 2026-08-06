@@ -1,0 +1,55 @@
+feature:
+  name: cdp-browser-automation
+  version: v1.0.0
+  description: >
+    基于Chrome DevTools Protocol (CDP) 的真实浏览器自动化服务。管理本地
+  products: 
+  atoms: 
+  inputs: 
+  type: string
+  description: "Chrome/Chromium可执行文件路径"
+  default: "自动检测系统Chrome"
+  type: integer
+  description: "CDP监听端口"
+  default: 9222
+  minimum: 1024
+  maximum: 65535
+  type: boolean
+  description: "是否无头模式运行"
+  default: false
+  type: integer
+  description: "Chrome实例池最大数量"
+  default: 3
+  type: array[string]
+  description: "注入的反检测脚本列表"
+  default: 
+  type: string
+  description: "Chrome用户数据目录（保存登录态）"
+  required: false
+  type: string
+  description: "浏览器使用的代理（可选）"
+  required: false
+  type: integer
+  description: "页面操作超时（毫秒）"
+  default: 30000
+  outputs: 
+  type: object
+  description: "CDP浏览器实例句柄，包含 page / context / playwright_browser 供调用方操作"
+  type: array[object]
+  description: "从浏览器提取的Cookie列表（登录完成后输出），每项包含 name / value / domain / path / expires"
+  type: string
+  description: "（按需）页面截图 base64，用于验证登录结果/滑块状态"
+  type: string
+  description: "（按需）页面渲染后HTML/文本内容"
+  capabilities: 
+  architecture: >
+    采用实例池+代理模式：(1) BrowserPool — 单例管理Chrome实例生命周期，
+  anti_patterns: 
+  evolution_flywheel: >
+    第一步: 实现单个Chrome实例的CDP连接 + 基础反检测注入 → 第二步: 加入
+  实例池管理和自动回收，解决多任务并发 → 第三步: 集成滑块验证码自动通过
+  能力，解决强反爬平台 → 第四步: 加入登录态持久化和Cookie双向同步 →
+  第五步: 积累各平台的反检测策略失败案例，反馈优化StealthInjector脚本库
+
+products:
+    - 残留进程: 退出后Chrome子进程残留 — 必须用with语义或atexit清理

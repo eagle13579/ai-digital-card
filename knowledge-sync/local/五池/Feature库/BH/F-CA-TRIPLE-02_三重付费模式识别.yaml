@@ -1,0 +1,19 @@
+id: F-CA-TRIPLE-02
+name: 三重付费模式识别
+dimension: 💡 创造力
+description: >-
+  基于BH02三重付费锁心智模型构建的模式识别器，检测供应商对买方是否
+  同时施加商品货款+技术授权费+合同锁定机会成本的三重付费结构。
+  识别信号：价格-技术绑定、排他性条款、最低采购量承诺。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH02: 三重付费锁
+products:
+  - 供应链锁定风险评估系统
+  - B2B合同审查助手
+employees: [计然, 獬豸, 乘黄]
+priority: P0
+maturity: design

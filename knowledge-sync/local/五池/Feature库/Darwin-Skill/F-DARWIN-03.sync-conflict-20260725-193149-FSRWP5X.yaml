@@ -1,0 +1,13 @@
+---
+id: F-DARWIN-03
+name: 独立评委盲测系统
+dimension: 场景
+source_model: DS-03
+description: >-
+  spawn独立子Agent做blind evaluation，防止self-evaluation bias
+sop: |-
+  ① 每次评估启动2个独立judge ② 下一轮用全新judge防锚定 ③ 至少2份共识才采信
+quality_gate: |-
+  禁止同context自评自改。每个judge独立spawn
+draft: false
+created_at: 2026-06-13

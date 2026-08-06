@@ -1,0 +1,26 @@
+name: "F-COG-VIP-01_VIP_Command_Center"
+dimension: "认知架构"
+domain: "neuroscience/bci/cognitive"
+status: "active"
+draft: false
+description: "VIP区作为主动将抽象数字概念转化为具体动作序列的指挥部，而非被动信息接收器"
+source: "图宾根大学Nature Communications (2026-06-15吸收)"
+source_type: "research_paper"
+mental_models:
+  - "VIP Command Center (抽象概念转化中枢)"
+  - "动作序列生成器"
+products:
+  - "盖娅进化大脑(命令中枢)"
+  - "赛博参谋(战略→执行转化)"
+applications:
+  - "将抽象战略指令拆解为可执行的原子动作链"
+  - "AGI任务规划中的意图→步骤自动分解"
+  - "人机协同中的高阶指令实时翻译"
+keywords:
+  - "VIP"
+  - "Command Center"
+  - "抽象概念转化"
+  - "动作序列"
+  - "认知架构"
+  - "图宾根"
+created_at: "2026-06-15"

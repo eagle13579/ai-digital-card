@@ -1,0 +1,24 @@
+id: F-OWUI-ADAPTER-01
+name: Vector DB Factory Pattern
+source_model: Open WebUI Vector DB Factory — 15+向量数据库统一接口设计模式
+dimension: 基本功
+
+products:
+  - 内容工厂: 自动匹配
+description: 通过工厂模式+抽象基类，统一15+种向量数据库(Chroma/Elasticsearch/Milvus/Pinecone/Qdrant/PGVector/Weaviate/OpenSearch/Oracle23ai/Valkey/S3Vector等)的CRUD接口，切换向量数据库只需改一行配置。
+input: 向量 + 元数据 + 集合名
+output: 相似度搜索结果 + 向量操作结果
+sop: '① 定义抽象基类VectorDB: search/insert/delete/update/reset
+
+  ② 每个DB实现子类适配器
+
+  ③ Factory根据配置字符串返回对应实例
+
+  ④ 统一处理连接池/重试/超时/批处理
+
+  ⑤ 多租户支持: 每个用户/知识库独立集合或命名空间'
+quality_gates: 新增DB适配器≤500行、切换DB零代码修改、连接失败自动重试3次、支持事务性批量写入
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: AI招商系统向量匹配/链客宝知识库/记忆宫殿RAG/中国软银策略存储

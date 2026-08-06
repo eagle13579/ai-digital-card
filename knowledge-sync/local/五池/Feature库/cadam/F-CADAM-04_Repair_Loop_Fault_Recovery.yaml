@@ -1,0 +1,14 @@
+name: Repair Loop 容错闭环
+dimension: 基本功
+description: AI输出编译失败时分类错误类型(语法/语义/运行时)，用最小修复策略自动重试。错误不流出到用户。
+applies_to:
+  - 盖娅之城建筑生成管线
+  - 白泽所有AI→代码的产出流程
+mental_model: |
+  容错不是可选项，是AI产出质量的底线。Repair Loop = 读错误→分类→最小修复→重编译→验证。
+  三次失败后才报告用户，而不是第一次失败就放弃。
+source: CADAM
+
+products:
+  - 通用: 自动匹配
+cadam_ref: skills/cad/ (验证链)

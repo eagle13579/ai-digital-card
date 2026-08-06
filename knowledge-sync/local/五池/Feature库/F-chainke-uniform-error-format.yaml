@@ -1,0 +1,11 @@
+feature:
+  id: F-chainke-uniform-error-format
+  name: chainke-uniform-error-format
+  description: "统一错误响应格式ErrorCode枚举+{code,message,details}"
+  source_project: "链客宝"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - 链客宝

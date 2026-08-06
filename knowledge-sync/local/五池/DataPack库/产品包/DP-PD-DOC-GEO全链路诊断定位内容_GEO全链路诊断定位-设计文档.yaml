@@ -1,0 +1,31 @@
+datapack_id: "DP-PD-DOC-GEO全链路诊断定位内容"
+name: "GEO全链路诊断定位内容平台·设计文档"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "GEO全链路诊断定位内容平台产品的设计文档和PRD"
+
+source: "L5孵化室/产品开发/GEO全链路诊断定位内容平台/"
+
+contents: |
+  GEO全链路诊断定位内容平台的产品设计文档、PRD、用户故事。
+
+data_format: "产品文档Markdown"
+
+mount_interface:
+  load: "读取产品设计文档到参考上下文"
+  query: "查询PRD/需求/设计决策"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "创造力Feature做需求分析时消费此DataPack"
+  - "场景Feature做场景参考时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "原子化拆解自产品目录"

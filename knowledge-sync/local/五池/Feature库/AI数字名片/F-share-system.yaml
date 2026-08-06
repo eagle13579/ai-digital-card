@@ -1,0 +1,16 @@
+name: 分享传播系统
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-qr-code: QR码生成与分享
+  - A-nfc-share: NFC碰触分享
+  - A-short-link: 短链生成与跳转
+  - A-seo-public-page: SEO公开页面
+  - A-share-stat: 分享数据统计
+description: 分享传播系统：QR码/NFC/短链分享/SEO公开页
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

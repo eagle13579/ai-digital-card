@@ -1,0 +1,14 @@
+name: F-FOLO-05
+version: "1.0.0"
+status: active
+dimension: 架构模式
+source: Folo (RSSNext) - packages/internal/utils/src/event-bus.ts
+atoms:
+  - FOLO-07_通用事件总线模式
+products:
+  - 盖娅之城
+  - AI数字名片
+  - 内容自动化工厂
+description: "跨平台事件总线，Web和React Native双版本实现"
+employees:
+  - 全栈工程师

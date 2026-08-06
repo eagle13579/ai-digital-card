@@ -1,0 +1,22 @@
+name: "F4: Skill-as-Meta-Config 知识注入"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - skill_file 记录
+  - Agent CLI 类型
+outputs:
+  - 带知识上下文的 Agent 执行
+  - Agent 配置文件 (CLAUDE.md / CODEX_HOME/skills / .agent_context/)
+products: [multica-agent-skill-pipeline]
+related_atoms:
+  - agent-backend-plugin-pattern
+  - skill-md-architecture
+  - cross-platform-skill-sync
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  根据 Agent 类型将技能知识写入不同的 Agent 配置文件
+  (Claude Code → CLAUDE.md, Codex → CODEX_HOME/skills, Gemini → .agent_context/)，
+  实现 RAG + Prompt 注入式的知识传递。产品化后可用于白泽军团所有
+  Agent 的技能注入标准化，确保每个 Agent 启动时都携带必要的上下文知识。

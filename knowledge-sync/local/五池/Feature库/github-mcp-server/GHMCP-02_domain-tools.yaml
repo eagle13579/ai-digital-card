@@ -1,0 +1,7 @@
+name: F-GHMCP-02_领域MCP工具组织
+description: 按功能域组织的MCP工具分组模式
+dimension: 体系
+source: github/github-mcp-server
+products:
+  - AI数字军团
+  - 链客宝API设计

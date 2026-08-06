@@ -1,0 +1,182 @@
+# Feature: HermesSkills 多模态 × 前端联合能力
+# 吸收自: minimax-multimodal-toolkit + frontend-dev
+# 创建日期: 2026-07-02
+
+---
+name: "HermesSkills-multimodal-frontend"
+version: "1.0.0"
+category: "cross-skill-integration"
+status: "active"
+
+# ─── 源技能 ───
+
+products:
+  - 文鳐技能集市: 自动匹配
+sources:
+  - skill: minimax-multimodal-toolkit
+    path: D:/skills/skills/minimax-multimodal-toolkit/SKILL.md
+    focus: 多模态AI生成(图片/视频/音频), API调用模式, 参数调优
+  - skill: frontend-dev
+    path: D:/skills/skills/frontend-dev/SKILL.md
+    focus: CSS架构, 响应式设计, 组件设计系统, 动效, Canvas API
+
+# ─── 目的 ───
+purpose: |
+  将 MiniMax 多模态生成能力无缝嵌入前端开发管线。
+  让前端页面不仅拥有精致的设计和动效，还能实时集成 AI 生成的图像、视频、语音和音乐资产。
+  消除"设计好但没真资产"的 gap，实现从设计到真资产的端到端交付。
+
+# ─── 能力矩阵 ───
+capabilities:
+  # === 前端设计能力 (from frontend-dev) ===
+  - id: design-engineering
+    source: frontend-dev
+    description: 设计旋钮系统 — VARIANCE/INTENSITY/DENSITY 三旋钮控制设计方向
+    sub-capabilities:
+      - CSS架构约定 (Tailwind + 禁止模式)
+      - Bento 范式布局
+      - 反 Slop 技术 (液体玻璃/磁感按钮/永久微动画)
+      - 组件状态全覆盖 (Loading/Empty/Error/Tactile)
+
+  - id: motion-engine
+    source: frontend-dev
+    description: 动画工具矩阵 — Framer/GSAP/Lottie/Three.js/CSS 四象限
+    sub-capabilities:
+      - 强度1-10标尺
+      - GPU性能铁律 (只动画 transform/opacity/filter/clip-path)
+      - 弹簧物理参数库
+      - 移动端降级 (prefers-reduced-motion, pointer:coarse)
+
+  # === 多模态生成能力 (from minimax-multimodal-toolkit) ===
+  - id: media-generation
+    source: minimax-multimodal-toolkit
+    description: MiniMax多模态内容生成 (TTS/音乐/图像/视频)
+    sub-capabilities:
+      - TTS语音合成与克隆设计
+      - 音乐生成 (BGM/带词歌曲)
+      - 图像生成 (t2i/i2i, 宽高比推断, 批量控制)
+      - 视频生成 (t2v/i2v/sef/ref, Prompt优化)
+      - 长视频多场景链式生成
+      - FFmpeg媒体处理管线
+
+  - id: copywriting
+    source: frontend-dev
+    description: 说服性文案框架 (AIDA/PAS/FAB)
+    sub-capabilities:
+      - CTA公式
+      - 情感触发器 (FOMO/损失恐惧/地位/便利)
+      - 异议处理策略
+
+  - id: visual-art
+    source: frontend-dev
+    description: 生成式视觉艺术 (p5.js)
+    sub-capabilities:
+      - 哲学驱动创作流程
+      - 静态输出 (PDF/PNG)
+      - 交互输出 (HTML)
+
+# ─── 集成管线 ───
+pipeline:
+  - phase: 1 设计架构
+    description: 分析需求 → 设置设计旋钮 → 规划布局 → 识别资产需求
+    tools: frontend-dev design-engineering
+    output: 项目结构 + 设计规格
+
+  - phase: 2 动效设计
+    description: 选动画工具 → 规划序列 → 性能检查
+    tools: frontend-dev motion-engine
+    output: 动效规格 + 组件拆分
+
+  - phase: 3 资产生成
+    description: 生成所有图像/视频/音频 → 本地保存 → 禁止占位图
+    tools: minimax-multimodal-toolkit media-generation
+    rules:
+      - 用户确认prompt后才生成
+      - 保存到项目assets/目录
+      - 后处理 (WebP/ffmpeg/标准化)
+
+  - phase: 4 文案创作
+    description: AIDA/PAS/FAB框架写真实文案
+    tools: frontend-dev copywriting
+    rules:
+      - 禁止 Lorem ipsum
+      - CTA用公式
+
+  - phase: 5 构建UI
+    description: 搭建项目 → 构建各section → 集成资产和文案
+    tools: frontend-dev design-engineering + motion-engine
+
+  - phase: 6 质量门禁
+    description: 最终检查清单
+    tools: frontend-dev quality-gates
+    checks:
+      - 无 placeholder URL
+      - 所有资产本地存在
+      - 动效性能通过
+      - 移动端适配
+
+# ─── 心智模型映射 ───
+mental_models:
+  - name: 设计旋钮系统
+    source: frontend-dev
+    description: 三个参数控制设计的对称性/动效强度/视觉密度
+
+  - name: 动画工具矩阵
+    source: frontend-dev
+    description: UI动效→Framer Motion, 滚动叙事→GSAP, 3D→Three.js, 悬停→CSS
+
+  - name: 生成矩阵
+    source: minimax-multimodal-toolkit
+    description: 4种模态(语音/音乐/图像/视频) × 2种输入(文本/媒体) = 8条生成路径
+
+  - name: 单段vs多段决策树
+    source: minimax-multimodal-toolkit
+    description: 语音(单角色→单段/多角色→多段), 视频(默认6s/长视频→多场景)
+
+  - name: 配额意识
+    source: minimax-multimodal-toolkit
+    description: 视频稀缺(2-5/天), 图像中等, 语音丰富, 生成前评估
+
+  - name: AIDA文案框架
+    source: frontend-dev
+    description: Attention→Interest→Desire→Action 四步说服链
+
+  - name: 性能铁律
+    source: frontend-dev
+    description: 只动画GPU属性(transform/opacity/filter/clip-path), 移动端降级
+
+# ─── 集成点 ───
+integration_points:
+  - from: frontend-dev asset-presets
+    to: minimax-multimodal-toolkit scripts
+    description: |
+      frontend-dev 的预设快捷方式(hero/thumb/icon/bgm/tts) 
+      直接映射到 minimax-multimodal-toolkit 的脚本调用参数
+
+  - from: minimax-multimodal-toolkit output
+    to: frontend-dev project assets
+    description: |
+      minimax输出(minimax-output/) → 复制到 frontend 项目 assets/ 目录
+      并执行格式转换(WebP/MP3/MP4标准化)
+
+  - from: frontend-dev prompt-engineering
+    to: minimax-multimodal-toolkit video-prompt-guide
+    description: |
+      前端文案与多模态Prompt需风格一致，
+      前端页面氛围 → 多模态生成的风格关键词(natural lighting/cinematic/warm tones)
+
+# ─── 依赖 ───
+dependencies:
+  - minimax-multimodal-toolkit
+  - frontend-dev
+  - ffmpeg (媒体处理)
+  - node/npm (前端项目)
+
+# ─── 标签 ───
+tags:
+  - frontend
+  - multimodal
+  - AI-generation
+  - design-system
+  - motion
+  - cross-skill

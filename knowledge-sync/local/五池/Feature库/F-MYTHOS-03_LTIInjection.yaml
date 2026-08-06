@@ -1,0 +1,23 @@
+# 🔒 LTI稳定性约束 - LTIInjection
+id: F-MYTHOS-03
+name: LTI稳定性约束注入
+dimension: 模型
+description: 通过ZOH离散化保证循环状态矩阵谱半径ρ(A)<1，使用对数空间参数化避免NaN，确保任意深度的循环训练稳定（Parcae架构）
+atoms:
+  - "Fable5-Mythos5-代码收割/03_LTIInjection"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 684-742)
+
+products:
+  - 通用: 自动匹配
+references:
+  - A_discrete = exp(-exp(log_dt + log_A).clamp(-20,20)) @ main.py:725
+  - 更新规则: h = A·h + B·e + trans_out @ main.py:742
+  - log_A/log_dt/B 可学习参数 @ main.py:710-712
+
+injection_points:
+  - RecurrentBlock.__init__: self.injection = LTIInjection(cfg.dim) @ main.py:817
+  - 每循环调用: h = self.injection(h, e, trans_out) @ main.py:863

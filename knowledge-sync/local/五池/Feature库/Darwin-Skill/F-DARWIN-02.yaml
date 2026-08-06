@@ -1,0 +1,16 @@
+---
+id: F-DARWIN-02
+name: 棘轮优化引擎
+dimension: 基本功
+source_model: DS-02, DS-05
+
+products:
+  - 通用: 自动匹配
+description: >-
+  评估→改进→验证→保留/回滚的循环优化机制，git版本控制确保只进不退
+sop: |-
+  ① 建git分支 ② 单维度改进 ③ 重新评估 ④ 新分>旧分→keep/revert ⑤ 连续2轮Δ<2→break
+quality_gate: |-
+  每轮只改一个维度。revert用git revert非reset --hard
+draft: false
+created_at: 2026-06-13

@@ -1,0 +1,35 @@
+# 💡 复盘进化系统
+id: F-AMOEBA-REVIEW-01
+name: 复盘进化系统
+dimension: 创造力
+description: 每轮阿米巴循环后自动复盘，提炼教训、更新KPI、驱动进化
+source_model: 阿米巴三阶段经营闭环
+status: active
+version: "1.0"
+created: 2026-06-14
+
+input:
+  - 本轮调研结果
+  - 本轮报告产出
+  - 历史复盘记录
+
+output:
+  - lesson: 经验教训
+  - quality: 质量评分(1-10)
+  - nextAction: 改进方向
+  - 更新后的kpi: { researchQuality, reportQuality, conversionRate }
+
+sop: |
+  1. 构造复盘prompt：本轮做了什么 + 产出什么 + 要求LLM反思
+  2. 调用DeepSeek API（temperature=0.6，更聚焦）
+  3. extractJSON() 容错解析
+  4. 追加到 lessonsLearned[]
+  5. 更新kpi：researchQuality+=0.5, reportQuality根据review调整
+  6. 保存状态
+
+quality_gate:
+  - 复盘教训必须有具体内容（非空泛）
+  - KPI更新必须有数学依据
+  - 连续3轮quality下降则触发告警
+
+draft: false

@@ -1,0 +1,16 @@
+name: LLM评估与质量门禁
+version: 1.0.0
+status: production
+dimension: ai-core/evaluation
+source: microsoft/generative-ai-for-beginners (Lesson 14, 15)
+description: "LLMOps评估体系：模型选择基准、虚构检测、迭代度量、RAG质量评估(MAP@K)"
+atoms:
+  - GAIB-16: 模型虚构识别与缓解
+  - GAIB-17: LLM评估、迭代与度量
+products:
+  - 红队战狼: AI安全审计
+  - 盖娅大脑: 知识质量评估
+  - 产品部署SOP: 模型上线门禁
+employees:
+  - 獬豸P8: 合规安全评估
+  - 狴犴P8: 质量审查

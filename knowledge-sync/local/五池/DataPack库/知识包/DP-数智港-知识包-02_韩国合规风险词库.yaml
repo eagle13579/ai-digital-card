@@ -1,0 +1,13 @@
+datapack_id: "DP-KW-数智港-02"
+name: "韩国合规风险词库"
+version: "1.0.0"
+type: "知识包"
+description: >
+  合规违禁词/标签规范/限量标准的结构化词库，来自server_deploy/data/risk_lexicon.yaml(294行)
+source: "server_deploy/data/risk_lexicon.yaml"
+contents: >
+  违禁词库(128个) + 标签规范(96条) + 限量标准(70条)
+consumed_by_features: >
+  F-TX-数智港-01 合规诊断引擎 / F-TX-数智港-02 LLM增强合规分析链
+project: "中韩出海数智港"
+created_at: "2026-06-08"

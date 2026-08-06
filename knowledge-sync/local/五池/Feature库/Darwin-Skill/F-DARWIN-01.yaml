@@ -1,0 +1,16 @@
+---
+id: F-DARWIN-01
+name: 9维Rubric Skill质量评估
+dimension: 体系
+source_model: DS-01
+
+products:
+  - 文鳐技能集市: 自动匹配
+description: >-
+  用结构(59分)+效果(35分)+Meta-skill(6分)九维度对SKILL.md做系统性质量评分
+sop: |-
+  ① 读取SKILL.md全文 ② 按9维度逐项打分(附理由) ③ 计算加权总分 ④ 记录到results.tsv
+quality_gate: |-
+  评分必须由独立judge执行，不可自评自改。dry_run>30%告警
+draft: false
+created_at: 2026-06-13

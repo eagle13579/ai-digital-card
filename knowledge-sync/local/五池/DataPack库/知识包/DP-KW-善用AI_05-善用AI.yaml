@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-善用AI"
+name: "05-善用AI"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "一堂60个骨干模型/05-善用AI — 一个可独立挂载的原子心智模型DataPack"
+
+source: "L5孵化室/五池/模型池/一堂/一堂必知必会的60个骨干模型/05-善用AI/"
+
+contents: |
+  05-善用AI心智模型的核心方法论和可执行模式。
+
+data_format: "心智模型YAML"
+
+mount_interface:
+  load: "读取此心智模型的完整定义到工作内存"
+  query: "检索模型的核心原则和适用场景"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应05-善用AI维度Feature执行时自动消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自一堂60个骨干模型"

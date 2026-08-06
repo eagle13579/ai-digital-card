@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-一堂工业化生成"
+name: "一堂工业化生成"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "原子心智模型集/一堂工业化生成 — 包含11个相关心智模型"
+
+source: "L5孵化室/五池/模型池/_原子/一堂工业化生成/"
+
+contents: |
+  11个M1-手艺人工厂主范式转移.md}､M10-交付工业化峰终定律.md}､M11-工业化陷阱警示板.md}､M2-三大范式转移.md}､M3-增长飞轮公式工业化.md...等心智模型
+
+data_format: "心智模型Markdown"
+
+mount_interface:
+  load: "读取全部11个心智模型到工作内存"
+  query: "按维度/标签/适用场景检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应一堂工业化生成相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自_原子目录"

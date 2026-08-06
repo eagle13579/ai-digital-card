@@ -1,0 +1,17 @@
+name: MiniMax移动端开发四件套
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — android/ios/flutter/react-native (2026-07-05)
+description: 四大移动端开发指南(Android原生Kotlin/Compose + iOS SwiftUI/UIKit + Flutter + React Native/Expo)，含状态管理/MD3/Apple HIG/性能优化/发布部署。
+atoms:
+  - MOBILE-DECISION: 平台决策树(原生 vs Flutter vs RN)
+  - MOBILE-MD3-HIG: MD3/Apple HIG设计规范
+  - MOBILE-STATEMGMT: 状态管理分层(简单→中等→复杂)
+  - MOBILE-STORE: 应用商店发布清单(App Store/Google Play)
+products:
+  - AI数字名片(微信小程序) — React Native/Expo迁移参考
+  - 链客宝 — 移动端适配参考
+employees:
+  - 烛龙P8(工程)
+  - 乘黄P8(产品)

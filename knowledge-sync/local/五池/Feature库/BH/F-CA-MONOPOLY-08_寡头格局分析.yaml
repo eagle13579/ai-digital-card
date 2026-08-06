@@ -1,0 +1,19 @@
+id: F-CA-MONOPOLY-08
+name: 寡头格局分析
+dimension: 💡 创造力
+description: >-
+  基于BH08寡头格局标准化心智模型构建的分析器，计算行业CR4/CR5
+  集中度并评估趋势。识别前几名参与者是否采用相似的定价机制、合同
+  条款和利润结构。检测寡头间隐性默契信号和新进入者壁垒高度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH08: 寡头格局标准化
+products:
+  - 行业结构分析系统
+  - 竞争格局评估引擎
+employees: [计然, 长乘, 獬豸]
+priority: P0
+maturity: design

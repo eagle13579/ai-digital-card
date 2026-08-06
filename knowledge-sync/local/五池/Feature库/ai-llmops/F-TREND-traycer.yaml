@@ -1,0 +1,14 @@
+name: Trending: traycer
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-10
+description: Auto-absorbed from GitHub Trending: traycerai/traycer
+atoms:
+  - TREND-traycerai-traycer-02: agent, architecture, workflow 模式
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

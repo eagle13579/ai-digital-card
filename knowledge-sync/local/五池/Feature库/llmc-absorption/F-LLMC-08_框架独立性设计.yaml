@@ -1,0 +1,23 @@
+id: F-LLMC-08
+name: 框架独立性设计
+dimension: 场景
+source_model: "Framework Independence — llm.c不依赖PyTorch-cPython，仅C标准库+OpenMP"
+description: "AI产品的去框架化策略，减少依赖链和安全风险"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+
+products:
+  - 通用: 自动匹配
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

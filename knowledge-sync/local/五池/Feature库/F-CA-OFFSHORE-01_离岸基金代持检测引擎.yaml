@@ -1,0 +1,25 @@
+id: F-CA-OFFSHORE-01
+name: 离岸基金代持逻辑检测引擎
+dimension: 💡 创造力
+description: >-
+  基于黑河调查局离岸基金代持逻辑全量吸收的12原子心智模型封装的离岸结构检测引擎。
+  覆盖三阶段闭环(所有权转移→受益人隐身→利润免税回流)、多层信封架构穿透、CRS博弈检测。
+status: active
+version: 1.0.0
+created: 2026-06-15
+source: 黑河调查局 — 离岸基金代持逻辑
+atoms:
+  - OF-01: 所有权与受益权分离检测
+  - OF-02: 多层信封架构穿透
+  - OF-03: 免税区套利三环
+  - OF-05: 三阶段免税闭环
+  - OF-06: CRS穿透博弈
+  - OF-09: 受益人黑洞效应
+  - OF-10: 三合一闭环检测
+products:
+  - 中国软银投资系统 (port=8312)
+  - 全球产业套利模块 (global_industry_arbitrage.py)
+  - 制裁合规门禁 (sanctions_compliance_gate.py)
+employees: [计然, 烛龙, 䑏疏, 獬豸, 长乘, 乘黄]
+priority: P0
+maturity: design

@@ -1,0 +1,14 @@
+name: WASM浏览器CAD引擎
+dimension: 基本功
+description: 将CAD编译器编译为WebAssembly在浏览器中直接运行，消除服务端依赖。零服务器成本、秒级编译、可离线。
+applies_to:
+  - 盖娅之城建筑编译管线
+  - 任何浏览器端需要计算密集处理的场景
+mental_model: |
+  浏览器不是只能展示的东西——它是计算平台。WASM让C++级别的CAD编译器在浏览器中运行。
+  CADAM用openscad-wasm + implicitjs(GLSL raymarching)双引擎架构。
+source: CADAM
+
+products:
+  - 通用: 自动匹配
+cadam_ref: packages/implicitjs/ + packages/cadjs/openscad.js

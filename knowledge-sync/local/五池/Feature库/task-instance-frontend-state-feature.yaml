@@ -1,0 +1,194 @@
+id: "F-A2E-TASK-INSTANCE-STATE-01"
+name: "TaskInstance Frontend State (Zustand + SSE Streaming + 任务隔离)"
+version: "1.0.0"
+description: >
+  AiToEarn Web 前端的 AI Agent 任务状态管理方案。核心创新是 TaskInstance 类：
+  每个 AI 任务创建独立的实例对象，持有自己的 taskId、消息流、工作流步骤和 SSE 连接，
+  从根本上消除多任务竞态条件（Race Condition）。
+
+  架构分层：
+  (1) Zustand Store（全局状态层：任务消息索引、当前任务ID、账户状态）
+  (2) TaskInstance 类（实例层：单个任务的所有状态与操作封装）
+  (3) SSE Handler（流式消息处理：init→stream_event→keep_alive→error）
+  (4) Workflow Handler（工作流步骤管理，含 TextDelta、ToolCall、ToolResult）
+  (5) Message Handler（消息管理：文本/图片/动作卡片/发布流）
+
+  无需 React 状态管理库，TaskInstance 是纯 TypeScript 类，不依赖 React Component
+  生命周期，可在任意 JS 环境下运行。
+domain: "frontend"
+type: "state-management-pattern"
+maturity: "production"
+autonomy: "component"
+tags:
+  - "zustand"
+  - "sse-streaming"
+  - "task-management"
+  - "react-state"
+  - "race-condition-free"
+  - "task-instance"
+  - "reactive-streaming"
+input_schema:
+  type: "object"
+  description: "任务配置 + SSE 事件流"
+  properties:
+    task_config:
+      type: "object"
+      description: '任务启动配置（通过 agent.methods.ts 的 createTask/sendMessage 传入）'
+      properties:
+        taskId:
+          type: "string"
+          description: "任务ID（临时或真实）"
+        prompt:
+          type: "string"
+          description: "用户提示词"
+        mediaInputs:
+          type: "array"
+          items:
+            type: "string"
+          description: "媒体附件"
+        model:
+          type: "string"
+          description: "AI 模型选择"
+      required:
+        - taskId
+        - prompt
+    sse_stream:
+      type: "object"
+      description: "SSE 事件流（由 SSE Handler 处理）"
+      properties:
+        event_types:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "init"
+              - "stream_event"
+              - "keep_alive"
+              - "error"
+          description: "支持的 SSE 事件类型"
+        message_types:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "text_delta"
+              - "tool_call"
+              - "tool_result"
+              - "input_required"
+              - "error"
+          description: "stream_event 的子消息类型"
+output_schema:
+  type: "object"
+  description: "实时任务状态 + 消息列表"
+  properties:
+    task_state:
+      type: "object"
+      description: "当前任务状态"
+      properties:
+        taskId:
+          type: "string"
+          description: "真实任务ID（SSE init 后从临时ID迁移）"
+        isGenerating:
+          type: "boolean"
+          description: "是否正在生成"
+        progress:
+          type: "integer"
+          description: "进度百分比"
+        streamingText:
+          type: "string"
+          description: "实时流式文本"
+        lastUpdated:
+          type: "integer"
+          description: "最后更新时间戳"
+        currentCost:
+          type: "number"
+          description: "当前消耗金额"
+    messages:
+      type: "array"
+      description: "对话消息列表（按 taskId 隔离存储）"
+      items:
+        type: "object"
+        properties:
+          id:
+            type: "string"
+          role:
+            type: "string"
+            enum: ["user", "assistant", "system"]
+          content:
+            type: "string"
+          messageType:
+            type: "string"
+          medias:
+            type: "array"
+          actions:
+            type: "array"
+          publishFlows:
+            type: "array"
+    workflow_steps:
+      type: "array"
+      description: "工作流步骤列表（tool calling 可视化）"
+      items:
+        type: "object"
+        properties:
+          stepIndex:
+            type: "integer"
+          toolName:
+            type: "string"
+          status:
+            type: "string"
+            enum: ["running", "completed", "error", "pending"]
+source:
+  type: "frontend-store-directory"
+  base_path: "project/aitoearn-web/src/store/agent/"
+  files:
+    - path: "index.ts"
+      lines: 145
+      role: "Zustand store 主入口 + TaskInstance Map 管理"
+    - path: "agent.types.ts"
+      role: "类型定义（IAgentState, ITaskMessageData, ISSEMessage 等）"
+    - path: "agent.constants.ts"
+      role: "常量（BASE_PROGRESS, GENERATING_STATUSES, STATUS_CONFIG）"
+    - path: "agent.state.ts"
+      lines: 47
+      role: "初始状态定义"
+    - path: "agent.methods.ts"
+      role: "核心方法（createTask, sendMessage, abortTask 等）"
+    - path: "task-instance/TaskInstance.ts"
+      lines: 435
+      role: "TaskInstance 核心类（实例隔离、状态封装）"
+    - path: "task-instance/task-instance.types.ts"
+      lines: 109
+      role: "TaskInstance 类型定义（上下文/回调/状态接口）"
+    - path: "task-instance/sse.handler.ts"
+      lines: 372
+      role: "SSE 消息处理（init/stream_event/keep_alive/error）"
+    - path: "task-instance/message.handler.ts"
+      role: "消息处理（addMarkdownMessage, updateMessageContent 等）"
+    - path: "task-instance/workflow.handler.ts"
+      role: "工作流处理（TextDelta, ToolCall, ToolResult 管理）"
+    - path: "handlers/action.handlers.ts"
+      role: "Action 按钮处理器"
+    - path: "utils/refs.ts"
+      role: "Refs 管理工具"
+    - path: "utils/message.ts"
+      role: "消息工具函数"
+    - path: "utils/progress.ts"
+      lines: 40
+      role: "进度计算（calculateProgress, getStatusConfig）"
+    - path: "utils/buildPrompt.ts"
+      role: "提示词构建"
+  total_files: 18
+  total_lines: ~1061+
+products:
+  - "AiToEarn Web Application（AI Agent 聊天界面）"
+  - "任何需要实时 AI 流式输出的 React 应用"
+  - "内容工厂任务面板"
+  - "Agent 发布工作流界面"
+evolution_tags:
+  - "zustand"
+  - "sse-streaming"
+  - "task-management"
+  - "react-state"
+  - "task-instance"
+  - "race-condition-free"
+  - "ai-streaming-frontend"

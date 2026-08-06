@@ -1,0 +1,15 @@
+name: Responsible AI原则与实践
+version: 1.0.0
+status: production
+dimension: ai-security
+source: microsoft/generative-ai-for-beginners (Lesson 03)
+description: "负责任的AI六原则: Fairness公平性、Inclusiveness包容性、Reliability/Safety可靠性安全、Security/Privacy安全隐私、Transparency透明度、Accountability问责制。覆盖虚构检测、有害内容过滤、偏见缓解"
+atoms:
+  - GAIB-16: 模型虚构识别与缓解
+products:
+  - 战狼红队: AI安全审计标准
+  - 獬豸P8: 合规审查框架
+  - 白泽控制台: 输出安全门禁
+employees:
+  - 獬豸P8: Responsible AI实践者
+  - 狴犴P8: 安全审查

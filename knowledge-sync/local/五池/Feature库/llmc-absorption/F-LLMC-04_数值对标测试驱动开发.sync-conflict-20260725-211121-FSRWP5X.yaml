@@ -1,0 +1,20 @@
+id: F-LLMC-04
+name: 数值对标测试驱动开发
+dimension: 基本功
+source_model: "Numerical Cross-Validation Testing — llm.c C版与PyTorch版数值对标，确保每个step的loss一致"
+description: "跨语言跨框架实现的一致性验证，C版必须与Python版完全对齐"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

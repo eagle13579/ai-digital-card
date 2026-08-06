@@ -1,0 +1,16 @@
+name: Trending: servers
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-10
+description: Auto-absorbed from GitHub Trending: modelcontextprotocol/servers
+atoms:
+  - TREND-modelcontextprotocol-01: Model Context Protocol servers
+  - TREND-modelcontextprotocol-02: sdk, protocol, agent 模式
+  - TREND-modelcontextprotocol-03: modelcontextprotocol/servers的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

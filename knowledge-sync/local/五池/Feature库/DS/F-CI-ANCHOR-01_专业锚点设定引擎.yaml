@@ -1,0 +1,19 @@
+id: F-CI-ANCHOR-01
+name: 专业锚点设定引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS01专业锚点设定心智模型构建的智能引擎，评估用户提问中专业锚点的
+  丰度与质量。检测维度：角色锚定是否存在、术语锚定密度、背景锚定完整度、
+  锚点与问题的匹配度。输出锚点质量评分及优化建议。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS01: 专业锚点设定
+products:
+  - 提问质量评估系统
+  - AI对话锚点注入器
+employees: [白泽, 计然]
+priority: P0
+maturity: design

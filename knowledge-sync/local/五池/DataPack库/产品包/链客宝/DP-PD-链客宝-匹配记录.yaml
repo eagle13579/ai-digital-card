@@ -1,0 +1,45 @@
+datapack_id: "DP-PD-链客宝-匹配记录"
+name: "链客宝·匹配记录"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝AI供需匹配引擎的匹配记录数据，包含匹配算法参数、匹配历史、匹配率统计和匹配质量评分"
+
+source: "chainke-full/geo-content/2026-06-05-2026年企业供需匹配新趋势-AI如何改变B2B对接效率.md | chainke-full/geo-content/2026-06-05-从扫街到AI匹配-企业家获客方式的四次进化.md"
+
+contents: |
+  【匹配记录数据】
+  1. AI匹配引擎参数: 匹配模型版本、相似度阈值、推荐数量上限（来源: geo-content匹配文章）
+     - 匹配效率提升: 3-5倍
+     - 交易成本降低: 40%以上
+  2. 匹配历史记录: 匹配发起方、匹配目标、匹配时间、匹配方式（AI推荐/手动搜索/转介绍）
+  3. 匹配质量评分: 
+     - 匹配准确率
+     - 用户接受率
+     - 后续交流率
+     - 最终合作转化率
+  4. 匹配统计: 日匹配量、周匹配量、累计匹配量
+  5. 不匹配反馈: 用户标记"不感兴趣"的原因分类
+  6. 匹配算法迭代: A/B测试记录、算法版本更新日志
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取匹配记录数据到工作内存"
+  query: "按时间段/匹配方式/匹配质量查询匹配记录"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "匹配Feature做供需撮合执行时消费此DataPack"
+  - "增长Feature做匹配效率分析时消费此DataPack"
+  - "数据Feature做匹配指标统计时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-需求发布"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原供需需求数据包（KFD-07合规）"

@@ -1,0 +1,9 @@
+# skills-SKILL.md驱动架构
+name: "skills-skill-md-architecture"
+version: "1.0.0"
+category: "Skill"
+description: "以SKILL.md为路由入口，references/为知识库，scripts/为工具的专家知识注入模式。迁移到AI数智军团：每个员工应有标准化的employee.yaml(对应SKILL.md)+memory.db(对应references/)+tools/(对应scripts/)"
+source: "MiniMax-AI/skills + Ant Design"
+
+products:
+  - 文鳐技能集市: 自动匹配

@@ -1,0 +1,26 @@
+# 🏗 Coda聚合层 - 三段式架构
+id: F-MYTHOS-07
+name: Coda后循环聚合层
+dimension: 模型
+description: Prelude→RecurrentBlock→Coda三段式架构，Prelude编码输入，Recurrent共享块循环T次（深度外推支持），Coda后循环精炼为输出logits
+atoms:
+  - "Fable5-Mythos5-代码收割/07_Coda"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 894-934, 946-956, 1025-1034)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 三段式架构: main.py:899-924
+  - 模型构造: prelude → recurrent → coda → head @ main.py:946-956
+  - 前向传播: main.py:1025-1034
+  - 配置: prelude_layers=2~6, coda_layers=2~6 @ variants.py
+
+injection_points:
+  - Prelude: 标准TransformerBlock, use_moe=False @ main.py:947-948
+  - Coda: 标准TransformerBlock, use_moe=False @ main.py:950-952
+  - e=frozen encoding 每轮注入 @ main.py:1028-1029
+  - 每层独立cache_key: prelude_{i}/coda_{i} @ main.py:1026, 1031

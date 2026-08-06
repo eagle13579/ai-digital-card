@@ -1,0 +1,29 @@
+name: browser-cookie-auto-extract
+description: 从本地浏览器自动提取多平台Cookie的工具链 — 支持Chrome/Firefox/Edge/Brave/Opera，配置后自动同步到三方CLI工具
+version: 1.0.0
+author: Agent Reach v1.3.0 萃取
+source: github.com/Panniantong/agent-reach
+license: MIT
+
+mental_models:
+  - AR-05: 浏览器Cookie自动提取模式
+  - AR-09: 自动Cookie同步到三方工具模式
+  - AR-14: 多种Cookie输入格式解析模式
+
+components:
+  - cookie_extract: browser_cookie3驱动，多浏览器支持，按平台domain+所需cookie名提取
+  - cookie_sync_bird: Twitter Cookie 同步到 bird CLI credentials.env
+  - cookie_sync_xfetch: Twitter Cookie 同步到 xfetch session.json
+  - cookie_docker_inject: Cookie 注入到 Docker 容器 + 容器重启 + 登录验证
+  - dual_format_parse: Cookie-Editor JSON + Header String 双格式解析
+
+products:
+  - 链客宝: 用户社交媒体账号绑定
+  - 蚕茧帝国: 外部平台认证管理
+  - AI数字名片: 社交平台资料抓取
+
+integration:
+  type: python_library
+  dependencies:
+    - browser-cookie3>=0.19
+  setup: 从 cookie_extract.py 提取 extract_all()/configure_from_browser() 函数
