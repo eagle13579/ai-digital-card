@@ -16,7 +16,7 @@ _EXPLICIT_V1_PREFIXES = frozenset({
     "/api/v1/bot", "/api/v1/brochure", "/api/v1/brochures",
     "/api/v1/business-card", "/api/v1/crm", "/api/v1/design-qa",
     "/api/v1/developer", "/api/v1/export", "/api/v1/gaia",
-    "/api/v1/distill",
+    "/api/v1/distill", "/api/v1/memory",
     "/api/v1/i18n", "/api/v1/integrations", "/api/v1/invoices",
     "/api/v1/knowledge-graph", "/api/v1/knowledge-models",
     "/api/v1/match", "/api/v1/matching",
