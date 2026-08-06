@@ -1,0 +1,40 @@
+# Feature YAML — AI数智名片
+name: "F-AI数智名片-电子画册翻页系统"
+version: "1.0"
+status: "implemented"
+date: "2026-07-08"
+tags: ["画册", "翻页", "HTML渲染", "分享", "小程序"]
+
+description: >
+  多页电子画册系统，支持封面/正文/图片/视频四种页面类型，4套用途主题色系，
+  StPageFlip翻页动画渲染，share_token公开分享，微信小程序+H5双渠道传播。
+
+architecture:
+  layers:
+    - layer: 数据模型
+      file: backend/app/models/brochure.py
+      models:
+        - Brochure (title/cover/purpose/pages_count/status/share_token/view_count)
+        - Page (brochure_id/sort_order/content_type/content/image_url/ai_summary)
+    - layer: 后端服务
+      files:
+        - backend/app/services/brochure_render.py (BrochureRenderer)
+        - backend/app/services/brochure_viewer.py (公开查看+小程序引导)
+      themes:
+        - partner: 粉红渐变 #f093fb→#f5576c
+        - client: 翡翠绿 #4ade80→#22c55e
+        - investor: 金色 #facc15→#eab308
+        - supplier: 天蓝 #60a5fa→#3b82f6
+    - layer: 小程序前端
+      file: liankebao-weapp/src/api/digitalBrochure.ts
+      stack: Taro 3.6 + React 18 + TypeScript
+
+mental_models:
+  - "电子画册+翻页展示系统"
+  - "微信生态全链路传播引擎"
+
+share_flow: |
+  用户创建/发布画册 → share_token(uuid4.hex[:16])
+    → H5链接 /view/{share_token} → StPageFlip翻页渲染
+      → 底部"打开小程序"引导 → 回流小程序
+        → view_count自动递增

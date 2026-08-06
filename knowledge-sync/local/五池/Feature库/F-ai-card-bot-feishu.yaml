@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-bot-feishu
+  name: ai-card-bot-feishu
+  description: "飞书机器人+卡片消息+中文命令"
+  source_project: "AI数字名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数字名片

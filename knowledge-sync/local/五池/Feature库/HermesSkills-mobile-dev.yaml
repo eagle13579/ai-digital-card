@@ -1,0 +1,138 @@
+# ============================================================================
+# Feature: Hermes Skills — Mobile Development (Cross-Platform)
+# ============================================================================
+# 该 Feature 整合了 Hermes Agent 官方 skills 库中 android-native-dev (29KB),
+# flutter-dev (5KB), react-native-dev (7KB), 和 ios-application-dev (7KB)
+# 的核心知识与心智模型，适用于跨平台移动应用的架构设计、UI 开发、
+# 性能优化和发布部署场景。
+# ============================================================================
+name: "Hermes Skills: Mobile Development (Cross-Platform)"
+description: >
+  融合 android-native-dev、flutter-dev、react-native-dev 和 ios-application-dev
+  四大 Hermes Agent 官方 mobile skill 的核心实践与心智模型，覆盖从平台差异适配、
+  原生能力桥接、状态管理、生命周期管理、渲染性能优化、响应式 UI 一致性、
+  并发线程模型到多环境发布流水线的全链路跨平台移动开发知识体系。
+
+source: "hermes-agent/skills"
+
+products:
+  - 文鳐技能集市: 自动匹配
+skills:
+  - name: android-native-dev
+    size: "29KB"
+    description: "Android native application development with Material Design 3, Kotlin/Compose, Gradle, and build troubleshooting"
+    source: "D:/skills/skills/android-native-dev/SKILL.md"
+  - name: flutter-dev
+    size: "5KB"
+    description: "Flutter cross-platform development covering widget patterns, Riverpod/Bloc state management, GoRouter navigation, and performance optimization"
+    source: "D:/skills/skills/flutter-dev/SKILL.md"
+  - name: react-native-dev
+    size: "7KB"
+    description: "React Native & Expo development covering components, animations, navigation, state management, testing, performance, and deployment"
+    source: "D:/skills/skills/react-native-dev/SKILL.md"
+  - name: ios-application-dev
+    size: "7KB"
+    description: "iOS application development with UIKit, SnapKit, SwiftUI, touch targets, safe areas, navigation patterns, Dynamic Type, Dark Mode, and accessibility"
+    source: "D:/skills/skills/ios-application-dev/SKILL.md"
+
+mental_models:
+  - name: "Platform Difference Adaptation"
+    file: "2026-07-02_HermesSkills_mobile_platform-difference-adaptation.md"
+    category: "architecture"
+    summary: "跨平台应用的架构应在逻辑层共享、在表现层适配，而非一套UI跑所有平台"
+    key_concepts:
+      - Material Design 3 vs Apple HIG 设计语言差异
+      - 统一业务逻辑 + 分平台呈现的分层策略
+      - 8pt/8dp 网格一致性
+      - 语义颜色优先避免平台色值耦合
+      - 触摸目标下限 44-48pt 跨平台统一
+      - 暗黑模式四平台双倍投入
+
+  - name: "Native Capability Bridge"
+    file: "2026-07-02_HermesSkills_mobile_native-capability-bridge.md"
+    category: "integration"
+    summary: "原生能力访问采用三层抽象：平台API层 → 框架桥接层 → 应用调用层"
+    key_concepts:
+      - 权限请求上下文化（需要时请求，非启动时）
+      - 渐进降级（无能力时提供手动替代路径）
+      - 各平台权限声明方式（Android XML / iOS Info.plist）
+      - 相机/定位/生物识别/安全存储统一抽象模式
+      - 首次体验优先（无权限也能使用核心功能）
+
+  - name: "State Management Layer"
+    file: "2026-07-02_HermesSkills_mobile_state-management-layer.md"
+    category: "architecture"
+    summary: "UI = f(state)，所有现代移动框架都将 UI 视为状态的函数，关键在高效驱动最小重建"
+    key_concepts:
+      - ViewModel/Notifier/Store/Observable 四平台对应模式
+      - 状态分层架构（UI → 状态管理层 → 数据仓储层）
+      - 不可变性原则驱动状态更新
+      - select/derivedStateOf/memo 精细控制重建范围
+      - Loading/Error/Data 三态异步模式
+      - 作用域管理与自动清理
+
+  - name: "Lifecycle & Resource Management"
+    file: "2026-07-02_HermesSkills_mobile_lifecycle-resource-management.md"
+    category: "resilience"
+    summary: "所有资源的获取与释放必须成对出现，生命周期绑定的代码必须在对应销毁点清理"
+    key_concepts:
+      - add/remove 配对法则避免内存泄漏
+      - LaunchedEffect/useEffect/DisposableEffect/dispose 生命周期对应
+      - 协程/观察者绑定到最精确的生命周期作用域
+      - 懒加载优先（不需要时不创建资源）
+      - 组件销毁后的安全性保障
+
+  - name: "Rendering Performance Optimization"
+    file: "2026-07-02_HermesSkills_mobile_rendering-performance-optimization.md"
+    category: "performance"
+    summary: "四个平台的性能瓶颈模式高度一致：不必要的重绘/重建 + 主线程阻塞 + 大列表无虚拟化 = 卡顿"
+    key_concepts:
+      - 目标 <16ms/帧，先度量再优化
+      - LazyColumn/ListView.builder/FlashList/UICollectionView 虚拟化
+      - const/select/memo 最小化重建
+      - 图像三件套（缓存 + 裁剪尺寸 + WebP/AVIF）
+      - 动画只操作 transform 和 opacity
+      - 包体积优化（R8/tree-shaking/Hermes/App Thinning）
+
+  - name: "Responsive UI Consistency"
+    file: "2026-07-02_HermesSkills_mobile_responsive-ui-consistency.md"
+    category: "ux"
+    summary: "UI 一致性不在像素层面，而在比例和模式层面——品牌层绝对一致、体验层模式一致、平台层适配差异"
+    key_concepts:
+      - 8pt/8dp 网格系统（4/8/16/24/32/48 增量）
+      - 触摸目标绝对最小值 44pt（iOS）/ 48dp（Android）
+      - 语义颜色替代硬编码色值
+      - 暗黑模式必须原生化（非取反）
+      - 安全区域默认遵守、动态字体支持
+      - 多屏幕测试（最小 375pt 到折叠屏展开）
+
+  - name: "Multi-Environment Release Pipeline"
+    file: "2026-07-02_HermesSkills_mobile_multi-environment-release-pipeline.md"
+    category: "operations"
+    summary: "发布是可重复的自动化流水线，环境差异集中配置、签名隔离、渐进式发布"
+    key_concepts:
+      - productFlavors/flavor/eas profiles/Xcode Schemes 构建变体
+      - 环境即配置（非代码硬编码）
+      - 签名证书 dev/CI/prod 严格隔离
+      - 构建可重现（Branch + Commit + Config → 一致产物）
+      - 渐进式发布（5% → 25% → 100%）
+      - 版本号自动化递增
+
+  - name: "Concurrency & Thread Model"
+    file: "2026-07-02_HermesSkills_mobile_concurrency-thread-model.md"
+    category: "architecture"
+    summary: "主线程只做渲染，网络/IO/计算全部委托后台，结果回传主线程更新 UI"
+    key_concepts:
+      - Dispatchers.Main/IO/Default (Android) vs isolate/compute (Flutter)
+      - JS Thread + 原生模块 (RN) vs Main Queue + GCD (iOS)
+      - 操作类型到线程的映射规则
+      - suspend 函数 main-safe 原则
+      - 后台→主线程单向数据流
+      - 取消即清理的协程/Task 绑定
+
+notes:
+  - "android-native-dev (29KB) 包含完整的 Material Design 3 规范、Gradle 构建系统、Jetpack Compose 声明式 UI、Kotlin 编码标准、测试策略和构建错误诊断"
+  - "flutter-dev (5KB) 轻量但精准，聚焦于 Rivot/Bloc 状态管理、GoRouter 导航、const 优化和 DevTools 性能分析"
+  - "react-native-dev (7KB) 结构清晰，覆盖 Expo Router 导航、FlashList 列表、Reanimated 3 动画、Zustand/Jotai/React Query 状态管理和 EAS 工程化"
+  - "ios-application-dev (7KB) 深入 Apple HIG，覆盖 UIKit/SwiftUI 双框架、SnapKit 自动布局、Dynamic Type、VoiceOver 和 Metal Shader"
+  - "四个 skill 之间有显式交叉引用，react-native-dev 明确指向其他三个原生技能，形成完整的跨平台知识图谱"

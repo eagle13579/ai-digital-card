@@ -1,0 +1,39 @@
+---
+feature_id: F-CHAINKE-LOGGING-01
+name: 结构化日志7字段
+dimension: 可观测性
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 8
+source_model: "7字段结构化日志+JSON格式+请求追踪ID"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝全后端结构化日志标准。每条日志包含7个固定字段：
+  timestamp, level, module, request_id, message, duration_ms, extra。
+  使用JSON格式输出，支持ELK等日志聚合系统。
+  请求追踪ID贯穿中间件→路由→服务→数据库全链路。
+inputs:
+  - 后端FastAPI应用
+  - 原有print/logger散落日志
+outputs:
+  - 结构化日志中间件
+  - 7字段JSON日志格式
+  - 请求追踪ID注入
+  - 请求耗时自动记录
+sop:
+  1. 定义LogEntry数据类（7字段）
+  2. 实现JSON格式化Handler
+  3. 创建LoggingMiddleware（记录请求+响应+耗时）
+  4. 统一使用context_logger替代全局logger
+quality_gates:
+  - 每条日志包含7字段
+  - JSON格式可被logstash直接消费
+  - 请求追踪ID贯穿全链路
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 8

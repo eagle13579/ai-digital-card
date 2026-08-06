@@ -1,0 +1,26 @@
+name: "F-BH-01_坐标点击浏览器控制引擎"
+description: "CDP坐标点击优先的浏览器自动化引擎。截图→LLM分析像素→click_at_xy()，天然穿透iframe/shadow/cross-origin"
+version: "1.0.0"
+dimension: "基本功"
+source: "browser-harness"
+source_model: "五池/模型池/BH-01_坐标点击优先范式.md"
+author: "browser-use (MIT)"
+license: "MIT"
+
+mental_models:
+  - "坐标点击优先: 截图→像素分析→坐标点击, 零选择器依赖"
+  - "极简依赖: 仅4个运行时依赖, 1608行Python核心"
+
+components:
+  - "helpers.py: CDP浏览器控制API(导航/输入/截图/标签页)"
+  - "daemon.py: CDP中继守护进程"
+  - "run.py: CLI入口"
+
+products:
+  - "AI数字军团: SAG管道浏览器操作能力"
+  - "内容工厂: 浏览器自动化内容采集/发布"
+  - "链客宝: 网页信息采集与验证"
+
+integration:
+  type: "workflow"
+  setup: "安装cdp-use/fetch-use/pillow/websockets依赖, 启动Chrome远程调试后连接"

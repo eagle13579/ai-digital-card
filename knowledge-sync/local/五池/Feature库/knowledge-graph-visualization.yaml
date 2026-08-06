@@ -1,0 +1,28 @@
+# knowledge-graph-visualization Feature
+
+name: knowledge-graph-visualization
+version: v1.0.0
+source: codebase-memory-mcp graph-ui + 自研组件
+created: 2026-07-05
+
+description: 3D知识图谱可视化组件。单HTML文件，零部署，Three.js力导向图。支持人际网络、金融图谱、知识库、供应链等任意关系数据的可视化。
+
+products:
+  - AI数字名片
+  - 中国软银投资系统
+  - 企业知识库RAG
+  - 赛博参谋
+
+atoms:
+  - 3D力导向布局引擎
+  - 节点-边数据模型 (5类别配色, 8边类型配色)
+  - Three.js OrbitControls 交互
+  - Flask蓝图集成
+  - 单HTML零部署模式
+
+capabilities:
+  - 3D力导向图渲染: 支持<2000节点
+  - 自动布局: 前端80次迭代力导向算法
+  - 交互: OrbitControls拖拽/缩放/自动旋转/Sprite悬停高亮
+  - 数据驱动: JSON输入, 按category/type自动配色
+  - 部署: 单HTML/CDN/Flask蓝图三种模式

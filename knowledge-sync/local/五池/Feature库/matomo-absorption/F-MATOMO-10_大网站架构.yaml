@@ -1,0 +1,62 @@
+feature_id: "F-MATOMO-10"
+name: "大网站架构模式 — Matomo批量归档+N+1防护+大表迁移"
+version: "1.0.0"
+dimension: "体系"
+source_model: "Matomo AGENTS.md质量规则 — 批量归档/CliMulti并行/CronArchive/N+1防护/log_大表迁移策略"
+one_liner: "面向规模化部署的架构设计：批量归档并行处理、N+1查询防护、log_大表安全迁移策略"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo在高流量场景下需要特殊架构设计：
+  
+  1. **批量归档 (CliMulti/CronArchive)** — 
+     单服务器无法在合理时间内归档千万级数据。CliMulti通过多进程并行归档
+     不同site/period组合。支持分布式归档 (多个Matomo实例共享DB)。
+  
+  2. **N+1查询防护** — 
+     报告查询时必须避免循环查询 (查N条记录每条再查1次数据库)。
+     使用预加载/批量查询模式，Archive层已聚合好数据，报告层直接读取。
+  
+  3. **log_大表迁移策略** — 
+     log_visit/log_action等日志表增长极快。建议：
+     - 按月/按周分区表 (MySQL PARTITION)
+     - 归档完成后删除/迁移原始日志
+     - 定期OPTIMIZE TABLE
+     - 归档和追踪使用不同数据库连接
+     
+  4. **ArchiveInvalidator** — 
+     当配置变更 (如新增目标) 时可标记历史归档失效，下次归档时重新处理。
+     支持仅标记特定时段/站点的失效，避免全量重归档。
+  
+  5. **DB读写分离** — 
+     Tracker写主库，Archive读从库，报告查询读从库，减少主库压力。
+input:
+  - "高流量网站 (日均百万+访客)"
+  - "大量历史数据 (TB级)"
+  - "多站点多时段分析需求"
+output:
+  - "规模化部署架构方案"
+  - "归档性能优化策略"
+  - "数据库维护计划"
+  - "高可用配置"
+sop:
+  - "step: 评估流量规模和数据量"
+  - "step: 设计分区表策略 (按月分区log_*表)"
+  - "step: 配置CliMulti并行归档 (进程数=CPU核数)"
+  - "step: 设置归档调度策略 (高频站点优先)"
+  - "step: 实施DB读写分离"
+  - "step: 配置ArchiveInvalidator失效标记"
+  - "step: 定期清理已归档原始日志"
+  - "step: 监控归档延迟和DB性能"
+quality_gate:
+  - "N+1查询已被静态分析工具拦截"
+  - "归档延迟在可接受范围"
+  - "log_表分区方案已实施"
+  - "读写分离已验证"
+  - "归档不阻塞追踪"
+dependencies:
+  - "MySQL分区表支持"
+  - "PHP pcntl扩展 (CliMulti)"
+  - "DB主从复制"
+  - "监控告警系统"

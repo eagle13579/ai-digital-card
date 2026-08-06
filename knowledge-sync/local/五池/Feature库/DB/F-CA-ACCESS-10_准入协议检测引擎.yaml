@@ -1,0 +1,20 @@
+id: F-CA-ACCESS-10
+name: 准入协议检测引擎
+dimension: 💡 创造力
+description: >-
+  基于DB01守门人名单心智模型构建的检测引擎，识别行业或平台中是否存在非公开的准入名单体系。检测维度：准入标准透明性、邀请制vs公开制、退出永久的除名条款、名单与市场控制力的关联程度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB01: 守门人名单(准入协议)
+products:
+  - 黑河调查局协议分析模块
+  - 行业准入控制力评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 长乘
+priority: P0
+maturity: design

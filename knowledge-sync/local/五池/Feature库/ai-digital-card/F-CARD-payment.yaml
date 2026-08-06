@@ -1,0 +1,21 @@
+name: F-CARD-payment
+version: 1.0.0
+status: production
+dimension: backend-payment
+description: AI数字名片支付体系 — 支付宝+微信支付双通道 + 订阅管理 + 发票系统 + 分销佣金
+atoms:
+  - F-CARD-payment-01: 支付宝Native支付集成
+  - F-CARD-payment-02: 微信支付JSAPI/Native集成
+  - F-CARD-payment-03: 订阅升级/降级/取消全流程
+  - F-CARD-payment-04: 企业套餐订阅
+  - F-CARD-payment-05: 发票创建/查看/PDF下载
+products:
+  - ai-digital-card
+employees:
+  - 文鳐P9: 代码收割归档
+tags:
+  - payment
+  - alipay
+  - wechat
+  - subscription
+  - invoice

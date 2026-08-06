@@ -1,0 +1,203 @@
+# Hermes Skills - Content Generation Tools Feature YAML
+# 来源: minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator
+# 提取日期: 2026-07-02
+
+name: HermesSkills-content-tools
+version: "1.0"
+
+products:
+  - 文鳐技能集市: 自动匹配
+category: document-generation
+description: >
+  文档内容生成工具集(docx/pdf/xlsx/pptx)的共性能力特征。
+  四个Skill均基于MiniMax API生态，采用API-First工具设计，
+  共享状态路由、校验管线、令牌驱动设计等模式。
+
+features:
+
+  # ──────────────────────────────────────────
+  # 共性架构特征
+  # ──────────────────────────────────────────
+
+  - id: content-api-first-tool-design
+    name: API-First工具封装
+    skills: [minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator]
+    description: >
+      将底层API(OpenXML/ReportLab/PptxGenJS)封装为可重复调用的CLI脚本和Python模块。
+      Agent通过标准化脚本接口调用，而非直接操作底层API。
+    key_components:
+      - docx: dotnet CLI + bash/powershell scripts
+      - pdf: make.sh + python scripts (reportlab/pypdf)
+      - xlsx: xlsx_unpack/xlsx_pack/xlsx_reader.py
+      - pptx: compile.js + slide modules (PptxGenJS)
+    value: 降低Agent调用复杂度，脚本可测试、可复用、有版本控制
+
+  - id: content-state-machine-routing
+    name: 状态机路由
+    skills: [minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator]
+    description: >
+      根据输入文件状态(有无输入)和操作意图(创建/编辑/格式化)路由到不同管线。
+      各Skill路由数量不同但结构相同。
+    routing_table:
+      docx:
+        - CREATE: 无输入，从头创建
+        - FILL-EDIT: 有输入，修改内容
+        - FORMAT-APPLY: 有输入，套模板
+      pdf:
+        - CREATE: 无输入，从头生成
+        - FILL: 有输入，填充表单
+        - REFORMAT: 有输入，重新设计
+      xlsx:
+        - READ: 有输入，分析数据
+        - CREATE: 无输入，新建
+        - EDIT: 有输入，修改
+        - FIX: 有输入，修复公式
+        - VALIDATE: 有输入，校验公式
+      pptx:
+        - READ: 有输入，提取文本
+        - CREATE: 无输入，新建演示
+        - EDIT: 有输入，XML编辑
+    value: 标准化任务入口，减少Agent决策成本
+
+  - id: content-validation-gate
+    name: 输出校验门
+    skills: [minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator]
+    description: >
+      每次输出操作后必须通过校验门才能交付。不同Skill的校验方式不同但逻辑相同：
+      校验不通过 = 不可交付，必须诊断修复后重试。
+    gate_mechanisms:
+      docx:
+        - merge-runs: 合并文本碎片
+        - XSD结构校验: 元素顺序合规
+        - 业务规则校验: 内容合规
+      xlsx:
+        - formula_check.py: 公式正确性
+        - libreoffice_recalc: 动态重算
+      pdf: (隐式校验 — 依赖渲染工具正确性)
+      pptx:
+        - 视觉一致性检查
+        - pptxgenjs.ts README问题检查
+    value: 确保交付文件质量、防止文件损坏
+
+  - id: content-environment-gate
+    name: 环境前置门
+    skills: [minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator]
+    description: >
+      所有Skill执行前必须通过环境检查。每个Skill提供setup/check/fix脚本。
+    requirements:
+      docx: .NET SDK + OpenXML NuGet
+      pdf: Python 3.9+ + reportlab/pypdf + Node.js + Playwright
+      xlsx: Python 3 + pandas + (可选) libreoffice
+      pptx: Node.js + PptxGenJS + markitdown
+    value: 避免运行时依赖缺失导致的失败
+
+  # ──────────────────────────────────────────
+  # 个性特征
+  # ──────────────────────────────────────────
+
+  - id: docx-openxml-element-order
+    name: OpenXML元素顺序规则
+    skill: minimax-docx
+    description: >
+      OpenXML文件完整性依赖于严格的元素顺序——properties必须在content之前。
+      sectPr必须是body的最后一个子元素。违反则文件损坏。
+    element_order_rules:
+      p: pPr → runs
+      r: rPr → t/br/tab
+      tbl: tblPr → tblGrid → tr
+      tr: trPr → tc
+      tc: tcPr → p
+      body: block content → sectPr (LAST)
+    value: 防止文件损坏的直接原因排查
+
+  - id: docx-template-base-replace
+    name: 模板Bass-Replace策略
+    skill: minimax-docx
+    description: >
+      当模板包含结构(封面/TOC/示例章节)时，使用Base-Replace策略：
+      以模板为base输出，替换body内容，保持所有章节、页眉页脚、titlePg设置。
+    value: 高效处理模板化文档，避免手动重建复杂结构
+
+  - id: pdf-token-based-design
+    name: 令牌驱动设计系统
+    skill: minimax-pdf
+    description: >
+      PDF视觉效果由设计令牌驱动——文档类型决定封面模式/字体/视觉身份，
+      强调色调文档语义自动选择。15种文档类型 + 9种行业色彩建议。
+    design_tokens:
+      - document_type: 决定封面模式(15种)和字体配对
+      - accent_color: 语义选择，自动衍生浅色版本
+      - cover_bg: 封面背景色覆盖
+    value: 声明式设计，视觉一致性保障
+
+  - id: pdf-content-block-format
+    name: 内容块中间格式
+    skill: minimax-pdf
+    description: >
+      使用content.json作为内容与渲染之间的中间格式。
+      17种内容块类型(h1/h2/body/bullet/callout/table/chart/flowchart等)覆盖所有文档需求。
+    value: 内容与设计解耦，同一内容可流经不同设计系统
+
+  - id: xlsx-xml-direct-edit
+    name: XML直编完整性
+    skill: minimax-xlsx
+    description: >
+      编辑.xlsx时不使用openpyxl round-trip(破坏VBA/透视表)，
+      而是解压为XML → 直接编辑XML节点 → 重新打包。
+    workflow: xlsx_unpack.py → [edit/insert/add scripts] → xlsx_pack.py
+    value: 保全Excel所有高级特性的唯一可靠方式
+
+  - id: xlsx-formula-first
+    name: 公式优先计算
+    skill: minimax-xlsx
+    description: >
+      所有计算单元格必须使用Excel公式(xml <f>节点)，不硬编码数值。
+      配合财务颜色标准(蓝色=输入/黑色=公式/绿色=跨表引用)。
+    color_standard:
+      input:
+        hex: "0000FF"
+        role: "蓝色 — 硬编码输入/假设"
+      computed:
+        hex: "000000"
+        role: "黑色 — 公式/计算结果"
+      cross_sheet:
+        hex: "00B050"
+        role: "绿色 — 跨sheet引用"
+    value: 保证电子表格的可复算性和可审计性
+
+  - id: pptx-slide-module-architecture
+    name: 幻灯片模块化架构
+    skill: pptx-generator
+    description: >
+      每个幻灯片是独立JS模块，export createSlide(pres, theme)。
+      通过compile.js合并，theme对象(5键)是模块间的契约接口。
+    theme_contract:
+      primary: 最深色，标题
+      secondary: 深色，正文
+      accent: 中色调强调
+      light: 浅色强调
+      bg: 背景色
+    value: 支持并行开发(子Agent)、保证配色一致性
+
+  - id: pptx-page-type-classification
+    name: 页面类型分类
+    skill: pptx-generator
+    description: >
+      每张幻灯片必须归类为5种类型之一：Cover / TOC / Section Divider / Content / Summary。
+      不同页面类型有不同的布局规范和元素要求。
+    value: 保证演示文稿的视觉多样性和结构完整性
+
+  # ──────────────────────────────────────────
+  # 通用FAQ & 最佳实践
+  # ──────────────────────────────────────────
+
+  - id: content-best-practices
+    name: 内容生成最佳实践
+    skills: [minimax-docx, minimax-pdf, minimax-xlsx, pptx-generator]
+    practices:
+      - 首次执行前运行env_check/setup脚本
+      - 复杂操作优先使用脚本而非手动组合底层API
+      - 每次写入后运行校验管线
+      - 编辑任务使用XML直编(openpyxl仅用于新建)
+      - 颜色/样式从设计系统派生,不硬编码
+      - 并发独立任务可交由子Agent并行处理

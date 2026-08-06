@@ -1,0 +1,13 @@
+name: 音乐生成引擎
+version: 1.0.0
+status: seed
+dimension: creative
+source: 阿里云自主学习-音乐生成
+
+products:
+  - 通用: 自动匹配
+description: "AI自动生成背景音乐/BGM"
+atoms:
+  - aliyun_音乐生成-旋律结构
+  - aliyun_音乐生成-和弦进行
+  - aliyun_音乐生成-编曲层次

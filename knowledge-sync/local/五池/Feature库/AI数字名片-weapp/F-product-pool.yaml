@@ -1,0 +1,15 @@
+name: 产品池
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 产品池模块，提供产品列表展示、分类筛选、关键词搜索及联系供应商功能，方便用户浏览与对接产品
+atoms:
+  - PP-001: 产品列表
+  - PP-002: 分类筛选
+  - PP-003: 关键词搜索
+  - PP-004: 联系供应商
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

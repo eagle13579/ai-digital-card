@@ -1,0 +1,17 @@
+name: 名片画册CRUD
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-brochure-create: 名片创建
+  - A-brochure-edit: 名片编辑
+  - A-brochure-publish: 名片发布
+  - A-brochure-share: 名片分享
+  - A-brochure-import: 批量导入名片
+  - A-brochure-export: 批量导出名片
+description: 名片画册CRUD：创建/编辑/发布/分享/批量导入导出
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

@@ -1,0 +1,20 @@
+id: F-CA-CLEAR-12
+name: 清算协议检测引擎
+dimension: 💡 创造力
+description: >-
+  基于DB03出生证明心智模型构建的检测引擎，识别行业是否存在认证体系与金融/交易/采购渠道的强制绑定。检测维度：认证与融资渠道绑定、认证与交易所准入绑定、认证与加工/采购链绑定。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB03: 无法清算的石头(清算协议)
+products:
+  - 黑河调查局协议分析模块
+  - 认证-融资绑定检测系统
+employees:
+  - 计然
+  - 烛龙
+  - 乘黄
+priority: P0
+maturity: design

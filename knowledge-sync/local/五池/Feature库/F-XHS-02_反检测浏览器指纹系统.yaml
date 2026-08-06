@@ -1,0 +1,18 @@
+name: F-XHS-02_反检测浏览器指纹系统
+version: 1.0.0
+status: active
+dimension: 体系
+source: xiaohongshu-mcp (xpzouying/xiaohongshu-mcp)
+atoms:
+- XHS-04 浏览器反检测指纹系统
+description: >
+  反检测浏览器栈：内置浏览器+固定指纹seed(同账号同指纹)+stealth JS+
+  代理支持(日志掩码凭据)+cookies预加载维持登录态。宁可不启动也不启动错误的浏览器。
+products:
+- 内容自动化工厂
+- 社交媒体自动化
+- IMAI-PC-Executor
+employees:
+- 爬虫工程师
+- 自动化工程师
+- 安全工程师

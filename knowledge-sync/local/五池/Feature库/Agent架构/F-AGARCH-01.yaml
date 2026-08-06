@@ -1,0 +1,16 @@
+name: "Router-Skill架构引擎"
+version: "1.0.0"
+status: absorbed
+dimension: 体系
+source: 一速《7种主流Agent架构深度拆解》
+description: "意图路由+技能执行的确定性Agent架构。用户输入→Intent Router意图分类→路由到对应Skill执行。可缓存、可监控、可评估，极大降低幻觉风险。"
+atoms:
+  - AgentArch 05_RouterSkill架构
+  - AgentArch 10_确定性路由vs开放式生成
+products:
+  - 白泽控制台
+  - 文鳐技能集市
+  - 链客宝
+  - 中韩出海数智港
+  - 盖娅进化大脑
+absorbed_date: 2026-07-10

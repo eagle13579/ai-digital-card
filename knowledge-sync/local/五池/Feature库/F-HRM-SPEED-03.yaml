@@ -1,0 +1,14 @@
+name: F-HRM-SPEED-03
+title: "Skill经济飞轮体系"
+dimension:
+  layer: "组织层"
+  type: "进化"
+  impact: "战略级"
+atoms: ["skill-preload-economy", "skill-economy-flywheel", "ultimate-speed-formula"]
+description: "超过3次的任务建Skill，越用越省，复利效应。从38轮→22轮→15轮→0轮"
+status: active
+created: 2026-06-17
+
+products:
+  - 通用: 自动匹配
+creator: 白泽

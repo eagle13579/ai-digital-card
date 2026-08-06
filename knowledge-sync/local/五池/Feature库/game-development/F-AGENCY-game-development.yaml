@@ -1,0 +1,24 @@
+# 🎮 Feature: 游戏开发能力 (Game Development)
+id: F-AGENCY-GAME-DEV
+name: game-development
+version: 1.0.0
+description: The Agency吸收 - 游戏开发角色定义库 (20角色, 6引擎: Unity/Unreal/Godot/Roblox/Blender)
+source: agency-agents/game-development/
+status: absorbed
+atoms:
+  - game-design: Game Designer系统/机制架构方法论
+  - narrative-design: Narrative Designer故事系统/对话树
+  - level-design: Level Designer关卡布局/节奏控制
+  - technical-art: Technical Artist着色器/材质/管道优化
+  - audio-engineering: Game Audio Engineer程序化音频/空间音效
+  - unreal-architecture: Unreal Systems Engineer性能架构/混合渲染
+  - unity-architecture: Unity Architect ScriptableObject/ECS
+  - godot-scripting: Godot Gameplay Scripter GDScript/信号系统
+  - roblox-scripting: Roblox Systems Scripter Luau/服务端
+  - blender-pipeline: Blender Add-on Engineer Python自动化
+capabilities:
+  - game-design-principles: 游戏设计方法论(核心循环/玩家动机/系统平衡)
+  - multi-engine-architecture: 多引擎架构知识(Unreal/Unity/Godot/Roblox)
+  - narrative-system: 叙事系统设计(分支故事/对话树/世界观)
+  - audio-programming: 程序化音频制作
+integration: 补充AI数字军团游戏开发能力, 可直接注入文鳐(叙事)+乘黄(设计)

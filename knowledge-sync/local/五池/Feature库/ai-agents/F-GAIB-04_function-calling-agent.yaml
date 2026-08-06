@@ -1,0 +1,16 @@
+name: Function Calling & AI Agent架构
+version: 1.0.0
+status: production
+dimension: ai-agents
+source: microsoft/generative-ai-for-beginners (Lesson 11, 17)
+description: "Function Calling与AI Agent框架模式。LLM+State+Tools三角架构、AutoGen多Agent协作、LangChain AgentExecutor"
+atoms:
+  - GAIB-10: Function Calling & 工具集成
+  - GAIB-11: AI Agents（State + Tools + LLM）
+products:
+  - 白泽路由协议: Agent路由决策
+  - 盖娅AI公民网格: 多Agent编排
+  - 烛龙工程流: Agent化开发流水线
+employees:
+  - 白泽P9: Agent架构设计
+  - 狴犴P8: Agent工具安全审查

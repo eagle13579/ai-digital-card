@@ -1,0 +1,21 @@
+id: F-CI-QUIZ-08
+name: 提问能力评估引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS10提问能力=核心资产心智模型构建的能力评估引擎，对用户的提问
+  水平进行五维量化评估：精准度(锚定能力)、深度(递进能力)、广度(跨界
+  能力)、逻辑性(结构能力)、创新性(视角能力)。输出综合评分及个性化
+  提升建议。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS10: 提问能力=核心资产
+products:
+  - 提问能力评估系统
+  - AI交互素养诊断工具
+  - 个性化提问训练平台
+employees: [白泽, 计然, 毕方]
+priority: P0
+maturity: design

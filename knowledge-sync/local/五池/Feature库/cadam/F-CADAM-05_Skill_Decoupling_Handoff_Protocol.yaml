@@ -1,0 +1,14 @@
+name: Skill解耦+统一交接协议
+dimension: 体系
+description: AI Agent技能通过统一的事件/消息总线交接，而非直接调用内部方法。每个Skill自包含、独立运行。
+applies_to:
+  - 盖娅多Agent协作架构
+  - 白泽数字员工之间的标准化协作
+mental_model: |
+  Skill = 自包含的能力单元。输入JSON→处理→输出JSON。不依赖其他Skill的内部状态。
+  交接协议 = 输出文件放约定目录 + 事件通知。解耦使得每个Skill可独立测试、替换、版本管理。
+source: CADAM (Adam-CAD/CADAM)
+
+products:
+  - 文鳐技能集市: 自动匹配
+cadam_ref: AGENTS.md "Each skill must be self-contained and independent at runtime"

@@ -1,0 +1,16 @@
+name: 开源模型生态与选型
+version: 1.0.0
+status: production
+dimension: open-source
+source: microsoft/generative-ai-for-beginners (Lesson 16)
+description: "开源模型三大优势: Customizable高度可定制、Cost低成本、Flexibility灵活性。重要模型: Llama 2/4(Meta)、Mistral(MoE架构)、Falcon(TII)、OLMo(完全开源)。Hugging Face生态90k+模型。适用场景: 隐私敏感/成本敏感/需要定制化的企业"
+atoms:
+  - GAIB-15: 开源vs闭源模型选择策略
+  - GAIB-13: SLM与边缘部署
+products:
+  - Mac Mini推理: 开源模型部署
+  - 盖娅推理中间件: 多模型路由
+  - 中国软银: 模型投资评估
+employees:
+  - 白泽P9: 模型战略决策
+  - 计然P8: TCO分析

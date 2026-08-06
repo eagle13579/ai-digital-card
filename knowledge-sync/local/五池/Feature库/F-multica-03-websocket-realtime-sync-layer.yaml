@@ -1,0 +1,21 @@
+name: "F3: WebSocket 实时同步层"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - 服务端事件 (task:progress / message / complete)
+  - 前端订阅请求
+outputs:
+  - 前端实时更新
+  - cache invalidation 事件
+products: [multica-agent-runtime-gateway]
+related_atoms:
+  - websocket-hub-pattern
+  - daemon-pull-engine
+  - task-instance-frontend-state
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  基于 gorilla/websocket 的实时同步层，通过同步 Event Bus → WebSocket Hub → Browser Client
+  架构推送服务端事件。包含应用层心跳保活机制。对标 Pusher / Socket.IO。
+  产品化后可作为独立的实时通知服务，为白泽军团及外部系统提供实时推送能力。

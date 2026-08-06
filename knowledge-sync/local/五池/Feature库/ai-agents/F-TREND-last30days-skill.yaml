@@ -1,0 +1,15 @@
+name: Trending: last30days-skill
+version: 1.0.0
+status: draft
+dimension: ai-agents
+source: github trending 2026-07-09
+description: Auto-absorbed from GitHub Trending: mvanhorn/last30days-skill
+atoms:
+  - TREND-mvanhorn-last30days--01: /last30days
+  - TREND-mvanhorn-last30days--02: pipeline, api, plugin 模式
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

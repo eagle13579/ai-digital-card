@@ -1,0 +1,35 @@
+---
+feature_id: F-CHAINKE-CHATBOT-01
+name: AI招商客服机器人
+dimension: 场景
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 8
+source_model: "FAQ+意图识别+转人工混合模式"
+description: >
+  链客宝AI招商系统的智能客服层。7种意图识别、18条FAQ知识库、
+  上下文管理、转人工工单生成。Intercom风格暗色WebUI，
+  支持灰度发布（feature_flags控制）。
+inputs:
+  - 用户消息（自然语言）
+  - 会话上下文（最近3轮）
+  - 用户身份/阶段信息
+outputs:
+  - AI回复（FAQ匹配/LLM生成）
+  - 意图标签（加盟咨询/产品了解/投诉等）
+  - 转人工工单（含上下文摘要）
+sop:
+  1. 消息接收 → 意图识别（7类）
+  2. 知识库FAQ匹配（18条）
+  3. LLM生成回复（含上下文-最近3轮）
+  4. 转人工判断（自动/用户请求）
+quality_gates:
+  - FAQ匹配准确率 > 85%
+  - 转人工响应时间 < 30s
+  - 用户满意度 > 4/5
+iteration_history:
+  - date: 2026-06-13
+    action: 创建P2版本
+    status: active
+    score: 8

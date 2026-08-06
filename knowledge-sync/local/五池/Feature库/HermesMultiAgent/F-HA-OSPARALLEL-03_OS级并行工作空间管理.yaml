@@ -1,0 +1,14 @@
+id: F-HA-OSPARALLEL-03
+name: OS级并行工作空间管理
+dimension: 架构/部署
+domain: 系统架构
+atoms:
+  - HA-05 OS级绝对并行
+  - HA-06 API契约协作
+description: 通过workspace参数启动OS级隔离的并行开发工作空间。每个工作空间独立进程、独立文件系统、独立环境变量。Agent间只通过API/文档契约通信，不共享记忆。
+products:
+  - 海智港: 多租户物理隔离 — 每个客户独立workspace
+  - 链客宝: 生产vs开发双workspace并行运行
+  - 盖娅进化大脑: gaia_cortex vs brain_daemon 独立workspace运行
+status: active
+priority: P1

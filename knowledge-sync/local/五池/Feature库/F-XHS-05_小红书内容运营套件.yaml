@@ -1,0 +1,19 @@
+name: F-XHS-05_小红书内容运营套件
+version: 1.0.0
+status: active
+dimension: 产品
+source: xiaohongshu-mcp (xpzouying/xiaohongshu-mcp)
+atoms:
+- XHS-06 前置参数校验
+description: >
+  小红书全链路能力：二维码登录/cookies持久化/图文发布(本地路径图片优先)/
+  视频发布/搜索(5维筛选面板)/评论/点赞收藏/用户主页。含post-to-xhs技能包
+  (图文模式+长文模式+URL提取模式)。
+products:
+- 内容自动化工厂
+- 䑏疏跨境助手
+- 中文社交媒体自动化
+employees:
+- 内容运营
+- 市场专员
+- 新媒体运营

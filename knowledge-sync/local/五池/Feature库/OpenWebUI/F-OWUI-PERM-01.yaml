@@ -1,0 +1,24 @@
+id: F-OWUI-PERM-01
+name: Granular RBAC + Multi-Tenant Access Control
+source_model: Open WebUI Authorization System — 用户组/角色/资源级别权限控制
+dimension: 体系
+
+products:
+  - 通用: 自动匹配
+description: 多层级权限体系：超级管理员→管理员→用户→Group成员。每个资源(模型/知识库/工具/频道/函数)可独立配置读/写/执行权限，支持用户分组管理和SCIM企业级身份同步。
+input: 用户身份 + 资源ID + 操作类型(read/write/execute)
+output: 授权通过/拒绝
+sop: '① 用户认证(JWT/OAuth/API Key) → 提取身份
+
+  ② 资源访问控制: 检查用户+用户组的权限(access_grants表)
+
+  ③ 按资源类型分发: 模型/知识库/工具各有独立权限域
+
+  ④ 管理员拥有所有权限，创建者可管理自己的资源
+
+  ⑤ 审计日志记录所有权限决策'
+quality_gates: 权限检查<10ms、支持1000+并发访问决策、审计日志完整可追溯、安全绕过测试零漏洞
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝多租户/中韩数智港企业用户/中国软银投资者管理/AI招商系统权限

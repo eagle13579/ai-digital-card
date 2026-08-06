@@ -1,0 +1,19 @@
+id: F-CI-RESPONSE-06
+name: 响应匹配检测引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS06响应匹配定律构建的交互质量检测引擎，实时评估提问深度与AI响应
+  深度之间的匹配度。检测维度：提问信息密度、AI响应信息密度、深度匹配
+  系数、响应模式分类(检索模式vs推理模式vs创造模式)。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS06: 响应匹配定律
+products:
+  - AI对话质量监控系统
+  - 响应匹配仪表盘
+employees: [计然, 䑏疏]
+priority: P0
+maturity: design

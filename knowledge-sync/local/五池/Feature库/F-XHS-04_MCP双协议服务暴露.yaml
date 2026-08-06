@@ -1,0 +1,21 @@
+name: F-XHS-04_MCP双协议服务暴露
+version: 1.0.0
+status: active
+dimension: 体系
+source: xiaohongshu-mcp (xpzouying/xiaohongshu-mcp)
+atoms:
+- XHS-09 MCP工具注册模式
+- XHS-10 双协议服务器架构
+description: >
+  同一服务同时暴露Gin HTTP API + MCP协议接口(官方SDK)：
+  jsonschema注解驱动工具参数描述 + 共享service层 + 统一错误格式 +
+  优雅关闭。既给人类用又给AI用。
+products:
+- 企业知识库RAG
+- 赛博参谋
+- 白泽控制台
+- 链客宝
+employees:
+- 后端工程师
+- 技术负责人
+- 架构师

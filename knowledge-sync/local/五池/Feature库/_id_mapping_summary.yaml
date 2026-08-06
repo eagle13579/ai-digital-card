@@ -1,0 +1,2167 @@
+scan_date: '2026-06-12'
+feature_library_path: D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\五池\Feature库
+summary:
+  total_non_draft_files: 624
+  total_unique_feature_ids: 603
+  total_draft_files: 28
+duplicate_ids:
+  count: 21
+  details:
+    F-CJ-名片-04:
+      kept: 场景\F-CJ-XST-收割01_分享传播系统.yaml
+      duplicates:
+      - file: 场景\F-CJ-名片-04_名片分享传播系统.yaml
+        action: marked_as_duplicate
+    F-CJ-数智港-01:
+      kept: 场景\F-CJ-数智港-01_多语言门户引擎.yaml
+      duplicates:
+      - file: 场景\F-场景-数智港-01_多语言门户引擎.yaml
+        action: marked_as_duplicate
+    F-CJ-数智港-02:
+      kept: 场景\F-CJ-数智港-02_韩企客户成交包引擎.yaml
+      duplicates:
+      - file: 场景\F-场景-数智港-02_韩企客户成交包引擎.yaml
+        action: marked_as_duplicate
+    F-CJ-数智港-03:
+      kept: 场景\F-CJ-数智港-03_AI数字员工展示区.yaml
+      duplicates:
+      - file: 场景\F-场景-数智港-03_AI数字员工展示区.yaml
+        action: marked_as_duplicate
+    F-CZL-数智港-01:
+      kept: 创造力\F-CZL-数智港-01_韩企市场侦察引擎.yaml
+      duplicates:
+      - file: 创造力\F-创造-数智港-13_韩企市场侦察引擎.yaml
+        action: marked_as_duplicate
+    F-CZL-数智港-02:
+      kept: 创造力\F-CZL-数智港-02_AI智能选品分析引擎.yaml
+      duplicates:
+      - file: 创造力\F-创造-数智港-14_AI智能选品分析引擎.yaml
+        action: marked_as_duplicate
+    F-CZL-数智港-03:
+      kept: 创造力\F-CZL-数智港-03_跨境商业创新引擎.yaml
+      duplicates:
+      - file: 创造力\F-创造-数智港-15_跨境商业创新引擎.yaml
+        action: marked_as_duplicate
+    F-DAT-链客宝-01:
+      kept: 数据\F-DAT-链客宝-01_信任评分引擎.yaml
+      duplicates:
+      - file: 数据\F-SJ-XST-收割01_信任评分引擎.yaml
+        action: marked_as_duplicate
+    F-DATA-数智港-01:
+      kept: 数据\F-DATA-数智港-01_韩国进口合规知识图谱.yaml
+      duplicates:
+      - file: 数据\F-数据-数智港-04_韩国进口合规知识图谱.yaml
+        action: marked_as_duplicate
+    F-DATA-数智港-02:
+      kept: 数据\F-DATA-数智港-02_韩企销售管道分析器.yaml
+      duplicates:
+      - file: 数据\F-数据-数智港-05_韩企销售管道分析器.yaml
+        action: marked_as_duplicate
+    F-DATA-数智港-03:
+      kept: 数据\F-DATA-数智港-03_大航海北极星数据看板.yaml
+      duplicates:
+      - file: 数据\F-数据-数智港-06_大航海北极星数据看板.yaml
+        action: marked_as_duplicate
+    F-JBG-数智港-01:
+      kept: 基本功\F-JBG-数智港-01_三语SEO部署架构.yaml
+      duplicates:
+      - file: 基本功\F-基本-数智港-10_三语SEO部署架构.yaml
+        action: marked_as_duplicate
+    F-JBG-数智港-02:
+      kept: 基本功\F-JBG-数智港-02_远程部署运维SOP.yaml
+      duplicates:
+      - file: 基本功\F-基本-数智港-11_远程部署运维SOP.yaml
+        action: marked_as_duplicate
+    F-JBG-数智港-03:
+      kept: 基本功\F-JBG-数智港-03_AI权益计量引擎.yaml
+      duplicates:
+      - file: 基本功\F-基本-数智港-12_AI权益计量引擎.yaml
+        action: marked_as_duplicate
+    F-SJ-数智港-01:
+      kept: 审美\F-SJ-数智港-01_韩品精选展示设计系统.yaml
+      duplicates:
+      - file: 审美\F-审美-数智港-16_韩品精选展示设计系统.yaml
+        action: marked_as_duplicate
+    F-SJ-数智港-02:
+      kept: 审美\F-SJ-数智港-02_企业品牌暗色主题系统.yaml
+      duplicates:
+      - file: 审美\F-审美-数智港-17_企业品牌暗色主题系统.yaml
+        action: marked_as_duplicate
+    F-SJ-数智港-03:
+      kept: 审美\F-SJ-数智港-03_合规诊断报告UI系统.yaml
+      duplicates:
+      - file: 审美\F-审美-数智港-18_合规诊断报告UI系统.yaml
+        action: marked_as_duplicate
+    F-TX-数智港-01:
+      kept: 体系\F-TX-数智港-01_合规诊断引擎.yaml
+      duplicates:
+      - file: 体系\F-体系-数智港-07_合规诊断引擎.yaml
+        action: marked_as_duplicate
+    F-TX-数智港-02:
+      kept: 体系\F-TX-数智港-02_LLM增强合规分析链.yaml
+      duplicates:
+      - file: 体系\F-体系-数智港-08_LLM增强合规分析链.yaml
+        action: marked_as_duplicate
+    F-TX-数智港-03:
+      kept: 体系\F-TX-数智港-03_合规报告生成管线.yaml
+      duplicates:
+      - file: 体系\F-体系-数智港-09_合规报告生成管线.yaml
+        action: marked_as_duplicate
+    F-数据-原子挖掘-03:
+      kept: 数据\F-SJ-XST-收割02_社交网络评分.yaml
+      duplicates:
+      - file: 数据\F-数据-原子挖掘-03_信任网络社交评分.yaml
+        action: marked_as_duplicate
+old_system_ids:
+  count: 399
+  details:
+    F-体系-01:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-01_系统架构MECE拆解.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-01:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-01_多策略加权匹配评分.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-04:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-04_多维度企业匹配规则引擎.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-07:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-07_有界自主安全模型.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-09:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-09_Connector统一接口模式.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-10:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-10_Mx模块化增量注入.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-13:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-13_零依赖统一网关.yaml
+        action: marked_deprecated
+    F-体系-原子挖掘-15:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-原子挖掘-15_插件化子模块加载.yaml
+        action: marked_deprecated
+    F-体系-吸收026:
+      classification: old_system
+      files:
+      - file: 体系\F-体系-吸收026_吸收_AI_体系.yaml
+        action: marked_deprecated
+    F-创造力-01:
+      classification: old_system
+      files:
+      - file: 创造力\F-创造力-01_新问题发现器.yaml
+        action: marked_deprecated
+    F-创造力-原子挖掘-16:
+      classification: old_system
+      files:
+      - file: 创造力\F-创造力-原子挖掘-16_80ProWrapUpNudge.yaml
+        action: marked_deprecated
+    F-场景-01:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-01_用户场景MECE拆解.yaml
+        action: marked_deprecated
+    F-场景-原子挖掘-08:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-原子挖掘-08_ResearchGoal全生命周期.yaml
+        action: marked_deprecated
+    F-场景-行动项-2026-06-10_Anthropic-AI自进化行动池:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-2026-06-10_Anthropic-AI自进化行动池.yaml
+        action: marked_deprecated
+    F-场景-行动项-AI_outperforms_law_professors_in_Stanford_Law_stud:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-AI_outperforms_law_professors_in_Stanford_Law_stud.yaml
+        action: marked_deprecated
+    F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809185:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809185.yaml
+        action: marked_deprecated
+    F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809188:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809188.yaml
+        action: marked_deprecated
+    F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809191:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809191.yaml
+        action: marked_deprecated
+    F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809192:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-A_10_year_old_Xeon_is_all_you_need_precip-17809192.yaml
+        action: marked_deprecated
+    F-场景-行动项-Age_verification_tech_could_put_children_at_greate:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Age_verification_tech_could_put_children_at_greate.yaml
+        action: marked_deprecated
+    F-场景-行动项-Agentic_Mfw_precip-1781057186:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Agentic_Mfw_precip-1781057186.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810581:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810581.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810582:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810582.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810584:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810584.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810585:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810585.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810586:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810586.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810590:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810590.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810594:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810594.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810603:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810603.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810606:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810606.yaml
+        action: marked_deprecated
+    F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810611:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Algorithmic_Monocultures_in_Hiring_precip-17810611.yaml
+        action: marked_deprecated
+    F-场景-行动项-Alphabet_announces__80B_equity_capital_raise_to_ex:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Alphabet_announces__80B_equity_capital_raise_to_ex.yaml
+        action: marked_deprecated
+    F-场景-行动项-Amazon_Has_Axed_Its_New_Stargate_Series_precip-178:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Amazon_Has_Axed_Its_New_Stargate_Series_precip-178.yaml
+        action: marked_deprecated
+    F-场景-行动项-Amber_Tree__A_Middle_Ground_Between_Rowan_Red_and_:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Amber_Tree__A_Middle_Ground_Between_Rowan_Red_and_.yaml
+        action: marked_deprecated
+    F-场景-行动项-Anthropic_confidentially_submits_draft_S-1_to_the_:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Anthropic_confidentially_submits_draft_S-1_to_the_.yaml
+        action: marked_deprecated
+    F-场景-行动项-CS336__Language_Modeling_from_Scratch_precip-17809:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-CS336__Language_Modeling_from_Scratch_precip-17809.yaml
+        action: marked_deprecated
+    F-场景-行动项-Cessation_of_public_development_of_Kefir_C_compile:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Cessation_of_public_development_of_Kefir_C_compile.yaml
+        action: marked_deprecated
+    F-场景-行动项-ChatGPT_for_Google_Sheets_Exfiltrates_Workbooks_pr:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-ChatGPT_for_Google_Sheets_Exfiltrates_Workbooks_pr.yaml
+        action: marked_deprecated
+    F-场景-行动项-ChatGPT_for_Google_Sheets_is_vulnerable_to_data_ex:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-ChatGPT_for_Google_Sheets_is_vulnerable_to_data_ex.yaml
+        action: marked_deprecated
+    F-场景-行动项-Chibil__A_C_compiler_targeting__NET_IL_precip-1780:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Chibil__A_C_compiler_targeting__NET_IL_precip-1780.yaml
+        action: marked_deprecated
+    F-场景-行动项-Chuwi_Minibook_X__the_netbook_we_deserve_precip-17:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Chuwi_Minibook_X__the_netbook_we_deserve_precip-17.yaml
+        action: marked_deprecated
+    F-场景-行动项-Codex_just_found_a__workaround__of_not_having_sudo:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Codex_just_found_a__workaround__of_not_having_sudo.yaml
+        action: marked_deprecated
+    F-场景-行动项-Decades_of_Effort_Restore_Steelhead_and_Salmon_Pas:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Decades_of_Effort_Restore_Steelhead_and_Salmon_Pas.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921344:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921344.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921482:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921482.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921595:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921595.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921658:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921658.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921756:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921756.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921771:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921771.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921911:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780921911.yaml
+        action: marked_deprecated
+    F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780922075:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Handmade_Hawaiian_Islands_Map_precip-1780922075.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919698:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919698.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919895:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919895.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919904:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780919904.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780920274:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780920274.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780920616:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780920616.yaml
+        action: marked_deprecated
+    F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780921311:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-I_made_my_phone_slow_on_purpose_precip-1780921311.yaml
+        action: marked_deprecated
+    F-场景-行动项-Iran_stops_negotiations_with_U_S___vows_to__comple:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Iran_stops_negotiations_with_U_S___vows_to__comple.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780919895:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780919895.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780919904:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780919904.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780919970:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780919970.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780920466:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780920466.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780920620:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780920620.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780920952:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780920952.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780921056:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780921056.yaml
+        action: marked_deprecated
+    F-场景-行动项-KDE_at_30_precip-1780921173:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-KDE_at_30_precip-1780921173.yaml
+        action: marked_deprecated
+    F-场景-行动项-LLMs_Are_Closer_to_Religion_Than_They_Appear_preci:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-LLMs_Are_Closer_to_Religion_Than_They_Appear_preci.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920766:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920766.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920812:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920812.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920911:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780920911.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921031:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921031.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921105:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921105.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921242:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921242.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921801:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921801.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921909:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780921909.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780922073:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_Basics_for_Hackers__2019__precip-1780922073.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780913947:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780913947.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780914320:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780914320.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780914688:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780914688.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780914911:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780914911.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780915062:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780915062.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780915456:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780915456.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780915680:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780915680.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780915837:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780915837.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780916033:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780916033.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780916116:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780916116.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780916408:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780916408.yaml
+        action: marked_deprecated
+    F-场景-行动项-Linux_M68k_precip-1780917512:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Linux_M68k_precip-1780917512.yaml
+        action: marked_deprecated
+    F-场景-行动项-MacBook_Pro_Rival_with_the_Nvidia_Powered_Surface_:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-MacBook_Pro_Rival_with_the_Nvidia_Powered_Surface_.yaml
+        action: marked_deprecated
+    F-场景-行动项-Malicious_npm_packages_detected_across_Red_Hat_Clo:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Malicious_npm_packages_detected_across_Red_Hat_Clo.yaml
+        action: marked_deprecated
+    F-场景-行动项-Meta_launches_Instagram__Facebook__and_WhatsApp_su:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Meta_launches_Instagram__Facebook__and_WhatsApp_su.yaml
+        action: marked_deprecated
+    F-场景-行动项-Meta_legal_action_forces_Facebook_whistleblower_to:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Meta_legal_action_forces_Facebook_whistleblower_to.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780919442:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780919442.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780919669:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780919669.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780919887:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780919887.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780920006:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780920006.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780920360:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780920360.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780920524:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780920524.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780920759:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780920759.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_Cosmos_3_precip-1780920905:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_Cosmos_3_precip-1780920905.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780918179:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780918179.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780918335:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780918335.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780918396:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780918396.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921597:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921597.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921624:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921624.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921660:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921660.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921773:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921773.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921898:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921898.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780921913:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780921913.yaml
+        action: marked_deprecated
+    F-场景-行动项-Nvidia_RTX_Spark_precip-1780922045:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Nvidia_RTX_Spark_precip-1780922045.yaml
+        action: marked_deprecated
+    F-场景-行动项-Only_17__of_all_64-bit_Integers_are_products_of_tw:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Only_17__of_all_64-bit_Integers_are_products_of_tw.yaml
+        action: marked_deprecated
+    F-场景-行动项-Re___PATCH__OOM_pardon__a_k_a__don_t_kill_my_xlock:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Re___PATCH__OOM_pardon__a_k_a__don_t_kill_my_xlock.yaml
+        action: marked_deprecated
+    F-场景-行动项-Reconciling_Kubernetes_cost_estimates_with_CUR___F:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Reconciling_Kubernetes_cost_estimates_with_CUR___F.yaml
+        action: marked_deprecated
+    F-场景-行动项-Surface_Laptop_Ultra__Made_for_World_Makers_precip:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Surface_Laptop_Ultra__Made_for_World_Makers_precip.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920002:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920002.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920056:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920056.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920529:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920529.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920809:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920809.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920962:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780920962.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921202:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921202.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921314:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921314.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921378:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921378.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921591:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921591.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921620:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780921620.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780922028:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Dirt_That_Refused_to_Die_precip-1780922028.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_History_of__Prisencolinensinainciusol__precip-:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_History_of__Prisencolinensinainciusol__precip-.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_Newest_Instagram__Exploit__Is_the_Goofiest_I_v:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_Newest_Instagram__Exploit__Is_the_Goofiest_I_v.yaml
+        action: marked_deprecated
+    F-场景-行动项-The_TfL_Cupboard_Filled_with_Lost_Tube_Moquettes_p:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-The_TfL_Cupboard_Filled_with_Lost_Tube_Moquettes_p.yaml
+        action: marked_deprecated
+    F-场景-行动项-Tracing_HTTP_Requests_with_Go_s_net_HTTP_httptrace:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Tracing_HTTP_Requests_with_Go_s_net_HTTP_httptrace.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091634:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091634.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091641:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091641.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091643:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091643.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091658:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091658.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091670:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091670.yaml
+        action: marked_deprecated
+    F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091673:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Unix_in_East_Germany__GDR___1990__precip-178091673.yaml
+        action: marked_deprecated
+    F-场景-行动项-Using_Git_s_rerere_feature_to_escape_recurring_con:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Using_Git_s_rerere_feature_to_escape_recurring_con.yaml
+        action: marked_deprecated
+    F-场景-行动项-Using_safe-area-inset_to_build_mobile-safe_layouts:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-Using_safe-area-inset_to_build_mobile-safe_layouts.yaml
+        action: marked_deprecated
+    F-场景-行动项-When_AI_Crosses_the_Line__The_Matplotlib_Incident_:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-When_AI_Crosses_the_Line__The_Matplotlib_Incident_.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091491:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091491.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091497:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091497.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091506:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091506.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091584:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091584.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091596:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091596.yaml
+        action: marked_deprecated
+    F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091606:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_Backrooms__Stuns_with__81M_Debut_precip-178091606.yaml
+        action: marked_deprecated
+    F-场景-行动项-_GitHub__chikitang_A___DOCTYPE_html___html_lang__e:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-_GitHub__chikitang_A___DOCTYPE_html___html_lang__e.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917360:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917360.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917391:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917391.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917479:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917479.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917515:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917515.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917861:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917861.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780917974:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780917974.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-投票测试议题_precip-1780918170:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-投票测试议题_precip-1780918170.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780917141:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780917141.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780917377:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780917377.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780917868:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780917868.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780917891:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780917891.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918010:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918010.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918043:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918043.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918075:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918075.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918094:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918094.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918116:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918116.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918171:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918171.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918240:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918240.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918334:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918334.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918338:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918338.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918462:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918462.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918595:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918595.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918637:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918637.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918732:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918732.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-状态机测试提议_precip-1780918956:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-状态机测试提议_precip-1780918956.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917141:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917141.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917485:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917485.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917728:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917728.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917890:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917890.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917950:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917950.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780917969:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780917969.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918026:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918026.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918039:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918039.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918045:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918045.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918049:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918049.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918051:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918051.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918093:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918093.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918094:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918094.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918098:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918098.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918163:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918163.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918172:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918172.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918178:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918178.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918218:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918218.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918221:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918221.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918327:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918327.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918470:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918470.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918472:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918472.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918532:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918532.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest-结票测试议题_precip-1780918638:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest-结票测试议题_precip-1780918638.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780911724:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780911724.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780911849:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780911849.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912069:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912069.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912202:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912202.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912355:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912355.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912504:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912504.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912637:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912637.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912761:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912761.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912838:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912838.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780912962:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780912962.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780913085:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780913085.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780913207:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780913207.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780913596:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780913596.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780913687:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780913687.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780913945:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780913945.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780914194:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780914194.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780914317:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780914317.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780914445:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780914445.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780914764:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780914764.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780914968:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780914968.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780915195:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780915195.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780916407:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780916407.yaml
+        action: marked_deprecated
+    F-场景-行动项-pytest_测试提议_precip-1780916544:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-pytest_测试提议_precip-1780916544.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780911850:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780911850.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780911930:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780911930.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912070:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912070.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912205:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912205.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912360:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912360.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912507:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912507.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912761:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780912761.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913085:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913085.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913597:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913597.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913690:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780913690.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780914071:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780914071.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780914765:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780914765.yaml
+        action: marked_deprecated
+    F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780915448:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-中小企业跨境合规成本高_缺乏一站式合规SaaS工具_precip-1780915448.yaml
+        action: marked_deprecated
+    F-场景-行动项-扩建盖娅城邦第三区_precip-1780911848:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-扩建盖娅城邦第三区_precip-1780911848.yaml
+        action: marked_deprecated
+    F-场景-行动项-扩建盖娅城邦第三区_precip-1780912066:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-扩建盖娅城邦第三区_precip-1780912066.yaml
+        action: marked_deprecated
+    F-场景-行动项-扩建盖娅城邦第三区_precip-1780912500:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-扩建盖娅城邦第三区_precip-1780912500.yaml
+        action: marked_deprecated
+    F-场景-行动项-扩建盖娅城邦第三区_precip-1780912961:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-扩建盖娅城邦第三区_precip-1780912961.yaml
+        action: marked_deprecated
+    F-场景-行动项-测试议题_precip-1780911725:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-测试议题_precip-1780911725.yaml
+        action: marked_deprecated
+    F-场景-行动项-测试议题_precip-1780911936:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-测试议题_precip-1780911936.yaml
+        action: marked_deprecated
+    F-场景-行动项-测试议题_precip-1780912073:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-测试议题_precip-1780912073.yaml
+        action: marked_deprecated
+    F-场景-行动项-测试议题_precip-1780912213:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-测试议题_precip-1780912213.yaml
+        action: marked_deprecated
+    F-场景-行动项-测试议题_precip-1780912963:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-测试议题_precip-1780912963.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918784:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918784.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918843:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918843.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918854:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918854.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918855:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918855.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918890:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918890.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918909:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918909.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780918958:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780918958.yaml
+        action: marked_deprecated
+    F-场景-行动项-自动化测试提议_precip-1780919002:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-自动化测试提议_precip-1780919002.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780918737:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780918737.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780918750:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780918750.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780918843:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780918843.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780918871:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780918871.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780918909:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780918909.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780919004:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780919004.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780919123:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780919123.yaml
+        action: marked_deprecated
+    F-场景-行动项-集成测试提议_precip-1780919335:
+      classification: old_system
+      files:
+      - file: 场景\F-场景-行动项-集成测试提议_precip-1780919335.yaml
+        action: marked_deprecated
+    F-基本功-01:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-01_代码质量审查.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-digest_report_20260608_180215:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-digest_report_20260608_180215.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-digest_report_20260608_180239:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-digest_report_20260608_180239.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_2026-06-03_OBSERVED_IN_API前缀混用技术债:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_2026-06-03_OBSERVED_IN_API前缀混用技术债.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_analytics:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_analytics.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_api_keys:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_api_keys.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_auth:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_auth.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_sso:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_sso.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_vector_search:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_vector_search.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_webhooks:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_AFFECTS_webhooks.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_RESULTS_IN_前端需要知道两组URL:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_RESULTS_IN_前端需要知道两组URL.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_API前缀混用技术债_RESULTS_IN_无法统一做API版本控制:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_API前缀混用技术债_RESULTS_IN_无法统一做API版本控制.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_乘黄_PARTICIPATED_IN_道德经蜂巢讨论:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_乘黄_PARTICIPATED_IN_道德经蜂巢讨论.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_渐进式版本化过程中缺乏统一规范_RELATES_TO_渐进式版本化:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_渐进式版本化过程中缺乏统一规范_RELATES_TO_渐进式版本化.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_烛龙_PARTICIPATED_IN_道德经蜂巢讨论:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_烛龙_PARTICIPATED_IN_道德经蜂巢讨论.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_自动拆分_EXTRACTED_BY_2026-05-18_道德经12原子心智:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_自动拆分_EXTRACTED_BY_2026-05-18_道德经12原子心智.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_自动拆分_EXTRACTED_BY_道德经12原子心智模型:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_自动拆分_EXTRACTED_BY_道德经12原子心智模型.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_计然_PARTICIPATED_IN_道德经蜂巢讨论:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_计然_PARTICIPATED_IN_道德经蜂巢讨论.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_乘黄:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_乘黄.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_烛龙:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_烛龙.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_计然:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_CREATED_BY_计然.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_DERIVED_FROM_2026-05-18_道德经12原子心智:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_DERIVED_FROM_2026-05-18_道德经12原子心智.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_DERIVED_FROM_道德经蜂巢讨论:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_DERIVED_FROM_道德经蜂巢讨论.yaml
+        action: marked_deprecated
+    F-基本功-决策验证-rel_道德经12原子心智模型_HAS_DATA_现状数据:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-决策验证-rel_道德经12原子心智模型_HAS_DATA_现状数据.yaml
+        action: marked_deprecated
+    F-基本功-原子挖掘-06:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-原子挖掘-06_假设验证门禁流程.yaml
+        action: marked_deprecated
+    F-基本功-原子挖掘-11:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-原子挖掘-11_滑动窗口速率限制.yaml
+        action: marked_deprecated
+    F-基本功-原子挖掘-14:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-原子挖掘-14_统一数据层与序列化协议.yaml
+        action: marked_deprecated
+    F-基本功-原子挖掘-17:
+      classification: old_system
+      files:
+      - file: 基本功\F-基本功-原子挖掘-17_TraceCallID关联.yaml
+        action: marked_deprecated
+    F-审美-01:
+      classification: old_system
+      files:
+      - file: 审美\F-审美-01_用户界面审美评估.yaml
+        action: marked_deprecated
+    F-数据-01:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-01_数据采集管道设计.yaml
+        action: marked_deprecated
+    F-数据-原子挖掘-02:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-原子挖掘-02_数据飞轮漏斗.yaml
+        action: marked_deprecated
+    F-数据-原子挖掘-03:
+      classification: old_system
+      files:
+      - file: 数据\F-SJ-XST-收割02_社交网络评分.yaml
+        action: marked_deprecated
+      - file: 数据\F-数据-原子挖掘-03_信任网络社交评分.yaml
+        action: marked_deprecated
+    F-数据-原子挖掘-05:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-原子挖掘-05_单位经济模型仪表盘.yaml
+        action: marked_deprecated
+    F-数据-原子挖掘-12:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-原子挖掘-12_中文NLP字段提取管线.yaml
+        action: marked_deprecated
+    F-数据-原子挖掘-18:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-原子挖掘-18_Cohort留存分析引擎.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-18_国学经典100_综合变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-18_国学经典100_综合变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-18_道德经12模型_变量关系:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-18_道德经12模型_变量关系.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-20_Mano-P变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-20_Mano-P变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-20_OpenMontage变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-20_OpenMontage变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-21_IJPay支付注入_变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-21_IJPay支付注入_变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-26_预测之书变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-26_预测之书变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-05-30_Hermes多智能体协作变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-05-30_Hermes多智能体协作变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-01_从模型池均衡:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-01_从模型池均衡.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-03_Skill_Bundles_变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-03_Skill_Bundles_变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-03_Skill_Distillation_变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-03_Skill_Distillation_变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-03_hermes-dashboard-delivery-metrics:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-03_hermes-dashboard-delivery-metrics.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_Bundle覆盖率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_Bundle覆盖率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_FTS5技能搜索覆盖率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_FTS5技能搜索覆盖率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-05-19_白泽复盘_三重防护_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-05-19_白泽复盘_三重防护_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-05-24_出海AI顾问-灵魂_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-05-24_出海AI顾问-灵魂_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-05-24_出海AI顾问-灵魂_变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-05-24_出海AI顾问-灵魂_变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-05-30_军团日报_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-05-30_军团日报_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-06-02_合规自动化数智员工_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-06-02_合规自动化数智员工_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-06-04_投资决策系统设计方_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-06-04_投资决策系统设计方_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_2026-06-05_盘前推演_变量3.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_md_complete_b_变量3.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_MEMORY_process_logs__变量3.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_auto_evolve_report_2_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_auto_evolve_report_2_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_auto_evolve_report_2_变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_auto_evolve_report_2_变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_go-aiport安全架构最佳实践_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_go-aiport安全架构最佳实践_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量2.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_最佳实践_链客宝GEO引流全链路_变量3.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_L3_道法术器全案_变量1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_L3_道法术器全案_变量1.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_SKILL平均质量分:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_SKILL平均质量分.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_SKILL版本覆盖率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_SKILL版本覆盖率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-关键假设变量池:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-关键假设变量池.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-实事求是变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-实事求是变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-机会预判变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-机会预判变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-渠道探索变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-渠道探索变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-科学理念变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-科学理念变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-精益验证变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-精益验证变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_一堂-解放思想变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_一堂-解放思想变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_三路并行任务效率比:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_三路并行任务效率比.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_产品MECE分类冗余率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_产品MECE分类冗余率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_原子基础设施成熟度评分:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_原子基础设施成熟度评分.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_增长飞轮变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_增长飞轮变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_工业化生成变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_工业化生成变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_工业化评分提升效率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_工业化评分提升效率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_数字员工活跃率:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_数字员工活跃率.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_漫剧AI关键变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_漫剧AI关键变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_电商自动化变量池:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_电商自动化变量池.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_科学销售变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_科学销售变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_集中度变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_集中度变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-2026-06-06_需修复低质量SKILL数:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-2026-06-06_需修复低质量SKILL数.yaml
+        action: marked_deprecated
+    F-数据-变量数据-20260603_hermes_desktop变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-20260603_hermes_desktop变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-20260603_多Agent分工:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-20260603_多Agent分工.yaml
+        action: marked_deprecated
+    F-数据-变量数据-README:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-README.yaml
+        action: marked_deprecated
+    F-数据-变量数据-cloakbrowser-variables:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-cloakbrowser-variables.yaml
+        action: marked_deprecated
+    F-数据-变量数据-hermes多代理架构_关键变量:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-hermes多代理架构_关键变量.yaml
+        action: marked_deprecated
+    F-数据-变量数据-永乐大典_变量池同步:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-变量数据-永乐大典_变量池同步.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-05-17_P0-Q1_现象池补充:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-05-17_P0-Q1_现象池补充.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-05-18_国学经典100_综合现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-05-18_国学经典100_综合现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-05-18_道德经12模型_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-05-18_道德经12模型_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-01_从模型池均衡:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-01_从模型池均衡.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-03_Skill_Bundles_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-03_Skill_Bundles_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-03_Skill_Distillation_Tomasz_Tunguz_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-03_Skill_Distillation_Tomasz_Tunguz_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-03_api-prefix-mix:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-03_api-prefix-mix.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-03_hermes-dashboard-misidentify:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-03_hermes-dashboard-misidentify.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-03_nginx-default-server-location-not-worki:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-03_nginx-default-server-location-not-worki.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_240523_精华注入产品方案_现象1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_240523_精华注入产品方案_现象1.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象1.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象2.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_md_complete_b_现象3.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象1.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象2:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象2.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象3:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_MEMORY_process_logs__现象3.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_L3_每周赚钱机会分析飞轮SOP_现象1:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_L3_每周赚钱机会分析飞轮SOP_现象1.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_P0-P2工业化梯度推进现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_P0-P2工业化梯度推进现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_Watchdog重启二次验证失效现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_Watchdog重启二次验证失效现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_cronjob静默失效现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_cronjob静默失效现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_一堂-实事求是吸收记录:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_一堂-实事求是吸收记录.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_一堂-解放思想吸收记录:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_一堂-解放思想吸收记录.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_GEO全链路诊断定位内容平台_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_GEO全链路诊断定位内容平台_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_go-aiport_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_go-aiport_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_中国智慧AI顾问_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_中国智慧AI顾问_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_企业知识库RAG_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_企业知识库RAG_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_出海数智港统一入口_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_出海数智港统一入口_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_漫剧AI工厂_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_漫剧AI工厂_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_神机_中韩数智港能力注入_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_神机_中韩数智港能力注入_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品_透明议事厅_现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品_透明议事厅_现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_产品大脑发达四肢羸弱现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_产品大脑发达四肢羸弱现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_僵尸cronjob堆积现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_僵尸cronjob堆积现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_原子批量创建即架构设计现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_原子批量创建即架构设计现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_增量工业化双轨验证现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_增量工业化双轨验证现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_多Agent并行天花板现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_多Agent并行天花板现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_子Agent并行写冲突现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_子Agent并行写冲突现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_投资系统复盘心智模型:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_投资系统复盘心智模型.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_数据管道三段门禁缺位现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_数据管道三段门禁缺位现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_漫剧AI现象分析:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_漫剧AI现象分析.yaml
+        action: marked_deprecated
+    F-数据-现象数据-2026-06-06_白泽之眼复盘_心智模型:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-2026-06-06_白泽之眼复盘_心智模型.yaml
+        action: marked_deprecated
+    F-数据-现象数据-20260603_hermes_desktop现象:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-20260603_hermes_desktop现象.yaml
+        action: marked_deprecated
+    F-数据-现象数据-20260603_多Agent分工:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-20260603_多Agent分工.yaml
+        action: marked_deprecated
+    F-数据-现象数据-README:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-README.yaml
+        action: marked_deprecated
+    F-数据-现象数据-sk_06_执行日志到新技能自发现:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-sk_06_执行日志到新技能自发现.yaml
+        action: marked_deprecated
+    F-数据-现象数据-上古神话_现象池_20260518:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-上古神话_现象池_20260518.yaml
+        action: marked_deprecated
+    F-数据-现象数据-产品目录架构应用场景_2026-05-19:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-产品目录架构应用场景_2026-05-19.yaml
+        action: marked_deprecated
+    F-数据-现象数据-技能发现闭环:
+      classification: old_system
+      files:
+      - file: 数据\F-数据-现象数据-技能发现闭环.yaml
+        action: marked_deprecated
+draft_files:
+- 体系\F-CZL-编排-01_Swarm因子编排引擎.yaml
+- 体系\F-TX-AIHQ-三模块网关_三模块统一网关模式.yaml
+- 体系\F-TX-AIHQ-平台发布_平台发布技能集模式.yaml
+- 体系\F-TX-AIHQ-零依赖网关_零依赖HTTP网关.yaml
+- 体系\F-TX-LKB-双路径API_双路径API版本演进.yaml
+- 体系\F-TX-SRC-七层服务自愈保活_七层服务自愈保活模式.yaml
+- 体系\F-TX-SRC-多Agent任务编排MECE_多Agent任务编排与MECE拆解模式.yaml
+- 体系\F-TX-SRC-技能缺口自动发现_技能缺口自动发现模式.yaml
+- 体系\F-TX-SRC-跨环境双向同步桥_跨环境双向同步桥模式.yaml
+- 创造力\F-CZL-AIHQ-社媒工厂_社媒内容工厂6步自治循环.yaml
+- 创造力\F-CZL-LKB-ABACC_ABACC说服框架.yaml
+- 创造力\F-CZL-LKB-数据增强_数据增强三模式.yaml
+- 创造力\F-CZL-SRC-左右脑双螺旋收敛_左右脑双螺旋收敛模式.yaml
+- 创造力\F-SBZ-审美-02_三层AI匹配引擎.yaml
+- 场景\F-ARC-桥接-01_零依赖降级桥接模式.yaml
+- 场景\F-CJ-LKB-X1X10_X1X10能力进阶管道.yaml
+- 场景\F-CJ-LKB-假设门禁_假设验证门禁.yaml
+- 场景\F-CJ-SRC-员工路由轮值分配_员工路由轮值分配模式.yaml
+- 基本功\F-JBG-AIHQ-Playwright采集_Playwright社媒采集管道.yaml
+- 基本功\F-JBG-AIHQ-统一数据层_统一数据层.yaml
+- 基本功\F-JBG-SRC-资源调度并发控制_资源调度与并发控制模式.yaml
+- 基本功\F-JBG-SRC-配置文件分层合并_配置文件分层合并模式.yaml
+- 数据\F-DAT-AIHQ-渠道评分_渠道匹配5维评分.yaml
+- 数据\F-DAT-LKB-张力评分_张力评分引擎.yaml
+- 数据\F-DAT-LKB-留存分析_留存分析MECE框架.yaml
+- 数据\F-DAT-SRC-批量灵魂注入管道_批量灵魂注入管道模式.yaml
+- 数据\F-DAT-SRC-指数裂变监控熔断_指数裂变监控与熔断模式.yaml
+- 数据\F-SJ-XST-收割03_裂变监控引擎.yaml
+
+
+# ── 2026-08-03 全库复查（本地项目收割流水线 cron） ──
+rescan_2026-08-03:
+  scan_date: '2026-08-03'
+  source: gaia_local_project_harvester cron
+  total_yaml_files_incl_subdirs: 5120
+  unique_feature_ids: 2616
+  root_dir_yaml_files: 240
+  subdirectories: 119
+  harvest_state: aligned (21 projects, reconcile_harvest_state.py)
+  note: 索引较2026-06-12快照(603 IDs)增长4.3x，全库复查已记录真实规模
+
+# ── 2026-08-05 全库复查（本地项目收割流水线 cron） ──
+rescan_2026-08-05:
+  scan_date: '2026-08-05'
+  source: gaia_local_project_harvester cron
+  total_yaml_files_incl_subdirs: 5144
+  unique_feature_ids: 2634
+  root_dir_yaml_files: 240
+  subdirectories: 122
+  harvest_state: aligned (21 projects, reconcile_harvest_state.py 确认无漂移)
+  delta_vs_0803: '+24 yaml / +18 IDs / +3 子目录'
+  note: 本轮无新收割（白名单11个均为幻影项目），Feature库微增来自其他流水线；索引对齐完成

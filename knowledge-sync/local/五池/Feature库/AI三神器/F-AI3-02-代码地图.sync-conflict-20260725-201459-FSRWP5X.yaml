@@ -1,0 +1,87 @@
+name: 代码地图
+version: 0.1.0
+dimension: 基本功
+status: draft
+draft: true
+source_model: CodeGraph
+description: >
+  将项目源代码解析为知识图谱——谁调用谁、谁依赖谁一清二楚。
+  基于CodeGraph心智模型，从代码中提取函数/类/模块间的调用关系和
+  数据流依赖，构建结构化的代码地图。支持秒级定位目标代码位置，
+  全程本地执行，不依赖云端推理，将token消耗降低一个量级，
+  实现精准、低成本的代码修改。
+sop:
+  - step: 1
+    name: 扫描项目文件
+    action: 递归扫描项目目录，识别所有源代码文件及配置文件，排除非代码资产
+    tools:
+      - 文件嗅探器
+      - 语言检测器
+    input: project_path
+    output: file_inventory
+  - step: 2
+    name: 构建调用关系图
+    action: 对每个文件进行AST解析，提取函数定义/函数调用/类定义/类继承/模块导入关系，构建有向图
+    tools:
+      - AST解析器（多语言）
+      - 符号提取器
+      - 依赖分析引擎
+    output: call_graph
+  - step: 3
+    name: 提供结构查询接口
+    action: 暴露查询接口，支持按函数名/类名/文件路径/调用链/反向引用等方式检索代码位置
+    queries:
+      - find_callers({symbol}) -> 返回所有调用方
+      - find_callees({symbol}) -> 返回所有被调用方
+      - trace_path({from}, {to}) -> 返回调用路径
+      - find_definition({symbol}) -> 返回定义位置
+      - search_by_regex({pattern}) -> 返回匹配节点
+    output: query_engine
+  - step: 4
+    name: 基于地图精准改代码
+    action: 用户在查询引擎中选择目标点，系统基于调用影响范围分析，给出修改建议并执行精准替换
+    tools:
+      - 影响范围分析器
+      - 精准替换引擎
+    output: modified_code + impact_report
+input:
+  - name: project_path
+    type: string
+    description: 项目根目录路径
+  - name: query
+    type: string
+    description: 代码查询语句（自然语言或结构化查询）
+    optional: true
+  - name: target_symbol
+    type: string
+    description: 待修改/查看的目标符号（函数名/类名/变量名）
+    optional: true
+output:
+  - name: call_graph
+    type: object
+    description: 项目完整调用关系图，含节点列表与边列表
+  - name: query_result
+    type: array
+    description: 结构化查询结果，含文件路径、行号、符号上下文
+  - name: impact_report
+    type: object
+    description: 修改影响范围分析，含受影响文件列表及改动风险评估
+  - name: modified_code
+    type: string
+    description: 基于代码地图分析后的精准修改代码
+quality_gates:
+  - name: 图谱覆盖率
+    metric: 项目所有源文件解析率 >= 98%，未解析文件需标记
+    severity: critical
+  - name: 解析准确性
+    metric: 调用关系误报率 <= 1%，漏报率 <= 3%
+    severity: critical
+  - name: 查询响应
+    metric: 百万行级项目秒级响应（< 3s）
+    severity: major
+  - name: 本地化比率
+    metric: 全程本地执行，零云端调用
+    severity: critical
+  - name: token效率
+    metric: 相较直接re-prompting方式，token消耗降低 >= 70%
+    severity: major

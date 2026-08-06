@@ -1,0 +1,21 @@
+name: "F1: Agent-Runtime 插件化引擎"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - Agent CLI 多种 (Claude Code / Codex / Hermes / Gemini / Cursor / Copilot / OpenClaw / OpenCode / Pi)
+  - Agent 执行指令
+outputs:
+  - 统一执行 Session (Message channel + Result channel)
+  - 结构化 Agent 执行记录
+products: [multica-agent-runtime-gateway]
+related_atoms:
+  - agent-backend-plugin-pattern
+  - daemon-pull-engine
+  - multica-daemon-self-healing-runtime
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  统一多种 Agent CLI 的 Backend 接口，提供流式执行与 stdout/stderr 解析能力。
+  将异构 Agent 调用抽象为统一的 Session 结构（Message channel + Result channel），
+  对标 LangChain Agent Executor。白泽军团可复用此模式接入更多 Agent CLI。

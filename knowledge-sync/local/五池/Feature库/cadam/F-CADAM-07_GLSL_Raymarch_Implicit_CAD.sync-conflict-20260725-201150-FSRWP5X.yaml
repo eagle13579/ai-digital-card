@@ -1,0 +1,12 @@
+name: GLSL Raymarching 隐式CAD
+dimension: 创造力
+description: 用GLSL着色器的Raymarching技术实现浏览器原生隐式CAD建模，零依赖、帧级交互、可导出网格。
+applies_to:
+  - 盖娅之城实时3D预览
+  - 需要浏览器端高性能3D渲染的场景
+mental_model: |
+  传统CAD(B-rep/CSG)复杂→渲染慢。隐式CAD(SDF)简单→渲染快(GPU)。
+  SDF = Signed Distance Function，用数学公式描述形状，GPU并行计算。
+  GLSL Raymarching = 在像素着色器里"发射光线"找到SDF表面。
+source: CADAM
+cadam_ref: packages/implicitjs/ (隐式CAD运行时)

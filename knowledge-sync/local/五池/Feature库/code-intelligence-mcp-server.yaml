@@ -1,0 +1,51 @@
+# code-intelligence-mcp-server Feature
+
+name: code-intelligence-mcp-server
+version: v1.0.0
+source: codebase-memory-mcp (DeusData)
+origin: https://github.com/DeusData/codebase-memory-mcp
+
+description: 高性能代码智能 MCP 服务器。将代码库索引为持久化知识图谱，158语言tree-sitter解析，14个MCP工具，毫秒级查询。
+
+products:
+  - 企业知识库RAG  # 增加代码索引能力
+  - AI数智军团    # MCP工具集成
+
+atoms:
+  - C语言零依赖单静态二进制
+  - RAM优先管线
+  - 多Pass流水线架构
+  - 并行工作池
+  - Hybrid LSP类型解析
+  - 11信号语义搜索
+  - 知识图谱数据模型
+  - MCP协议原生集成
+  - 11Agent零配置接入
+  - 团队共享图制品
+  - 看门狗后台自动同步
+  - openCypher子集
+
+capabilities:
+  - 代码索引: 支持158语言tree-sitter AST解析
+  - 知识图谱: 14节点标签×20边类型
+  - MCP工具: 14个代码智能工具
+  - 语义搜索: 11信号纯算法评分
+  - 类型解析: Hybrid LSP 9语言深度类型解析
+  - 安装: 单二进制，一键安装11个Agent
+  - 同步: 后台git变更自动检测+增量重索引
+
+mcp_tools:
+  - index_repository: 索引代码库
+  - search_graph: 结构化搜索
+  - trace_path: 调用链追踪(BFS)
+  - detect_changes: git diff影响映射
+  - query_graph: Cypher图查询
+  - get_graph_schema: 获取图schema
+  - get_code_snippet: 按限定名读源码
+  - get_architecture: 代码库全景概览
+  - search_code: 代码文本搜索
+  - manage_adr: 架构决策记录CRUD
+  - list_projects: 列出已索引项目
+  - delete_project: 删除项目
+  - index_status: 索引状态检查
+  - ingest_traces: 运行时踪迹注入

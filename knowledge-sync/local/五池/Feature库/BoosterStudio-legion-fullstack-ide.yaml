@@ -1,0 +1,19 @@
+# Booster Studio 全栈Agent IDE 哲学
+# 从首行代码到真机跑通，所有环节深度定制
+name: "legion-fullstack-ide"
+version: "1.0.0"
+category: "军团平台"
+description: "AI数智军团全栈IDE：创建员工→注入灵魂→分配任务→验证结果的完整闭环"
+source: "Booster Studio"
+
+products:
+  - 白泽军团: 自动匹配
+mental_models:
+  - "全栈Agent IDE 哲学"
+  - "CLI First 设计"
+  - "原生客户体验"
+capabilities:
+  - legion_init: "legion init product-name 初始化产品"
+  - legion_spawn: "legion spawn employee-type 创建员工"
+  - legion_deploy: "legion deploy 部署到生产"
+  - legion_validate: "legion validate 沙箱验证"

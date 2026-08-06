@@ -1,0 +1,14 @@
+name: 活动中心
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 活动中心模块，展示活动列表，支持按状态筛选，提供在线报名功能，帮助用户参与各类活动
+atoms:
+  - AC-001: 活动列表
+  - AC-002: 状态筛选
+  - AC-003: 报名
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

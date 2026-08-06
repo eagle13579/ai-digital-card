@@ -1,0 +1,29 @@
+name: multi-source-stock-data-aggregator
+description: >
+  17个数据源优先级降级回退链，覆盖A股/港股/美股/日股/韩股/台股。
+  自动从最高优先级数据源获取数据，失败时无缝切换到下一级。
+version: "1.0.0"
+source: "daily_stock_analysis (ZhuLinsen, GitHub)"
+source_url: "https://github.com/eagle13579/daily_stock_analysis"
+products: ["中国软银投资系统", "䑏疏跨境助手", "AI自动交易引擎"]
+data_sources:
+  - "efinance (东方财富, P0)"
+  - "akshare (东方财富爬虫, P1)"
+  - "tushare (Tushare Pro, P2)"
+  - "pytdx (通达信, P2)"
+  - "baostock (P3)"
+  - "yfinance (Yahoo Finance, P4)"
+  - "longbridge (长桥, P5)"
+  - "tickflow (TickFlow, P6)"
+markets:
+  - "A股"
+  - "港股"
+  - "美股"
+  - "日股"
+  - "韩股"
+  - "台股"
+capabilities:
+  - "实时行情(K线/分时/盘口)"
+  - "技术指标计算"
+  - "基本面数据"
+  - "新闻公告"

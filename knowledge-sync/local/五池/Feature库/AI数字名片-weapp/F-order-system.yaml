@@ -1,0 +1,15 @@
+name: 订单系统
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 订单系统模块，管理订单列表与状态Tab切换，集成微信支付能力，支持再次购买，保障交易闭环
+atoms:
+  - OS-001: 订单列表
+  - OS-002: 状态Tab
+  - OS-003: 微信支付
+  - OS-004: 再次购买
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

@@ -1,0 +1,7 @@
+name: F-GHMCP-04_代码搜索MCP工具
+description: GitHub code search封装的MCP工具设计
+dimension: 基本功
+source: github/github-mcp-server
+products:
+  - AI数字军团
+  - 企业知识库RAG

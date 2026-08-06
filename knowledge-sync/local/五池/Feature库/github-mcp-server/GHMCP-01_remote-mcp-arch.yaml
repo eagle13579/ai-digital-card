@@ -1,0 +1,7 @@
+name: F-GHMCP-01_远程MCP Server架构
+description: HTTP远程MCP Server + OAuth/PAT认证模式
+dimension: 体系
+source: github/github-mcp-server
+products:
+  - AI数字军团MCP网关
+  - 盖娅之城

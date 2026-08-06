@@ -1,0 +1,25 @@
+name: "F-BH-02_自写工具浏览器拓展机制"
+description: "Agent在运行时自动编写辅助函数和领域技能的机制，harness每次运行自我增强"
+version: "1.0.0"
+dimension: "创造力"
+source: "browser-harness"
+source_model: "五池/模型池/BH-02_自我编写工具机制.md"
+author: "browser-use (MIT)"
+license: "MIT"
+
+mental_models:
+  - "自写工具: Agent发现缺口→写入agent_helpers.py→动态加载→下次可用"
+  - "领域技能沉淀: 网站特定知识(选择器/API/陷阱)自动文档化"
+
+components:
+  - "agent_helpers.py: 空壳脚手架, Agent写入自定义函数"
+  - "_load_agent_helpers(): 动态import并合并到全局命名空间"
+  - "domain-skills/: 80个网站特定技能.md文件"
+
+products:
+  - "AI数字军团: 员工自主编写和分享网站操作技能"
+  - "内容工厂: 浏览器自动化内容采集的工作流脚本"
+
+integration:
+  type: "workflow"
+  setup: "Agent发现需要自定义操作时, 写入agent_helpers.py即可自动生效"

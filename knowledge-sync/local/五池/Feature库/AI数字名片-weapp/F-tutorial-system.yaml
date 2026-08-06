@@ -1,0 +1,14 @@
+name: 使用教程页
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 使用教程页，按分类组织教程内容，支持展开/收起详情，提供相关教程推荐，帮助用户快速上手
+atoms:
+  - TS-001: 分类
+  - TS-002: 展开
+  - TS-003: 相关教程
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

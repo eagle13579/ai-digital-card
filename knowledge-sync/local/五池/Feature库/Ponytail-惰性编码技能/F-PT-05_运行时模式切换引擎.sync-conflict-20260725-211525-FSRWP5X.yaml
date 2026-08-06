@@ -1,0 +1,28 @@
+# === Feature定义 ===
+feature_id: "F-PT-05"
+name: "运行时模式切换引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "Ponytail-惰性编码技能/PT02, PT09"
+status: active
+score: 7
+
+## 定位
+one_liner: "白泽的多模式运行时(lite/full/ultra/review)切换+状态持久化"
+what_it_does: |
+  白泽的多模式运行时(lite/full/ultra/review)切换+状态持久化
+
+## SOP
+sop: |
+  1. 截获/ponytail命令
+  2. 解析模式参数
+  3. 持久化到标志文件
+  4. 注入对应context
+  5. 确认切换
+
+## 质量门禁
+quality_gate:
+  score: 7
+  checks:
+    - "可执行性: SOP步骤清晰可执行"
+    - "可验证: 有明确的输出/验证方法"

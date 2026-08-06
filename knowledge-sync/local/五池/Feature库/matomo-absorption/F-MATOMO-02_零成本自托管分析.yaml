@@ -1,0 +1,43 @@
+feature_id: "F-MATOMO-02"
+name: "零成本自托管分析 — Matomo PHP+MySQL自部署"
+version: "1.0.0"
+dimension: "场景"
+source_model: "Matomo Installer — 5分钟安装向导，PHP+MySQL自部署，数据主权完全自主"
+one_liner: "纯PHP+MySQL架构，无需SaaS费用，5分钟完成安装，数据100%掌控在自己服务器"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo是自托管分析平台的典型代表：所有组件（PHP应用+MySQL数据库）部署在自己服务器上。
+  安装向导5步完成：欢迎页→系统检查→数据库配置→超级用户创建→JS追踪代码获取。
+  无SaaS订阅费，无数据泄露风险，无第三方依赖。数据存储在国内服务器满足合规要求。
+  
+  — 部署方式: 裸PHP/nginx 或 Docker Compose (matomo+mariadb)
+  — 资源需求: 2核4G+ECS, 40GB磁盘
+  — 安装向导: UI向导 或 CLI console:install
+  - 升级: 通过 CoreUpdater 插件自动/手动升级
+input:
+  - "Linux/Windows服务器 (推荐Linux)"
+  - "PHP 8.0+ + MySQL/MariaDB + Nginx/Apache"
+  - "域名+SSL证书 (HTTPS强制)"
+output:
+  - "完整的自建Web分析平台"
+  - "数据完全在自有服务器中"
+  - "零SaaS订阅费用"
+sop:
+  - "step: 准备服务器 (PHP+MySQL+Nginx)"
+  - "step: 下载/克隆Matomo到web目录"
+  - "step: 访问 /index.php 启动安装向导"
+  - "step: 系统检查 → 数据库配置 → 超级用户"
+  - "step: 获取JS追踪代码嵌入目标网站"
+  - "step: 配置crontab定期归档 (./console core:archive)"
+quality_gate:
+  - "安装向导完成即验证通过"
+  - "数据库连接测试通过"
+  - "JS追踪代码可正常加载"
+  - "首条访客数据记录成功"
+dependencies:
+  - "PHP 8.0+ (pdo_mysql, gd, json, curl, mbstring)"
+  - "MySQL 5.7+ / MariaDB 10.3+"
+  - "Nginx / Apache"
+  - "SSL证书 (Let's Encrypt)"

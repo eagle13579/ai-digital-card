@@ -1,0 +1,827 @@
+version: '1.0'
+updated: 2026-06-04 07:11
+source: 母体记忆宫殿 skills/
+description: 所有 Profile 的共享技能索引，启动时按需加载
+categories:
+  .curator_backups:
+    description: ''
+    skills: []
+    count: 0
+  .hub:
+    description: ''
+    skills: []
+    count: 0
+  ai-employee-autonomous-closed-loop:
+    description: ''
+    skills: []
+    count: 0
+  ai-employee-product-creation:
+    description: ''
+    skills: []
+    count: 0
+  ai-legion-combat-sop:
+    description: ''
+    skills:
+    - ai-employee-sandbox-isolation-atom
+    - intent-routing-engine-atom
+    - three-layer-architecture-atom
+    count: 3
+  albert-einstein-perspective:
+    description: ''
+    skills: []
+    count: 0
+  aliyun-fastapi-react-deployment:
+    description: ''
+    skills: []
+    count: 0
+  alpine-flask-admin-panel:
+    description: ''
+    skills: []
+    count: 0
+  alpine-js-troubleshooting-native-fallback:
+    description: ''
+    skills: []
+    count: 0
+  api-frontend-format-mismatch-diagnosis:
+    description: ''
+    skills: []
+    count: 0
+  apple:
+    description: '---
+
+      description: Apple/macOS-specific skills — iMessage, Reminders, Notes, FindMy,
+      and macOS automat'
+    skills:
+    - apple-notes
+    - apple-reminders
+    - findmy
+    - imessage
+    - macos-computer-use
+    count: 5
+  architecture:
+    description: ''
+    skills:
+    - ai-digital-civilization
+    - gaia-matrix-architecture
+    - industrial-benchmark-system-redesign
+    - platform-module-architecture
+    - shared-database-security-architecture
+    count: 5
+  asset-scan-to-evolution-three-stage-delivery:
+    description: ''
+    skills: []
+    count: 0
+  atomic-absorption-into-product:
+    description: ''
+    skills: []
+    count: 0
+  atomic-product-combination-pipeline:
+    description: ''
+    skills: []
+    count: 0
+  autonomous-ai-agents:
+    description: '---
+
+      description: Skills for spawning and orchestrating autonomous AI coding agents
+      and multi-agent w'
+    skills:
+    - 7x24-autonomous-push-engine
+    - agent-workflow-atomization
+    - ai-agent-mesh-architecture
+    - bai-ze-complete-wake-protocol
+    - bai-ze-requirement-to-delivery
+    - baize-auto-recovery
+    - claude-code
+    - codex
+    - evolution-zone-autonomous-workflow
+    - gaia-awakening-engine
+    - hermes-agent
+    - hermes-multi-agent-deployment-essence
+    - image-ocr-analysis
+    - legion-self-evolution-engine
+    - legion-status
+    - multi-agent-competitive-simulation
+    - opencode
+    - product-auto-evolution-engine
+    - skill-eval-framework
+    - subconscious-evolution-engine
+    - superpower-decision-white-paper
+    - tiangong-automation-os
+    count: 22
+  baize-awakening:
+    description: ''
+    skills: []
+    count: 0
+  baize-legion-command:
+    description: ''
+    skills: []
+    count: 0
+  batch-employee-skill-deployment:
+    description: ''
+    skills: []
+    count: 0
+  beehive-to-continuous-execution:
+    description: ''
+    skills: []
+    count: 0
+  capability-injection-to-product:
+    description: ''
+    skills: []
+    count: 0
+  ceo-correction-protocol:
+    description: ''
+    skills: []
+    count: 0
+  ceo-first-principle-enforcer:
+    description: ''
+    skills: []
+    count: 0
+  ceo-no-bluff-first-redline:
+    description: ''
+    skills: []
+    count: 0
+  chinese-classics-100-master:
+    description: ''
+    skills: []
+    count: 0
+  classical-chinese:
+    description: ''
+    skills:
+    - caigentan-wisdom
+    - changcheng-wisdom
+    - chuanxilu-wisdom
+    - chuci-wisdom
+    - daodejing-wisdom
+    - daxue-wisdom
+    - dujiangyan-wisdom
+    - guanzi-wisdom
+    - guiguzi-wisdom
+    - hanfeizi-wisdom
+    - hongloumeng-wisdom
+    - huangdi-neijing-wisdom
+    - junxianzhi-wisdom
+    - kejuzhi-wisdom
+    - lollipop-essence
+    - lunyu-wisdom
+    - mengzi-wisdom
+    - sanguo-yanyi-wisdom
+    - shanggu-mythology-wisdom
+    - shiji-wisdom
+    - shijing-wisdom
+    - sidafaming-wisdom
+    - sunzi-bingfa-wisdom
+    - tangshi-songci-wisdom
+    - tiangongkaiwu-wisdom
+    - xinjing-wisdom
+    - xunzi-wisdom
+    - yijing-wisdom
+    - yongle-dadian-wisdom
+    - zhongyong-wisdom
+    - zhuangzi-wisdom
+    - zhuzi-baijia-wisdom
+    - zizhitongjian-wisdom
+    count: 33
+  code-injection-automation-pipeline:
+    description: ''
+    skills: []
+    count: 0
+  cognitive:
+    description: ''
+    skills:
+    - adr-decision-record-atom
+    - adversarial-validation-gate
+    - agent-cluster-json-pipeline
+    - ai-agent-platform-parity
+    - anthropic-founder-handbook-ai-native-startups
+    - architecture-beehive-collision-atom
+    - architecture-thinking-framework
+    - constraint-first-atom
+    - cross-project-best-practice-migration
+    - decision-triage-atom
+    - employee-route-dispatcher
+    - evolution-atomic-replication
+    - expert-secrets-essence
+    - hermes-multi-agent-architecture-absorption
+    - historical-pattern-prediction
+    - human-architect-thinking-essence
+    - industrial-benchmark-assessment
+    - legion-self-circulating-system
+    - lobster-flock-5-tier-sop
+    - lobster-flock-team-templates
+    - multi-agent-division-sop
+    - multi-agent-scenario-sop
+    - oscar-research-methodology
+    - palace-four-dimension-health-check
+    - palace-knowledge-navigation-system
+    - prediction-book-essence
+    - second-order-trace-atom
+    - six-phase-absorption-pipeline
+    - temple-decision-flywheel
+    - tension-matrix-atom
+    count: 30
+  compliance:
+    description: ''
+    skills:
+    - coffee-sister-compliance-essence
+    count: 1
+  creative:
+    description: '---
+
+      description: Creative content generation — ASCII art, hand-drawn style diagrams,
+      and visual desi'
+    skills:
+    - architecture-diagram
+    - ascii-art
+    - ascii-video
+    - baoyu-comic
+    - baoyu-infographic
+    - claude-design
+    - comfyui
+    - creative-ideation
+    - design-md
+    - design-system-foundation
+    - excalidraw
+    - humanizer
+    - manim-video
+    - p5js
+    - pixel-art
+    - popular-web-designs
+    - pretext
+    - sketch
+    - songwriting-and-ai-music
+    - touchdesigner-mcp
+    count: 20
+  cross-env-ai-sync-bridge:
+    description: ''
+    skills: []
+    count: 0
+  cross-environment-ai-management:
+    description: ''
+    skills: []
+    count: 0
+  cross-project-derivative-synthesis:
+    description: ''
+    skills: []
+    count: 0
+  data-science:
+    description: '---
+
+      description: Skills for data science workflows — interactive exploration, Jupyter
+      notebooks, dat'
+    skills:
+    - jupyter-live-kernel
+    count: 1
+  deploy-chain-recovery:
+    description: ''
+    skills: []
+    count: 0
+  design-doc-code-reality-pressure-test:
+    description: ''
+    skills: []
+    count: 0
+  devops:
+    description: ''
+    skills:
+    - 502-bad-gateway-mece-troubleshooting
+    - auto-execution-dedup
+    - baize-feishu-bot-deployment
+    - chainke-unified-gateway-deployment
+    - corp-org-cycle-direct-execution
+    - corp-org-cycle-execution
+    - cronjob-drvfs-write-persistence-fix
+    - cronjob-sandbox-background-pattern
+    - hermes-cron-background-process-pattern
+    - hermes-session-store-maintenance
+    - kanban-orchestrator
+    - kanban-worker
+    - mac-mini-autonomous-evolution
+    - memory-palace-cross-platform-sync
+    - remote-ssh-file-transfer-pattern
+    - resource-scheduler-system
+    - spa-deployment
+    - webhook-subscriptions
+    - wsl-infrastructure-operations
+    count: 19
+  diagramming:
+    description: '---
+
+      description: Diagram creation skills for generating visual diagrams, flowcharts,
+      architecture di'
+    skills: []
+    count: 0
+  digital-employee:
+    description: ''
+    skills:
+    - ai-employee-creation-standard-sop
+    - ai-legion-continuous-training-system
+    - amoeba-incubation-mechanism
+    - classic-wisdom-batch-injection
+    - human-to-ai-org-mapping-methodology
+    - inter-role-plan-interrogation
+    - memory-palace-development-protocol
+    count: 7
+  docs:
+    description: ''
+    skills: []
+    count: 0
+  dogfood:
+    description: ''
+    skills: []
+    count: 0
+  domain:
+    description: '---
+
+      name: domain-intel
+
+      description: Passive domain reconnaissance using Python stdlib. Use this skil'
+    skills: []
+    count: 0
+  dreamina-cli:
+    description: ''
+    skills: []
+    count: 0
+  dreamina-essence:
+    description: ''
+    skills: []
+    count: 0
+  dual-feishu-gateway-setup:
+    description: ''
+    skills: []
+    count: 0
+  elon-musk-perspective:
+    description: ''
+    skills: []
+    count: 0
+  email:
+    description: '---
+
+      description: Skills for sending, receiving, searching, and managing email from
+      the terminal.
+
+      ---'
+    skills:
+    - himalaya
+    count: 1
+  employee-batch-governance-workflow:
+    description: ''
+    skills: []
+    count: 0
+  employee-routing-enforcer:
+    description: ''
+    skills: []
+    count: 0
+  enterprise-git-workflow-sop:
+    description: ''
+    skills: []
+    count: 0
+  fastapi-delegate-post-check:
+    description: ''
+    skills: []
+    count: 0
+  fastapi-middleware-class-compatibility-fix:
+    description: ''
+    skills: []
+    count: 0
+  feeds:
+    description: '---
+
+      description: Skills for monitoring, aggregating, and processing RSS feeds, blogs,
+      and web conten'
+    skills: []
+    count: 0
+  feiyue-assistant-dev-pattern:
+    description: ''
+    skills: []
+    count: 0
+  feynman-perspective:
+    description: ''
+    skills: []
+    count: 0
+  five-layer-penetration-knowledge-evolution:
+    description: ''
+    skills: []
+    count: 0
+  flask-deployment-debug-triple-kill:
+    description: ''
+    skills: []
+    count: 0
+  flask-reverse-proxy-gateway:
+    description: ''
+    skills: []
+    count: 0
+  flask-reverse-proxy-service-gateway:
+    description: ''
+    skills: []
+    count: 0
+  fmhy-curatorial-essence:
+    description: ''
+    skills: []
+    count: 0
+  gaia-cortex:
+    description: ''
+    skills: []
+    count: 0
+  gaming:
+    description: '---
+
+      description: Skills for setting up, configuring, and managing game servers,
+      modpacks, and gaming'
+    skills:
+    - minecraft-modpack-server
+    - pokemon-player
+    count: 2
+  geo-marketing-full-stack:
+    description: ''
+    skills: []
+    count: 0
+  gifs:
+    description: '---
+
+      description: Skills for searching, downloading, and working with GIFs and short-form
+      animated me'
+    skills: []
+    count: 0
+  github:
+    description: '---
+
+      description: GitHub workflow skills for managing repositories, pull requests,
+      code reviews, issu'
+    skills:
+    - codebase-inspection
+    - github-auth
+    - github-code-review
+    - github-issues
+    - github-pr-workflow
+    - github-repo-management
+    count: 6
+  huanshu-intelligence-framework:
+    description: ''
+    skills: []
+    count: 0
+  inference-sh:
+    description: '# inference.sh
+
+
+      Run 150+ AI applications in the cloud via the [inference.sh](https://inference.sh)
+      p'
+    skills: []
+    count: 0
+  insforge-deno-sandbox:
+    description: ''
+    skills: []
+    count: 0
+  kimi-agent-cluster-legion-sop:
+    description: ''
+    skills: []
+    count: 0
+  kimi-k2-5-agent-cluster-absorption:
+    description: ''
+    skills: []
+    count: 0
+  knowledge-absorption-methodology:
+    description: ''
+    skills: []
+    count: 0
+  leisure:
+    description: ''
+    skills:
+    - find-nearby
+    count: 1
+  linkbao-aliyun-deploy-workflow:
+    description: ''
+    skills: []
+    count: 0
+  linus-torvalds-perspective:
+    description: ''
+    skills: []
+    count: 0
+  mao-zedong-perspective:
+    description: ''
+    skills: []
+    count: 0
+  mcp:
+    description: '---
+
+      description: Skills for working with MCP (Model Context Protocol) servers, tools,
+      and integratio'
+    skills:
+    - mcporter
+    count: 1
+  media:
+    description: '---
+
+      description: Skills for working with media content — YouTube transcripts, GIF
+      search, music gene'
+    skills:
+    - gif-search
+    - heartmula
+    - songsee
+    - spotify
+    - youtube-content
+    count: 5
+  miyamoto-musashi-perspective:
+    description: ''
+    skills: []
+    count: 0
+  mlops:
+    description: '---
+
+      description: Knowledge and Tools for Machine Learning Operations - tools and
+      frameworks for trai'
+    skills:
+    - huggingface-hub
+    - ml-model-evaluation-gates
+    count: 2
+  multi-project-api-consolidation:
+    description: ''
+    skills: []
+    count: 0
+  multi-stack-capability-boundary-audit:
+    description: ''
+    skills: []
+    count: 0
+  nginx-react-subpath-deployment:
+    description: ''
+    skills: []
+    count: 0
+  note-taking:
+    description: '---
+
+      description: Note taking skills, to save information, assist with research,
+      and collab on multi-'
+    skills:
+    - obsidian
+    count: 1
+  notes-and-methodology:
+    description: ''
+    skills:
+    - hermes-multi-agent-architecture-guide
+    count: 1
+  nvwa-soul-distillation:
+    description: ''
+    skills: []
+    count: 0
+  openhuman-essence:
+    description: ''
+    skills: []
+    count: 0
+  overseas-expansion:
+    description: ''
+    skills:
+    - china-korea-digital-port-dev
+    - china-softbank-operating-system
+    - feishu-cli-integration
+    - huozhi-liezhuan-business-wisdom
+    - market-intelligence-engine
+    count: 5
+  polaris-kanban-multi-issue-batch-fix:
+    description: ''
+    skills: []
+    count: 0
+  product:
+    description: ''
+    skills:
+    - ai-dragon-head-quant-strategy
+    - amoeba-startup-arena
+    - api-to-conversational-employee
+    - asset-consolidation-flywheel
+    - atomic-product-discovery-flywheel
+    - chainke-development-best-practice
+    - chinese-stock-short-term-quant
+    - content-factory-autonomous-ops
+    - content-factory-route-discovery
+    - document-archiving-best-practice
+    - enterprise-development-best-practice
+    - firefighting-entrepreneurship
+    - five-elements-arctic-star
+    - five-layer-architecture-pattern
+    - five-layer-panoramic-architecture
+    - fractal-architecture-engine
+    - intelligence-harvesting-pipeline
+    - multi-product-feature-injection
+    - multi-track-product-audit
+    - polaris-industrial-platform
+    - product-data-three-layer-isolation
+    - product-directory-architecture-standard
+    - product-directory-archive-standard
+    - product-evolution-autonomous-super-system
+    - product-three-tier-architecture
+    - product-vision-expansion
+    - skill-bundles-framework
+    - three-layer-org-architecture
+    - wechat-miniprogram-development
+    count: 29
+  product-architecture-merger:
+    description: ''
+    skills: []
+    count: 0
+  product-deployment-commercialization-sop:
+    description: ''
+    skills: []
+    count: 0
+  product-inception-from-docs:
+    description: ''
+    skills: []
+    count: 0
+  productivity:
+    description: '---
+
+      description: Skills for document creation, presentations, spreadsheets, and
+      other productivity w'
+    skills:
+    - airtable
+    - business-document-archiving
+    - google-workspace
+    - linear
+    - load-window-a
+    - load-window-b
+    - load-window-c
+    - load-window-x1
+    - load-window-x2
+    - load-window-x3
+    - load-window-x4
+    - maps
+    - nano-pdf
+    - notion
+    - powerpoint
+    - show-all-windows
+    - teams-meeting-pipeline
+    count: 17
+  project-role-instantiator:
+    description: ''
+    skills: []
+    count: 0
+  project-status-recovery:
+    description: ''
+    skills: []
+    count: 0
+  red-teaming:
+    description: ''
+    skills:
+    - godmode
+    count: 1
+  remote-training-server-diagnosis:
+    description: ''
+    skills: []
+    count: 0
+  research:
+    description: '---
+
+      description: Skills for academic research, paper discovery, literature review,
+      domain reconnaiss'
+    skills:
+    - arxiv
+    - blogwatcher
+    - llm-wiki
+    - polymarket
+    - research-paper-writing
+    - tianji-paper-pipeline-cron
+    count: 6
+  security:
+    description: ''
+    skills: []
+    count: 0
+  shared:
+    description: ''
+    skills: []
+    count: 0
+  shenji-three-ring-automation:
+    description: ''
+    skills: []
+    count: 0
+  silent-user-decision-flow:
+    description: ''
+    skills: []
+    count: 0
+  smart-home:
+    description: '---
+
+      description: Skills for controlling smart home devices — lights, switches, sensors,
+      and home aut'
+    skills:
+    - openhue
+    count: 1
+  social-media:
+    description: '---
+
+      description: Skills for interacting with social platforms and social-media workflows
+      — posting, '
+    skills:
+    - xitter
+    - xurl
+    count: 2
+  software-development:
+    description: ''
+    skills:
+    - action-router-python-pattern
+    - attention-system-python-pattern
+    - base-tool-employee
+    - checkpoint-delegate-protocol
+    - cloakbrowser-browser-automation
+    - code-harvest-full-source-sop
+    - config-hub-python-pattern
+    - context-trimmer
+    - cross-platform-python-pattern
+    - data-source-protocol
+    - debugging-hermes-tui-commands
+    - dual-persistence-python-pattern
+    - eventbus-python-pattern
+    - fastapi-dev-middleware-patterns
+    - flask-style-bridge
+    - hermes-agent-skill-authoring
+    - hex-grid-python-pattern
+    - ijpay-essence
+    - large-page-dev-safety-sop
+    - lifecycle-hook-python-pattern
+    - mano-p-essence
+    - mcp-budget-guard
+    - multi-agent-collaboration-architecture
+    - node-inspect-debugger
+    - openhuman-memory-tree-essence
+    - openhuman-subconscious-essence
+    - openhuman-tokenjuice-essence
+    - openmontage-essence
+    - plan
+    - product-audit-parallel-deploy
+    - programmatic-audio-python-pattern
+    - project-architecture-reconnaissance
+    - python-debugpy
+    - requesting-code-review
+    - scoring-engine
+    - session-orchestrator-pattern
+    - skillclaw-essence
+    - slidev-essence
+    - spatial-workspace-python-pattern
+    - spike
+    - stpageflip-flipbook-integration
+    - streaming-sse-ai-python-pattern
+    - subagent-driven-development
+    - subconscious-essence
+    - swarm-delegate-wrapper
+    - systematic-debugging
+    - vibecraft-absorption
+    - wanshanwuzu-essence
+    - wechat-miniprogram-native-audit
+    - writing-plans
+    count: 50
+  steve-jobs-perspective:
+    description: ''
+    skills: []
+    count: 0
+  subagent-code-api-consistency-verification:
+    description: ''
+    skills: []
+    count: 0
+  subagent-sandbox-persistence-verification:
+    description: ''
+    skills: []
+    count: 0
+  three-layer-org-and-ai-employee-productization:
+    description: ''
+    skills: []
+    count: 0
+  unified-portal-development-team-pattern:
+    description: ''
+    skills: []
+    count: 0
+  v1-to-v2-incremental-integration:
+    description: ''
+    skills: []
+    count: 0
+  warren-buffett-perspective:
+    description: ''
+    skills: []
+    count: 0
+  website-icp-compliance:
+    description: ''
+    skills: []
+    count: 0
+  yuanbao:
+    description: ''
+    skills: []
+    count: 0
+  zhairu-kb-butler-productization:
+    description: ''
+    skills: []
+    count: 0
+total_skills: 277
+loading_guide:
+  principle: 每个 Profile 只加载项目相关的 30-50 个技能，不加载全量
+  how_to_use: Profile 的 SOUL.md 中声明需要的 category 列表，启动时自动加载对应分类
+  example:
+    chainke-dev:
+    - product
+    - devops
+    - software-development
+    - cognitive
+    gaia-city:
+    - product
+    - cognitive
+    - overseas-expansion
+    evolution:
+    - autonomous-ai-agents
+    - cognitive
+    - digital-employee
+profile_skills: []
+last_backfeed_sync: '2026-06-04T07:14:39.004184'
+last_sync: '2026-06-04T07:15:52.580565'

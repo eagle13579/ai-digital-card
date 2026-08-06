@@ -1,0 +1,40 @@
+feature_id: "F-MATOMO-05"
+name: "隐私设计框架 — Matomo Cookie opt-out + IP匿名 + 数据保留"
+version: "1.0.0"
+dimension: "体系"
+source_model: "Matomo PrivacyManager插件 — Cookie opt-out, IP匿名化, 数据保留策略, 用户数据删除"
+one_liner: "内置完整的隐私合规框架：Cookie opt-out组件、IP地址匿名化、数据保留自动清理、GDPR工具集"
+what_it_does: >
+  Matomo的PrivacyManager插件提供了开箱即用的隐私合规能力，面向GDPR/PIPL/CCPA等法规：
+  
+  1. **Cookies Opt-out** — 提供Widget嵌入到网站，用户可一键选择不被追踪。默认禁用第三方Cookie。
+  2. **IP地址匿名化** — 在Tracker层将IP最后1-2字节置零 (如 192.168.1.0)，存储前即匿名。
+  3. **数据保留策略** — 可配置原始日志保留天数、归档数据保留月数、报告数据保留年数。自动清理过期数据。
+  4. **用户数据删除** — 提供根据访客ID删除全部历史数据的功能，满足被遗忘权要求。
+  5. **GDPR工具** — 数据导出功能 (用户可下载其全部数据)、管理界面数据删除请求。
+  6. **无需Cookie模式** — 可配置不设置任何追踪Cookie，仅用第一方标识。
+  
+  不只合规：这是产品级信任差异化 — 竞争对手需要繁琐配置，Matomo开箱即合规。
+input:
+  - "追踪请求中的原始IP"
+  - "浏览器Cookie状态"
+  - "合规法规要求 (GDPR/PIPL/CCPA)"
+output:
+  - "匿名化后的存储数据"
+  - "符合法规的追踪配置"
+  - "自动数据清理策略"
+sop:
+  - "step: 安装PrivacyManager插件 (默认集成)"
+  - "step: 配置IP匿名化位数 (1/2字节)"
+  - "step: 设置数据保留策略 (原始日志/归档/报告)"
+  - "step: 嵌入opt-out Widget (iframe/JS)"
+  - "step: 配置删除旧数据的定时任务"
+  - "step: (可选) 禁用追踪Cookie"
+quality_gate:
+  - "IP匿名化已启用"
+  - "数据保留策略已配置"
+  - "opt-out Widget可正常访问"
+  - "历史数据清理已验证"
+dependencies:
+  - "PrivacyManager插件"
+  - "crontab (定期清理)"

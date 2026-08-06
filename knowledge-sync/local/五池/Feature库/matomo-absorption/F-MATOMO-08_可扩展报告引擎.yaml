@@ -1,0 +1,53 @@
+feature_id: "F-MATOMO-08"
+name: "可扩展报告引擎 — Matomo插件注册新报告+可视化"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "Matomo API + Report插件注册机制 — 插件可注册新的API方法和报告，DataTable驱动所有可视化"
+one_liner: "通过插件注册新报告和可视化类型，DataTable统一数据结构驱动多形态展示，无需修改核心代码"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo的可扩展报告引擎允许插件无需修改核心代码即可：
+  
+  **注册新报告** — 插件通过继承 Report 基类，实现 getDefaultTypeView() 等接口，
+  即可在侧边栏导航中出现新报告页面，数据从API自动获取。
+  
+  **API扩展** — 每个报告自动对应一个API方法，插件可通过 registerAPI() 
+  注册自定义API，DataTable为统一数据交换格式。
+  
+  **自定义可视化** — 通过 Visualizations 插件注册新的可视化类型，
+  如数据表格/折线图/柱状图/饼图/地图/热力图等。DataTable作为底层数据结构，
+  不同可视化只是同一数据的展示方式。
+  
+  **报告维度** — 支持添加自定义维度 (CustomDimensions插件)，
+  使报告可按自定义属性 (如会员等级/来源渠道) 进行分组。
+  
+  — Report基类: getDefaultTypeView()/getName()/getMetrics()/configureView()
+  — API基类: getXxx() 方法自动暴露为API
+  — DataTable: 统一数据结构，支持 Row/Map/Simple 三种形态
+input:
+  - "插件开发者的报告逻辑"
+  - "API数据处理"
+  - "可视化配置 (图表类型/颜色/尺寸)"
+output:
+  - "侧边栏新增报告页面"
+  - "API端点自动注册"
+  - "自定义可视化展示"
+  - "DataTable数据格式"
+sop:
+  - "step: 创建插件并继承 Report 基类"
+  - "step: 实现 getDefaultTypeView() 定义报告视图"
+  - "step: 实现 getMetrics() 声明报告指标"
+  - "step: 注册API方法 (如需要)"
+  - "step: 在 plugin.json 声明报告"
+  - "step: 激活插件查看新报告"
+quality_gate:
+  - "报告在侧边栏可见"
+  - "API返回正确DataTable格式"
+  - "可视化渲染正常"
+  - "报告数据与核心报告一致"
+dependencies:
+  - "Piwik\\Plugin\\Report 基类"
+  - "Piwik\\DataTable"
+  - "Piwik\\Visualization"

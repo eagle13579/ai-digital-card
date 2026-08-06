@@ -1,0 +1,14 @@
+name: github-actions-daily-analysis
+description: >
+  15+ GitHub Actions Workflows覆盖每日分析、CI/CD、自动发版、
+  Docker构建、PR审查、Issue管理。
+version: "1.0.0"
+source: "daily_stock_analysis (ZhuLinsen)"
+products: ["中国软银投资系统", "AI自动交易引擎"]
+workflows:
+  - "00-daily-analysis.yml: 每日定时分析"
+  - "ci.yml: 测试+lint+类型检查"
+  - "docker-publish.yml: Docker镜像自动构建发布"
+  - "desktop-release.yml: 桌面端安装包构建"
+  - "pr-review.yml: AI自动PR审查"
+  - "stale.yml: Issue/PR过期标记"

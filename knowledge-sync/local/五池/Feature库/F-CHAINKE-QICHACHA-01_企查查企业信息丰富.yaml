@@ -1,0 +1,36 @@
+---
+feature_id: F-CHAINKE-QICHACHA-01
+name: 企查查企业信息丰富
+dimension: 数据
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 8
+source_model: "企查查开放平台API+数据增强模式"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝AI招商系统的线索发现层组件。通过企查查API自动丰富
+  企业信息（工商信息/司法风险/经营状况/知识产权等），
+  为匹配评分提供多维特征数据。
+inputs:
+  - 企业名称/统一社会信用代码
+outputs:
+  - 丰富后的企业信息JSON（含工商/风险/经营/知产4大类）
+  - AI摘要（LLM生成的企业全景画像）
+  - 数据新鲜度标签
+sop:
+  1. 企业搜索（名称/信用代码多模式匹配）
+  2. 信息采集（工商信息/司法/经营/知产4路并行）
+  3. AI摘要生成（DeepSeek总结企业全景）
+  4. 缓存策略（减少API调用，T+24h刷新）
+quality_gates:
+  - 企业匹配准确率 > 95%
+  - API请求缓存命中率 > 70%
+  - 信息完整度评分 > 8/10
+iteration_history:
+  - date: 2026-06-13
+    action: 创建P0版本
+    status: active
+    score: 8

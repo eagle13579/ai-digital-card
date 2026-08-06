@@ -1,0 +1,11 @@
+feature:
+  id: F-AICARD-SECURITY-HARDENING
+  name: ai-card-security-hardening
+  description: "AI数字名片纵深安全防御 — rate_limiter激活+CORS白名单+6安全头+security_audit.py自动化扫描"
+  source_project: "AI数字名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - CORS

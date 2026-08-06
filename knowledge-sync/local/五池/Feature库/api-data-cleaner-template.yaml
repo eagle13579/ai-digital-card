@@ -1,0 +1,26 @@
+name: api-data-cleaner-template
+description: 平台API数据清洗模板 — 将冗余API JSON自动精简为核心字段，减少Token消耗50-70%
+version: 1.0.0
+author: Agent Reach v1.3.0 萃取（XHS格式化器）
+source: github.com/Panniantong/agent-reach (xiaohongshu.py)
+license: MIT
+
+mental_models:
+  - AR-07: 平台数据结构清洗模式
+  - AR-12: 通用公开API通道模式
+
+components:
+  - clean_note: 从嵌套API响应中提取核心字段（id/title/content/author/互动/图片/标签/评论）
+  - clean_comment: 从嵌套评论中提取 content + user + 互动数据
+  - auto_detect_format: 自动识别列表/单对象/嵌套包装器的数据结构
+  - pipe_formatter: CLI管道清洗模式 `mcporter call ... | agent-reach format xhs`
+
+products:
+  - 内容工厂: 社交媒体内容采集后降噪
+  - 蚕茧帝国: 外部API响应标准化
+  - AI数字军团: 信息采集管道的数据预处理
+
+integration:
+  type: python_function
+  dependencies: []
+  setup: 复制 _clean_note/_clean_comment 函数，根据不同API调整字段映射表

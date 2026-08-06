@@ -1,0 +1,32 @@
+datapack_id: "DP-HR-能力-工程·技术"
+name: "工程·技术人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "工程·技术领域2名员工的能力档案"
+
+source: "employees/ 按能力关键词分类"
+
+contents: |
+  2名工程·技术领域员工:
+  - 烛龙
+      - 烛龙-9eb456c4
+
+data_format: "员工YAML + 能力矩阵"
+
+mount_interface:
+  load: "加载此领域全部员工档案"
+  query: "按具体技能/等级检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应工程·技术相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按能力领域重新拆分为原子DataPack"

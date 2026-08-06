@@ -1,0 +1,33 @@
+---
+feature_id: F-CHAINKE-CZL-01
+name: AI招商创意提案引擎
+dimension: 创造力
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 7
+source_model: "LLM多方案发散+候选收敛模式"
+description: >
+  链客宝AI招商系统的创造力层。基于企业画像+历史成功案例，
+  LLM自动生成3种差异化招商方案（如：补贴型/资源型/品牌型），
+  并给出推荐理由。帮助招商团队突破思维定式。
+inputs:
+  - 企业画像（行业/规模/阶段）
+  - 历史成交案例（可选参考）
+outputs:
+  - 3套差异化招商方案
+  - 每套方案的预期ROI评估
+  - 推荐方案+理由
+sop:
+  1. 读取企业画像
+  2. LLM发散3种差异化方案（prompt含约束+参考案例）
+  3. 每方案做ROI评估
+  4. 输出推荐排序
+quality_gates:
+  - 方案差异化（余弦相似度<0.6）
+  - ROI评估一致性
+iteration_history:
+  - date: 2026-06-13
+    action: 创建
+    score: 7
+    status: active

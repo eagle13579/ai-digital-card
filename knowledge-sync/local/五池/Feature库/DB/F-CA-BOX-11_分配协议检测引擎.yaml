@@ -1,0 +1,20 @@
+id: F-CA-BOX-11
+name: 分配协议检测引擎
+dimension: 💡 创造力
+description: >-
+  基于DB02密封盒分配心智模型构建的检测引擎，识别是否存在单方面定价+强制全收交易模式。检测维度：定价权归属、买方选择自由度、拒绝条款的惩罚力度、分配机制对渠道利润的控制程度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB02: 没有选择的盒子(分配协议)
+products:
+  - 黑河调查局协议分析模块
+  - 供应链控制力评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 䑏疏
+priority: P0
+maturity: design

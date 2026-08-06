@@ -1,0 +1,51 @@
+datapack_id: "DP-PD-链客宝-毛利率仪表盘"
+name: "链客宝·毛利率仪表盘"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝毛利率及成本结构仪表盘数据，包含成本分类、各渠道ROI分析、毛利率趋势和成本优化建议"
+
+source: "chainke-full/backend/app/routers/unit_economics.py"
+
+contents: |
+  【毛利率仪表盘数据】
+  1. 成本结构（来源: unit_economics.py COST_ENTRIES）:
+     - 市场推广: ¥60,000（百度SEM¥25,000 + 展会¥35,000）
+     - 销售人力: ¥48,000（3人电销团队）
+     - 渠道分成: ¥12,000（3家渠道伙伴15%分成）
+     - 工具订阅: ¥3,000（AI外呼系统月费）
+     - 总获客成本: ¥123,000（2026-06）
+  2. 渠道经济分析（来源: unit_economics.py CHANNEL_ECONOMICS）:
+     | 渠道 | 花费 | 线索 | 转化 | CAC | 收入 | ROI |
+     |:-----|:----:|:----:|:----:|:---:|:----:|:---:|
+     | 线上 | ¥28,000 | 120 | 4 | ¥7,000 | ¥32,400 | 1.16 |
+     | 展会 | ¥35,000 | 200 | 2 | ¥17,500 | ¥19,600 | 0.56 |
+     | 转介绍 | ¥2,000 | 15 | 1 | ¥2,000 | ¥6,800 | 3.40 |
+     | 渠道 | ¥8,000 | 30 | 1 | ¥8,000 | ¥6,800 | 0.85 |
+  3. 毛利率: 72%（来源: unit_economics.py avg_gross_margin）
+  4. 毛利率计算逻辑: （总收入 - 总成本）/ 总收入
+  5. 健康评分: 当前80分(优秀)，基准分50 + LTV/CAC加分15 + 回收周期加分15 + 毛利率加分10
+  6. 成本优化建议: 加大ROI>1.5渠道预算，重点关注转介绍渠道(ROI=3.40)
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取毛利率仪表盘数据到工作内存"
+  query: "按月份查询成本/按渠道查询ROI/查询毛利率趋势"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "单位经济Feature做成本分析时消费此DataPack"
+  - "增长Feature做渠道效率分析时消费此DataPack"
+  - "数据Feature做财务仪表盘展示时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-LTV_CAC模型"
+  - "DP-PD-链客宝-订单交易"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原单元经济数据包（KFD-07合规）"

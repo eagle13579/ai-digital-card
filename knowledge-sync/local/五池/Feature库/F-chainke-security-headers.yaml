@@ -1,0 +1,11 @@
+feature:
+  id: F-chainke-security-headers
+  name: chainke-security-headers
+  description: "6安全头中间件:CSP/HSTS/X-Frame-Options/X-Content-Type-Options/Referrer-Policy/Permissions-Policy"
+  source_project: "链客宝"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - 链客宝

@@ -1,0 +1,32 @@
+# hybrid-lsp-type-resolver Feature
+
+name: hybrid-lsp-type-resolver
+version: v1.0.0
+source: codebase-memory-mcp (DeusData)
+origin: https://github.com/DeusData/codebase-memory-mcp
+
+description: 轻量多语言类型解析引擎。纯C实现9种语言的类型分辨率算法，不依赖外部语言服务器，聚焦call graph精度。
+
+products:
+  - AI数智军团  # 代码分析需要类型解析
+  - 企业知识库RAG  # 代码问答需要类型感知
+
+atoms:
+  - Hybrid LSP轻量类型解析
+  - 分布式交叉文件注册表
+
+languages:
+  - Python: import + dotted submodule, dataclasses, generics, typing
+  - TypeScript/JS: generics, JSX, JSDoc, method chaining
+  - Go: generics, embedded structs, interface satisfaction
+  - Java: class hierarchies, generics, overload matching
+  - Kotlin: extension functions, scope functions, data classes
+  - Rust: trait methods, generics, derive macros
+  - C/C++: templates, macros, header-vs-source
+  - C#: LINQ, records, generics, async Task
+  - PHP: namespaces, traits, late-static-binding
+
+architecture:
+  layer1: tree-sitter syntactic pass (所有158语言)
+  layer2: Hybrid LSP type-aware pass (9语言深度解析)
+  fallback: 文本分辨率（无Hybrid LSP的语言）

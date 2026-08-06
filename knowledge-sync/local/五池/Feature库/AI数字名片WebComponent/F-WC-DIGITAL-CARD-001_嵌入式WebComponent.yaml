@@ -1,0 +1,87 @@
+# Feature: AI数字名片WebComponent
+# 吸收自: D:\AI数字名片WebComponent (3 TS files)
+# 日期: 2026-07-08
+# 标签: [web-component, lit, digital-card, embed]
+
+id: F-WC-DIGITAL-CARD-001
+name: AI数字名片嵌入式WebComponent
+type: component-library
+status: absorbed
+source: D:\AI数字名片WebComponent
+
+description: >
+  基于Lit框架构建的<ai-digital-card>自定义元素。
+  支持full/embed两种显示模式、dark/light主题、API加载/事件驱动的交互模型。
+  自包含所有依赖（Lit捆绑），通过Shadow DOM实现样式隔离。
+
+architecture:
+  entry: src/ai-digital-card.ts (495 lines)
+  styles: src/styles.ts (588 lines) - CSS设计Token系统
+  build: vite.config.ts - esbuild minify, UMD+ES双格式
+
+properties:
+  - name: api-base
+    type: string
+    description: API端点
+  - name: card-id
+    type: string
+    description: 按ID加载卡片数据
+  - name: theme
+    type: enum
+    values: [dark, light]
+  - name: mode
+    type: enum
+    values: [full, embed]
+  - name: user-token
+    type: string
+    description: 认证Bearer Token
+  - name: width
+    type: string
+    description: CSS宽度覆写
+  - name: height
+    type: string
+    description: CSS高度覆写
+
+events:
+  - name: error
+    detail: CardErrorEvent
+    description: 加载失败时触发
+  - name: card-share
+    detail: "{ card: DigitalCardData }"
+    description: 用户点击分享
+  - name: card-edit
+    detail: "{ card: DigitalCardData }"
+    description: 用户点击编辑
+  - name: card-view
+    detail: "{ card: DigitalCardData }"
+    description: 用户点击查看
+  - name: card-message
+    detail: "{ card: DigitalCardData, action: string }"
+    description: 自定义消息动作
+
+states:
+  - loading: spinner动画
+  - error: 错误信息+重试按钮
+  - empty: 空状态提示
+  - data: 卡片内容(封面/头像/信息/详情/社交/操作按钮)
+
+design-tokens:
+  host-custom-properties:
+    - --width
+    - --height
+  brand-colors:
+    - --color-brand-500 (#6366f1)
+    - --color-brand-400 (#818cf8)
+    - --color-brand-600 (#4f46e5)
+  spacing-scale: --spacing-1 到 --spacing-10 (4px 到 40px)
+  typography:
+    font-family: Inter system stack
+    size-scale: --size-xs 到 --size-3xl
+  shadows: sm / md / lg
+  animation: fast / base / slow (100ms / 200ms / 300ms)
+
+accessibility:
+  - role=status / role=alert on dynamic states
+  - aria-label on loading
+  - focus-visible outlines on all interactive elements
+  - prefers-reduced-motion media query support

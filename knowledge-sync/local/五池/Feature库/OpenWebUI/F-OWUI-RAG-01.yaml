@@ -1,0 +1,26 @@
+id: F-OWUI-RAG-01
+name: RAG Pipeline with Multi-Format Document Loader
+source_model: Open WebUI Retrieval Pipeline — 多格式文档加载→分块→嵌入→向量搜索→重排序→引用的全链路RAG架构
+dimension: 场景
+
+products:
+  - 企业知识库RAG: 自动匹配
+description: 支持PDF/Word/YouTube/网页/OCR等多种文档格式的自动加载、分块、嵌入存储，混合搜索(BM25+向量)检索，多模型Reranker重排序，带引用来源的答案生成。
+input: 文档/URL/文本 + 查询
+output: 带引用标注的回答 + 相关文档片段
+sop: '① 文档加载器链: PDF→pypdf, 网页→jina/firecrawl, YouTube→转录
+
+  ② 分块策略: 语义分块/递归字符分块/固定大小分块
+
+  ③ 嵌入: OpenAI/Ollama/Azure/Mistral多引擎可选
+
+  ④ 存储: 15+向量DB工厂模式(Chroma/PGVector/Milvus等)
+
+  ⑤ 检索: 混合搜索(BM25+向量) + RRF融合 + Reranker精排
+
+  ⑥ 生成: 注入检索结果到LLM context + 引用标注'
+quality_gates: 检索召回率>85%、注入context<50% token上限、引用可溯源到原文、支持多文档交叉检索
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝智能知识库/中韩数智港合规检索/AI招商匹配引擎/记忆宫殿搜素

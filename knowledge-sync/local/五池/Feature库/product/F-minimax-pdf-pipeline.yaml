@@ -1,0 +1,20 @@
+name: MiniMax智能PDF生成管线
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — minimax-pdf (2026-07-05)
+description: 基于Token化设计系统的专业PDF生成管线。15种封面风格，三模式(CREATE/FILL/REFORMAT)，打印即出。
+atoms:
+  - PDF-TOKEN-DESIGN: Token化设计系统(文档类型→配色/字体/布局)
+  - PDF-3MODE: 三模式路由(CREATE从零/FILL填表/REFORMAT重排)
+  - PDF-15-COVER: 15种封面风格模板
+  - PDF-PALETTE: 8种文档类型配色库(报告/提案/简历/作品集/学术/合同/发票/新闻稿)
+products:
+  - 链客宝 — 企业报告/合同PDF生成
+  - 中韩出海数智港 — 多语言文档输出
+  - AI数字名片 — 电子名片PDF导出
+  - 赛博参谋 — 商业计划书/路演文档
+employees:
+  - 文鳐P9(文档)
+  - 乘黄P8(产品)
+  - 计然P8(商业文档)

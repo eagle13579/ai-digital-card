@@ -1,0 +1,45 @@
+datapack_id: "DP-PD-链客宝-六度人脉图谱"
+name: "链客宝·六度人脉图谱"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝用户六度人脉网络图谱数据，包含人脉路径搜索、中间人推荐、人脉距离计算和关系链可视化配置"
+
+source: "chainke-full/geo-content/2026-06-05-从扫街到AI匹配-企业家获客方式的四次进化.md | chainke-full/geo-content/2026-06-05-B2B交易的核心难题-如何建立企业间信任网络.md"
+
+contents: |
+  【六度人脉图谱数据】
+  1. 人脉网络节点: 每个企业为一个人脉节点，关联用户身份和信任分
+  2. 人脉边定义: 名片交换、合作交易、共同群组、转介绍关系
+  3. 人脉距离计算: 
+     - 一度: 直接交换名片/合作过
+     - 二度: 共同联系人的直接关系
+     - 三度: 通过两个中间人可达
+     - 四至六度: 逐步扩展
+  4. 中间人推荐: 找到两个企业之间的最优路径，推荐中间人做引荐
+  5. 人脉图谱可视化: 前端图谱渲染数据格式、节点大小/颜色映射规则
+  6. 人脉增长统计: 每周新增人脉连接数、活跃人脉占比
+  7. 圈子发现: 基于人脉密度的企业圈子聚类（行业圈/地域圈/供应链圈）
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取六度人脉图谱数据到工作内存"
+  query: "按企业ID查询人脉网络/查询两企业间路径/查询圈子聚类"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "信任评分Feature做人脉网络评估时消费此DataPack"
+  - "匹配Feature做关系推荐时消费此DataPack"
+  - "增长Feature做网络效应分析时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户关系网"
+  - "DP-PD-链客宝-信任分模型"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原信任评分数据包（KFD-07合规）"
