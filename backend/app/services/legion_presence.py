@@ -195,6 +195,21 @@ class LegionPresence:
                 (emp_id,),
             )
 
+    def get_learned_titles(self, emp_id: str) -> list[str]:
+        """查询员工最近学过的知识标题（用于差异化学习去重）。"""
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT last_learned_title FROM legion_members WHERE emp_id=?",
+                (emp_id,),
+            ).fetchall()
+        titles = [r["last_learned_title"] for r in rows if r["last_learned_title"]]
+        # 返回最近 N 个（去重）
+        seen: list[str] = []
+        for t in titles:
+            if t and t not in seen:
+                seen.append(t)
+        return seen[:50]
+
     # ── 查询 ─────────────────────────────────────────────────────
 
     def get_all(self) -> list[dict]:

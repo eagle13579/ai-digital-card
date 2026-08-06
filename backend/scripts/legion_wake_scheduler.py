@@ -56,6 +56,51 @@ LEGION_PATH = Path("/app/gaia-commercial/apps/services/ai_legion/employees")
 BATCH_SIZE_DEFAULT = 5
 INTERVAL_DEFAULT = 600  # 10 分钟
 
+# ── 部门知识通道（P0-1 差异化学习）────────────────────────────
+# 按员工部门定向投喂不同知识领域，让全员学到的内容有区分度
+# 每条通道: SQL 过滤条件 + 展示标签
+DEPT_CHANNELS: dict[str, dict] = {
+    "research": {
+        "label": "研究洞察",
+        "sql": """AND (
+              source IN ('distill_auto', 'retrospective', 'distill_enterprise')
+              OR tags::text LIKE '%research%'
+            )""",
+    },
+    "compliance": {
+        "label": "安全合规",
+        "sql": """AND (
+              title LIKE '%安全%' OR title LIKE '%合规%' OR title LIKE '%Guardrail%'
+              OR title LIKE '%OWASP%' OR title LIKE '%风控%'
+            )""",
+    },
+    "acquisition": {
+        "label": "销售获客",
+        "sql": """AND (
+              title LIKE '%销售%' OR title LIKE '%获客%' OR title LIKE '%名片%'
+              OR title LIKE '%营销%' OR title LIKE '%F-CARD%'
+            )""",
+    },
+    "ai_assistant": {
+        "label": "技能工具",
+        "sql": """AND (
+              title LIKE '%技能%' OR title LIKE '%工具%' OR title LIKE '%SAG%'
+              OR title LIKE '%蒸馏%'
+            )""",
+    },
+    "general": {
+        "label": "通用知识",
+        "sql": """AND (
+              source IN ('distill_enterprise', 'retrospective', 'manual')
+              OR tags::text LIKE '%general%'
+            )""",
+    },
+}
+# 默认通道（未识别部门 → 通用）
+DEFAULT_CHANNEL = "general"
+# 全通道共享开关（可关闭 → 仅按部门）
+ENABLE_CROSS_CHANNEL = True
+
 
 def load_env() -> None:
     """从 backend/.env 加载环境变量（与 systemd EnvironmentFile 一致）。"""
@@ -105,12 +150,13 @@ def get_next_batch(members: list[dict], batch_size: int, offset_file: Path) -> l
 
 
 async def wake_one(member: dict) -> dict:
-    """激活单个员工：加载灵魂 → sync 学习 → 更新在场状态。"""
+    """激活单个员工：加载灵魂 → 按部门通道学习 → 分享经验 → 更新在场状态。"""
     from app.agents.legion_employee import LegionEmployee
     from app.services.legion_presence import LegionPresence
 
     emp_id = member["emp_id"]
     name = member["name"]
+    dept = member.get("department") or DEFAULT_CHANNEL
     soul_dir = member.get("soul_dir") or ""
     presence = LegionPresence.get()
 
@@ -124,24 +170,52 @@ async def wake_one(member: dict) -> dict:
             presence.mark_idle(emp_id)
             return {"emp_id": emp_id, "ok": False, "reason": "no_soul_dir"}
 
-        # 从共享知识库直查最新共享知识（同步学习）
+        # ── P0-1 差异化学习：按部门通道定向投喂 ──────────────
         new_count = 0
         learned_title = ""
+        channel = DEPT_CHANNELS.get(dept, DEPT_CHANNELS[DEFAULT_CHANNEL])
+        channel_label = channel["label"]
+
+        # 该员工已学过的标题（防止重复学习，从 presence 记录）
+        learned_before = presence.get_learned_titles(emp_id)
+
         try:
             from app.database import AsyncSessionLocal
             from sqlalchemy import text as _text
 
+            # 部门通道 SQL + 排除 system 噪音 + 排除已学
+            channel_sql = channel["sql"]
+            exclude_sql = ""
+            if learned_before:
+                titles = "', '".join(t.replace("'", "''") for t in learned_before[:50])
+                exclude_sql = f"AND title NOT IN ('{titles}')"
+
             async with AsyncSessionLocal() as db:
                 rows = await db.execute(
-                    _text("""
+                    _text(f"""
                         SELECT title, content FROM gaia_knowledge
-                        WHERE (source LIKE 'agent_share%' OR tags::text LIKE '%shared%')
-                          AND is_active = true
+                        WHERE is_active = true
+                          AND source != 'system'
+                          {channel_sql}
+                          {exclude_sql}
                         ORDER BY created_at DESC, id DESC
-                        LIMIT 5
+                        LIMIT 10
                     """)
                 )
-                items = [{"title": r.title or "", "content": (r.content or "")[:300]} for r in rows]
+                items = [{"title": r.title or "", "content": (r.content or "")[:400]} for r in rows]
+
+            # 若部门通道知识不足，补充全通道共享知识（保证人人有得学）
+            if not items and ENABLE_CROSS_CHANNEL:
+                async with AsyncSessionLocal() as db:
+                    rows = await db.execute(
+                        _text("""
+                            SELECT title, content FROM gaia_knowledge
+                            WHERE is_active = true AND source != 'system'
+                            ORDER BY created_at DESC, id DESC
+                            LIMIT 5
+                        """)
+                    )
+                    items = [{"title": r.title or "", "content": (r.content or "")[:400]} for r in rows]
 
             for it in items:
                 title = it.get("title", "")
@@ -149,7 +223,7 @@ async def wake_one(member: dict) -> dict:
                 if existing:
                     continue
                 await employee.memorize(
-                    content=f"[共享学习] {title}\n{it.get('content', '')}",
+                    content=f"[共享学习-{channel_label}] {title}\n{it.get('content', '')}",
                     category="shared_learning",
                 )
                 new_count += 1
@@ -159,18 +233,56 @@ async def wake_one(member: dict) -> dict:
         except Exception as exc:  # noqa: BLE001
             logger.debug("wake sync failed for %s: %s", emp_id, repr(exc))
 
+        # ── P0-2 批次互教互学：员工把「最新学到」分享进知识库 ──
+        shared = False
+        if learned_title:
+            try:
+                from app.database import AsyncSessionLocal
+                from sqlalchemy import text as _text
+
+                async with AsyncSessionLocal() as db:
+                    await db.execute(
+                        _text("""
+                            INSERT INTO gaia_knowledge
+                            (source, source_id, knowledge_type, title, content, tags,
+                             confidence, impact_score, vector_embedded, is_active)
+                            VALUES
+                            (:src, :sid, 'agent_share', :title, :content, :tags,
+                             0.8, 0.6, false, true)
+                        """),
+                        {
+                            "src": f"agent_share_{emp_id}",
+                            "sid": f"{emp_id}_{int(time.time())}",
+                            "title": f"{name} 分享: {learned_title}",
+                            "content": f"（{channel_label}通道学习分享）{name} 学到的 {learned_title} 已回灌知识库，供全员学习。",
+                            "tags": json.dumps(["agent_share", dept, channel_label], ensure_ascii=False),
+                        },
+                    )
+                    await db.commit()
+                presence.record_share(emp_id)
+                shared = True
+                logger.info("  🔄 %s(%s) 分享 1 条 → 知识库", name, emp_id)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("  ⚠️ %s 分享失败: %s", emp_id, repr(exc))
+
         # 更新在场状态 + 成长统计
         if new_count:
             presence.record_sync(emp_id, learned_title)
             presence.mark_idle(emp_id)
-            logger.info("  📖 %s(%s) 学习 %d 条 → %s", name, emp_id, new_count, learned_title[:40])
+            logger.info(
+                "  📖 %s(%s)[%s] 学习 %d 条 → %s",
+                name, emp_id, channel_label, new_count, learned_title[:40],
+            )
         else:
             # 没有新知识也记一次「在场」（sync_count 仍+1 表示活跃）
             presence.record_sync(emp_id, "")
             presence.mark_idle(emp_id)
-            logger.info("  💤 %s(%s) 在场（无新知识）", name, emp_id)
+            logger.info("  💤 %s(%s)[%s] 在场（无新知识）", name, emp_id, channel_label)
 
-        return {"emp_id": emp_id, "ok": True, "learned": new_count, "title": learned_title}
+        return {
+            "emp_id": emp_id, "ok": True, "learned": new_count,
+            "title": learned_title, "shared": shared, "channel": channel_label,
+        }
 
     except Exception as exc:  # noqa: BLE001
         logger.error("  ✗ %s 唤醒失败: %s", emp_id, repr(exc))
