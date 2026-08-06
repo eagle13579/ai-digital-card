@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI数智名片 — 7m×2.7m 宣传墙 · AI时尚版</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #06060c;
+  display: flex; flex-direction: column; align-items: center; padding: 40px 24px;
+  font-family: 'Noto Sans SC', 'Geist', system-ui, sans-serif;
+}
+
+/* =============================================
+   MAIN WALL — AI-native dark cinematic
+   ============================================= */
+.wall-wrapper {
+  max-width: 1400px; width: 100%; border-radius: 24px; overflow: hidden;
+  position: relative;
+  box-shadow:
+    rgba(6, 182, 212, 0.1) 0px 30px 60px -20px,
+    rgba(139, 92, 246, 0.08) 0px 20px 40px -20px,
+    rgba(0, 0, 0, 0.4) 0px 10px 30px -10px;
+}
+
+.wall {
+  width: 100%; aspect-ratio: 7/2.7; display: flex; position: relative;
+  background: linear-gradient(160deg,
+    #0a0a18 0%,
+    #0d0d24 25%,
+    #0f0f2a 50%,
+    #0d0d24 75%,
+    #0a0a18 100%
+  );
+  overflow: hidden;
+}
+
+/* === Animated Gradient Orbs === */
+.wall-orb-1 {
+  position: absolute; width: 700px; height: 700px; top: 20%; left: 25%;
+  background: radial-gradient(circle, rgba(6,182,212,0.10) 0%, rgba(139,92,246,0.05) 35%, transparent 60%);
+  pointer-events: none; z-index: 1;
+  filter: blur(40px);
+}
+.wall-orb-2 {
+  position: absolute; width: 500px; height: 500px; top: 60%; right: 15%;
+  background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, rgba(139,92,246,0.04) 30%, transparent 55%);
+  pointer-events: none; z-index: 1;
+  filter: blur(60px);
+}
+.wall-orb-3 {
+  position: absolute; width: 400px; height: 400px; bottom: -10%; left: 45%;
+  background: radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 50%);
+  pointer-events: none; z-index: 1;
+  filter: blur(50px);
+}
+
+/* === Tech Grid — cyan-visible infrastructure === */
+.wall-grid {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+.wall-grid::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 30%, rgba(6,182,212,0.03) 0%, transparent 50%);
+}
+
+/* === Scan line effect === */
+.wall-scanline {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(6,182,212,0.015) 2px,
+    rgba(6,182,212,0.015) 4px
+  );
+}
+
+/* === Zone === */
+.zone { position: relative; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; }
+
+/* ===== Z1: Brand — luminous logo ===== */
+.z1 { width: 16%; padding: 20px 14px; align-items: center; text-align: center; }
+.z1-logo {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+  position: relative;
+}
+.z1-logo::before {
+  content: ''; position: absolute; inset: -4px; border-radius: 22px;
+  background: linear-gradient(135deg, rgba(6,182,212,0.3), rgba(139,92,246,0.3));
+  filter: blur(8px); z-index: -1;
+}
+.z1-logo::after {
+  content: ''; position: absolute; inset: 0; border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  pointer-events: none;
+}
+.z1-logo span { color: #fff; font-family: Geist; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+.z1-name {
+  font-family: Geist; font-weight: 700; font-size: 22px;
+  background: linear-gradient(135deg, #e2e8f0, #ffffff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.88px;
+}
+.z1-sub { font-family: 'Geist Mono'; font-weight: 400; font-size: 7px; color: #52525b; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+.z1-line { width: 20px; height: 1.5px; background: linear-gradient(90deg, #06b6d4, #8b5cf6); margin: 8px auto; border-radius: 2px; }
+.z1-by { font-size: 8px; color: #71717a; line-height: 1.6; }
+.z1-by em { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-style: normal; font-weight: 600; }
+.z1-v { font-size: 6px; color: #52525b; margin-top: 3px; font-family: 'Geist Mono'; letter-spacing: 0.5px; }
+.z1-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.15);
+  border-radius: 9999px; padding: 2px 8px; font-size: 6.5px;
+  color: #22d3ee; font-weight: 500; margin-top: 6px;
+  font-family: 'Geist Mono'; letter-spacing: 0.3px;
+}
+
+/* ===== Z2: Core Message — glass cards ===== */
+.z2 { width: 24%; padding: 20px 16px; align-items: flex-start; }
+.z2-tag {
+  font-family: 'Geist Mono'; font-size: 7px; font-weight: 500;
+  color: #22d3ee; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+.z2-title {
+  font-size: 17px; font-weight: 700; color: #f4f4f5; line-height: 1.3; letter-spacing: -0.3px; margin-bottom: 10px;
+}
+.z2-title em {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; font-style: normal;
+}
+.z2-card {
+  display: flex; align-items: center; gap: 10px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.04); border-radius: 12px; padding: 10px 14px; width: 100%;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s ease;
+}
+.z2-card.before { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.04); }
+.z2-card.after {
+  background: rgba(6,182,212,0.05); border-color: rgba(6,182,212,0.12);
+  box-shadow: 0 0 20px rgba(6,182,212,0.05);
+}
+.z2-ico {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.z2-ico.gray { background: rgba(255,255,255,0.06); color: #a1a1aa; }
+.z2-ico.blue { background: rgba(6,182,212,0.12); color: #22d3ee; }
+.z2-txt { font-size: 8px; line-height: 1.4; }
+.z2-txt .lb { font-weight: 600; font-size: 9px; letter-spacing: -0.1px; }
+.z2-txt .lb.b { background: linear-gradient(135deg, #06b6d4, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.z2-txt .lb.g { color: #71717a; }
+.z2-txt .ds { color: #52525b; font-size: 7px; }
+.z2-arrow {
+  text-align: center; font-size: 9px; line-height: 1; margin: 3px 0;
+  color: #22d3ee; opacity: 0.3; font-family: 'Geist Mono';
+}
+.z2-tagline {
+  font-size: 9px; font-weight: 600; margin-top: 8px; letter-spacing: -0.15px;
+  display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.z2-tagline::before {
+  content: ''; width: 16px; height: 1.5px;
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6); border-radius: 2px;
+}
+
+/* ===== Z3: AI Engines — glass grid ===== */
+.z3 { width: 32%; padding: 16px 14px; align-items: center; }
+.z3-tag {
+  font-family: 'Geist Mono'; font-size: 7px; font-weight: 500;
+  color: #c084fc; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;
+}
+.z3-title {
+  font-size: 11px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.2px; text-align: center;
+}
+.z3-title small { font-size: 6.5px; color: #52525b; font-weight: 400; display: block; margin-top: 1px; letter-spacing: 0; font-family: 'Geist Mono'; }
+.z3-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; margin: 6px 0;
+}
+.z3-item {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 5px 2px; border-radius: 10px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.25s ease;
+}
+.z3-item:hover {
+  background: rgba(139,92,246,0.06);
+  border-color: rgba(139,92,246,0.12);
+  box-shadow: 0 0 16px rgba(139,92,246,0.06);
+}
+.z3-ico {
+  width: 20px; height: 20px; border-radius: 6px;
+  background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(139,92,246,0.12));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #22d3ee;
+}
+.z3-nm { font-size: 7px; color: #d4d4d8; font-weight: 600; letter-spacing: -0.1px; }
+.z3-sb { font-size: 5.5px; color: #52525b; font-family: 'Geist Mono'; }
+
+.z3-divider {
+  width: 80%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.12), transparent);
+  margin: 5px auto;
+}
+
+/* === Revenue — neon data cards === */
+.z3-rev-label {
+  font-size: 7px; font-weight: 600; margin-bottom: 3px;
+  font-family: 'Geist Mono'; text-transform: uppercase; letter-spacing: 1px;
+  background: linear-gradient(135deg, #22d3ee, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.z3-rev-grid { display: flex; gap: 5px; width: 100%; }
+.z3-rev-card {
+  flex: 1;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: rgba(6,182,212,0.04);
+  border: 1px solid rgba(6,182,212,0.08);
+  border-radius: 10px; padding: 6px 8px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.z3-rev-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
+}
+.z3-rev-num {
+  font-family: Geist; font-weight: 800; font-size: 13px;
+  background: linear-gradient(135deg, #06b6d4, #22d3ee, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.52px;
+}
+.z3-rev-lb { font-size: 6px; color: #71717a; font-family: 'Geist Mono'; letter-spacing: 0.3px; }
+.z3-rev-total-wrap { text-align: center; margin-top: 3px; }
+.z3-rev-total {
+  font-family: Geist; font-weight: 900; font-size: 20px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -1px;
+  filter: drop-shadow(0 0 12px rgba(6,182,212,0.2));
+}
+.z3-rev-unit { font-size: 7px; color: #71717a; font-family: 'Geist Mono'; }
+.z3-margin {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(236,72,153,0.08); border: 1px solid rgba(236,72,153,0.15);
+  border-radius: 9999px; padding: 1px 6px; font-size: 6px;
+  color: #f472b6; font-weight: 500; margin-left: 4px; font-family: 'Geist Mono';
+}
+.z3-tags {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 6px; margin-top: 3px;
+}
+.z3-tag-item {
+  font-size: 6px; color: #52525b; display: flex; align-items: center; gap: 2px;
+  font-family: 'Geist Mono';
+}
+.z3-tag-item::before { content: '✦'; font-size: 4px; background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ===== Z4: Data + 招商 — data-dense elegance ===== */
+.z4 {
+  width: 20%; padding: 18px 14px; align-items: flex-start;
+  border-left: 1px solid rgba(139,92,246,0.08);
+  position: relative;
+}
+.z4-tag {
+  font-family: 'Geist Mono'; font-size: 7px; font-weight: 500;
+  color: #f472b6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+.z4-metrics { display: flex; gap: 12px; width: 100%; margin-bottom: 6px; }
+.z4-metric { flex: 1; }
+.z4-num {
+  font-family: Geist; font-weight: 800; font-size: 26px; line-height: 1; letter-spacing: -1.3px;
+}
+.z4-num.gradient {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.z4-num.light { color: #f4f4f5; }
+.z4-lb { font-size: 7px; color: #71717a; margin-top: 1px; font-family: 'Geist Mono'; }
+.z4-line { width: 28px; height: 1.5px; background: linear-gradient(90deg, #8b5cf6, transparent); margin: 5px 0; border-radius: 2px; }
+
+.z4-partner-title {
+  font-size: 8px; font-weight: 600; margin-bottom: 4px;
+  color: #f472b6; display: flex; align-items: center; gap: 4px;
+  font-family: 'Geist Mono'; letter-spacing: 0.5px;
+}
+.z4-partner { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+.z4-partner-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 7px; color: #a1a1aa;
+  padding: 3px 8px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.z4-partner-item .tag {
+  font-size: 5.5px; font-weight: 700; font-family: 'Geist Mono';
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #fff; padding: 1px 4px; border-radius: 9999px;
+}
+.z4-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 3px 14px;
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(139,92,246,0.06);
+  display: flex; gap: 8px;
+  font-size: 5.5px; color: #52525b; font-family: 'Geist Mono';
+}
+
+/* ===== Z5: Slogan — vertical ===== */
+.z5 { width: 8%; padding: 16px 6px; align-items: center; justify-content: center; }
+.z5-slogan {
+  writing-mode: vertical-rl;
+  font-size: 20px; font-weight: 800; letter-spacing: 8px; line-height: 1.3;
+  background: linear-gradient(135deg, #f4f4f5, #22d3ee, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.z5-slogan .hl {
+  background: linear-gradient(135deg, #06b6d4, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.z5-line {
+  width: 24px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,92,246,0.3), transparent);
+  margin: 6px 0;
+}
+.z5-sign { font-size: 6px; color: #52525b; writing-mode: vertical-rl; letter-spacing: 3px; font-family: 'Geist Mono'; }
+
+/* =============================================
+   5 BANNERS — Glass pill design
+   ============================================= */
+.banners-row { display: flex; gap: 12px; margin-top: 16px; width: 100%; max-width: 1400px; }
+
+.banner {
+  width: calc((100% - 48px) / 5); aspect-ratio: 1/3;
+  border-radius: 16px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.03);
+  padding: 16px 10px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.35s ease;
+}
+.banner:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(6,182,212,0.12);
+  box-shadow: 0 0 30px rgba(6,182,212,0.05);
+  transform: translateY(-3px);
+}
+
+/* Banner glow strip */
+.banner::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+.b1::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+.b2::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.b3::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.b4::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.b5::before { background: linear-gradient(90deg, #06b6d4, #8b5cf6); }
+
+.banner-bg { position: absolute; inset: 0; pointer-events: none; }
+.b1-bg { background: radial-gradient(ellipse at 50% 20%, rgba(6,182,212,0.06), transparent 60%); }
+.b2-bg { background: radial-gradient(ellipse at 50% 20%, rgba(139,92,246,0.06), transparent 60%); }
+.b3-bg { background: radial-gradient(ellipse at 50% 20%, rgba(236,72,153,0.06), transparent 60%); }
+.b4-bg { background: radial-gradient(ellipse at 50% 20%, rgba(245,158,11,0.06), transparent 60%); }
+.b5-bg { background: radial-gradient(ellipse at 50% 20%, rgba(6,182,212,0.04), transparent 60%); }
+
+.banner-content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* === B1: Brand === */
+.b1-logo {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px rgba(6,182,212,0.2);
+  margin-bottom: 6px; flex-shrink: 0;
+}
+.b1-logo span { color: #fff; font-family: Geist; font-weight: 800; font-size: 11px; letter-spacing: -0.3px; }
+.b1-title { font-size: 12px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.24px; }
+.b1-line {
+  width: 16px; height: 1.5px;
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  margin: 5px auto; border-radius: 2px;
+}
+.b1-slogan { font-size: 11px; font-weight: 700; line-height: 1.3; margin: 4px 0; letter-spacing: -0.22px; }
+.b1-slogan, .b1-slogan .hl {
+  background: linear-gradient(135deg, #f4f4f5, #22d3ee, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.b1-desc { font-size: 7px; color: #a1a1aa; line-height: 1.5; padding: 0 2px; }
+.b1-by { font-size: 5.5px; color: #52525b; margin-top: auto; padding-bottom: 4px; font-family: 'Geist Mono'; }
+
+/* === B2: AI Engines === */
+.b2-icon {
+  width: 28px; height: 28px; border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #a78bfa; margin-bottom: 4px;
+}
+.b2-title { font-size: 11px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.22px; }
+.b2-sub { font-size: 6px; color: #52525b; margin-bottom: 5px; font-family: 'Geist Mono'; letter-spacing: 0.5px; }
+.b2-g {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 100%;
+}
+.b2-g-item {
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 6px; padding: 3px 2px; text-align: center;
+}
+.b2-g-ico { font-size: 7px; }
+.b2-g-nm { font-size: 5.5px; color: #d4d4d8; font-weight: 600; }
+.b2-g-sb { font-size: 5px; color: #52525b; font-family: 'Geist Mono'; }
+.b2-bottom {
+  font-size: 6px; color: #a78bfa; font-weight: 500; margin-top: auto; padding-bottom: 4px;
+  font-family: 'Geist Mono'; letter-spacing: 0.3px;
+}
+
+/* === B3: Revenue === */
+.b3-icon {
+  width: 28px; height: 28px; border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.05));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #f472b6; margin-bottom: 4px;
+}
+.b3-title { font-size: 11px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.22px; }
+.b3-tiers { width: 100%; display: flex; flex-direction: column; gap: 3px; margin: 4px 0; }
+.b3-tier {
+  display: flex; align-items: center; gap: 5px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 6px; padding: 2px 6px;
+}
+.b3-tier-tag {
+  font-size: 5px; font-weight: 700; font-family: 'Geist Mono';
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #fff; padding: 1px 3px; border-radius: 9999px;
+}
+.b3-tier-lb { font-size: 6px; color: #a1a1aa; flex: 1; text-align: left; }
+.b3-tier-num {
+  font-family: Geist; font-weight: 700; font-size: 8px;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.16px;
+}
+.b3-total {
+  font-family: Geist; font-weight: 900; font-size: 14px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.7px; margin-top: 2px;
+  filter: drop-shadow(0 0 8px rgba(6,182,212,0.15));
+}
+.b3-totallb { font-size: 5.5px; color: #52525b; font-family: 'Geist Mono'; }
+.b3-margin {
+  font-size: 6px; color: #f472b6; font-weight: 500; margin-top: auto; padding-bottom: 4px;
+  font-family: 'Geist Mono';
+}
+
+/* === B4: 招商 === */
+.b4-icon {
+  width: 28px; height: 28px; border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #fbbf24; margin-bottom: 4px;
+}
+.b4-title { font-size: 11px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.22px; }
+.b4-list { width: 100%; display: flex; flex-direction: column; gap: 3px; margin: 4px 0; }
+.b4-item {
+  display: flex; align-items: center; gap: 4px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 6px; padding: 2px 6px;
+}
+.b4-tag {
+  font-size: 5px; font-weight: 700; font-family: 'Geist Mono';
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #fff; padding: 1px 4px; border-radius: 9999px;
+}
+.b4-txt { font-size: 6px; color: #a1a1aa; text-align: left; line-height: 1.2; }
+.b4-bottom {
+  font-size: 5.5px; color: #fbbf24; font-weight: 500; margin-top: auto; padding-bottom: 4px;
+  font-family: 'Geist Mono';
+}
+
+/* === B5: Moat === */
+.b5-icon {
+  width: 28px; height: 28px; border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(139,92,246,0.08));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #22d3ee; margin-bottom: 4px;
+}
+.b5-title { font-size: 11px; font-weight: 700; color: #f4f4f5; letter-spacing: -0.22px; }
+.b5-nums { display: flex; gap: 8px; justify-content: center; margin: 4px 0; }
+.b5-num-val {
+  font-family: Geist; font-weight: 800; font-size: 15px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.6px; line-height: 1;
+}
+.b5-num-lb { font-size: 5.5px; color: #52525b; font-family: 'Geist Mono'; }
+.b5-moat { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.b5-moat-item {
+  font-size: 6px; color: #a1a1aa;
+  padding: 2px 6px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 5px; text-align: center; line-height: 1.3;
+}
+.b5-moat-item .hl { background: linear-gradient(135deg, #06b6d4, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600; }
+
+/* ===== Specs ===== */
+.wall-specs {
+  max-width: 1400px; width: 100%; margin-top: 20px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+}
+.wall-specs h4 {
+  color: #52525b; font-size: 9px; font-weight: 500;
+  font-family: 'Geist Mono'; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
+}
+.wall-specs .row {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  font-size: 8px; color: #52525b; font-family: 'Geist Mono';
+}
+.wall-specs .row strong { color: #a1a1aa; font-weight: 500; }
+
+.dim-bar {
+  max-width: 1400px; width: 100%; margin-top: 8px; display: flex;
+}
+.dim-seg {
+  text-align: center; font-size: 6px; color: #52525b; padding-top: 3px;
+  border-top: 1px solid rgba(139,92,246,0.1);
+  border-left: 1px solid rgba(139,92,246,0.06);
+  font-family: 'Geist Mono';
+}
+.dim-seg:first-child { border-left: none; }
+.dim-pc { color: #22d3ee; font-weight: 600; }
+
+/* ===== Evolution Changelog ===== */
+.changelog {
+  max-width: 1400px; width: 100%; margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 10px;
+}
+.changelog h4 {
+  color: #52525b; font-size: 7px; font-weight: 500;
+  font-family: 'Geist Mono'; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;
+}
+.changelog-items { display: flex; gap: 8px; flex-wrap: wrap; }
+.changelog-item { display: flex; align-items: center; gap: 4px; font-size: 6.5px; color: #71717a; font-family: 'Geist Mono'; }
+.changelog-dot { width: 4px; height: 4px; border-radius: 50%; }
+.dot-cyan { background: #06b6d4; }
+.dot-purple { background: #8b5cf6; }
+.dot-pink { background: #ec4899; }
+</style>
+</head>
+<body>
+
+<!-- ===== 7m WALL ===== -->
+<div class="wall-wrapper">
+  <div class="wall">
+    <div class="wall-orb-1"></div>
+    <div class="wall-orb-2"></div>
+    <div class="wall-orb-3"></div>
+    <div class="wall-grid"></div>
+    <div class="wall-scanline"></div>
+
+    <!-- Z1: Brand — luminous -->
+    <div class="zone z1">
+      <div class="z1-logo"><span>AI</span></div>
+      <div class="z1-name">AI 数智名片</div>
+      <div class="z1-sub">AI Digital Business Card</div>
+      <div class="z1-line"></div>
+      <div class="z1-by">向海容 × <em>白泽AI数智军团</em></div>
+      <div class="z1-v">v3.4.0 · 已上线</div>
+      <div class="z1-badge">✦ 15 AI Engines · Self-evolving</div>
+    </div>
+
+    <!-- Z2: Core Message — glass morphism -->
+    <div class="zone z2">
+      <div class="z2-tag">✦ Core Thesis</div>
+      <div class="z2-title">
+        让名片从「纸片」<br>进化为 <em>AI 交互入口</em>
+      </div>
+      <div class="z2-card before">
+        <div class="z2-ico gray">◇</div>
+        <div class="z2-txt">
+          <div class="lb g">传统名片 · 信息死亡</div>
+          <div class="ds">交换即终点 · 无法追踪 · 无法变现</div>
+        </div>
+      </div>
+      <div class="z2-arrow">▽</div>
+      <div class="z2-card after">
+        <div class="z2-ico blue">◆</div>
+        <div class="z2-txt">
+          <div class="lb b">AI数智名片 · 活过来</div>
+          <div class="ds">AI交互起点 · 访客追踪 · 信任变现</div>
+        </div>
+      </div>
+      <div class="z2-tagline">不是名片工具 → AI Agent × 信任网络</div>
+    </div>
+
+    <!-- Z3: AI Engines + Revenue -->
+    <div class="zone z3">
+      <div class="z3-tag">✦ AI Engine Cluster</div>
+      <div class="z3-title">15 Self-Developed AI Engines<small>Real-time Learning · Self-evolving · 3-year Head Start</small></div>
+      <div class="z3-grid">
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">OCR Scan</div><div class="z3-sb">PaddleOCR</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">RAG QA</div><div class="z3-sb">Knowledge Graph</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">Smart Match</div><div class="z3-sb">Vector Search</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">AI Writing</div><div class="z3-sb">Content Gen</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">Recommend</div><div class="z3-sb">Thompson</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">Knowledge G.</div><div class="z3-sb">Relation Reasoning</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">Online Learn</div><div class="z3-sb">Real-time Feedback</div></div>
+        <div class="z3-item"><div class="z3-ico">◈</div><div class="z3-nm">Trust Score</div><div class="z3-sb">Social Graph</div></div>
+      </div>
+
+      <div class="z3-divider"></div>
+
+      <div class="z3-rev-label">💰 Revenue · Investment Thesis</div>
+      <div class="z3-rev-grid">
+        <div class="z3-rev-card"><div class="z3-rev-num">¥3.6B</div><div class="z3-rev-lb">SaaS/yr</div></div>
+        <div class="z3-rev-card"><div class="z3-rev-num">¥365M</div><div class="z3-rev-lb">API/yr</div></div>
+        <div class="z3-rev-card"><div class="z3-rev-num">¥300M</div><div class="z3-rev-lb">Enterprise/yr</div></div>
+      </div>
+      <div class="z3-rev-total-wrap">
+        <span class="z3-rev-total">¥7.25B</span>
+        <span class="z3-rev-unit"> /year total</span>
+        <span class="z3-margin">Gross Margin &gt;85%</span>
+      </div>
+      <div class="z3-tags">
+        <span class="z3-tag-item">Visitor Tracking</span>
+        <span class="z3-tag-item">Enterprise Subscription</span>
+        <span class="z3-tag-item">API Ecosystem</span>
+        <span class="z3-tag-item">12 Languages</span>
+        <span class="z3-tag-item">Global</span>
+      </div>
+    </div>
+
+    <!-- Z4: Data + 招商 -->
+    <div class="zone z4">
+      <div class="z4-tag">✦ Scale & Partnership</div>
+      <div class="z4-metrics">
+        <div class="z4-metric"><div class="z4-num gradient">10亿</div><div class="z4-lb">User-level Architecture</div></div>
+        <div class="z4-metric"><div class="z4-num light">200+</div><div class="z4-lb">AI Legion Members</div></div>
+      </div>
+      <div class="z4-line"></div>
+      <div class="z4-partner-title">→ Partnership Models</div>
+      <div class="z4-partner">
+        <div class="z4-partner-item"><span class="tag">A</span> Strategic Investment · AI Business Card赛道</div>
+        <div class="z4-partner-item"><span class="tag">B</span> City Partner · Revenue Share 30%</div>
+        <div class="z4-partner-item"><span class="tag">C</span> Enterprise Custom · From ¥99K</div>
+        <div class="z4-partner-item"><span class="tag">D</span> API Ecosystem · Onboard in 30min</div>
+      </div>
+      <div class="z4-footer">
+        <span>158 APIs</span>
+        <span>32+ Modules</span>
+        <span>15 Engines</span>
+        <span>★8.2/10</span>
+        <span>Gross Margin &gt;85%</span>
+      </div>
+    </div>
+
+    <!-- Z5: Vertical Slogan -->
+    <div class="zone z5">
+      <div class="z5-slogan">让10亿人的名片<span class="hl">活</span>过来</div>
+      <div class="z5-line"></div>
+      <div class="z5-sign">向海容</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Dimension Bar ===== -->
+<div class="dim-bar">
+  <div class="dim-seg" style="width:16%">1.12m <span class="dim-pc">16%</span></div>
+  <div class="dim-seg" style="width:24%">1.68m <span class="dim-pc">24%</span></div>
+  <div class="dim-seg" style="width:32%">2.24m <span class="dim-pc">32%</span></div>
+  <div class="dim-seg" style="width:20%">1.40m <span class="dim-pc">20%</span></div>
+  <div class="dim-seg" style="width:8%">0.56m <span class="dim-pc">8%</span></div>
+</div>
+
+<!-- ===== 5 BANNERS ===== -->
+<div class="banners-row">
+
+  <!-- B1: Brand -->
+  <div class="banner b1">
+    <div class="banner-bg b1-bg"></div>
+    <div class="banner-content">
+      <div class="b1-logo"><span>AI</span></div>
+      <div class="b1-title">AI 数智名片</div>
+      <div class="b1-line"></div>
+      <div class="b1-slogan">让10亿人的名片活过来</div>
+      <div class="b1-line"></div>
+      <div class="b1-desc">不是名片工具<br>是 AI Agent × 信任网络<br>不是 SaaS<br>是 1亿用户智能连接基础设施</div>
+      <div class="b1-by">向海容 × 白泽AI数智军团</div>
+    </div>
+  </div>
+
+  <!-- B2: AI Engines -->
+  <div class="banner b2">
+    <div class="banner-bg b2-bg"></div>
+    <div class="banner-content">
+      <div class="b2-icon">◇</div>
+      <div class="b2-title">AI Engine Cluster</div>
+      <div class="b2-sub">15 Self-developed · Self-evolving</div>
+      <div class="b2-g">
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">OCR</div><div class="b2-g-sb">Scan</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">RAG</div><div class="b2-g-sb">QA</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">Match</div><div class="b2-g-sb">Vector</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">Write</div><div class="b2-g-sb">Gen</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">Rec.</div><div class="b2-g-sb">Thompson</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">KG</div><div class="b2-g-sb">Reason</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">Learn</div><div class="b2-g-sb">Online</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">◈</div><div class="b2-g-nm">Score</div><div class="b2-g-sb">Trust</div></div>
+      </div>
+      <div class="b2-bottom">3-yr Head Start · No competitor has AI</div>
+    </div>
+  </div>
+
+  <!-- B3: Revenue -->
+  <div class="banner b3">
+    <div class="banner-bg b3-bg"></div>
+    <div class="banner-content">
+      <div class="b3-icon">◆</div>
+      <div class="b3-title">Three-Tier Revenue</div>
+      <div class="b3-tiers">
+        <div class="b3-tier"><span class="b3-tier-tag">L1</span><span class="b3-tier-lb">SaaS Subscription</span><span class="b3-tier-num">¥3.6B/yr</span></div>
+        <div class="b3-tier"><span class="b3-tier-tag">L2</span><span class="b3-tier-lb">API Ecosystem</span><span class="b3-tier-num">¥365M/yr</span></div>
+        <div class="b3-tier"><span class="b3-tier-tag">L3</span><span class="b3-tier-lb">Enterprise Value-add</span><span class="b3-tier-num">¥300M/yr</span></div>
+      </div>
+      <div class="b3-total">¥7.25B/yr</div>
+      <div class="b3-totallb">Total Revenue · Stable Phase</div>
+      <div class="b3-margin">Gross Margin &gt;85% · Marginal Cost → 0</div>
+    </div>
+  </div>
+
+  <!-- B4: 招商 -->
+  <div class="banner b4">
+    <div class="banner-bg b4-bg"></div>
+    <div class="banner-content">
+      <div class="b4-icon">◇</div>
+      <div class="b4-title">Partnership</div>
+      <div class="b4-list">
+        <div class="b4-item"><span class="b4-tag">A</span><span class="b4-txt">Strategic Investment · AI Card赛道</span></div>
+        <div class="b4-item"><span class="b4-tag">B</span><span class="b4-txt">City Partner · Revenue Share 30%</span></div>
+        <div class="b4-item"><span class="b4-tag">C</span><span class="b4-txt">Enterprise Custom · From ¥99K</span></div>
+        <div class="b4-item"><span class="b4-tag">D</span><span class="b4-txt">API Ecosystem · Onboard 30min</span></div>
+      </div>
+      <div class="b4-bottom">Global 2B People · Penetration &lt;5% · Trillion Blue Ocean</div>
+    </div>
+  </div>
+
+  <!-- B5: Moat -->
+  <div class="banner b5">
+    <div class="banner-bg b5-bg"></div>
+    <div class="banner-content">
+      <div class="b5-icon">◈</div>
+      <div class="b5-title">Core Moat</div>
+      <div class="b5-nums">
+        <div><div class="b5-num-val">10亿</div><div class="b5-num-lb">User-level</div></div>
+        <div><div class="b5-num-val">200+</div><div class="b5-num-lb">AI Legion</div></div>
+        <div><div class="b5-num-val">★8.2</div><div class="b5-num-lb">Rating</div></div>
+      </div>
+      <div class="b5-moat">
+        <div class="b5-moat-item"><span class="hl">AI Layer</span> · 15 Engines · 3-yr Head Start</div>
+        <div class="b5-moat-item"><span class="hl">Trust Network</span> · More Users = Better Match</div>
+        <div class="b5-moat-item"><span class="hl">WeChat Eco</span> · 1B Users Zero-cost Reach</div>
+        <div class="b5-moat-item"><span class="hl">AI Legion</span> · 6 Months → 6 Days · 1% Cost</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Specs ===== -->
+<div class="wall-specs">
+  <h4>📐 AI Digital Business Card · Promotional Specs</h4>
+  <div class="row">
+    <span><strong>Main Wall:</strong> 7000×2700mm</span>
+    <span><strong>Banners ×5:</strong> 400×1200mm each</span>
+    <span><strong>Style:</strong> AI-native Dark · Glass · Cyan-Purple-Pink Gradient</span>
+    <span><strong>Font:</strong> Geist · Geist Mono · Noto Sans SC</span>
+    <span><strong>Inspiration:</strong> Replicate × ElevenLabs × RunwayML</span>
+    <span><strong>Status:</strong> Printable · Print-ready</span>
+  </div>
+</div>
+
+<!-- ===== Design Manifesto ===== -->
+<div class="changelog">
+  <h4>⚡ AI-native Design Philosophy</h4>
+  <div class="changelog-items">
+    <span class="changelog-item"><span class="changelog-dot dot-cyan"></span>Deep dark canvas · 3 luminous gradient orbs</span>
+    <span class="changelog-item"><span class="changelog-dot dot-purple"></span>Glass morphism · backdrop-blur cards</span>
+    <span class="changelog-item"><span class="changelog-dot dot-pink"></span>Cyan→Purple→Pink gradient system</span>
+    <span class="changelog-item"><span class="changelog-dot dot-cyan"></span>Geist extreme negative tracking</span>
+    <span class="changelog-item"><span class="changelog-dot dot-purple"></span>Glowing gradient text throughout</span>
+    <span class="changelog-item"><span class="changelog-dot dot-pink"></span>Scanline effect · 72px cyan grid</span>
+    <span class="changelog-item"><span class="changelog-dot dot-cyan"></span>Pill-shaped icons · soft neon glow</span>
+    <span class="changelog-item"><span class="changelog-dot dot-purple"></span>Hover: box-shadow glow + lift</span>
+  </div>
+</div>
+
+</body>
+</html>

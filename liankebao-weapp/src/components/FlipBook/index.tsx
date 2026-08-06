@@ -1,5 +1,5 @@
 import { PLACEHOLDER } from '../../constants/placeholder'
-1|import { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import { View, Image, Text } from '@tarojs/components'
 import './index.scss'
 

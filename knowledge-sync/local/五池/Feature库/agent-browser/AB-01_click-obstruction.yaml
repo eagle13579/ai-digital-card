@@ -1,0 +1,7 @@
+name: F-AB-01_点击遮挡检测
+description: CDP级别点击前遮挡检测, 拒绝误点击
+dimension: 基本功
+source: vercel-labs/agent-browser
+products:
+  - 内容工厂
+  - AI数字军团

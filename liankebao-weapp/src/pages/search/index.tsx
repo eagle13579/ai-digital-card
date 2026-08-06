@@ -1,7 +1,8 @@
-import { FC, useState, useEffect, useCallback } from 'react'
+import { FC, useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import './index.scss'
+import { searchApi } from '../../api/digitalBrochure'
 
 /* ========================================================================== */
 /*  类型                                                                       */
@@ -128,6 +129,7 @@ const Search: FC = () => {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [showHistory, setShowHistory] = useState(true)
   const [searched, setSearched] = useState(false)
+  const allResultsRef = useRef<SearchResult[]>([])
 
   /* ---- 加载历史记录 ---- */
   useEffect(() => {
@@ -188,7 +190,7 @@ const Search: FC = () => {
 
   /* ---- 执行搜索 ---- */
   const doSearch = useCallback(
-    (kw: string) => {
+    async (kw: string) => {
       const trimmed = kw.trim()
       if (!trimmed) return
 
@@ -197,22 +199,69 @@ const Search: FC = () => {
       setShowHistory(false)
       setSearched(true)
 
-      // 内置搜索 (demo data)
-      const lower = trimmed.toLowerCase()
-      let filtered = DEMO_RESULTS.filter(
-        (item) =>
-          item.title.toLowerCase().includes(lower) ||
-          (item.subtitle && item.subtitle.toLowerCase().includes(lower)) ||
-          (item.description && item.description.toLowerCase().includes(lower)) ||
-          (item.tags && item.tags.some((t) => t.toLowerCase().includes(lower))),
-      )
+      try {
+        // 调用后端语义搜索 API
+        const res = await searchApi.semanticSearch({
+          query: trimmed,
+          top_k: 20,
+          min_score: 0.3,
+        })
 
-      // 标签筛选
-      if (activeTab !== 'all') {
-        filtered = filtered.filter((item) => item.type === activeTab)
+        // API 返回 ApiResponse<SearchResultItem[]>，data 为结果数组
+        const apiResults: any[] = res.data || []
+
+        // 数据映射：后端返回 {user_name, company, title, intro, score, ...}
+        const mapped: SearchResult[] = apiResults.map(
+          (item: any, index: number) => ({
+            id: item.id || `result_${index}`,
+            type: 'card' as const,
+            title:
+              item.user_name +
+              (item.title ? ` · ${item.title}` : ''),
+            subtitle: item.company || '',
+            description: item.intro || '',
+            tags: [],
+          }),
+        )
+
+        // 保存全部结果供标签切换使用
+        allResultsRef.current = mapped
+
+        // 按当前标签筛选
+        let filtered = mapped
+        if (activeTab !== 'all') {
+          filtered = mapped.filter(
+            (item: SearchResult) => item.type === activeTab,
+          )
+        }
+
+        setResults(filtered)
+      } catch (err) {
+        console.error('语义搜索 API 调用失败，降级到本地 Demo 过滤', err)
+
+        // 降级：本地 Demo 数据过滤
+        const lower = trimmed.toLowerCase()
+        let filtered = DEMO_RESULTS.filter(
+          (item) =>
+            item.title.toLowerCase().includes(lower) ||
+            (item.subtitle &&
+              item.subtitle.toLowerCase().includes(lower)) ||
+            (item.description &&
+              item.description.toLowerCase().includes(lower)) ||
+            (item.tags &&
+              item.tags.some((t) =>
+                t.toLowerCase().includes(lower),
+              )),
+        )
+
+        if (activeTab !== 'all') {
+          filtered = filtered.filter(
+            (item) => item.type === activeTab,
+          )
+        }
+
+        setResults(filtered)
       }
-
-      setResults(filtered)
     },
     [saveHistory, activeTab],
   )
@@ -247,9 +296,10 @@ const Search: FC = () => {
     (key: string) => {
       setActiveTab(key)
       if (searched) {
+        const source = allResultsRef.current.length > 0 ? allResultsRef.current : DEMO_RESULTS
         // 重新筛选当前结果
         const lower = keyword.trim().toLowerCase()
-        let filtered = DEMO_RESULTS.filter(
+        let filtered = source.filter(
           (item) =>
             item.title.toLowerCase().includes(lower) ||
             (item.subtitle && item.subtitle.toLowerCase().includes(lower)) ||

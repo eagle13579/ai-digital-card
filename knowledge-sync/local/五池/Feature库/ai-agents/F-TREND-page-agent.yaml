@@ -1,0 +1,16 @@
+name: Trending: page-agent
+version: 1.0.0
+status: draft
+dimension: ai-agents
+source: github trending 2026-07-05
+description: Auto-absorbed from GitHub Trending: alibaba/page-agent
+atoms:
+  - TREND-alibaba-page-agent-01: Page Agent
+  - TREND-alibaba-page-agent-02: agent, api, workflow 模式
+  - TREND-alibaba-page-agent-03: alibaba/page-agent的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

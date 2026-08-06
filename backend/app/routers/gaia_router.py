@@ -18,7 +18,7 @@ from app.ai.gaia_trainer import get_gaia_trainer, GaiaTrainer
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/gaia", tags=["盖娅进化大脑"])
+router = APIRouter(prefix="/api/v1/gaia", tags=["盖娅进化大脑"])
 
 
 # ======================================================================
@@ -77,6 +77,7 @@ async def ingest_knowledge(
         tags=data.tags,
         confidence=data.confidence,
     )
+    await db.commit()
     return {
         "code": 200,
         "message": "知识已摄取",
@@ -134,6 +135,7 @@ async def ingest_feedback(
         source=data.source,
         comment=data.comment,
     )
+    await db.commit()
     return {
         "code": 200,
         "message": "反馈已记录" + (" 并生成知识" if knowledge else ""),
@@ -174,6 +176,8 @@ async def trigger_evolution(
     """
     brain = get_gaia_brain()
     result = await brain.process_evolution_cycle(db, trigger=data.trigger)
+    # 显式提交（get_db 的 finally 只做 close/rollback，不自动 commit）
+    await db.commit()
     status_code = 200 if result.get("status") == "completed" else 500
     return {
         "code": status_code,
@@ -194,6 +198,8 @@ async def trigger_training(
     """
     trainer = get_gaia_trainer()
     result = await trainer.run_training_cycle(db, trigger=trigger)
+    # 显式提交（get_db 的 finally 只做 close/rollback，不自动 commit）
+    await db.commit()
     status_code = 200 if result.get("status") == "completed" else 500
     return {
         "code": status_code,

@@ -1,0 +1,51 @@
+# Feature: F-SEVEN-BINS
+# 七分法 — 简洁知识分类体系
+
+name: F-SEVEN-BINS
+version: 1.0.0
+status: draft
+domain: cognitive
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - A2-七分法
+
+classification:
+  bins:
+    - id: people
+      name: 人物
+      description: 联系人/合作伙伴/团队成员画像
+    - id: projects
+      name: 项目
+      description: 当前推进的所有项目
+    - id: decisions
+      name: 决策
+      description: 重要决策记录（什么决定+为什么+结果）
+    - id: company
+      name: 公司
+      description: 公司架构/制度/战略
+    - id: meetings
+      name: 会议日志
+      description: 每次会议的核心内容
+    - id: knowledge
+      name: 知识库
+      description: 学习资料/方法论
+    - id: index
+      name: 索引
+      description: 跨分类的关联引用和导航
+
+usage:
+  - 新手引导的默认分类方案
+  - 中小团队知识库顶层设计模板
+  - 用户首次使用AI第二大脑的推荐分类
+
+target_products:
+  - 白泽控制台（新手引导模式）
+  - 文鳐（首次使用教程）
+  - 师旷（知识管理面板）
+
+target_employees:
+  - 师旷
+  - 乘黄
+  - 文鳐

@@ -1,0 +1,14 @@
+name: multi-platform-push-notifier
+description: >
+  统一推送适配器，支持6+平台：企业微信/飞书/Telegram/Discord/Slack/邮件。
+  每个平台独立format() + send()接口。
+version: "1.0.0"
+source: "daily_stock_analysis (ZhuLinsen)"
+products: ["中国软银投资系统", "AI自动交易引擎", "䑏疏跨境助手"]
+platforms:
+  - "企业微信 (WeCom)"
+  - "飞书 (Feishu/Lark)"
+  - "Telegram"
+  - "Discord"
+  - "Slack"
+  - "Email (SMTP)"

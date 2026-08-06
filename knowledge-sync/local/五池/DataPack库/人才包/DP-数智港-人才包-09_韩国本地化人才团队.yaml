@@ -1,0 +1,13 @@
+datapack_id: "DP-HR-数智港-01"
+name: "韩国本地化人才团队"
+version: "1.0.0"
+type: "人才包"
+description: >
+  韩国本地数字员工团队(성호/주연/동현/혜진/은주)的soul-injection和memory
+source: "22_大航海/数字员工/"
+contents: >
+  성호技术总监(soul 2.6KB) + 주연市场总监(soul 2.8KB) + 동현商务经理(soul 2.8KB) + 혜진运营主管(soul 2.8KB) + 은주研究分析师(soul 2.8KB)
+consumed_by_features: >
+  F-CZL-数智港-01 韩企市场侦察引擎 / F-CJ-数智港-02 韩企客户成交包引擎
+project: "中韩出海数智港"
+created_at: "2026-06-08"

@@ -1,0 +1,41 @@
+datapack_id: "DP-PD-链客宝-用户身份"
+name: "链客宝·用户身份"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝用户的企业身份认证与基础信息数据，包括企业实名认证、法人信息、营业执照等核心身份凭据"
+
+source: "chainke-full/ywhy-ai-backend/data/users.json | chainke-full/backend/app/routers/learning_center.py"
+
+contents: |
+  【用户身份数据】
+  1. 用户认证信息: hash密码、创建时间（来源: ywhy-ai-backend/data/users.json）
+     - testuser: 普通测试用户
+     - admin: 管理员用户
+     - secureuser: 安全测试用户
+     密码存储格式: salt$hash
+  2. 企业身份凭据: 企业名称、统一社会信用代码、法人代表、营业执照
+  3. 身份认证状态: 未认证/已认证/金牌认证
+  4. 用户等级体系: 免费版/专业版/企业版（来源: unit_economics.py RevenueEntry.plan）
+  5. 学习中心用户映射: 课程报名学员身份（来源: learning_center.py Course.enrolled_count）
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取链客宝用户身份数据到工作内存"
+  query: "按用户ID/企业名/认证等级查询用户身份"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "身份认证Feature做用户鉴权时消费此DataPack"
+  - "企业名片Feature做企业信息展示时消费此DataPack"
+  - "信任评分Feature做信任分计算时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原用户数据包（KFD-07合规）"

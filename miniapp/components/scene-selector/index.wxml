@@ -1,0 +1,47 @@
+<!--
+  场景选择器 SceneSelector
+  4种场景手动切换 + AI自动建议浮层
+-->
+<view class="scene-selector">
+  <!-- 场景按钮组 — 横向滚动 -->
+  <scroll-view class="scene-tabs" scroll-x enable-flex enhanced>
+    <view
+      class="scene-tab spring-press"
+      wx:for="{{scenes}}"
+      wx:key="type"
+      data-scene="{{item.type}}"
+      bindtap="onSceneTap"
+    >
+      <view class="scene-tab-inner {{activeScene === item.type ? 'active' : ''}}">
+        <text class="scene-icon">{{item.icon}}</text>
+        <text class="scene-label">{{item.label}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- AI场景建议浮层 -->
+  <view class="ai-suggestion-overlay" wx:if="{{aiSuggestionVisible}}" bindtap="onDeclineAISuggestion">
+    <view class="ai-suggestion-card" catchtap="">
+      <view class="suggestion-header">
+        <text class="suggestion-emoji">🤖</text>
+        <text class="suggestion-title">AI场景建议</text>
+      </view>
+      <view class="suggestion-body">
+        <text class="suggestion-text">
+          根据名片内容，建议切换到
+          <text class="suggestion-highlight">{{getSceneInfo(aiSuggestedScene).icon}} {{getSceneInfo(aiSuggestedScene).label}}</text>
+          模式，展示更合适的信息
+        </text>
+      </view>
+      <view class="suggestion-actions">
+        <button class="btn-decline spring-press" bindtap="onDeclineAISuggestion">知道了</button>
+        <button class="btn-accept spring-press" bindtap="onAcceptAISuggestion">切换场景</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI建议加载中 -->
+  <view class="ai-suggesting" wx:if="{{aiSuggesting}}">
+    <text class="suggesting-text">🤖 AI分析场景中...</text>
+  </view>
+</view>

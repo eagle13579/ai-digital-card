@@ -1,0 +1,305 @@
+{
+  "//": "AI数字名片 - 设计Token体系 (design-tokens.json)",
+  "//desc": "完整Token定义，兼容tailwind.config.js theme.extend格式",
+  "version": "1.0.0",
+  "designDirection": "AI原生暗色",
+  "date": "2026-07-08",
+
+  "colors": {
+    "page": "#0A0A18",
+    "elevated": "#0F0F13",
+    "overlay": "#141418",
+
+    "glass": {
+      "1": "rgba(255, 255, 255, 0.04)",
+      "2": "rgba(255, 255, 255, 0.07)",
+      "3": "rgba(139, 92, 246, 0.12)"
+    },
+
+    "hover": "rgba(255, 255, 255, 0.06)",
+    "active": "rgba(255, 255, 255, 0.10)",
+
+    "cyan": {
+      "DEFAULT": "#06b6d4",
+      "light": "#22d3ee",
+      "dark": "#0891b2"
+    },
+    "purple": {
+      "DEFAULT": "#8b5cf6",
+      "light": "#a78bfa",
+      "dark": "#7c3aed"
+    },
+    "pink": {
+      "DEFAULT": "#ec4899",
+      "light": "#f472b6",
+      "dark": "#db2777"
+    },
+
+    "success": "#10b981",
+    "warning": "#f59e0b",
+    "danger": "#ef4444",
+
+    "text": {
+      "primary": "rgba(255, 255, 255, 0.92)",
+      "secondary": "rgba(255, 255, 255, 0.65)",
+      "tertiary": "rgba(255, 255, 255, 0.40)",
+      "quaternary": "rgba(255, 255, 255, 0.20)",
+      "inverse": "#0A0A18",
+      "accent": "#a78bfa"
+    },
+
+    "border": {
+      "subtle": "rgba(255, 255, 255, 0.06)",
+      "default": "rgba(255, 255, 255, 0.10)",
+      "accent": "rgba(139, 92, 246, 0.25)",
+      "cyan": "rgba(6, 182, 212, 0.25)"
+    }
+  },
+
+  "gradients": {
+    "primary": "linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899)",
+    "cyanPurple": "linear-gradient(135deg, #06b6d4, #8b5cf6)",
+    "purplePink": "linear-gradient(135deg, #8b5cf6, #ec4899)",
+    "cyanOnly": "linear-gradient(135deg, #06b6d4, #22d3ee)",
+    "glow": "radial-gradient(ellipse at center, rgba(139,92,246,0.3), rgba(6,182,212,0.1), transparent)"
+  },
+
+  "fontFamily": {
+    "sans": "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+    "mono": "'Geist Mono', 'SF Mono', 'Fira Code', monospace",
+    "sc": "'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+    "system": "'Geist', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif"
+  },
+
+  "fontSize": {
+    "xs": ["20rpx", { "lineHeight": "1.4", "fontWeight": "400" }],
+    "sm": ["24rpx", { "lineHeight": "1.5", "fontWeight": "400" }],
+    "base": ["28rpx", { "lineHeight": "1.6", "fontWeight": "400" }],
+    "lg": ["32rpx", { "lineHeight": "1.5", "fontWeight": "500" }],
+    "xl": ["36rpx", { "lineHeight": "1.4", "fontWeight": "600" }],
+    "2xl": ["40rpx", { "lineHeight": "1.3", "fontWeight": "700" }],
+    "3xl": ["48rpx", { "lineHeight": "1.2", "fontWeight": "700" }],
+    "4xl": ["56rpx", { "lineHeight": "1.1", "fontWeight": "800" }]
+  },
+
+  "letterSpacing": {
+    "tight": "-0.01em",
+    "normal": "0",
+    "wide": "0.02em",
+    "wider": "0.05em"
+  },
+
+  "glass": {
+    "layer1": {
+      "background": "rgba(255, 255, 255, 0.04)",
+      "backdropFilter": "blur(20px)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.06)"
+    },
+    "layer2": {
+      "background": "rgba(255, 255, 255, 0.07)",
+      "backdropFilter": "blur(30px)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.10)"
+    },
+    "layer3": {
+      "background": "rgba(139, 92, 246, 0.12)",
+      "backdropFilter": "blur(40px)",
+      "border": "0.5px solid rgba(139, 92, 246, 0.20)",
+      "boxShadow": "0 0 20px rgba(139, 92, 246, 0.15)"
+    }
+  },
+
+  "orb": {
+    "sm": "0 0 12px rgba(139, 92, 246, 0.15)",
+    "md": "0 0 24px rgba(139, 92, 246, 0.20)",
+    "lg": "0 0 40px rgba(139, 92, 246, 0.25)",
+    "xl": "0 0 60px rgba(6, 182, 212, 0.20)",
+    "cyan": "0 0 20px rgba(6, 182, 212, 0.20)",
+    "pink": "0 0 20px rgba(236, 72, 153, 0.20)",
+    "hover": "0 0 30px rgba(139, 92, 246, 0.35)"
+  },
+
+  "spacing": {
+    "1": "4rpx",
+    "2": "8rpx",
+    "3": "12rpx",
+    "4": "16rpx",
+    "5": "20rpx",
+    "6": "24rpx",
+    "8": "32rpx",
+    "10": "40rpx",
+    "12": "48rpx",
+    "16": "64rpx",
+    "20": "80rpx"
+  },
+
+  "borderRadius": {
+    "xs": "8rpx",
+    "sm": "12rpx",
+    "md": "16rpx",
+    "lg": "24rpx",
+    "xl": "32rpx",
+    "full": "9999rpx"
+  },
+
+  "shadow": {
+    "glassEdge": "inset 0 0.5px 0 rgba(255, 255, 255, 0.08)",
+    "glassInner": "inset 0 1px 0 rgba(255, 255, 255, 0.04)"
+  },
+
+  "animation": {
+    "easing": {
+      "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "out": "cubic-bezier(0, 0, 0.2, 1)",
+      "in": "cubic-bezier(0.4, 0, 1, 1)",
+      "inOut": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "duration": {
+      "fast": "150ms",
+      "normal": "250ms",
+      "slow": "400ms",
+      "orb": "4000ms",
+      "shimmer": "2000ms"
+    },
+    "transitions": {
+      "fade": "opacity 250ms cubic-bezier(0, 0, 0.2, 1)",
+      "scale": "transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "glass": "all 250ms cubic-bezier(0, 0, 0.2, 1)",
+      "spring": "transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)"
+    },
+    "keyframes": {
+      "orbFloat": {
+        "0%, 100%": { "transform": "translateY(0) scale(1)", "opacity": 0.6 },
+        "50%": { "transform": "translateY(-15rpx) scale(1.05)", "opacity": 1 }
+      },
+      "shimmer": {
+        "0%": { "backgroundPosition": "200% 0" },
+        "100%": { "backgroundPosition": "-200% 0" }
+      },
+      "pulseGlow": {
+        "0%, 100%": { "opacity": 0.5 },
+        "50%": { "opacity": 1 }
+      }
+    }
+  },
+
+  "components": {
+    "card": {
+      "background": "rgba(255, 255, 255, 0.07)",
+      "borderRadius": "16rpx",
+      "paddingX": "32rpx",
+      "paddingY": "24rpx",
+      "boxShadow": "0 0 24px rgba(139, 92, 246, 0.20)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.10)",
+      "edgeGlow": "inset 0 0.5px 0 rgba(255, 255, 255, 0.08)",
+      "states": {
+        "hover": { "transform": "scale(1.02)" },
+        "active": { "transform": "scale(0.98)" }
+      }
+    },
+    "button": {
+      "primary": {
+        "background": "linear-gradient(135deg, #06b6d4, #8b5cf6)",
+        "color": "#0A0A18",
+        "height": "88rpx",
+        "borderRadius": "12rpx",
+        "boxShadow": "0 0 12px rgba(139, 92, 246, 0.15)",
+        "fontSize": "32rpx",
+        "fontWeight": "600"
+      },
+      "outline": {
+        "background": "rgba(255, 255, 255, 0.04)",
+        "border": "0.5px solid rgba(255, 255, 255, 0.10)",
+        "color": "rgba(255, 255, 255, 0.92)",
+        "height": "88rpx",
+        "borderRadius": "12rpx",
+        "fontSize": "32rpx",
+        "fontWeight": "500"
+      },
+      "small": {
+        "height": "64rpx",
+        "borderRadius": "8rpx",
+        "fontSize": "28rpx"
+      }
+    },
+    "input": {
+      "background": "rgba(255, 255, 255, 0.04)",
+      "border": "0.5px solid rgba(255, 255, 255, 0.06)",
+      "borderRadius": "12rpx",
+      "height": "88rpx",
+      "padding": "0 24rpx",
+      "color": "rgba(255, 255, 255, 0.92)",
+      "placeholderColor": "rgba(255, 255, 255, 0.40)",
+      "states": {
+        "focus": { "border": "0.5px solid rgba(139, 92, 246, 0.25)" },
+        "error": { "border": "0.5px solid #ef4444" }
+      }
+    },
+    "navigation": {
+      "background": "rgba(255, 255, 255, 0.07)",
+      "backdropFilter": "blur(30px)",
+      "height": "88rpx",
+      "titleFontSize": "36rpx",
+      "titleColor": "rgba(255, 255, 255, 0.92)"
+    },
+    "tabBar": {
+      "background": "#0F0F13",
+      "borderTop": "0.5px solid rgba(255, 255, 255, 0.06)",
+      "height": "100rpx",
+      "itemColor": "rgba(255, 255, 255, 0.40)",
+      "itemColorActive": "#06b6d4",
+      "itemFontSize": "20rpx",
+      "iconSize": "48rpx",
+      "safeBottom": "env(safe-area-inset-bottom)"
+    },
+    "stat": {
+      "numberSize": "40rpx",
+      "numberWeight": "700",
+      "numberColor": "rgba(255, 255, 255, 0.92)",
+      "labelSize": "20rpx",
+      "labelColor": "rgba(255, 255, 255, 0.65)",
+      "gap": "32rpx"
+    },
+    "userHeader": {
+      "avatarSize": "120rpx",
+      "avatarBorder": "2px solid rgba(255, 255, 255, 0.15)",
+      "avatarOrb": "0 0 24px rgba(139, 92, 246, 0.20)",
+      "nameSize": "40rpx",
+      "positionSize": "24rpx",
+      "padding": "40rpx 24rpx"
+    },
+    "avatarStack": {
+      "size": "72rpx",
+      "border": "2px solid #0A0A18",
+      "overlap": "-16rpx"
+    }
+  },
+
+  "home": {
+    "orbBackground": [
+      "radial-gradient(ellipse 600rpx 400rpx at 20% 30%, rgba(6,182,212,0.12), transparent)",
+      "radial-gradient(ellipse 500rpx 500rpx at 70% 60%, rgba(139,92,246,0.10), transparent)",
+      "radial-gradient(ellipse 400rpx 300rpx at 50% 80%, rgba(236,72,153,0.08), transparent)"
+    ],
+    "actionBar": {
+      "background": "rgba(255, 255, 255, 0.07)",
+      "backdropFilter": "blur(30px)",
+      "margin": "24rpx",
+      "borderRadius": "32rpx",
+      "border": "0.5px solid rgba(255, 255, 255, 0.10)",
+      "edgeGlow": "inset 0 0.5px 0 rgba(255, 255, 255, 0.08)"
+    },
+    "aiEntry": {
+      "boxShadow": "0 0 40px rgba(139, 92, 246, 0.25)",
+      "borderRadius": "24rpx"
+    },
+    "upgradeBanner": {
+      "background": "linear-gradient(135deg, #8b5cf6, #ec4899)"
+    }
+  },
+
+  "support": {
+    "darkModeOnly": true,
+    "lightModeDisabled": true,
+    "description": "AI原生暗色方向，仅支持暗色模式"
+  }
+}

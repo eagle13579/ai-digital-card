@@ -1,0 +1,15 @@
+id: F-HA-FIREWALL-02
+name: 上下文防火墙中间件
+dimension: 架构/安全
+domain: 系统架构
+atoms:
+  - HA-03 Context Firewall
+  - HA-04 父子代理四步协议
+description: 上下文防火墙的标准化实现。确保所有delegate_task遵守父-子代理记忆物理隔离原则：只传目标+必要背景，不传整会话；子代理只返回结构化报告，不写全局状态。
+products:
+  - 白泽控制台: delegate_task自动精简context，附加防火墙门禁
+  - 盖娅进化大脑: 左右脑推理中间件集成上下文防火墙门禁
+  - 链客宝: 敏感客户数据处理时，子代理独立沙箱不共享客户数据
+  - 海智港: 跨租户数据隔离 — 每个租户的子代理运行在独立上下文中
+status: active
+priority: P0

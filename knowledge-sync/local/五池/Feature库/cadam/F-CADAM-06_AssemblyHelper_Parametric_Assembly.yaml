@@ -1,0 +1,14 @@
+name: AssemblyHelper参数化装配体
+dimension: 场景
+description: 复杂3D模型拆分为子部件装配，每个子部件独立参数化，组合成完整装配体。支持部件级复用和变体生成。
+applies_to:
+  - 盖娅之城复杂建筑(城堡/教堂/塔楼)
+  - 任何需要模块化设计的3D建模
+mental_model: |
+  建筑 = 基础 + 墙体 × N层 + 屋顶 + 装饰。不是一整个模型，是装配体。
+  每一层可独立调整，某个部件可复用到其他建筑。
+source: CADAM
+
+products:
+  - 通用: 自动匹配
+cadam_ref: packages/cadpy/ (STEP装配体生成)

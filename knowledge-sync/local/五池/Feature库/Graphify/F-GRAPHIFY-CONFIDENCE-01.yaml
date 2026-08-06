@@ -1,0 +1,26 @@
+id: F-GRAPHIFY-CONFIDENCE-01
+name: EXTRACTED/INFERRED/AMBIGUOUS 三层置信度标签
+source_model: Graphify confidence system — 每个关系边带置信度标签，诚实标记来源可靠性
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+description: >-
+  每个提取的关系边带三层置信度标签，诚实标记「找到了什么」vs「猜到了什么」:
+  EXTRACTED=源文件中显式存在的(import/直接调用),
+  INFERRED=合理推导得到的(调用图传递/上下文共现),
+  AMBIGUOUS=不确定的(标记供人工审查)。
+  用户/下游系统根据置信度决定是否采纳该关系。
+input: 关系边 {source, target, relation}
+output: "标记置信度的边 {source, target, relation, confidence: EXTRACTED|INFERRED|AMBIGUOUS}"
+sop: |
+  ① 显式规则匹配: import/require/call → EXTRACTED
+  ② 图算法推导: 调用图二遍传递 → INFERRED
+  ③ 模糊匹配: 命名相似/上下文共现 → AMBIGUOUS(标记)
+  ④ 在GRAPH_REPORT.md中统计三种标签分布
+  ⑤ MCP查询时AI选择是否采纳INFERRED/AMBIGUOUS边
+quality_gates: EXTRACTED精度>95%、INFERRED精度>75%、AMBIGUOUS标记无遗漏
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 白泽输出质量门禁/Feature真实性标记/员工记忆可信度

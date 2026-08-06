@@ -1,0 +1,98 @@
+feature_id: F-CADAM-03
+feature_name: Step-First 确定性验证链
+feature_type: 心智模型 / 质量门禁模式
+version: 1.0.0
+created: 2026-06-15
+author: CADAM项目 -> Feature吸收
+
+# ============================================================
+# 核心理念
+# ============================================================
+
+products:
+  - 通用: 自动匹配
+core_concept: >
+  STEP是主要的CAD工件，所有其他格式（STL、3MF、GLB）都是派生品。
+  每次生成后运行确定性验证链：
+  refs + facts + planes + positioning（基准验证）
+  -> measure针对每项规格（规格验证）
+  -> snapshot视觉确认（语义验证）。
+  发现问题的走repair-loop闭环修复。
+
+# ============================================================
+# CADAM实现
+# ============================================================
+cadam_implementation:
+  description: >
+    CADAM建立了严格的四层验证体系：
+    (1) 基准层：refs --facts --planes --positioning
+    确认比例、标签、主平面、定位参考。
+    (2) 规格层：measure/align/frame/diff
+    验证每项用户指定的尺寸、间隙、装配关系。
+    (3) 视觉层：snapshot PNG/GIF
+    捕捉语义错误（看错特征方向、镜像问题等）。
+    (4) 闭环层：failing -> classify -> smallest fix -> rerun -> revalidate
+    每层发现问题都走最小修复路径。
+  key_components:
+    - python scripts/inspect refs: 基准事实提取
+    - python scripts/inspect measure: 精确尺寸测量
+    - python scripts/inspect align: 装配对齐验证
+    - python scripts/inspect diff: 几何差异比较
+    - python scripts/snapshot: 视觉验证
+  invariant: >
+    不做几何验证的STEP不是可交付的CAD。
+    验证结果（而非LLM声称）是交付的唯一依据。
+
+# ============================================================
+# 映射盖娅进化大脑
+# ============================================================
+mapping_to_gaiya:
+  description: >
+    这一模式对应"AI输出的质量门禁体系"
+  baize_analogy:
+    - STEP验证 -> 白泽输出的自动化测试
+    - refs --facts -> 输出格式/结构验证
+    - measure -> 精确数值验证
+    - snapshot -> 人工视觉抽检
+    - repair-loop -> 缺陷修复流水线
+  analogy: >
+    正如CADAM不允许未经验证的STEP进入交付环节，
+    白泽Agent的每项产出都应当经过自动化质量门禁，
+    不合格的自动进入修复闭环而非直接交给用户。
+
+# ============================================================
+# 适用场景
+# ============================================================
+applicable_scenarios:
+  - 任何AI生成工程资产的质量控制
+  - AI生成代码的自动化测试流水线
+  - 多步骤AI工作流中有中间产物的验证
+  - 需要可审计的AI输出质量管理
+  - AI Agent的自我纠错机制
+
+# ============================================================
+# 心智模型详细描述
+# ============================================================
+mental_model_detail:
+  name: Step-First Deterministic Validation Chain (主工件优先确定性验证链)
+  level: L5孵化室 - 核心心智模型
+  description: >
+    核心原则：总要有一个"主要工件"（Primary Artifact），
+    所有其他格式都是从这个主要工件派生而来。
+    验证永远针对主要工件进行，派生品不承载验证责任。
+    验证链条从机械层到语义层逐级深入，
+    每一级通过才能进入下一级。
+    发现问题时从"最小可修复单元"入手，
+    修复后重新跑完整验证链。
+  principles:
+    - 主工件优先: 选择一个格式作为真相来源
+    - 逐级验证: 基准 -> 规格 -> 语义，逐层深入
+    - 测量驱动: 依赖精确数值而非视觉判断
+    - 修复闭环: 发现问题必走classify->fix->rerun->revalidate
+    - 不跳过: 每个阶段不能因"看起来对"而跳过
+  workflow:
+    - "1. 生成主工件（STEP）"
+    - "2. refs+facts+planes+positioning基准验证"
+    - "3. spec-driven checks：measure/align/frame/diff"
+    - "4. snapshot视觉语义验证"
+    - "5. 通过 -> 交付 | 不通过 -> repair-loop"

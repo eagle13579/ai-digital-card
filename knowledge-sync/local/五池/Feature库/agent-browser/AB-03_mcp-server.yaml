@@ -1,0 +1,7 @@
+name: F-AB-03_MCP Server浏览器控制
+description: MCP协议暴露浏览器操作工具, tool profiles控制
+dimension: 体系
+source: vercel-labs/agent-browser
+products:
+  - AI数字军团
+  - 翟如AI超级助理

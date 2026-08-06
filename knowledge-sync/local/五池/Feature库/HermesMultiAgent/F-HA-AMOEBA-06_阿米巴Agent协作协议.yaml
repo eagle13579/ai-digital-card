@@ -1,0 +1,15 @@
+id: F-HA-AMOEBA-06
+name: 阿米巴Agent协作协议
+dimension: 架构/协作
+domain: 系统架构
+atoms:
+  - HA-03 Context Firewall
+  - HA-04 父子代理四步协议
+  - HA-06 API契约协作
+description: 多Agent协作的标准协议。Agent间通过API契约通信、上下文防火墙隔离、父子代理四步协议执行。每个Agent独立决策、独立执行，只通过结构化报告协作。
+products:
+  - 白泽项目阿米巴工作流: 多个delegate_task并行派单，各自独立执行
+  - 蜂巢讨论引擎: 每个公民基于灵魂数据独立发言，不互相污染
+  - 盖娅左右脑架构: 左脑发散+右脑收敛独立运行，通过TCP-R门禁汇聚
+status: active
+priority: P0

@@ -35,11 +35,28 @@ _MODULE_MAP = {
     "OptimizationAnalyzer": ("app.ai.optimization", "OptimizationAnalyzer"),
     "ABTestingEngine": ("app.ai.ab_testing", "ABTestingEngine"),
     "get_ab_testing_engine": ("app.ai.ab_testing", "get_ab_testing_engine"),
+    # ── RAG 管道 ──
     "RAGPipeline": ("app.ai.rag_pipeline", "RAGPipeline"),
     "DeepSeekClient": ("app.ai.rag_pipeline", "DeepSeekClient"),
     "ContextBuilder": ("app.ai.rag_pipeline", "ContextBuilder"),
     "RAGContext": ("app.ai.rag_pipeline", "RAGContext"),
     "RAGResponse": ("app.ai.rag_pipeline", "RAGResponse"),
+    "HyDEQueryTransformer": ("app.ai.rag_pipeline", "HyDEQueryTransformer"),
+    # ── SAG 自校验管道 ──
+    "SAGPipeline": ("app.ai.sag_pipeline", "SAGPipeline"),
+    "SAGMode": ("app.ai.sag_pipeline", "SAGMode"),
+    "SAGDepth": ("app.ai.sag_pipeline", "SAGDepth"),
+    "SAGContext": ("app.ai.sag_pipeline", "SAGContext"),
+    "SAGResponse": ("app.ai.sag_pipeline", "SAGResponse"),
+    "SAGPromptFactory": ("app.ai.sag_pipeline", "SAGPromptFactory"),
+    # ── Hybrid 融合管道 (已废弃, 请使用 RAGPipeline(fusion_mode="hybrid")) ──
+    "HybridPipeline": ("app.ai.hybrid_pipeline", "HybridPipeline"),
+    "FusionStrategy": ("app.ai.hybrid_pipeline", "FusionStrategy"),
+    # ── 管道路由 ──
+    "PipelineRouter": ("app.ai.pipeline_router", "PipelineRouter"),
+    "PipelineType": ("app.ai.pipeline_router", "PipelineType"),
+    "QueryClassifier": ("app.ai.pipeline_router", "QueryClassifier"),
+    "RouteResult": ("app.ai.pipeline_router", "RouteResult"),
     "KnowledgeGraph": ("app.ai.knowledge_graph", "KnowledgeGraph"),
     "KnowledgeGraphBuilder": ("app.ai.knowledge_graph", "KnowledgeGraphBuilder"),
     "CachedKnowledgeGraphBuilder": ("app.ai.knowledge_graph", "CachedKnowledgeGraphBuilder"),

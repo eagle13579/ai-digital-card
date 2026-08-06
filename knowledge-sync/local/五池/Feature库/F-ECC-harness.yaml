@@ -1,0 +1,150 @@
+# ECC (Effective Coding Companion) — Feature YAML
+# 来源: affaan-m/ECC — Agent Harness Performance Optimization System
+# 提取日期: 2026-07-04
+# 星级: 225k ★
+
+name: F-ECC-harness
+version: "1.0.0"
+category: agent-harness
+description: >
+  ECC Agent Harness 性能优化系统的核心能力特征集合。
+  Skills/Instincts/Memory/Security/Research-First 五维能力矩阵。
+  直接对标我方 SKILL.md 技能系统 + employee.yaml 记忆系统。
+
+features:
+
+  # ──────────────────────────────────────────
+  # 核心架构特征
+  # ──────────────────────────────────────────
+
+  - id: ecc-skill-hotplug
+    name: 技能热插拔引擎 (Skill Hot-Plug Engine)
+    dimension: 架构/技能系统
+    priority: P0
+    description: >
+      技能作为结构化能力单元(SKILL.md)，支持按需加载、依赖解析、
+      生命周期管理(加载→激活→休眠→卸载)、冲突检测。
+      核心元模型: Skill = {name, description, depends_on, triggers, behaviors}
+    key_components:
+      - skill-registry: 技能注册中心，维护所有可用技能的索引
+      - skill-resolver: 依赖解析器，自动加载技能依赖树
+      - skill-scheduler: 加载调度器，基于任务相关性排序
+      - skill-context: 认知上下文切换器，技能加载时修改Agent认知
+    value: >
+      Agent能力动态组合，不必加载全部技能。按任务相关性加载top-N，
+      节省Token、降低噪音、提高准确率。
+
+  - id: ecc-instinct-chain
+    name: 本能行为链定义器 (Instinct Behavior Chain)
+    dimension: 架构/行为系统
+    priority: P1
+    description: >
+      三层本能体系(L1安全/L2效率/L3个性化)定义Agent的默认行为。
+      本能不是规则，是不需要思考的默认动作，用户指令可覆盖。
+    key_components:
+      - instinct-registry: 本能注册表，维护所有本能条目
+      - instinct-override: 用户指令覆盖机制
+      - instinct-learner: 从行为历史学习个性化本能的模块
+    value: >
+      Agent无需每次被告知"先读再写"——这是默认行为。
+      用户无需重复偏好——Agent从行为中学习。
+
+  - id: ecc-memory-stack
+    name: 持久化记忆检索系统 (Persistent Memory Stack)
+    dimension: 架构/记忆
+    priority: P0
+    description: >
+      三层记忆架构(工作记忆→短期记忆→长期记忆)，
+      支持结构化存储、语义检索、自动遗忘和合并。
+    key_components:
+      - working-memory: Token窗口内的当前上下文
+      - short-term-memory: 最近N任务摘要，持久化存储
+      - long-term-memory: 向量索引+知识库，语义搜索
+      - memory-compressor: 自动合并和摘要生成
+      - memory-forgetter: TTL+重要度评分的遗忘机制
+    value: >
+      Agent拥有跨越会话的持久记忆，每次对话不是从零开始。
+      记忆检索质量决定Agent的知识深度。
+
+  - id: ecc-security-sandbox
+    name: 运行时安全沙箱 (Runtime Security Sandbox)
+    dimension: 安全/架构
+    priority: P0
+    description: >
+      四层运行时安全防护(Filesystem→Network→Exec→Data)。
+      默认拒绝(default deny)，权限随任务授予随任务回收。
+    key_components:
+      - fs-domain: 文件系统访问域限制
+      - network-acl: 网络出站访问白名单
+      - cmd-whitelist: 命令执行白名单
+      - data-egress: 数据外传控制
+      - per-task-permission: 任务级权限管理
+    value: >
+      安全从"事后追责"转变为"执行前预防"。
+      任务级权限确保Agent只获得完成当前任务所需的最小权限。
+
+  - id: ecc-research-first
+    name: 研究优先探测管线 (Research-First Pipeline)
+    dimension: 方法/工具
+    priority: P1
+    description: >
+      先研究后行动的强制性工作流(read first, write never)。
+      包含代码阅读、方案搜索、影响分析、最小化修改四个步骤。
+    key_components:
+      - code-reader: 强制先读完整上下文的模块
+      - search-before-build: 搜索现有方案再动手
+      - impact-analyzer: 修改影响范围分析
+      - minimal-change: 最小化修改策略
+    value: >
+      减少Agent因上下文不足导致的错误。
+      每次修改前确保Agent理解全貌。
+
+  - id: ecc-harness-container
+    name: Agent Harness 容器运行时 (Agent Harness Runtime)
+    dimension: 架构/部署
+    priority: P1
+    description: >
+      Harness作为Agent的运行容器，提供环境(Env)、资源(Resources)、约束(Constraints)。
+      可互换、可监控、可管理。
+    key_components:
+      - env-provider: 环境变量和资源配置
+      - resource-limiter: Token/CPU/并发预算管理
+      - event-logger: 全行为事件日志
+      - runtime-api: Harness管理API
+    value: >
+      Agent运行标准化，同一个Agent可在不同环境中运行。
+      Harness可监控Agent的一切行为。
+
+  # ──────────────────────────────────────────
+  # 集成与产品映射
+  # ──────────────────────────────────────────
+
+products:
+  - name: 白泽控制台
+    features: [ecc-skill-hotplug, ecc-memory-stack]
+    mapping: 技能热插拔引擎集成到delegate_task，记忆检索增强搜索能力
+
+  - name: 盖娅进化大脑
+    features: [ecc-instinct-chain, ecc-research-first]
+    mapping: 本能行为链映射推理中间件，研究优先管线增强自主探索
+
+  - name: 链客宝
+    features: [ecc-security-sandbox, ecc-harness-container]
+    mapping: 安全沙箱隔离多租户，Harness容器保障运行稳定性
+
+  - name: 海智港
+    features: [ecc-memory-stack, ecc-security-sandbox]
+    mapping: 客户知识库隔离+文件访问沙箱
+
+  - name: 狴犴安全审计
+    features: [ecc-security-sandbox]
+    mapping: 运行时安全沙箱+事后审计双保险架构
+
+changelog:
+  - version: "1.0.0"
+    date: 2026-07-04
+    changes:
+      - ECC Agent Harness Feature化完成
+      - 提取6个核心Feature (3 P0, 3 P1)
+      - 映射5个产品
+      - 对齐我方SKILL.md/employee记忆系统

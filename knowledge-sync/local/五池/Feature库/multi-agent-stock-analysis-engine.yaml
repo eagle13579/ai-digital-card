@@ -1,0 +1,24 @@
+name: multi-agent-stock-analysis-engine
+description: >
+  6个专业AI Agent并行分析股票（技术/情报/风险/决策/持仓/基本面），
+  聚合为四层决策仪表盘。
+version: "1.0.0"
+source: "daily_stock_analysis (ZhuLinsen)"
+products: ["中国软银投资系统", "AI自动交易引擎", "AI龙头战法量化模型"]
+agents:
+  - name: technical_agent
+    role: 技术分析（均线/缠论/波浪/量价/形态）
+  - name: intel_agent
+    role: 情报分析（新闻/公告/舆情）
+  - name: risk_agent
+    role: 风险评估（风险警报/仓位建议）
+  - name: decision_agent
+    role: 决策合成（买卖信号/操作清单）
+  - name: portfolio_agent
+    role: 持仓管理（组合风险/再平衡）
+  - name: base_agent
+    role: 基本面分析（财务数据）
+strategies:
+  - "15种分析策略动态路由"
+  - "多Agent并行→聚合决策仪表盘"
+  - "四层报告结构: 核心结论/数据视角/情报/作战计划"

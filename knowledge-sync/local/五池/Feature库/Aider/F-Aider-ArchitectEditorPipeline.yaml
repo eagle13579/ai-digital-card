@@ -1,0 +1,75 @@
+name: F-Aider-ArchitectEditorPipeline
+version: 1.0.0
+type: 工作流模式
+status: active
+created: 2025-07-08
+source: Aider (AI Pair Programming Tool)
+
+description: >
+  Architect→Editor两级流水线，将AI编码任务拆分为"规划"和"执行"两个阶段，
+  分别由不同模型完成。强推理模型负责设计方案，快速模型负责实现代码变更。
+
+principles:
+  - name: 分离关注点
+    description: 将"思考做什么"与"如何做"分离到不同模型，优化资源利用
+  - name: 模型专业化
+    description: 强模型(如Claude Opus)用于推理规划，轻量模型(如gpt-4o-mini)用于实现
+  - name: 人工把关
+    description: 支持auto_accept_architect参数控制是否自动执行规划，默认需要用户确认
+
+workflow:
+  steps:
+    - step: 1
+      name: 用户请求
+      actor: 用户
+      action: 提出编码需求
+    - step: 2
+      name: 架构规划
+      actor: Architect模型(强推理)
+      action: 分析需求，输出自然语言方案
+      output: markdown格式的设计方案
+    - step: 3
+      name: 确认(可选)
+      actor: 用户
+      action: 审核方案，确认是否继续
+    - step: 4
+      name: 代码实现
+      actor: Editor模型(快速)
+      action: 将方案转为具体代码变更
+      format: editblock/wholefile/udiff
+    - step: 5
+      name: 质量检查
+      actor: Linter
+      action: 检查生成代码，反馈错误
+    - step: 6
+      name: 自动提交
+      actor: Git
+      action: 生成Conventional Commit并提交
+
+implementation:
+  entry_point: aider/coders/architect_coder.py
+  base_class: AskCoder → ArchitectCoder
+  key_class: Coder (工厂方法创建子Coder)
+  config_params:
+    - key: main_model.editor_model
+      description: 指定编辑器模型(如不指定则使用主模型)
+    - key: main_model.editor_edit_format
+      description: 编辑器使用的编辑格式
+    - key: auto_accept_architect
+      type: boolean
+      default: false
+
+dependencies:
+  - liteLLM (多提供商LLM抽象)
+  - GitPython (版本控制)
+  - prompt_toolkit (交互界面)
+
+reusable_contexts:
+  - 复杂功能开发需要"先设计后编码"的场景
+  - 预算敏感的API使用(昂贵模型仅用于规划阶段)
+  - 需要可追溯设计决策记录的团队协作
+
+limitations:
+  - 两阶段增加响应延迟
+  - 简单任务上可能过度设计
+  - 需要两个模型协作良好

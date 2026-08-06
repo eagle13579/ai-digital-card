@@ -1,0 +1,11 @@
+feature:
+  id: F-GAIA-PERSONALITY-CACHE
+  name: gaia-personality-cache
+  description: "公民人格缓存 — 174人离线预生成（167KB JSON），运行时O(1)读取避免每轮城市循环174次LLM调用"
+  source_project: "盖娅之城"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - 缓存

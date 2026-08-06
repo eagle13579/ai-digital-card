@@ -99,6 +99,66 @@ export default function MatchingPage() {
   }, []);
 
   // ============================================================
+  // 三蛋蛋 · 买家推荐（Transphee 客户匹配）
+  // 输入卖家信息 → 返回潜在买家名单
+  // ============================================================
+  interface BuyerItem {
+    rank: number;
+    cname: string;
+    province?: string;
+    city?: string;
+    url?: string;
+    industryType?: string;
+    industryMain?: string;
+    product?: string;
+    business?: string;
+    typical_customers?: string;
+    source?: string;
+    pinned?: boolean;
+    score?: number;
+    contacts?: Array<{ name_masked?: string; position?: string; email_masked?: string; email_domain_type?: string }>;
+  }
+  const [buyerForm, setBuyerForm] = useState({ product: '', business: '', typical_customers: '', province: '' });
+  const [buyers, setBuyers] = useState<BuyerItem[]>([]);
+  const [buyerTotal, setBuyerTotal] = useState<number | null>(null);
+  const [buyerQuota, setBuyerQuota] = useState<{ used?: number; limit?: number } | null>(null);
+  const [buyerLoading, setBuyerLoading] = useState(false);
+  const [buyerPage, setBuyerPage] = useState(1);
+
+  const handleFindBuyers = useCallback(async (page: number = 1) => {
+    const { product, business, typical_customers } = buyerForm;
+    if (!product.trim() && !business.trim() && !typical_customers.trim()) {
+      showToast('请至少填写「你卖什么」「主营业务」「典型客户」之一', 'error');
+      return;
+    }
+    setBuyerLoading(true);
+    try {
+      const res = await api.post<{ data: any; quota?: any }>('/api/transphee/match', {
+        company_name: product.trim() || business.trim() || typical_customers.trim() || '本公司',
+        product: product.trim(),
+        business: business.trim(),
+        typical_customers: typical_customers.trim(),
+        page,
+        province: buyerForm.province.trim() ? [buyerForm.province.trim()] : undefined,
+      });
+      if (res.code === 200 && res.data) {
+        const d = res.data;
+        setBuyers(d.list || []);
+        setBuyerTotal(d.total ?? null);
+        setBuyerPage(d.page ?? page);
+        if (res.quota) setBuyerQuota(res.quota);
+        if (!d.list || d.list.length === 0) showToast('没有找到匹配买家，换个描述试试', 'success');
+      } else {
+        showToast(res.message || '查询失败', 'error');
+      }
+    } catch {
+      showToast('请求失败，请稍后重试', 'error');
+    } finally {
+      setBuyerLoading(false);
+    }
+  }, [buyerForm, showToast]);
+
+  // ============================================================
   // 执行匹配
   // ============================================================
   const handleMatch = useCallback(async () => {
@@ -295,6 +355,122 @@ export default function MatchingPage() {
           </span>
         </div>
       )}
+
+      {/* ── 三蛋蛋 · 买家推荐 ─────────────────────────────── */}
+      <div className="bg-white rounded-2xl p-4 border border-border-light">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
+            <Package className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-on-surface">买家推荐</h3>
+            <p className="text-[10px] text-text-muted">输入你的产品/主营，从 1000 万企业库匹配潜在买家</p>
+          </div>
+          {buyerQuota && (
+            <span className="text-[10px] text-text-muted bg-slate-100 px-2 py-0.5 rounded-full">
+              今日 {buyerQuota.used ?? '-'}/{buyerQuota.limit ?? '-'}
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-2 mt-2">
+          <input
+            value={buyerForm.product}
+            onChange={(e) => setBuyerForm({ ...buyerForm, product: e.target.value })}
+            placeholder="你卖什么（如：陪护型养老服务机器人）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            value={buyerForm.business}
+            onChange={(e) => setBuyerForm({ ...buyerForm, business: e.target.value })}
+            placeholder="主营业务（选填，如：研发生产销售养老机器人整机及软件）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            value={buyerForm.typical_customers}
+            onChange={(e) => setBuyerForm({ ...buyerForm, typical_customers: e.target.value })}
+            placeholder="典型客户（选填，如：养老院、护理院、康复医院）"
+            className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <div className="flex gap-2">
+            <input
+              value={buyerForm.province}
+              onChange={(e) => setBuyerForm({ ...buyerForm, province: e.target.value })}
+              placeholder="限定省份（选填，如：江苏省）"
+              className="flex-1 px-3 py-2 rounded-xl bg-slate-50 border border-border-light text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <button
+              onClick={() => handleFindBuyers(1)}
+              disabled={buyerLoading}
+              className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+            >
+              {buyerLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+              找买家
+            </button>
+          </div>
+        </div>
+
+        {/* 买家结果 */}
+        {buyerTotal !== null && (
+          <div className="mt-3 text-[10px] text-text-muted">
+            找到 {buyerTotal >= 10000 && buyers.length === 20 ? '10000+' : buyerTotal} 家潜在买家 · 第 {buyerPage} 页
+          </div>
+        )}
+
+        {buyers.length > 0 && (
+          <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
+            {buyers.map((b) => (
+              <div key={`${b.cname}-${b.rank}`}
+                className="rounded-xl border border-border-light p-3 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-text-muted shrink-0 w-5">{b.rank}.</span>
+                  <p className="text-xs font-bold text-on-surface flex-1 truncate">{b.cname}</p>
+                  {b.pinned && (
+                    <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[9px] font-medium">联盟</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mt-1 ml-7">
+                  <span className="text-[10px] text-text-muted">{(b.province || '') + (b.city ? ' ' + b.city : '')}</span>
+                  {b.industryMain && <span className="text-[10px] text-text-muted">· {b.industryMain}</span>}
+                  {b.business && <span className="text-[10px] text-text-muted truncate">· {b.business.slice(0, 24)}</span>}
+                </div>
+                {b.contacts && b.contacts.length > 0 && (
+                  <div className="mt-1.5 ml-7 flex flex-wrap gap-1">
+                    {b.contacts.slice(0, 3).map((c, i) => (
+                      <span key={i} className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[9px]">
+                        {c.name_masked || ''}{c.position ? ` · ${c.position}` : ''}
+                      </span>
+                    ))}
+                    {b.contacts.length > 3 && (
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-text-muted text-[9px]">+{b.contacts.length - 3}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {buyers.length > 0 && (
+          <div className="mt-2 flex items-center justify-between">
+            <button
+              onClick={() => handleFindBuyers(buyerPage - 1)}
+              disabled={buyerPage <= 1 || buyerLoading}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 text-xs text-text-muted hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              上一页
+            </button>
+            <button
+              onClick={() => handleFindBuyers(buyerPage + 1)}
+              disabled={buyerLoading || buyers.length < 20}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 text-xs text-text-muted hover:text-on-surface transition-colors disabled:opacity-40"
+            >
+              下一页
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* 概览统计 */}
       {matchResults.length > 0 && (

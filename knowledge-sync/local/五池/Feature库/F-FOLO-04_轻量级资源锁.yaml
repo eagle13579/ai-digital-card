@@ -1,0 +1,16 @@
+name: F-FOLO-04
+version: "1.0.0"
+status: active
+dimension: 架构模式
+source: Folo (RSSNext) - packages/internal/database/src/ResourceLock.ts
+atoms:
+  - FOLO-04_资源锁并发控制模式
+  - FOLO-05_wa-sqlite可流式VFS模式
+products:
+  - AI数字名片
+  - 盖娅之城
+  - 链客宝
+description: "Promise-based异步锁，用于单线程环境下的资源竞争控制"
+employees:
+  - 后端工程师
+  - 全栈工程师

@@ -1,0 +1,20 @@
+name: MiniMax智能DOCX文档管线
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — minimax-docx (2026-07-05)
+description: 基于OpenXML SDK的专业Word文档创建/编辑/格式化。三管线(创建/编辑/模板套用)，支持中英双语排版和GB/T公文标准。
+atoms:
+  - DOCX-OPENXML: OpenXML三层架构([Content_Types]/document/styles/header/theme)
+  - DOCX-3PIPELINE: 三管线(A从零/B编辑/C模板格式化)
+  - DOCX-BILINGUAL: 中英双语排版(宋体/Times New Roman自动适配)
+  - DOCX-STYLE: 文档类型驱动样式+学术规范(IEEE/ACM/APA)
+products:
+  - 链客宝 — 合同/报告自动生成
+  - 中韩出海数智港 — 双语商务文档
+  - AI数字名片 — 电子名片/简历导出
+  - 鸣蜩(飞阅会) — 会议纪要Word输出
+employees:
+  - 文鳐P9(文档)
+  - 乘黄P8(产品)
+  - 鹿蜀P8(运营)

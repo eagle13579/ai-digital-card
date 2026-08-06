@@ -65,8 +65,8 @@ install-frontend:
 # ── 本地开发 ──────────────────────────────────
 
 dev-backend:
-	@echo "🚀 启动后端开发服务器 (http://localhost:8201)..."
-	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8201
+	@echo "🚀 启动后端开发服务器 (http://localhost:8002)..."
+	cd backend && uvicorn run:app --reload --host 0.0.0.0 --port 8002
 
 dev-frontend:
 	@echo "🚀 启动前端开发服务器 (http://localhost:3000)..."
@@ -141,7 +141,7 @@ docker-build:
 docker-up:
 	@echo "🐳 启动 Docker Compose 服务..."
 	docker compose up -d
-	@echo "✅ 服务已启动 (后端: http://localhost:8201, 前端: http://localhost:8200)"
+	@echo "✅ 服务已启动 (后端: http://localhost:8002, 前端: http://localhost:8200)"
 
 docker-down:
 	@echo "🐳 停止 Docker Compose 服务..."

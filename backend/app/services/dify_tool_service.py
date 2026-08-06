@@ -728,8 +728,13 @@ class SceneComposer:
 dify_tool_manager = DifyToolManager()
 
 # 全局 Dify 应用编排器
-dify_orchestrator = DifyOrchestrator(tool_manager=dify_tool_manager)
-
+try:
+    dify_orchestrator = DifyOrchestrator(tool_manager=dify_tool_manager)
+except Exception as e:
+    dify_orchestrator = None
+    import logging
+    logger = logging.getLogger("dify_tool_service")
+    logger.warning("DifyOrchestrator init failed: %s", e)
 
 __all__ = [
     # 单例

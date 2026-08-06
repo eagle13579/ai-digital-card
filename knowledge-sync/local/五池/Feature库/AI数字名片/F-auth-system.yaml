@@ -1,0 +1,16 @@
+name: 用户认证系统
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-wx-login: 微信登录
+  - A-sms-login: 短信验证码登录
+  - A-jwt-auth: JWT令牌管理
+  - A-sso: 单点登录SSO
+  - A-oauth2: OAuth2授权
+description: 微信登录/短信登录/JWT令牌/SSO/OAuth2一站式用户认证系统
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

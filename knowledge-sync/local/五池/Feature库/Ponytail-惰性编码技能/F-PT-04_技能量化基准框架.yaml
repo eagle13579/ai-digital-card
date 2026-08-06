@@ -1,0 +1,31 @@
+# === Feature定义 ===
+feature_id: "F-PT-04"
+name: "技能量化基准框架"
+version: "1.0.0"
+dimension: "数据"
+source_model: "Ponytail-惰性编码技能/PT07, PT08"
+status: active
+score: 7
+
+## 定位
+one_liner: "12任务×4模型基准测试模式——量化每个数字员工技能的效果"
+
+products:
+  - 文鳐技能集市: 自动匹配
+what_it_does: |
+  12任务×4模型基准测试模式——量化每个数字员工技能的效果
+
+## SOP
+sop: |
+  1. 定义测试任务
+  2. 创建baseline+实验臂
+  3. 运行n次
+  4. 统计代码量/成本/速度
+  5. 生成对比报告
+
+## 质量门禁
+quality_gate:
+  score: 7
+  checks:
+    - "可执行性: SOP步骤清晰可执行"
+    - "可验证: 有明确的输出/验证方法"

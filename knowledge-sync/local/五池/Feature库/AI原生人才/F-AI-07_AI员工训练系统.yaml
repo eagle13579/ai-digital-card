@@ -1,0 +1,16 @@
+name: F-AI-07_AI员工训练系统
+dimension: 基本功
+domain: AI原生人才
+version: 1.0
+
+products:
+  - 数字员工SaaS: 自动匹配
+description: |-
+  训练AI员工的标准四步法：写流程→写标准→写经验→写边界
+models_referenced:
+  - M5-白泽军团映射
+applications:
+  - 数字员工SaaS
+  - 白泽控制台
+draft: false
+created_at: 2026-06-15

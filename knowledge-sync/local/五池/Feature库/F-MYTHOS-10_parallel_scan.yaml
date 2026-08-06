@@ -1,0 +1,27 @@
+# 🛡 parallel_scan - 并行安全扫描 (Glasswing-Open)
+id: F-MYTHOS-10
+name: 并行漏洞安全扫描
+dimension: 安全
+description: 四阶段安全扫描管线：Rank（文件漏洞排名1-5）→ Scan（并行Agent扫描，自适应轮次预算）→ Triage（验证链分析）→ Exploit（PoC开发），支持集群检测和邻域深度分析
+atoms:
+  - "Fable5-Mythos5-代码收割/10_parallel_scan"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: glasswing-open/scripts/parallel_scan.py (lines 1-500)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 排名阶段: rank_files() @ parallel_scan.py:113-158
+  - 自适应轮次预算: rank_5→100%, rank_3→60%, rank_1→30% @ parallel_scan.py:187
+  - 集群检测: 相邻文件+50%预算 @ parallel_scan.py:202-203
+  - 三分类确认: run_triage() @ parallel_scan.py:270-325
+  - 邻域重扫: neighbor_rescan() @ parallel_scan.py:407-457
+
+injection_points:
+  - ProcessPoolExecutor并行派发Agent @ parallel_scan.py:37
+  - Claude Code子进程: run_claude() @ parallel_scan.py:60-95
+  - 发现写入: findings/FINDING-*.md @ parallel_scan.py:213-216
+  - 日志写入: recon/logs/ + scan_results JSON @ parallel_scan.py:226-267

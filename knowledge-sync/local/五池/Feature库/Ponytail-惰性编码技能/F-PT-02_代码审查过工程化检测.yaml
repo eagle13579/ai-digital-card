@@ -1,0 +1,31 @@
+# === Feature定义 ===
+feature_id: "F-PT-02"
+name: "代码审查过工程化检测"
+version: "1.0.0"
+dimension: "体系"
+source_model: "Ponytail-惰性编码技能/PT03, PT05, PT06"
+status: active
+score: 7
+
+## 定位
+one_liner: "审查代码过度工程化：不必要的抽象、重复造轮子、缺失ponytail:注释"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  审查代码过度工程化：不必要的抽象、重复造轮子、缺失ponytail:注释
+
+## SOP
+sop: |
+  1. 扫描diff/代码
+  2. 检测无需求抽象
+  3. 检测stdlib替代
+  4. 检测ponytail:注释覆盖率
+  5. 输出去重清单
+
+## 质量门禁
+quality_gate:
+  score: 7
+  checks:
+    - "可执行性: SOP步骤清晰可执行"
+    - "可验证: 有明确的输出/验证方法"

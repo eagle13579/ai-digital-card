@@ -1,0 +1,22 @@
+name: F-XHS-01_人性化浏览器交互引擎
+version: 1.0.0
+status: active
+dimension: 体系
+source: xiaohongshu-mcp (xpzouying/xiaohongshu-mcp)
+atoms:
+- XHS-01 人性化交互延迟系统
+- XHS-02 交互原语统一封装
+- XHS-03 降级式浮层关闭
+description: >
+  浏览器自动化交互层：对数正态分布人性化延迟(10种动作场景) +
+  交互原语统一封装(Provider接口可注入) + 降级式浮层关闭(三级降级链)。
+  让任何浏览器自动化系统"像人一样操作"，对抗平台风控。
+products:
+- 内容自动化工厂
+- IMAI-PC-Executor
+- 浏览器自动化IDE
+- 䑏疏跨境助手
+employees:
+- 技术负责人
+- 爬虫工程师
+- 自动化工程师

@@ -1,0 +1,27 @@
+---
+id: F-TX-HUNGER-01
+name: 饥饿检测引擎
+dimension: 体系
+source_model: 盖娅皮层(gaia_cortex.py), 盖娅左右脑(gaia_duality.py)
+
+products:
+  - 通用: 自动匹配
+description: >-
+  当盖娅空闲>1小时自动扫描系统缺口（服务离线/Feature缺失/窗口过期/员工未复盘），
+  自动推进最高优先级事项。补完盖娅大脑"只循环不主动"的自我驱动缺口。
+sop: |-
+  ① 检测最后活动时间戳（gateway_state.json / processes.json / state.db）
+  ② 若空闲>1小时触发全面缺口扫描
+  ③ 扫描4类缺口：
+     - 服务离线：关键端口未监听
+     - Feature缺失：Feature库中draft但未被创建的Feature
+     - 窗口过期：cron job长时间未运行 / session超时
+     - 员工未复盘：员工memory多日未更新
+  ④ 按缺口严重性排序（离线>Feature缺失>窗口过期>员工未复盘）
+  ⑤ 自动推进P0事项（重启服务/创建Feature/复盘触发）
+quality_gate: |-
+  仅当空闲>1小时才触发，不可干扰盖娅正常30min运行周期。
+  每次扫描记录到_cron_logs/hunger/。单次最多推进1个P0+2个P1。
+  推进前先检查是否已由其他进程处理，避免重复操作。
+draft: false
+created_at: 2026-06-14

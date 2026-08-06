@@ -1,0 +1,61 @@
+# Feature: F-NIGHT-EVOLVE
+# 夜间繁衍机制 — 半夜自动扫描/建卡片/合并/高亮明日待办
+
+name: F-NIGHT-EVOLVE
+version: 1.0.0
+status: draft
+domain: automation
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - A4-夜间繁衍机制
+
+schedule: "0 23 * * *"  # 每天23:00
+
+pipeline:
+  - stage: 1
+    name: 增量收集
+    task: 扫描今日新增文件/记录
+    trigger: cron
+
+  - stage: 2
+    name: 孤立检测与建卡
+    task: |
+      每条新增节点做关联度分析
+      - 关联度 < 阈值 → 自动建独立卡片并打标签
+      - 关联度 > 阈值 → 建立关联链接
+
+  - stage: 3
+    name: 去重合并
+    task: |
+      - 相似度 > 90% → 自动合并（保留最新版本）
+      - 相似度 70-90% → 创建关联链接，标注"建议关注"
+
+  - stage: 4
+    name: 待办高亮
+    task: |
+      扫描今日内容中涉及"明天需要决策"的信息
+      输出到明日起始页/首屏
+
+  - stage: 5
+    name: 生成夜间报告
+    output_format: |
+      ## 🌙 夜间繁衍报告
+      - 新建卡片：{N} 张
+      - 合并节点：{N} 个
+      - 高亮待办：{N} 个
+      - 新发现关联：{N} 条
+
+dependencies:
+  - state_graph.py  # 复用检查点系统保证午夜任务不丢失
+
+target_products:
+  - 盖娅大脑
+  - 师旷知识管理
+  - 白泽控制台
+
+target_employees:
+  - 师旷
+  - 盖娅
+  - 白泽

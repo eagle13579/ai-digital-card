@@ -1,0 +1,37 @@
+# 🌊 AI调研管道
+id: F-AMOEBA-RESEARCH-01
+name: AI调研管道
+dimension: 场景
+description: 用DeepSeek AI自动扫描行业热点，输出结构化调研报告
+source_model: 阿米巴三阶段经营闭环
+status: active
+version: "1.0"
+created: 2026-06-14
+
+products:
+  - 通用: 自动匹配
+input:
+  - 部门名称
+  - 当前日期
+  - 历史调研（避免重复）
+
+output:
+  - topic: 调研主题
+  - summary: 调研摘要
+  - keyFindings: 3个关键发现
+  - marketSignal: 市场信号
+  - confidence: 信心指数(1-10)
+  - suggestedReport: 建议报告主题
+
+sop: |
+  1. 构造prompt：角色设定+调研要求+JSON格式约束
+  2. 调用DeepSeek API（temperature=0.8）
+  3. extractJSON() 3层容错解析
+  4. 输出结构化调研报告
+
+quality_gate:
+  - 调研主题必须与部门相关
+  - 关键发现至少3条
+  - 信心指数必须有
+
+draft: false

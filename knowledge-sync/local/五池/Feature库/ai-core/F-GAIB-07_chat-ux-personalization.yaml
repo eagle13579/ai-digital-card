@@ -1,0 +1,16 @@
+name: Chat UX与个性化设计
+version: 1.0.0
+status: production
+dimension: ai-core/ux
+source: microsoft/generative-ai-for-beginners (Lesson 07, 12)
+description: "AI聊天应用UX设计原则与个性化框架。System Message个人化、Accessibility、多轮对话管理"
+atoms:
+  - GAIB-14: Chat UX 与个性化设计
+  - GAIB-07: Instruction-Tuned LLM & System Message
+products:
+  - 盖娅之城: 公民对话UX
+  - 招贤(数字员工SaaS): 员工对话界面
+  - 云师(AI灵魂觉醒引擎): 灵魂注入对话
+employees:
+  - 乘黄P8: 产品UX设计
+  - 鹿蜀P8: 运营体验优化

@@ -1,0 +1,42 @@
+name: "双模式Glass设计Token系统"
+id: F-AI数字名片App-DSGN-TOKEN
+status: 已有
+priority: P0
+tags: [design-system, theme, dark-mode, light-mode, glass-morphism]
+description: >
+  为AI数字名片App提供完整的 Dark/Light 双模式设计系统，
+  包含原子设计Token、语义颜色、阴影、间距、圆角、Typography，
+  并与React Native Paper MD3主题集成。
+source:
+  - src/theme/index.ts (241行): 原子Token定义 + Dark/Light双色板 + Paper主题适配
+  - src/theme/theme-context.tsx (77行): ThemeContext + ThemeProvider + useTheme hook
+  - App.tsx (171行): 消费PaperProvider + NavigationContainer主题
+tech_stack:
+  - React Native + Expo
+  - React Native Paper MD3
+  - React Context + Hooks
+  - Platform API
+key_decisions:
+  - 透明度驱动的色板: 同一Token在dark/light模式使用不同的rgba透明度
+  - 三模式切换: dark/light/system 跟随系统
+  - 毛玻璃玻璃效果: 通过glassBg + glassBorder + 透明度层模拟
+  - Paper主题桥接: 将自定义Token映射到MD3Theme的colors槽
+architecture: |
+  用户选择ThemeMode (dark/light/system)
+          │
+          ▼
+  ThemeContext (theme-context.tsx)
+    ├─ system → useColorScheme() 自动跟随
+    ├─ dark → DarkTheme
+    └─ light → LightTheme
+          │
+          ├──▶ AppTheme (theme/index.ts)
+          │    ├─ colors (darkColors / lightColors)
+          │    ├─ typography
+          │    ├─ spacing
+          │    ├─ radius
+          │    └─ shadows
+          │
+          ├──▶ PaperTheme (MD3DarkTheme / MD3LightTheme 适配)
+          │
+          └──▶ useTheme() hook → 所有组件获取设计Token

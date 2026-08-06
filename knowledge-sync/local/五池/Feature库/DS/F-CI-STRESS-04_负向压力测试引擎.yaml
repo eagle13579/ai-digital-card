@@ -1,0 +1,19 @@
+id: F-CI-STRESS-04
+name: 负向压力测试引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS04负向压力测试心智模型构建的AI验证引擎，通过可控错误注入触发
+  AI纠错机制。检测维度：错误注入精准度、AI纠错响应完整度、纠错逻辑
+  清晰度、纠错内容系统性评分。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS04: 负向压力测试
+products:
+  - AI纠错质量验证系统
+  - 认知压力测试工具
+employees: [獬豸, 烛龙]
+priority: P0
+maturity: design

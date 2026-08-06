@@ -1,0 +1,15 @@
+name: F-DT-03_GUI桌面自动化编排器
+version: 1.0.0
+status: active
+dimension: 基础架构
+source: DataTool
+atoms:
+  - DT-02_GUI自动化包装器模式
+  - DT-03_视频处理五步编排工作流
+  - DT-06_CLI-desktop桥接模式
+products:
+  - AI数智军团
+  - 数字员工SaaS
+  - 盖娅OPC
+  - 翟如AI超级助理
+description: 将无CLI的桌面GUI应用包装为可编程自动化API。pywinauto坐标操作+工作流编排+管理员权限提权三位一体。

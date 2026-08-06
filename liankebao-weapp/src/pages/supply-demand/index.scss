@@ -262,6 +262,21 @@
       background: $color-primary-light;
     }
   }
+
+  /* ---- 赞/踩反馈按钮 ---- */
+  &-feedback-btn {
+    font-size: $font-size-xs;
+    padding: 2px $spacing-xs;
+    border-radius: $radius-sm;
+    line-height: 1.4;
+
+    &--done {
+      color: $color-text-placeholder;
+      border-color: $color-border;
+      background: $color-bg;
+      pointer-events: none;
+    }
+  }
 }
 
 /* ========================================================================== */
@@ -514,5 +529,73 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ========================================================================== */
+/*  每日推荐查看次数限制                                                          */
+/* ========================================================================== */
+
+.supply-demand__daily-remaining {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px $page-padding;
+  background: $color-primary-light;
+
+  &-text {
+    font-size: $font-size-xs;
+    color: $color-primary-dark;
+    font-weight: 500;
+  }
+}
+
+.supply-demand__list-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.supply-demand__limit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+
+  &-icon {
+    font-size: 48px;
+    margin-bottom: $spacing-md;
+  }
+
+  &-text {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-btn {
+    width: 280px;
+    height: 76px;
+    line-height: 76px;
+    background: $color-gradient-primary;
+    color: #fff;
+    font-size: $font-size-md;
+    font-weight: 600;
+    border-radius: 38px;
+    text-align: center;
+    border: none;
+
+    &::after {
+      display: none;
+    }
   }
 }

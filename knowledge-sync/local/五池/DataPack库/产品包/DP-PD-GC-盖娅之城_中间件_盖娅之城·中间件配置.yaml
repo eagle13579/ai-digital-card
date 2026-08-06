@@ -1,0 +1,28 @@
+datapack_id: "DP-PD-GC-盖娅之城_中间件"
+name: "盖娅之城·中间件配置"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "认证/限流/日志中间件的配置参数"
+
+source: "L5孵化室/产品开发/盖娅之城/"
+
+contents: |
+  KFD标定Phase 1从盖娅之城识别出的配置数据。
+
+data_format: "产品元数据"
+
+mount_interface:
+  load: "读取此数据到参考上下文"
+  query: "按维度查询"
+  version: "返回当前DataPack版本"
+
+consumed_by_features: []
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "KFD标定识别"

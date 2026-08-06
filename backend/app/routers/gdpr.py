@@ -28,7 +28,7 @@ from app.middleware.audit import record_audit
 
 logger = logging.getLogger("gdpr")
 
-router = APIRouter(prefix="/api/gdpr", tags=["GDPR 合规"])
+router = APIRouter(prefix="/api/v1/gdpr", tags=["GDPR 合规"])
 
 
 # ── 辅助函数 ──────────────────────────────────────────────────────
@@ -234,7 +234,7 @@ async def export_my_data(
     # 记录审计事件
     ip = await _get_client_ip(request)
     await record_audit(
-        db, user_id, "EXPORT", "/api/gdpr/data",
+        db, user_id, "EXPORT", "/api/v1/gdpr/data",
         detail={"export_size": len(json.dumps(export_package, ensure_ascii=False, default=str))},
         ip=ip,
     )
@@ -364,7 +364,7 @@ async def delete_my_account(
         from app.database import AsyncSessionLocal
         async with AsyncSessionLocal() as audit_db:
             await record_audit(
-                audit_db, None, "DELETE_ACCOUNT", "/api/gdpr/account",
+                audit_db, None, "DELETE_ACCOUNT", "/api/v1/gdpr/account",
                 detail={"original_user_id": user_id},
                 ip=ip,
             )

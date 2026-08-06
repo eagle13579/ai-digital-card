@@ -1,0 +1,13 @@
+name: F-CW-03_客服AI能力套件
+version: 1.0.0
+status: active
+dimension: AI原生人才
+source: ChatWoot (chatwoot/chatwoot) — Captain AI + Canned Response
+description: 客服场景AI能力套件：①对话自动摘要(坐席打开即见要点) ②建议回复(上下文生成候选回复) ③知识库内容助手(RAG检索) ④预设回复模板+变量占位符+宏(一键多步操作)。AI降三本：降阅读成本、降打字成本、降查找成本。
+atoms:
+- CW-06 CannedResponse预设回复
+- CW-07 CaptainAI客服智能助手
+products:
+- 链客宝
+- 白泽控制台
+- 数字员工SaaS

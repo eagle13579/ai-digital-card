@@ -89,4 +89,16 @@ backend/data/learning_log.jsonl
 # Sensitive config / temp scripts
 backend/.env.free-claude-proxy
 backend/_verify_notification.py
+<<<<<<< HEAD
 backend/nul
+=======
+
+# 盖娅反哺管道运行时状态（不入库）
+backend/scripts/.gaia_*.json
+backend/data/self_study/
+backend/scripts/.gaia_palace*
+
+# 运行数据与构建产物（不入版本库）
+backend/data/
+frontend/dist.bak_*/
+>>>>>>> origin/master

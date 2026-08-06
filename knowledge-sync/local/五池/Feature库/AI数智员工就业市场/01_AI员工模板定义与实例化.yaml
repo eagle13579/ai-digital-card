@@ -1,0 +1,71 @@
+# ============================================================================
+# Feature: AI员工模板定义与实例化
+# ============================================================================
+id: feature-ai-employee-template-instantiation
+name: AI员工模板定义与实例化
+module: models/employee.py + engine/engine.py
+status: active
+version: 0.1.0
+created: 2026-05-26
+
+# ── 描述 ────────────────────────────────────────────────────────────────────
+description_zh: |
+  定义7位AI核心员工模板（英招·徐准·乘黄·计然·獬豸·烛龙·文鳐），
+  每位员工包含中文名/韩文名/职级/定价/能力集/vs人类成本/工作流节点等属性。
+  引擎根据模板为客户创建独立实例，每个实例拥有独立APIKey和沙箱目录。
+
+description_en: |
+  Define 7 core AI employee templates (Yingzhao, Xuzhun, Chenghuang, Jiran,
+  Xiezhi, Zhulong, Wenyao), each with name/level/price/capabilities/vs-human cost.
+  Engine instantiates templates into customer-specific instances with isolated sandboxes.
+
+# ── 数据结构 ────────────────────────────────────────────────────────────────
+data_model:
+  employee_template:
+    fields:
+      id: "员工唯一标识 (拼音)"
+      name_zh: "中文名"
+      name_ko: "韩文名"
+      title_zh: "中文头衔"
+      title_ko: "韩文头衔"
+      level: "职级 (P8/P9)"
+      price: "月租价格 (元)"
+      capabilities_zh: "中文能力列表"
+      capabilities_ko: "韩文能力列表"
+      vs_human_cost: "对标人类月薪"
+      vs_human_role: "对标人类岗位"
+      avatar_color: "头像颜色"
+      workflow_node: "工作流节点编号 (1-7)"
+  instance:
+    fields:
+      instance_id: "实例ID (全局唯一)"
+      employee_id: "员工ID"
+      customer_id: "客户ID"
+      api_key: "API密钥"
+      status: "状态 (active/inactive)"
+      created_at: "创建时间"
+      sandbox_dir: "沙箱目录路径"
+
+# ── API ─────────────────────────────────────────────────────────────────────
+api_endpoints:
+  - method: GET
+    path: /api/v1/market/employees
+    description: "获取所有员工模板列表"
+  - method: GET
+    path: /api/v1/market/employees/{id}
+    description: "获取单个员工详情"
+  - method: POST
+    path: /api/v1/hire/instantiate
+    description: "创建员工实例（直接雇佣，跳过支付）"
+  - method: POST
+    path: /api/v1/hire/create-order
+    description: "创建雇佣订单（先支付后激活）"
+  - method: POST
+    path: /api/v1/hire/activate
+    description: "支付确认后激活员工"
+
+# ── 依赖 ────────────────────────────────────────────────────────────────────
+dependencies:
+  - sandbox  # 实例化需要沙箱
+  - billing  # 价格计算
+  - payment  # 支付流程

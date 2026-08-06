@@ -1,0 +1,12 @@
+name: "Plan-and-Execute流水线"
+version: "1.0.0"
+status: absorbed
+dimension: 执行
+source: 一速《7种主流Agent架构深度拆解》
+description: "先规划后执行的确定性执行引擎。Planner生成完整计划，Executor严格按计划执行，支持分阶段验证和回退。"
+atoms:
+  - AgentArch 03_PlanAndExecute架构
+products:
+  - 白泽指挥官协议
+  - 产品开发工作流
+absorbed_date: 2026-07-10

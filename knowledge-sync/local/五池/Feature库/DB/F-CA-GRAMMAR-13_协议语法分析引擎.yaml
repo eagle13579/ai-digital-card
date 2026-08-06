@@ -1,0 +1,21 @@
+id: F-CA-GRAMMAR-13
+name: 协议语法分析引擎
+dimension: 💡 创造力
+description: >-
+  基于DB04三层协议语法心智模型构建的分析引擎，对任何行业进行三层协议栈的标准化分析。分析维度：准入层完整性、分配层控制力、清算层不可绕行性。三层叠加形成协议语法的完整评估。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB04: 写进合同的语法
+products:
+  - 黑河调查局协议分析模块
+  - 行业协议语法评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 长乘
+  - 白泽
+priority: P0
+maturity: design

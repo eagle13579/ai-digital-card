@@ -1,0 +1,254 @@
+{
+  "results": [
+    {
+      "step": 1,
+      "name": "Health Check",
+      "status": 200,
+      "ok": true,
+      "summary": "{'status': 'ok', 'service': 'ai-digital-brochure', 'version': '3.4.0'}",
+      "severity": "P0"
+    },
+    {
+      "step": 2,
+      "name": "Root Page",
+      "status": -1,
+      "ok": false,
+      "summary": "Expecting value: line 1 column 1 (char 0)",
+      "severity": "P0"
+    },
+    {
+      "step": 3,
+      "name": "Subscription Plans",
+      "status": 401,
+      "ok": false,
+      "summary": "{'detail': 'Not authenticated'}",
+      "severity": "P0"
+    },
+    {
+      "step": 4,
+      "name": "OpenAPI Docs",
+      "status": 200,
+      "ok": true,
+      "summary": "{'openapi': '3.1.0', 'info': {'title': 'AI数字名片 API', 'description': 'AI数字名片后端服务 - 模块化架构', 'version': '2.0.0'}, 'paths': {'/api/v1/brochures/purpose-te",
+      "severity": "P1"
+    },
+    {
+      "step": 5,
+      "name": "User Register",
+      "status": 200,
+      "ok": true,
+      "summary": "{'access_token': 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjIiLCJleHAiOjE3ODM1NjMzNjJ9.qIKj1l9TOLN8f6iG2lQ5Pw0AJXdjVgOs_v-hFbaktVpxZX4NiTSHL-",
+      "severity": "P0"
+    },
+    {
+      "step": 6,
+      "name": "User Login",
+      "status": 200,
+      "ok": true,
+      "summary": "{'access_token': 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjIiLCJleHAiOjE3ODM1NjMzNjV9.lp8HOZnY_1gWoaGJZ6YhEQQXSuxSf1mTKW0-oppcAsp3Sf8iQzhAee",
+      "severity": "P0"
+    },
+    {
+      "step": 7,
+      "name": "Get User Info",
+      "status": 200,
+      "ok": true,
+      "summary": "{'id': 122, 'username': None, 'phone': '13867763854', 'name': '真实用户_70765334', 'avatar': '', 'company': '数智科技有限公司', 'title': '产品总监', 'intro': '', 'rol",
+      "severity": "P0"
+    },
+    {
+      "step": 8,
+      "name": "Create Business Card",
+      "status": 201,
+      "ok": true,
+      "summary": "{'id': 50, 'user_id': 122, 'title': '产品总监', 'cover': '', 'purpose': '', 'pages_count': 0, 'status': 'draft', 'share_token': '88781e1f9e284fa4', 'view_",
+      "severity": "P1"
+    },
+    {
+      "step": 8,
+      "name": "Create Brochure Card",
+      "status": 200,
+      "ok": true,
+      "summary": "{'id': 51, 'user_id': 122, 'title': '张总 - 个人名片', 'cover': '', 'purpose': '', 'pages_count': 2, 'status': 'draft', 'share_token': '33e0f778af984245', '",
+      "severity": "P1"
+    },
+    {
+      "step": 9,
+      "name": "Card List",
+      "status": 200,
+      "ok": true,
+      "summary": "[{'id': 51, 'user_id': 122, 'title': '张总 - 个人名片', 'cover': '', 'purpose': '', 'pages_count': 2, 'status': 'draft', 'share_token': '33e0f778af984245', ",
+      "severity": "P1"
+    },
+    {
+      "step": 10,
+      "name": "Brochure List",
+      "status": 200,
+      "ok": true,
+      "summary": "{'items': [{'id': 1, 'user_id': 51, 'title': 'roger的容蓝名片', 'cover': '', 'purpose': 'partner', 'pages_count': 3, 'status': 'draft', 'share_token': 'ead",
+      "severity": "P1"
+    },
+    {
+      "step": 11,
+      "name": "Publish Brochure",
+      "status": 403,
+      "ok": false,
+      "summary": "{'detail': '无权发布此画册'}",
+      "severity": "P1"
+    },
+    {
+      "step": 12,
+      "name": "Semantic Search",
+      "status": 200,
+      "ok": true,
+      "summary": "{'mock': True, 'error': '服务暂时不可用，返回Mock数据', 'data': []}",
+      "severity": "P1"
+    },
+    {
+      "step": 13,
+      "name": "Recommend Personal",
+      "status": 403,
+      "ok": false,
+      "summary": "{'detail': {'message': '今日推荐次数已用完', 'remaining': 0, 'limit': 0}}",
+      "severity": "P1"
+    },
+    {
+      "step": 14,
+      "name": "Supply-Demand Match",
+      "status": 405,
+      "ok": false,
+      "summary": "{'detail': 'Method Not Allowed'}",
+      "severity": "P2"
+    },
+    {
+      "step": 15,
+      "name": "AI Writing Assist",
+      "status": 200,
+      "ok": true,
+      "summary": "{'purpose': 'bio', 'content': '张总，数智科技产品总监，深耕数字智能领域，擅长产品战略规划与创新落地，推动多款核心产品成功上市，助力企业实现数智化转型与业务增长。', 'error': ''}",
+      "severity": "P2"
+    },
+    {
+      "step": 16,
+      "name": "AI Chat",
+      "status": 200,
+      "ok": true,
+      "summary": "{'reply': '抱歉，AI 服务暂时不可用，请稍后再试。（飞书白泽 API 连接失败，所有重试均已耗尽）', 'model': 'baize-4k', 'usage': {}}",
+      "severity": "P2"
+    },
+    {
+      "step": 17,
+      "name": "Share Page View",
+      "status": 404,
+      "ok": false,
+      "summary": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>画册暂时无法加载 - AI数字名片</title>\n<style>body{font-family:-apple-s",
+      "severity": "P0"
+    },
+    {
+      "step": 18,
+      "name": "Knowledge Graph",
+      "status": 200,
+      "ok": true,
+      "summary": "{'central': {'id': 'person:122', 'type': 'person', 'label': '真实用户_70765334', 'user_id': 122, 'name': '真实用户_70765334', 'company': '数智科技有限公司', 'title': ",
+      "severity": "P2"
+    },
+    {
+      "step": 19,
+      "name": "Analytics Dashboard",
+      "status": 200,
+      "ok": true,
+      "summary": "{'mock': True, 'data': []}",
+      "severity": "P1"
+    },
+    {
+      "step": 20,
+      "name": "Share Link Generation",
+      "status": 405,
+      "ok": false,
+      "summary": "{'detail': 'Method Not Allowed'}",
+      "severity": "P1"
+    },
+    {
+      "step": 21,
+      "name": "Export Card",
+      "status": 200,
+      "ok": true,
+      "summary": "{'mock': True, 'data': []}",
+      "severity": "P2"
+    },
+    {
+      "step": 22,
+      "name": "AB Test Experiments",
+      "status": 200,
+      "ok": true,
+      "summary": "{'code': 200, 'message': 'ok', 'data': {'items': [], 'total': 0, 'page': 1, 'page_size': 20}}",
+      "severity": "P2"
+    },
+    {
+      "step": 23,
+      "name": "Membership Plans",
+      "status": 404,
+      "ok": false,
+      "summary": "{'detail': 'Not Found'}",
+      "severity": "P0"
+    },
+    {
+      "step": 24,
+      "name": "Usage Stats",
+      "status": 404,
+      "ok": false,
+      "summary": "{'detail': 'Not Found'}",
+      "severity": "P1"
+    },
+    {
+      "step": 25,
+      "name": "Subscription Plans (auth)",
+      "status": 200,
+      "ok": true,
+      "summary": "[{'tier': 'free', 'name_cn': '免费版', 'name_en': 'Free', 'name': '免费版', 'price_cents': 0, 'price_yuan': '0', 'price': '0', 'amount': '0', 'interval': 'm",
+      "severity": "P0"
+    },
+    {
+      "step": 26,
+      "name": "Messages",
+      "status": 200,
+      "ok": true,
+      "summary": "{'code': 0, 'message': 'ok', 'data': []}",
+      "severity": "P1"
+    },
+    {
+      "step": 27,
+      "name": "Visitor Records",
+      "status": 200,
+      "ok": true,
+      "summary": "{'mock': True, 'data': []}",
+      "severity": "P2"
+    },
+    {
+      "step": 28,
+      "name": "AI Config",
+      "status": 200,
+      "ok": true,
+      "summary": "{'autoReply': True, 'smartRecommend': True, 'dataAnalysis': False, 'filterSensitive': True, 'timeout': 30, 'welcomeMessage': '您好！我是AI智能客服，请问有什么可以帮您的？'",
+      "severity": "P2"
+    },
+    {
+      "step": 29,
+      "name": "SAG Analyze",
+      "status": -1,
+      "ok": false,
+      "summary": "timed out",
+      "severity": "P2"
+    },
+    {
+      "step": 30,
+      "name": "User Logout",
+      "status": 404,
+      "ok": false,
+      "summary": "{'detail': 'Not Found'}",
+      "severity": "P1"
+    }
+  ],
+  "ok": 20,
+  "total": 31
+}

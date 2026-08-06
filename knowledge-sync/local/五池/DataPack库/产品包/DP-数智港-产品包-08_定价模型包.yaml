@@ -1,0 +1,13 @@
+datapack_id: "DP-PD-数智港-02"
+name: "定价模型包"
+version: "1.0.0"
+type: "产品包"
+description: >
+  三档定价体系+功能矩阵+年付折扣策略
+source: "07_pricing/pricing.yaml(294行) + pricing/README.md(6KB)"
+contents: >
+  Starter/Professional/Enterprise三档定价 + 功能矩阵对比 + 年付折扣(15%/25%/40%) + 增值服务定价
+consumed_by_features: >
+  F-CJ-数智港-02 韩企客户成交包引擎
+project: "中韩出海数智港"
+created_at: "2026-06-08"

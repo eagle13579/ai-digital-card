@@ -17,7 +17,7 @@ from app.models.brochure import Brochure
 from app.models.tag import UserTag
 from app.routers.auth import get_current_user
 
-router = APIRouter(prefix="/api/export", tags=["数据导出"])
+router = APIRouter(prefix="/api/v1/export", tags=["数据导出"])
 
 
 def _build_card_data(user: User, db_brochures: list[Brochure]) -> dict[str, Any]:

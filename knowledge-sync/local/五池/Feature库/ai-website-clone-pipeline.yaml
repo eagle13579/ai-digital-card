@@ -1,0 +1,30 @@
+name: ai-website-clone-pipeline
+description: >
+  将任意目标网站反向工程为像素级完美副本的5阶段自动化管道。
+  支持13个AI IDE平台，一份源文件同步所有平台。
+version: "1.0.0"
+source: "AI Website Cloner Template (JCodesMore, GitHub)"
+products: ["白泽技能集市", "烛龙工程流", "链客宝"]
+triggers:
+  - "克隆这个网站"
+  - "复制这个页面"
+  - "逆向工程这个URL"
+dependencies:
+  - "浏览器MCP工具（Chrome/Playwright/Puppeteer）"
+  - "Node.js 20+"
+  - "git worktree支持"
+
+phases:
+  reconnaissance:
+    description: "截图 + 全局提取 + 交互扫描 + 页面拓扑"
+    outputs: ["docs/research/DESIGN_TOKENS.md", "docs/research/BEHAVIORS.md", "docs/research/PAGE_TOPOLOGY.md"]
+  foundation:
+    description: "顺序执行：字体→CSS→TS类型→图标→资产下载"
+    sequential: true
+  component_spec_and_dispatch:
+    description: "核心循环：提取→写spec→派builder→merge"
+    rule: "单builder ≤150行spec内容"
+  assembly:
+    description: "page.tsx导入所有组件 + 页面级交互"
+  visual_qa:
+    description: "原站vs克隆并排对比，逐section修复"

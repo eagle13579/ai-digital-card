@@ -1,0 +1,16 @@
+name: Trending: ADR
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-08-06
+description: Auto-absorbed from GitHub Trending: uber/ADR
+atoms:
+  - TREND-uber-ADR-01: ADR: Agentic AI Detection and Response
+  - TREND-uber-ADR-02: workflow, architecture, agent 模式
+  - TREND-uber-ADR-03: uber/ADR的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

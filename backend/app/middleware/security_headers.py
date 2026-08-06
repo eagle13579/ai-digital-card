@@ -52,6 +52,12 @@ class SecurityHeadersMiddleware:
                     if key.lower() not in existing_keys
                 ]
                 message["headers"] = headers + new_headers
+                # Remove server version information leak
+                message["headers"] = [
+                    h for h in message["headers"]
+                    if not h[0].lower() == b"server"
+                ]
+                message["headers"].append((b"server", b"uvicorn"))
             await send(message)
 
         await self.app(scope, receive, send_wrapper)

@@ -1,0 +1,19 @@
+id: F-CA-LOCK-04
+name: 长协软锁定识别
+dimension: 💡 创造力
+description: >-
+  基于BH04长期合同软锁定心智模型构建的识别器，检测长期合同中排他性
+  条款+数量承诺+价格调整机制的组合信号。量化买方的切换成本、合同
+  不对称性指数、以及长协对供应商现金流的保障强度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH04: 长期合同软锁定
+products:
+  - 合同条款分析引擎
+  - 供应链切换成本计算器
+employees: [獬豸, 乘黄, 计然]
+priority: P0
+maturity: design

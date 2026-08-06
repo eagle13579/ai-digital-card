@@ -1,0 +1,46 @@
+feature:
+  name: diting-multi-platform-crawler
+  version: v1.0.0
+  description: >
+    基于MediaCrawler架构的多平台社交媒体爬虫引擎，支持7大中国内容平台
+  products: 
+  atoms: 
+  inputs: 
+  type: string
+  description: "目标平台标识，枚举值: xiaohongshu / douyin / kuaishou / bilibili / weibo / zhihu / tieba"
+  type: string
+  description: "搜索关键词（搜索模式必传）"
+  required: false
+  type: string
+  description: "内容详情ID（详情模式必传，与keyword二选一）"
+  required: false
+  type: string
+  description: "登录方式标识: cookie / qrcode / phone / cdp_browser"
+  default: "cookie"
+  type: integer
+  description: "最大翻页数（搜索模式有效）"
+  default: 10
+  type: string
+  description: "输出格式: json / csv / parquet"
+  default: "json"
+  outputs: 
+  type: array[object]
+  description: "内容列表（笔记/视频），每项包含 id / title / content / author_info / stats（点赞/收藏/评论数）/ images_or_videos / tags / create_time"
+  type: array[object]
+  description: "评论数据列表，每项包含 comment_id / user / content / likes / reply_to / create_time"
+  type: array[object]
+  description: "创作者/作者信息，每项包含 user_id / nickname / avatar / follower_count / description"
+  type: object
+  description: "搜索元信息: total_count / has_next / cost_seconds / platform / keyword"
+  capabilities: 
+  architecture: >
+    采用分层架构：最上层为统一入口层（CrawlerFacade），接收platform + keyword +
+  anti_patterns: 
+  evolution_flywheel: >
+    第一步: 先完成单一平台（小红书）全链路打通 → 第二步: 提取公共抽象层MC01，
+  将平台差异封装为Provider → 第三步: 按需接入抖音/快手/B站等平台，每个
+  平台验证后积累反爬pattern → 第四步: 反馈回MC06反爬策略路由库，形成
+  平台特征指纹库 → 第五步: 平台数积累至7+后，自动调优轮询策略和QPS分配
+
+products:
+    - 无速率控制: 满速并发请求导致IP被封 — 必须集成MC05令牌桶

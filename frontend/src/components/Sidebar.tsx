@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, CreditCard, Settings, Users, Sparkles,
   ChevronLeft, ChevronRight, FileText, Key, ContactRound,
-  Target, BarChart3, ScanLine,
+  Target, BarChart3, ScanLine, DollarSign, Activity,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useT } from '../i18n';
@@ -20,12 +20,15 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/', labelKey: '仪表盘', icon: <LayoutDashboard className="w-5 h-5" /> },
   { path: '/cards', labelKey: '名片编辑', icon: <CreditCard className="w-5 h-5" /> },
   { path: '/matching', labelKey: '匹配中心', icon: <Sparkles className="w-5 h-5" /> },
+  { path: '/ai-analytics', labelKey: 'AI智能分析', icon: <BarChart3 className="w-5 h-5" /> },
   { path: '/network', labelKey: '信任网络', icon: <Users className="w-5 h-5" /> },
   { path: '/ocr/review', labelKey: 'OCR校正', icon: <ScanLine className="w-5 h-5" /> },
   { path: '/crm', labelKey: '联系人管理', icon: <ContactRound className="w-5 h-5" /> },
   { path: '/crm/dashboard', labelKey: 'CRM仪表盘', icon: <BarChart3 className="w-5 h-5" /> },
   { path: '/crm/pipeline', labelKey: '销售管道', icon: <Target className="w-5 h-5" /> },
   { path: '/api-keys', labelKey: '开发者门户', icon: <Key className="w-5 h-5" /> },
+  { path: '/pricing', labelKey: '定价', icon: <DollarSign className="w-5 h-5" /> },
+  { path: '/health', labelKey: '系统监控', icon: <Activity className="w-5 h-5" /> },
   { path: '/settings', labelKey: '设置', icon: <Settings className="w-5 h-5" /> },
 ];
 

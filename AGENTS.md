@@ -92,6 +92,20 @@
 
 ---
 
+## 铁律八：军团反哺制度化
+
+**所有数字军团成员（Hermes子代理/分身/cron任务）完成任务后，必须把工作沉淀提炼为知识反哺盖娅大脑。**
+
+- 时机: 任务收尾时（汇报前），≥3个工具调用的实质性工作必反哺
+- 方式: `python3 backend/scripts/gaia_reflect.py --title "..." --content "背景/方案/教训" --type pattern --tags ...`
+- 内容: 洞察/模式/规则/踩坑教训（非流水账），宁缺毋滥
+- 验证: psql 查 gaia_knowledge 确认写入
+- 反哺失败不阻塞主任务（API 不可达时跳过记录）
+
+触发: `skill_view(name='legion-backfeed-discipline')`
+
+---
+
 ## 项目信息
 
 - 项目: AI数智名片 — 智能电子名片+供需匹配+获客系统

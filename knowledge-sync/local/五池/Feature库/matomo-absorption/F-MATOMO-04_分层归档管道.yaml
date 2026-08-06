@@ -1,0 +1,51 @@
+feature_id: "F-MATOMO-04"
+name: "分层归档管道 — Tracker→Archive→DataTable三层处理"
+version: "1.0.0"
+dimension: "基本功"
+source_model: "Matomo Tracker.php + Archive.php + DataTable.php — 实时写入→定时归档→报告查询三层架构"
+one_liner: "Tracker实时写原始数据 → Archive定时预计算聚合 → DataTable提供报告查询，三层解耦支撑高性能"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo的三层数据处理管道，是高并发Web分析的核心架构模式：
+  
+  **第一层 — Tracker (实时写入层)**
+  通过 piwik.php 接收JS追踪请求，实时写入log_visit/log_action/log_conversion等原始日志表。
+  每个追踪请求毫秒级响应，不阻塞访问者。
+  
+  **第二层 — Archive (定时归档层)**
+  通过 crontab 触发 ./console core:archive，将原始数据聚合并预计算为archive表。
+  支持批量归档 (CliMulti并行处理多个site/period组合)。
+  ArchiveProcessor处理每个插件的归档逻辑。
+  
+  **第三层 — DataTable (报告查询层)**
+  从archive表读取已聚合数据，DataTable数据结构支持过滤/排序/分页/可视化。
+  Archive::build() 工厂方法自动判断数据是否已归档，未归档则触发归档。
+  
+  - CliMulti: 并行多进程归档
+  - ArchiveInvalidator: 使失效归档重新处理
+  - 批量归档: 减少高并发下的实时计算压力
+input:
+  - "Web访客追踪请求 (HTTP GET to piwik.php)"
+  - "原始访问日志 (log_visit表)"
+  - "归档调度配置 (crontab)"
+output:
+  - "聚合后的统计数据 (archive_numeric_* / archive_blob_* 表)"
+  - "DataTable报告数据结构"
+  - "可视化报告 (折线图/饼图/表格等)"
+sop:
+  - "step: Tracker接收请求→写入log_*表 (实时)"
+  - "step: 设置crontab定时触发归档 (每5-60分钟)"
+  - "step: ArchiveProcessor读取原始数据→预计算聚合指标"
+  - "step: 聚合结果写入archive_numeric_* / archive_blob_* 表"
+  - "step: API/报告查询Archive::build()→DataTable返回结果"
+quality_gate:
+  - "Tracker响应时间 < 100ms"
+  - "归档不阻塞实时追踪"
+  - "归档结果一致性校验"
+  - "DataTable查询 < 200ms"
+dependencies:
+  - "crontab (或服务器定时任务)"
+  - "MySQL/MariaDB"
+  - "CliMulti (并行归档需要pcntl)"

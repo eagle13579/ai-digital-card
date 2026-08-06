@@ -1,0 +1,17 @@
+name: Fine-Tuning与SLM策略
+version: 1.0.0
+status: production
+dimension: fine-tuning-slm
+source: microsoft/generative-ai-for-beginners (Lesson 18, 19)
+description: "监督微调决策框架与SLM边缘部署策略。何时微调vs RAG vs Prompt、数据准备、成本评估、Phi-3/ONNX本地推理"
+atoms:
+  - GAIB-12: Fine-Tuning（监督微调）
+  - GAIB-13: 小语言模型（SLM）与边缘部署
+  - GAIB-15: 开源 vs 闭源模型选择策略
+products:
+  - Mac Mini MLX训练: LoRA微调管道
+  - 盖娅推理中间件: 4B+14B双模型路由
+  - 本地部署推理: ONNX Runtime推理
+employees:
+  - 计然P8: 微调成本收益分析
+  - 烛龙P8: 训练管道工程

@@ -1,0 +1,57 @@
+id: F-000-incremental-editor
+name: 增量式精确文件编辑器
+version: 1.0.0
+status: active
+source: 000最佳实践集合 → OpenManus StrReplaceEditor + MetaGPT Planner + CoT Commands
+
+description: >
+  集"精确替换编辑(StrReplace)"、"SOP驱动的慢思考规划(Planner)"、
+  "显式思维链路命令(Command)"于一体的Agent文件操作与任务规划工具集。
+  强调原子化操作、可审计思维链、可回滚编辑历史。
+
+mental_models:
+  - "增量式替换编辑器"
+  - "思维链路显式引导"
+  - "SOP驱动的慢思考规划器"
+
+components:
+
+  str_replace_editor:
+    language: Python
+    file: str_replace_editor.py
+    features:
+      - view: 带行号的文件/目录查看
+      - create: 安全创建（不覆盖已有文件）
+      - str_replace: 唯一性校验的精确替换
+      - insert: 指定行插入
+      - undo_edit: 历史栈回滚
+    safety:
+      - 绝对路径强制校验
+      - 目录操作限制(view only)
+      - 创建文件防覆盖
+      - 多匹配拒绝
+
+  cot_command_system:
+    language: Python
+    file: thinking_command.py
+    commands:
+      - APPEND_TASK: 添加任务到DAG
+      - RESET_TASK: 重置任务及其依赖
+      - REPLACE_TASK: 替换已有任务
+      - FINISH_CURRENT_TASK: 标记完成
+      - PUBLISH_MESSAGE: 多Agent通信
+      - REPLY_TO_HUMAN: 回复用户
+      - ASK_HUMAN: 向用户求助
+      - PASS: 主动不行动
+
+  slow_think_planner:
+    language: Python
+    file: planner.py
+    capabilities:
+      - 结构化上下文模板(STRUCTURAL_CONTEXT)
+      - 分层记忆(plan持久化 + working_memory短期)
+      - 自动审查循环(plan → precheck → review → confirm)
+      - 任务结果三路径(确认/重做/改计划)
+      - 上下文压缩(get_useful_memories)
+
+tags: [editor, planning, cot, python, file-operations, sop]

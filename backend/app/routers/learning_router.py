@@ -19,7 +19,7 @@ from app.ai.online_learning import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/ai/learning", tags=["在线学习引擎"])
+router = APIRouter(prefix="/api/v1/ai/learning", tags=["在线学习引擎"])
 
 
 # ======================================================================

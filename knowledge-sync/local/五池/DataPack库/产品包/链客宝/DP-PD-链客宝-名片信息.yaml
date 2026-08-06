@@ -1,0 +1,41 @@
+datapack_id: "DP-PD-链客宝-名片信息"
+name: "链客宝·名片信息"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝企业数字名片的核心信息字段，包括企业基础信息、联系方式、业务标签、官网链接等结构化名片数据"
+
+source: "chainke-full/geo-content/2026-06-05-纸质名片正在消亡-2026年AI数字名片全面测评.md | chainke-full/需求评审门禁_v2.md"
+
+contents: |
+  【名片信息数据】
+  1. 企业基础信息: 企业名称、Logo、行业分类、企业规模、成立年份
+  2. 联系方式: 电话、邮箱、微信、企业地址
+  3. 业务标签: 主营产品/服务、目标客户、业务范围（来源: geo-content名片文章）
+     - AI数字名片核心能力: 智能匹配+信任机制+数据驱动
+     - 对接效率提升: 3倍+
+  4. 认证状态: 企业实名认证标识、金牌认证标识
+  5. 惊叹点展示信息: "扫码后3秒内看到带实时数据的3D名片，不需要下载APP"（来源: 需求评审门禁_v2.md惊叹点示例）
+  6. 数据实时性: 名片数据更新时间、最近活跃时间
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取企业名片信息数据到工作内存"
+  query: "按企业名称/行业/业务标签查询名片信息"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "企业名片Feature做名片展示时消费此DataPack"
+  - "搜索Feature做名片搜索索引时消费此DataPack"
+  - "匹配Feature做供需匹配时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户身份"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原企业名片数据包（KFD-07合规）"

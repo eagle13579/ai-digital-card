@@ -1,0 +1,37 @@
+---
+feature_id: F-CHAINKE-MATOMO-01
+name: Matomo自建追踪分析
+dimension: 数据
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 7
+source_model: "Matomo开源分析平台+自建数据主权模式"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝AI招商系统的Web访客追踪层。自建Matomo替代第三方分析，
+  保护用户数据隐私。提供访客来源追踪、行为路径分析、
+  转化漏斗等招商核心指标。
+inputs:
+  - 追踪代码（前端埋点）
+  - 站点配置
+outputs:
+  - 实时访客数据（在线人数/来源/页面）
+  - 转化漏斗（浏览→留资→签约）
+  - 渠道分析报表
+sop:
+  1. Docker部署Matomo服务
+  2. nginx反向代理配置
+  3. 前端埋点代码注入
+  4. 自定义上报事件（留资/签约/分享）
+quality_gates:
+  - 数据采集延迟 < 30s
+  - 追踪准确率 > 95%
+  - 自托管=数据主权100%
+iteration_history:
+  - date: 2026-06-13
+    action: 创建P0版本
+    status: active
+    score: 7

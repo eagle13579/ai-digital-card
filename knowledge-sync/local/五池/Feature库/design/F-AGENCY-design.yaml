@@ -1,0 +1,24 @@
+name: 设计能力增强
+version: 1.0.0
+description: The Agency吸收 - 设计角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Brand Guardian
+  - Image Prompt Engineer
+  - Inclusive Visuals Specialist
+  - UI Designer
+  - UX Architect
+  - UX Researcher
+  - Visual Storyteller
+  - Whimsy Injector
+capabilities:
+  - UI界面设计与视觉设计系统构建
+  - UX架构设计与用户体验研究
+  - 品牌视觉守护与一致性管理
+  - 图像提示词工程与视觉叙事
+  - 包容性视觉与无障碍设计
+  - 创意趣味注入与品牌调性提升
+integration: 直接补充AI数字军团设计能力

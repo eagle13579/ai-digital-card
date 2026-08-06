@@ -1,0 +1,16 @@
+name: Trending: pocket-tts
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-10
+description: Auto-absorbed from GitHub Trending: kyutai-labs/pocket-tts
+atoms:
+  - TREND-kyutai-labs-pocket-t-01: Pocket TTS
+  - TREND-kyutai-labs-pocket-t-02: api 模式
+  - TREND-kyutai-labs-pocket-t-03: kyutai-labs/pocket-tts的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

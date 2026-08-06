@@ -1,0 +1,64 @@
+# ============================================================
+# Feature: 产业链定位器
+# 文件名: feature_财经图谱_industry_chain_locator.yaml
+# ============================================================
+名称: 产业链定位器
+
+products:
+  - 通用: 自动匹配
+描述: >
+  给定企业/产品/行业实体名称，返回其在产业链知识图谱中的精确位置，
+  包括所属层级、领域范围、上下游关系及关键节点信息，辅助投资决策
+  与产业链分析。
+
+输入:
+  type: 实体名称
+  format:
+    - "企业全称 / 简称 (例: 宁德时代, CATL)"
+    - "产品名称 (例: 磷酸铁锂电池)"
+    - "行业关键词 (例: 新能源汽车)"
+  encoding: UTF-8
+  batch: 支持批量查询 (≤100个/次)
+
+输出:
+  type: 产业链位置描述
+  schema:
+    实体名称: string
+    所属产业链: string
+    层级: string
+    领域: string
+    上下游关系:
+      上游供应商:
+        type: array
+        items: string
+      下游客户:
+        type: array
+        items: string
+    竞争实体:
+      type: array
+      items: string
+    关键指标:
+      市占率:
+        type: float
+        optional: true
+      产业集中度:
+        type: string
+        optional: true
+    数据更新时间: datetime
+
+核心:
+  - 产业链知识图谱 (结构化产业本体 + 企业关联)
+  - 更新管道 (定期同步财报/公告/新闻, 保持图谱时效性)
+
+技术栈:
+  - 知识图谱: Neo4j / NebulaGraph
+  - 本体建模: OWL / RDF + 产业分类标准 (GICS / 申万行业)
+  - 更新管道: Apache Kafka + Flink CDC
+  - 查询接口: GraphQL / Cypher
+  - 实体对齐: 基于BERT的实体消歧模型
+
+关联产品:
+  - 中国软银
+  - 链客宝
+
+成熟度: ⭐ (新创建)

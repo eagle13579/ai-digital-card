@@ -109,6 +109,11 @@ class CrmContact(Base):
         Integer, nullable=True, comment="来源记录ID(如MatchRecord.id)"
     )
 
+    # ── 四级可见性 ────────────────────────────────────────────────────────
+    visibility: Mapped[str] = mapped_column(
+        String(20), default="public", comment="可见性: public/platform/network/private"
+    )
+
     # ── 标签（JSON 数组，也可通过 UserTag 关联） ───────────────────────
     tags: Mapped[str] = mapped_column(
         Text, default="[]", comment="联系人标签(JSON数组)"
@@ -154,6 +159,7 @@ class CrmContact(Base):
             "intro": self.intro,
             "source": self.source,
             "source_record_id": self.source_record_id,
+            "visibility": self.visibility,
             "tags": self.tags,
             "pipeline_stage_id": self.pipeline_stage_id,
             "deal_value": float(self.deal_value) if self.deal_value else None,

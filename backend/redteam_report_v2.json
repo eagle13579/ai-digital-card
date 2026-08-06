@@ -1,0 +1,52 @@
+{
+  "findings": [
+    {
+      "severity": "P0",
+      "title": "名片水平越权",
+      "detail": "用户70可读取其他用户(id=51)的名片1: roger的容蓝名片",
+      "fix": "在brochure查询中添加WHERE user_id = current_user.id条件"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权",
+      "detail": "用户70可读取其他用户(id=52)的名片2: test",
+      "fix": "在brochure查询中添加WHERE user_id = current_user.id条件"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权",
+      "detail": "用户70可读取其他用户(id=54)的名片3: roger名片",
+      "fix": "在brochure查询中添加WHERE user_id = current_user.id条件"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权",
+      "detail": "用户70可读取其他用户(id=55)的名片4: roger名片",
+      "fix": "在brochure查询中添加WHERE user_id = current_user.id条件"
+    },
+    {
+      "severity": "P0",
+      "title": "名片水平越权",
+      "detail": "用户70可读取其他用户(id=51)的名片5: roger的容蓝名片",
+      "fix": "在brochure查询中添加WHERE user_id = current_user.id条件"
+    },
+    {
+      "severity": "P1",
+      "title": "passlib已弃用",
+      "detail": "passlib 1.7.4已被维护者标记为弃用,pypi最后更新2022年",
+      "fix": "迁移至bcrypt直接使用"
+    },
+    {
+      "severity": "P1",
+      "title": "python-jose漏洞风险",
+      "detail": "python-jose 3.3.0已知有CVE-2024-33664/CVE-2024-33665(jwt注入)",
+      "fix": "升级到python-jose 3.3.0+或迁移到PyJWT"
+    },
+    {
+      "severity": "P2",
+      "title": "httpx无HTTP2",
+      "detail": "httpx不带http2支持, 但无直接CVE",
+      "fix": "升级到httpx[oh]"
+    }
+  ]
+}

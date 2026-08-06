@@ -1,0 +1,37 @@
+datapack_id: "DP-HR-等级-无等级"
+name: "无等级人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "无等级等级6名核心员工的完整档案"
+
+source: "employees/ 按等级分类"
+
+contents: |
+  6名无等级等级员工:
+  - 天枢-03195daf
+      - 猲-7e04fca6
+      - 讙头-22d7eced
+      - 诸犍-12f9e71b
+      - 长右-cf3b7c35
+      - 駮-49c68d83
+
+data_format: "员工YAML + 等级矩阵"
+
+mount_interface:
+  load: "加载此等级全部员工档案"
+  query: "按技能/活跃度检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做能力分析时消费"
+  - "体系Feature做组织规划时消费"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按等级重新拆分为原子DataPack"

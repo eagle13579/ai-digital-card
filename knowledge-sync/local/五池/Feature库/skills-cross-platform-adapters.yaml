@@ -1,0 +1,9 @@
+# skills-跨平台适配器
+name: "skills-cross-platform-adapters"
+version: "1.0.0"
+category: "Skill"
+description: "同一技能库适配多平台(Claude/Cursor/Codex)。迁移到AI数智军团：legion-cli 适配国内飞书/国外Slack/Web三端，核心能力一次编写到处运行。"
+source: "MiniMax-AI/skills + Ant Design"
+
+products:
+  - 文鳐技能集市: 自动匹配

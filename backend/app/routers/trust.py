@@ -8,7 +8,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas import TrustCreate, TrustResponse
 
-router = APIRouter(prefix="/api/trust", tags=["信任网络"])
+router = APIRouter(prefix="/api/v1/trust", tags=["信任网络"])
 
 
 @router.get("/network")

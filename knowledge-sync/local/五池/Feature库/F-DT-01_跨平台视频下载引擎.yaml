@@ -1,0 +1,17 @@
+name: F-DT-01_跨平台视频下载引擎
+version: 1.0.0
+status: active
+dimension: 媒体
+source: DataTool
+atoms:
+  - DT-01_跨平台视频URL路由模式
+  - DT-07_多目录视频文件发现模式
+  - DT-08_视频ID+时间戳文件夹归档模式
+products:
+  - 䑏疏跨境助手
+  - 内容自动化工厂
+  - 中韩出海数智港
+  - 出海时光机
+  - 中国软银投资系统
+  - 出海AI顾问
+description: 跨平台视频URL识别→下载→归档的完整引擎。支持7+平台自适应路由，多目录自动发现最新文件，按视频ID自动归档。

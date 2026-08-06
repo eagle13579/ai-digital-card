@@ -1,0 +1,17 @@
+name: F-DT-02_视频字幕自动提取管道
+version: 1.0.0
+status: active
+dimension: 媒体
+source: DataTool
+atoms:
+  - DT-04_SRT字幕解析与双轨存储模式
+  - DT-05_Whisper ASR管道模式
+products:
+  - 䑏疏跨境助手
+  - 内容自动化工厂
+  - 中韩出海数智港
+  - 翟如AI超级助理
+  - 企业知识库RAG
+  - 出海AI顾问
+  - 中国软银投资系统
+description: 视频→字幕的完整自动提取管道。GUI自动化提取+SRT解析+Whisper ASR双通道，JSON+PG双轨存储。

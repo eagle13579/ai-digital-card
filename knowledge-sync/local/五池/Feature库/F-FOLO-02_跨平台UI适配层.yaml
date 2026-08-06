@@ -1,0 +1,16 @@
+name: F-FOLO-02
+version: "1.0.0"
+status: active
+dimension: 架构模式
+source: Folo (RSSNext) - packages/internal/components + apps/desktop + apps/mobile
+atoms:
+  - FOLO-02_跨平台UI适配层模式
+  - FOLO-06_Apple UIKit设计Token体系
+products:
+  - AI数字名片
+  - 内容自动化工厂
+  - 链客宝
+description: "共享组件库+平台适配器+设计Token实现三端统一UI"
+employees:
+  - 前端工程师
+  - 移动端工程师

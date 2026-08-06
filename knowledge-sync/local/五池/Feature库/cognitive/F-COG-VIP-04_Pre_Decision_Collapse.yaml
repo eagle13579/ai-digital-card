@@ -1,0 +1,27 @@
+name: "F-COG-VIP-04_Pre_Decision_Collapse"
+dimension: "预测诊断"
+domain: "neuroscience/bci/cognitive"
+status: "active"
+draft: false
+description: "错误在执行前已被神经回路预判并表现为信号塌缩，塌缩本身作为错误先兆的预测诊断信号"
+source: "图宾根大学Nature Communications (2026-06-15吸收)"
+source_type: "research_paper"
+mental_models:
+  - "Pre-Decision Signal Collapse (预判错误信号塌缩)"
+  - "错误先兆预判模型"
+products:
+  - "中国软银投资系统(止损预判)"
+  - "狴犴代码审查"
+applications:
+  - "交易决策系统的早期错误信号检测与止损触发"
+  - "代码审查中预判缺陷位置，在编译/运行前标记风险区域"
+  - "AGI安全护栏：在模型输出有害内容前捕获先兆信号"
+keywords:
+  - "VIP"
+  - "Signal Collapse"
+  - "预判"
+  - "错误诊断"
+  - "止损"
+  - "预测诊断"
+  - "图宾根"
+created_at: "2026-06-15"

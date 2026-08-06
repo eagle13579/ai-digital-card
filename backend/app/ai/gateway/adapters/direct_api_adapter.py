@@ -26,6 +26,7 @@ from app.ai.gateway.interfaces import (
     EmbeddingRequest,
     EmbeddingResponse,
 )
+from app.ai.token_pricing import calculate_cost, classify_model, USD_TO_CNY
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -34,17 +35,26 @@ logger = logging.getLogger(__name__)
 DEEPSEEK_CHAT_URL = "https://api.deepseek.com/v1/chat/completions"
 DEEPSEEK_EMBED_URL = "https://api.deepseek.com/v1/embeddings"
 
-# Cost per 1K tokens (USD) — approximate as of 2025. Update as needed.
-MODEL_PRICING: dict[str, dict[str, float]] = {
-    "deepseek-chat": {"input": 0.00027, "output": 0.00110},
-    "deepseek-reasoner": {"input": 0.00055, "output": 0.00219},
-    "deepseek-coder": {"input": 0.00014, "output": 0.00028},
-    "text-embedding-3-small": {"input": 0.00002, "output": 0.0},
-    "text-embedding-3-large": {"input": 0.00013, "output": 0.0},
-}
-
 MAX_RETRIES = 3
 BASE_BACKOFF_SEC = 1.0
+
+# ── User-facing fallback messages (Chinese) ────────────────────────────
+FALLBACK_MESSAGE = (
+    "抱歉，AI 服务暂时不可用，请稍后再试。"
+    "（DeepSeek API 连接失败，所有重试均已耗尽）"
+)
+
+FALLBACK_STREAM_MESSAGE = (
+    "抱歉，AI 服务暂时不可用，请稍后再试。"
+    "（DeepSeek API 流式连接失败）"
+)
+
+FALLBACK_EMBED_MESSAGE = (
+    "Embedding 服务暂时不可用，请稍后再试。"
+    "（DeepSeek Embedding API 连接失败）"
+)
+
+CACHED_FALLBACK_PREFIX = "（以下为缓存的上次成功结果 — API 当前不可用）\n\n"
 
 
 class DirectAIGateway(AIGatewayProtocol):
@@ -57,6 +67,12 @@ class DirectAIGateway(AIGatewayProtocol):
         - On 429 (rate limit), 502, 503, 504 → retry up to 3 times
         - Exponential backoff: 1s, 2s, 4s
         - Other errors are returned immediately as failure responses
+
+    Fallback behaviour (single-point-of-failure protection):
+        - Stores the last successful response in-memory
+        - On failure after all retries, returns the cached last response
+          (prefixed with a note) if available, or a polite fallback message.
+        - Prevents 500 crashes when DeepSeek API is unreachable.
     """
 
     def __init__(
@@ -88,6 +104,16 @@ class DirectAIGateway(AIGatewayProtocol):
             "total_cost": 0.0,
             "total_latency_ms": 0.0,
             "errors": 0,
+            "fallbacks_served": 0,
+        }
+
+        # ── Last-successful-response cache (in-memory fallback) ──────
+        # Stores the most recent successful response per method.
+        # Used as a degraded-fallback when the API is unreachable.
+        self._last_successful: dict[str, Any] = {
+            "chat": None,       # AIResponse | None
+            "stream_chat": "",  # str (full content)
+            "embed": None,      # EmbeddingResponse | None
         }
 
         self._client: httpx.AsyncClient | None = None
@@ -154,16 +180,17 @@ class DirectAIGateway(AIGatewayProtocol):
                     }
 
                     model_used = data.get("model", request.model)
-                    cost = self._estimate_cost(
-                        model_used, prompt_tokens, completion_tokens
-                    )
+                    cost = calculate_cost(
+                        "external", model_used, prompt_tokens, completion_tokens
+                    )["token_cost"]
 
                     # Update metrics
                     self.metrics["total_tokens"] += total_tokens
                     self.metrics["total_cost"] += cost
                     self.metrics["total_latency_ms"] += elapsed_ms
 
-                    return AIResponse(
+                    # ── Cache last successful response for fallback ──
+                    response_obj = AIResponse(
                         content=content,
                         model=model_used,
                         usage=usage_dict,
@@ -172,6 +199,9 @@ class DirectAIGateway(AIGatewayProtocol):
                         tool_calls=tool_calls,
                         request_id=request.request_id,
                     )
+                    self._last_successful["chat"] = response_obj
+
+                    return response_obj
 
                 # Handle retriable status codes
                 if response.status_code in (429, 502, 503, 504):
@@ -188,17 +218,10 @@ class DirectAIGateway(AIGatewayProtocol):
                     last_error = f"HTTP {response.status_code}: {response.text}"
                     continue
 
-                # Non-retriable error
+                # Non-retriable error → return fallback
                 last_error = f"HTTP {response.status_code}: {response.text}"
                 self.metrics["errors"] += 1
-                return AIResponse(
-                    content=f"Error: {last_error}",
-                    model=request.model,
-                    usage={},
-                    latency_ms=(time.monotonic() - start) * 1000.0,
-                    finish_reason="error",
-                    request_id=request.request_id,
-                )
+                return self._fallback_chat_response(request, last_error, start)
 
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
                 wait = BASE_BACKOFF_SEC * (2 ** (attempt - 1))
@@ -216,25 +239,11 @@ class DirectAIGateway(AIGatewayProtocol):
             except Exception as exc:
                 logger.exception("Unexpected error calling DeepSeek chat API")
                 self.metrics["errors"] += 1
-                return AIResponse(
-                    content=f"Unexpected error: {exc}",
-                    model=request.model,
-                    usage={},
-                    latency_ms=(time.monotonic() - start) * 1000.0,
-                    finish_reason="error",
-                    request_id=request.request_id,
-                )
+                return self._fallback_chat_response(request, str(exc), start)
 
-        # All retries exhausted
+        # All retries exhausted → return fallback
         self.metrics["errors"] += 1
-        return AIResponse(
-            content=f"All retries exhausted. Last error: {last_error}",
-            model=request.model,
-            usage={},
-            latency_ms=(time.monotonic() - start) * 1000.0,
-            finish_reason="error",
-            request_id=request.request_id,
-        )
+        return self._fallback_chat_response(request, last_error or "unknown error", start)
 
     async def stream_chat(
         self,
@@ -271,7 +280,13 @@ class DirectAIGateway(AIGatewayProtocol):
                             wait = BASE_BACKOFF_SEC * (2 ** (attempt - 1))
                             await asyncio.sleep(wait)
                             continue
-                        yield f"Error: HTTP {response.status_code}"
+                        # All retries exhausted — serve cached or fallback
+                        if self._last_successful["stream_chat"]:
+                            note = "（以下为缓存的上次成功结果 — API 当前不可用）\n\n"
+                            yield note
+                            yield self._last_successful["stream_chat"]
+                        else:
+                            yield FALLBACK_STREAM_MESSAGE
                         return
 
                     async for line in response.aiter_lines():
@@ -290,6 +305,10 @@ class DirectAIGateway(AIGatewayProtocol):
                                 yield token
                         except json.JSONDecodeError:
                             continue
+
+                    # Stream completed successfully — cache full content
+                    if full_content:
+                        self._last_successful["stream_chat"] = full_content
                     return
 
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
@@ -303,11 +322,23 @@ class DirectAIGateway(AIGatewayProtocol):
                     wait = BASE_BACKOFF_SEC * (2 ** (attempt - 1))
                     await asyncio.sleep(wait)
                 else:
-                    yield f"Error: {exc}"
+                    # All retries exhausted — serve cached or fallback
+                    if self._last_successful["stream_chat"]:
+                        note = "（以下为缓存的上次成功结果 — API 当前不可用）\n\n"
+                        yield note
+                        yield self._last_successful["stream_chat"]
+                    else:
+                        yield FALLBACK_STREAM_MESSAGE
                     return
             except Exception as exc:
                 logger.exception("Unexpected error in stream_chat")
-                yield f"Error: {exc}"
+                # Serve cached or fallback
+                if self._last_successful["stream_chat"]:
+                    note = "（以下为缓存的上次成功结果 — API 当前不可用）\n\n"
+                    yield note
+                    yield self._last_successful["stream_chat"]
+                else:
+                    yield FALLBACK_STREAM_MESSAGE
                 return
 
     async def embed(self, request: EmbeddingRequest) -> EmbeddingResponse:
@@ -343,7 +374,8 @@ class DirectAIGateway(AIGatewayProtocol):
                     self.metrics["total_tokens"] += total_tokens
                     self.metrics["total_latency_ms"] += elapsed_ms
 
-                    return EmbeddingResponse(
+                    # ── Cache last successful embedding for fallback ──
+                    embed_response = EmbeddingResponse(
                         embeddings=embeddings,
                         model=model_used,
                         dimension=dimension,
@@ -353,6 +385,9 @@ class DirectAIGateway(AIGatewayProtocol):
                         },
                         latency_ms=elapsed_ms,
                     )
+                    self._last_successful["embed"] = embed_response
+
+                    return embed_response
 
                 if response.status_code in (429, 502, 503, 504):
                     wait = BASE_BACKOFF_SEC * (2 ** (attempt - 1))
@@ -369,13 +404,7 @@ class DirectAIGateway(AIGatewayProtocol):
 
                 last_error = f"HTTP {response.status_code}: {response.text}"
                 self.metrics["errors"] += 1
-                return EmbeddingResponse(
-                    embeddings=[],
-                    model=request.model,
-                    dimension=0,
-                    usage={},
-                    latency_ms=(time.monotonic() - start) * 1000.0,
-                )
+                return self._fallback_embed_response(request, last_error, start)
 
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
                 wait = BASE_BACKOFF_SEC * (2 ** (attempt - 1))
@@ -392,22 +421,10 @@ class DirectAIGateway(AIGatewayProtocol):
             except Exception as exc:
                 logger.exception("Unexpected error calling DeepSeek embed API")
                 self.metrics["errors"] += 1
-                return EmbeddingResponse(
-                    embeddings=[],
-                    model=request.model,
-                    dimension=0,
-                    usage={},
-                    latency_ms=(time.monotonic() - start) * 1000.0,
-                )
+                return self._fallback_embed_response(request, str(exc), start)
 
         self.metrics["errors"] += 1
-        return EmbeddingResponse(
-            embeddings=[],
-            model=request.model,
-            dimension=0,
-            usage={},
-            latency_ms=(time.monotonic() - start) * 1000.0,
-        )
+        return self._fallback_embed_response(request, last_error or "unknown error", start)
 
     # ── Internals ─────────────────────────────────────────────────────
 
@@ -453,10 +470,100 @@ class DirectAIGateway(AIGatewayProtocol):
 
     @staticmethod
     def _estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
-        """Estimate cost in USD based on model pricing lookup."""
-        pricing = MODEL_PRICING.get(model, {"input": 0.0, "output": 0.0})
-        cost = (
-            (prompt_tokens / 1000.0) * pricing.get("input", 0.0)
-            + (completion_tokens / 1000.0) * pricing.get("output", 0.0)
+        """Estimate cost in ¥ (CNY) via centralized token pricing engine."""
+        result = calculate_cost(
+            "external", model, prompt_tokens, completion_tokens
         )
-        return round(cost, 6)
+        return round(result["token_cost"], 6)
+
+    # ── Fallback helpers ──────────────────────────────────────────────
+
+    def _fallback_chat_response(
+        self,
+        request: AIRequest,
+        error: str,
+        start: float,
+    ) -> AIResponse:
+        """Return a degraded fallback AIResponse when DeepSeek API fails.
+
+        Strategy:
+            1. If a previous successful response exists → return it prefixed
+               with a notice that cached content is being shown.
+            2. Otherwise → return a polite Chinese fallback message.
+        """
+        self.metrics["fallbacks_served"] += 1
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+
+        cached = self._last_successful.get("chat")
+        if cached is not None:
+            logger.warning(
+                "DeepSeek API unavailable — serving cached chat response. "
+                "Error: %s",
+                error,
+            )
+            return AIResponse(
+                content=f"{CACHED_FALLBACK_PREFIX}{cached.content}",
+                model=cached.model,
+                usage=cached.usage,
+                latency_ms=elapsed_ms,
+                finish_reason="degraded_fallback",
+                tool_calls=cached.tool_calls,
+                request_id=request.request_id,
+            )
+
+        logger.error(
+            "DeepSeek API unavailable and no cached response — "
+            "returning fallback message. Error: %s",
+            error,
+        )
+        return AIResponse(
+            content=FALLBACK_MESSAGE,
+            model=request.model,
+            usage={},
+            latency_ms=elapsed_ms,
+            finish_reason="error",
+            request_id=request.request_id,
+        )
+
+    def _fallback_embed_response(
+        self,
+        request: EmbeddingRequest,
+        error: str,
+        start: float,
+    ) -> EmbeddingResponse:
+        """Return a degraded fallback EmbeddingResponse when DeepSeek API fails.
+
+        Strategy:
+            1. If a previous successful embedding exists → return it.
+            2. Otherwise → return an empty embedding list.
+        """
+        self.metrics["fallbacks_served"] += 1
+        elapsed_ms = (time.monotonic() - start) * 1000.0
+
+        cached = self._last_successful.get("embed")
+        if cached is not None:
+            logger.warning(
+                "DeepSeek embed API unavailable — serving cached embedding. "
+                "Error: %s",
+                error,
+            )
+            return EmbeddingResponse(
+                embeddings=cached.embeddings,
+                model=cached.model,
+                dimension=cached.dimension,
+                usage=cached.usage,
+                latency_ms=elapsed_ms,
+            )
+
+        logger.error(
+            "DeepSeek embed API unavailable and no cached embedding — "
+            "returning empty response. Error: %s",
+            error,
+        )
+        return EmbeddingResponse(
+            embeddings=[],
+            model=request.model,
+            dimension=0,
+            usage={},
+            latency_ms=elapsed_ms,
+        )
