@@ -26,8 +26,8 @@ class GaiaKnowledge(Base):
         comment="知识来源: retrospective | feedback | ab_test | manual | system",
     )
     source_id: Mapped[str] = mapped_column(
-        String(64), nullable=True, default="",
-        comment="来源标识（如复盘ID、反馈ID、实验ID）",
+        String(512), nullable=True, default="",
+        comment="来源标识（如复盘ID、反馈ID、实验ID、同步路径）",
     )
     knowledge_type: Mapped[str] = mapped_column(
         String(32), nullable=False, index=True,
