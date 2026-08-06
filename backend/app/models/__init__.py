@@ -140,6 +140,9 @@ from app.models.accuracy_gate import (
     GateCheckSource,
 )
 
+# ── P1 安全修复: 资料文件上传配额记录 ──
+from app.models.user_file import UserFileRecord
+
 __all__ = [
     "User", "Brochure", "Page", "UserTag", "MatchRecord",
     "VisitorLog", "TrustNetwork", "PaymentOrder", "EnterpriseSubscription", "Integration",
@@ -247,4 +250,6 @@ __all__ = [
     "CalibrationType",
     "CalibrationStatus",
     "GateCheckSource",
+    # P1 安全修复: 资料文件上传配额记录
+    "UserFileRecord",
 ]

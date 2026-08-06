@@ -456,7 +456,7 @@ class DifyOrchestrator(BaseAppOrchestrator if _BAIZE_DIFY_AVAILABLE else object)
             super().__init__(tool_executor=self._tool_executor)
         else:
             self._composer = SceneComposer(self._tool_executor)
-            self._coordinator = MultiAgentCoordinator(self._tool_executor)
+            self._coordinator = None  # MultiAgentCoordinator 暂缺失
             self._active_runs: dict[str, OrchestrationResult] = {}
 
         self._initialized = False

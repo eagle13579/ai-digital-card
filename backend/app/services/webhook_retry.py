@@ -10,7 +10,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-import httpx
+from app.services.safe_fetch import safe_fetch_raw, SSRFError
 
 logger = logging.getLogger("webhook_retry")
 RETRY_DELAYS = [10, 30, 60, 120, 300]
@@ -32,12 +32,6 @@ class WebhookRetryService:
     def __init__(self) -> None:
         self._dead_letter_queue: dict[int, DeadLetterEntry] = {}
         self._next_id: int = 1
-        self._client: httpx.AsyncClient | None = None
-
-    async def get_client(self) -> httpx.AsyncClient:
-        if self._client is None:
-            self._client = httpx.AsyncClient(timeout=30.0)
-        return self._client
 
     async def send_with_retry(
         self, url: str, payload: dict[str, Any],
@@ -52,7 +46,6 @@ class WebhookRetryService:
             headers: 额外 HTTP 头
             secret:  可选签名密钥，提供后将自动添加 X-Webhook-Signature 头 (HMAC-SHA256)
         """
-        client = await self.get_client()
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         req_headers = {"Content-Type": "application/json", **(headers or {})}
 
@@ -66,12 +59,20 @@ class WebhookRetryService:
             if attempt > 1:
                 await asyncio.sleep(RETRY_DELAYS[attempt - 2])
             try:
-                resp = await client.post(url, content=body, headers=req_headers)
-                last_code = resp.status_code
-                if resp.status_code < 500:
+                status_code, _ = await asyncio.to_thread(
+                    safe_fetch_raw,
+                    url,
+                    max_bytes=1024 * 1024,
+                    timeout=30,
+                    method="POST",
+                    content=body,
+                    headers=req_headers,
+                )
+                last_code = status_code
+                if status_code < 500:
                     success = True
                     break
-                last_error = f"HTTP {resp.status_code}: {resp.text[:200]}"
+                last_error = f"HTTP {status_code}"
             except Exception as e:
                 last_error = str(e)
                 logger.warning("Webhook %s attempt #%d: %s", url, attempt, e)
@@ -123,6 +124,5 @@ class WebhookRetryService:
         return len(self._dead_letter_queue)
 
     async def close(self) -> None:
-        if self._client:
-            await self._client.aclose()
-            self._client = None
+        """No-op: no persistent client to close (safe_fetch creates per-request clients)."""
+        pass

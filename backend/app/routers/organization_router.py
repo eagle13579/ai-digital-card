@@ -97,6 +97,21 @@ async def _require_org_admin(
     raise_http_error(403, ErrorCode.FORBIDDEN, "仅组织管理员可执行此操作")
 
 
+async def _require_org_member(
+    db: AsyncSession, org_id: int, current_user: User
+) -> Optional[dict]:
+    """验证当前用户是否为组织成员（owner 或 成员），返回成员记录（修复 BUG-008）"""
+    org = await _get_org_or_404(db, org_id)
+    # 组织所有者天然是成员
+    if org.owner_id == current_user.id:
+        return {"user_id": current_user.id, "role": "owner"}
+    members = await db.run_sync(lambda s: org_service.get_org_members(s, org_id))
+    for m in members:
+        if m["user_id"] == current_user.id:
+            return m
+    raise_http_error(403, ErrorCode.FORBIDDEN, "仅组织成员可查看")
+
+
 # ── API 端点 ────────────────────────────────────────────────────────────────────
 
 
@@ -144,9 +159,13 @@ async def list_my_organizations(
 @router.get("/{org_id}")
 async def get_organization_detail(
     org_id: int,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取组织详情"""
+    """获取组织详情（仅组织成员可查看）"""
+    # 修复 BUG-008：需登录且为组织成员
+    await _require_org_member(db, org_id, current_user)
+
     org = await _get_org_or_404(db, org_id)
 
     # 成员数统计

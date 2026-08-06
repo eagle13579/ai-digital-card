@@ -1,0 +1,123 @@
+ab_test_decision_logs | id:INTEGERPK; experiment_id:INTEGER; decision:VARCHAR(16); variant_name:VARCHAR(64); p_value:FLOAT; reason:TEXT; details:JSON; created_at:DATETIME
+ab_test_events | id:INTEGERPK; experiment_id:INTEGER; variant_id:INTEGER; user_id:INTEGER; visitor_id:VARCHAR(64); event_type:VARCHAR(32); metadata:JSON; created_at:DATETIME
+ab_test_variants | id:INTEGERPK; experiment_id:INTEGER; name:VARCHAR(64); description:VARCHAR(256); sort_order:INTEGER; is_control:BOOLEAN; config:JSON; weight:FLOAT; is_default:BOOLEAN; impressions:INTEGER; clicks:INTEGER; conversions:INTEGER; views:INTEGER; created_at:DATETIME
+ab_tests | id:INTEGERPK; user_id:INTEGER; name:VARCHAR(128); description:TEXT; status:VARCHAR(16); traffic_fraction:FLOAT; min_sample_size:INTEGER; significance_level:FLOAT; metric:VARCHAR(32); target_brochure_id:INTEGER; created_at:DATETIME; updated_at:DATETIME; started_at:DATETIME; completed_at:DATETIME; cached_results:JSON
+accuracy_baselines | id:INTEGERPK; baseline_id:VARCHAR(64); name:VARCHAR(128); description:TEXT; accuracy_threshold:FLOAT; pass_immediately:FLOAT; warn_threshold:FLOAT; quality_baseline_id:VARCHAR(64); quality_avg_total:FLOAT; sample_count:INTEGER; passing_count:INTEGER; passing_rate:FLOAT; agent_version:VARCHAR(64); model_name:VARCHAR(128); calibration_type:VARCHAR(32); calibration_id:VARCHAR(64); is_active:BOOLEAN; is_archived:BOOLEAN; meta_data:JSON; effective_from:DATETIME; effective_until:DATETIME; created_at:DATETIME; updated_at:DATETIME
+accuracy_calibration_records | id:INTEGERPK; calibration_id:VARCHAR(64); calibration_type:VARCHAR(32); status:VARCHAR(32); old_baseline_id:VARCHAR(64); old_accuracy_threshold:FLOAT; new_baseline_id:VARCHAR(64); new_accuracy_threshold:FLOAT; new_pass_immediately:FLOAT; new_warn_threshold:FLOAT; delta:FLOAT; delta_percent:FLOAT; quality_baseline_id:VARCHAR(64); quality_avg_total:FLOAT; sample_count:INTEGER; passing_count:INTEGER; passing_rate:FLOAT; details:JSON; error_message:TEXT; notification_sent:BOOLEAN; notification_channels:JSON; meta_data:JSON; calibrated_at:DATETIME; created_at:DATETIME
+accuracy_check_records | id:INTEGERPK; check_id:VARCHAR(64); source:VARCHAR(32); baseline_id:VARCHAR(64); baseline_threshold:FLOAT; baseline_name:VARCHAR(128); current_accuracy:FLOAT; current_sample_count:INTEGER; current_passing_count:INTEGER; deviation:FLOAT; deviation_percent:FLOAT; decision:VARCHAR(32); passed:BOOLEAN; blocked:BOOLEAN; quality_avg_total:FLOAT; quality_baseline_total:FLOAT; block_reason:TEXT; block_details:JSON; ci_pipeline_id:VARCHAR(128); ci_build_number:VARCHAR(64); ci_commit_sha:VARCHAR(64); ci_branch:VARCHAR(128); meta_data:JSON; checked_at:DATETIME; created_at:DATETIME
+accuracy_gate_configs | id:INTEGERPK; gate_config_id:VARCHAR(64); enabled:BOOLEAN; ci_block_enabled:BOOLEAN; default_accuracy_threshold:FLOAT; default_pass_immediately:FLOAT; default_warn_threshold:FLOAT; ci_block_on_warn:BOOLEAN; ci_required_samples:INTEGER; ci_auto_calibrate_on_degradation:BOOLEAN; auto_calibrate:BOOLEAN; monthly_calibration_day:INTEGER; quarterly_calibration_month:INTEGER; notify_on_calibration:BOOLEAN; notification_channels:JSON; meta_data:JSON; created_at:DATETIME; updated_at:DATETIME
+activity | id:INTEGERPK
+analytics_events | id:INTEGERPK; user_id:INTEGER; session_id:VARCHAR(64); event_type:VARCHAR(32); properties:JSON; page_url:VARCHAR(512); ip_address:VARCHAR(45); user_agent:VARCHAR(512); created_at:DATETIME
+api_key_usage | id:INTEGERPK; api_key_id:INTEGER; date:VARCHAR(10); request_count:INTEGER; created_at:DATETIME
+api_keys | id:INTEGERPK; user_id:INTEGER; key:VARCHAR(64); name:VARCHAR(128); permissions:TEXT; rate_limit:INTEGER; is_active:BOOLEAN; last_used_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+api_usage_log | id:INTEGERPK
+app_store_plugin_installs | id:INTEGERPK; plugin_id:INTEGER; user_id:INTEGER; version_id:INTEGER; is_active:INTEGER; installed_at:DATETIME; uninstalled_at:DATETIME
+app_store_plugin_reviews | id:INTEGERPK; plugin_id:INTEGER; reviewer_id:INTEGER; status:VARCHAR(20); comments:TEXT; created_at:DATETIME
+app_store_plugin_versions | id:INTEGERPK; plugin_id:INTEGER; version:VARCHAR(32); changelog:TEXT; download_url:VARCHAR(512); required_api_version:VARCHAR(32); file_size:INTEGER; checksum:VARCHAR(128); is_published:INTEGER; created_at:DATETIME
+app_store_plugins | id:INTEGERPK; developer_id:INTEGER; name:VARCHAR(128); description:TEXT; icon_url:VARCHAR(512); category:VARCHAR(64); version:VARCHAR(32); price:FLOAT; status:VARCHAR(20); install_count:INTEGER; rating:FLOAT; rating_count:INTEGER; homepage_url:VARCHAR(512); documentation_url:VARCHAR(512); repository_url:VARCHAR(512); tags:VARCHAR(512); created_at:DATETIME; updated_at:DATETIME
+approval_requests | id:INTEGERPK; team_id:INTEGER; requester_id:INTEGER; action:VARCHAR(7); target_user_id:INTEGER; reason:TEXT; status:VARCHAR(8); reviewer_id:INTEGER; reject_reason:TEXT; created_at:DATETIME; reviewed_at:DATETIME
+audit_logs | id:INTEGERPK; user_id:INTEGER; action:VARCHAR(32); resource:VARCHAR(128); detail:TEXT; ip:VARCHAR(45); user_agent:VARCHAR(512); timestamp:DATETIME
+brochures | id:INTEGERPK; user_id:INTEGER; title:VARCHAR(128); cover:VARCHAR(256); purpose:VARCHAR(32); pages_count:INTEGER; status:VARCHAR(16); share_token:VARCHAR(32); view_count:INTEGER; album_meta:TEXT; created_at:DATETIME; updated_at:DATETIME; visibility:VARCHAR(16); platform_id:INTEGER
+business_card | id:INTEGERPK
+business_need | id:INTEGERPK
+circuit_breaker_state | id:INTEGERPK
+connections | id:INTEGERPK; user_id:INTEGER; contact_id:INTEGER; source:VARCHAR(32); status:VARCHAR(16); strength:FLOAT; label:VARCHAR(64); created_at:DATETIME; updated_at:DATETIME
+contact | id:INTEGERPK
+contacts | id:INTEGERPK; user_id:INTEGER; name:VARCHAR(64); phone_hash:VARCHAR(64); phone_enc:TEXT; phone_last4:VARCHAR(4); company:VARCHAR(128); position:VARCHAR(128); source:VARCHAR(16); is_matched:SMALLINT; matched_user_id:INTEGER; created_at:DATETIME; updated_at:DATETIME; deleted_at:DATETIME
+contract | id:INTEGERPK
+crm_activities | id:INTEGERPK; owner_id:INTEGER; contact_id:INTEGER; deal_id:INTEGER; activity_type:VARCHAR(16); title:VARCHAR(256); description:TEXT; source_model:VARCHAR(32); source_record_id:INTEGER; activity_date:DATETIME; created_at:DATETIME
+crm_campaign_recipients | id:INTEGERPK; campaign_id:INTEGER; contact_id:INTEGER; email:VARCHAR(128); name:VARCHAR(128); tracking_token:VARCHAR(64); sent:BOOLEAN; sent_at:DATETIME; send_error:TEXT; opened:BOOLEAN; opened_at:DATETIME; unsubscribed:BOOLEAN; unsubscribed_at:DATETIME; created_at:DATETIME
+crm_campaigns | id:INTEGERPK; owner_id:INTEGER; name:VARCHAR(256); subject:VARCHAR(512); template_name:VARCHAR(64); template_params:TEXT; target_filter:TEXT; status:VARCHAR(16); total_recipients:INTEGER; sent_count:INTEGER; opened_count:INTEGER; unsubscribed_count:INTEGER; created_at:DATETIME; updated_at:DATETIME
+crm_contacts | id:INTEGERPK; owner_id:INTEGER; user_id:INTEGER; name:VARCHAR(128); phone:VARCHAR(32); email:VARCHAR(128); company:VARCHAR(256); title:VARCHAR(128); department:VARCHAR(128); avatar:VARCHAR(512); intro:TEXT; source:VARCHAR(16); source_record_id:INTEGER; tags:TEXT; pipeline_stage_id:INTEGER; deal_value:NUMERIC(12, 2); deal_currency:VARCHAR(8); last_contacted_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+crm_deals | id:INTEGERPK; owner_id:INTEGER; contact_id:INTEGER; pipeline_stage_id:INTEGER; title:VARCHAR(256); value:NUMERIC(12, 2); currency:VARCHAR(8); probability:FLOAT; expected_close_date:DATETIME; status:VARCHAR(16); lost_reason:TEXT; created_at:DATETIME; updated_at:DATETIME
+crm_documents | id:INTEGERPK; owner_id:INTEGER; contact_id:INTEGER; deal_id:INTEGER; doc_type:VARCHAR(16); template_name:VARCHAR(64); title:VARCHAR(256); doc_number:VARCHAR(32); content_html:TEXT; content_data:JSON; total_amount:FLOAT; currency:VARCHAR(8); status:VARCHAR(16); created_at:DATETIME; updated_at:DATETIME
+crm_form_submission_logs | id:INTEGERPK; form_id:INTEGER; submitter_ip:VARCHAR(45); submitter_ua:TEXT; payload:TEXT; contact_id:INTEGER; honeypot_triggered:BOOLEAN; success:BOOLEAN; error_message:TEXT; created_at:DATETIME
+crm_forms | id:INTEGERPK; owner_id:INTEGER; name:VARCHAR(128); title:VARCHAR(256); description:TEXT; fields:TEXT; submit_action:VARCHAR(32); redirect_url:VARCHAR(512); success_message:VARCHAR(256); enable_honeypot:BOOLEAN; enable_rate_limit:BOOLEAN; auto_tags:TEXT; is_active:BOOLEAN; submission_count:INTEGER; embed_theme:VARCHAR(32); embed_primary_color:VARCHAR(16); created_at:DATETIME; updated_at:DATETIME
+crm_notes | id:INTEGERPK; owner_id:INTEGER; contact_id:INTEGER; deal_id:INTEGER; content:TEXT; is_pinned:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+crm_pipeline_stages | id:INTEGERPK; user_id:INTEGER; name:VARCHAR(64); sort_order:INTEGER; color:VARCHAR(16); is_default:BOOLEAN; is_closed:BOOLEAN; win_probability:FLOAT; created_at:DATETIME
+crm_workflow_logs | id:INTEGERPK; owner_id:INTEGER; rule_id:INTEGER; rule_name:VARCHAR(128); trigger_event:VARCHAR(32); context_snapshot:TEXT; action_results:TEXT; success:BOOLEAN; created_at:DATETIME
+crm_workflow_rules | id:INTEGERPK; owner_id:INTEGER; name:VARCHAR(128); description:TEXT; trigger_event:VARCHAR(32); conditions:TEXT; actions:TEXT; enabled:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+customer_journey_stages | id:INTEGERPK; contact_id:INTEGER; pipeline_id:INTEGER; stage:VARCHAR(20); entered_at:DATETIME; duration_days:INTEGER; actions_taken:TEXT; score:FLOAT; next_action:VARCHAR(256)
+deal | id:INTEGERPK
+deal_activity | id:INTEGERPK
+developer_reward_balances | id:INTEGERPK; developer_id:INTEGER; total_points:INTEGER; used_points:INTEGER; balance:INTEGER; updated_at:DATETIME
+developer_rewards | id:INTEGERPK; developer_id:INTEGER; reward_type:VARCHAR(32); points:INTEGER; reason:VARCHAR(256); source_id:INTEGER; source_desc:VARCHAR(128); status:VARCHAR(20); created_at:DATETIME; issued_at:DATETIME
+email_campaigns | id:INTEGERPK; name:VARCHAR(256); subject:VARCHAR(512); content_template:TEXT; target_segment:TEXT; scheduled_at:DATETIME; sent_count:INTEGER; open_count:INTEGER; click_count:INTEGER; status:VARCHAR(16); created_at:DATETIME
+enterprise | id:INTEGERPK
+enterprise_relation | id:INTEGERPK
+enterprise_subscriptions | id:INTEGERPK; user_id:INTEGER; company_name:VARCHAR(128); seats:INTEGER; tier:VARCHAR(32); start_date:DATETIME; end_date:DATETIME; auto_renew:BOOLEAN; status:VARCHAR(16); features:JSON; created_at:DATETIME; updated_at:DATETIME
+error_logs | id:INTEGERPK; msg:TEXT; url:VARCHAR(1024); line:INTEGER; col:INTEGER; stack:TEXT; page:VARCHAR(256); user_id:INTEGER; user_agent:VARCHAR(512); ip:VARCHAR(45); created_at:DATETIME
+escrow_deals | id:INTEGERPK; buyer_id:INTEGER; seller_id:INTEGER; amount:FLOAT; status:VARCHAR(20); title:VARCHAR(255); description:TEXT; created_at:DATETIME; updated_at:DATETIME
+escrow_disputes | id:INTEGERPK; deal_id:INTEGER; initiator_id:INTEGER; reason:VARCHAR(500); description:TEXT; status:VARCHAR(20); evidence:TEXT; resolution:TEXT; created_at:DATETIME; resolved_at:DATETIME
+escrow_milestones | id:INTEGERPK; deal_id:INTEGER; name:VARCHAR(200); description:TEXT; status:VARCHAR(20); due_date:DATETIME; completed_at:DATETIME
+funnel_definitions | id:INTEGERPK; funnel_name:VARCHAR(32); step_name:VARCHAR(32); step_order:INTEGER; event_type:VARCHAR(32); time_limit_minutes:INTEGER
+gaia_evolution_events | id:INTEGERPK; event_type:VARCHAR(32); event_source:VARCHAR(32); description:VARCHAR(512); metadata:JSON; reference_type:VARCHAR(32); reference_id:INTEGER; created_at:DATETIME
+gaia_knowledge | id:INTEGERPK; source:VARCHAR(32); source_id:VARCHAR(64); knowledge_type:VARCHAR(32); title:VARCHAR(256); content:TEXT; tags:JSON; confidence:FLOAT; impact_score:FLOAT; is_active:BOOLEAN; vector_embedded:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+gaia_model_weights | id:INTEGERPK; module:VARCHAR(64); weights:JSON; version:VARCHAR(32); description:VARCHAR(512); training_run_id:INTEGER; is_active:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+gaia_training_runs | id:INTEGERPK; status:VARCHAR(16); trigger:VARCHAR(32); knowledge_count:INTEGER; feedback_count:INTEGER; weights_count:INTEGER; vector_index_size:INTEGER; duration_ms:INTEGER; metrics:JSON; error_message:TEXT; started_at:DATETIME; completed_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+import_history | id:INTEGERPK
+integrations | id:INTEGERPK; user_id:INTEGER; provider:VARCHAR(32); name:VARCHAR(128); enabled:BOOLEAN; config:TEXT; last_sync_at:DATETIME; webhook_url:VARCHAR(512); webhook_secret:VARCHAR(128); webhook_enabled:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+invitation_codes | id:INTEGERPK; code:VARCHAR(8); batch_id:VARCHAR(32); max_uses:INTEGER; used_count:INTEGER; created_by:INTEGER; expires_at:DATETIME; is_active:BOOLEAN; remark:TEXT; created_at:DATETIME; updated_at:DATETIME
+invoices | id:INTEGERPK; invoice_no:VARCHAR(32); user_id:INTEGER; amount:FLOAT; tax_rate:FLOAT; tax_amount:FLOAT; total_amount:FLOAT; status:VARCHAR(16); order_no:VARCHAR(32); buyer_name:VARCHAR(128); buyer_tax_id:VARCHAR(32); seller_name:VARCHAR(128); seller_tax_id:VARCHAR(32); items:JSON; notes:TEXT; created_at:DATETIME; updated_at:DATETIME
+knowledge_models | id:INTEGERPK; model_id:VARCHAR(32); category:VARCHAR(32); name:VARCHAR(128); source:VARCHAR(64); source_ref:VARCHAR(256); content:TEXT; tags:JSON; confidence:FLOAT; version:VARCHAR(16); is_active:BOOLEAN; vector_embedded:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+match_credit_log | id:INTEGERPK
+match_records | id:INTEGERPK; user_a_id:INTEGER; user_b_id:INTEGER; match_score:FLOAT; status:VARCHAR(16); common_tags:TEXT; source:VARCHAR(16); created_at:DATETIME
+membership_order | id:INTEGERPK
+messages | id:INTEGERPK; sender_id:INTEGER; receiver_id:INTEGER; content:TEXT; is_read:BOOLEAN; conversation_id:VARCHAR(36); created_at:DATETIME
+metrics_snapshot | id:INTEGERPK
+nfc_cards | id:INTEGERPK; user_id:INTEGER; nfc_uid:VARCHAR(64); card_data_json:TEXT; vcard_raw:TEXT; created_at:DATETIME; updated_at:DATETIME
+nfc_tap_records | id:INTEGERPK; from_user_id:INTEGER; to_user_id:INTEGER; nfc_uid:VARCHAR(64); created_at:DATETIME
+online_matching_events | id:INTEGERPK
+online_matching_feedback | id:INTEGERPK
+online_matching_registrations | id:INTEGERPK
+order | id:INTEGERPK
+organization_invites | id:INTEGERPK; org_id:INTEGER; email:VARCHAR(255); token:VARCHAR(64); status:VARCHAR(20); created_at:DATETIME
+organization_members | id:INTEGERPK; org_id:INTEGER; user_id:INTEGER; role:VARCHAR(20); joined_at:DATETIME
+organizations | id:INTEGERPK; name:VARCHAR(200); slug:VARCHAR(100); owner_id:INTEGER; created_at:DATETIME
+pages | id:INTEGERPK; brochure_id:INTEGER; sort_order:INTEGER; content_type:VARCHAR(16); content:TEXT; image_url:VARCHAR(256); media_url:VARCHAR(512); ai_summary:TEXT
+payment_orders | id:INTEGERPK; order_no:VARCHAR(32); user_id:INTEGER; membership_tier:VARCHAR(16); channel:VARCHAR(16); channel_order_no:VARCHAR(64); status:VARCHAR(16); total_cents:INTEGER; paid_at:DATETIME; raw_callback:VARCHAR(2048); created_at:DATETIME; updated_at:DATETIME
+payment_transaction | id:INTEGERPK
+platform_members | id:INTEGERPK; platform_id:INTEGER; user_id:INTEGER; role:VARCHAR(20); joined_at:INTEGER
+platform_opportunities | id:INTEGERPK; platform_id:INTEGER; creator_id:INTEGER; title:VARCHAR(200); description:TEXT; industry:VARCHAR(50); city:VARCHAR(50); budget:INTEGER; status:VARCHAR(20); created_at:INTEGER
+platforms | id:INTEGERPK; name:VARCHAR(128); platform_no:VARCHAR(32); creator_id:INTEGER; annual_fee:FLOAT; description:TEXT; created_at:DATETIME; updated_at:DATETIME; province:VARCHAR(32); city:VARCHAR(32); district:VARCHAR(32); contact_name:VARCHAR(64); phone:VARCHAR(20); industries:TEXT
+private_board_order | id:INTEGERPK
+product | id:INTEGERPK
+prompt_templates | id:VARCHAR(64)PK; name:VARCHAR(128); category:VARCHAR(18); version:VARCHAR(32); description:VARCHAR(512); system_prompt:TEXT; user_prompt_template:TEXT; parameters_schema:JSON; output_schema:JSON; tags:JSON; is_active:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+quality_baselines | id:INTEGERPK; baseline_id:VARCHAR(64); name:VARCHAR(128); description:TEXT; agent_version:VARCHAR(64); model_name:VARCHAR(128); canary_deployment_id:VARCHAR(64); avg_usefulness:FLOAT; avg_accuracy:FLOAT; avg_completeness:FLOAT; avg_coherence:FLOAT; avg_harmlessness:FLOAT; avg_total:FLOAT; sample_count:INTEGER; passing_count:INTEGER; passing_rate:FLOAT; passing_threshold:FLOAT; score_distribution:JSON; tags:JSON; sample_meta:JSON; is_active:BOOLEAN; is_archived:BOOLEAN; created_at:DATETIME; updated_at:DATETIME; evaluated_at:DATETIME
+quality_eval_jobs | id:INTEGERPK; job_id:VARCHAR(64); status:VARCHAR(32); eval_method:VARCHAR(32); sample_ids:JSON; model_config:JSON; total_samples:INTEGER; completed_samples:INTEGER; failed_samples:INTEGER; baseline_id:VARCHAR(64); summary:JSON; created_at:DATETIME; started_at:DATETIME; completed_at:DATETIME
+quality_samples | id:INTEGERPK; sample_id:VARCHAR(64); input_text:TEXT; agent_output:TEXT; expected_output:TEXT; category:VARCHAR(64); tags:JSON; sample_meta:JSON; canary_deployment_id:VARCHAR(64); agent_version:VARCHAR(64); model_name:VARCHAR(128); status:VARCHAR(32); eval_method:VARCHAR(32); score_usefulness:FLOAT; score_accuracy:FLOAT; score_completeness:FLOAT; score_coherence:FLOAT; score_harmlessness:FLOAT; score_total:FLOAT; eval_detail:JSON; eval_log:TEXT; error_message:TEXT; evaluated_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+rate_limit_record | id:INTEGERPK
+rbac_role_permissions | id:INTEGERPK; role_id:INTEGER; permission_key:VARCHAR(64); created_at:DATETIME
+rbac_roles | id:INTEGERPK; name:VARCHAR(32); display_name:VARCHAR(64); description:TEXT; is_system:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+rbac_user_roles | id:INTEGERPK; user_id:INTEGER; role_id:INTEGER; granted_by:INTEGER; created_at:DATETIME
+referral_links | id:INTEGERPK; owner_user_id:INTEGER; code:VARCHAR(32); title:VARCHAR(100); description:VARCHAR(500); invite_type:VARCHAR(20); redirect_url:VARCHAR(500); scan_count:INTEGER; register_count:INTEGER; is_active:BOOLEAN; expires_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+relation_events | id:INTEGERPK; relation_id:INTEGER; from_user_id:INTEGER; to_user_id:INTEGER; event_type:VARCHAR(30); old_trust_score:FLOAT; new_trust_score:FLOAT; reason:VARCHAR(200); metadata_json:TEXT; created_at:DATETIME
+resource_platforms | id:INTEGERPK; name:VARCHAR(100); platform_no:VARCHAR(50); creator_id:INTEGER; annual_fee:INTEGER; description:TEXT; member_limit:INTEGER; visibility:VARCHAR(20); created_at:INTEGER; updated_at:INTEGER
+retention_cohorts | id:INTEGERPK; cohort_date:DATETIME; day_offset:INTEGER; user_count:INTEGER; active_count:INTEGER; retention_rate:INTEGER
+review | id:INTEGERPK
+revoked_token | id:INTEGERPK
+reward_redemptions | id:INTEGERPK; developer_id:INTEGER; points_spent:INTEGER; redemption_type:VARCHAR(32); quota_amount:INTEGER; description:VARCHAR(256); status:VARCHAR(20); created_at:DATETIME
+sdk_apps | id:INTEGERPK; name:VARCHAR(128); description:TEXT; app_id:VARCHAR(64); app_secret:VARCHAR(128); developer_id:INTEGER; sdk_type:VARCHAR(32); platform:VARCHAR(32); status:VARCHAR(16); version:VARCHAR(16); permissions:TEXT; redirect_uris:TEXT; icon_url:VARCHAR(512); homepage_url:VARCHAR(512); privacy_policy_url:VARCHAR(512); is_verified:BOOLEAN; is_public:BOOLEAN; total_installs:INTEGER; created_at:DATETIME; updated_at:DATETIME
+six_degree_path_cache | id:INTEGERPK; from_user_id:INTEGER; to_user_id:INTEGER; path_json:TEXT; path_length:INTEGER; total_trust_score:FLOAT; hit_count:INTEGER; expires_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+social_connections | id:VARCHAR(36)PK; user_id:INTEGER; contact_id:INTEGER; source:VARCHAR(32); message:TEXT; status:VARCHAR(16); strength:FLOAT; created_at:DATETIME; updated_at:DATETIME
+subscription | id:INTEGERPK
+team_invites | id:INTEGERPK; team_id:INTEGER; inviter_id:INTEGER; invitee_email:VARCHAR(256); invitee_phone:VARCHAR(20); invitee_id:INTEGER; role:VARCHAR(6); status:VARCHAR(8); token:VARCHAR(128); message:TEXT; expires_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+team_members | id:INTEGERPK; team_id:INTEGER; user_id:INTEGER; role:VARCHAR(6); title_in_team:VARCHAR(128); is_active:BOOLEAN; joined_at:DATETIME; invited_by:INTEGER; created_at:DATETIME
+teams | id:INTEGERPK; name:VARCHAR(128); slug:VARCHAR(64); description:TEXT; logo:VARCHAR(256); website:VARCHAR(256); industry:VARCHAR(64); size:VARCHAR(16); owner_id:INTEGER; max_members:INTEGER; is_active:BOOLEAN; created_at:DATETIME; updated_at:DATETIME
+tenants | id:INTEGERPK; name:VARCHAR(128); slug:VARCHAR(64); plan:VARCHAR(16); created_at:DATETIME
+token_budget_alert | id:INTEGERPK; alert_id:VARCHAR(64); rule_name:VARCHAR(128); alert_level:VARCHAR(16); current_usage:INTEGER; token_limit:INTEGER; usage_ratio:FLOAT; threshold:FLOAT; agent_name:VARCHAR(128); user_id:INTEGER; message:TEXT; detail:TEXT; is_resolved:BOOLEAN; resolved_at:DATETIME; created_at:DATETIME
+token_consumption_record | id:INTEGERPK; record_id:VARCHAR(64); agent_name:VARCHAR(128); user_id:INTEGER; session_id:VARCHAR(64); rule_name:VARCHAR(128); prompt_tokens:INTEGER; completion_tokens:INTEGER; total_tokens:INTEGER; is_truncated:BOOLEAN; is_downgraded:BOOLEAN; degrade_strategy:VARCHAR(32); estimated_cost:FLOAT; cost_per_token:FLOAT; model_name:VARCHAR(64); operation:VARCHAR(64); status:VARCHAR(32); metadata_json:TEXT; created_at:DATETIME
+trial_records | id:INTEGERPK; user_id:INTEGER; subscription_id:INTEGER; trial_tier:VARCHAR(32); status:VARCHAR(16); started_at:DATETIME; expires_at:DATETIME; converted_at:DATETIME; created_at:DATETIME
+trust_network | id:INTEGERPK; user_id:INTEGER; trusted_user_id:INTEGER; created_at:DATETIME
+unlock_records | id:INTEGERPK; user_id:INTEGER; target_user_id:INTEGER; match_record_id:INTEGER; created_at:DATETIME
+usage_counters | id:INTEGERPK; user_id:INTEGER; feature:VARCHAR(32); period:VARCHAR(16); used_count:INTEGER; limit_count:INTEGER; reset_at:DATETIME; model_type:VARCHAR(16); model_name:VARCHAR(64); token_type:VARCHAR(16); prompt_tokens:INTEGER; completion_tokens:INTEGER; total_tokens:INTEGER; token_cost:FLOAT; external_cost:FLOAT; markup_rate:FLOAT; created_at:DATETIME; updated_at:DATETIME
+user_consents | id:INTEGERPK; user_id:INTEGER; consent_type:VARCHAR(64); granted:BOOLEAN; consent_version:VARCHAR(16); source:VARCHAR(64); ip:VARCHAR(45); user_agent:VARCHAR(512); detail:TEXT; created_at:DATETIME
+user_event | id:INTEGERPK
+user_relations | id:INTEGERPK; from_user_id:INTEGER; to_user_id:INTEGER; relation_type:VARCHAR(20); label:VARCHAR(100); trust_score:FLOAT; interaction_count:INTEGER; last_interaction_at:DATETIME; bidirectional:BOOLEAN; is_active:BOOLEAN; source:VARCHAR(30); source_detail:VARCHAR(200); version:BIGINT; created_at:DATETIME; updated_at:DATETIME; deleted_at:DATETIME; is_deleted:BOOLEAN; organization_id:INTEGER
+user_tags | id:INTEGERPK; user_id:INTEGER; tag_type:VARCHAR(16); tag:VARCHAR(64); weight:FLOAT; source:VARCHAR(16); created_at:DATETIME
+users | id:INTEGERPK; username:VARCHAR(64); phone:VARCHAR(20); password_hash:VARCHAR(128); wechat_openid:VARCHAR(64); name:VARCHAR(64); company:VARCHAR(128); title:VARCHAR(128); intro:TEXT; avatar:VARCHAR(256); role:VARCHAR(16); membership_tier:VARCHAR(16); membership_expires_at:DATETIME; membership_synced_at:DATETIME; unlock_quota:INTEGER; quota_reset_at:DATETIME; created_at:DATETIME; updated_at:DATETIME
+visitor_logs | id:INTEGERPK; brochure_id:INTEGER; visitor_id:VARCHAR(64); visitor_ip:VARCHAR(48); visitor_name:VARCHAR(64); source:VARCHAR(32); page_viewed:VARCHAR(64); duration:INTEGER; interested:BOOLEAN; contact_msg:TEXT; visit_time:DATETIME
+wallet | id:INTEGERPK
+wallet_transaction | id:INTEGERPK
+webhook_subscriptions | id:INTEGERPK; user_id:INTEGER; name:VARCHAR(128); url:VARCHAR(512); secret:VARCHAR(128); events:TEXT; active:BOOLEAN; retry_count:INTEGER; timeout_seconds:INTEGER; last_triggered_at:DATETIME; last_response_code:INTEGER; last_error:TEXT; created_at:DATETIME; updated_at:DATETIME
+withdrawal | id:INTEGERPK

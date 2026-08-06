@@ -30,11 +30,20 @@ import logging
 import os
 from typing import Any
 
+from fastapi import Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from app.cache.interfaces import CacheProtocol
 from app.repositories.interfaces import KnowledgeRepositoryProtocol
 from app.broker.interfaces import ServiceBrokerProtocol
 from app.events.interfaces import EventBusProtocol
 from app.ai.gateway.interfaces import AIGatewayProtocol
+from app.database import get_db
+from app.models.brochure import Brochure
+from app.models.user import User
+from app.routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -493,3 +502,37 @@ async def shutdown_all() -> None:
     _knowledge_repo_instance = None
 
     logger.info("All system dependencies shut down")
+
+
+# ======================================================================
+# 鉴权公共依赖 — 资源归属校验
+# ======================================================================
+
+
+async def get_owned_brochure(
+    brochure_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Brochure:
+    """公共依赖：获取画册并校验访问权限（修复 BUG-003 名片枚举）。
+
+    权限规则：
+        - 画册不存在 → 404
+        - 私有画册（visibility=private）→ 仅本人 或 企业管理员（admin）可读
+        - 公开画册（public/platform/network）→ 登录用户可读
+
+    同时使用 selectinload 预加载 pages，避免 MissingGreenlet。
+    """
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
+    brochure = result.scalars().first()
+    if brochure is None:
+        raise HTTPException(status_code=404, detail="画册不存在")
+    if brochure.visibility == "private":
+        if brochure.user_id == current_user.id or current_user.role == "admin":
+            return brochure
+        raise HTTPException(status_code=403, detail="无权查看此画册")
+    return brochure

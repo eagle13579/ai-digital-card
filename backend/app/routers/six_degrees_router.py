@@ -40,7 +40,7 @@ router = APIRouter(prefix="/api/business-card/six-degrees", tags=["六度人脉"
 
 
 class CreateRelationRequest(BaseModel):
-    from_user_id: int = Field(..., description="关系发起方用户ID")
+    from_user_id: Optional[int] = Field(None, description="关系发起方用户ID（服务端强制取当前登录用户，忽略客户端传入值）")
     to_user_id: int = Field(..., description="关系接收方用户ID")
     relation_type: str = Field("invite", description="关系类型: invite/contact/brochure/coop/refer")
     trust_score: float = Field(0.5, ge=0.0, le=1.0, description="初始信任度 0.0~1.0")
@@ -132,6 +132,7 @@ def _serialize_event(event: RelationEvent) -> dict:
 @router.get("/{user_id}/network")
 async def get_user_network(
     user_id: int,
+    current_user: User = Depends(get_current_user),
     max_depth: int = Query(3, ge=1, le=6, description="人脉深度（1~6）"),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=1, le=100, description="每页条数"),
@@ -139,6 +140,9 @@ async def get_user_network(
     db: AsyncSession = Depends(get_db),
 ):
     """获取用户 N 度人脉网络"""
+    # 修复 BUG-005：仅本人可查看自己的人脉网络
+    if user_id != current_user.id:
+        raise_http_error(403, ErrorCode.FORBIDDEN, "只能查看自己的人脉网络")
     result = await db.run_sync(
         lambda s: find_network(
             s,
@@ -156,10 +160,14 @@ async def get_user_network(
 async def get_path(
     from_user_id: int,
     to_user_id: int,
+    current_user: User = Depends(get_current_user),
     max_depth: int = Query(6, ge=1, le=6, description="最大搜索深度（1~6）"),
     db: AsyncSession = Depends(get_db),
 ):
     """查找两个用户之间的最短六度路径"""
+    # 修复 BUG-005：路径起点必须为当前登录用户本人
+    if from_user_id != current_user.id:
+        raise_http_error(403, ErrorCode.FORBIDDEN, "路径起点必须为本人")
     if from_user_id == to_user_id:
         return success({
             "path": [from_user_id],
@@ -191,6 +199,9 @@ async def create_user_relation(
     db: AsyncSession = Depends(get_db),
 ):
     """创建用户关系边（信任连接）"""
+    # 修复 BUG-004：强制 from_user_id 取当前登录用户，禁止伪造他人身份建立关系
+    data.from_user_id = current_user.id
+
     if data.from_user_id == data.to_user_id:
         raise_http_error(400, ErrorCode.VALIDATION_ERROR, "不能与自己建立关系")
 
@@ -223,6 +234,7 @@ async def create_user_relation(
 @router.get("/relations/{user_id}")
 async def get_user_relations(
     user_id: int,
+    current_user: User = Depends(get_current_user),
     is_active: Optional[bool] = Query(None, description="筛选有效/无效关系"),
     relation_type: Optional[str] = Query(None, description="筛选关系类型"),
     page: int = Query(1, ge=1, description="页码"),
@@ -230,6 +242,9 @@ async def get_user_relations(
     db: AsyncSession = Depends(get_db),
 ):
     """获取用户的关系列表（作为发起方或接收方）"""
+    # 修复 BUG-005：仅本人可查看自己的关系列表
+    if user_id != current_user.id:
+        raise_http_error(403, ErrorCode.FORBIDDEN, "只能查看自己的关系列表")
     # 构建查询：用户作为 from_user_id 或 to_user_id 的关系
     conditions = [
         (UserRelation.from_user_id == user_id) | (UserRelation.to_user_id == user_id),
@@ -276,6 +291,16 @@ async def update_relation_trust(
     db: AsyncSession = Depends(get_db),
 ):
     """更新关系信任度"""
+    # 修复 BUG-004：校验关系归属 — 仅关系参与方（发起方/接收方）可更新信任度
+    result = await db.execute(
+        select(UserRelation).where(UserRelation.id == relation_id)
+    )
+    rel = result.scalars().first()
+    if rel is None:
+        raise_http_error(404, ErrorCode.NOT_FOUND, f"关系 {relation_id} 不存在")
+    if rel.from_user_id != current_user.id and rel.to_user_id != current_user.id:
+        raise_http_error(403, ErrorCode.FORBIDDEN, "无权更新该关系")
+
     try:
         relation = await db.run_sync(
             lambda s: update_trust_score(

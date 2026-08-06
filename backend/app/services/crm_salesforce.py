@@ -11,6 +11,7 @@ from urllib.parse import quote
 import httpx
 import requests
 
+from app.connectors.soql_utils import soql_escape, validate_email, validate_limit
 from app.services.crm_bridge import CRMProvider
 
 logger = logging.getLogger("crm_salesforce")
@@ -152,9 +153,15 @@ class SalesforceProvider(CRMProvider):
             return {"id": contact_id, "provider": "salesforce", "updated": True}
 
     async def _find_by_email(self, email: str) -> dict[str, Any] | None:
-        """通过 SOQL 查询按 Email 查找联系人。"""
-        escaped_email = email.replace("'", "\\'")
-        query = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{escaped_email}' LIMIT 1"
+        """通过 SOQL 查询按 Email 查找联系人（Email 白名单 + SOQL 严格转义，防注入）。"""
+        # Email 格式白名单：非法值直接返回 None，不拼入 SOQL
+        try:
+            safe_email = validate_email(email)
+        except ValueError as e:
+            logger.warning("SalesforceProvider: 非法 Email → %s", e)
+            return None
+        safe_email = soql_escape(safe_email)
+        query = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{safe_email}' LIMIT 1"
         url = f"{self._instance_url}/services/data/v58.0/query?q={quote(query)}"
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self._headers())
@@ -330,11 +337,15 @@ def export_contact(config: dict[str, Any], contact_data: dict[str, Any]) -> dict
     fields = {k: v for k, v in fields.items() if v}
 
     try:
-        # 3. 按 Email 查重
+        # 3. 按 Email 查重（Email 格式白名单 + SOQL 严格转义，防注入）
         email = fields.get("Email", "")
         if email:
-            escaped = email.replace("'", "\\'")
-            query = f"SELECT Id FROM Contact WHERE Email = '{escaped}' LIMIT 1"
+            try:
+                safe_email = soql_escape(validate_email(email))
+            except ValueError as e:
+                logger.warning("export_contact: 非法 Email 跳过查重 → %s", e)
+                safe_email = soql_escape(email)
+            query = f"SELECT Id FROM Contact WHERE Email = '{safe_email}' LIMIT 1"
             from urllib.parse import quote
             q_url = f"{base_url}/query?q={quote(query)}"
             search_resp = requests.get(q_url, headers=headers, timeout=REQUEST_TIMEOUT)

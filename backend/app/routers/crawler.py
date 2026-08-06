@@ -11,7 +11,6 @@ import asyncio
 import logging
 import re
 
-import httpx
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -19,6 +18,7 @@ from pydantic import BaseModel, Field
 from app.ai.extractor import AIExtractor
 from app.models.user import User
 from app.routers.auth import get_current_user
+from app.services.safe_fetch import safe_fetch_text, SSRFError
 
 logger = logging.getLogger(__name__)
 
@@ -81,21 +81,11 @@ class BatchScrapeResponse(BaseModel):
 # ── 核心抓取引擎 ─────────────────────────────────────────────────────
 
 
-async def _fetch_page(url: str, client: httpx.AsyncClient) -> tuple[str, str, str]:
+async def _fetch_page(url: str) -> tuple[str, str, str]:
     """抓取网页内容并解析，返回 (title, description, raw_text)"""
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-    }
-    resp = await client.get(url, headers=headers, timeout=15.0, follow_redirects=True)
-    resp.raise_for_status()
+    html = safe_fetch_text(url, max_bytes=5*1024*1024, timeout=15)
 
-    soup = BeautifulSoup(resp.text, "lxml")
+    soup = BeautifulSoup(html, "lxml")
 
     # 提取标题
     title = (soup.title.string.strip() if soup.title and soup.title.string else "")
@@ -192,8 +182,7 @@ async def _scrape_single(url: str, use_ai: bool = True) -> ScrapeResponse:
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
 
-        async with httpx.AsyncClient() as client:
-            title, description, raw_text = await _fetch_page(url, client)
+        title, description, raw_text = await _fetch_page(url)
 
         # 结构化字段提取
         contact = await _extract_contact(raw_text)
@@ -214,13 +203,8 @@ async def _scrape_single(url: str, use_ai: bool = True) -> ScrapeResponse:
                 ai_summary=ai_summary,
             ),
         )
-    except httpx.TimeoutException:
-        return ScrapeResponse(success=False, error=f"请求超时: {url}")
-    except httpx.HTTPStatusError as e:
-        return ScrapeResponse(
-            success=False,
-            error=f"HTTP错误 {e.response.status_code}: {url}",
-        )
+    except SSRFError as e:
+        return ScrapeResponse(success=False, error=f"SSRF拦截或请求失败: {e}")
     except Exception:
         logger.exception("Error scraping %s", url)
         return ScrapeResponse(success=False, error=f"采集处理异常: {url}")

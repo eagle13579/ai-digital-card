@@ -89,3 +89,4 @@ backend/data/learning_log.jsonl
 # Sensitive config / temp scripts
 backend/.env.free-claude-proxy
 backend/_verify_notification.py
+backend/nul

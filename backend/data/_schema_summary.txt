@@ -1,0 +1,357 @@
+== ab_test_decision_logs | rows=0 | cols=8 | idx=2
+   cols: id, experiment_id, decision, variant_name, p_value, reason, details, created_at
+   idxs: ix_ab_test_decision_logs_created_at, ix_ab_test_decision_logs_experiment_id
+== ab_test_events | rows=0 | cols=8 | idx=5
+   cols: id, experiment_id, variant_id, user_id, visitor_id, event_type, metadata, created_at
+   idxs: ix_ab_test_events_variant_id, ix_ab_test_events_experiment_id, ix_ab_test_events_visitor_id, ix_ab_test_events_user_id, ix_ab_test_events_created_at
+== ab_test_variants | rows=0 | cols=14 | idx=1
+   cols: id, experiment_id, name, description, sort_order, is_control, config, weight, is_default, impressions, clicks, conversions
+   idxs: ix_ab_test_variants_experiment_id
+== ab_tests | rows=0 | cols=15 | idx=3
+   cols: id, user_id, name, description, status, traffic_fraction, min_sample_size, significance_level, metric, target_brochure_id, created_at, updated_at
+   idxs: ix_ab_tests_user_id, ix_ab_tests_target_brochure_id, ix_ab_tests_status
+== accuracy_baselines | rows=0 | cols=23 | idx=5
+   cols: id, baseline_id, name, description, accuracy_threshold, pass_immediately, warn_threshold, quality_baseline_id, quality_avg_total, sample_count, passing_count, passing_rate
+   idxs: idx_accuracy_baseline_effective, ix_accuracy_baselines_agent_version, ix_accuracy_baselines_baseline_id, idx_accuracy_baseline_version, idx_accuracy_baseline_active
+== accuracy_calibration_records | rows=0 | cols=24 | idx=4
+   cols: id, calibration_id, calibration_type, status, old_baseline_id, old_accuracy_threshold, new_baseline_id, new_accuracy_threshold, new_pass_immediately, new_warn_threshold, delta, delta_percent
+   idxs: ix_accuracy_calibration_records_calibration_id, idx_accuracy_calib_status, idx_accuracy_calib_time, idx_accuracy_calib_type
+== accuracy_check_records | rows=0 | cols=25 | idx=5
+   cols: id, check_id, source, baseline_id, baseline_threshold, baseline_name, current_accuracy, current_sample_count, current_passing_count, deviation, deviation_percent, decision
+   idxs: idx_accuracy_check_source, ix_accuracy_check_records_check_id, idx_accuracy_check_time, idx_accuracy_check_decision, idx_accuracy_check_baseline
+== accuracy_gate_configs | rows=0 | cols=18 | idx=1
+   cols: id, gate_config_id, enabled, ci_block_enabled, default_accuracy_threshold, default_pass_immediately, default_warn_threshold, ci_block_on_warn, ci_required_samples, ci_auto_calibrate_on_degradation, auto_calibrate, monthly_calibration_day
+   idxs: ix_accuracy_gate_configs_gate_config_id
+== activity | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_activity_id
+== analytics_events | rows=0 | cols=9 | idx=4
+   cols: id, user_id, session_id, event_type, properties, page_url, ip_address, user_agent, created_at
+   idxs: ix_analytics_events_session_id, ix_analytics_events_created_at, ix_analytics_events_event_type, ix_analytics_events_user_id
+== api_key_usage | rows=0 | cols=5 | idx=1
+   cols: id, api_key_id, date, request_count, created_at
+   idxs: ix_api_key_usage_api_key_id
+== api_keys | rows=0 | cols=10 | idx=2
+   cols: id, user_id, key, name, permissions, rate_limit, is_active, last_used_at, created_at, updated_at
+   idxs: ix_api_keys_user_id, sqlite_autoindex_api_keys_1
+== api_usage_log | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_api_usage_log_id
+== app_store_plugin_installs | rows=0 | cols=7 | idx=3
+   cols: id, plugin_id, user_id, version_id, is_active, installed_at, uninstalled_at
+   idxs: ix_app_store_plugin_installs_user_id, ix_app_store_plugin_installs_plugin_id, ix_app_store_plugin_installs_id
+== app_store_plugin_reviews | rows=0 | cols=6 | idx=2
+   cols: id, plugin_id, reviewer_id, status, comments, created_at
+   idxs: ix_app_store_plugin_reviews_plugin_id, ix_app_store_plugin_reviews_id
+== app_store_plugin_versions | rows=0 | cols=10 | idx=2
+   cols: id, plugin_id, version, changelog, download_url, required_api_version, file_size, checksum, is_published, created_at
+   idxs: ix_app_store_plugin_versions_plugin_id, ix_app_store_plugin_versions_id
+== app_store_plugins | rows=0 | cols=18 | idx=4
+   cols: id, developer_id, name, description, icon_url, category, version, price, status, install_count, rating, rating_count
+   idxs: ix_app_store_plugins_developer_id, ix_app_store_plugins_id, ix_app_store_plugins_category, ix_app_store_plugins_status
+== approval_requests | rows=0 | cols=11 | idx=0
+   cols: id, team_id, requester_id, action, target_user_id, reason, status, reviewer_id, reject_reason, created_at, reviewed_at
+== audit_logs | rows=2608 | cols=8 | idx=4
+   cols: id, user_id, action, resource, detail, ip, user_agent, timestamp
+   idxs: idx_audit_user_action, idx_audit_user_id, idx_audit_action, idx_audit_timestamp
+== brochures | rows=20 | cols=14 | idx=1
+   cols: id, user_id, title, cover, purpose, pages_count, status, share_token, view_count, album_meta, created_at, updated_at
+   idxs: sqlite_autoindex_brochures_1
+== business_card | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_business_card_id
+== business_need | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_business_need_id
+== circuit_breaker_state | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_circuit_breaker_state_id
+== connections | rows=120 | cols=9 | idx=1
+   cols: id, user_id, contact_id, source, status, strength, label, created_at, updated_at
+   idxs: sqlite_autoindex_connections_1
+== contact | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_contact_id
+== contacts | rows=0 | cols=14 | idx=1
+   cols: id, user_id, name, phone_hash, phone_enc, phone_last4, company, position, source, is_matched, matched_user_id, created_at
+   idxs: ix_contacts_user_id
+== contract | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_contract_id
+== crm_activities | rows=0 | cols=11 | idx=2
+   cols: id, owner_id, contact_id, deal_id, activity_type, title, description, source_model, source_record_id, activity_date, created_at
+   idxs: ix_crm_activities_owner_id, ix_crm_activities_contact_id
+== crm_campaign_recipients | rows=0 | cols=14 | idx=2
+   cols: id, campaign_id, contact_id, email, name, tracking_token, sent, sent_at, send_error, opened, opened_at, unsubscribed
+   idxs: ix_crm_campaign_recipients_tracking_token, ix_crm_campaign_recipients_campaign_id
+== crm_campaigns | rows=0 | cols=14 | idx=1
+   cols: id, owner_id, name, subject, template_name, template_params, target_filter, status, total_recipients, sent_count, opened_count, unsubscribed_count
+   idxs: ix_crm_campaigns_owner_id
+== crm_contacts | rows=0 | cols=20 | idx=2
+   cols: id, owner_id, user_id, name, phone, email, company, title, department, avatar, intro, source
+   idxs: ix_crm_contacts_user_id, ix_crm_contacts_owner_id
+== crm_deals | rows=0 | cols=13 | idx=2
+   cols: id, owner_id, contact_id, pipeline_stage_id, title, value, currency, probability, expected_close_date, status, lost_reason, created_at
+   idxs: ix_crm_deals_contact_id, ix_crm_deals_owner_id
+== crm_documents | rows=0 | cols=15 | idx=1
+   cols: id, owner_id, contact_id, deal_id, doc_type, template_name, title, doc_number, content_html, content_data, total_amount, currency
+   idxs: ix_crm_documents_owner_id
+== crm_form_submission_logs | rows=0 | cols=10 | idx=1
+   cols: id, form_id, submitter_ip, submitter_ua, payload, contact_id, honeypot_triggered, success, error_message, created_at
+   idxs: ix_crm_form_submission_logs_form_id
+== crm_forms | rows=0 | cols=18 | idx=1
+   cols: id, owner_id, name, title, description, fields, submit_action, redirect_url, success_message, enable_honeypot, enable_rate_limit, auto_tags
+   idxs: ix_crm_forms_owner_id
+== crm_notes | rows=0 | cols=8 | idx=1
+   cols: id, owner_id, contact_id, deal_id, content, is_pinned, created_at, updated_at
+   idxs: ix_crm_notes_owner_id
+== crm_pipeline_stages | rows=0 | cols=9 | idx=1
+   cols: id, user_id, name, sort_order, color, is_default, is_closed, win_probability, created_at
+   idxs: ix_crm_pipeline_stages_user_id
+== crm_workflow_logs | rows=0 | cols=9 | idx=1
+   cols: id, owner_id, rule_id, rule_name, trigger_event, context_snapshot, action_results, success, created_at
+   idxs: ix_crm_workflow_logs_owner_id
+== crm_workflow_rules | rows=0 | cols=10 | idx=1
+   cols: id, owner_id, name, description, trigger_event, conditions, actions, enabled, created_at, updated_at
+   idxs: ix_crm_workflow_rules_owner_id
+== customer_journey_stages | rows=0 | cols=9 | idx=1
+   cols: id, contact_id, pipeline_id, stage, entered_at, duration_days, actions_taken, score, next_action
+   idxs: ix_customer_journey_stages_contact_id
+== deal | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_deal_id
+== deal_activity | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_deal_activity_id
+== developer_reward_balances | rows=0 | cols=6 | idx=2
+   cols: id, developer_id, total_points, used_points, balance, updated_at
+   idxs: ix_developer_reward_balances_id, ix_developer_reward_balances_developer_id
+== developer_rewards | rows=0 | cols=10 | idx=2
+   cols: id, developer_id, reward_type, points, reason, source_id, source_desc, status, created_at, issued_at
+   idxs: ix_developer_rewards_id, ix_developer_rewards_developer_id
+== email_campaigns | rows=0 | cols=11 | idx=0
+   cols: id, name, subject, content_template, target_segment, scheduled_at, sent_count, open_count, click_count, status, created_at
+== enterprise | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_enterprise_id
+== enterprise_relation | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_enterprise_relation_id
+== enterprise_subscriptions | rows=0 | cols=12 | idx=0
+   cols: id, user_id, company_name, seats, tier, start_date, end_date, auto_renew, status, features, created_at, updated_at
+== error_logs | rows=0 | cols=11 | idx=3
+   cols: id, msg, url, line, col, stack, page, user_id, user_agent, ip, created_at
+   idxs: idx_error_log_page, idx_error_log_user_id, idx_error_log_created_at
+== escrow_deals | rows=0 | cols=9 | idx=4
+   cols: id, buyer_id, seller_id, amount, status, title, description, created_at, updated_at
+   idxs: ix_escrow_deals_id, ix_escrow_deals_seller_id, ix_escrow_deals_status, ix_escrow_deals_buyer_id
+== escrow_disputes | rows=0 | cols=10 | idx=2
+   cols: id, deal_id, initiator_id, reason, description, status, evidence, resolution, created_at, resolved_at
+   idxs: ix_escrow_disputes_deal_id, ix_escrow_disputes_id
+== escrow_milestones | rows=0 | cols=7 | idx=2
+   cols: id, deal_id, name, description, status, due_date, completed_at
+   idxs: ix_escrow_milestones_deal_id, ix_escrow_milestones_id
+== funnel_definitions | rows=0 | cols=6 | idx=1
+   cols: id, funnel_name, step_name, step_order, event_type, time_limit_minutes
+   idxs: ix_funnel_definitions_funnel_name
+== gaia_evolution_events | rows=0 | cols=8 | idx=4
+   cols: id, event_type, event_source, description, metadata, reference_type, reference_id, created_at
+   idxs: ix_gaia_evolution_events_created_at, ix_gaia_evolution_events_event_type, idx_gaia_event_ref, idx_gaia_event_type_time
+== gaia_knowledge | rows=0 | cols=13 | idx=5
+   cols: id, source, source_id, knowledge_type, title, content, tags, confidence, impact_score, is_active, vector_embedded, created_at
+   idxs: idx_gaia_knowledge_active, idx_gaia_knowledge_source, ix_gaia_knowledge_knowledge_type, ix_gaia_knowledge_source, idx_gaia_knowledge_type
+== gaia_model_weights | rows=0 | cols=9 | idx=2
+   cols: id, module, weights, version, description, training_run_id, is_active, created_at, updated_at
+   idxs: idx_gaia_weights_module_active, ix_gaia_model_weights_module
+== gaia_training_runs | rows=0 | cols=14 | idx=2
+   cols: id, status, trigger, knowledge_count, feedback_count, weights_count, vector_index_size, duration_ms, metrics, error_message, started_at, completed_at
+   idxs: idx_gaia_training_status, ix_gaia_training_runs_status
+== import_history | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_import_history_id
+== integrations | rows=0 | cols=12 | idx=1
+   cols: id, user_id, provider, name, enabled, config, last_sync_at, webhook_url, webhook_secret, webhook_enabled, created_at, updated_at
+   idxs: ix_integrations_user_id
+== invitation_codes | rows=0 | cols=11 | idx=2
+   cols: id, code, batch_id, max_uses, used_count, created_by, expires_at, is_active, remark, created_at, updated_at
+   idxs: ix_invitation_codes_code, ix_invitation_codes_id
+== invoices | rows=0 | cols=17 | idx=1
+   cols: id, invoice_no, user_id, amount, tax_rate, tax_amount, total_amount, status, order_no, buyer_name, buyer_tax_id, seller_name
+   idxs: sqlite_autoindex_invoices_1
+== knowledge_models | rows=0 | cols=14 | idx=5
+   cols: id, model_id, category, name, source, source_ref, content, tags, confidence, version, is_active, vector_embedded
+   idxs: ix_knowledge_models_category, idx_km_category, idx_km_model_id, ix_knowledge_models_model_id, idx_km_active
+== match_credit_log | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_match_credit_log_id
+== match_records | rows=7337 | cols=8 | idx=0
+   cols: id, user_a_id, user_b_id, match_score, status, common_tags, source, created_at
+== membership_order | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_membership_order_id
+== messages | rows=0 | cols=7 | idx=5
+   cols: id, sender_id, receiver_id, content, is_read, conversation_id, created_at
+   idxs: ix_messages_created_at, ix_messages_sender_id, ix_messages_conversation_id, ix_messages_is_read, ix_messages_receiver_id
+== metrics_snapshot | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_metrics_snapshot_id
+== nfc_cards | rows=0 | cols=7 | idx=2
+   cols: id, user_id, nfc_uid, card_data_json, vcard_raw, created_at, updated_at
+   idxs: ix_nfc_cards_user_id, ix_nfc_cards_nfc_uid
+== nfc_tap_records | rows=0 | cols=5 | idx=2
+   cols: id, from_user_id, to_user_id, nfc_uid, created_at
+   idxs: ix_nfc_tap_records_from_user_id, ix_nfc_tap_records_to_user_id
+== online_matching_events | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_online_matching_events_id
+== online_matching_feedback | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_online_matching_feedback_id
+== online_matching_registrations | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_online_matching_registrations_id
+== order | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_order_id
+== organization_invites | rows=0 | cols=6 | idx=2
+   cols: id, org_id, email, token, status, created_at
+   idxs: ix_organization_invites_id, ix_organization_invites_token
+== organization_members | rows=0 | cols=5 | idx=1
+   cols: id, org_id, user_id, role, joined_at
+   idxs: ix_organization_members_id
+== organizations | rows=0 | cols=5 | idx=2
+   cols: id, name, slug, owner_id, created_at
+   idxs: ix_organizations_slug, ix_organizations_id
+== pages | rows=0 | cols=8 | idx=0
+   cols: id, brochure_id, sort_order, content_type, content, image_url, media_url, ai_summary
+== payment_orders | rows=0 | cols=12 | idx=1
+   cols: id, order_no, user_id, membership_tier, channel, channel_order_no, status, total_cents, paid_at, raw_callback, created_at, updated_at
+   idxs: sqlite_autoindex_payment_orders_1
+== payment_transaction | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_payment_transaction_id
+== platform_members | rows=0 | cols=5 | idx=1
+   cols: id, platform_id, user_id, role, joined_at
+   idxs: sqlite_autoindex_platform_members_1
+== platform_opportunities | rows=0 | cols=10 | idx=0
+   cols: id, platform_id, creator_id, title, description, industry, city, budget, status, created_at
+== platforms | rows=0 | cols=14 | idx=1
+   cols: id, name, platform_no, creator_id, annual_fee, description, created_at, updated_at, province, city, district, contact_name
+   idxs: sqlite_autoindex_platforms_1
+== private_board_order | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_private_board_order_id
+== product | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_product_id
+== prompt_templates | rows=0 | cols=13 | idx=3
+   cols: id, name, category, version, description, system_prompt, user_prompt_template, parameters_schema, output_schema, tags, is_active, created_at
+   idxs: idx_prompt_category, idx_prompt_active, sqlite_autoindex_prompt_templates_1
+== quality_baselines | rows=0 | cols=25 | idx=5
+   cols: id, baseline_id, name, description, agent_version, model_name, canary_deployment_id, avg_usefulness, avg_accuracy, avg_completeness, avg_coherence, avg_harmlessness
+   idxs: idx_quality_baseline_version, idx_quality_baseline_active, ix_quality_baselines_agent_version, ix_quality_baselines_baseline_id, ix_quality_baselines_model_name
+== quality_eval_jobs | rows=0 | cols=14 | idx=1
+   cols: id, job_id, status, eval_method, sample_ids, model_config, total_samples, completed_samples, failed_samples, baseline_id, summary, created_at
+   idxs: ix_quality_eval_jobs_job_id
+== quality_samples | rows=0 | cols=25 | idx=5
+   cols: id, sample_id, input_text, agent_output, expected_output, category, tags, sample_meta, canary_deployment_id, agent_version, model_name, status
+   idxs: idx_quality_sample_category, idx_quality_sample_status, idx_quality_sample_created, ix_quality_samples_category, ix_quality_samples_sample_id
+== rate_limit_record | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_rate_limit_record_id
+== rbac_role_permissions | rows=0 | cols=4 | idx=1
+   cols: id, role_id, permission_key, created_at
+   idxs: sqlite_autoindex_rbac_role_permissions_1
+== rbac_roles | rows=0 | cols=7 | idx=1
+   cols: id, name, display_name, description, is_system, created_at, updated_at
+   idxs: sqlite_autoindex_rbac_roles_1
+== rbac_user_roles | rows=0 | cols=5 | idx=1
+   cols: id, user_id, role_id, granted_by, created_at
+   idxs: sqlite_autoindex_rbac_user_roles_1
+== referral_links | rows=0 | cols=13 | idx=4
+   cols: id, owner_user_id, code, title, description, invite_type, redirect_url, scan_count, register_count, is_active, expires_at, created_at
+   idxs: ix_referral_links_code, ix_referral_links_id, idx_referral_owner, ix_referral_links_owner_user_id
+== relation_events | rows=0 | cols=10 | idx=5
+   cols: id, relation_id, from_user_id, to_user_id, event_type, old_trust_score, new_trust_score, reason, metadata_json, created_at
+   idxs: ix_relation_events_created_at, ix_relation_events_to_user_id, ix_relation_events_relation_id, ix_relation_events_from_user_id, ix_relation_events_id
+== resource_platforms | rows=0 | cols=10 | idx=1
+   cols: id, name, platform_no, creator_id, annual_fee, description, member_limit, visibility, created_at, updated_at
+   idxs: sqlite_autoindex_resource_platforms_1
+== retention_cohorts | rows=0 | cols=6 | idx=1
+   cols: id, cohort_date, day_offset, user_count, active_count, retention_rate
+   idxs: ix_retention_cohorts_cohort_date
+== review | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_review_id
+== revoked_token | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_revoked_token_id
+== reward_redemptions | rows=0 | cols=8 | idx=2
+   cols: id, developer_id, points_spent, redemption_type, quota_amount, description, status, created_at
+   idxs: ix_reward_redemptions_id, ix_reward_redemptions_developer_id
+== sdk_apps | rows=0 | cols=20 | idx=5
+   cols: id, name, description, app_id, app_secret, developer_id, sdk_type, platform, status, version, permissions, redirect_uris
+   idxs: idx_sdk_developer, ix_sdk_apps_developer_id, idx_sdk_type_status, idx_sdk_status, sqlite_autoindex_sdk_apps_1
+== six_degree_path_cache | rows=0 | cols=10 | idx=5
+   cols: id, from_user_id, to_user_id, path_json, path_length, total_trust_score, hit_count, expires_at, created_at, updated_at
+   idxs: idx_path_cache_expires, ix_six_degree_path_cache_from_user_id, ix_six_degree_path_cache_id, ix_six_degree_path_cache_to_user_id, sqlite_autoindex_six_degree_path_cache_1
+== social_connections | rows=0 | cols=9 | idx=1
+   cols: id, user_id, contact_id, source, message, status, strength, created_at, updated_at
+   idxs: sqlite_autoindex_social_connections_1
+== subscription | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_subscription_id
+== team_invites | rows=0 | cols=13 | idx=1
+   cols: id, team_id, inviter_id, invitee_email, invitee_phone, invitee_id, role, status, token, message, expires_at, created_at
+   idxs: sqlite_autoindex_team_invites_1
+== team_members | rows=0 | cols=9 | idx=0
+   cols: id, team_id, user_id, role, title_in_team, is_active, joined_at, invited_by, created_at
+== teams | rows=0 | cols=13 | idx=1
+   cols: id, name, slug, description, logo, website, industry, size, owner_id, max_members, is_active, created_at
+   idxs: sqlite_autoindex_teams_1
+== tenants | rows=0 | cols=5 | idx=1
+   cols: id, name, slug, plan, created_at
+   idxs: sqlite_autoindex_tenants_1
+== token_budget_alert | rows=0 | cols=15 | idx=4
+   cols: id, alert_id, rule_name, alert_level, current_usage, token_limit, usage_ratio, threshold, agent_name, user_id, message, detail
+   idxs: ix_token_budget_alert_rule_name, ix_token_budget_alert_alert_id, ix_token_budget_alert_created_at, ix_token_budget_alert_id
+== token_consumption_record | rows=0 | cols=19 | idx=7
+   cols: id, record_id, agent_name, user_id, session_id, rule_name, prompt_tokens, completion_tokens, total_tokens, is_truncated, is_downgraded, degrade_strategy
+   idxs: ix_token_consumption_record_created_at, ix_token_consumption_record_rule_name, ix_token_consumption_record_id, ix_token_consumption_record_agent_name, ix_token_consumption_record_record_id
+== trial_records | rows=0 | cols=9 | idx=0
+   cols: id, user_id, subscription_id, trial_tier, status, started_at, expires_at, converted_at, created_at
+== trust_network | rows=50 | cols=4 | idx=0
+   cols: id, user_id, trusted_user_id, created_at
+== unlock_records | rows=0 | cols=5 | idx=0
+   cols: id, user_id, target_user_id, match_record_id, created_at
+== usage_counters | rows=0 | cols=18 | idx=2
+   cols: id, user_id, feature, period, used_count, limit_count, reset_at, model_type, model_name, token_type, prompt_tokens, completion_tokens
+   idxs: ix_usage_counters_user_id, sqlite_autoindex_usage_counters_1
+== user_consents | rows=0 | cols=10 | idx=3
+   cols: id, user_id, consent_type, granted, consent_version, source, ip, user_agent, detail, created_at
+   idxs: idx_consent_user_type, idx_consent_user_created, ix_user_consents_user_id
+== user_event | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_user_event_id
+== user_relations | rows=0 | cols=18 | idx=6
+   cols: id, from_user_id, to_user_id, relation_type, label, trust_score, interaction_count, last_interaction_at, bidirectional, is_active, source, source_detail
+   idxs: idx_user_relation_active, ix_user_relations_from_user_id, ix_user_relations_id, ix_user_relations_to_user_id, idx_user_relation_to
+== user_tags | rows=806 | cols=7 | idx=0
+   cols: id, user_id, tag_type, tag, weight, source, created_at
+== users | rows=104 | cols=18 | idx=3
+   cols: id, username, phone, password_hash, wechat_openid, name, company, title, intro, avatar, role, membership_tier
+   idxs: sqlite_autoindex_users_3, sqlite_autoindex_users_2, sqlite_autoindex_users_1
+== visitor_logs | rows=25 | cols=11 | idx=0
+   cols: id, brochure_id, visitor_id, visitor_ip, visitor_name, source, page_viewed, duration, interested, contact_msg, visit_time
+== wallet | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_wallet_id
+== wallet_transaction | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_wallet_transaction_id
+== webhook_subscriptions | rows=0 | cols=14 | idx=1
+   cols: id, user_id, name, url, secret, events, active, retry_count, timeout_seconds, last_triggered_at, last_response_code, last_error
+   idxs: ix_webhook_subscriptions_user_id
+== withdrawal | rows=0 | cols=1 | idx=1
+   cols: id
+   idxs: ix_withdrawal_id

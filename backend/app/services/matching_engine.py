@@ -443,7 +443,7 @@ class MatchEngine:
         return record
 
     # ── PLT 2-cycle enhanced matching ─────────────────────────────────
-    # Source: Agent创世纪·Loop Coder v2 并行循环架构吸收
+    # Source: Agent创世纪·Loop Coder v2 → baize_libs.plt_engine
     # Core: 第2次循环聚焦TOP-K精细重排，精度+15-20%
 
     @staticmethod
@@ -452,76 +452,18 @@ class MatchEngine:
         user_a_id: int,
         top_candidates: list[dict],
     ) -> list[dict]:
-        """PLT第2次循环精炼 — 对TOP候选进行更精细的语义重排
-
-        Args:
-            user_a_id: 当前用户
-            top_candidates: 第1次循环的TOP-N候选列表
-                [{user_id, score, tag_overlap, vector_semantic, tag_weight, common_tags}, ...]
-        Returns:
-            精炼后重新排序的候选列表
-        """
+        """PLT第2次循环精炼 — 委托到baize_libs.plt_engine"""
         if not top_candidates:
             return []
 
-        # 取TOP-5做精细重排（第2次滑动窗口聚焦）
-        window = top_candidates[:5]
+        import sys as _sys
+        _bl = r"D:\__archive\enterprise-rag\baize_libs"
+        _sp = [i for i, p in enumerate(_sys.path) if 'site-packages' in p]
+        _sys.path.insert(_sp[-1] + 1 if _sp else len(_sys.path), _bl)
+        from baize_libs.plt_engine import plt_rerank as _plt
 
-        # [PLT优化] 用户A的向量只需构建一次，提到循环外
+        # Build user vectors once (outside PLT loop - optimization)
         provide_a = await MatchEngine._build_tag_vector(db, user_a_id, "provide")
         need_a = await MatchEngine._build_tag_vector(db, user_a_id, "need")
-        parts_a = await MatchEngine._build_user_document(db, user_a_id)
-        doc_a = " ".join(parts_a)
 
-        for match in window:
-            uid = match.get("user_id") or match.get("match", {}).get("user_id")
-            if not uid:
-                continue
-
-            # [PLT优化] 用户B的向量, 缓存TOP-5内不重复用的uid
-            provide_b = await MatchEngine._build_tag_vector(db, uid, "provide")
-            need_b = await MatchEngine._build_tag_vector(db, uid, "need")
-
-            # 更精细的标签重叠 — 考虑标签语义而非精确匹配
-            refined_overlap = 0.0
-            for tag_a, wa in provide_a.items():
-                for tag_b, wb in need_b.items():
-                    # 部分匹配也计分（中文字段、同义词）
-                    if tag_a in tag_b or tag_b in tag_a:
-                        refined_overlap += wa * wb * 0.8
-
-            for tag_b, wb in provide_b.items():
-                for tag_a, wa in need_a.items():
-                    if tag_b in tag_a or tag_a in tag_b:
-                        refined_overlap += wb * wa * 0.8
-
-            norm = len(window) * 1.0
-            refined_tag_score = min(1.0, refined_overlap / norm) if norm > 0 else 0.0
-
-            # 更精细的向量语义 — 全文档拼接对比
-            parts_a = await MatchEngine._build_user_document(db, user_a_id)
-            parts_b = await MatchEngine._build_user_document(db, uid)
-            doc_b = " ".join(parts_b)
-
-            try:
-                refined_semantic = VectorSearchEngine.compute_semantic_similarity(
-                    tags_a=parts_a, tags_b=parts_b,
-                )
-                refined_semantic = max(0.0, float(refined_semantic))
-            except Exception:
-                refined_semantic = match.get("vector_semantic", 0.0)
-
-            # PLT融合公式 — 第2次更偏重语义和精细重叠
-            plt_score = refined_tag_score * 0.35 + refined_semantic * 0.50 + match.get("tag_weight", 0.0) * 0.15
-            plt_score = min(1.0, plt_score * 1.1)  # PLT增益因子
-
-            match["score"] = round(plt_score, 4)
-            match["plt_refined"] = True
-            match["refined_tag_overlap"] = round(refined_tag_score, 4)
-            match["refined_semantic"] = round(refined_semantic, 4)
-
-        # 按PLT精炼后分数重排
-        window.sort(key=lambda x: x["score"], reverse=True)
-
-        # 非TOP-5部分保持原序
-        return window + top_candidates[5:]
+        return _plt(top_candidates, top_k=5, plt_gain=1.1)

@@ -21,11 +21,20 @@ Usage:
 
 from __future__ import annotations
 
+import logging
 import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Callable, Optional
+
+from baize_libs.generic_agent.agent_safety import (
+    TurnProgressiveWarnings,
+    ProgressiveSignal,
+)
+
+
+logger = logging.getLogger(__name__)
 
 
 # ── 状态定义 ────────────────────────────────────────────────────────────────
@@ -276,6 +285,13 @@ class OrchestratorLoop:
         self._decompose_fn = decompose_fn or self._default_decompose
         self.state = OrchestratorState()
 
+        # ── 渐进式安全警告 ─────────────────────────────────────────────
+        self._turn_counter: int = 0
+        """编排器内部轮次计数器。每轮委派递增。"""
+
+        self._progressive_warnings: TurnProgressiveWarnings = TurnProgressiveWarnings()
+        """渐进式警告跟踪器，根据轮次施加安全约束。"""
+
     async def orchestrate(self, goal: str) -> dict[str, Any]:
         """编排器主循环 — 执行一个完整目标。
 
@@ -323,7 +339,29 @@ class OrchestratorLoop:
         # 主委派循环
         all_results: list[DelegateResult] = []
 
+        # 重置渐进式警告轮次计数
+        self._turn_counter = 0
+
         while pending and self.state.delegation_count < self._max_delegations:
+            # ── 递增轮次计数 ──────────────────────────────────────────
+            self._turn_counter += 1
+            self._progressive_warnings._turn = self._turn_counter
+
+            # ── 检查渐进式安全信号 ─────────────────────────────────────
+            pw_signal = TurnProgressiveWarnings.get_signal(
+                turn=self._turn_counter,
+                in_plan_mode=False,  # 编排器默认不在 Plan 模式
+            )
+
+            # "break" 级别：直接跳出循环，中止委派
+            if pw_signal is not None and pw_signal.action == "break":
+                logger.warning(
+                    "[TurnProgressiveWarnings] turn=%d action=break — %s",
+                    self._turn_counter,
+                    pw_signal.message,
+                )
+                break
+
             task_id = pending.pop(0)
             task = self.state.task_tree.get(task_id)
             if task is None:
@@ -347,6 +385,32 @@ class OrchestratorLoop:
                 self.state.completed_count += 1
             elif result.is_failure():
                 self.state.failed_count += 1
+
+            # ── 渐进式安全信号 — 注入警告到结果 ────────────────────────
+            if pw_signal is not None:
+                if pw_signal.action == "inject_warning":
+                    # 注入警告到委派结果的 artifacts 中
+                    result.artifacts["_turn_warning"] = {
+                        "turn": self._turn_counter,
+                        "level": pw_signal.level,
+                        "message": pw_signal.message,
+                    }
+                    logger.info(
+                        "[TurnProgressiveWarnings] 注入警告: turn=%d %s",
+                        self._turn_counter,
+                        pw_signal.message,
+                    )
+                elif pw_signal.action == "ask_user":
+                    # "ask_user" 级别：记录危险信号，推动下一轮前需用户介入
+                    result.artifacts["_must_ask_user"] = {
+                        "turn": self._turn_counter,
+                        "message": pw_signal.message,
+                    }
+                    logger.warning(
+                        "[TurnProgressiveWarnings] 必须 ask_user: turn=%d %s",
+                        self._turn_counter,
+                        pw_signal.message,
+                    )
 
             # Phase 4: 更新 — 决策下一步
             self.state.phase = Phase.UPDATE

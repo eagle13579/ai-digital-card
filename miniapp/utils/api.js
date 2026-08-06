@@ -191,6 +191,26 @@ const matchApi = {
   },
 }
 
+// ===== 三蛋蛋企业匹配引擎 (Transphee 1000万企业库) =====
+const transpheeApi = {
+  /** 探活 (无需登录, 不耗配额) */
+  health() {
+    return get('/api/transphee/health')
+  },
+  /** 今日配额 (100次/天, 北京0点重置) */
+  quota() {
+    return get('/api/transphee/quota')
+  },
+  /**
+   * 企业匹配: 输入卖家信息 → 潜在买家名单
+   * @param {Object} data { company_name(必填), product, business, typical_customers, page, province: [] }
+   * 返回 list 按 rank 排序; total 可能为下限(10000+); 跨页去重按 cname
+   */
+  match(data) {
+    return post('/api/transphee/match', data)
+  },
+}
+
 // ===== 信任模块 =====
 const trustApi = {
   getNetwork() {
@@ -552,6 +572,7 @@ module.exports = {
   brochureApi,
   tagApi,
   matchApi,
+  transpheeApi,
   trustApi,
   visitorApi,
   aiApi,
