@@ -56,7 +56,7 @@ SKIP_DIRS = {"__pycache__", ".git", "node_modules", "venv", ".venv", "dist", "bu
              "audio_cache", "image_cache", "cache", "backup", "_backups", "logs",
              "data", "models", "assets", "images", "static"}
 SKIP_NAME_PREFIX = (".", "_index")
-SKIP_NAME_KW = (".env", "secret", "password", "token", "apikey", "api_key", "credential")
+SKIP_NAME_KW = (".env", "secret", "password", "token", "apikey", "api_key", "credential", "sync-conflict")
 # 配置类文件精确排除（config.yaml 等运行配置常含密钥——GitHub secret scanning 会拦截 push）
 SKIP_NAME_EXACT = {"config.yaml", "config.yml", "settings.yaml", "settings.yml",
                    "secrets.yaml", "secret.yaml", "credentials.yaml", "auth.yaml",
