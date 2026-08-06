@@ -130,7 +130,7 @@ def recommend_matches(user_id: int, top_k: int = 10, min_score: float = 0.1) -> 
                 s = w * other_needs[tag]
                 score += s
                 matched_tags.add(tag)
-            max_score += w * 5  # 假设对方权重最大5
+            max_score += w  # 对方权重范围 [0,1]，最大贡献 = w * 1.0
 
         # 我需要 匹配 对方提供
         for tag, w in my_needs.items():
@@ -138,7 +138,7 @@ def recommend_matches(user_id: int, top_k: int = 10, min_score: float = 0.1) -> 
                 s = w * other_provides[tag]
                 score += s
                 matched_tags.add(tag)
-            max_score += w * 5
+            max_score += w
 
         if max_score > 0:
             final_score = score / max_score
