@@ -1,0 +1,19 @@
+name: MiniMax智能PPTX演示文稿生成
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — pptx-generator (2026-07-05)
+description: 基于Token化设计系统的PPTX演示文稿生成器。PptxGenJS从零创建(封面/目录/内容/分节/总结)，XML编辑已有PPTX，markitdown文本提取。
+atoms:
+  - PPTX-TOKEN: Token化演示设计(商务/科技/创意/学术四种风格)
+  - PPTX-5SLIDE: 五种标准页型(Cover→TOC→Content→Divider→Summary)
+  - PPTX-XML: XML编辑工作流(解压→编辑→重压)
+  - PPTX-MARKITDOWN: markitdown内容提取
+products:
+  - 赛博参谋(计然) — 商业路演PPT自动生成
+  - 中韩出海数智港 — 商务提案PPT
+  - 鸣蜩(飞阅会) — 会议汇报PPT
+employees:
+  - 计然P8(商业)
+  - 商羊P8(市场)
+  - 文鳐P9(文档)

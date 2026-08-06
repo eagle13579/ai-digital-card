@@ -1,0 +1,67 @@
+feature_id: "F-体系-原子挖掘-13"
+name: "零依赖统一网关"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M13-零依赖统一网关"
+source_project: "AI获客"
+source_location: "D:/AI获客/gateway.py: http.server + sys.path + try/except 模块发现"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "使用Python标准库http.server构建的零第三方依赖统一API网关，自动发现加载2B/2C/社媒三子模块"
+what_it_does: |
+  场景：链客宝内部运维面板/管理后台需要轻量级快速部署，不引入额外框架依赖。
+  问题：为运维工具引入FastAPI/Flask会增加依赖管理和部署复杂度，小型内部工具需要极简方案。
+  价值：借鉴AI获客gateway.py的零依赖模式——仅使用Python http.server stdlib，无需任何第三方库，
+  即可构建功能完整的API网关，自动发现并加载子模块。适合链客宝内部工具/管理面板/运维接口的快速搭建。
+  架构亮点：零第三方依赖 + 模块自动发现(sys.path+try/except) + 统一路由分发 + JSON序列化内置。
+
+input: |
+  - HTTP请求: 标准HTTP/1.1请求(GET/POST/PUT/DELETE)
+  - 路由映射: URL路径→处理函数的映射表
+  - 子模块路径: 待发现的子模块目录列表
+  - 请求体: POST/PUT的JSON请求体(可选)
+  - 查询参数: URL查询参数字典(可选)
+
+output: |
+  - HTTP响应: 标准HTTP响应(状态码+头+JSON体)
+  - 路由结果: 请求分发到对应处理函数的执行结果
+  - 错误响应: 404/405/500的标准错误JSON格式
+  - 模块列表: 已发现并加载的子模块清单
+
+sop: |
+  1. 启动HTTP服务器，绑定到指定端口(默认8080)
+  2. 扫描配置的子模块路径，通过sys.path.insert + try/except ImportError加载
+  3. 为每个加载成功的模块注册路由前缀和处理器
+  4. 请求到达 → 解析请求方法和URL路径
+  5. 路由匹配 → 按最长前缀匹配分发到对应模块处理器
+  6. 处理器执行 → 返回JSON序列化结果
+  7. 错误处理 → 未匹配路由返回404，处理器异常返回500+错误跟踪
+  8. 关闭时优雅退出，释放资源
+
+quality_gate:
+  - gate: "零依赖"
+    standard: "除Python标准库外无任何第三方依赖导入"
+    score: 5
+  - gate: "模块发现"
+    standard: "支持至少3个子模块的自动发现和加载"
+    score: 5
+  - gate: "路由完整"
+    standard: "支持GET/POST/PUT/DELETE四种HTTP方法"
+    score: 5
+  - gate: "错误处理"
+    standard: "所有异常被捕获并以标准JSON错误格式返回"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从AI获客gateway.py提取
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

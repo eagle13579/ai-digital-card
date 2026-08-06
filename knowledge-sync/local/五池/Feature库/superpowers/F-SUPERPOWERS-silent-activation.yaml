@@ -1,0 +1,23 @@
+name: superpowers-silent-activation
+dimension: 创造力
+description: 静默触发 — Skill根据上下文自动激活，无需用户命令
+source: obra/superpowers (GitHub 245K Stars)
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - 上下文感知的Skill自动匹配
+  - 状态机驱动的流水线自动流转
+  - 用户可选的跳过/强制进入机制
+  - Agent透明告知当前执行阶段
+  - 自然语言输入到Skill路由映射
+mental_models:
+  - SP-05_Silent-Activation
+  - SP-03_14-Skill-Pipeline
+triggers:
+  - 用户输入自然语言需求时自动匹配对应Skill
+  - 前一个Skill完成时自动触发下一个
+integration:
+  - 在delegate_task中引入skill自动路由
+  - SKILL.md增加auto_trigger字段
+  - 减少用户指令负担，提升体验

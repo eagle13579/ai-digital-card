@@ -1,0 +1,14 @@
+name: F-OMC-03_人才市场插件生态
+version: 1.0.0
+status: active
+dimension: 产品
+source: OneManCompany — talent_market/
+description: AI员工的插件市场系统。Talent Package = profile.yaml + skills/ + tools/ + launch.sh，支持local和remote双模式。远程模式通过MCP
+  Server连接one-man-company.com中央市场，有社区打分和验证机制。
+atoms:
+- OMC-10 人才市场插件生态
+- OMC-08 企业级人力资源管理
+products:
+- 文鳐技能集市
+- 招贤数字员工SaaS
+- 链客宝AI人才匹配

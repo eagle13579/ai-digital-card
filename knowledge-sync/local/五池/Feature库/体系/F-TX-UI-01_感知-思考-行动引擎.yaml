@@ -1,0 +1,24 @@
+feature_id: "F-TX-UI-01"
+name: "感知-思考-行动引擎"
+version: "1.0.0"
+dimension: "体系"
+source_model: "UI-TARSM1"
+one_liner: "实现截图感知→VLM思考→动作解析→执行的闭环架构"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  将任意自动化任务建模为感知-思考-行动三段循环。
+input: |-
+  任务描述
+output: |-
+  执行记录
+sop: |-
+  1. 截图感知 2. VLM分析决策 3. 解析为动作 4. 执行 5. 验证 6. 循环
+quality_gate: |-
+  1. 闭环<30s 2. 重试≥3次 3. 支持暂停恢复
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: UI-TARS-desktop全量吸收

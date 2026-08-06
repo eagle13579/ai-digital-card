@@ -1,0 +1,13 @@
+# F-BIZ-23: 合规套利路径引擎
+id: "F-BIZ-23"
+name: "合规套利路径引擎"
+dimension: "🧱 基本功"
+domain: "商业模式"
+description: "每层都合法(云主机+eSIM+远程桌面)，整体路径站得住"
+source_model: "M-BIZ-23"
+source: "向海容与合作伙伴对话 2026-06-14"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

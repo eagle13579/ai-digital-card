@@ -1,0 +1,23 @@
+name: superpowers-agent-orchestrator
+dimension: 场景
+description: Agent即项目经理 — 主Agent不写代码只做管理
+source: obra/superpowers (GitHub 245K Stars)
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - 主Agent角色定位：项目经理而非编码员
+  - 动态编队与按需角色创建
+  - 并行任务调度与进度追踪
+  - 子Agent上下文隔离与独立执行
+  - 汇聚审查与最终交付组装
+mental_models:
+  - SP-04_Agent-as-Orchestrator
+  - SP-03_14-Skill-Pipeline
+triggers:
+  - 需要多人协作的复杂任务
+  - 跨领域/跨技术栈的多文件修改
+integration:
+  - 强化龙虾群聊指挥链的指挥官角色
+  - 增强delegate_task的角色匹配逻辑
+  - 与铁律「CEO不动手」完全对齐

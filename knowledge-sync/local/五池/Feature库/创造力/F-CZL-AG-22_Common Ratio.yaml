@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-22
+name: Common Rationalizations扩展
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 从执行日志中发现新的偷懒模式并生成反驳
+
+products:
+  - 通用: 自动匹配

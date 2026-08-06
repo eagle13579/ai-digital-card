@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-35
+name: 责任人继任规划
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 基于AI落地责任人履职数据推荐最佳继任者
+
+products:
+  - 通用: 自动匹配

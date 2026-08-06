@@ -1,0 +1,24 @@
+feature_id: "F-TX-XC-02"
+name: "时间门控调度器"
+version: "1.0.0"
+dimension: "体系"
+source_model: "XCrawlerM2"
+one_liner: "根据当前时间段自动切换执行模式"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  设定多个时间门(如开盘/午盘/收盘/盘后)，每个门对应不同的执行逻辑，避免无效操作。
+input: |-
+  时间门定义(时间段+执行函数)
+output: |-
+  时间门调度表+自动切换引擎
+sop: |-
+  1. 定义时间门 2. 绑定每个门的执行逻辑 3. 运行时检测当前时间 4. 自动路由到对应门
+quality_gate: |-
+  1. 时间门精度<1分钟 2. 切换延迟<100ms 3. 门区间不重叠
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

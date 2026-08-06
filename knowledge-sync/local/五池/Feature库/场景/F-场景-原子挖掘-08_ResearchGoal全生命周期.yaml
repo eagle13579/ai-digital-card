@@ -1,0 +1,66 @@
+feature_id: "F-场景-原子挖掘-08"
+name: "Research Goal全生命周期管理"
+version: "1.0.0"
+dimension: "场景"
+source_model: "M19-Research Goal全生命周期"
+source_project: "Vibe-Trading"
+source_location: "D:/Vibe-Trading/Vibe-Trading/agent: goal→criteria→evidence→budget→completion policy"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "目标→标准→证据→预算→完成策略的全链路Goal生命周期管理，可映射为链客宝销售线索跟进流程"
+what_it_does: |
+  场景：链客宝销售团队需要系统化的商机/线索跟进生命周期管理。
+  问题：销售线索跟进缺乏结构化管理，线索流转不可控，跟进效率低。
+  价值：将Vibe-Trading的Research Goal生命周期映射到链客宝商机管理——销售创建Goal(商机)→设置Criteria(成交条件)→收集Evidence(线索证据)→标记Completion(成交/关闭)。
+  架构亮点：goal创建→claim认领→evidence收集→criteria检查→budget预算控制→completion policy完成策略。
+
+input: |
+  - Goal定义: 商机/线索的目标描述(成交金额/时间/客户类型)
+  - Criteria设置: 成交条件(客户决策/合同签署/首付款到账)
+  - Budget预算: 跟进该商机的时间/人力/成本预算
+  - 完成策略: 成功(赢单)/失败(输单)/搁置(延期)的判断标准
+
+output: |
+  - Goal状态机: 创建→进行中→证据收集→门禁检查→完成
+  - 证据收集进度: 各criteria的evidence收集状态
+  - 预算消耗: 已用预算/总预算比例
+  - 完成判定: 基于completion policy的自动判定结果
+  - Goal报告: 全生命周期复盘报告(含每个阶段的用时和效果)
+
+sop: |
+  1. 创建Goal：销售创建商机Goal(含目标描述、预计金额、截止日期)
+  2. 设置Criteria：定义成交的必须条件(至少3个)
+  3. 认领Claim：销售认领Goal，进入跟进状态
+  4. 收集Evidence：销售逐条收集criteria对应的evidence
+  5. 预算监控：实时监控时间/人力预算消耗
+  6. 门禁检查：自动检查各criteria是否满足
+  7. Completion判定：基于completion policy自动判定赢单/输单/搁置
+  8. 复盘归档：生成Goal复盘报告，沉淀至知识库
+
+quality_gate:
+  - gate: "Criteria完整性"
+    standard: "每个Goal至少设置3个可验证的criteria"
+    score: 5
+  - gate: "Evidence可追溯"
+    standard: "每条evidence必须关联具体的客户沟通记录或文档"
+    score: 5
+  - gate: "预算可控"
+    standard: "支持预算超支预警和自动暂定机制"
+    score: 5
+  - gate: "Completion自动判定"
+    standard: "criteria满足后自动触发completion流程"
+    score: 5
+
+score_target: "8/10"
+depends_on: []
+enhanced_by: ["F-基本功-原子挖掘-06"]
+
+iteration_log: |
+  v1.0.0 - 创建: 从Vibe-Trading Research Goal生命周期提取，映射为链客宝商机管理
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

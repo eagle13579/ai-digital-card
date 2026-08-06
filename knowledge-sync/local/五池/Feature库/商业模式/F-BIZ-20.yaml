@@ -1,0 +1,13 @@
+# F-BIZ-20: 结构化输入对照引擎
+id: "F-BIZ-20"
+name: "结构化输入对照引擎"
+dimension: "🧱 基本功"
+domain: "商业模式"
+description: "同一任务用结构化方式输入不同模型，客观对比输出质量"
+source_model: "M-BIZ-20"
+source: "向海容与合作伙伴对话 2026-06-14"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

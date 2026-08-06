@@ -1,0 +1,24 @@
+feature_id: "F-CJ-XC-01"
+name: "主力阶段识别器"
+version: "1.0.0"
+dimension: "场景"
+source_model: "XCrawlerM7"
+one_liner: "将主力画图的七个阶段编码为可量化的识别模型"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  分析股票的量价数据，识别当前处于主力画图的哪个阶段(吸筹/拉升/洗盘/出货)，给出概率和置信度。
+input: |-
+  股票历史量价数据
+output: |-
+  主力阶段诊断报告(当前阶段+置信度++下阶段预测)
+sop: |-
+  1. 加载量价数据 2. 计算成交量/价格波动/换手率 3. 匹配七阶段特征 4. 输出概率分布
+quality_gate: |-
+  1. 七阶段全识别 2. 准确率≥60% 3. 输出概率分布
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

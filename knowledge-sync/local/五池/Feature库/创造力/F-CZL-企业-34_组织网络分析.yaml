@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-34
+name: 组织网络分析
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 分析企业内部谁依赖谁的隐性协作网络
+
+products:
+  - 通用: 自动匹配

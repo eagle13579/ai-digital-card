@@ -1,0 +1,19 @@
+id: F-VIC-01
+name: BOM拆解引擎
+description: 输入产业链名称或主题，自动拆解为上游/中游/下游各环节，输出BOM表格式的产业链全景图（环节名称/核心企业/毛利率/集中度/增长率/壁垒评分）
+dimension: 基本功
+type: 分析引擎
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 乘黄_P8
+source_atoms:
+- VIC-BOM-01
+- VIC-CHAIN-MARGIN-06
+quality_score: 0
+iterations: 0

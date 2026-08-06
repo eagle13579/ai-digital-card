@@ -1,0 +1,42 @@
+id: skill-gaia-integration
+name: 技能-盖娅大脑联动系统
+version: 2.0.0
+status: production
+
+products:
+  - 文鳐技能集市: 自动匹配
+description: >
+  白泽军团Skill从字符串升级为结构化SkillDefinition，
+  实现技能激活时自动向盖娅大脑注册项目摘要索引、
+  注入业务核心背景、加载训练素材的三位一体联动。
+  解决旧版技能无状态、无上下文、无项目绑定的问题。
+
+architecture:
+  skill_definition:
+    fields:
+      name: {type: string, purpose: "技能名"}
+      description: {type: string, purpose: "技能描述"}
+      applies_to_projects: {type: "List[string]", purpose: "关联项目", auto_register: true}
+      injects_core_context: {type: string, purpose: "激活时自动注入的核心背景"}
+      training_material: {type: string, purpose: "初始化训练素材"}
+      auto_register_summary: {type: boolean, default: true}
+
+  integration_flow:
+    agent_creation:
+      - "遍历AgentConfig.skills"
+      - "字符串格式 → 自动转换为通用SkillDefinition"
+    on_skill_activation:
+      - "auto_register_summary=True → 为applies_to_projects注册摘要到GaiaBrain"
+      - "injects_core_context非空 → 设置GaiaBrain战略核心背景"
+      - "training_material非空 → 执行训练（可选）"
+    gaia_feedback:
+      - "Agent.think()结果 → 自动归档到对应项目+场景的Hermes记忆层"
+
+backward_compatibility:
+  - "旧版字符串格式自动兼容: ['技能名1', '技能名2'] → SkillDefinition(name='技能名1')"
+  - "AgentConfig 的 skills 字段同时支持 str 和 SkillDefinition"
+
+use_cases:
+  - "营销获客Agent: 注册Project-GK摘要 + 注入营销核心方法"
+  - "中韩跨境Agent: 注册Project-KRCN摘要 + 注入合规规则"
+  - "AI员工Agent: 注册Project-Workers摘要 + 注入员工管理策略"

@@ -1,0 +1,13 @@
+# F-BIZ-17: AI原生组织引擎
+id: "F-BIZ-17"
+name: "AI原生组织引擎"
+dimension: "🧱 体系"
+domain: "商业模式"
+description: "全员AI原生能力：每个人都可以直接用AI工具干出来，不需要中间层翻译"
+source_model: "M-BIZ-17"
+source: "向海容与合作伙伴对话 2026-06-14"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

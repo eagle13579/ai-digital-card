@@ -1,0 +1,50 @@
+# === Feature 定义文件 ===
+feature_id: "F-CJ-数智港-02"
+name: "韩企客户成交包引擎"
+version: "1.0.0"
+dimension: "场景"
+source_model: "P0客户触达体系 + 成交包模板"
+
+## 定位
+one_liner: "韩国目标企业从触达→诊断报告→报价单→话术的完整成交包生成"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  对每个韩国目标客户(COSRX/Neogen/VT等)自动化生成：合规诊断报告HTML(含评分)、报价单MD、触达话术中韩双语、触达材料包。标准化成交包结构。
+  
+input: |
+  企业名称 + 产品品类 + 合规数据(report_data.json) + 企业用户画像
+  
+output: |
+  合规诊断报告.html + 报价单.md + 触达话术.md(中韩双语) + 成交方案.md
+  
+sop: |
+  1. 从合规知识库查询目标企业产品的合规数据
+  2. 生成合规诊断报告HTML(risk_engine评分)
+  3. 按pricing.yaml匹配定价方案
+  4. 生成中韩双语触达话术
+  5. 打包为完整成交包目录
+  
+  quality_gate:
+  - gate: "诊断报告评分项>=5个维度"
+    standard: "通过"
+    score: 5
+  - gate: "报价单有定价依据(引用pricing.yaml)"
+    standard: "通过"
+    score: 5
+  - gate: "触达话术包含中韩双语+场景引导"
+    standard: "通过"
+    score: 5
+  - gate: "成交包结构与其他客户一致"
+    standard: "通过"
+    score: 5
+  
+  score_target: "10/10"
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，2026-06-08
+  
+product: "韩企AI灵魂工厂"

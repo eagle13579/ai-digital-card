@@ -1,0 +1,8 @@
+feature_id: F-CE-04_文件系统上下文提取
+name: 文件系统上下文提取
+version: 1.0.0
+dimension: 场景
+source_model: Context-Engineering吸收
+
+products:
+  - 通用: 自动匹配

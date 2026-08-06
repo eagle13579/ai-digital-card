@@ -1,0 +1,19 @@
+name: superpowers-decision-flywheel
+version: v1.0.0
+description: 决策飞轮引擎 — 基于14-Skill Pipeline的自动化决策流转引擎。包含brainstorming→clarify→design→plan→code→review→test→document→ship全流程的自触发决策飞轮。每个阶段自动判断下一步决策：是否需要用户确认、是否需要拆解子任务、是否满足质量门禁。飞轮以Silent Activation为动力源，以Evidence-Driven为刹车机制，形成自主决策闭环。
+
+atomic_models:
+  - MM-03: 14-Skill Pipeline (14技能流水线) — 完整的工程化流水线决策链
+  - MM-05: Silent Activation (静默触发) — 决策飞轮的自动推进动力
+  - MM-06: Design-First Iteration (先设计再编码) — 飞轮中的关键决策节点
+  - MM-08: Evidence-Driven Quality Gate (证据驱动质量门) — 飞轮的质检刹车机制
+
+entry_points:
+  - 用户提出需求时，飞轮自动从brainstorming阶段启动
+  - 前一个Skill完成时，自动触发下一个Skill决策
+  - 质量门禁不通过时，飞轮回退到上一阶段
+
+products:
+  - 通用: 自动匹配
+
+created_at: 2026-07-05

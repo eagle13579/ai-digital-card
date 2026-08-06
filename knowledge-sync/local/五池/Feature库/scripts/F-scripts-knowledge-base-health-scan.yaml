@@ -1,0 +1,63 @@
+id: F-scripts-knowledge-base-health-scan
+name: "知识库健康巡检套件"
+version: 1.0.0
+status: active
+
+description: >
+  提供两阶段知识库运维检查：扫描知识库核心子结构（原子集市/产品开发/进化日志）的完整性与活跃度，
+  并审计代码资产库中各收割项目的元数据（INJECTION.md / SOURCE.md / src/）完整性。
+
+source_project: "scripts (Hermes Agent 脚本工具集)"
+source_path: "D:\\scripts"
+
+file_list:
+  - scan_assets.py
+  - scan_harvest.ps1
+
+triggers:
+  - "定期巡检（每日/每周）"
+  - "新原子或新代码资产入库后"
+
+checklist:
+  phase_A:
+    name: "结构巡检 (scan_assets.py)"
+    items:
+      - id: A1
+        desc: "原子集市: customer-acquisition-engine 是否存在？"
+        output: "YES/NO + Items"
+      - id: A2
+        desc: "原子集市: 各原子是否有 .whl 构建产物？"
+        output: "总数 / 有WHL数"
+      - id: A3
+        desc: "原子集市: 无 WHL 的候选提取原子（Top 15）"
+        output: "名 + .py 文件数"
+      - id: A4
+        desc: "产品开发: 活跃产品数（含 app.py）"
+        output: "总数 / 活跃数"
+      - id: A5
+        desc: "进化日志: 日志条数 + 最新日志预览"
+        output: "数量 + 前500字符"
+
+  phase_B:
+    name: "资产审计 (scan_harvest.ps1)"
+    items:
+      - id: B1
+        desc: "代码资产目录数"
+        output: "总数"
+      - id: B2
+        desc: "各资产 IM/SM/src 三指标检查"
+        output: "逐行 Y/N/N"
+      - id: B3
+        desc: "缺失 INJECTION.md 的资产清单"
+        output: "列表"
+
+output_format: "阶段A: 结构化打印到 stdout；阶段B: NAME IM=Y/N SM=Y/N src=Y/N 逐行 + 汇总统计 + 缺失清单"
+
+dependencies:
+  - "Python 3.x"
+  - "PowerShell 5.1+"
+  - "知识库路径结构: L5孵化室/原子集市, L5孵化室/产品开发, L5孵化室/进化日志, L1图书馆/代码资产库"
+
+related_models:
+  - scripts_26-07-08_01_Hermes知识库结构巡检模型
+  - scripts_26-07-08_02_代码资产收割质量审计模型

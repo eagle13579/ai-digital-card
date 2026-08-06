@@ -1,0 +1,23 @@
+id: F-RB-CREATIVE-01
+name: Creative Tools Suite — 背景工作室/形状魔法/纹理实验室
+source_model: "React Bits — 3个创意工具: Background Studio(可视化编辑背景)/Shape Magic(形状生成)/Texture Lab(纹理生成)"
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+description: >-
+  3个浏览器内创意工具: Background Studio可视化编辑和导出45种背景动效(polar aurora/particles/waves/beams等)、
+  Shape Magic交互式形状生成和变形、Texture Lab纹理样式在线编辑。
+  工具输出可直接复制为React组件代码。降低了动效设计的门槛——不需要动效开发能力,
+  可视化调整参数→自动生成代码。
+input: 视觉设计意图
+output: 可复制粘贴的React组件代码
+sop: "① Background Studio: 选背景类型→调参数(颜色/速度/密度/大小)→复制代码
+  ② Shape Magic: 选形状→调变形参数→复制SVG/组件代码
+  ③ Texture Lab: 选纹理样式→调参数→复制CSS代码
+  ④ 所有工具零安装浏览器内使用"
+quality_gates: 可视化编辑实时响应<100ms、导出的代码零依赖、技术栈自适应
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 链客宝营销页面/AI招商品牌设计/白泽设计工具

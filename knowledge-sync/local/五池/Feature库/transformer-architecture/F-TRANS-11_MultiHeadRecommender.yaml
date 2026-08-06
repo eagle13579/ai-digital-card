@@ -1,0 +1,24 @@
+name: "F-TRANS-11"
+title: "MultiHeadRecommender — 多头内容推荐引擎"
+version: 1.0.0
+category: "Transformer产品注入"
+description: "Multi-Head Attention在内容推荐上的工程实现。N个头并行独立推荐,结果拼接融合。已注入AI名片。"
+
+atoms:
+  - "T05 Multi-Head"
+
+code_references:
+  - file: "multi_head_recommender.py"
+    class: "MultiHeadRecommender"
+    method: "recommend"
+    summary: "多线程并行执行各head→去重→加权融合。h=4个头(行业/能力/地域/热度)"
+    link: "D:\\AI数智名片\\services\\multi_head_recommender.py"
+
+product_injection:
+  - product: "AI数智名片"
+    path: "D:\\AI数智名片\\services\\multi_head_recommender.py"
+    verified: true
+
+demo_result:
+  heads: "行业匹配(0.35)+能力互补(0.30)+地域匹配(0.20)+热度匹配(0.15)"
+  fusion: "去重+加权分排序→Top-5综合推荐"

@@ -1,0 +1,9 @@
+feature_id: F-AS-04_多Persona编排模板
+name: 用户(白泽)编排Persona
+version: 1.0.0
+dimension: 体系
+source_model: agent-skills吸收
+one_liner: 用户(白泽)编排Persona。Persona不调用Persona。Skill是强制必经节点。
+
+products:
+  - 白泽军团: 自动匹配

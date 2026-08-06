@@ -1,0 +1,54 @@
+feature_id: "F-体系-01"
+name: "系统架构MECE拆解"
+version: "1.0.0"
+dimension: "体系"
+source_model: "科学理念(005) + 科学决策(071)"
+created_at: "2026-06-07"
+author: "白泽"
+
+one_liner: "对任意系统/项目/问题进行MECE拆解，输出结构化层次图"
+what_it_does: |
+  场景：面对复杂系统时，需要将其拆解为可执行的子模块。
+  问题：直觉性拆解容易遗漏重要模块或产生重叠。
+  价值：MECE保证拆解无遗漏无重叠，每个子模块可直接派单。
+
+input: |
+  - 系统描述: 要拆解的系统的名称和范围
+  - 拆解深度: 几层(默认2层)
+  - 关注点: 拆解时特别关注的维度
+
+output: |
+  - MECE层次结构图: 树形结构
+  - 每个子模块一句话定位
+  - 子模块间依赖关系
+
+sop: |
+  1. 确认拆解对象和范围
+  2. 按维度选择拆解方法(功能/数据/流程/组织)
+  3. 逐层拆解，每层用MECE原则检查
+  4. 标注子模块间的依赖关系
+  5. 输出结构化拆解图
+
+quality_gate:
+  - gate: "MECE完整性"
+    standard: "同层模块无重叠、无遗漏"
+    score: 4
+  - gate: "可执行性"
+    standard: "每个子模块可独立派单执行"
+    score: 4
+  - gate: "依赖清晰"
+    standard: "模块间依赖关系已标注"
+    score: 4
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 初始版本
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-73
+name: 反向思维框架
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 从目标逆向推导实现路径
+
+products:
+  - 通用: 自动匹配

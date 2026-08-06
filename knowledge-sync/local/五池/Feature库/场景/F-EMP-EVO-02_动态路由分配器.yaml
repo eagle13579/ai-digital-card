@@ -1,0 +1,48 @@
+# Feature: 动态路由分配器
+# ID: F-EMP-EVO-02
+# 维度: 场景
+# 创建: 2026-06-10
+
+name: "动态路由分配器"
+id: "F-EMP-EVO-02"
+dimension: "场景"
+version: "1.0"
+status: "active"
+
+description: >
+  替换gaia_cortex.py L3层硬编码emp_map（烛龙/乘黄/文鳐）为多层动态路由。
+  优先分配L0员工，确保111名L0员工获得首次任务委派机会。
+
+source_model: "M_硬编码路由陷阱 + M_L0飞轮启动"
+
+products:
+  - 通用: 自动匹配
+input:
+  - "gaia_cortex L3层当前委派队列生成逻辑"
+  - "cache/gaia_delegation_queue.json（进化引擎产生的L0委派推荐）"
+  - "employee_router.recommend() 能力匹配"
+
+output:
+  - "gaia_delegation_queue.json中recommended_employee字段不再硬编码"
+  - "L0员工在委派队列中优先出现"
+
+sop:
+  step_1: "读取进化引擎委派队列中的L0任务推荐"
+  step_2: "尝试employee_router能力匹配（排除热门3人）"
+  step_3: "域匹配回退（按产品归属/任务类型映射）"
+  step_4: "L0优先级匹配（进化引擎推荐的L0任务优先）"
+  step_5: "随机轮值（最后防线，避开烛龙/乘黄/文鳐）"
+
+rules:
+  - "排除单人周任务>3"
+  - "优先L0员工（进化引擎标记auto_assign=True）"
+  - "L0/L1员工不分配复杂任务"
+
+iterations:
+  - date: "2026-06-10"
+    action: "替换gaia_cortex L3硬编码emp_map"
+    score: 9
+    note: "四层回退机制保证路由永不硬编码"
+product:
+  - "AI数智军团"
+  - "文鳐技能集市"

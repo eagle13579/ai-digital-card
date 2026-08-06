@@ -1,0 +1,7 @@
+name: F-SAAS-03_Next.js SaaS架构
+description: App Router+Server Actions+Middleware+Drizzle ORM三层架构
+version: 1.0.0
+dimension: 体系
+source: nextjs/saas-starter
+products:
+  - 所有Next.js项目

@@ -1,0 +1,26 @@
+feature_id: F-CJ-软银-06
+name: 一字板爆量换手模型（韩建山河型）
+version: "1.0"
+dimension: 场景
+source_model: 2026-06-10 向海容实战复盘
+one_liner: 连续一字板后开板放巨量，振幅巨大，换手率>20%
+
+products:
+  - 通用: 自动匹配
+what_it_does: 识别并量化该模式
+sop: |
+  Phase 1 — 一字板确认
+  连续2个以上一字板（开盘即涨停，全天封死）
+  Phase 2 — 开板日识别
+  高开/涨停开盘 → 瞬间砸盘 → 巨量换手
+  换手率>20%，振幅>8%
+  Phase 3 — 回封确认
+  砸盘后30分钟内能否拉回
+  如果能回封或收在高位，则换手成功
+quality_gate:
+  score: 7
+  checks:
+    - 基于实战数据验证
+iteration_log:
+  - "2026-06-10: v1.0初始版本，向海容命名"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

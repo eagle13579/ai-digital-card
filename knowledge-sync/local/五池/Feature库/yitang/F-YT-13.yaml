@@ -1,0 +1,23 @@
+module_name: LTV/CAC≥3法则
+module_number: 13
+category: 创业方法-单元模型
+mental_models:
+  - LTV/CAC≥3法则
+  - 用户终身价值
+  - 获客成本
+  - 回本周期≤12个月
+  - 财务健康度金标准
+learning_objectives:
+  - 掌握判断单元模型成立的核心财务指标
+  - 学会计算LTV和CAC
+  - 能评估商业模式是否可持续
+employee_roles:
+  - CFO/财务负责人
+  - 创业者
+  - 运营负责人
+source: 一堂创业课/创业方法-单元模型
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

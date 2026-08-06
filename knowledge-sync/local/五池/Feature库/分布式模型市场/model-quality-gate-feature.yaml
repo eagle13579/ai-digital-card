@@ -1,0 +1,90 @@
+metadata:
+
+products:
+  - 通用: 自动匹配
+  name: model-quality-gate-feature
+  version: 1.0.0
+  date: 2026-07-02
+  author: 白泽
+  domain: distributed-model-marketplace
+  category: trust
+
+description: >
+  模型质量门禁Feature。通过自动基准测试、用户反馈评分、质押机制三层防护，
+  确保市场模型维持可信赖的质量水平。
+  自动基准测试：模型注册时在标准评测集上运行，产出客观质量评分。
+  用户反馈评分：收集推理后的隐式反馈（响应满意度、重试率、会话续存率）。
+  质押机制：发布者需预先质押代币，质量持续不达标触发罚没。
+
+components:
+  - name: auto-benchmark-runner
+    function: |
+      自动基准测试运行器。模型注册/版本发布时自动触发标准评测。
+      评测集包括：MMLU-Pro(知识推理)、HumanEval(代码生成)、GSM8K(数学)、MT-Bench(对话)。
+      每个任务产出0-100标准化分数，加权综合评分。最低上架阈值>=40分。
+    tech_stack:
+      - Python / vLLM (模型推理)
+      - lm-evaluation-harness (评测框架)
+      - Celery / Redis (异步任务队列)
+    priority: P0
+
+  - name: implicit-feedback-collector
+    function: |
+      隐式反馈收集器。从用户推理行为中抽取质量信号。
+      收集：重新生成率、会话续存率、提前离开率、内容复制率。
+      每个信号归一化为0-1分数，加权综合为用户反馈分。
+    tech_stack:
+      - Apache Kafka (行为事件流)
+      - Python / Pandas (统计分析)
+      - Redis (实时滑动窗口聚合)
+    priority: P0
+
+  - name: staking-contract
+    function: |
+      质押合约。发布者预先质押代币作为质量保证金。
+      模型注册时强制质押，综合评分持续低于阈值7天触发罚没。
+      持续高质量(评分>80分)30天可获得质押奖励。
+    tech_stack:
+      - Solana / Rust / Anchor框架
+      - SPL Token Program
+    priority: P1
+
+  - name: reputation-scorer
+    function: |
+      信誉评分系统。信誉分 = 历史质量分x0.5 + 活跃度x0.2 + 质押量x0.3。
+      高信誉发布者的模型享有更高路由优先权。
+    tech_stack: Python / PostgreSQL
+    priority: P1
+
+  - name: dispute-arbitration
+    function: |
+      争议仲裁机制。用户可发起争议（版权侵权、质量不符），DAO投票仲裁。
+      争议发起需小额押金防止恶意争议，投票胜出方获得对方押金。
+    tech_stack: Solana DAO合约
+    priority: P2
+
+interfaces:
+  input_schema:
+    type: object
+    required: [model_id]
+    properties:
+      model_id: {type: string}
+      eval_dataset: {type: string, optional: true}
+  output_schema:
+    type: object
+    properties:
+      quality_score: {type: number, minimum: 0, maximum: 1}
+      passed_gate: {type: boolean}
+      benchmark_detail: {type: object}
+      issues: {type: array, items: {type: string}}
+
+dependencies:
+  - model-registry-feature: {required: true}
+
+maturity:
+  stage: concept
+  readiness: 0.15
+  roadmap:
+    - P0: 自动基准测试 + 用户反馈系统
+    - P1: 质押合约 + 信誉评分
+    - P2: 争议仲裁

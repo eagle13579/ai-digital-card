@@ -1,0 +1,28 @@
+feature_id: F-CZL-NEURO-08
+name: 探索利用决策器
+version: 1.0.0
+dimension: 创造力
+source_model: 脑神经间断平衡/H9-探索-利用权衡.md
+one_liner: 基于间断平衡理论，判断当前任务应探索(创新)还是利用(执行)
+
+products:
+  - 通用: 自动匹配
+what_it_does: 评估任务的新颖度/复杂度/风险度，结合系统当前状态给出探索vs利用的决策建议，以及最佳交替周期建议
+input: task_novelty(1-10) + task_complexity(1-10) + risk_tolerance(1-10)
+output: strategy(explore/utilize) + confidence + cycle_suggestion
+sop: '1. 评估任务新颖度
+
+  2. 评估任务复杂度
+
+  3. 评估风险承受度
+
+  4. 综合加权确定策略方向
+
+  5. 如有必要建议交替周期'
+quality_gate: '评分7/10: 决策与人工判断一致率75%+，覆盖8种典型场景，含mixed混合策略'
+score: 7
+depends_on: []
+enhanced_by:
+- F-TX-NEURO-01
+implementation: 'D:\向海容的知识库\wiki\wiki\记忆宫殿\scripts\explore_utilize_decider.py'
+draft: false

@@ -1,0 +1,66 @@
+F-ZV-01:
+
+products:
+  - 通用: 自动匹配
+  name: 插件化索引组件工厂
+  dimension: 基础设施
+  domain: 向量搜索
+  atoms: [ZV01, ZV04]
+  description: >
+    基于 INDEX_FACTORY_REGISTER 宏和 IndexModule 基类构建的插件化组件工厂。
+    所有 Metric/Storage/Builder/Searcher/Streamer/Reformer/Cluster/Refiner 均
+    通过名称注册和创建，支持 8 种索引算法热插拔。白泽映射：认知组件（检索器/
+    推理器/路由器）也应以工厂模式注册，支持运行时热替换。
+  priority: P0
+
+F-ZV-02:
+  name: 分层向量索引管线
+  dimension: 检索
+  domain: 向量搜索
+  atoms: [ZV02, ZV03]
+  description: >
+    Holder→Provider→Flow 三层数据抽象 + Build/Search/Stream 三阶段生命周期。
+    Holder 负责原始数据存取（OnePass/MultiPass），Provider 添加 key→vector 随机
+    访问，Flow 聚合 Searcher+Reformer+Metric+Storage 执行完整搜索。每种索引
+    算法独立实现三阶段组件，通过工厂统一管理。白泽映射：知识检索也应有原始
+    知识层→索引访问层→推理执行层的三层管线，每层可独立升级。
+  priority: P0
+
+F-ZV-03:
+  name: SIMD 调度混合检索引擎
+  dimension: 检索
+  domain: 向量搜索
+  atoms: [ZV05, ZV09, ZV08]
+  description: >
+    融合三大能力：(1) SIMD Dispatch 距离计算——运行时检测 CPU 自动选择
+    AVX512/AVX2/SSE/NEON/Scalar 路径；(2) FTS 全文检索——内置分词+倒排+
+    BM25 全链路；(3) MixedReducer 多路召回融合——稠密+稀疏+FTS+标量过滤
+    统一加权排序。白泽映射：认知检索也应混合语义搜索+关键词+规则过滤，
+    距离运算自动 dispatch 到 GPU/CPU 最优后端。
+  priority: P0
+
+F-ZV-04:
+  name: 量化压缩与混合存储引擎
+  dimension: 存储
+  domain: 向量搜索
+  atoms: [ZV06, ZV07]
+  description: >
+    多层量化（Binary/INT8/INT4/RabitQ 残差量化）+ 分段存储（Segmented Storage
+    + WAL + MMAP/BufferPool/Heap 三种后端）。量化直接在编码数据上计算距离，
+    降低内存占用和计算量；Segment 不可变设计配合 WAL 确保持久性和崩溃恢复。
+    白泽映射：白泽在边缘设备使用 INT8 量化 embedding，在服务器使用 FP32
+    全精度，存储采用 Segment+WAL 防崩溃。
+  priority: P1
+
+F-ZV-05:
+  name: Schema-Doc-Query 三层数据协议
+  dimension: 扩展
+  domain: 向量搜索
+  atoms: [ZV10, ZV12]
+  description: >
+    Schema（集合元数据定义）→ Doc（数据行，含多向量+标量字段）→ Query
+    （VectorQuery/FtsQuery/MultiQuery）三层数据协议 + EmbeddingFunction（自动
+    编码）+ Reranker（二次精排）两个扩展点。面向多语言 SDK（Python/Go/Rust/
+    Node.js/Dart），提供一致的 API 体验。白泽映射：白泽定义认知 Schema →
+    认知 Doc → 认知 Query 三层协议，嵌入函数和精排器作为扩展点对外开放。
+  priority: P1

@@ -1,0 +1,18 @@
+id: F-VIC-03
+name: 供需失衡诊断器
+description: 对三高环节进行供需分析，诊断当前供需缺口大小、持续时间、供给响应周期，输出暴利窗口的持续时间和退出信号
+dimension: 数据
+type: 诊断引擎
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 谛听_P7
+source_atoms:
+- VIC-SUPPLY-DEMAND-03
+quality_score: 0
+iterations: 0

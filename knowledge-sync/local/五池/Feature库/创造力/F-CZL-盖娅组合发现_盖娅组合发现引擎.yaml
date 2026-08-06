@@ -1,0 +1,55 @@
+feature_id: "F-CZL-盖娅组合发现"
+name: "盖娅组合发现引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "gaia-cortex SKILL.md §L2组合层 + evolution-zone-autonomous-workflow SKILL.md"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "从已有资产池排列组合发现新组合方案——新产出=资产A×资产B，禁止从零创造"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  七层飞轮L2组合层的核心能力。基于缺口列表，从已有资产(技能/代码/产品/心智模型/员工)中排列组合产生组合方案。不是从零创造，是已有资产的排列组合。三维评分(支付意愿/替代难度/交付复杂度)排序。
+
+input: |
+  - 缺口列表(L1输出)
+  - 资产索引(技能/代码/产品/心智模型/员工)
+  - 复用优先检查清单
+
+output: |
+  - N个排列组合方案
+  - 三维评分排序
+  - 新产出=资产A×资产B的公式
+
+sop: |
+  1. 读资产索引(技能554个/代码104项目/产品116个/心智1100个/员工166人)
+  2. 对每个缺口: 找已存资产→排列组合→产生方案
+  3. 禁止从零创造: 新产出必须=已有资产A×已有资产B
+  4. 三维评分: 支付意愿(1-10)/替代难度(1-10)/交付复杂度(1-10)
+  5. 排序输出TOP方案
+
+  quality_gate:
+  - gate: "复用优先"
+    standard: "每个方案都来自已有资产组合,非从零"
+    score: 8
+  - gate: "三维评分完整"
+    standard: "TOP3方案全部三维评分"
+    score: 7
+
+score_target: "9/10"
+depends_on:
+  - "F-TX-盖娅七层飞轮"
+  - "F-DAT-盖娅资产扫描"
+
+enhanced_by:
+  - "F-CZL-盖娅左脑发散"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+  # 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

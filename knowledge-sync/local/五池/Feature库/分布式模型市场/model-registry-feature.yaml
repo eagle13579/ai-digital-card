@@ -1,0 +1,83 @@
+metadata:
+
+products:
+  - 通用: 自动匹配
+  name: model-registry-feature
+  version: 1.0.0
+  date: 2026-07-02
+  author: 白泽
+  domain: distributed-model-marketplace
+  category: infrastructure
+
+description: >
+  模型注册表Feature。在HuggingFace Model Hub标准之上扩展计费字段
+  (price_per_token, revenue_share_pct, license_type)与版本管理能力。
+  所有上架模型的元数据(名称、描述、标签、架构、参数量、许可协议、定价、收益分成比例)
+  均通过Registry注册、校验、索引与版本追踪，是路由、结算、质量门禁的数据依赖。
+
+components:
+  - name: model-meta-registrar
+    function: |
+      模型元数据的注册与验证入口。
+      接收模型发布者提交的元数据（名称、描述、标签、架构、参数量等）
+      校验必填字段与格式（如 price_per_token > 0, revenue_share_pct 0-100）
+      分配全局唯一 model_id，写入元数据索引存储
+    tech_stack:
+      - Python 3.12+ / FastAPI
+      - PostgreSQL (元数据主存储)
+      - Redis (缓存热点查询)
+    priority: P0
+
+  - name: version-manager
+    function: |
+      模型版本管理（SemVer语义化版本控制）。
+      每个模型可拥有多个版本（v1.0.0, v1.1.0, v2.0.0）
+      支持版本冻结、废弃(deprecate)、回滚
+      版本快照可追溯，历史版本不可变
+      每个版本独立关联价格与许可协议
+    tech_stack:
+      - PostgreSQL (版本快照表，使用JSONB存储版本差异)
+      - Alembic (数据库迁移)
+    priority: P0
+
+  - name: metadata-search-engine
+    function: |
+      基于标签与全文的语义化元数据搜索。
+      支持标签组合过滤、全文模糊搜索、参数范围过滤、定价范围过滤、许可协议过滤
+    tech_stack:
+      - Elasticsearch (全文索引)
+      - PostgreSQL (关系型标签查询)
+      - pgvector (后续支持Embedding语义搜索)
+    priority: P1
+
+  - name: billing-field-enforcer
+    function: |
+      计费相关字段的强制校验与联动逻辑。
+      强制 price_per_token > 0，revenue_share_pct 在 0-100 区间
+      许可协议必须选自白名单
+      联动逻辑：修改价格时自动重算路由质量分
+    tech_stack:
+      - Pydantic v2 (校验层)
+      - PostgreSQL CHECK constraints
+    priority: P0
+
+interfaces:
+  input_schema:
+    type: object
+    required: [model_name, base_model, license_type, price_per_token, revenue_share_pct]
+    properties:
+      model_name: {type: string, maxLength: 128}
+      base_model: {type: string}
+      license_type: {type: string, enum: [apache-2.0, mit, cc-by-sa-4.0, custom]}
+      price_per_token: {type: number, exclusiveMinimum: 0}
+      revenue_share_pct: {type: number, minimum: 0, maximum: 100}
+
+dependencies: []
+
+maturity:
+  stage: concept
+  readiness: 0.2
+  roadmap:
+    - P0: 元数据注册 + 定价引擎 + 版本管理
+    - P1: 语义搜索 + 模型审核门禁
+    - P2: Embedding语义搜索 + 自动评分

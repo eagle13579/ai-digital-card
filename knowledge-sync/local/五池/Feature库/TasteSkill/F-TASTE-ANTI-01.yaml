@@ -1,0 +1,23 @@
+id: F-TASTE-ANTI-01
+name: Anti-Slop Rules — 禁止AI默认设计模式
+source_model: Taste-Skill Section 0.D/4/Pre-flight — 30+条硬规则禁止AI默认设计(紫色渐变/AI紫/Inter默认/Serif默认/暖色高端默认)
+dimension: 审美
+
+products:
+  - 通用: 自动匹配
+description: >-
+  系统性识别和拦截AI默认设计模式: 禁止AI紫色渐变、禁止Inter做默认字体、
+  禁止Serif做默认(除非品牌明确指定)、禁止暖色高端默认色板(beige+brass+espresso被标注为最常出现的AI tell)、
+  禁止Fraunces/Instrument_Serif作为默认。每条规则都有上下文感知的替代路径。
+input: 设计候选方案
+output: 检测违规项列表 + 替代方案建议
+sop: "① 色板检查: 检测lila紫/AI紫渐变/beige+brass暖色默认
+  ② 字体检查: Inter是否被用作默认(应选Geist/Satoshi等替代)
+  ③ Serif检查: Fraunces/Instrument_Serif作为默认即拦截
+  ④ 布局检查: 居中hero+三等特征卡+通用玻璃态=拦截
+  ⑤ 输出: 发现N项AI默认模式 → 每项给替代方案"
+quality_gates: 检测准确率>90%、拦截不阻断合理使用(品牌确实用紫时不拦截)
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝UI审查/AI招商页面/AI数智军团设计质量/白泽输出前自检

@@ -1,0 +1,23 @@
+module_name: 天花板四法交叉验证
+module_number: 07
+category: 创业方法-需求分析
+mental_models:
+  - 天花板四法交叉验证
+  - 自顶向下估算
+  - 自底向上估算
+  - 对标法
+  - CR1估算
+learning_objectives:
+  - 掌握四种市场天花板估算方法
+  - 学会交叉验证减少估算偏差
+  - 能判断市场空间是否足够大
+employee_roles:
+  - 战略分析师
+  - 投资分析师
+  - CEO/创业者
+source: 一堂创业课/创业方法-需求分析
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

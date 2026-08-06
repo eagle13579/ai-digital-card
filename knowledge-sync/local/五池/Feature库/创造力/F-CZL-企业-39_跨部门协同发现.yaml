@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-39
+name: 跨部门协同发现
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 从独立部门的数据中发现跨部门协同机会
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,8 @@
+feature_id: F-CE-06_BDI心智状态注册表
+name: BDI心智状态注册表
+version: 1.0.0
+dimension: 体系
+source_model: Context-Engineering吸收
+
+products:
+  - 通用: 自动匹配

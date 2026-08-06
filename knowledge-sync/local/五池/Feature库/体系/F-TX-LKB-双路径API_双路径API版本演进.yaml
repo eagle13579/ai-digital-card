@@ -1,0 +1,31 @@
+feature_id: F-TX-LKB-双路径API_双路径API版本演进
+name: 双路径API版本演进
+version: 1.0.0
+dimension: 体系
+source_model: chainke-full/backend/app/main.py
+source_project: chainke-full
+one_liner: 不破坏旧API的情况下渐进式引入新版本，通过修改router.prefix临时注册再恢复实现零成本双版本共存
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从chainke-full/backend/app/main.py中提取的双路径API版本演进模式。同一router对象临时改prefix注册v1
+  → 恢复原prefix注册兼容版，实现零成本双版本共存
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载双路径API版本演进模式
+
+  2. 根据同一router对象临时改prefix注册v1 → 恢复原prefix注册兼容版，实现零成本双版本共存执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从chainke-full/backend/app/main.py提取初始版本
+product: "链客宝"

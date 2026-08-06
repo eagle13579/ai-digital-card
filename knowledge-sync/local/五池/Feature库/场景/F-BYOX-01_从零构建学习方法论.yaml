@@ -1,0 +1,20 @@
+{
+  "name": "F-BYOX-01 从零构建学习方法论",
+  "version": "1.0.0",
+  "status": "released",
+  "dimension": "场景",
+  "source": "build-your-own-x",
+  "description": "费曼学习法(BYOX-01) + 跨领域模式迁移(BYOX-04) + 最小可行实现(BYOX-03) 三位一体方法论。31个技术领域从0构建的教程清单",
+  "mental_models": [
+    "BYOX-01 费曼学习法",
+    "BYOX-03 最小可行实现",
+    "BYOX-04 跨领域模式迁移"
+  ],
+  "components": [
+    "31个技术分类/500+外部教程链接"
+  ],
+  "products": [
+    "AI数智军团: 军团学习能力进化",
+    "所有产品: 深度技术理解基底"
+  ]
+}

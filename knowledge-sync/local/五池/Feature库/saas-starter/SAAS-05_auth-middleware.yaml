@@ -1,0 +1,7 @@
+name: F-SAAS-05_JWT认证中间件模式
+description: JWT Cookie+全局中间件+Zod验证三层安全
+version: 1.0.0
+dimension: 基本功
+source: nextjs/saas-starter
+products:
+  - 所有含用户系统的产品

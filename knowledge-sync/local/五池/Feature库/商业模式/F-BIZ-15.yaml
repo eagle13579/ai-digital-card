@@ -1,0 +1,16 @@
+# F-BIZ-15: 四九三十六资本结构
+id: "F-BIZ-15"
+name: "四九三十六资本结构"
+dimension: "💰 数据"
+domain: "商业模式"
+description: "4维度×9能力=36种子，2000万→20亿，10倍×10倍×3倍"
+source_model: "M-BIZ-15"
+source: "新坐标公司会议纪要 (2026-06-14)"
+sop: |
+  36种子轮(2000万)→春生(2亿)→夏长(20亿)→秋收(60亿)→冬藏再布局
+quality_gate: "评分≥7/10"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

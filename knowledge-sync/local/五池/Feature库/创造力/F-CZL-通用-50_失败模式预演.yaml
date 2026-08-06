@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-50
+name: 失败模式预演
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 在Dream Sandbox中预演可能失败的所有路径
+
+products:
+  - 通用: 自动匹配

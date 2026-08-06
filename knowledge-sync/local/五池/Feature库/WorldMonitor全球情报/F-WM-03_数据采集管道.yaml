@@ -1,0 +1,20 @@
+id: F-WM-03
+name: 数据采集管道
+description: >
+  串联 WM04 多源采集器、WM07 数据清洗与 WM10 结构化存储，构建端到端的数据采集管道。
+  采集器支持 HTTP轮询、WebSocket订阅、消息队列监听等多种接入方式，采集后的原始数据
+  经由规则引擎去重、格式标准化与富化处理后，写入时序/文档混合存储。管道采用
+  Apache Kafka 作为消息中枢，保证数据有序、可靠、可回溯。
+dimension: 数据
+domain: WorldMonitor
+status: 规划中
+tags:
+  - 数据管道
+  - 数据采集
+  - ETL
+  - Kafka
+  - 时序数据
+source: WM04 + WM07 + WM10
+
+products:
+  - 通用: 自动匹配

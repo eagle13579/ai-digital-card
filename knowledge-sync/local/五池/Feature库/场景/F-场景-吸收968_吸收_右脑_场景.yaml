@@ -1,0 +1,52 @@
+feature_id: "F-场景-吸收968"
+name: "吸收_右脑_场景"
+version: "1.0.0"
+dimension: "场景"
+source_model: "五池/模型池/场景/20260805_场景_右脑.md"
+created_at: "20260805"
+updated_at: "20260805"
+author: "盖娅吸收管道v2.0 (缺口驱动自动生成)"
+last_execution: "20260805"
+
+one_liner: "来自右脑领域最佳实践的场景维度Feature — 由盖娅吸收管道自动蒸馏封装"
+
+what_it_does: |
+  由盖娅认知吸收管道v2.0自动生成。
+  来源: 右脑领域的最新最佳实践搜索。
+  维度: 场景。
+  经8阶段流水线(缺口感知→搜索→蒸馏→分类→写入→Feature→注入→闭环)。
+
+input: |
+  - 标准场景维度Feature输入
+  - 具体执行时参考source_model的原始原子心智模型
+
+output: |
+  - 标准场景维度Feature交付物
+  - 质量自评分数
+  - 改进建议
+
+sop: |
+  1. 加载source_model指向的原子心智模型文件
+  2. 理解场景维度在这个领域的核心模式
+  3. 应用到当前具体任务场景
+  4. 按quality_gate标准执行并评分
+  5. 产出交付物+迭代建议
+
+quality_gate:
+  - gate: "原子应用正确"
+    standard: "source_model的原子概念被正确应用到任务"
+    score: 5
+  - gate: "产出可交付"
+    standard: "结果可直接被使用"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 20260805 盖娅吸收管道v2.0自动生成
+  来源: 右脑领域最佳实践 → 场景维度蒸馏
+  状态: 初始版本，需通过真实执行提升评分

@@ -1,0 +1,31 @@
+feature_id: F-CZL-LKB-数据增强_数据增强三模式
+name: 数据增强三模式
+version: 1.0.0
+dimension: 创造力
+source_model: chainke-full/backend/app/routers/sales_script.py
+source_project: chainke-full
+one_liner: 将抽象/平淡数据转化为有冲击力表达的三种方法：用类比变直观、缩小单位变亲民、前后对比变震撼
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从chainke-full/backend/app/routers/sales_script.py中提取的数据增强三模式模式。类比(抽象→直观)
+  / 单位变换(大→小) / 对比(前→后)
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载数据增强三模式模式
+
+  2. 根据类比(抽象→直观) / 单位变换(大→小) / 对比(前→后)执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从chainke-full/backend/app/routers/sales_script.py提取初始版本
+product: "链客宝"

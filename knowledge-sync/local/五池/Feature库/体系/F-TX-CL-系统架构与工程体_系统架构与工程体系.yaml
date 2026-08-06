@@ -1,0 +1,47 @@
+feature_id: "F-TX-CL-系统架构与工程体"
+name: "系统架构与工程体系"
+version: "1.0.0"
+dimension: "体系"
+source_model: "非一堂原子模型聚合/体系"
+# 精确source_model溯源 (2026-06-12): 五池/模型池/2026-04-22_三线作战战略模型.md.bak + 五池/模型池/2026-05-20_OpenMontage模型.md + 五池/模型池/2026-05-26_预测之书模型.md
+created_at: "2026-06-07"
+author: "白泽 (批量聚合)"
+
+one_liner: "聚合体系维度相关原子心智模型的标准化Feature集群"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  将体系维度的多个原子心智模型聚合为一个可执行的标准化Feature。
+  涵盖系统架构与工程体系相关的心智模型群组。
+  AI数字员工执行时，自动从关联原子中选择最适合当前场景的模型。
+
+input: |
+  - 任务描述: 需要在体系维度执行的具体任务
+  - 上下文: 环境/用户/场景信息
+
+output: |
+  - 标准化体系维度交付物
+  - 应用的心智模型记录
+  - 质量自评
+
+sop: |
+  1. 理解任务，匹配体系维度最合适的原子模型
+  2. 应用选中的心智模型执行任务
+  3. 记录使用的模型和效果
+  4. 自评并迭代改进
+
+quality_gate:
+  - gate: "模型匹配准确"
+    standard: "选择了最适合的原子模型"
+    score: 5
+  - gate: "产出可用"
+    standard: "结果可直接交付"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-07 聚合Feature

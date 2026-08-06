@@ -1,0 +1,8 @@
+name: F-SDCN-02_Registry注册表分发
+description: JSON注册表+CLI智能管道组件分发
+version: 1.0.0
+dimension: 审美
+source: shadcn-ui/ui
+products:
+  - 文鳐技能集市
+  - AI数字名片

@@ -1,0 +1,20 @@
+id: F-VIC-05
+name: AI产业链全自动提问工具
+description: 封装三步AI提问法为一键工具：输入行业主题→自动生成三连问→调LLM执行→输出结构化的产业链分析报告
+dimension: 创造力
+type: 自动化工具
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 文鳐_P9
+- 乘黄_P8
+source_atoms:
+- VIC-AI-QUESTION-05
+- VIC-AI-PIPELINE-09
+quality_score: 0
+iterations: 0

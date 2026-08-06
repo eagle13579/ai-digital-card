@@ -1,0 +1,12 @@
+name: backend-场景
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - FastAPI架构
+  - ORM映射
+  - 任务队列
+  - 异步编程
+  - 缓存
+  - 认证

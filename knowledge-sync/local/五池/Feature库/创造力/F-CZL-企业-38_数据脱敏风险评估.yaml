@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-38
+name: 数据脱敏风险评估
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 自动评估数据沙箱中数据的脱敏充分性
+
+products:
+  - 通用: 自动匹配

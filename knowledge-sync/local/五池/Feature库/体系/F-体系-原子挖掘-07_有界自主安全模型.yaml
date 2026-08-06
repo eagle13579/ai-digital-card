@@ -1,0 +1,65 @@
+feature_id: "F-体系-原子挖掘-07"
+name: "有界自主安全模型"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M18-有界自主安全模型"
+source_project: "Vibe-Trading"
+source_location: "D:/Vibe-Trading/Vibe-Trading/agent: mandate+kill switch+order guard+审计账本"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "AI自主操作的四层安全护栏：委派授权→文件级kill switch→预检门禁→审计账本"
+what_it_does: |
+  场景：链客宝AI功能(自动报价/自动回复/智能推荐)需要防止越权和误操作。
+  问题：AI自主操作缺少安全边界，一旦出错可能导致商业损失或数据泄露。
+  价值：借鉴Vibe-Trading的有界自主交易安全模型，为链客宝AI功能提供四层安全护栏。
+  架构亮点：用户提交mandate(标的/单量/敞口/杠杆)→文件级kill switch→预检门禁(订单安全检查)→审计账本(操作全记录)。
+
+input: |
+  - Mandate授权: 用户对AI的操作授权范围(什么能做/做多少/哪些禁止)
+  - 操作请求: AI拟执行的具体操作内容
+  - 风险参数: 操作的风险阈值(金额/频次/范围)
+  - 用户身份: 发起操作的用户/系统标识
+
+output: |
+  - 授权通过/拒绝: 操作是否在mandate授权范围内
+  - 安全检查结果: 预检门禁的逐项检查结果
+  - 审计记录: 操作完整日志(含入参/出参/时间戳/操作者)
+  - Kill switch状态: 紧急停止开关状态(绿色/红色)
+  - 风险预警: 接近授权边界的预警通知
+
+sop: |
+  1. 用户提交Mandate：定义AI操作的授权范围(操作类型/金额上限/频次限制/禁止操作)
+  2. 操作前检查：AI操作请求与Mandate匹配校验
+  3. Kill switch检查：检查全局/用户级紧急停止开关状态
+  4. 预检门禁：逐项检查操作安全条件(金额阈值/频次阈值/合规性)
+  5. 操作执行：门禁通过后执行操作
+  6. 审计记录：操作全量日志写入审计账本
+  7. 事后监控：操作完成后持续监控异常信号
+
+quality_gate:
+  - gate: "Mandate覆盖"
+    standard: "所有AI可执行操作类型必须在Mandate中明确定义"
+    score: 5
+  - gate: "Kill switch可用性"
+    standard: "用户可随时通过UI/API触发kill switch"
+    score: 5
+  - gate: "审计完整性"
+    standard: "每个操作都有完整的审计日志，不可篡改"
+    score: 5
+  - gate: "越权拦截率"
+    standard: "100%拦截越权操作(准确率+召回率均为100%)"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从Vibe-Trading agent安全模型提取
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

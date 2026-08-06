@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-41
+name: 反向论证生成器
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 对每个决策自动生成反向论证(红队模式)
+
+products:
+  - 通用: 自动匹配

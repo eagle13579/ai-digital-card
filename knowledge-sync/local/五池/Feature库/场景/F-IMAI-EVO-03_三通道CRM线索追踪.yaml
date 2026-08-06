@@ -1,0 +1,23 @@
+{
+  "name": "F-IMAI-EVO-03 三通道CRM线索追踪",
+  "version": "1.0.0",
+  "status": "injected",
+  "dimension": "场景",
+  "source": "IMAI-PC-Executor crm.py -> 链客宝",
+  "description": "RAG状态机+SAG评分引擎+LLM跨渠道融合的线索追踪系统。RAG定义线索状态流转规则, SAG按关键词+渠道+互动行为评分, LLM融合跨渠道线索信息",
+  "mental_models": [
+    "IMAI-06: 获客CRM状态机模型"
+  ],
+  "components": [
+    "crm_three_channel.py: CRMDB + SagLeadScorer + CrmThreeChannelRouter"
+  ],
+  "products": [
+    "链客宝: 企业家线索管理",
+    "内容自动化工厂: 获客CRM模块"
+  ],
+  "channels": {
+    "RAG": "LEAD_STATUS_CONFIG(8态)+KEYWORD_CATEGORIES(10关键词)",
+    "SAG": "SagLeadScorer.score_lead()",
+    "LLM": "llm_fusion_logic()跨渠道融合"
+  }
+}

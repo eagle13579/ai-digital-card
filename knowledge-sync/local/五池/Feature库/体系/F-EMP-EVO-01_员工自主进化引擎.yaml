@@ -1,0 +1,48 @@
+# Feature: 员工自主进化引擎
+# ID: F-EMP-EVO-01
+# 维度: 体系
+# 创建: 2026-06-10
+
+name: "员工自主进化引擎"
+id: "F-EMP-EVO-01"
+dimension: "体系"
+version: "1.0"
+status: "active"
+
+description: >
+  连接data_loader.py成熟度计算和行动层（delegate_task）的桥接引擎。
+  每小时全量扫描→计算L0-L3分布→分析瓶颈→生成进化动作→写入gaia_cortex委派队列。
+
+source_model: "M_成熟度桥接引擎 + M_L0飞轮启动 + M_委派队列模式"
+
+products:
+  - 数字员工SaaS: 自动匹配
+input:
+  - "employees/ 目录下的employee.yaml和memory.db"
+  - "data_loader.load_all_employees() 全员数据"
+  - "data_loader.compute_maturity_for_employee() 成熟度计算"
+
+output:
+  - "evolution_scan_*.json 进化日志 → L5孵化室/进化日志/"
+  - "gaia_delegation_queue.json 委派队列 → cache/"
+  - "/api/evolution/* coach面板3个新端点"
+
+sop:
+  step_1: "加载全员数据（复用data_loader真实数据）"
+  step_2: "计算成熟度（L0-L3分布 + 三维维度分）"
+  step_3: "分析进化状态（瓶颈部门 + 晋升候选 + 无导师部门）"
+  step_4: "生成进化动作（L0委派 + 晋升 + 导师分配）"
+  step_5: "写入gaia_cortex委派队列 + 进化日志"
+
+quality_gate:
+  syntax_check: "python -m py_compile employee_evolution_engine.py"
+  data_accuracy: "L0+L1+L2+L3 总数=员工总数"
+  integration_test: "python employee_evolution_engine.py --status 返回正确分布"
+  score: 8
+
+iterations:
+  - date: "2026-06-10"
+    action: "创建v1.0"
+    score: 8
+    note: "复用data_loader成熟度计算，不重建评估系统"
+product: "AI数智军团"

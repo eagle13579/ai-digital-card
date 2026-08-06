@@ -1,0 +1,69 @@
+name: "代码瘦身规范"
+version: "1.0.0"
+dimension: "基本功"
+status: "draft"
+draft: true
+source_model: "Code Pass"
+
+products:
+  - 通用: 自动匹配
+description: >
+  把1000行臃肿代码压回100行，做减法比做加法难。
+  通过系统性代码审查与重构，消除冗余、提取公共逻辑、
+  抽象可复用组件，在保持功能不变的前提下实现代码量级压缩。
+
+sop:
+  - step: 1
+    action: "生成初始代码"
+    description: "按需求生成功能完整的页面/组件代码，优先保证功能正确"
+  - step: 2
+    action: "代码冗余审查"
+    description: >
+      系统性扫描以下冗余模式：
+      (a) 重复样式——相同或高度相似的CSS声明块
+      (b) 未用变量——声明但未使用的state/props/import/constant
+      (c) 长函数——超过20行的函数，存在多职责混合
+      (d) 重复逻辑——相同逻辑在不同位置多次出现
+      (e) 硬编码值——应抽象为常量的magic number/string
+      (f) 过度嵌套——超过3层的条件/循环/三元运算嵌套
+  - step: 3
+    action: "提取公共组件"
+    description: "将重复出现的UI模式提取为可复用组件，定义清晰的props接口"
+  - step: 4
+    action: "压缩重复逻辑"
+    description: >
+      应用重构策略：
+      (a) 提取函数——重复计算逻辑提取为工具函数
+      (b) 合并状态——可推导的state合并减少冗余渲染
+      (c) 自定义Hook——组件间共享逻辑封装为Hook
+      (d) 条件简化——复杂条件表达式简化为查表/策略模式
+  - step: 5
+    action: "验证功能不变"
+    description: "运行单元测试和集成测试，确认瘦身后功能/交互/渲染结果与原始版本完全一致"
+  - step: 6
+    action: "输出瘦身报告"
+    description: "生成代码瘦身报告，包含原始行数/瘦身后行数/压缩比/各措施贡献度"
+
+input:
+  format: "任意前端代码文件（JS/TS/JSX/TSX/CSS/SCSS）"
+  content: "功能完整的页面或组件代码，文件长度通常≥200行，存在可优化的冗余空间"
+
+output:
+  format: "瘦身后代码 + 代码瘦身报告"
+  includes:
+    - "经过重构的最终代码文件"
+    - "代码瘦身报告（原始行数/瘦身后行数/压缩比/行数减少百分比）"
+    - "重构操作清单（每项修改的说明与依据）"
+    - "测试通过证明（测试覆盖率报告截取）"
+
+quality_gates:
+  - gate: "压缩比门槛"
+    description: "原始代码与瘦身后代码的行数压缩比≥40%（即至少减少40%的行数）"
+  - gate: "零功能回归"
+    description: "所有已有测试（单元测试+集成测试）100%通过，无新增failures"
+  - gate: "可读性不降"
+    description: "瘦身后的代码圈复杂度(Cyclomatic Complexity)不高于原始版本，命名清晰度不降低"
+  - gate: "无副作用引入"
+    description: "瘦身过程中不修改公共API签名、不改变组件对外接口、不引入新的外部依赖"
+  - gate: "瘦身报告完整"
+    description: "报告必须包含原始行数、最终行数、单文件压缩比、总压缩比、损失函数（重构带来的轻微可读性成本记录）"

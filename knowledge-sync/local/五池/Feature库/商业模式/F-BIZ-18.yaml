@@ -1,0 +1,13 @@
+# F-BIZ-18: 包装溢价引擎
+id: "F-BIZ-18"
+name: "包装溢价引擎"
+dimension: "🧱 场景"
+domain: "商业模式"
+description: "纯技术裸卖=白菜价，穿件衣服(硬件/培训)多卖10倍"
+source_model: "M-BIZ-18"
+source: "向海容与合作伙伴对话 2026-06-14"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

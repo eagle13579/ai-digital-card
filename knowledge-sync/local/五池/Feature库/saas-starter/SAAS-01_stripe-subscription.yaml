@@ -1,0 +1,8 @@
+name: F-SAAS-01_Stripe订阅集成
+description: Stripe Checkout+webhook+Coupon Portal标准SaaS订阅
+version: 1.0.0
+dimension: 商业模式
+source: nextjs/saas-starter
+products:
+  - AI数字名片
+  - 链客宝企业版

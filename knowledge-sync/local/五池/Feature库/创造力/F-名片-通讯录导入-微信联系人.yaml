@@ -1,0 +1,28 @@
+name: F-名片-通讯录导入-微信联系人
+version: 1.0.0
+domain: software-development
+type: feature
+maturity: seed
+autonomy: A0
+status: active
+description: '链客宝小程序 — 通过wx.chooseContact将微信通讯录联系人批量导入AI数智名片'
+---
+
+# F-名片-通讯录导入-微信联系人
+
+## 一句话
+30秒内从微信批量导入通讯录联系人，加密存储后自动匹配+训练。
+
+## 架构
+小程序 wx.chooseContact → POST /api/contacts/import → AES-256加密存储 → 匹配引擎 → 训练数据池
+
+## 关联PRD
+通讯录导入PRD_蜂巢会产出.md
+
+## 隐私关键设计
+- 不上传完整通讯录（仅用户选择的上传）
+- 手机号AES-256-GCM加密
+- 用户可随时删除全部导入数据
+
+## 冷启动价值
+1000联系人导入 → ~50万匹配对 → 三塔DNN可真正训练 → 匹配度90%+

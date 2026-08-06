@@ -1,0 +1,23 @@
+module_name: 三种验证法
+module_number: 16
+category: 创业方法-精益验证
+mental_models:
+  - 三种验证法
+  - 定性挖原因
+  - 定量测概率
+  - 类比拿基准
+  - 三板斧：常识-情报-实验
+learning_objectives:
+  - 掌握对关键假设进行验证的三条路径
+  - 学会根据假设类型选择合适的验证方式
+  - 能按成本从低到高逐级使用验证手段
+employee_roles:
+  - 产品经理
+  - 增长负责人
+  - 创业者
+source: 一堂创业课/创业方法-精益验证
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

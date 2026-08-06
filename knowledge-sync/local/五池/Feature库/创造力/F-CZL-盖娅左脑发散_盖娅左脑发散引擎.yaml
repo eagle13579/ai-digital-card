@@ -1,0 +1,59 @@
+feature_id: "F-CZL-盖娅左脑发散"
+name: "盖娅左脑发散引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "gaia-cortex SKILL.md §左右脑架构 + scripts/gaia_duality.py + double-triangle-model-absorption v5.0"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "左脑(三角一·创造力)每30分钟自动发散N种进化方案，通过T-C-P-R飞轮验证后送入右脑收敛执行"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  盖娅左右脑双螺旋的左脑引擎。每30分钟从资产状态中发散出至少3种进化方案(新增skill/注入心智/组合产品/Feature打磨/阿米巴孵化)，经TCP-R门禁验证后输出TOP方案给右脑执行。100次循环已验证稳定(408发散/404门禁通过/0失败)。
+
+input: |
+  - 当前资产状态(L0感知输出)
+  - 缺口分析(L1输出)
+  - 底座评估(基本功+数据成熟度)
+
+output: |
+  - N种进化方案(每轮≥3种)
+  - TCP-R门禁验证结果
+  - TOP方案(按三维评分排序)
+
+sop: |
+  1. 读取资产状态+缺口列表
+  2. 按三角一创造力4轴发散: 业务拆解/底层规律/解放思想/创造假设
+  3. 最少产出3种不同方向方案
+  4. 每个方案过TCP-R门禁(T/C/P/R四步)
+  5. 三维评分(商业价值/可行性/扩散性)
+  6. 输出TOP1-3给右脑收敛
+  7. 每2h左脑吸收全球设计/创意/审美最佳实践(gaia_duality.py --left-absorb)
+
+  quality_gate:
+  - gate: "最少3方案"
+    standard: "每轮至少发散3种不同方向"
+    score: 8
+  - gate: "TCP-R全通过"
+    standard: "TOP方案必须通过TCP-R门禁"
+    score: 9
+
+score_target: "9/10"
+depends_on:
+  - "F-TX-盖娅七层飞轮"
+  - "F-CZL-ADV-TCP-_TCP-R门禁执行器"
+
+enhanced_by:
+  - "F-CZL-灵感闪现"
+  - "F-CZL-深度思考"
+  - "F-CZL-解放思想"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+  # 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

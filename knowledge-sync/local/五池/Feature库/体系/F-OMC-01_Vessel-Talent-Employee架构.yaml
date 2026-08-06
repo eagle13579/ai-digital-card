@@ -1,0 +1,15 @@
+name: F-OMC-01_Vessel-Talent-Employee架构
+version: 1.0.0
+status: active
+dimension: 体系
+source: OneManCompany — vessel.py, vessel_config.py
+description: Vessel(执行容器)+Talent(员工人格)=Employee(完整员工)。Vessel负责on-demand任务调度和执行后端的生命周期管理，Talent负责身份/技能/工具集。两者通过vessel.yaml和profile.yaml解耦，支持三个执行后端(LangChain/Claude
+  CLI/Script)。
+atoms:
+- OMC-01 Vessel+Talent执行架构
+- OMC-06 完整数据包契约
+- OMC-04 注册表路由模式
+products:
+- AI数智军团员工体系
+- 白泽指挥官协议
+- 数字员工管理体系

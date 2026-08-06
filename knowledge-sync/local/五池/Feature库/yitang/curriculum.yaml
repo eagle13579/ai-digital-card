@@ -1,0 +1,156 @@
+# 一堂创业方法 · 学习路径索引
+# 按学习顺序排列：从机会预判→需求分析→产品内核→单元模型→精益验证→科学销售→增长壁垒
+title: 一堂创业20课完整学习路径
+version: 1.0
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17
+total_modules: 20
+
+modules:
+  - id: F-YT-01
+    module_number: 01
+    name: 机会预判三阶段法
+    category: 创业方法-机会预判
+    order: 1
+    description: 从0到1判断创业方向的系统方法论
+  - id: F-YT-02
+    module_number: 02
+    name: L型业务负责人
+    category: 创业方法-机会预判
+    order: 2
+    description: 逻辑型创业者思维模式
+  - id: F-YT-03
+    module_number: 03
+    name: 预判三层认知
+    category: 创业方法-机会预判
+    order: 3
+    description: 创业认知进阶框架
+
+  - id: F-YT-04
+    module_number: 04
+    name: 痛点确诊三维度
+    category: 创业方法-需求分析
+    order: 4
+    description: 判断需求真伪的核心框架
+  - id: F-YT-05
+    module_number: 05
+    name: 奥斯卡调研模型
+    category: 创业方法-需求分析
+    order: 5
+    description: 系统化调研方法论
+  - id: F-YT-06
+    module_number: 06
+    name: 用户画像三要素
+    category: 创业方法-需求分析
+    order: 6
+    description: 精准定义目标用户
+  - id: F-YT-07
+    module_number: 07
+    name: 天花板四法交叉验证
+    category: 创业方法-需求分析
+    order: 7
+    description: 市场规模估算四种方法
+
+  - id: F-YT-08
+    module_number: 08
+    name: 产品内核剥离法
+    category: 创业方法-产品内核
+    order: 8
+    description: 找到产品核心竞争力的方法
+  - id: F-YT-09
+    module_number: 09
+    name: 灵魂拷问链
+    category: 创业方法-产品内核
+    order: 9
+    description: 检验产品功能必要性的追问链
+  - id: F-YT-10
+    module_number: 10
+    name: FALSE模型(借假修真)
+    category: 创业方法-产品内核
+    order: 10
+    description: MVP设计核心武器库
+  - id: F-YT-11
+    module_number: 11
+    name: 讲香双方向
+    category: 创业方法-产品内核
+    order: 11
+    description: 产品价值呈现方法
+
+  - id: F-YT-12
+    module_number: 12
+    name: 10大经典单元模型分类框架
+    category: 创业方法-单元模型
+    order: 12
+    description: 商业模式细胞级切片分析
+  - id: F-YT-13
+    module_number: 13
+    name: LTV/CAC≥3法则
+    category: 创业方法-单元模型
+    order: 13
+    description: 单元模型成立的核心财务指标
+  - id: F-YT-14
+    module_number: 14
+    name: 动态预测模型
+    category: 创业方法-单元模型
+    order: 14
+    description: 规模效应与反规模陷阱分析
+
+  - id: F-YT-15
+    module_number: 15
+    name: 风险-知识矩阵：P0致命盲区识别
+    category: 创业方法-精益验证
+    order: 15
+    description: 识别关键风险和盲区
+  - id: F-YT-16
+    module_number: 16
+    name: 三种验证法
+    category: 创业方法-精益验证
+    order: 16
+    description: 关键假设验证的三条路径
+  - id: F-YT-17
+    module_number: 17
+    name: 第0轮原则
+    category: 创业方法-精益验证
+    order: 17
+    description: 先类比/竞品调研再验证
+  - id: F-YT-18
+    module_number: 18
+    name: 反例方法论
+    category: 创业方法-精益验证
+    order: 18
+    description: 主动找反例验证假设
+
+  - id: F-YT-19
+    module_number: 19
+    name: 卖点四步法
+    category: 创业方法-科学销售
+    order: 19
+    description: 提炼产品卖点的系统方法
+  - id: F-YT-20
+    module_number: 20
+    name: 销售三阶段
+    category: 创业方法-科学销售
+    order: 20
+    description: 用户从接触到付费的转化路径
+
+learning_path:
+  - phase: 机会判断
+    modules: [01, 02, 03]
+    description: 学会判断创业方向，从0到1选对赛道
+  - phase: 需求分析
+    modules: [04, 05, 06, 07]
+    description: 验证需求真伪，精准定义用户和市场
+  - phase: 产品内核
+    modules: [08, 09, 10, 11]
+    description: 找到产品核心竞争力，做好产品定位
+  - phase: 单元经济
+    modules: [12, 13, 14]
+    description: 设计可持续的商业模式，算清经济账
+  - phase: 精益验证
+    modules: [15, 16, 17, 18]
+    description: 用最小成本验证关键假设，降低试错成本
+  - phase: 科学销售
+    modules: [19, 20]
+    description: 建立可复制的销售体系，实现商业闭环

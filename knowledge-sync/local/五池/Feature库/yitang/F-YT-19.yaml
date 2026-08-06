@@ -1,0 +1,22 @@
+module_name: 卖点四步法
+module_number: 19
+category: 创业方法-科学销售
+mental_models:
+  - 卖点四步法
+  - 用户画像→痛点匹配→价值提炼→话术落地
+  - 对不同角色讲不同卖点
+  - 功能vs价值转换
+learning_objectives:
+  - 掌握提炼产品卖点的四步系统方法
+  - 学会为不同角色定制卖点
+  - 能将功能转化为用户可感知的价值
+employee_roles:
+  - 销售负责人
+  - 市场营销
+  - 产品经理
+source: 一堂创业课/创业方法-科学销售
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

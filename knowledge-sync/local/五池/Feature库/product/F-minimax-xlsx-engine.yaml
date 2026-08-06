@@ -1,0 +1,20 @@
+name: MiniMax智能Excel引擎
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — minimax-xlsx (2026-07-05)
+description: 基于OpenXML零损编辑的Excel处理引擎。支持创建/读取/编辑/验证，公式重算，样式审计，无损格式保留。
+atoms:
+  - XLSX-XML-EDIT: XML零损编辑(xlsx_unpack→edit→pack)
+  - XLSX-4MODE: 四任务路由(READ/CREATE/EDIT/FIX)
+  - XLSX-SST: 共享字符串表模式
+  - XLSX-FORMULA: 公式安全验证+libreoffice重算
+products:
+  - 链客宝 — 企业报表/数据导出
+  - 䑏疏跨境助手 — 跨境电商数据分析
+  - 计然(赛博参谋) — 财务模型/投资分析
+  - 中国软银投资系统 — 回测数据导出
+employees:
+  - 蠪侄P9(财务)
+  - 计然P8(分析)
+  - 䑏疏P8(跨境)

@@ -1,0 +1,27 @@
+feature_id: F-CZL-QUANTUM-04
+name: 叠加态草稿迭代
+version: 1.0.0
+dimension: 创造力
+source_model: 量子时间逆转/Q8-叠加态包容性.md
+one_liner: Feature在草稿状态下处于叠加态——可自由修改/试错/重构, 发布才坍缩为确定态
+
+products:
+  - 通用: 自动匹配
+what_it_does: Feature库中的draft Feature处于叠加态——可以自由修改评分/SOP/source_model而不受门禁约束。发布(deploy)瞬间坍缩为确定态，受质量门禁保护
+input: Feature YAML + 当前状态(draft/released)
+output: 状态门禁决策(允许修改/需要审核)
+sop: '1. 草稿Feature(draft=true)处于叠加态
+
+  2. 修改草稿无需通过门禁
+
+  3. 发布时执行全量门禁检查
+
+  4. 发布后变为确定态
+
+  5. 确定态修改需走变更流程'
+quality_gate: '评分6/10: 草稿迭代无阻塞率90%'
+score: 6
+depends_on: []
+enhanced_by: []
+implementation: 概念Feature — 指导Feature库门禁设计
+draft: true

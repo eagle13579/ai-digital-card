@@ -1,0 +1,19 @@
+id: F-PAT-ShrinkingAcceleration
+name: 缩量加速持筹模型
+dimension: 场景
+domain: 持仓管理
+description: >-
+  分歧转一致确认后，后续连板持续缩量，持筹者惜售，最安全的持仓阶段
+source_model: 宗申动力2026-06-11~06-12走势
+
+products:
+  - 通用: 自动匹配
+signals:
+  - 分歧转一致确认后持续缩量
+  - 成交量递减（180万→146万→93万）
+  - 封板度保持1.0
+  - 跳空高开幅度递增
+score: 8.5
+iterations: 1
+created_at: 2026-06-13 13:21
+source_stock: 宗申动力(001696)

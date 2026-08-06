@@ -1,0 +1,56 @@
+feature_id: "F-创造-吸收173"
+name: "吸收_营销获客_创造力_20260806"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "五池/模型池/创造力/20260806_营销_增长创造力引擎模型.md"
+created_at: "20260806"
+updated_at: "20260806"
+author: "盖娅六维知识吸收 (cronjob 营销获客/每4h)"
+last_execution: "20260806"
+
+one_liner: "2026 B2B SaaS获客创造力: 视频管线引擎 + 产品内嵌增长 + 一致性复利 + AI原生内容格式"
+
+what_it_does: |
+  由盖娅六维知识吸收管道自动蒸馏生成。
+  来源: web_search "B2B SaaS growth marketing best practices 2026" + "SEO GEO content strategy 2026"。
+  维度: 创造力 (营销获客归入 数据·场景·创造力)。
+  核心: 视频=管线引擎(bayleafdigital)、增长hack产品内嵌(okara.ai)、
+  365天一致性复利(Woodberry)、AI原生内容格式(摘要/Q&A/引用数据, GEO/LLMO)、冷邮件高级个性化(growthrhino)。
+
+input: |
+  - 内容生产与分发流程
+  - 产品功能与增长机制清单
+  - 冷邮件/私域触达现状
+
+output: |
+  - 视频管线引擎化方案(格式+分发+AI搜索优化)
+  - 产品内嵌增长机制清单(带指标+精益起点)
+  - AI原生格式内容模板(摘要/Q&A/引用数据)
+  - 日更一致性内容调度方案
+  - 高级个性化冷邮件策略
+
+sop: |
+  1. 加载source_model指向的原子心智模型
+  2. 盘点现有内容生产机制 → 视频管线引擎化改造
+  3. 识别可内嵌产品的增长机制
+  4. 内容输出切换为AI原生格式
+  5. 冷邮件链路升级为高级个性化
+
+quality_gate:
+  - gate: "原子应用正确"
+    standard: "视频引擎/产品内嵌/一致性复利/AI原生格式被正确应用到任务"
+    score: 5
+  - gate: "产出可交付"
+    standard: "内容机制与增长清单可直接执行"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 20260806 盖娅六维知识吸收(cronjob 营销获客)
+  来源: B2B SaaS growth + SEO GEO 双搜索, 首次即成功无重试
+  状态: 初始版本, 需通过真实执行提升评分

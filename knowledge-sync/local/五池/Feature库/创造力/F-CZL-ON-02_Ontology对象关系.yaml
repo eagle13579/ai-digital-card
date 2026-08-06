@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-02
+name: Ontology对象关系挖掘
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 从业务数据中自动发现未注册的对象关系
+
+products:
+  - 通用: 自动匹配

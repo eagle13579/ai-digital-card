@@ -1,0 +1,15 @@
+---
+id: F-CSB-AI-05
+name: 智慧蓝图与并购注入
+category: 场景
+dimension: 工具集成
+description: 经典智慧注入蓝图 + 客户获取管线 + LLM成本管控 + 北极星看板SDK
+version: 1.0.0
+status: draft
+source: BaiZeCapital_旧版 wisdom_blueprint.py + acq_inject.py + llm_cost_controller.py + polaris_dashboard_sdk.py
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - 2026-06-23_CSB-智慧蓝图与并购注入
+dependencies: []

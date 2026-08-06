@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-20
+name: 记忆分层迁移推荐
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 工作记忆满时推荐哪些信息压缩到短期记忆
+
+products:
+  - 通用: 自动匹配

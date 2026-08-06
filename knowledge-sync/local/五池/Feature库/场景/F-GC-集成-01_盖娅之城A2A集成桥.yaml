@@ -1,0 +1,74 @@
+feature_id: F-GC-集成-01
+name: 盖娅之城 ↔ A2A通信层 集成桥
+version: "1.0"
+dimension: 场景
+source_model: 盖娅之城A2A集成桥适配器
+source_project: Feature总线/integration/gaia_city_bridge.py
+one_liner: 让盖娅之城通过A2A消息总线进行结构化通信的轻量桥接模块
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  提供一个可独立import的Python模块 gaia_city_bridge，
+  让盖娅之城的使用者可以选择通过A2A消息总线而非直接写DB进行：
+  - 提议 → 发布到A2A话题总线
+  - 匹配公民 → 通过AgentRegistry查询
+  - 讨论消息 → 发布到A2A消息总线(带correlation_id追踪)
+  - 沉淀结果 → 从A2A获取完整消息链
+
+  核心设计原则:
+  1. 只新增不覆盖(铁律九十二)
+  2. 不修改盖娅之城现存代码(100+文件)
+  3. 桥接器是独立可import的Python模块
+  4. 复用已有的A2A组件(message_bus/agent_registry/topic_broker)
+  5. 不在桥接器里重写任何已有功能(铁律八十九)
+
+  盖娅之城原流程 → A2A桥接后:
+  | 原流程                  | 桥接后                                     |
+  |:------------------------|:-------------------------------------------|
+  | 发起提议(proposal)      | message_bus.publish(topic='gaia.proposal') |
+  | 匹配公民                | agent_registry.find_by_capability()        |
+  | 讨论消息                | message_bus.publish(type='discussion',     |
+  |                        |   correlation_id=proposal_id)              |
+  | 沉淀结果                | message_bus.get_chain(correlation_id)      |
+
+  盖娅之城路径: L5孵化室/产品开发/盖娅之城/
+  A2A层路径:    L5孵化室/Feature总线/a2a/
+input:
+  - action: propose | match | discuss | settle | status
+  - from_agent: str  # 发起提议的Agent标识
+  - proposal_title: str  # 提议标题
+  - proposal_desc: str  # 提议描述
+  - required_capabilities: list[str]  # 匹配所需能力
+  - agent_id: str  # 发言者
+  - content: str  # 讨论内容
+  - stance: str  # 支持/质疑/补充/反对
+  - proposal_id: str  # 关联提议ID
+output:
+  - correlation_id: str  # 追踪链ID
+  - proposal_id: str  # 提议ID
+  - message_id: str  # 消息ID
+  - participants: list[dict]  # 匹配到的参与者列表
+  - chain: list[dict]  # 完整消息链
+  - status: dict  # 桥接器状态
+sop: |
+  1. GaiaCityA2ABridge(message_bus, agent_registry) -> 初始化桥接器
+  2. propose(from_agent, title, desc) -> 发布提议到A2A总线, 返回correlation_id+proposal_id
+  3. match_participants(proposal_id, required_capabilities) -> 通过AgentRegistry匹配公民
+  4. discuss(proposal_id, agent_id, content, stance) -> 发布讨论消息到A2A总线
+  5. settle(proposal_id) -> 获取完整消息链作为沉淀结果
+  6. get_status() -> 返回桥接器连接状态+统计
+quality_gate:
+  - score: 7/10
+  - checks:
+    - 桥接器Python语法验证通过
+    - 不修改盖娅之城现有代码(100+文件)
+    - 只新增不覆盖
+    - 复用已有的a2a/message_bus.py/a2a/agent_registry.py
+    - 独立可import
+    - 提议→匹配→讨论→沉淀全流程A2A化
+iteration_log:
+  - "2026-06-08: v1.0初始版本, 集成桥创建完成"
+product:
+  - "盖娅之城"
+  - "盖娅进化大脑"

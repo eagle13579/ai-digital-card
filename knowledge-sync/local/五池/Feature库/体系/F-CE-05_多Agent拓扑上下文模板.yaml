@@ -1,0 +1,8 @@
+feature_id: F-CE-05_多Agent拓扑上下文模板
+name: 多Agent拓扑上下文模板
+version: 1.0.0
+dimension: 体系
+source_model: Context-Engineering吸收
+
+products:
+  - 通用: 自动匹配

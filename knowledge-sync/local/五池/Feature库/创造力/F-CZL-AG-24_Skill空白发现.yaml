@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-24
+name: Skill空白发现
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 扫描766个skill发现未被覆盖的开发场景
+
+products:
+  - 文鳐技能集市: 自动匹配

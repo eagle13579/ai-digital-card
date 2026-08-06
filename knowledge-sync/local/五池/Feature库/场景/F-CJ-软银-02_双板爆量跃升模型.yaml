@@ -1,0 +1,44 @@
+feature_id: F-CJ-软银-02
+name: 双板爆量跃升模型（汉王科技型）
+version: "1.0"
+dimension: 场景
+source_model: 汉王科技(002362) 2026-06 实战复盘
+source_project: 中国软银投资系统/龙头战法量化模型
+one_liner: 2连板，第2板放巨量换手，第3天低开高走资金流入拉升
+
+products:
+  - 通用: 自动匹配
+what_it_does: 识别「双板爆量跃升」模式——主力通过第2板放巨量完成高位换手，第3天低开洗盘后拉升的经典龙头二波启动形态
+input:
+  - daily_data: list  # 最近5日K线数据
+  - minute_data: list  # 当日分钟数据
+  - pre_close: float  # 昨收
+output:
+  - is_matched: bool
+  - confidence: float
+  - day2_volume_ratio: float  # 第2板量比
+  - day3_inflow_score: float  # 第3天资金流入评分
+sop: |
+  Phase 1 — 确认2连板
+    条件: 最近2个交易日连续涨停(非一字板)
+    
+  Phase 2 — 第2板放量
+    条件: 第2板换手率 > 第1板换手率×1.5
+    或: 第2板成交量 > 近5日均量×2
+    
+  Phase 3 — 第3天低开拉升
+    条件: 开盘价 < 昨收 (低开)
+    盘中拉回昨收上方，涨幅>3%
+    资金净流入为正
+    
+  Phase 4 — 封板确认 (可选)
+    如果能再次涨停，则确认强势二波
+quality_gate:
+  score: 7/10
+  checks:
+    - 基于汉王科技2026-06实战分时验证
+    - 第2板放量阈值需回测优化
+    - 第3天拉升力度与资金流入正相关
+iteration_log:
+  - "2026-06-10: v1.0初始版本，向海容命名「双板爆量跃升」"
+product: "中国软银投资系统"

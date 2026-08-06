@@ -1,0 +1,22 @@
+name: "F-TRANS-13"
+title: "nanoGPT Inference API — Transformer推理服务"
+version: 1.0.0
+category: "Transformer产品化"
+description: "将收割的nanoGPT代码包装为Flask API推理服务(:5058)。GET /health, POST /generate。0.03M参数,CPU运行。已本机验证运行。"
+
+atoms:
+  - "T10 自回归生成"
+  - "T04 注意力机制"
+
+code_references:
+  - file: "app.py"
+    lines: 92
+    summary: "Flask API包装nanoGPT: 加载GPT→自回归采样→返回序列+top-5概率"
+    link: "D:\\temp_downloads\\nanogpt-api\\app.py"
+
+demo_result:
+  health: "GET /health → 200 OK"
+  generate: "POST /generate tokens=10 → 14 tokens (4+10) 自回归生成成功"
+  port: 5058
+
+status: "running"

@@ -1,0 +1,22 @@
+name: 售后支持
+version: 1.0.0
+description: The Agency吸收 - 售后支持角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Analytics Reporter
+  - Executive Summary Generator
+  - Finance Tracker
+  - Infrastructure Maintainer
+  - Legal Compliance Checker
+  - Support Responder
+capabilities:
+  - 客户支持响应与问题解决
+  - 分析报告生成与执行摘要编写
+  - 财务跟踪与费用管理
+  - 基础设施维护与系统健康监控
+  - 法律合规检查与风险评估
+  - 多渠道客服与用户体验优化
+integration: 直接补充AI数字军团售后支持能力

@@ -1,0 +1,16 @@
+---
+id: F-UUX-07
+name: 组件状态矩阵规范
+dimension: 基本功
+source_model: UUX-07
+
+products:
+  - 通用: 自动匹配
+description: >-
+  Default/Hover/Active/Disabled/Focus标准化状态表
+sop: |-
+  详见原子模型 UUX-07
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

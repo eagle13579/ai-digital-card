@@ -1,0 +1,30 @@
+{
+  "name": "F-IMAI-02 多平台适配器架构建模",
+  "version": "1.0.0",
+  "status": "released",
+  "dimension": "体系",
+  "source": "IMAI-PC-Executor",
+  "description": "统一平台适配器抽象基类(PlatformAdapter)+WorkerEnum指令枚举+Engine-WSClient分离架构，新增平台只需继承基类实现5个抽象方法",
+  "mental_models": [
+    "IMAI-01: 平台适配器模式",
+    "IMAI-04: 引擎-WS客户端协议分离架构"
+  ],
+  "components": [
+    "platforms/base.py: PlatformAdapter抽象基类(107行)",
+    "worker_enum.py: WorkerEnum指令枚举(113行)",
+    "engine.py: 执行引擎主循环(259行)",
+    "ws_client.py: WebSocket客户端(219行)"
+  ],
+  "products": [
+    "AI数智军团: 数字员工多平台适配器基底",
+    "内容工厂: 多平台内容发布适配器"
+  ],
+  "integration": {
+    "type": "pipeline",
+    "dependencies": [
+      "playwright",
+      "websockets"
+    ],
+    "setup": "继承PlatformAdapter，实现search_user/view_profile/comment/send_private_message/check_login"
+  }
+}

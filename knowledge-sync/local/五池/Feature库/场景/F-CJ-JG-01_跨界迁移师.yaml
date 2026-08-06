@@ -1,0 +1,24 @@
+feature_id: "F-CJ-JG-01"
+name: "跨界迁移师"
+version: "1.0.0"
+dimension: "场景"
+source_model: "结构思维M3"
+one_liner: "帮用户把一个领域的结构迁移到另一个领域"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  分析用户在已有领域的核心结构，帮其迁移到新领域。骨架复用换层皮。
+input: |-
+  已有领域+目标领域描述
+output: |-
+  跨界迁移方案(源结构+目标适配+表层替换清单)
+sop: |-
+  1. 提取已有领域核心骨架 2. 分析目标领域特殊性 3. 识别骨架兼容度 4. 适配表层替换
+quality_gate: |-
+  1. 骨架提取完整 2. 领域差异分析 3. 至少适配3个关键点
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: 结构思维·提取结构一通百通吸收

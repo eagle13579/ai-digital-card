@@ -1,0 +1,59 @@
+feature_id: 'F-CJ-透明议事厅-01'
+name: '多模态AI议事应用场景'
+type: 'feature'
+dimension: '场景'
+source_model: '透明议事厅 — agora.py（CLI入口） + server.py（Flask Web入口） + scripts/hall_daemon.py（7x24自动值守） + core/need_discovery.py（自动发现）'
+source_path: 'D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\透明议事厅\'
+description: >
+  透明议事厅覆盖6大核心应用场景，满足从个人创意到组织级产品创新的全场景需求：
+  ①CLI即席议事场景(agora.py)——用户输入任何议题立即启动完整蜂巢会议，
+  支持4种CLI模式：python agora.py "议题"（即席议事）、--scan（自动发现需求）、
+  --status（查看状态）、--list（列出全部记录）。
+  ②Web仪表盘场景(server.py+app.py)——Flask Web服务端口5055，
+  提供RESTful API（/api/health,/api/status,/api/sessions,/api/hypotheses,
+  /api/precipitations,/api/stats）+ HTML模板渲染，支持API Key认证。
+  ③7x24值守场景——hall_daemon.py每30分钟自动执行需求发现→蜂巢会议→验证→沉淀
+  的完整循环，实现AI军团自主产品创新，支持--daemon/--once/--status三种模式。
+  ④需求自动发现场景——NeedDiscovery引擎扫描记忆宫殿五池(认知池/灵感池/问题池/方案池/成果池)、
+  员工提案(P7-P9级7位AI员工)、外部信号(用户反馈/市场趋势/竞品动态/技术突破/政策变化)、
+  定时扫描(每日/每周/每月)，四源驱动持续发现产品需求。
+  ⑤盖娅之城集成场景——通过sse_server.py实现SSE实时推流推送议事状态，
+  data_loader.py加载会议数据到盖娅决策系统，discussion_engine.py驱动三大会议厅
+  （觉醒大厅/作战室/智库）协同议事。
+  ⑥成果沉淀复用场景——PrecipitationEngine将讨论成果沉淀到五池(模型池/行动池/决策验证池)、
+  员工记忆库（参与成员进化）、Gaia进化队列三大复用渠道。
+inputs:
+  - '用户议题: CLI参数传入或Web界面输入的讨论主题（字符串）'
+  - '命令模式参数: --scan / --status / --list / --id（CLI入口切换）'
+  - '环境变量: PORT(5055)/AUTH_ENABLED/API_KEY/LLM_MOCK_MODE/DEEPSEEK_API_KEY/.env'
+  - '记忆宫殿根路径: 自动探测(五池/复盘目录)或HERMES_HOME环境变量'
+  - 'Web API请求: POST/PUT/DELETE需API Key认证的HTTP请求'
+outputs:
+  - 'CLI议事输出: 完整蜂巢会议日志(含角色发言摘要/评分/裁决/假设/沉淀路径)'
+  - 'Web API JSON: 议事状态/列表/详情/Hypothesis/沉淀的标准化JSON响应'
+  - 'Web HTML页面: 透明议事厅仪表盘(index.html模板渲染)'
+  - '已沉淀成果: 写入五池/模型池/行动池/决策验证池的.md文件 + Gaia进化队列JSON'
+  - '循环运行报告: hall_daemon.py每30分钟运行的Session/Hypothesis/Precipitation计数'
+sop:
+  - '1. CLI即席模式：python agora.py "议题" → 创建Session → 左脑发散 → TCP-R对话 → 右脑收敛 → 红队终审 → 提取假设 → 沉淀成果'
+  - '2. CLI扫描模式：python agora.py --scan → NeedDiscovery扫描4信号源 → 返回需求列表（置信度+紧迫度）'
+  - '3. Web服务模式：python server.py → Flask启动端口5055 → API端点提供RESTful访问 → 配置可选API Key认证'
+  - '4. 值守模式：python scripts/hall_daemon.py --daemon → 每30分钟循环 → 自动发现需求并处理top 3'
+  - '5. 盖娅集成模式：SSE实时推流议事状态 → data_loader加载数据 → discussion_engine驱动三大会议厅'
+  - '6. 成果复用场景：precipitation_engine.precipitate() → 五池5类沉淀(markdown文档) + 员工进化 + Gaia进化队列'
+quality_gate:
+  min_score: 5
+  score: 7
+current_score: 7
+status: 'active'
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-10'
+product:
+  - "7x24值守"
+  - "AI员工自动生产"
+  - "决策引擎仪表盘"
+  - "盖娅之城"
+  - "盖娅进化大脑"
+  - "透明议事厅"

@@ -1,0 +1,206 @@
+name: "F-TRANS-06"
+title: "自回归任务流水线"
+version: 2.0.0
+category: "生成推理"
+description: "基于已生成前缀逐步预测下一个Token的自回归解码流水线,配合KV缓存与解码策略(采样/束搜索/温度控制)实现高质量的序列到序列生成"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T10 自回归生成"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # ===== 自回归生成核心循环 =====
+
+  # --- nanoGPT: 标准自回归生成 ---
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "generate"
+    lines: 214-239
+    summary: "自回归生成循环: idx_cond裁剪→前向→last_logits→/temperature→top-k裁剪→softmax→multinomial采样→concat"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "forward"
+    lines: 168-191
+    summary: "推理优化: targets=None时只计算最后一个位置的logits(logits = lm_head(x[:,[-1],:])),减少不必要的LM头计算"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- nanoGPT_sample: 完整采样脚本 ---
+  - file: "nanoGPT_sample.py"
+    lines: 1-93
+    summary: "完整采样管线: 从checkpoint恢复/预训练权重加载→模型eval→encode prompt→for samples→generate→decode→print"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_sample.py"
+
+  # --- nanoGPT_sample: 采样参数 ---
+  - file: "nanoGPT_sample.py"
+    lines: 18-24
+    summary: "可配置采样参数: temperature(温度0.8), top_k(200), num_samples(10), max_new_tokens(500), seed(1337)"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_sample.py"
+
+  # ===== 因果掩码(自回归必要条件) =====
+
+  # --- nanoGPT: 因果掩码(手工实现) ---
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "__init__"
+    lines: 43-48
+    summary: "因果掩码: torch.tril(torch.ones(block_size, block_size)) — 下三角矩阵,确保每个Token只能关注到自己及左侧的Token"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "forward"
+    lines: 60-68
+    summary: "Flash Attention: is_causal=True (PyTorch≥2.0原生支持) / 手工掩码: att = att.masked_fill(bias==0, -inf)"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 原论文: 自回归子序列掩码 ---
+  - file: "paper_Models.py"
+    function: "get_subsequent_mask"
+    lines: 18-23
+    summary: "subsequent_mask = 1 - triu(ones(1,len_s,len_s), diagonal=1) — 解码器的因果子序列掩码"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # ===== KV缓存(推理加速) =====
+
+  # --- Llama: KV缓存 ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "forward"
+    lines: 125-166
+    summary: "past_key_values.update(key_states, value_states, layer_idx) — 缓存已生成的K/V矩阵,避免每一步重复计算历史Token的K/V"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- BERT: KV缓存(Decoder模式) ---
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertSelfAttention"
+    method: "forward"
+    lines: 71-108
+    summary: "past_key_values.update(key_layer, value_layer, self.layer_idx) — BERT在decoder模式下也支持KV缓存加速推理"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  # ===== 解码采样策略 =====
+
+  # --- nanoGPT: Top-K采样+温度控制 ---
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "generate"
+    lines: 227-237
+    summary: "logits = logits/temperature → top-k截断 → softmax归一化 → torch.multinomial采样 — 组合了温度调节、Top-K过滤和多项式采样"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class AutoregressivePipeline:
+      """
+      自回归任务流水线 — 逐步生成序列的核心引擎
+
+      ===== 主循环 =====
+      def generate(self, prompt_ids, max_new_tokens, temperature=1.0, top_k=None):
+          idx = prompt_ids  # (batch, seq_len)
+          # 可选: 初始化KV缓存
+
+          for step in range(max_new_tokens):
+              # 1. 裁剪上下文(防止超过最大长度)
+              idx_cond = idx[:, -block_size:]
+
+              # 2. 单次前向传播
+              logits, _ = model(idx_cond)  # (batch, seq_len, vocab_size)
+
+              # 3. 取最后一个位置的logits
+              logits = logits[:, -1, :]  # (batch, vocab_size)
+
+              # 4. 解码策略
+              logits = logits / temperature    # 温度控制
+              if top_k is not None:
+                  # Top-K截断: 只保留最高K个候选
+                  top_k_vals, _ = torch.topk(logits, top_k)
+                  logits[logits < top_k_vals[:, [-1]]] = -inf
+              probs = F.softmax(logits, dim=-1)
+
+              # 5. 采样
+              idx_next = torch.multinomial(probs, num_samples=1)
+
+              # 6. 追加并继续
+              idx = torch.cat([idx, idx_next], dim=1)
+
+          return idx
+
+      ===== 解码策略对比 =====
+      ┌────────────┬────────────────────────────────┬──────────────────────┐
+      │ 策略       │ 实现                          │ 适用场景             │
+      ├────────────┼────────────────────────────────┼──────────────────────┤
+      │ Greedy     │ argmax(logits)               │ 确定性推理(翻译)     │
+      │ Sampling   │ multinomial(softmax(logits)) │ 创造性生成(对话)     │
+      │ Top-K      │ 保留Top-K后采样              │ 平衡多样性与质量     │
+      │ Top-P(nuc) │ 保留累积概率≥p的最小集合     │ 动态候选集自适应     │
+      │ Beam Search│ 保留Top-B个序列路径          │ 高质量但计算昂贵     │
+      └────────────┴────────────────────────────────┴──────────────────────┘
+
+      ===== KV缓存加速原理 =====
+      第t步时:
+        Q_t = proj_q(x_t)                  # 只计算当前输入Token的Q
+        K_(1:t) = [K_(1:t-1); proj_k(x_t)] # K缓存拼接新K
+        V_(1:t) = [V_(1:t-1); proj_v(x_t)] # V缓存拼接新V
+        注意力: softmax(Q_t @ K_(1:t)^T / sqrt(d)) @ V_(1:t)
+        复杂度: O(t*d²), 而非从头计算的O(t²*d)
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "逐步自回归解码,每次前向传播生成一个最优Token — 每一步输出作为下一步输入,形成链式依赖"
+  - "因果掩码确保自回归一致性: 每个Token只能关注到自己及之前的Token,不能看到未来信息"
+  - "KV缓存避免重复计算: 已生成的Token的K/V矩阵被缓存,每一步只需计算当前新Token的K/V,推理复杂度从O(n²)降到O(n)"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "任务分解与执行流水线"
+    description: >
+      链客宝的复杂业务流程(如"帮企业找到3家匹配的供应链伙伴并发送合作邀约")
+      被分解为子任务序列,自回归地生成每一步执行计划:
+      步骤1: 解析需求 → 步骤2: 搜索候选 → 步骤3: 排序匹配 → 步骤4: 生成邀约文案
+      每一步的输出作为下一步的输入,形成链式任务流水线。KV缓存机制确保
+      在长流程中不重复计算已完成的步骤。
+
+  - product: "AI名片"
+    component: "智能推荐回复生成器"
+    description: >
+      当用户收到名片交换请求时,自动生成个性化回复。自回归流水线:
+      - prompt: "用户A是[身份],用户B是[身份],生成得体的名片交换回复"
+      - 逐步生成: 问候→自我介绍→合作意愿表达→签名
+      Top-K采样(temperature=0.7, top_k=50)确保每次回复多样但不偏离主题。
+      KV缓存加持下可在100ms内完成30字的回复生成。
+
+  - product: "数智港"
+    component: "内容生成飞轮引擎"
+    description: >
+      基于历史上下文逐步生成:
+      - 知识卡片: 从碎片知识点→结构化知识卡片(逐步扩充)
+      - 分析报告: 从摘要→引言→数据→分析→结论(分段逐步生成)
+      - 对话回复: 从理解→推理→表达(三步自回归)
+      飞轮引擎使用束搜索(beam_width=3)在每一步保留3个最佳候选路径,
+      确保生成内容在多样性和质量之间取得平衡。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "已落地: KV缓存加速推理 — 从LlamaAttention和BertSelfAttention吸收"
+  - "推测解码(Speculative Decoding): 用小模型猜测N个Token,大模型验证,大幅提升生成速度"
+  - "并行解码(Non-autoregressive): 一步生成所有Token,牺牲少量质量换取极致速度"
+  - "Medusa解码: 训练多个辅助头预测未来N步,实现并行推测"
+  - "分块因果注意力(CCM): 长序列生成的分块策略,既保持自回归又支持长上下文"

@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-28
+name: 增量切片优化
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 分析历史切片大小推荐最优的切片粒度
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,32 @@
+feature_id: F-CZL-AIHQ-社媒工厂_社媒内容工厂6步自治循环
+name: 社媒内容工厂6步自治循环
+version: 1.0.0
+dimension: 创造力
+source_model: AI获客/社媒运营/social_engine.py
+# 精确source_model溯源 (2026-06-12): * 2026-06-12: 来源待进一步溯源
+source_project: AI获客
+one_liner: 社交媒体内容生产的持续自治循环：诊断趋势→采集素材→AI生成→审核→发布→监测效果→回到诊断改进
+
+products:
+  - 内容工厂: 自动匹配
+what_it_does: 从AI获客/社媒运营/social_engine.py中提取的社媒内容工厂6步自治循环模式。Diagnose → Collect → Generate
+  → Review → Publish → Monitor → (loop)
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载社媒内容工厂6步自治循环模式
+
+  2. 根据Diagnose → Collect → Generate → Review → Publish → Monitor → (loop)执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从AI获客/社媒运营/social_engine.py提取初始版本
+product: "内容自动化工厂"

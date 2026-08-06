@@ -1,0 +1,17 @@
+id: F-RR-02
+name: tRPC全栈框架
+description: 整合RR02 tRPC接口层与RR09服务编排能力，构建全栈类型安全的RPC通信框架。基于tRPC协议实现端到端类型推导，消除前后端接口契约维护成本；集成服务发现、负载均衡、熔断降级与链路追踪等微服务治理能力，为RedRoom各模块之间提供高性能、高可靠的通信基底。
+dimension: 基本功
+domain: 基础架构/RPC通信
+status: 孵化中
+tags:
+  - tRPC
+  - 全栈框架
+  - 类型安全
+  - 服务编排
+  - 微服务治理
+  - RPC通信
+source: RedRoom情报平台 / RR02+RR09
+
+products:
+  - 通用: 自动匹配

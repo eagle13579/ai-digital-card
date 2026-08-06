@@ -1,0 +1,9 @@
+name: F-SAAS-02_定价页面模式
+description: 按年/月切换, 数据库驱动定价, Stripe连通
+version: 1.0.0
+dimension: 商业模式
+source: nextjs/saas-starter
+products:
+  - AI数字名片
+  - 文鳐技能集市
+  - 链客宝

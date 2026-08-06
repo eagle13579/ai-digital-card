@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-42
+name: 假设验证方案设计
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 为模糊想法自动设计验证实验方案
+
+products:
+  - 通用: 自动匹配

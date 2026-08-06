@@ -1,0 +1,24 @@
+feature_id: "F-TX-JG-02"
+name: "心理表征训练器"
+version: "1.0.0"
+dimension: "体系"
+source_model: "结构思维M2"
+one_liner: "帮用户建立对特定领域的心理表征(底层逻辑图)"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  帮用户在某个领域建立高手级心理表征。核心：高手的脑子是一张可嵌套的底层逻辑图。
+input: |-
+  目标领域描述+当前水平
+output: |-
+  心理表征构建方案(骨架+套用模式+新问题映射表)
+sop: |-
+  1. 识别核心骨架 2. 剥离场景绑定 3. 抽象为可复用模式 4. 创建新问题映射表 5. 训练套用
+quality_gate: |-
+  1. 骨架剥离干净 2. 至少3种套用模式 3. 映射表有5+案例
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: 结构思维·提取结构一通百通吸收

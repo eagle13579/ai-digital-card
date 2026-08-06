@@ -1,0 +1,22 @@
+name: superpowers-cross-platform
+dimension: 数据
+description: 全平台兼容 — 同一套Skills在5个Agent平台上一致运行
+source: obra/superpowers (GitHub 245K Stars)
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - 纯Shell零依赖实现
+  - Claude Code / Cursor / Codex CLI / OpenCode / Gemini CLI兼容
+  - 约定优于配置的目录结构
+  - 渐进增强的高级功能可选
+  - Skill文件自文档化
+mental_models:
+  - SP-07_Multi-Platform-Agnosticism
+triggers:
+  - 需要跨Agent平台部署Skills时
+  - 需要保证技能一致性的多环境场景
+integration:
+  - 军团SKILL.md增加platforms字段
+  - SKILL.md增加auto_trigger字段
+  - 建立Skill依赖图

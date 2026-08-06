@@ -1,0 +1,6 @@
+feature_id: F-CZL-AUTO-80
+name: 约束放松实验
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 逐个放松约束观察系统行为变化

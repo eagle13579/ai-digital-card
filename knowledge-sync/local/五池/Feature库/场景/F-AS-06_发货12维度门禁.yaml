@@ -1,0 +1,6 @@
+feature_id: F-AS-06_发货12维度门禁
+name: 每发布过12维度门禁: 代码质量/安全/基础设施/运营/业务
+version: 1.0.0
+dimension: 场景
+source_model: agent-skills吸收
+one_liner: 每发布过12维度门禁: 代码质量/安全/基础设施/运营/业务。

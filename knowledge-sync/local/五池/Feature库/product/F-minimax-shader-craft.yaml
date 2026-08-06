@@ -1,0 +1,17 @@
+name: MiniMax着色器工坊 — 36种GLSL视觉技术
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — shader-dev (2026-07-05)
+description: 36种GLSL着色器技术(光线行进/SDF建模/流体模拟/粒子系统/PBR光照/后处理)，ShaderToy兼容。
+atoms:
+  - SHADER-36: 36种技术路由表(按视觉效果选技术组合)
+  - SHADER-ST-COMPAT: ShaderToy兼容标准(统一输入/WebGL2适配)
+  - SHADER-LAYER: 视觉分层(背景→主体→特效→后期)
+products:
+  - AI数字名片 — 3D视觉背景/交互效果
+  - 内容工厂 — 短视频视觉特效
+  - 盖娅之城 — 3D可视化界面
+employees:
+  - 烛龙P8(工程)
+  - 乘黄P8(产品)

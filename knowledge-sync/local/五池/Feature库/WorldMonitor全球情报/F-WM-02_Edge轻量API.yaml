@@ -1,0 +1,20 @@
+id: F-WM-02
+name: Edge轻量API
+description: >
+  整合 WM03 Edge 计算网关与 WM05 轻量级查询接口，在边缘节点上部署无状态API网关，
+  实现对全球采集点的就近接入与实时响应。API 采用 GraphQL 聚合 + REST 降级策略，
+  支持按需字段裁剪与批量拉取，显著降低跨洲链路延迟与中心集群负载。边缘节点内置
+  本地缓存与离线队列，保障断网场景下的数据不丢失。
+dimension: 场景
+domain: WorldMonitor
+status: 规划中
+tags:
+  - Edge Computing
+  - GraphQL
+  - REST
+  - API网关
+  - 离线容灾
+source: WM03 + WM05
+
+products:
+  - 通用: 自动匹配

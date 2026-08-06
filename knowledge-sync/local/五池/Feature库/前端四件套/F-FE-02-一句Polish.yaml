@@ -1,0 +1,54 @@
+name: "一句Polish"
+version: "1.0.0"
+dimension: "审美"
+status: "draft"
+draft: true
+source_model: "Impeccable"
+
+products:
+  - 通用: 自动匹配
+description: >
+  用AI打磨替代手写微调，一句"polish"指令即可将塑料感页面打磨到高端水准。
+  无需人工逐像素调整，AI自动执行排版收紧、留白优化、配色微调与微交互添加。
+
+sop:
+  - step: 1
+    action: "生成初版页面"
+    description: "根据需求生成功能完整但视觉未优化的初始页面，确保结构和交互逻辑正确"
+  - step: 2
+    action: "执行polish"
+    description: >
+      触发AI自动打磨流程，依次执行以下子任务：
+      (a) 排版收紧——检查并优化文字间距、行高、段落间距，去除松散布局
+      (b) 留白调整——微调内边距和外边距，建立呼吸感和视觉层次
+      (c) 配色优化——校验对比度、颜色语义准确性，微调饱和度和明度
+      (d) 微交互添加——为可交互元素添加hover/focus/active/transition效果
+      (e) 圆角/阴影统一——确保视觉语言的一致性
+  - step: 3
+    action: "验证审美评分"
+    description: "通过taste_gate工具对打磨后页面进行审美评分，从排版/配色/留白/一致性/微交互五个维度打分"
+  - step: 4
+    action: "交付或迭代"
+    description: "评分达标(≥8/10)则交付；不达标则定位低分维度重新执行step 2，最多迭代3轮"
+
+input:
+  format: "React组件代码 / HTML+CSS文件 / 页面截图描述"
+  content: "已完成功能开发的初始页面代码，至少包含基本结构、样式和交互逻辑"
+
+output:
+  format: "优化后的页面代码 + polish报告"
+  includes:
+    - "经过视觉打磨的完整页面代码"
+    - "polish变更清单（逐项说明修改了什么及原因）"
+    - "审美评分报告（各维度得分及总评）"
+    - "迭代记录（如有多轮打磨）"
+
+quality_gates:
+  - gate: "审美评分阈值"
+    description: "taste_gate评分≥8/10方可交付，<8分需迭代"
+  - gate: "功能保真度"
+    description: "polish后所有交互功能与原版一致，不可因视觉优化破坏逻辑"
+  - gate: "可访问性"
+    description: "打磨后的配色对比度满足WCAG AA标准（文本对比度≥4.5:1）"
+  - gate: "响应式兼容"
+    description: "打磨效果在移动端/平板/桌面端均视觉协调，无断版/溢出问题"

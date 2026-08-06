@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-04
+name: 状态转换路径优化
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 发现从A到B的最优状态转换路径(非预设路径)
+
+products:
+  - 通用: 自动匹配

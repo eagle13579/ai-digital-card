@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-06
+name: 跨对象关联创新
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 发现不同Ontology对象之间的非预设关联
+
+products:
+  - 通用: 自动匹配

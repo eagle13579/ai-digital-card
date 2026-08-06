@@ -1,0 +1,24 @@
+feature_id: "F-TX-JG-03"
+name: "道生一溯源器"
+version: "1.0.0"
+dimension: "体系"
+source_model: "结构思维M10"
+one_liner: "从繁杂规则中追溯出那个唯一的'一'源头并贯通"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  帮用户从大量规则中追溯最核心的源头，再推导出所有衍生规则。
+input: |-
+  规则体系描述
+output: |-
+  道生一溯源报告(源头识别+推导树+规则归因)
+sop: |-
+  1. 收集所有规则 2. 追溯共同源头 3. 验证源头能推导出所有规则 4. 绘制推导树
+quality_gate: |-
+  1. 识别出唯一源头 2. 源头能推导≥80%规则 3. 推导树完整
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: 结构思维·提取结构一通百通吸收

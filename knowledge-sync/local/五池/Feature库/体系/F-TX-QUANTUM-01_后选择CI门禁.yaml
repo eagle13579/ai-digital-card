@@ -1,0 +1,27 @@
+feature_id: F-TX-QUANTUM-01
+name: 后选择CI门禁
+version: 1.0.0
+dimension: 体系
+source_model: 量子时间逆转/Q3-后选择滤镜.md, Q7-时间轴逆向修正.md
+one_liner: CI/CD管道内建后选择滤镜：只保留完美通过的构建，失败的从未存在
+
+products:
+  - 通用: 自动匹配
+what_it_does: 每次CI运行等效于量子力学后选择实验——跑N次构建，只让通过的merge到主分支。失败的构建记录可查但不影响主分支历史
+input: Git push事件 + 测试结果
+output: 通过的构建自动合并 + 失败的自动丢弃
+sop: '1. 每次push触发CI构建
+
+  2. 运行全量测试
+
+  3. 测试通过→自动merge到目标分支
+
+  4. 测试失败→标记丢弃但不删除日志
+
+  5. 后选择统计: 通过率/失败模式/趋势'
+quality_gate: '评分7/10: CI通过后merge自动率90%'
+score: 7
+depends_on: []
+enhanced_by: []
+implementation: 概念Feature — 指导Git工作流设计
+draft: false

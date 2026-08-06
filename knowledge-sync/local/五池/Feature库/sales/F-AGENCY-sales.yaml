@@ -1,0 +1,24 @@
+name: 销售能力补充
+version: 1.0.0
+description: The Agency吸收 - 销售角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Account Strategist
+  - Sales Coach
+  - Deal Strategist
+  - Discovery Coach
+  - Sales Engineer
+  - Outbound Strategist
+  - Pipeline Analyst
+  - Proposal Strategist
+capabilities:
+  - 客户账户策略与关键客户管理
+  - 销售教练与发现方法论指导
+  - 交易策略设计与商务谈判支持
+  - 售前技术工程师与方案架构
+  - 外呼触达策略与管道分析
+  - 销售提案撰写与竞标准备
+integration: 直接补充AI数字军团销售能力

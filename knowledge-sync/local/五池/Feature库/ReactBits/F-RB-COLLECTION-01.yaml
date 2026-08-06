@@ -1,0 +1,24 @@
+id: F-RB-COLLECTION-01
+name: 130+ Animated UI Components Collection
+source_model: "React Bits — 4大类目130+动效组件: TextAnimations·Animations·Components·Backgrounds, 覆盖从文字动效到3D场景"
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+description: >-
+  130+生产级React动效组件分4类: 文字动效(解密/分割/旋转/滚动/模糊等25种)、
+  交互动效(光标追踪/磁力/粒子/像素轨迹等30种)、UI组件(Dock/轮播/卡片/菜单等35种)、
+  背景动效(极光/粒子/光束/网格等45种)。每个组件带完整CSS动画和Motion/GSAP等动效库集成。
+  覆盖了现代Web前端的所有常见动效需求, 是一个可复用的UI动效模式库。
+input: 动效需求(类型+效果描述)
+output: 匹配的组件名+代码示例
+sop: "① 识别需求类型: 文字动效/交互动效/UI组件/背景动效
+  ② 从130+组件库中匹配最佳方案
+  ③ 选择对应技术栈版本(JS/TS + CSS/Tailwind)
+  ④ 复制组件文件到项目
+  ⑤ 按props自定义配置"
+quality_gates: 组件零外部依赖(除React)、FPS>55、可访问性合规
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 链客宝UI升级/AI招商品牌页面/白泽控制台/中韩数智港营销

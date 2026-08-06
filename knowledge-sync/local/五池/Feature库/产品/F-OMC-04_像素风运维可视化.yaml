@@ -1,0 +1,14 @@
+name: F-OMC-04_像素风运维可视化
+version: 1.0.0
+status: active
+dimension: 产品
+source: OneManCompany — frontend/office-map.js, floor-picker.html
+description: 像素风(Pixel Art)2D Canvas实时运维面板。Agent在办公楼层有对应像素角色，状态变化实时反映(空闲/忙碌/开会中)。纯Vanilla
+  JS+Canvas 2D，零构建工具。Agent支撑可见可交互的游戏化面板。
+atoms:
+- OMC-07 像素风可视化运维面板
+- OMC-05 事件驱动消息总线
+products:
+- AI数智军团运维面板
+- 白泽控制台
+- 中韩出海数智港监控面板

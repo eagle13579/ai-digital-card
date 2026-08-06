@@ -1,0 +1,24 @@
+feature_id: "F-CJ-JG-02"
+name: "反脆弱防护师"
+version: "1.0.0"
+dimension: "场景"
+source_model: "结构思维M4"
+one_liner: "诊断系统依赖风险并设计反脆弱架构"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  分析当前依赖的规则/平台/方法，识别路线图依赖并升级为地图式结构。
+input: |-
+  系统/业务流程描述
+output: |-
+  反脆弱诊断报告(依赖识别+脆弱度评分+改造方案)
+sop: |-
+  1. 识别路线图式依赖 2. 评估脆弱度 3. 提取底层逻辑 4. 设计通用化替代
+quality_gate: |-
+  1. 识别≥3个脆弱依赖 2. 每个依赖有底层逻辑追溯 3. 改造方案可执行
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: 结构思维·提取结构一通百通吸收

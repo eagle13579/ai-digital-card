@@ -1,0 +1,29 @@
+feature_id: F-API-XST-02
+name: 评分API路由
+dimension: 体系
+version: "1.0"
+status: active
+source_model: 芯森态 api/routers/score.py + api/services/score_service.py
+
+products:
+  - 通用: 自动匹配
+  - 芯森态
+description: 评分引擎的API封装：全量评分管道 + 单用户评分详情
+
+input: POST /api/score/run (可选data_path) / GET /api/score/user/{id}
+
+output: 评分摘要(batch_id/users/grade_counts) / 单用户评分详情
+
+sop: |
+  POST→run_full_scoring()→加载→评分→入库→返回摘要
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

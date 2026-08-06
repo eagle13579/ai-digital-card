@@ -1,0 +1,65 @@
+feature_id: "F-TX-链客宝-02"
+name: "7层数据安全防御"
+version: "1.0.0"
+dimension: "体系"
+source_model: "chainke-full/backend/app/routers/ + chainke-full/src/pages/business-card/api.ts"
+source_project: "chainke-full"
+created_at: "2026-06-08"
+author: "白泽 (向海容授权自动扫描吸收)"
+
+one_liner: "从网络传输、身份认证、业务逻辑到数据存储，7层递进式安全防御体系保障企业数据安全"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  场景：链客宝处理大量企业敏感数据（联系方式、商业合作意向、人脉关系），需要多层次安全防护。
+  问题：单一安全措施不足以防御复杂攻击场景，需要纵深防御体系。
+  价值：链客宝架构从7个层次构建安全防御：
+
+  第1层 - 网络传输安全: HTTPS TLS加密传输 (api.ts中baseURL使用HTTPS)
+  第2层 - 身份认证: 用户ID校验 + 数据归属校验 (CardData.user_id)
+  第3层 - 输入验证: Pydantic BaseModel类型校验 (所有模块自动校验请求体)
+  第4层 - 业务逻辑安全: 数据归属隔离，用户只能操作自己的数据
+  第5层 - 注入防护: 使用参数化查询/ORM防止SQL注入
+  第6层 - 依赖安全: try/except降级机制防止依赖缺失导致服务崩溃
+  第7层 - 监控日志: 各模块加载日志 + 操作审计
+
+input: |
+  - API请求: HTTP/HTTPS请求到达后端
+  - 用户身份: user_id 用于数据归属验证
+  - 请求数据: 通过Pydantic模型自动校验格式/类型
+  - 业务操作: CRUD操作的数据归属检查
+
+output: |
+  - 安全传输通道: TLS加密的HTTPS连接
+  - 身份验证通过: 用户ID有效且数据归属匹配
+  - 输入校验通过: 请求体符合Pydantic模型定义
+  - 安全审计日志: 模块加载状态 + 操作记录
+
+sop: |
+  1. 确保所有API端点通过HTTPS提供服务
+  2. 在每个路由模块中，实现数据归属校验（用户只能访问自己的数据）
+  3. 使用Pydantic BaseModel定义所有请求/响应模型，启用自动类型校验
+  4. 在API客户端（api.ts）中配置基础安全策略（超时、重试、错误处理）
+  5. 对敏感操作（删除、更新）实现二次确认机制
+  6. 使用try/except包裹外部依赖加载，实现降级安全
+  7. 启用模块加载日志，监控各安全层运行状态
+
+quality_gate:
+  - gate: "数据归属隔离"
+    standard: "用户A不能通过API操作或查看用户B的数据"
+    score: 5
+  - gate: "输入校验完整性"
+    standard: "所有API端点请求体经过Pydantic模型校验，拒绝类型不符的请求"
+    score: 5
+  - gate: "降级安全"
+    standard: "第三方依赖缺失时，路由模块优雅降级不报错"
+    score: 5
+
+score_target: "9/10"
+depends_on:
+  - "F-TX-链客宝-01_36路由模块化架构"
+enhanced_by: []
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 从chainke-full/backend/app/routers/各模块的Pydantic校验+try/except降级模式吸收，初始版本
+product: "链客宝"

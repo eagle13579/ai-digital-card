@@ -1,0 +1,127 @@
+feature_id: F-SIM-03
+feature_name: 开源集成生态 (1000+ Integrations / Plugin Marketplace)
+feature_type: 生态能力 / 集成框架
+version: 1.0.0
+created: 2026-07-04
+
+products:
+  - 通用: 自动匹配
+source_project: Sim (AI Agent工作空间平台)
+source_link: https://sim.ai
+
+# ============================================================
+# Sim产品中的原始定义
+# ============================================================
+sim_definition: >
+  Sim拥有1000+预构建集成，覆盖:
+  - 数据源: Google Sheets, Notion, Airtable, PostgreSQL, MySQL, BigQuery, Snowflake
+  - 文件: PDF, Word, Excel, CSV, 图片OCR, 音频转录
+  - 通讯: Slack, Discord, Email, Telegram, WhatsApp
+  - SaaS: Salesforce, HubSpot, Zendesk, Jira, Asana, Linear, GitHub, GitLab
+  - AI: HuggingFace, Replicate, Stability AI, ElevenLabs
+  - 搜索: Google Search, Bing, SerpAPI, Tavily
+  - 支付: Stripe, PayPal
+  集成方式: OAuth一键授权 / API Key配置 / 无代码配置面板
+  所有集成以Plugin形式安装, 支持社区贡献和私有插件
+
+sim_implementation:
+  - Plugin SDK: 标准化插件开发模板(TS+Python)
+  - 插件市场: 搜索/安装/更新/评分
+  - OAuth管理: 统一的授权凭证存储和刷新
+  - 插件沙箱: 安全隔离的插件运行环境
+  - 社区贡献: GitHub集成仓库, PR自动构建发布
+  - 使用统计: 每个插件的安装量/调用量/成功率
+
+# ============================================================
+# 可注入产品分析
+# ============================================================
+injectable_products:
+  - product: 链客宝
+    priority: P0 (最高优先级)
+    gap_analysis: >
+      链客宝作为B2B企业服务平台, 目前内部有AI数字员工集成和部分内部API,
+      但面向企业客户的SaaS集成生态严重缺失: 无CRM(销售易/纷享销客)集成、
+      无财务(金蝶/用友)集成、无办公(飞书/钉钉/企微)集成、无支付(支付宝/微信)集成。
+      客户需要手动导出/导入数据, 无法实现业务流程自动化。
+    injection_method: >
+      构建「链客宝集成市场」:
+      (1) 设计Plugin SDK: 标准化集成开发模板(基于链客宝已有EventBusProtocol)
+      (2) 一期核心集成(20个): 飞书/钉钉/企微(办公) + 金蝶/用友(财务) + 纷享销客(CRM)
+        + 支付宝/微信支付(收款) + 企业微信(客服) + 快递100(物流) + 企查查(企业信息)
+      (3) OAuth凭证统一管理
+      (4) 集成使用统计: 每个企业客户安装了哪些集成, 调用频率
+      (5) 从Sim的1000+集成中筛选B2B中国企业最需要的100个, 优先内置
+    effort_estimate: "4-6周 (Plugin SDK 1周 + 核心20集成 2周 + 市场UI 1周 + OAUTH管理 1周)"
+    expected_impact: >
+      ★★★ 极大提升: 链客宝从「封闭工具」变为「开放平台」, B2B客户的采购决策前提条件之一
+      直接对标 Salesforce AppExchange / 钉钉开放平台
+
+  - product: 中韩出海数智港
+    priority: P1 (高优先级)
+    gap_analysis: >
+      跨境平台当前缺关键行业集: 韩国支付(KG Inicis/NicePay)、
+      韩国海关(UNI-PASS)、跨境物流(CJK Logistics)、汇率转换、
+      多语言翻译(Naver Papago/Kakao i)、Naver/KaKao社交登录。
+    injection_method: >
+      跨境集成包: (1) 韩国支付网关集成 (2) 韩国海关数据API集成
+      (3) 跨境物流跟踪集成 (4) 多货币汇率引擎 (5) 韩中翻译引擎集成
+    effort_estimate: "3-4周 (韩国支付2周 + 海关/物流1周 + 翻译/汇率1周)"
+    expected_impact: >
+      ★★★ 极大提升: 从「信息平台」到「交易平台」, 支付/物流/海关全在线
+      解决当前中韩跨境「线上展示, 线下成交」的断点
+
+  - product: 盖娅之城
+    priority: P1
+    gap_analysis: >
+      盖娅之城公民(AI员工)当前只能通过内置Blueprint和API工作。
+      缺外部工具集成能力, 公民无法接入Slack/飞书/邮件等实际工作工具,
+      也无法处理PDF/Excel等实际工作文档。
+    injection_method: >
+      公民工具集成: (1) 文件处理插件(解析PDF/Word/Excel) (2) 通讯集成(邮件/飞书/企微)
+      (3) 知识库集成(Notion/语雀/飞书文档) (4) 外部数据源集成(数据库/API)
+      每个集成作为公民的「装备」, 在任务分配时可指定所需装备
+    effort_estimate: "3-4周 (插件框架2周 + 核心8集成1周 + 装备系统1周)"
+    expected_impact: >
+      ★★★ 极大提升: 公民从「虚拟角色」变为「真实工作助手」,
+      能处理真实企业文件和数据, 大幅提升实用性
+
+  - product: AI数字军团
+    priority: P2
+    gap_analysis: >
+      AI数字军团已有10个MCP Server, 可扩展为完整的插件市场。
+      当前MCP Server手动添加, 缺标准化发布和发现机制。
+    injection_method: >
+      MCP插件市场: (1) 标准化MCP Server发布流程 (2) 插件目录(搜索/安装/升级)
+      (3) 员工能力与插件匹配: 推荐给员工安装能增强其能力的插件
+    effort_estimate: "2周"
+    expected_impact: "★★☆ MCP生态从10个→100个的规模化路径"
+
+  - product: 白泽控制台
+    priority: P2
+    gap_analysis: >
+      白泽作为CEO控制台, 需要连接各个业务系统的数据。
+      当前集成靠手动对接, 缺标准化集成框架。
+    injection_method: >
+      白泽数据源集成: (1) 标准化数据接入插件 (2) ERP/CRM/财务系统数据桥接
+      (3) 行业数据源(券商报告/行业指数)集成
+    effort_estimate: "2周"
+    expected_impact: "★★☆ 白泽数据视野从内部扩展到全市场"
+
+# ============================================================
+# 心智模型(原子能力)
+# ============================================================
+mental_models:
+  - name: 平台思维
+    description: 产品不应做所有功能, 应通过插件生态让第三方贡献能力
+  - name: 集成优先
+    description: 新功能开发前先看是否有现成集成, 避免重复造轮子
+  - name: OAuth标准化
+    description: 所有外部授权的统一管理, 安全+用户体验兼得
+
+# ============================================================
+# 注入时序建议
+# ============================================================
+injection_timeline:
+  phase_1_now: "链客宝集成市场MVP (Plugin SDK + 核心10集成)"
+  phase_2_next: "中韩出海数智港跨境集成包 + 盖娅之城公民装备系统"
+  phase_3_future: "AI数字军团MCP市场 + 白泽数据源集成框架"

@@ -1,0 +1,18 @@
+name: superpowers-zero-dep-search
+version: v1.0.0
+description: 零依赖向量搜索 — 基于Superpowers纯Shell零依赖理念，构建不依赖外部向量数据库/Embedding模型/GPU/API Key的语义搜索能力。通过11信号综合评分（TF-IDF元数据重叠、Random Indexing共现、MinHash结构化指纹、AST特征向量、数据流近似分析、Halstead复杂度等），实现纯算法驱动的代码语义搜索。无需任何外部依赖，跨平台一致运行。
+
+atomic_models:
+  - MM-07: Multi-Platform Agnosticism (全平台兼容) — 纯Shell/零依赖实现保证跨平台一致性
+  - MM-03: 14-Skill Pipeline (14技能流水线) — 搜索能力作为流水线中的一个内置Skill
+  - MM-05: Silent Activation (静默触发) — 搜索技能根据上下文自动激活
+
+entry_points:
+  - Agent在编码过程中需要查找相关代码时自动激活搜索
+  - 代码审查阶段自动搜索相似模式进行比对
+  - 跨平台部署时无需任何额外依赖配置
+
+products:
+  - 通用: 自动匹配
+
+created_at: 2026-07-05

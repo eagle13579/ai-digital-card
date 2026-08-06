@@ -1,0 +1,17 @@
+feature_id: F-场景-行动项-2026-06-16-左脑吸收行动池
+name: 左脑吸收行动池 — 2026-06-16
+description: 从行动池沉淀的行动项Feature
+type: 行动项
+draft: true
+source: D:\向海容的知识库\wiki\wiki\记忆宫殿\五池\行动池\2026-06-16-左脑吸收行动池.md
+status: pending_review
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-16T12:19:46'
+tags:
+- 行动项
+- 行动池
+- 自动化注入
+related_employees: []
+capabilities: []

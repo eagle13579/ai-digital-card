@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-37
+name: 组合创新
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: N个现有元素的排列组合发现新方案
+
+products:
+  - 通用: 自动匹配

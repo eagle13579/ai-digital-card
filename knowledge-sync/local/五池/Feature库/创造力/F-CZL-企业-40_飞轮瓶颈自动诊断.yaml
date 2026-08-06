@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-40
+name: 飞轮瓶颈自动诊断
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 数据输入->关联->输出->反馈各环节瓶颈自动检测
+
+products:
+  - 通用: 自动匹配

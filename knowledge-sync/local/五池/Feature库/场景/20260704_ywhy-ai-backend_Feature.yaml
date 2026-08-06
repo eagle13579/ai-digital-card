@@ -1,0 +1,9 @@
+name: ywhy-ai-backend-场景
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - FastAPI架构
+  - 异步编程
+  - 认证

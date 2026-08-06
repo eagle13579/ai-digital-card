@@ -1,0 +1,28 @@
+feature_id: F-GETKE-XST-01
+name: LBS附近推 — 地理围栏精准推送
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态 api/getke/lbs_tool.py (167行)
+
+products:
+  - 通用: 自动匹配
+description: 门店地址→高德地理编码→3km圈→人群画像→AI文案→渠道路由
+
+input: 门店名称+地址 (可选lat/lng)
+
+output: 推送方案(门店坐标/人群画像/AI文案/推荐渠道/预估成本)
+
+sop: |
+  LBSTool().run(Store(name,address))→GeoFencer.geo_code()→AudienceProfiler→ContentGenerator→ChannelRouter
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

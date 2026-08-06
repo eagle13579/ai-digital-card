@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-25
+name: 编排模式推荐器
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 根据任务复杂度推荐最优编排模式
+
+products:
+  - 通用: 自动匹配

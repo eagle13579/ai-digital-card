@@ -1,0 +1,11 @@
+feature_id: F-AES-20260806-06
+name: 创意约束引擎
+version: 1.0.0
+dimension: 创造力
+source_model: aesthetic-creative-self-evolution
+created_at: 2026-08-06 06:07:51
+one_liner: 四约束(受众/媒介/风格/限制) → 批量生成项目创意
+mind_models:
+  - 创意约束生成: 通过限定 受众/媒介/风格/限制 四约束生成项目创意, 约束越多创意越具体
+  - 发散-收敛双模式: 先广撒网(发散) 再筛选排序(收敛), 避免一上来就求完美
+  - 创意可训练性: 创意不是天赋, 是可重复的生成-筛选-迭代流程

@@ -1,0 +1,23 @@
+module_name: 10大经典单元模型分类框架
+module_number: 12
+category: 创业方法-单元模型
+mental_models:
+  - 10大经典单元模型分类框架
+  - 九大构造块
+  - 价值主张-客户细分-客户关系-渠道通路-收入来源-核心资源-关键业务-重要伙伴-成本结构
+  - LTV>CPA
+  - 三好单元
+learning_objectives:
+  - 掌握商业模式"细胞级"切片分析方法
+  - 学会用九大构造块设计商业模式
+  - 能验证单元经济可复制性
+employee_roles:
+  - 创业者
+  - 商业模式设计师
+  - 投资分析师
+source: 一堂创业课/创业方法-单元模型
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配
