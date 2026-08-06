@@ -1,0 +1,44 @@
+feature_id: "F-MATOMO-01"
+name: "插件化事件总线架构 — Matomo Plugin+EventDispatcher"
+version: "1.0.0"
+dimension: "体系"
+source_model: "Matomo Plugin.php + EventDispatcher.php — 98个plugins通过Plugin基类+plugin.json注册，EventDispatcher事件总线通信"
+one_liner: "Plugin基类定义生命周期钩子，EventDispatcher处理跨插件通信，所有功能松耦合可插拔"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo的插件化架构核心：每个插件继承Plugin基类，通过registerEvents()注册事件监听，
+  通过plugin.json声明元数据。EventDispatcher作为中央总线，postEvent触发事件时同步调用
+  所有已注册的观察者。插件可影响Tracker（跟踪）、Archive（归档）、Report（报告）、
+  Visualization（可视化）全链路。PHP-DI依赖注入容器管理插件服务的生命周期。
+  
+  — Plugin基类: registerEvents()/install()/uninstall()/activate()/deactivate()
+  — EventDispatcher: postEvent() 分发，支持三组优先级 (FIRST/SECOND/THIRD)
+  — plugin.json: name/description/version/theme/authors/homepage
+  — 插件市场: marketplace.matomo.org 支持第三方插件交易与分发
+input:
+  - "Plugin基类接口声明 (registerEvents返回事件名→回调映射)"
+  - "plugin.json元数据配置"
+  - "EventDispatcher.publish/postEvent调用"
+output:
+  - "插件级功能独立部署/卸载"
+  - "事件驱动的松耦合通信"
+  - "98+插件在同一平台共存互不干扰"
+sop:
+  - "step: 创建插件目录 plugins/<PluginName>/"
+  - "step: 编写 Plugin.php extends Piwik\\Plugin，实现registerEvents()"
+  - "step: 创建 plugin.json 声明元数据"
+  - "step: 使用 EventDispatcher::postEvent('Event.Name', $params) 触发事件"
+  - "step: 其他插件通过 registerEvents() 返回映射监听事件"
+  - "step: 通过CorePluginsAdmin管理插件的激活/停用"
+quality_gate:
+  - "插件可独立安装卸载不影响核心"
+  - "EventDispatcher事件无循环依赖"
+  - "插件间通过事件通信而非直接依赖"
+  - "每个插件有plugin.json完整元数据"
+dependencies:
+  - "PHP 8.0+"
+  - "Piwik\\Plugin 基类"
+  - "Piwik\\EventDispatcher"
+  - "Piwik\\Container\\StaticContainer (PHP-DI)"

@@ -1,0 +1,90 @@
+name: F-Aider-RepoMapContextEngine
+version: 1.0.0
+type: 上下文工程
+status: active
+created: 2025-07-08
+source: Aider (AI Pair Programming Tool)
+
+description: >
+  基于tree-sitter AST分析的代码仓库压缩表示引擎。自动扫描Git仓库中的源代码，
+  提取核心符号（类、函数、方法签名），生成高度浓缩的"代码地图"。
+  在有限的token预算内，为LLM提供最有价值的仓库级上下文。
+
+principles:
+  - name: token效率优先
+    description: 在固定token预算(默认1024tokens)内最大化信息密度
+  - name: 相关性排序
+    description: 根据当前编辑任务涉及的符号，优先包含关联度最高的文件
+  - name: 增量更新
+    description: 使用SQLite缓存，仅重新解析变更的文件，避免全量扫描
+
+architecture:
+  components:
+    - name: AST解析器
+      technology: tree-sitter + grep_ast
+      languages: 支持Python/JS/TS/Go/Rust/Java等30+语言
+    - name: Tag提取器
+      output: Tag(rel_fname, fname, line, name, kind)
+    - name: 相关性排序器
+      algorithm: 基于编辑文件中引用关系的TF-IDF变体
+    - name: Token预算分配器
+      strategy: 按重要性比例分配map_tokens token预算
+    - name: 缓存层
+      technology: SQLite (diskcache)
+      path: .aider.tags.cache.v{CACHE_VERSION}
+      version: v3(基本) / v4(使用tsl_pack)
+
+data_flow:
+  - input: Git仓库路径
+  - process: tree-sitter解析 → Tag提取 → 排序 → token截断
+  - output: 格式化的仓库文本地图
+  - usage: 注入每次LLM调用的system prompt中
+
+configuration:
+  - key: map_tokens
+    type: int
+    default: 1024
+    description: 仓库地图的token预算
+  - key: map_mul_no_files
+    type: int
+    default: 8
+    description: 无文件添加到聊天时的map token倍增系数
+  - key: max_context_window
+    type: int
+    description: LLM最大上下文窗口，用于动态调整
+  - key: refresh
+    type: str
+    default: auto
+    description: 缓存刷新策略(auto/always/never)
+
+file_filters:
+  - .aiderignore (类似.gitignore，排除不需要分析的路径)
+  - 自动识别二进制文件并跳过
+  - 尊重.gitignore规则
+
+implementation:
+  entry_point: aider/repomap.py
+  class: RepoMap
+  key_methods:
+    - get_repo_map(): 生成仓库地图文本
+    - set_repo_map(): 设置/刷新地图
+    - get_ranked_tags(): 获取排序后的符号列表
+    - get_ranked_tags_map(): 获取格式化的地图文本
+
+dependencies:
+  - tree-sitter (AST解析)
+  - grep_ast (文件到语言的映射)
+  - diskcache (SQLite缓存)
+  - pygments (语法高亮/lexer)
+  - tqdm (进度条，首次全量解析时使用)
+
+reusable_contexts:
+  - 任何需要为LLM提供代码库上下文的工具
+  - 代码搜索/导航工具(类似Sourcegraph)
+  - 文档知识库的"文档地图"生成
+
+limitations:
+  - 对非标准/小众语言支持有限
+  - AST无法捕获运行时动态特性
+  - 首次解析大仓库耗时较长
+  - 符号级别粒度的上下文可能遗漏跨模块的设计模式

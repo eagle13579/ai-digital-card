@@ -1,0 +1,51 @@
+feature_id: "F-MATOMO-09"
+name: "设备检测管道 — Matomo DeviceDetector用户设备识别"
+version: "1.0.0"
+dimension: "数据"
+source_model: "Matomo DevicesDetection插件 + DeviceDetector库 — 从User-Agent自动识别设备类型/品牌/型号/浏览器/OS"
+one_liner: "User-Agent→DeviceDetector→结构化设备数据(类型/品牌/型号/浏览器/OS/分辨率)，用于用户画像和行为分析"
+
+products:
+  - 通用: 自动匹配
+what_it_does: >
+  Matomo内置DeviceDetector (基于开源库 piwik/device-detector)，
+  从访问者的User-Agent字符串自动解析出结构化设备信息：
+  
+  **设备类型**: 桌面/手机/平板/电视/可穿戴/游戏机/车载
+  **设备品牌**: Apple/Samsung/Huawei/Xiaomi/OPPO/Google等200+品牌
+  **设备型号**: iPhone 15 Pro Max/Samsung Galaxy S24/等
+  **操作系统**: iOS 17/Android 14/Windows 11/macOS 14/等
+  **浏览器**: Chrome 120/Firefox 121/Safari 17/Edge 120/等
+  
+  解析结果存储在log_visit表中作为访客维度，支持按设备类型/品牌/浏览器/OS等维度
+  进行报告分析和分段。用户也可禁用设备模型检测以提升性能。
+  
+  — 报告维度: 设备类型/设备品牌/设备型号/操作系统/浏览器
+  - 可视化: 设备占比饼图/趋势图/品牌分布
+  - 设置: 可禁用设备模型检测 (提升性能)
+  - 数据更新: 设备数据库定期更新 (DeviceDetectorCache)
+input:
+  - "HTTP请求头中的User-Agent字符串"
+  - "设备数据库 (DeviceDetector内置YAML规则)"
+output:
+  - "设备类型 (desktop/mobile/tablet/tv/etc)"
+  - "设备品牌+型号"
+  - "操作系统+版本"
+  - "浏览器+版本"
+  - "按设备维度的分析报告"
+sop:
+  - "step: Tracker接收HTTP请求"
+  - "step: 提取User-Agent (或Sec-CH-UA)"
+  - "step: DeviceDetector解析User-Agent"
+  - "step: 结构化结果存入log_visit表"
+  - "step: Archive聚合设备维度的指标"
+  - "step: 报告展示设备分类数据"
+quality_gate:
+  - "设备类型分类准确率 > 95%"
+  - "新设备型号在更新后可识别"
+  - "解析性能不影响追踪响应时间"
+  - "报告维度完整 (类型/品牌/OS/浏览器)"
+dependencies:
+  - "DeviceDetector库 (piwik/device-detector)"
+  - "DevicesDetection插件"
+  - "设备数据库更新订阅"

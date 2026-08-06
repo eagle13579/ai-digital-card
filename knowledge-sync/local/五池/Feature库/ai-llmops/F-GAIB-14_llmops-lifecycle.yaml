@@ -1,0 +1,15 @@
+name: LLMOps应用生命周期
+version: 1.0.0
+status: production
+dimension: ai-llmops
+source: microsoft/generative-ai-for-beginners (Lesson 14)
+description: "LLMOps五维评估: Quality质量、Harm安全、Honesty忠实度、Cost成本、Latency延迟。三阶段生命周期: Ideate/Explore(探索构建)→Build/Augment(评估增强)→Operationalize(集成部署)。管理安全/合规/治理"
+atoms:
+  - GAIB-17: LLM评估、迭代与度量
+products:
+  - 产品部署SOP: LLM上线门禁
+  - 盖娅评估系统: LLM-as-Judge质量评估
+  - 红队战狼: 持续安全评估
+employees:
+  - 烛龙P8: 部署运维
+  - 计然P8: 成本评估

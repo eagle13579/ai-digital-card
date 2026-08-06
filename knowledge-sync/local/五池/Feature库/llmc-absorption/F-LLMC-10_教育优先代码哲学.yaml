@@ -1,0 +1,23 @@
+id: F-LLMC-10
+name: 教育优先代码哲学
+dimension: 审美
+source_model: "Education-First Code Philosophy — llm.c代码可读性优先，清晰注释+变量命名+完整错误处理"
+description: "技术产品的教学价值设计，代码即文档"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+
+products:
+  - 通用: 自动匹配
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

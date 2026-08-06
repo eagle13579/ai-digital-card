@@ -1,3 +1,5 @@
+import html
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +10,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas import TagInput, TagBatchInput, TagResponse
 
-router = APIRouter(prefix="/api/tags", tags=["标签"])
+router = APIRouter(prefix="/api/v1/tags", tags=["标签"])
 
 
 @router.get("/me", response_model=dict)
@@ -41,10 +43,12 @@ async def add_tags(
     """批量添加标签"""
     created = []
     for tag_input in data.tags:
+        # XSS防护：对标签内容做HTML转义
+        safe_tag = html.escape(tag_input.tag)
         tag = UserTag(
             user_id=current_user.id,
             tag_type=data.tag_type,
-            tag=tag_input.tag,
+            tag=safe_tag,
             weight=tag_input.weight,
             source=data.source,
         )

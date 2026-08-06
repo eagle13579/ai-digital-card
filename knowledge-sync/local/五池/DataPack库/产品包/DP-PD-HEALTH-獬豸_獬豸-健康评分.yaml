@@ -1,0 +1,30 @@
+datapack_id: "DP-PD-HEALTH-獬豸"
+name: "獬豸·健康评分"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "獬豸产品的10维度健康评分和里程碑状态"
+
+source: "L5孵化室/产品开发/獬豸/"
+
+contents: |
+  獬豸的10维度工业级评分、里程碑进度、待办事项。
+
+data_format: "健康评分JSON"
+
+mount_interface:
+  load: "读取产品健康评分到监控上下文"
+  query: "查询各维度评分/变化趋势/里程碑状态"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做健康检查时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "原子化拆解自产品目录"

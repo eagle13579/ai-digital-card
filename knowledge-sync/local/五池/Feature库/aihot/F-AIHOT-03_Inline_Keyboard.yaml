@@ -1,0 +1,57 @@
+# 内联键盘导航系统 — 不用命令行输入，全部用按钮完成多级导航
+# AIHOT Bot 核心心智模型 #3
+name: F-AIHOT-03_Inline_Keyboard
+dimension: 场景
+domain: 交互设计-Bot键盘导航
+status: 生产就绪
+priority: P1
+source_models:
+  - M-AIHOT-03_Inline_Keyboard
+description: |
+  内联键盘导航系统是AIHOT Bot的交互核心，用户无需输入任何命令，
+  所有操作通过Telegram内联键盘按钮完成，实现无刷新多级导航。
+
+  技术实现：
+  - inline_keyboard：按钮布局定义（按行排列的按钮数组）
+  - callback_query：按钮点击回调处理（callback_data路由）
+  - editMessageText：消息内容原地更新，无刷新切换页面
+
+  设计原则：
+  - 零输入：用户只需点击，无需输入任何文本
+  - 即时反馈：按钮点击后立即更新当前消息
+  - 状态保持：导航状态保存在session中，断线重连可续
+  - 深度控制：支持多层级（首页→分类→列表→详情）
+input:
+  - 键盘布局配置（行×列按钮矩阵）
+  - 回调路由表（callback_data → handler映射）
+  - 当前session状态（用户当前所在页面/层级）
+output:
+  - 更新后的消息（通过editMessageText）
+  - 新的内联键盘布局
+  - 用户交互事件日志
+sop: |
+  1. 发送消息时附带inline_keyboard按钮布局
+  2. 用户点击按钮 → Telegram发送callback_query
+  3. 解析callback_data → 查找路由表 → 执行对应handler
+  4. handler处理业务逻辑 → 生成新内容+新键盘布局
+  5. editMessageText更新原消息（内容+键盘同时更新）
+  6. 更新session状态（当前页面/页码/分类等）
+quality_gates:
+  - gate: 回调路由完整性
+    criteria: 所有callback_data都有对应的handler
+    method: 枚举所有回调路由表，检查无遗漏
+  - gate: 状态一致性
+    criteria: 页面状态与session缓存一致
+    method: 模拟多级导航，每一步校验session状态
+  - gate: 响应时延
+    criteria: 按钮点击到页面更新的延迟 < 2秒
+    method: callback_query → editMessageText完成时间
+version: "1.0.0"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-15
+product_mapping:
+  - 内容工厂: 内容工厂的用户交互界面可复用内联键盘导航
+  - 盖娅之城: 盖娅Bot的交互系统可参考此设计
+  - 所有AI产品: 前端导航设计的参考范式（按钮优先于命令）

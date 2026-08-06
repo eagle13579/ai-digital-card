@@ -34,6 +34,7 @@ from app.routers.invoice import router as invoice_router
 from app.routers.knowledge_graph import router as knowledge_graph_router
 from app.routers.subscription_router import router as subscription_router
 from app.routers.gaia_router import router as gaia_router
+from app.routers.distill_router import router as distill_router
 from app.crm.crm_router import router as crm_router
 from app.routers.bot_router import router as bot_router
 from app.routers.document import router as document_router
@@ -92,6 +93,7 @@ __all__ = [
     "knowledge_graph_router",
     "subscription_router",
     "gaia_router",
+    "distill_router",
     "crm_router",
     "bot_router",
     "document_router",

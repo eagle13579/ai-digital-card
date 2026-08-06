@@ -1,0 +1,126 @@
+id: "F-A2E-PLATFORM-ADAPTER-01"
+name: "Multi-Platform Adapter (策略模式 + 注册表 + 5 Provider接口)"
+version: "1.0.0"
+description: >
+  基于策略模式（Strategy Pattern）的多平台适配器架构，通过统一的注册表（Registry）
+  和5个标准Provider接口（AuthProvider、ContentProvider、PublishProvider、AnalyticsProvider、
+  EngagementProvider）实现对 TikTok、Douyin、Instagram、YouTube、Bilibili 等14+社交
+  平台的一站式内容发布、分析和互动管理。每个平台实现为独立Adapter，通过注册表动态注入
+  核心服务。
+domain: "backend"
+type: "architecture-pattern"
+maturity: "production"
+autonomy: "component"
+tags:
+  - "strategy-pattern"
+  - "registry"
+  - "platform-adapter"
+  - "multi-tenancy"
+  - "provider-interface"
+input_schema:
+  type: "object"
+  description: "平台配置 + 能力 Provider 定义"
+  properties:
+    platform_config:
+      type: "object"
+      description: "平台基本配置（名称、API版本、端点、认证方式）"
+      required: true
+      properties:
+        platform_name:
+          type: "string"
+          description: "平台唯一标识（如 tiktok/douyin/youtube）"
+        account_type:
+          type: "string"
+          description: "AccountType 枚举值"
+        api_base_url:
+          type: "string"
+          description: "平台 API 基础 URL"
+        auth_type:
+          type: "string"
+          enum: ["oauth2", "cookie", "api-key"]
+    capability_providers:
+      type: "object"
+      description: "5个标准 Provider 接口实现"
+      properties:
+        auth_provider:
+          type: "object"
+          description: "授权认证 Provider（OAuth2/cookie 管理）"
+        content_provider:
+          type: "object"
+          description: "内容生成 Provider（标题/描述/话题限制规则）"
+        publish_provider:
+          type: "object"
+          description: "发布 Provider（内容发布/定时/取消）"
+        analytics_provider:
+          type: "object"
+          description: "数据分析 Provider（账号/作品分析）"
+        engagement_provider:
+          type: "object"
+          description: "互动 Provider（评论/点赞/互动处理）"
+output_schema:
+  type: "object"
+  description: "注册完成的平台实例"
+  properties:
+    platform_id:
+      type: "string"
+      description: "注册后的平台唯一ID"
+    instance:
+      type: "object"
+      description: "平台 Adapter 实例，提供5个Provider的统一访问入口"
+    capabilities:
+      type: "array"
+      items:
+        type: "string"
+      description: "该平台支持的能力列表"
+source:
+  type: "monorepo-directory"
+  base_path: "project/aitoearn-web/src/api/platforms/"
+  files:
+    - path: "publish.api.ts"
+      lines: 93
+      role: "发布 API 入口（统一多平台发布调用）"
+    - path: "publish.types.ts"
+      lines: 60
+      role: "发布记录数据结构定义"
+    - path: "publish.constants.ts"
+      lines: 16
+      role: "发布常量（状态枚举、平台映射）"
+    - path: "work.api.ts"
+      lines: 10
+      role: "作品查询入口"
+    - path: "work.types.ts"
+      lines: 49
+      role: "作品数据结构定义"
+    - path: "douyin.api.ts"
+      lines: ~80
+      role: "抖音平台 Adapter"
+    - path: "douyin.types.ts"
+      role: "抖音特有类型定义"
+    - path: "tiktok.api.ts"
+      role: "TikTok 平台 Adapter"
+    - path: "instagram.api.ts"
+      role: "Instagram 平台 Adapter"
+    - path: "youtube.api.ts"
+      role: "YouTube 平台 Adapter"
+    - path: "bilibili.api.ts"
+      role: "Bilibili 平台 Adapter"
+    - path: "pinterest.api.ts"
+      role: "Pinterest 平台 Adapter"
+    - path: "threads.api.ts"
+      role: "Threads 平台 Adapter"
+  backend_draft_generation:
+    path: "project/aitoearn-backend/apps/aitoearn-ai/src/core/draft-generation/draft-generation-platforms.ts"
+    lines: 170
+    role: "平台内容生成限制规则（平台特定长度/媒体约束）"
+products:
+  - "阿久内容工厂"
+  - "GEO内容工厂"
+  - "AiToEarn Chrome 插件"
+  - "AiToEarn Web Application"
+  - "AI Agent 内容发布工作流"
+evolution_tags:
+  - "ai-to-earn"
+  - "platform-adapter"
+  - "strategy-pattern"
+  - "registry-pattern"
+  - "multi-platform"

@@ -1,0 +1,16 @@
+name: Trending: claude-video
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-10
+description: Auto-absorbed from GitHub Trending: bradautomates/claude-video
+atoms:
+  - TREND-bradautomates-claude-01: /watch
+  - TREND-bradautomates-claude-02: agent, plugin, api 模式
+  - TREND-bradautomates-claude-03: bradautomates/claude-video的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

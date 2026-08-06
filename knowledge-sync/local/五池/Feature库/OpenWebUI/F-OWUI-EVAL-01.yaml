@@ -1,0 +1,24 @@
+id: F-OWUI-EVAL-01
+name: LLM Evaluation Arena with Crowd-Sourced Feedback
+source_model: Open WebUI Evaluation System (evaluations.py 14.4KB + feedbacks.py 18KB) — 模型竞技场+用户反馈+排行榜
+dimension: 基本功
+
+products:
+  - 通用: 自动匹配
+description: >-
+  完整的大模型评估系统: 用户可以对任何模型回复给予反馈(rating+snapshot+metadata)。
+  支持模型排行榜(按评分排序)、模型历史走势(评分随时间变化)、用户反馈管理。
+  Feedback包含: 评分数据(1-5分)、快照(模型输出)、元数据(版本/参数)、用户标注。
+  管理员可配置评估模式/模型间对比/竞技场(Arena)模式。
+input: 模型回复 + 用户评分(1-5) + 可选标注
+output: 模型排行榜/评分趋势/用户反馈列表
+sop: "① 用户评估: 聊天中对模型回复评分(赞/踩/1-5星) → 写入feedbacks表
+  ② 排行榜聚合: GET /leaderboard → 按平均评分排序+置信区间
+  ③ 历史追踪: GET /leaderboard/{model_id}/history → 评分随时间变化
+  ④ 管理员面板: 查看全部反馈/导出/删除/配置评估参数
+  ⑤ 用户面板: 查看自己的反馈历史"
+quality_gates: 排行榜更新延迟<1min、支持A/B blind对比、评分可区分到具体模型版本、导出格式含完整metadata
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 数字员工绩效评估/中国软银策略评分/链客宝客户满意度/AI招商匹配质量

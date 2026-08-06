@@ -1,0 +1,48 @@
+# 任务工作台 — 每个Amoeba任务的独立工作区
+# 从 hermes-desktop Chat 体系和 hermes-dashboard ProfileWorkspace 融合
+name: F-5057-TASK-WORKBENCH
+dimension: 场景
+domain: 盖娅之城-任务指挥中心
+status: draft
+priority: P0
+source_models:
+  - hermes-desktop Chat体系 (Chat/ChatInput/MessageList/MessageRow)
+  - hermes-dashboard ProfileWorkspace (Tabs/LogViewer)
+description: |
+  每个Amoeba任务拥有独立的工作台，包含：
+  1. 对话区 — 基于hermes-desktop Chat体系，支持流式对话/token推理/工具调用
+  2. 文件区 — 任务产出的文件管理
+  3. 看板区 — 任务进度追踪
+  4. 日志区 — 基于hermes-dashboard SSE LogViewer
+  5. 成员区 — 当前认领任务的军团成员列表
+input:
+  - 用户指令（在对话中发布）
+  - 军团成员认领事件
+  - 其他工作台的消息
+output:
+  - 对话历史（独立存储）
+  - 任务产出文件（独立目录）
+  - 进度状态更新
+  - 知识沉淀到盖娅大脑
+sop: |
+  1. 用户发布指令 → 创建Amoeba任务
+  2. 任务获得独立工作台ID（UUID）
+  3. 创建隔离的工作目录: /workspaces/{task_id}/
+  4. 军团成员认领 → 加入工作台
+  5. 对话/工具调用/文件产出均保存在工作台内
+  6. 任务完成后沉淀知识到盖娅大脑
+quality_gates:
+  - gate: 工作台隔离验证
+    criteria: 任务A无法读取任务B的对话和文件
+    method: e2e测试两个并行任务
+  - gate: 对话流式渲染
+    criteria: 流式token/推理/工具进度正确渲染
+    method: 对标hermes-desktop Chat行为
+  - gate: 日志实时性
+    criteria: SSE日志延迟 < 500ms
+    method: 定时检查
+version: "0.1"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-14

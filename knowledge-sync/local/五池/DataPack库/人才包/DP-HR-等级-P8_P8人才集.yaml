@@ -1,0 +1,41 @@
+datapack_id: "DP-HR-等级-P8"
+name: "P8人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "P8等级28名核心员工的完整档案"
+
+source: "employees/ 按等级分类"
+
+contents: |
+  28名P8等级员工:
+  - chenghuang
+      - zangjing
+      - 䍺-a916bed6
+      - 云师-0f0ea28a
+      - 化蛇-efb685b4
+      - 商羊
+      - 商羊-P8
+      - 孟槐-9ddcebaa
+      - 山膏-visual-designer
+      - 投资大师-639ec77b
+
+data_format: "员工YAML + 等级矩阵"
+
+mount_interface:
+  load: "加载此等级全部员工档案"
+  query: "按技能/活跃度检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做能力分析时消费"
+  - "体系Feature做组织规划时消费"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按等级重新拆分为原子DataPack"

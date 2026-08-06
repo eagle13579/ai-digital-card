@@ -1,0 +1,52 @@
+# AI热点情报聚合管线 — 从公开REST API自动采集结构化热点，格式化后推送到终端
+# AIHOT Bot 核心心智模型 #1
+name: F-AIHOT-01_News_Pipeline
+dimension: 数据
+domain: 情报采集-自动化管线
+status: 生产就绪
+priority: P0
+source_models:
+  - M-AIHOT-01_News_Pipeline
+description: |
+  AI热点情报聚合管线是实现AIHOT Bot的基础设施，从公开REST API自动
+  采集结构化AI热点新闻，经过格式化处理后通过Telegram Bot推送到终端用户。
+
+  核心流程：
+  - 数据源：AIHOT API (https://aihot.com/api/news，无Auth)
+  - 采集方式：axios HTTP请求，GET方式轮询
+  - 格式化：markdown结构化输出，包含标题/摘要/链接/分类标签
+  - 推送：通过Telegram Bot API sendMessage/EditMessageText
+
+  全自动管线，无需人工干预，无人值守运行。
+input:
+  - AIHOT API返回的JSON结构化热点数据（标题/摘要/链接/分类/时间戳）
+  - 格式化模板（markdown模板，不同分类不同颜色标记）
+output:
+  - Telegram频道/群组的结构化消息（markdown格式）
+  - 按分类分组的AI热点列表（每日/每4小时更新）
+sop: |
+  1. axios GET → AIHOT API (https://aihot.com/api/news)
+  2. 解析JSON响应，提取title/summary/link/category/timestamp字段
+  3. 按category分组（模型/产品/行业/论文/技巧/快讯）
+  4. 应用markdown格式化模板 → 生成推送消息
+  5. Telegram Bot API → sendMessage推送到目标chat_id
+  6. 记录推送日志（消息ID/时间/数量）
+quality_gates:
+  - gate: API可用性
+    criteria: AIHOT API响应成功率 > 99%
+    method: 每次请求检查HTTP状态码200，超时5秒
+  - gate: 数据结构完整性
+    criteria: 每条热点必须包含title+link，可选summary/category
+    method: 解析后逐字段验证，缺失字段以默认值填充
+  - gate: 推送成功率
+    criteria: Telegram Bot消息发送成功率 > 98%
+    method: 检查sendMessage返回的message_id
+version: "1.0.0"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-15
+product_mapping:
+  - 内容工厂: 情报采集模块可复用为内容工厂的外部数据采集管线
+  - 盖娅情报: 情报系统的结构化数据采集通道
+  - 情报系统: 统一情报采集基础设施

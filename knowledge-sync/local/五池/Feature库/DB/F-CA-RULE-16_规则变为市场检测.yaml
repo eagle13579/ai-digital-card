@@ -1,0 +1,21 @@
+id: F-CA-RULE-16
+name: 规则变为市场检测
+dimension: 💡 创造力
+description: >-
+  基于DB08规则变成市场本身心智模型构建的检测引擎，识别行业通用标准的起源与控制者。检测维度：行业标准制定者、标准定义权集中度、市场份额下降与标准控制权变化的分离程度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB08: 规则变成了市场本身
+products:
+  - 黑河调查局协议分析模块
+  - 标准定义权评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 长乘
+  - 白泽
+priority: P0
+maturity: design

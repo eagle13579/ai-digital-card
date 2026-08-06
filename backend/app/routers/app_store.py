@@ -43,7 +43,7 @@ logger = logging.getLogger("chainke.app_store")
 # ===================================================================
 # Router
 # ===================================================================
-router = APIRouter(prefix="/api/app-store", tags=["App Store"])
+router = APIRouter(prefix="/api/v1/app-store", tags=["App Store"])
 
 PLUGIN_CATEGORIES = [
     "tools",

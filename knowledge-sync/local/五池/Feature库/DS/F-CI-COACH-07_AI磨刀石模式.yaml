@@ -1,0 +1,19 @@
+id: F-CI-COACH-07
+name: AI磨刀石模式
+dimension: 🧠 认知提升
+description: >-
+  基于DS09 AI是磨刀石不是答案机心智模型构建的对话模式引擎，将AI交互
+  从「答案获取」切换为「思维模型批改」。核心功能：用户输出理解→AI批改
+  思维模型→迭代修正建议→理解进化追踪。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS09: AI是磨刀石不是答案机
+products:
+  - 思维模型批改系统
+  - 认知锻造工作台
+employees: [白泽, 乘黄, 毕方]
+priority: P0
+maturity: design

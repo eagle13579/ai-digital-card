@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>AI数智军团 · 运行看板</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:#0A0A18; color:rgba(255,255,255,0.9); padding:20px; }
+h1 { font-size:24px; margin-bottom:5px; }
+.sub { color:rgba(255,255,255,0.5); font-size:13px; margin-bottom:20px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:24px; }
+.card { background:#141418; border-radius:12px; padding:16px; border:1px solid rgba(255,255,255,0.06); }
+.card .num { font-size:32px; font-weight:700; }
+.card .label { font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; }
+.green { color:#10b981; } .red { color:#ef4444; } .gray { color:rgba(255,255,255,0.3); }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; color:rgba(255,255,255,0.4); font-weight:500; padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+td { padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.03); }
+.cat { background:#141418; border-radius:12px; padding:16px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.06); }
+.cat h3 { font-size:15px; margin-bottom:8px; }
+.badge { font-size:12px; color:rgba(255,255,255,0.3); font-weight:400; }
+.ok-badge { font-size:12px; margin-left:8px; }
+.err-badge { font-size:12px; margin-left:4px; }
+.footer { text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:24px; padding:12px; }
+</style>
+</head>
+<body>
+<h1>🤖 AI数智军团 · 运行看板</h1>
+<div class='sub'>更新于 2026-07-09 01:00 · 共 0 个自动任务</div>
+
+<div class='grid'>
+  <div class='card'><div class='num green'>0</div><div class='label'>运行正常</div></div>
+  <div class='card'><div class='num red'>0</div><div class='label'>运行异常</div></div>
+  <div class='card'><div class='num gray'>0</div><div class='label'>从未运行</div></div>
+  <div class='card'><div class='num'>6/7</div><div class='label'>服务在线</div></div>
+</div>
+
+<h2 style='font-size:16px; margin-bottom:8px;'>🔌 核心服务</h2>
+<table style='margin-bottom:24px;'>
+<tr><th>服务</th><th>端口</th><th>状态</th></tr>
+<tr><td>AI数智名片</td><td style='text-align:center'>:8002</td><td style='text-align:center'>🟢</td></tr><tr><td>Redis</td><td style='text-align:center'>:6379</td><td style='text-align:center'>🟢</td></tr><tr><td>PostgreSQL</td><td style='text-align:center'>:5432</td><td style='text-align:center'>🟢</td></tr><tr><td>盖娅之城</td><td style='text-align:center'>:5057</td><td style='text-align:center'>🟢</td></tr><tr><td>白泽控制台</td><td style='text-align:center'>:5010</td><td style='text-align:center'>🟢</td></tr><tr><td>链客宝</td><td style='text-align:center'>:8000</td><td style='text-align:center'>🔴</td></tr><tr><td>中国软银</td><td style='text-align:center'>:8312</td><td style='text-align:center'>🟢</td></tr>
+</table>
+
+<h2 style='font-size:16px; margin-bottom:8px;'>⚙️ 自动任务</h2>
+
+
+<div class='footer'>
+<a href='watchdog.log' style='color:rgba(255,255,255,0.3)'>查看 Watchdog 日志</a>
+</div>
+</body>
+</html>

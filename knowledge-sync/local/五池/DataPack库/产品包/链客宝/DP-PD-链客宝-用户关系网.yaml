@@ -1,0 +1,40 @@
+datapack_id: "DP-PD-链客宝-用户关系网"
+name: "链客宝·用户关系网"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝用户之间的业务关联网络，包括合作伙伴关系、转介绍链、共同联系人、六度人脉路径等关系数据"
+
+source: "chainke-full/geo-content/2026-06-05-从扫街到AI匹配-企业家获客方式的四次进化.md | chainke-full/geo-content/2026-06-05-B2B交易的核心难题-如何建立企业间信任网络.md"
+
+contents: |
+  【用户关系网数据】
+  1. 直接关系: 已交换名片的用户对、已达成合作的企业对
+  2. 间接关系: 共同联系人、二度/三度人脉路径
+  3. 关系强度: 基于交互频次、交易金额、合作时长计算
+  4. 转介绍链: 用户A→用户B→用户C的推荐链跟踪（来源: unit_economics.py ChannelEconomics转介绍渠道ROI=3.40）
+  5. 关系标签: 上下游/合作伙伴/竞品/服务商
+  6. 关系发现: 基于供需匹配的潜在关系推荐（来源: geo-content匹配文章）
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取用户关系网络数据到工作内存"
+  query: "按用户ID查询关系链/六度人脉路径/共同联系人"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "匹配Feature做关系推荐时消费此DataPack"
+  - "信任评分Feature做六度人脉评估时消费此DataPack"
+  - "增长Feature做转介绍分析时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户身份"
+  - "DP-PD-链客宝-用户行为"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原用户数据包（KFD-07合规）"

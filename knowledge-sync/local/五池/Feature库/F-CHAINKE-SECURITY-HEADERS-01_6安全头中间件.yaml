@@ -1,0 +1,43 @@
+---
+feature_id: F-CHAINKE-SECURITY-HEADERS-01
+name: 6安全头中间件
+dimension: 安全/合规
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 9
+source_model: "SecurityHeadersMiddleware+6安全头+nginx双保险"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝API安全头中间件。6个HTTP安全头：
+  1. Content-Security-Policy (CSP)
+  2. X-Frame-Options (DENY)
+  3. X-Content-Type-Options (nosniff)
+  4. Strict-Transport-Security (31536000s)
+  5. Referrer-Policy (strict-origin-when-cross-origin)
+  6. Permissions-Policy (camera=(), microphone=())
+  nginx配置同步设置安全头，构成应用层+网络层双保险。
+inputs:
+  - FastAPI中间件
+  - nginx配置
+outputs:
+  - SecurityHeadersMiddleware类
+  - 6标准安全头所有响应附加
+  - nginx安全头配置
+  - curl -I全返回验证
+sop:
+  1. 实现SecurityHeadersMiddleware
+  2. 注入到FastAPI app中间件链
+  3. 同步更新nginx.conf安全头
+  4. curl -I全量验证
+quality_gates:
+  - curl -I返回全部6安全头
+  - 无报头缺失或错误值
+  - nginx与应用层配置一致
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 9

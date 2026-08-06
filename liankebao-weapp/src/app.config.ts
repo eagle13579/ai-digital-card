@@ -13,6 +13,8 @@ export default {
     'pages/supply-demand/index',
     'pages/tutorial/index',
     'pages/mine/index',
+    'pages/network/index',
+    'pages/visitors/index',
   ],
   window: {
     navigationBarTitleText: 'AI数字名片',

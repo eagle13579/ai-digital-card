@@ -1,0 +1,53 @@
+# 🧩 装饰器路由+消息中间件 — 自动路由+可插拔拦截
+id: F-AUTOGEN-02
+name: "装饰器路由+消息中间件"
+description: "装饰器驱动的类型路由 + InterventionHandler消息中间件管道。让Agent消息处理自动路由+可插拔拦截，降低消息处理耦合度"
+version: "1.0"
+dimension: "基本功"
+source_model: "AG04+AG07"
+status: active
+created: "2026-07-07"
+
+one_liner: "装饰器驱动的类型路由 + InterventionHandler消息中间件管道"
+
+what_it_does: |
+  1. @message_handler 装饰器 — 通过装饰器声明消息类型与Handler的绑定关系，自动注册路由
+  2. 类型路由 — 根据消息类型（Type+Schema）自动分派至对应Handler，消除手动if-else
+  3. InterventionHandler管道 — 消息进入Handler前经可插拔拦截链（日志/鉴权/限流/转换）
+  4. 拦截器优先级排序 — 每个InterventionHandler可定义优先级，管道内按序执行
+  5. 拦截器可插拔 — 通过配置动态添加/移除拦截器，无需修改Handler代码
+  6. 错误中间件 — 拦截链中的异常可被ErrorHandler捕获并统一格式化返回
+
+input:
+  - "Agent消息对象（含消息类型、载荷、元数据）"
+  - "路由装饰器声明（@message_handler(type, schema)）"
+  - "InterventionHandler配置列表（名称、优先级、启用状态）"
+
+output:
+  - "路由分派结果（匹配的Handler执行输出）"
+  - "拦截链日志（每个拦截器的处理记录）"
+  - "统一错误响应（拦截或Handler抛出的异常）"
+
+sop: |
+  1. 开发者使用 @message_handler(type="SomeType", schema=SomeSchema) 装饰Handler函数
+  2. Agent启动时扫描装饰器注册表，建立类型→Handler映射
+  3. 配置InterventionHandler管道（如AuthInterceptor、RateLimiter、Logger）
+  4. 消息到达后，路由层从类型映射中查找匹配的Handler
+  5. 消息依次通过InterventionHandler管道（按优先级排序）
+  6. 任一拦截器拒绝则短路返回错误，不进入Handler
+  7. 通过管道的消息最终交付给Handler执行业务逻辑
+  8. 返回结果经ErrorHandler统一格式化后输出
+
+quality_gate:
+  - "装饰器声明的Schema必须通过JSON Schema校验"
+  - "同一消息类型不可重复注册多个Handler（需用subtype区分）"
+  - "拦截器管道超时 ≤ 5s（单个拦截器 ≤ 1s）"
+  - "未匹配类型的消息必须走FallbackHandler，不可静默丢弃"
+  - "拦截器链变更必须热生效，不中断进行中的请求"
+
+products:
+  - "盖娅之城"
+  - "白泽军团"
+
+iteration_log:
+  - "v1.0 — 初始创建，基于AutoGen 15心智模型（AG04, AG07）设计"

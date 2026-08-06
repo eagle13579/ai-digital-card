@@ -1,0 +1,44 @@
+datapack_id: "DP-PD-链客宝-订单交易"
+name: "链客宝·订单交易"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝平台的订单交易数据，包括企业订阅付费、交易记录、支付流水、合同管理和账单数据"
+
+source: "chainke-full/backend/app/routers/unit_economics.py"
+
+contents: |
+  【订单交易数据】
+  1. 收入条目: 客户付费记录（来源: unit_economics.py RevenueEntry）
+     - 客户示例: 智联科技(企业版¥12,800)、云帆数据(专业版¥6,800)、锐思咨询(专业版¥6,800)
+     - 博远科技(企业版¥12,800)、创享互联(专业版¥6,800)、明略数据(企业版¥12,800)
+     - 华盛集团(专业版¥6,800)、聚量科技(免费版¥0)
+     - 套餐类型: 免费版/专业版/企业版
+     - 获客渠道: 线上/展会/转介绍/渠道
+  2. 付费统计: 付费用户数、ARPU、月经常性收入(MRR)
+  3. 订阅管理: 订阅周期、续费状态、到期提醒
+  4. 合同管理: 合同编号、签约日期、服务期限、合同金额
+  5. 交易流水: 支付时间、支付方式、支付状态、发票信息
+  6. 退款/纠纷: 退款记录、纠纷处理状态
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取订单交易数据到工作内存"
+  query: "按客户ID/时间段/套餐类型/支付状态查询订单"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "交易Feature做订单管理时消费此DataPack"
+  - "单位经济Feature做LTV/CAC计算时消费此DataPack"
+  - "增长Feature做收入分析时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户身份"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原供需需求数据包（KFD-07合规）"

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI数智名片 — 7m×2.7m 宣传墙（深蓝科技版）</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0e1a;
+  display: flex; flex-direction: column; align-items: center; padding: 40px 24px;
+  font-family: 'Noto Sans SC','Inter',sans-serif;
+}
+
+.wall-wrapper {
+  max-width: 1400px; width: 100%;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* ===== THE WALL ===== */
+.wall {
+  width: 100%; aspect-ratio: 7/2.7; display: flex; position: relative;
+  background: linear-gradient(150deg, #040922 0%, #0a1635 25%, #0d1f3f 50%, #08142e 75%, #040922 100%);
+  overflow: hidden;
+}
+
+/* 网格线 */
+.wall-grid {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    linear-gradient(rgba(2,169,213,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2,169,213,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* 光晕 */
+.wall-glow {
+  position: absolute; width: 600px; height: 600px; top: 35%; left: 38%;
+  transform: translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(2,169,213,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 1;
+}
+.wall-glow2 {
+  position: absolute; width: 400px; height: 400px; top: 15%; right: 12%;
+  background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 1;
+}
+.wall-glow3 {
+  position: absolute; width: 300px; height: 300px; bottom: 5%; left: 50%;
+  background: radial-gradient(circle, rgba(2,169,213,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: 1;
+}
+
+.zone { position: relative; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; }
+
+/* ============ Z1: Brand ============ */
+.z1 {
+  width: 18%; padding: 20px 16px; align-items: center; text-align: center;
+  background: linear-gradient(180deg, rgba(4,9,34,0.8) 0%, rgba(10,22,53,0.6) 100%);
+}
+.z1-logo {
+  width: 70px; height: 70px; border-radius: 16px;
+  background: linear-gradient(135deg, #02a9d5, #2dd4bf);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px; box-shadow: 0 4px 20px rgba(2,169,213,0.2);
+  position: relative;
+}
+.z1-logo::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 19px;
+  border: 1px solid rgba(2,169,213,0.2);
+}
+.z1-logo span { color: #fff; font-family: Manrope; font-weight: 800; font-size: 22px; letter-spacing: 2px; }
+.z1-name { font-family: Manrope; font-weight: 800; font-size: 26px; color: #e1e6ed; letter-spacing: 2px; }
+.z1-sub { font-family: Manrope; font-weight: 600; font-size: 9px; color: #5a7a94; letter-spacing: 1px; margin-top: 3px; }
+.z1-line { width: 28px; height: 2px; background: linear-gradient(90deg, #02a9d5, #2dd4bf); margin: 8px auto; border-radius: 2px; }
+.z1-by { font-size: 10px; color: #8fa8c0; line-height: 1.5; }
+.z1-by em { color: #02a9d5; font-style: normal; font-weight: 600; }
+.z1-v { font-size: 8px; color: #5a7a94; margin-top: 4px; }
+
+/* ============ Z2: Core Message ============ */
+.z2 {
+  width: 25%; padding: 20px 18px; align-items: flex-start;
+  background: linear-gradient(180deg, rgba(10,22,53,0.4) 0%, rgba(13,31,63,0.3) 100%);
+}
+.z2-title { font-size: 19px; font-weight: 800; color: #e1e6ed; line-height: 1.3; margin-bottom: 10px; }
+.z2-title em { color: #02a9d5; font-style: normal; }
+.z2-card {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.04); border-radius: 10px;
+  padding: 8px 12px; width: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.z2-card.before { border-color: rgba(255,255,255,0.06); }
+.z2-card.after { border-color: rgba(2,169,213,0.15); box-shadow: 0 2px 12px rgba(2,169,213,0.08); }
+.z2-ico { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.z2-ico.gray { background: rgba(255,255,255,0.06); }
+.z2-ico.blue { background: rgba(2,169,213,0.12); }
+.z2-txt { font-size: 9px; line-height: 1.3; color: #8fa8c0; }
+.z2-txt .lb { font-weight: 600; font-size: 10px; }
+.z2-txt .lb.b { color: #02a9d5; }
+.z2-txt .lb.g { color: #5a7a94; }
+.z2-txt .ds { color: #5a7a94; font-size: 8px; }
+.z2-arrow { text-align: center; color: #02a9d5; font-size: 12px; line-height: 1; margin: 2px 0; opacity: 0.5; }
+.z2-tagline { font-size: 12px; color: #02a9d5; font-weight: 700; margin-top: 6px; }
+
+/* ============ Z3: AI Engine + Revenue ============ */
+.z3 {
+  width: 31%; padding: 16px 14px; align-items: center;
+  background: linear-gradient(180deg, rgba(13,31,63,0.5) 0%, rgba(8,20,46,0.3) 100%);
+}
+.z3-title { font-size: 13px; font-weight: 700; color: #e1e6ed; margin-bottom: 6px; text-align: center; }
+.z3-title small { font-size: 8px; color: #5a7a94; font-weight: 400; display: block; margin-top: 1px; }
+.z3-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; width: 100%; margin-bottom: 6px; }
+.z3-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 5px 2px; border-radius: 8px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.z3-ico {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(2,169,213,0.1); border: 1px solid rgba(2,169,213,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 9px;
+}
+.z3-nm { font-size: 7.5px; color: #c8d5e0; font-weight: 600; }
+.z3-sb { font-size: 6px; color: #5a7a94; }
+.z3-hr { width: 70%; height: 1px; background: linear-gradient(90deg,transparent,rgba(2,169,213,0.2),transparent); margin: 4px auto; }
+.z3-rev { display: flex; gap: 5px; width: 100%; margin: 4px 0; }
+.z3-rev-item {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(2,169,213,0.08), rgba(255,255,255,0.02));
+  border: 1px solid rgba(2,169,213,0.1);
+  border-radius: 8px; padding: 5px 6px; text-align: center;
+}
+.z3-rev-num { font-family: Manrope; font-weight: 800; font-size: 14px; color: #02a9d5; }
+.z3-rev-lb { font-size: 7px; color: #8fa8c0; }
+.z3-rev-total { font-family: Manrope; font-weight: 800; font-size: 18px; color: #02a9d5; margin-top: 1px; }
+.z3-rev-totallb { font-size: 8px; color: #8fa8c0; }
+.z3-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px 8px; margin-top: 3px; }
+.z3-tag { font-size: 7.5px; color: #8fa8c0; display: flex; align-items: center; gap: 2px; }
+.z3-tag::before { content: '·'; color: #02a9d5; font-weight: bold; }
+
+/* ============ Z4: Data + 招商 ============ */
+.z4 {
+  width: 18%; padding: 16px 12px; align-items: flex-start;
+  background: linear-gradient(180deg, rgba(8,20,46,0.5) 0%, rgba(4,9,34,0.4) 100%);
+  border-radius: 0;
+}
+.z4-stat { margin-bottom: 4px; }
+.z4-num { font-family: Manrope; font-weight: 800; font-size: 28px; line-height: 1; letter-spacing: -1px; }
+.z4-num.cyan { color: #02a9d5; }
+.z4-num.light { color: #e1e6ed; }
+.z4-lb { font-size: 9px; color: #8fa8c0; margin-top: 1px; }
+.z4-line { width: 40px; height: 1px; background: rgba(2,169,213,0.2); margin: 5px 0; }
+.z4-zh { font-size: 10px; font-weight: 700; color: #02a9d5; margin-bottom: 3px; }
+.z4-partner { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.z4-partner-item {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 7.5px; color: #c8d5e0;
+  padding: 2px 6px; background: rgba(255,255,255,0.03);
+  border-radius: 4px; border: 1px solid rgba(255,255,255,0.04);
+}
+.z4-partner-item .tag {
+  font-size: 6px; background: rgba(2,169,213,0.12);
+  color: #02a9d5; padding: 1px 4px; border-radius: 3px; font-weight: 600;
+}
+.z4-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 4px 12px; background: rgba(0,0,0,0.3);
+  display: flex; gap: 10px; font-size: 6.5px; color: #5a7a94;
+}
+
+/* ============ Z5: Slogan ============ */
+.z5 {
+  width: 8%; padding: 16px 6px; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, rgba(10,22,53,0.4) 0%, rgba(4,9,34,0.6) 100%);
+}
+.z5-slogan {
+  writing-mode: vertical-rl;
+  font-size: 18px; font-weight: 800; color: #e1e6ed;
+  letter-spacing: 6px; line-height: 1.4;
+}
+.z5-slogan .hl { color: #02a9d5; }
+.z5-line { width: 20px; height: 1px; background: linear-gradient(90deg,transparent,#02a9d5,transparent); margin: 6px 0; }
+.z5-sign { font-size: 7px; color: #5a7a94; writing-mode: vertical-rl; letter-spacing: 2px; }
+
+/* ============ 5 Banners ============ */
+.banners-row { display: flex; gap: 12px; margin-top: 16px; width: 100%; max-width: 1400px; }
+.banner {
+  width: calc((100% - 48px) / 5); aspect-ratio: 1/3;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(10,22,53,0.6) 0%, rgba(4,9,34,0.8) 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  padding: 12px 8px; display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.banner-bg { position: absolute; inset: 0; pointer-events: none; }
+.b1-bg { background: linear-gradient(180deg, rgba(2,169,213,0.04) 0%, transparent 60%); }
+.b2-bg { background: linear-gradient(180deg, rgba(2,169,213,0.03) 0%, transparent 60%); }
+.b3-bg { background: linear-gradient(180deg, rgba(45,212,191,0.03) 0%, transparent 60%); }
+.b4-bg { background: linear-gradient(180deg, rgba(2,169,213,0.04) 0%, transparent 60%); }
+.b5-bg { background: linear-gradient(180deg, rgba(2,169,213,0.05) 0%, transparent 60%); }
+
+.banner-content { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* Banner 1 - Brand */
+.b1-title { font-size: 13px; font-weight: 800; color: #e1e6ed; margin-top: 8px; }
+.b1-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #02a9d5, #2dd4bf);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(2,169,213,0.2);
+  margin-bottom: 6px; flex-shrink: 0;
+}
+.b1-logo span { color: #fff; font-family: Manrope; font-weight: 800; font-size: 12px; }
+.b1-slogan { font-size: 12px; font-weight: 700; color: #e1e6ed; line-height: 1.3; margin: 6px 0; }
+.b1-slogan .hl { color: #02a9d5; }
+.b1-line { width: 20px; height: 1.5px; background: linear-gradient(90deg, #02a9d5, #2dd4bf); margin: 4px 0; border-radius: 2px; }
+.b1-desc { font-size: 7.5px; color: #8fa8c0; line-height: 1.4; padding: 0 2px; }
+.b1-by { font-size: 6px; color: #5a7a94; margin-top: auto; padding-bottom: 4px; }
+
+/* Banner 2 - AI Engines */
+.b2-title { font-size: 12px; font-weight: 700; color: #e1e6ed; margin-top: 6px; }
+.b2-sub { font-size: 6.5px; color: #5a7a94; margin-bottom: 4px; }
+.b2-g { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 100%; }
+.b2-g-item {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 5px; padding: 3px 2px; text-align: center;
+}
+.b2-g-ico { font-size: 8px; }
+.b2-g-nm { font-size: 6px; color: #c8d5e0; font-weight: 600; }
+.b2-g-sb { font-size: 5px; color: #5a7a94; }
+.b2-bottom { font-size: 7px; color: #02a9d5; font-weight: 600; margin-top: auto; padding-bottom: 4px; }
+
+/* Banner 3 - Revenue */
+.b3-title { font-size: 12px; font-weight: 700; color: #e1e6ed; margin-top: 6px; }
+.b3-card {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(2,169,213,0.08), transparent);
+  border: 1px solid rgba(2,169,213,0.1);
+  border-radius: 6px; padding: 3px 6px; margin-bottom: 2px; text-align: center;
+}
+.b3-card-lb { font-size: 7px; color: #8fa8c0; }
+.b3-card-num { font-family: Manrope; font-weight: 800; font-size: 10px; color: #02a9d5; }
+.b3-total { font-family: Manrope; font-weight: 800; font-size: 14px; color: #02a9d5; margin-top: 4px; }
+.b3-totallb { font-size: 6.5px; color: #8fa8c0; }
+.b3-margin { font-size: 7px; color: #2dd4bf; font-weight: 600; margin-top: 2px; }
+
+/* Banner 4 - 招商 */
+.b4-title { font-size: 12px; font-weight: 700; color: #e1e6ed; margin-top: 6px; }
+.b4-item {
+  display: flex; align-items: center; gap: 4px; width: 100%;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 4px; padding: 2px 6px; margin-bottom: 2px;
+}
+.b4-tag { font-size: 6px; background: rgba(2,169,213,0.12); color: #02a9d5; padding: 1px 3px; border-radius: 3px; font-weight: 700; flex-shrink: 0; }
+.b4-txt { font-size: 6.5px; color: #c8d5e0; text-align: left; }
+.b4-bottom { font-size: 6.5px; color: #02a9d5; font-weight: 600; margin-top: auto; padding-bottom: 4px; }
+
+/* Banner 5 - Moat */
+.b5-title { font-size: 12px; font-weight: 700; color: #e1e6ed; margin-top: 6px; }
+.b5-nums { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
+.b5-num { font-family: Manrope; font-weight: 800; font-size: 16px; color: #02a9d5; text-align: center; }
+.b5-num-lb { font-size: 6px; color: #8fa8c0; }
+.b5-moat { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.b5-moat-item {
+  font-size: 6.5px; color: #c8d5e0;
+  padding: 2px 5px; background: rgba(255,255,255,0.03);
+  border-radius: 3px; border: 1px solid rgba(255,255,255,0.04);
+  text-align: center; line-height: 1.2;
+}
+
+/* Specs */
+.wall-specs {
+  max-width: 1400px; width: 100%; margin-top: 20px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+}
+.wall-specs h4 { color: #8fa8c0; font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+.wall-specs .row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 10px; color: #5a7a94; }
+.wall-specs .row strong { color: #c8d5e0; }
+
+.dim-bar {
+  max-width: 1400px; width: 100%; margin-top: 8px; display: flex;
+}
+.dim-seg {
+  text-align: center; font-size: 7px; color: #5a7a94;
+  padding-top: 3px; border-top: 1px solid rgba(255,255,255,0.08);
+  border-left: 1px solid rgba(255,255,255,0.04);
+}
+.dim-seg:first-child { border-left: none; }
+.dim-pc { color: #02a9d5; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ===== THE 7m WALL ===== -->
+<div class="wall-wrapper">
+  <div class="wall">
+    <div class="wall-grid"></div>
+    <div class="wall-glow"></div>
+    <div class="wall-glow2"></div>
+    <div class="wall-glow3"></div>
+
+    <!-- Z1: Brand -->
+    <div class="zone z1">
+      <div class="z1-logo"><span>AI</span></div>
+      <div class="z1-name">AI 数智名片</div>
+      <div class="z1-sub">AI DIGITAL BUSINESS CARD</div>
+      <div class="z1-line"></div>
+      <div class="z1-by">向海容 ×<br><em>白泽AI数智军团</em></div>
+      <div class="z1-v">v3.4.0 · 已上线</div>
+    </div>
+
+    <!-- Z2: Core Message -->
+    <div class="zone z2">
+      <div class="z2-title">
+        让名片从「纸片」<br>进化为<em>「AI交互入口」</em>
+      </div>
+      <div class="z2-card before">
+        <div class="z2-ico gray">📄</div>
+        <div class="z2-txt">
+          <div class="lb g">传统名片 · 信息死亡</div>
+          <div class="ds">交换即终点 · 无法追踪 · 无法变现</div>
+        </div>
+      </div>
+      <div class="z2-arrow">▼</div>
+      <div class="z2-card after">
+        <div class="z2-ico blue">🧠</div>
+        <div class="z2-txt">
+          <div class="lb b">AI数智名片 · 活过来</div>
+          <div class="ds">AI交互起点 · 访客追踪 · 信任变现</div>
+        </div>
+      </div>
+      <div class="z2-tagline">不是名片工具 → 是AI Agent + 信任网络</div>
+    </div>
+
+    <!-- Z3: AI Engines + Revenue -->
+    <div class="zone z3">
+      <div class="z3-title">🧠 AI 引擎群 · 核心竞争力<small>15个自研AI引擎 · 越用越准</small></div>
+      <div class="z3-grid">
+        <div class="z3-item"><div class="z3-ico">📷</div><div class="z3-nm">OCR扫描</div><div class="z3-sb">PaddleOCR</div></div>
+        <div class="z3-item"><div class="z3-ico">💬</div><div class="z3-nm">RAG问答</div><div class="z3-sb">知识图谱</div></div>
+        <div class="z3-item"><div class="z3-ico">🎯</div><div class="z3-nm">智能匹配</div><div class="z3-sb">向量搜索</div></div>
+        <div class="z3-item"><div class="z3-ico">✍️</div><div class="z3-nm">AI写作</div><div class="z3-sb">文案生成</div></div>
+        <div class="z3-item"><div class="z3-ico">📊</div><div class="z3-nm">推荐系统</div><div class="z3-sb">Thompson</div></div>
+        <div class="z3-item"><div class="z3-ico">🧬</div><div class="z3-nm">知识图谱</div><div class="z3-sb">关系推理</div></div>
+        <div class="z3-item"><div class="z3-ico">🔄</div><div class="z3-nm">在线学习</div><div class="z3-sb">实时反馈</div></div>
+        <div class="z3-item"><div class="z3-ico">🤝</div><div class="z3-nm">信任评分</div><div class="z3-sb">社交关系</div></div>
+      </div>
+
+      <div class="z3-hr"></div>
+
+      <div style="font-size:9px;color:#02a9d5;font-weight:700;margin-bottom:2px;">💰 商业价值 · 招商核心</div>
+      <div class="z3-rev">
+        <div class="z3-rev-item"><div class="z3-rev-num">¥3.6亿</div><div class="z3-rev-lb">SaaS订阅/年</div></div>
+        <div class="z3-rev-item"><div class="z3-rev-num">¥3,650万</div><div class="z3-rev-lb">API生态/年</div></div>
+        <div class="z3-rev-item"><div class="z3-rev-num">¥3,000万</div><div class="z3-rev-lb">企业增值/年</div></div>
+      </div>
+      <div style="text-align:center;"><span class="z3-rev-total">¥7.25亿</span><span class="z3-rev-totallb"> /年 · 合计营收</span></div>
+
+      <div class="z3-tags">
+        <span class="z3-tag">访客追踪</span>
+        <span class="z3-tag">企业订阅</span>
+        <span class="z3-tag">API生态</span>
+        <span class="z3-tag">12种语言</span>
+        <span class="z3-tag">全球化</span>
+      </div>
+    </div>
+
+    <!-- Z4: Data + 招商 -->
+    <div class="zone z4">
+      <div class="z4-stat"><div class="z4-num cyan">10亿</div><div class="z4-lb">用户级架构</div></div>
+      <div class="z4-stat"><div class="z4-num light">200+</div><div class="z4-lb">AI数智军团</div></div>
+      <div class="z4-line"></div>
+      <div class="z4-zh">🤝 招商合作</div>
+      <div class="z4-partner">
+        <div class="z4-partner-item"><span class="tag">A</span> 战略投资 · 抢占AI名片赛道</div>
+        <div class="z4-partner-item"><span class="tag">B</span> 城市合伙人 · 分成30%</div>
+        <div class="z4-partner-item"><span class="tag">C</span> 企业定制 · ¥9.9万起</div>
+        <div class="z4-partner-item"><span class="tag">D</span> API生态 · 30分钟接入</div>
+      </div>
+      <div class="z4-bar">158条API · 32+模块 · 15引擎 · ⭐8.2/10 · 毛利>85%</div>
+    </div>
+
+    <!-- Z5: Slogan -->
+    <div class="zone z5">
+      <div class="z5-slogan">让10亿人的名片<span class="hl">活</span>过来</div>
+      <div class="z5-line"></div>
+      <div class="z5-sign">向海容</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Dimension Bar ===== -->
+<div class="dim-bar">
+  <div class="dim-seg" style="width:18%">1.26m <span class="dim-pc">18%</span></div>
+  <div class="dim-seg" style="width:25%">1.75m <span class="dim-pc">25%</span></div>
+  <div class="dim-seg" style="width:31%">2.17m <span class="dim-pc">31%</span></div>
+  <div class="dim-seg" style="width:18%">1.26m <span class="dim-pc">18%</span></div>
+  <div class="dim-seg" style="width:8%">0.56m <span class="dim-pc">8%</span></div>
+</div>
+
+<!-- ===== 5 BANNERS ===== -->
+<div class="banners-row">
+
+  <!-- B1: Brand -->
+  <div class="banner">
+    <div class="banner-bg b1-bg"></div>
+    <div class="banner-content">
+      <div class="b1-logo"><span>AI</span></div>
+      <div class="b1-title">AI 数智名片</div>
+      <div class="b1-line"></div>
+      <div class="b1-slogan">让10亿人的名片<br><span class="hl">活</span>过来</div>
+      <div class="b1-line"></div>
+      <div class="b1-desc">不是名片工具<br>是AI Agent + 信任网络<br>不是 SaaS<br>是1亿用户智能连接基础设施</div>
+      <div class="b1-by">向海容 × 白泽AI数智军团</div>
+    </div>
+  </div>
+
+  <!-- B2: AI Engines -->
+  <div class="banner">
+    <div class="banner-bg b2-bg"></div>
+    <div class="banner-content">
+      <div style="font-size:20px;margin-top:4px;">🧠</div>
+      <div class="b2-title">AI 引擎群</div>
+      <div class="b2-sub">15个自研 · 越用越准</div>
+      <div class="b2-g">
+        <div class="b2-g-item"><div class="b2-g-ico">📷</div><div class="b2-g-nm">OCR名片</div><div class="b2-g-sb">扫描识别</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">💬</div><div class="b2-g-nm">RAG问答</div><div class="b2-g-sb">知识图谱</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">🎯</div><div class="b2-g-nm">智能匹配</div><div class="b2-g-sb">向量搜索</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">✍️</div><div class="b2-g-nm">AI写作</div><div class="b2-g-sb">文案生成</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">🧬</div><div class="b2-g-nm">知识图谱</div><div class="b2-g-sb">关系推理</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">🔄</div><div class="b2-g-nm">在线学习</div><div class="b2-g-sb">实时反馈</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">📊</div><div class="b2-g-nm">推荐系统</div><div class="b2-g-sb">Thompson</div></div>
+        <div class="b2-g-item"><div class="b2-g-ico">🤝</div><div class="b2-g-nm">信任评分</div><div class="b2-g-sb">社交关系</div></div>
+      </div>
+      <div class="b2-bottom">3年先发窗口 · 竞品无AI能力</div>
+    </div>
+  </div>
+
+  <!-- B3: Revenue -->
+  <div class="banner">
+    <div class="banner-bg b3-bg"></div>
+    <div class="banner-content">
+      <div style="font-size:20px;margin-top:4px;">💰</div>
+      <div class="b3-title">三层盈利模型</div>
+      <div style="margin-top:4px;width:100%;">
+        <div class="b3-card"><div class="b3-card-lb">L1 订阅SaaS</div><div class="b3-card-num">¥3.6亿/年</div></div>
+        <div class="b3-card"><div class="b3-card-lb">L2 API生态</div><div class="b3-card-num">¥3,650万/年</div></div>
+        <div class="b3-card"><div class="b3-card-lb">L3 企业增值</div><div class="b3-card-num">¥3,000万/年</div></div>
+      </div>
+      <div class="b3-total">¥7.25亿/年</div>
+      <div class="b3-totallb">合计营收（稳定期）</div>
+      <div class="b3-margin">毛利 >85% · 边际成本趋近于零</div>
+    </div>
+  </div>
+
+  <!-- B4: 招商 -->
+  <div class="banner">
+    <div class="banner-bg b4-bg"></div>
+    <div class="banner-content">
+      <div style="font-size:20px;margin-top:4px;">🤝</div>
+      <div class="b4-title">招商合作</div>
+      <div style="margin-top:4px;width:100%;display:flex;flex-direction:column;gap:2px;">
+        <div class="b4-item"><span class="b4-tag">A</span><span class="b4-txt">战略投资 · 抢占AI名片赛道</span></div>
+        <div class="b4-item"><span class="b4-tag">B</span><span class="b4-txt">城市合伙人 · 收入分成30%</span></div>
+        <div class="b4-item"><span class="b4-tag">C</span><span class="b4-txt">企业定制 · 私有部署¥9.9万起</span></div>
+        <div class="b4-item"><span class="b4-tag">D</span><span class="b4-txt">API生态 · 30分钟接入</span></div>
+      </div>
+      <div class="b4-bottom">全球20亿商务人士 · 渗透率<5% · 千亿蓝海</div>
+    </div>
+  </div>
+
+  <!-- B5: Moat -->
+  <div class="banner">
+    <div class="banner-bg b5-bg"></div>
+    <div class="banner-content">
+      <div style="font-size:20px;margin-top:4px;">🏆</div>
+      <div class="b5-title">核心壁垒</div>
+      <div class="b5-nums">
+        <div><div class="b5-num">10亿</div><div class="b5-num-lb">用户级</div></div>
+        <div><div class="b5-num">200+</div><div class="b5-num-lb">AI军团</div></div>
+        <div><div class="b5-num">⭐8.2</div><div class="b5-num-lb">评分</div></div>
+      </div>
+      <div class="b5-moat">
+        <div class="b5-moat-item">🛡️ AI智能层 · 15引擎 · 3年先发窗口</div>
+        <div class="b5-moat-item">🔗 信任网络 · 越多人用匹配越准</div>
+        <div class="b5-moat-item">📱 微信生态 · 10亿用户零成本触达</div>
+        <div class="b5-moat-item">🤖 AI军团 · 传统6月→6天 · 成本1%</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== Specs ===== -->
+<div class="wall-specs">
+  <h4>📐 AI数智名片 · 宣传物料规格</h4>
+  <div class="row">
+    <span><strong>主墙:</strong> 7000×2700mm</span>
+    <span><strong>竖幅×5:</strong> 400×1200mm/幅</span>
+    <span><strong>配色:</strong> 深蓝科技版 · <span style="color:#02a9d5;font-weight:600;">强调 #02A9D5</span></span>
+    <span><strong>字体:</strong> Manrope / Noto Sans SC / Inter</span>
+    <span><strong>风格:</strong> 深海科技 · 通透暗色</span>
+    <span><strong>状态:</strong> 可印刷 · 已对齐项目品牌</span>
+  </div>
+</div>
+
+</body>
+</html>

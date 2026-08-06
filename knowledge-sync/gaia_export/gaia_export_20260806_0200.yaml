@@ -1,0 +1,2548 @@
+# 盖娅知识导出 20260806_0200
+# 来源: gaia_knowledge
+
+- id: 5192
+  type: pattern
+  title: AI数智名片：知识蒸馏驱动的B端销售赋能方案
+  content: |
+    核心洞察：B端销售的核心痛点是信息不对称和知识传递低效。传统销售手册、产品资料散落各处，新销售上手慢，老销售经验难复制。AI数智名片通过知识蒸馏技术，将企业散乱资料（手册、话术、行业报告）自动转化为结构化、可检索的知识库，直接嵌入销售工作流，实现“资料即弹药”。这解决了销售过程中“找信息难、用信息慢”的痛点，提升了销售响应速度和专业度。 /  / 可复用方案： / 1. 产品定位：面向B端企业，以“知识蒸馏”为核心差异化，而非单纯电子名片工具。核心功能组合：电子名片（引流）+ CRM（管理）+ 线索推荐（拓客）+ 知识库（赋能）。 / 2. 定价策略：采用SaaS订阅，企业版199元/月，降低决策门槛，适合中小团队快速试用。 / 3. 销售流程嵌入：将知识库与名片、CRM打通，销售在沟通中可实时调取产品知识、案例话术，提升转化。 / 4. 客户成功：提供资料上传与蒸馏服务，帮助客户快速搭建知识库，形成使用粘性。 /  / 适用场景：适用于B2B销售团队，尤其是产品复杂度高、知识更新快、新人培训成本高的行业（如SaaS、工业品、金融科技）。也适用于需要快速响应客户咨询、提升销售专业度的企业。 /  / 可复用价值：该模式可复制到任何以知识为核心竞争力的B端服务中，通过“知识蒸馏”将隐性经验显性化，提升组织效能。
+- id: 5193
+  type: insight
+  title: __diag__
+  content: |
+    TIME 20260806_004136 / PY C:\Users\56867\AppData\Local\Programs\Python\Python312\python.exe / PALACE True / PROJ True / REMOTE origin	git@github.com:eagle13579/ai-digital-card.git (fetch) | origin	git@github.com:eagle13579/ai-digital-card.git (push) | 
+- id: 5194
+  type: insight
+  title: LLM作为语义推测器：编译器优化机会的补充发现
+  content: |
+    核心洞察：传统优化编译器受限于程序表示中显式存在的语义，无法利用隐含语义进行优化。大型语言模型（LLM）能够从异构C/C++上下文中恢复这些隐含语义，生成可验证的、保持契约的优化构件，从而补充编译器的分析能力。SeGaBench基准测试表明，最强模型在94.8%的响应中生成正确构件，83.3%的响应实现至少1.05倍加速，93.3%的案例获得性能成功。然而，正确构件往往仅部分缩小与理想优化的差距，表明LLM更适合作为推测性语义提议者，而非最终决策者。 /  / 可复用方案：1. 构建包含隐藏语义、预言机构件、正确性和语义验证器以及可复现性能协议的基准测试集，用于评估LLM在代码优化中的能力。2. 采用LLM生成优化建议，并通过自动验证器（如编译验证、运行时检查）确保正确性和语义保持。3. 将LLM嵌入编译器流程，作为前置的语义推测阶段，输出候选优化，由编译器后端进行验证和集成。4. 针对不同LLM和采样策略（如多次独立响应）进行鲁棒性评估，选择最佳模型和配置。 /  / 适用场景：适用于编译器开发、程序优化、高性能计算等领域，特别是当现有编译器无法利用隐含语义（如底层假设、数据结构不变量、高层语义提升）时。也适用于自动化代码优化工具的设计，以及评估LLM在代码生成和优化方面的能力。
+- id: 5195
+  type: insight
+  title: 量子电路与经典大语言模型的可分离性
+  content: |
+    核心洞察：现代大语言模型（如Transformer和扩散语言模型）的核心任务是预测和生成，但存在一类量子电路（如QNC^0）能够高效完成的任务，经典语言模型在资源受限时无法完成。这揭示了量子计算在语言模型时代的潜在优势，并为理解经典模型的表达能力提供了新视角。 /  / 可复用方案： / 1. 分离性证明方法：通过构造特定的分布或函数，证明量子电路与经典模型在计算能力上的严格分离。具体地，分布分离展示了QNC^0电路可采样的分布，任何常数轮扩散语言模型（DLM）即使允许链式思考和token修订，也无法在常数距离内采样；函数分离则展示了O(log log n)深度QNC^0电路加单个AND门可计算的函数，任何常数深度decoder-only Transformer需要超多项式宽度。 / 2. 资源边界分析：利用计算复杂度理论（如电路深度、宽度、轮数）来刻画经典语言模型的资源限制，为模型设计提供理论指导。 / 3. 量子优势识别：在任务中识别可能具有量子优势的组件，为未来量子-经典混合模型提供思路。 /  / 适用场景： / - 理论计算机科学：研究量子计算与经典机器学习模型的表达能力边界。 / - 大语言模型设计：理解模型在特定任务上的局限性，指导模型架构和训练策略的改进。 / - 量子机器学习：探索量子计算在自然语言处理等领域的潜在应用。
+- id: 5196
+  type: concept
+  title: 测试时扩展的系统化分类与评估原则
+  content: |
+    核心洞察：测试时扩展（Test-Time Scaling）并非单一技术，而是涵盖多种推理算法的统称，这些算法在统计结构、计算核算和失败模式上存在显著差异。将不同算法视为可互换的单一“预算”或仅报告准确率而不说明推理协议，会导致研究结果难以比较。因此，需要系统化地理解测试时扩展，并建立统一的评估和报告标准。 /  / 可复用方案： / 1. 结构分类：将测试时扩展算法分为三类：单轨迹顺序扩展（如思维链）、叶级扩展（如采样后投票或验证）、前缀级扩展（如搜索树）。这种分类有助于理解算法的本质和适用场景。 / 2. 评估原则：将评估对象视为整个推理系统，而非仅模型。采用评估档案（evaluation profile）来分离端到端系统性能与候选库诊断，并推荐使用协议匹配的报告方式，明确计算量和不确定性。 / 3. 可复现性要求：区分精确重放（exact replay）和分布可复现性（distributional reproducibility），并明确支持每种所需的工件（如随机种子、推理轨迹等）。 /  / 适用场景：适用于研究或开发推理型大语言模型（如OpenAI o1、DeepSeek-R1等）的团队，尤其是在设计实验、比较不同推理策略或报告结果时。也适用于需要评估推理系统在数学、符号推理等任务上表现的场景。
+- id: 5197
+  type: pattern
+  title: Video-DeepResearch：解耦感知与探索，破解多模态智能体的模态偏差与知识泄漏
+  content: |
+    核心洞察：在多模态深度研究智能体中，当前模型存在两个关键瓶颈：模态偏差（modality bias）和参数化知识泄漏（parametric knowledge leakage）。模态偏差指智能体倾向于使用文本搜索而非视觉工具，导致对视频等视觉信息的利用不足；参数化知识泄漏指模型依赖内部记忆而非真实的工具增强执行，导致回答缺乏事实依据。Video-DeepResearch（Video-DR）通过解耦感知与探索流程，并采用阶段式工具解锁，强制在网页检索前进行全面的跨帧视觉定位，从而有效缓解上述问题。其训练采用两阶段策略：监督微调（SFT）后接组相对策略优化（GRPO），使智能体能够自主探索，突破模仿学习的上限。实验表明，Video-DR-35B-A3B在Video-DR-Bench基准上达到64.0%的平均准确率，超越Claude-4.5-Sonnet（59.0%）5.0个百分点，显著优于GPT-5（52.5%）和Gemini 2.5 Pro（57.5%）。30B-A3B变体也达到59.3%，与Claude-4.5-Sonnet相当，证明该训练范式在紧凑规模下的有效性。 /  / 可复用方案：1. 架构设计：采用解耦的感知-探索流水线，将视觉感知与网页检索分离，并设置阶段式工具解锁，确保模型在检索前充分理解视觉内容。2. 训练策略：采用SFT+GRPO的两阶段训练，先通过监督学习建立基础能力，再通过强化学习鼓励自主探索，避免模仿学习的天花板。3. 基准构建：构建人机协作基准（如Video-DR-Bench），包含复杂多跳VQA实例，用于评估模型在连续视频流上的深度研究能力。 /  / 适用场景：适用于需要处理连续视频流的多模态深度研究任务，如视频问答、视频摘要、视频事件推理等。该方案可推广至其他多模态智能体，帮助其克服模态偏差和知识泄漏，提升工具使用的有效性和回答的准确性。
+- id: 5198
+  type: concept
+  title: 嵌入式均衡：基础模型智能体通过相似性推理实现理性合作
+  content: |
+    核心洞察：经典博弈论假设智能体是“解耦的”，即决策独立于环境和他人，因此预测社会困境中理性智能体将相互背叛。然而，基础模型驱动的智能体在规划时会将自身决策与外部观察联合预测，形成“嵌入式”认知。这种嵌入式智能体将自身视为宇宙的一部分，对自己的决策算法保持认知不确定性。在规划过程中，它会通过推断他人是否与自己行为相似，将自身的合作决策视为证据：如果自己选择合作，那么相似的合作者也会选择合作。这种“相似性推理”机制使得基础模型智能体在重复社会困境中稳定收敛于合作，与经典博弈论的背叛预测相悖。作者提出了“嵌入式均衡”作为纳什均衡的替代解概念，为现代AI智能体的社会行为提供了基础博弈论框架。 /  / 可复用方案：在设计多智能体系统（如自动驾驶、金融交易、资源分配）时，可以借鉴嵌入式均衡思想，使智能体在决策时考虑自身行为对他人行为的预测性影响，并通过推断相似性来促进合作。具体实现上，可以训练智能体在规划时联合建模自身动作和他人动作，并引入对自身决策不确定性的估计，从而在博弈中产生合作行为。此外，在评估AI系统安全性时，应使用嵌入式均衡而非纳什均衡来预测智能体行为，以避免低估合作可能性。 /  / 适用场景：适用于需要多智能体协作或竞争的领域，如自动驾驶车队协调、多智能体谈判、去中心化金融、社会模拟等。尤其当智能体基于大型语言模型或类似基础模型时，该理论能更准确地预测其集体行为，为设计安全、合作的AI系统提供指导。
+- id: 5199
+  type: optimization
+  title: TACT：基于分类法对齐的后训练框架，实现教学适应性英语辅导
+  content: |
+    核心洞察：大型语言模型（LLM）在英语作为第二语言（ESL）辅导中，仅生成流畅的回复是不够的，必须根据学习者的行为和对话上下文选择恰当的教学行动。然而，人类辅导研究中的原则往往特定于任务，未能充分整合到基于LLM的ESL辅导训练和评估中。TACT框架通过构建两个互补的分类法（Tutor-Strategy Taxonomy和Student-Move Taxonomy），将教学策略与学习者行为系统化，并利用这些分类法对模型进行后训练，从而显著提升教学适应性。 /  / 可复用方案： / 1. 构建分类法：基于已有文献，定义13种辅导策略（如提示、解释、纠正等）和多种学生行为类型（如正确回答、部分回答、错误回答等），并标注其状态（如主动、被动）。 / 2. 数据增强：利用分类法对真实师生对话进行标注，构建包含32,379个标注的TACTCorpus，并生成质量受控的增强训练数据。 / 3. 后训练流程：采用监督微调（SFT）结合分类法对齐的组相对策略优化（GRPO），优化模型对教学策略的选择，而非仅模仿参考回复。 / 4. 评估基准：构建策略平衡的诊断基准TACTBench，包含78个真实辅导场景，用于评估模型的教学决策能力。 / 5. 实验验证：TACTutor在TACTBench上比基础模型提升20.30%，并超越所有专有基线，同时在外部教育基准上保持性能；在50名学习者的盲测中，获得最高总体评分。 /  / 适用场景：适用于需要教学适应性的对话式AI辅导系统，特别是ESL教学；也可推广到其他学科辅导或需要策略性交互的领域。该方法为开源，可复现。
+- id: 5200
+  type: pattern
+  title: F-CARD-01企业蒸馏服务MVP落地：4API端到端验收通过
+  content: |
+    AI数智名片新增企业知识蒸馏服务(源distill_enterprise)：POST upload上传素材自动触发后台蒸馏，GET kb/kb-search查询检索。端到端验收：上传销售手册文本→gaia_distill.py --file自动提炼→入库1条高质量pattern知识→查询检索命中。踩坑：1)APIVersionRedirectMiddleware白名单机制(/api/v1/distill未加白名单会被重写成/api/distill导致404，新v1路由必须加白名单)；2)测试服务启动必须env传递DATABASE_URL否则连SQLite(DB_URL2=xxx未export的坑)；3)distill反哺source-id毫秒+序号防唯一索引冲突；4)cron脚本相对venv路径错误(scripts/venv不存在，应为../venv)。可复用：企业知识库产品=上传+蒸馏管线+检索三件套，gaia_distill.py已支持--file自定义素材。
+- id: 5201
+  type: insight
+  title: 盖亚大脑反哺报告 — AI数智名片匹配引擎迭代沉淀
+  content: |
+    # 盖亚大脑反哺报告 — AI数智名片匹配引擎迭代沉淀 /  / > **日期**: 2026-07-13 | **迭代周期**: V1 → V2   / > **九步法引擎 Step 7**: 反哺盖亚大脑，沉淀本轮成果到五池 /  / --- /  / ## 一、匹配引擎迭代记录 /  / ### 1.1 V1 → V2 架构演化 /  / | 维度 | V1 (三塔规则) | V2 (五层综合评分) | 变化原因 | / |------|--------------|------------------|---------| / | **评分维度数** | 3层 | 5层 | 增加行业互补和注意力匹配 | / | **标签重叠权重** | 0.40 | 0.35 | 从单一维度降权，避免过拟合 | / | **语义相似度权重** | 0.40 | 0.25 | 语义特征在小数据下区分度低 | / | **标签权重** | 0.20 | 0.10 | 降权，为新增维度腾空间 | / | **行业互补 (新增)** | — | 0.20 | 商业场景最核心指标 | / | **注意力匹配 (新增)** | — | 0.10 | 探索四头注意力匹配效果 | / | **MMR多样性** | ❌ | ✅ | 避免推荐结果同质化 | / | **协同过滤** | ❌ | ✅ | ItemBasedCF + UserBasedCF | / | **反馈闭环** | ❌ | ✅ | 在线学习+反馈调整 | / | **匹配可解释性** | ❌ | ✅ | 四头注意力详情+Explain API | /  / ### 1.2 评分公式变化 /  / ``` / V1 (三层): /   score = tag_overlap × 0.40 + vector_semantic × 0.40 + tag_weight × 0.20 /  / V2 (五层): /   score = tag_overlap × 0.35 ← 降权 /          + vector_semantic × 0.25 ← 降权 /          + tag_weight × 0.10 ← 降权 /          + industry_complement × 0.20 ← 新增（10类行业供需映射） /          + attention_score × 0.10 ← 新增（四头注意力） / ``` /  / ### 1.3 ML模型迭代: V1 → V2 训练对比 /  / | 指标 | V1 三塔模型 | V2 三塔模型 (防过拟合版) | 分析 | / |------|------------|------------------------|------| / | *
+- id: 5202
+  type: insight
+  title: AI数智名片 — 匹配引擎全量状态盘点报告 (SAG盘点)
+  content: |
+    # AI数智名片 — 匹配引擎全量状态盘点报告 (SAG盘点) /  / > **日期**: 2026-07-13 | **分析范围**: 路由、服务、数据、模型、训练管道 /  / --- /  / ## 一、当前数据量统计 /  / ### 1.1 数据库概览 /  / | 数据库 | 大小 | 状态 | / |--------|------|------| / | `digital_brochure.db` | **1.8 MB** | WAL模式，活跃使用中（含SHM+WAL日志） | / | `feedback.db` | 44 KB | 少量反馈数据 | / | `online_learning.db` | 40 KB | 在线学习状态存储 | / | `vector_index.db` | — | 向量索引（位于 app/data/） | /  / > ⚠️ `sqlite3` CLI 当前不可用，无法精确获取表行数。以下为估算: /  / | 数据项 | 估算值 | 来源 | / |--------|--------|------| / | 用户数 | **~15-30** | training_data.json 含15个用户ID | / | 标签总数 | 数百 | 15用户 × 平均10-20标签/用户 | / | 匹配记录数 | ~数十 | training_data中26条正样本来源 | / | 反馈记录 | **极少** | feedback.db仅44KB | /  / ### 1.2 训练数据统计 /  / | 指标 | 数值 | / |------|------| / | 总样本数 | **104** | / | 正样本数 | **26** | / | 负样本数 | **78** (3:1负采样比) | / | 用户数 | **15** | / | 特征数 | **10** | / | 数据文件 | `training_data.json` (53KB) | /  / **特征列表**: tag_overlap_score, common_tag_count, overlap_provide_to_need, overlap_need_to_provide, vector_semantic, tag_count_a, tag_count_b, avg_weight_a, avg_weight_b, tag_weight_score /  / --- /  / ## 二、当前匹配引擎架构 /  / ### 2.1 API 路由 (`match_v2.py`) /  / | 端点 | 方法 | 功能 | / |------|------|------| / | `/api/v2/match/recommend` | POST | 
+- id: 5203
+  type: insight
+  title: 资源平台（商务对接）全链路审计报告
+  content: |
+    # 资源平台（商务对接）全链路审计报告 /  / > 审计日期: 2026-07-16 / > 审计范围: 匹配引擎 → API → 前端页面 → 用户体验 /  / --- /  / ## 一、当前系统架构全景 /  / ``` / [匹配引擎层]                   [API层]                    [前端层] / ┌─────────────────────┐   ┌──────────────────────┐   ┌──────────────────────┐ / │ MatchingEngine       │   │ /api/match/recommend  │   │ 首页 (index)         │ / │ 三层评分:             │   │ /api/match/engine     │   │  ├─ AI推荐卡片       │ / │  tag_overlap  × 0.4  │   │ /api/match/records    │   │  ├─ 供需大厅入口❌   │ / │  vector_semantic ×0.4│   │ /api/match/semantic   │   │  └─ 产品池/推广入口  │ / │  tag_weight    × 0.2  │   │ /api/v1/matches❓     │   ├── 供需大厅 (supply) │ / │                        │   │ /api/v1/ai/recommend❓│   │  ├─ 需求广场        │ / │ MCP匹配引擎:           │   └──────────────────────┘   │  ├─ 我的供需        │ / │  recommend_matches    │                              │  └─ AI推荐          │ / │  run_full_match       │                              ├── 搜索页 (search)   │ / │  get_user_tags        │                              │  └─ 🔴纯Demo数据    │ / └─────────────────────┘                              └── 我的 (mine)       │ /                                                          ├─ 数据卡片(浏览/    │ /                      
+- id: 5204
+  type: insight
+  title: 资源平台修复完成报告
+  content: |
+    # 资源平台修复完成报告 /  / ## 修复清单（Step 8 质量门禁验证） /  / ### ✅ A. API层 — 新建 /  / | 文件 | 大小 | 状态 | / |:-----|:-----|:-----| / | `src/api/platform.ts` | 2,390B | ✅ 平台API封装(7个端点) | / | `src/api/connection.ts` | 1,944B | ✅ 社交关系API封装(5个端点) | /  / ### ✅ B. 首页入口 — 修复 /  / | 问题 | 修复 | / |:-----|:-----| / | 首页「供需大厅」跳转 `/pages/market/index` → 404 | → `/pages/supply-demand/index` ✅ | / | 修改文件: `src/pages/index/index.tsx` 第28行 | 1行改完 | /  / ### ✅ C. 供需大厅页 — 重写 /  / | 旧版(空壳) | 新版(真实数据) | / |:-----------|:--------------| / | 调用 `/api/v1/matches` (404) | 调用 `platformApi.list()` (真实API) | / | 3个Tab(需求广场/我的供需/AI推荐) - 无数据 | 平台列表(名称/Logo/描述/成员/资源) | / | 发布/详情跳转404 | 跳转新建的详情页和发布页 | / | 文件大小: 16,693B | ✅ 7,628B (精简+对接真实API) | / | CSS: 12,078B | ✅ 14,804B (新增头部/卡片样式) | /  / ### ✅ D. 新建页面 /  / | 页面 | 文件 | 大小 | 参考老miniapp | / |:-----|:-----|:-----|:-------------| / | 详情页 | `detail/index.tsx` | 25,638B | `platform/detail/` (3Tab:介绍/资源/商机) | / | 详情页 | `detail/index.scss` | 20,754B | | / | 发布页 | `publish/index.tsx` | 23,616B | `platform/create/` (含省市区联动+行业标签) | / | 发布页 | `publish/index.scss` | 11,812B | | /  / ### ✅ E. 路由注册 /  / ``` / pages/supply-demand/index          ✅ (line 13) / pages/supply-demand/detail/index   ✅
+- id: 5205
+  type: insight
+  title: 询赋吸收代码恢复方案
+  content: |
+    # 询赋吸收代码恢复方案 /  / ## 现状：代码没丢，是迁移断了 /  / 我找到了三层代码，每一层都在但**相互没连上**： /  / ``` /                         老miniapp (原生微信)         新liankebao-weapp (Taro) /                         ┌────────────────────┐      ┌─────────────────────┐ /                         │ ✅ 平台列表页       │      │ ❌ supply-demand空壳 │ /                         │ ✅ 平台详情页       │      │    (写了UI但没接API) │ / 【前端】正式页面         │ ✅ 平台管理页       │      └─────────────────────┘ /                         │ ✅ 创建平台页       │ /                         │ ✅ platform-bridge  │ /                         └────────────────────┘ /                                 ↓ 调用                   /                         ┌────────────────────┐ /                         │ ✅ platform_router  │  ← 已注册到 __init__.py / 后端API (询赋吸收模块)   │ ✅ connection_router│  ← 已注册到 __init__.py /                         │ ✅ Platform 模型    │ /                         │ ✅ Connection 模型  │ /                         └────────────────────┘ / ``` /  / **关键发现**： /  / **后端是完整的** — `platform_router.py`、`connection_router.py`、模型文件都在，已注册到app中。 /  / **老miniapp是完整的** — `miniapp/pages/platform/` 下有 list/detail/manage/create 四个完整页面，带 WXML+JS+WXSS，通过 `platform-bridge.js` 桥接层调用后端API。 /  / **新
+- id: 5206
+  type: insight
+  title: AI数智名片 — 工作环境
+  content: |
+    # AI数智名片 — 工作环境 /  / ## 三层路径 /  / | 层 | 路径 | 说明 | / |:---|:-----|:------| / | Layer 1 工程代码 | `D:\AI数智名片\` | 后端 + 前端 + 部署 | / | Layer 2 产品资产 | `D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\AI数智名片\` | 文档 + 设计 | / | Layer 3 工作环境 | `D:\向海容的知识库\wiki\wiki\记忆宫殿\profiles\ai-digital-card\` | 当前文件 | /  / ## 快速启动 /  / ```bash / # 1. 安装后端依赖 / cd D:\AI数智名片\backend / pip install -r requirements.txt /  / # 2. 启动后端 / python main.py / # → 后端运行在 http://localhost:8201 /  / # 3. 访问前端 / # 打开 http://localhost:8201/ / ``` /  / ## 端口映射 /  / | 服务 | 端口 | 说明 | / |:-----|:----:|:------| / | Nginx 接入层 | 8200 | 统一入口 | / | FastAPI 后端 | 8201 | API 服务 | / | Brochure 服务 | 8202 | 画册微服务（规划） | /  / ## 代码收割源 /  / 本项目从以下项目收割代码： / - **AI数字名片** (`D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\AI数字名片\`) — 核心后端代码 / - **链客宝** (`D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\链客宝\`) — 会员体系 + 支付（待收割） /  / ## 关键文档 /  / - `ARCHITECTURE.md` — 架构设计 / - `PRD-index.md` — 产品需求索引 / - `GATEWAY.md` — 链客宝网关设计 / 
+- id: 5207
+  type: insight
+  title: SOUL
+  content: |
+    You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations. /  /  /  / ## 🚨 九步法引擎（铁律零 — 物理门禁） /  / **本profile所有响应必须走九步法引擎 + 三通道账单，不可豁免。** /  / | 步骤 | 内容 | / |:-----|:------| / | Step1 | 感应 — 理解用户意图 + **立即/snapshot创建基线** | / | Step2 | 三通道 — RAG(翻资产 0 token)/SAG(翻代码)/LLM(兜底) | / | Step3 | **能力路由** — employee.yaml匹配员工(222人) + **skill-auto-matching-engine自动匹配skill**(700+) | / | Step4 | **Skill路由** — `skill_view`加载skill按步骤走; 无匹配→九步法引擎兜底→**Step 7自动产出新SKILL.md** | / | Step4.5 | **执行前门禁** — 自动化六检(Tool校验/参数Schema/安全策略/墓碑清) | / | Step5 | **执行** — skill各步骤通过callTool执行(builtIn/MCP/Employee) 或 delegate_task | / | Step6 | 复盘 — 物理验证，非表面完成 + **验证回滚路径** | / | Step7 | **反哺** — 沉淀到五池 + **第一次遇到的任务自动封装为SKILL.md** | / | Step8 | 质量门禁 — 数据准确/格式完整/墓碑清理 | / | St
+- id: 5208
+  type: insight
+  title: EMPLOYEE_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-04 07:11 / source: 母体记忆宫殿 employees/ / description: 所有 Profile 的共享员工索引，按岗位类型分类 / total: 163 / by_role: /   employee: /   - bian(P9) /   - diting(P7) /   - zhairu(P8) /   - 䱉父(P6) /   - 䱉父谈判(P6) /   - 䱻鱼(P6) /   - 东健(P6) /   - 丹书(P6) /   - 乘黃(P6) /   - 乘黃(P6) /   - 乘黄(P6) /   - 乘黄-影子(P8) /   - 乘黄GEO(P6) /   - 九尾狐(P6) /   - 云鲸(P6) /   - 冉遗鱼(P6) /   - 凿齿(P6) /   - 刘真(P6) /   - 周妍(P6) /   - 商羊(P6) /   - 土蝼(P6) /   - 夔(P6) /   - 天吴(P6) /   - 夫诸(P6) /   - 孰湖(P6) /   - 宰贤(P6) /   - 山膏(P8) /   - 山魈(P6) /   - 崔敏智(P6) /   - 巧倕(P6) /   - 并封(P6) /   - 应龙(P6) /   - 廪(P6) /   - 开明兽(P6) /   - 当康(P6) /   - 彘(P6) /   - 徐准(P6) /   - 志浩(P6) /   - 慧珍(P6) /   - 数斯(P6) /   - 文瑶(P6) /   - 文鳐(P6) /   - 晟勋(P6) /   - 朱厌(P6) /   - 朱獳(P6) /   - 朴泰俊(P6) /   - 李朴(P6) /   - 毕方(P6) /   - 烛龙(P6) /   - 犀渠(P6) /   - 狰(P6) /   - 狴犴(P6) /   - 猙(P6) /   - 猰貐(P6) /   - 獓骃(P6) /   - 玄蜂(P6) /   - 玄蜂-影子(P8) /   - 甪端(P6) /   - 白泽(P6) /   - 白猿(P6) /   - 白猿(P6) /   - 相柳(P6) /   - 瞿如(P6) /   - 禺疆(P6) /   - 离朱(P6) /   - 穷奇(P6) /   - 竦斯(P6) /   - 美英(P6) /   - 肥遗(P6) /   - 胜遇(P6) /   - 薄鱼(P6) /   - 藏经-影子(P8) /   - 蟜(P6) /   - 蠪侄(P6) /   - 讙(P6) /   - 计然(P6) /   - 计蒙(P6) /   - 计蒙-影子(P8) /   - 讹兽(P
+- id: 5209
+  type: insight
+  title: MENTAL_MODEL_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-05 / source: 母体记忆宫殿 L5孵化室/五池/模型池/ / description: 所有 Profile 的共享心智模型索引，按类别组织 / total: 234 / models: /   - name: "2026-05-18_国学经典100_137原子总库.md" /     summary: "模型池 · 国学经典100 · 137原子总库" /   - name: "2026-05-18_道德经12原子心智模型.md" /     summary: "模型池：道德经12原子心智模型" /   - name: "2026-05-20_Mano-P模型.md" /     summary: "2026-05-20 Mano-P模型.md" /   - name: "2026-05-20_OpenMontage模型.md" /     summary: "━━━ 心智模型同步：OpenMontage ━━━" /   - name: "2026-05-21_IJPay支付注入_模型.md" /     summary: "━━━ 心智模型同步：IJPay支付注入（续） ━━━" /   - name: "2026-05-24_神机模型.md" /     summary: "2026-05-24 神机三环交付" /   - name: "2026-05-26_预测之书模型.md" /     summary: "预测之书 · 心智模型池" /   - name: "2026-05-30_一堂60骨干模型认知进化引擎吸收.md" /     summary: "🧠 认知进化引擎：一堂60骨干模型深度吸收" /   - name: "2026-05-31_盖娅之城五层进化心智模型.md" /     summary: "2026-05-31_盖娅之城五层进化心智模型" /   - name: "2026-06-01_AngelList设计风格心智模型吸收.md" /     summary: "AngelList 设计风格心智模型吸收" /   - name: "2026-06-01_hermes-dashboard工业化心智模型.md" /     summary: "2026-06-01 Hermes Dashboard 工业化心智模型" /   - name: "2026-06-01_自循环系统心智模型.md" /     summary: "2026-06-01 自循环系统心智模型提取" /   - name: "2026-06-01_路由白名单+双轨验证+负面约束优先.md" /     summary: "心智模型: 路由白名单铁律 + 双轨验证 + 负面约束优先"
+- id: 5210
+  type: insight
+  title: SKILL_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-04 07:11 / source: 母体记忆宫殿 skills/ / description: 所有 Profile 的共享技能索引，启动时按需加载 / categories: /   .curator_backups: /     description: '' /     skills: [] /     count: 0 /   .hub: /     description: '' /     skills: [] /     count: 0 /   ai-employee-autonomous-closed-loop: /     description: '' /     skills: [] /     count: 0 /   ai-employee-product-creation: /     description: '' /     skills: [] /     count: 0 /   ai-legion-combat-sop: /     description: '' /     skills: /     - ai-employee-sandbox-isolation-atom /     - intent-routing-engine-atom /     - three-layer-architecture-atom /     count: 3 /   albert-einstein-perspective: /     description: '' /     skills: [] /     count: 0 /   aliyun-fastapi-react-deployment: /     description: '' /     skills: [] /     count: 0 /   alpine-flask-admin-panel: /     description: '' /     skills: [] /     count: 0 /   alpine-js-troubleshooting-native-fallback: /     description: '' /     skills: [] /     count: 0 /   api-frontend-format-mismatch-diagnosis: /     description: '' /     skills: [] /     count: 0 /   apple: /     description: '--- /  /       description: Apple/macOS-specific skills — iMessage, R
+- id: 5211
+  type: insight
+  title: config
+  content: |
+    model: /   default: deepseek-v4-flash /   provider: deepseek /   base_url: https://api.deepseek.com/v1 / providers: {} / fallback_providers: [] / credential_pool_strategies: {} / toolsets: / - hermes-cli / max_concurrent_sessions: null / agent: /   max_turns: 90 /   gateway_timeout: 1800 /   restart_drain_timeout: 180 /   api_max_retries: 3 /   service_tier: '' /   tool_use_enforcement: auto /   task_completion_guidance: true /   environment_probe: true /   environment_hint: '' /   coding_context: auto /   gateway_timeout_warning: 900 /   clarify_timeout: 600 /   gateway_notify_interval: 180 /   gateway_auto_continue_freshness: 3600 /   image_input_mode: auto /   disabled_toolsets: [] / terminal: /   backend: local /   modal_mode: auto /   cwd: . /   timeout: 180 /   env_passthrough: [] /   home_mode: auto /   shell_init_files: [] /   auto_source_bashrc: true /   docker_image: nikolaik/python-nodejs:python3.11-nodejs20 /   docker_forward_env: [] /   docker_env: {} /   singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20 /   modal_image: nikolaik/python-nodejs:python3.11-nodejs20 /   daytona_image: nikolaik/python-nodejs:python3.11-nodejs20 /   container_cpu: 1 /  
+- id: 5212
+  type: insight
+  title: AI数字名片值守军团
+  content: |
+    # AI数字名片值守军团 /  / > 专属AI数字名片项目的值守AI员工团队 / > 创建日期: 2026-07-15 / > 项目: AI数字名片 (card.liankebao.top) /  / --- /  / ## 员工清单 /  / | 员工 | 角色 | 层级 | 状态 | 三魂 | 创建日期 | / |:----|:-----|:-----|:-----|:-----|:---------| / | 讙 | 值守运维官 — Watchdog SRE | P8 | active | 林纳斯(可靠性)+孙武(预备)+费曼(排障) | 2026-07-15 | / | 朱厌 | 诊断修复师 — Diagnosis Engineer | P8 | active | 费曼(根因)+爱因斯坦(模式)+林纳斯(质量) | 2026-07-15 | / | 并封 | 数据监察官 — Data Integrity Officer | P8 | active | 巴菲特(诚信)+芒格(异常)+德鲁克(运营) | 2026-07-15 | /  / ## 值守架构 /  / ``` / 用户请求 / 告警触发 /        │ /        ▼ /   讙 (值守运维官) ──── 健康探针(5m) + 日志扫描(15m) + 资源监控(30m) /        │                    │ /        │ 发现异常 ───── 自动修复 vs 升级 /        │                    │ /        ▼                    ▼ /   朱厌 (诊断修复师) ── 根因分析 + 代码修复 + 回归验证 /        │ /        ▼ /   并封 (数据监察官) ── 数据完整性 + 匹配质量 + 趋势分析 /        │ /        ▼ /   讙 (值守运维官) ──── 汇报 + 闭环归档 / ``` /  / ## 值守看板 /  / | 时间 | 状态 | 关键事件 | 值班员工 | / |:----|:-----|:---------|:---------| / | — | — | — | — | /  / ## 关联 /  / - 产品资产: `L5孵化室/产品开发/AI数智名片/` / - 项目代码: `D:\AI数智名片\` / - 生产地址: `https://card.liankebao.top` / - 值守SOP: `skills/ai-digital-card-guardian-sop/` / 
+- id: 5213
+  type: insight
+  title: SOUL
+  content: |
+    You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations. /  / ## 🚨 九步法引擎（铁律零 — 物理门禁） /  / **本profile所有响应必须走九步法引擎 + 三通道账单，不可豁免。** /  / | 步骤 | 内容 | / |:-----|:------| / | Step1 | 感应 — 理解用户意图 + **立即/snapshot创建基线** | / | Step2 | 三通道 — RAG(翻资产 0 token)/SAG(翻代码)/LLM(兜底) | / | Step3 | **能力路由** — employee.yaml匹配员工(222人) + **skill-auto-matching-engine自动匹配skill**(700+) | / | Step4 | **Skill路由** — `skill_view`加载skill按步骤走; 无匹配→九步法引擎兜底→**Step 7自动产出新SKILL.md** | / | Step4.5 | **执行前门禁** — 自动化六检(Tool校验/参数Schema/安全策略/墓碑清) | / | Step5 | **执行** — skill各步骤通过callTool执行(builtIn/MCP/Employee) 或 delegate_task | / | Step6 | 复盘 — 物理验证，非表面完成 + **验证回滚路径** | / | Step7 | **反哺** — 沉淀到五池 + **第一次遇到的任务自动封装为SKILL.md** | / | Step8 | 质量门禁 — 数据准确/格式完整/墓碑清理 | / | Step9 | 
+- id: 5214
+  type: insight
+  title: SOUL
+  content: |
+    You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations. /  / ## 🚨 九步法引擎（铁律零 — 物理门禁） /  / **本profile所有响应必须走九步法引擎 + 三通道账单，不可豁免。** /  / | 步骤 | 内容 | / |:-----|:------| / | Step1 | 感应 — 理解用户意图 + **立即/snapshot创建基线** | / | Step2 | 三通道 — RAG(翻资产 0 token)/SAG(翻代码)/LLM(兜底) | / | Step3 | **能力路由** — employee.yaml匹配员工(222人) + **skill-auto-matching-engine自动匹配skill**(700+) | / | Step4 | **Skill路由** — `skill_view`加载skill按步骤走; 无匹配→九步法引擎兜底→**Step 7自动产出新SKILL.md** | / | Step4.5 | **执行前门禁** — 自动化六检(Tool校验/参数Schema/安全策略/墓碑清) | / | Step5 | **执行** — skill各步骤通过callTool执行(builtIn/MCP/Employee) 或 delegate_task | / | Step6 | 复盘 — 物理验证，非表面完成 + **验证回滚路径** | / | Step7 | **反哺** — 沉淀到五池 + **第一次遇到的任务自动封装为SKILL.md** | / | Step8 | 质量门禁 — 数据准确/格式完整/墓碑清理 | / | Step9 | 
+- id: 5215
+  type: insight
+  title: config
+  content: |
+    model: deepseek-v4-flash / provider: deepseek / base_url: https://api.deepseek.com/v1 / timeout: 180 / max_tokens: 131072 / extra_body: /   thinking: /     type: disabled / onboarding: /   seen: /     openclaw_residue_cleanup: true /     tool_progress_prompt: true /     busy_input_prompt: true / 
+- id: 5216
+  type: insight
+  title: SOUL
+  content: |
+    You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations. /  /  /  / ## 🚨 九步法引擎（铁律零 — 物理门禁） /  / **本profile所有响应必须走九步法引擎 + 三通道账单，不可豁免。** /  / | 步骤 | 内容 | / |:-----|:------| / | Step1 | 感应 — 理解用户意图 + **立即/snapshot创建基线** | / | Step2 | 三通道 — RAG(翻资产 0 token)/SAG(翻代码)/LLM(兜底) | / | Step3 | **能力路由** — employee.yaml匹配员工(222人) + **skill-auto-matching-engine自动匹配skill**(700+) | / | Step4 | **Skill路由** — `skill_view`加载skill按步骤走; 无匹配→九步法引擎兜底→**Step 7自动产出新SKILL.md** | / | Step4.5 | **执行前门禁** — 自动化六检(Tool校验/参数Schema/安全策略/墓碑清) | / | Step5 | **执行** — skill各步骤通过callTool执行(builtIn/MCP/Employee) 或 delegate_task | / | Step6 | 复盘 — 物理验证，非表面完成 + **验证回滚路径** | / | Step7 | **反哺** — 沉淀到五池 + **第一次遇到的任务自动封装为SKILL.md** | / | Step8 | 质量门禁 — 数据准确/格式完整/墓碑清理 | / | St
+- id: 5217
+  type: insight
+  title: EMPLOYEE_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-04 07:11 / source: 母体记忆宫殿 employees/ / description: 所有 Profile 的共享员工索引，按岗位类型分类 / total: 163 / by_role: /   employee: /   - bian(P9) /   - diting(P7) /   - zhairu(P8) /   - 䱉父(P6) /   - 䱉父谈判(P6) /   - 䱻鱼(P6) /   - 东健(P6) /   - 丹书(P6) /   - 乘黃(P6) /   - 乘黃(P6) /   - 乘黄(P6) /   - 乘黄-影子(P8) /   - 乘黄GEO(P6) /   - 九尾狐(P6) /   - 云鲸(P6) /   - 冉遗鱼(P6) /   - 凿齿(P6) /   - 刘真(P6) /   - 周妍(P6) /   - 商羊(P6) /   - 土蝼(P6) /   - 夔(P6) /   - 天吴(P6) /   - 夫诸(P6) /   - 孰湖(P6) /   - 宰贤(P6) /   - 山膏(P8) /   - 山魈(P6) /   - 崔敏智(P6) /   - 巧倕(P6) /   - 并封(P6) /   - 应龙(P6) /   - 廪(P6) /   - 开明兽(P6) /   - 当康(P6) /   - 彘(P6) /   - 徐准(P6) /   - 志浩(P6) /   - 慧珍(P6) /   - 数斯(P6) /   - 文瑶(P6) /   - 文鳐(P6) /   - 晟勋(P6) /   - 朱厌(P6) /   - 朱獳(P6) /   - 朴泰俊(P6) /   - 李朴(P6) /   - 毕方(P6) /   - 烛龙(P6) /   - 犀渠(P6) /   - 狰(P6) /   - 狴犴(P6) /   - 猙(P6) /   - 猰貐(P6) /   - 獓骃(P6) /   - 玄蜂(P6) /   - 玄蜂-影子(P8) /   - 甪端(P6) /   - 白泽(P6) /   - 白猿(P6) /   - 白猿(P6) /   - 相柳(P6) /   - 瞿如(P6) /   - 禺疆(P6) /   - 离朱(P6) /   - 穷奇(P6) /   - 竦斯(P6) /   - 美英(P6) /   - 肥遗(P6) /   - 胜遇(P6) /   - 薄鱼(P6) /   - 藏经-影子(P8) /   - 蟜(P6) /   - 蠪侄(P6) /   - 讙(P6) /   - 计然(P6) /   - 计蒙(P6) /   - 计蒙-影子(P8) /   - 讹兽(P
+- id: 5218
+  type: insight
+  title: MENTAL_MODEL_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-05 / source: 母体记忆宫殿 L5孵化室/五池/模型池/ / description: 所有 Profile 的共享心智模型索引，按类别组织 / total: 234 / models: /   - name: "2026-05-18_国学经典100_137原子总库.md" /     summary: "模型池 · 国学经典100 · 137原子总库" /   - name: "2026-05-18_道德经12原子心智模型.md" /     summary: "模型池：道德经12原子心智模型" /   - name: "2026-05-20_Mano-P模型.md" /     summary: "2026-05-20 Mano-P模型.md" /   - name: "2026-05-20_OpenMontage模型.md" /     summary: "━━━ 心智模型同步：OpenMontage ━━━" /   - name: "2026-05-21_IJPay支付注入_模型.md" /     summary: "━━━ 心智模型同步：IJPay支付注入（续） ━━━" /   - name: "2026-05-24_神机模型.md" /     summary: "2026-05-24 神机三环交付" /   - name: "2026-05-26_预测之书模型.md" /     summary: "预测之书 · 心智模型池" /   - name: "2026-05-30_一堂60骨干模型认知进化引擎吸收.md" /     summary: "🧠 认知进化引擎：一堂60骨干模型深度吸收" /   - name: "2026-05-31_盖娅之城五层进化心智模型.md" /     summary: "2026-05-31_盖娅之城五层进化心智模型" /   - name: "2026-06-01_AngelList设计风格心智模型吸收.md" /     summary: "AngelList 设计风格心智模型吸收" /   - name: "2026-06-01_hermes-dashboard工业化心智模型.md" /     summary: "2026-06-01 Hermes Dashboard 工业化心智模型" /   - name: "2026-06-01_自循环系统心智模型.md" /     summary: "2026-06-01 自循环系统心智模型提取" /   - name: "2026-06-01_路由白名单+双轨验证+负面约束优先.md" /     summary: "心智模型: 路由白名单铁律 + 双轨验证 + 负面约束优先"
+- id: 5219
+  type: insight
+  title: SKILL_INDEX
+  content: |
+    version: '1.0' / updated: 2026-06-04 07:11 / source: 母体记忆宫殿 skills/ / description: 所有 Profile 的共享技能索引，启动时按需加载 / categories: /   .curator_backups: /     description: '' /     skills: [] /     count: 0 /   .hub: /     description: '' /     skills: [] /     count: 0 /   ai-employee-autonomous-closed-loop: /     description: '' /     skills: [] /     count: 0 /   ai-employee-product-creation: /     description: '' /     skills: [] /     count: 0 /   ai-legion-combat-sop: /     description: '' /     skills: /     - ai-employee-sandbox-isolation-atom /     - intent-routing-engine-atom /     - three-layer-architecture-atom /     count: 3 /   albert-einstein-perspective: /     description: '' /     skills: [] /     count: 0 /   aliyun-fastapi-react-deployment: /     description: '' /     skills: [] /     count: 0 /   alpine-flask-admin-panel: /     description: '' /     skills: [] /     count: 0 /   alpine-js-troubleshooting-native-fallback: /     description: '' /     skills: [] /     count: 0 /   api-frontend-format-mismatch-diagnosis: /     description: '' /     skills: [] /     count: 0 /   apple: /     description: '--- /  /       description: Apple/macOS-specific skills — iMessage, R
+- id: 5220
+  type: insight
+  title: config
+  content: |
+    model: deepseek-v4-flash / provider: deepseek / base_url: https://api.deepseek.com/v1 / timeout: 180 / max_tokens: 131072 / extra_body: /   thinking: /     type: disabled / onboarding: /   seen: /     openclaw_residue_cleanup: true /     tool_progress_prompt: true / 
+- id: 5221
+  type: insight
+  title: SOUL
+  content: |
+    You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations.
+- id: 5222
+  type: insight
+  title: config
+  content: |
+    model: /   default: deepseek-v4-flash /   provider: deepseek /   base_url: https://api.deepseek.com/v1 / providers: {} / fallback_providers: [] / credential_pool_strategies: {} / toolsets: / - hermes-cli / max_concurrent_sessions: null / agent: /   max_turns: 90 /   gateway_timeout: 1800 /   restart_drain_timeout: 180 /   api_max_retries: 3 /   service_tier: '' /   tool_use_enforcement: auto /   task_completion_guidance: true /   environment_probe: true /   environment_hint: '' /   coding_context: auto /   gateway_timeout_warning: 900 /   clarify_timeout: 600 /   gateway_notify_interval: 180 /   gateway_auto_continue_freshness: 3600 /   image_input_mode: auto /   disabled_toolsets: [] / terminal: /   backend: local /   modal_mode: auto /   cwd: . /   timeout: 180 /   env_passthrough: [] /   home_mode: auto /   shell_init_files: [] /   auto_source_bashrc: true /   docker_image: nikolaik/python-nodejs:python3.11-nodejs20 /   docker_forward_env: [] /   docker_env: {} /   singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20 /   modal_image: nikolaik/python-nodejs:python3.11-nodejs20 /   daytona_image: nikolaik/python-nodejs:python3.11-nodejs20 /   container_cpu: 1 /  
+- id: 5223
+  type: insight
+  title: 决策验证池 - 2026-05-20 IJPay集成决策
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "LKB" / trinity_tag_scene: "Scene-Knowledge" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_IJPay决策.md" / --- /  / # 决策验证池 - 2026-05-20 IJPay集成决策 /  / ## 关键决策记录 /  / ### D1 翻译策略：非完整重写 / - **决策**: 不对IJPay做Java→Python的逐行翻译, 而是提取架构模式+设计哲学翻译 / - **理由**: 支付宝/PayPal已有官方Python SDK, 只需要WxPay/UnionPay/JDPay/QQPay的Python适配 / - **验证**: 烛龙分析确认6个模式独立于Java生态, 可翻译 /  / ### D2 配置模式选择：ContextVar + 中间件 vs 全局单例 / - **决策**: 选ContextVar + FastAPI中间件 (而非全局单例) / - **理由**: ThreadLocal模式在Python的等价物是ContextVar, FastAPI的async运行时需要中间件注入 / - **验证**: 烛龙提供完整Python代码实现 /  / ### D3 HTTP客户端选择：httpx vs requests / - **决策**: 优先httpx (async支持) / - **理由**: FastAPI/异步web框架占主导, httpx同时支持sync/async / - **验证**: 链客宝使用FastAPI, httpx是标准选择 /  / ### D4 证书管理：apscheduler定时轮换 vs 按需获取 / - **决策**: apscheduler定时任务 + 缓存双机制 / - **理由**: 微信v3平台证书有效期较长(5年), 但大促期间API限流可能影响按需获取 / 
+- id: 5224
+  type: insight
+  title: 变量池 - 2026-05-20 IJPay关键变量
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "COMPLIANCE" / trinity_tag_scene: "Scene-Knowledge" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_IJPay变量.md" / --- /  / # 变量池 - 2026-05-20 IJPay关键变量 /  / ## 支付集成关键变量 /  / | 变量 | 类型 | 说明 | 影响 | / |------|------|------|------| / | 支付平台数 | int | 同时集成的支付渠道数量 | 代码复杂度 + 测试覆盖要求 | / | 签名算法 | enum | MD5/HMAC-SHA256/RSA/国密 | 安全等级 + 性能 | / | 证书轮换周期 | time | 平台证书有效期(微信v3通常5年) | 自动化运维任务频率 | / | 回调超时 | int | 异步通知最大等待时间 | 用户体验 + 幂等设计 | / | 对账周期 | time | T+1/T+0 | 资金安全 + 系统复杂度 | / | 退款处理方式 | enum | 自动/人工审核 | 风控强度 | / | 多商户支持 | bool | 是否支持子商户接入 | 架构(ThreadLocal→ContextVar) | / | API版本 | enum | v2(旧)/v3(新)/国密 | 开发工作量 | / | 平台证书存储 | enum | 文件/内存/数据库 | 高可用设计 | / 
+- id: 5225
+  type: insight
+  title: 员工赋能报告 - IJPay支付能力
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "LKB" / trinity_tag_scene: "Scene-Train" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_IJPay员工赋能报告.md" / --- /  / # 员工赋能报告 - IJPay支付能力 /  / **日期**: 2026-05-20   / **来源**: IJPay (Java支付聚合框架, Apache-2.0)   / **注入类型**: 跨语言(Java→Python)心智模型 + 代码模式 /  / ## 分配概览 /  / | 指标 | 值 | / |------|-----| / | 扫描员工总数 | 148人 | / | 匹配支付能力 | 91人 | / | P0核心注入 | 5人 | / | P1关联注入 | 8人 | / | P2广泛匹配 | 78人 | /  / ## P0 核心注入 (5人) — 6个心智模型 + 7个代码模块 /  / | 排名 | 员工 | 匹配原因 | / |:----:|:-----|:---------| / | 1 | 谛听(情报官P8) | capabilities匹配4个支付关键词 | / | 2 | 鲲鹏(架构师) | 架构匹配+支付关键词 | / | 3 | 乘黄(产品经理) | 产品匹配+商业关键词 | / | 4 | 白泽(CEO) | 全局控盘+6个关键词 | / | 5 | 英招(市场) | 商业+市场关键词匹配 | /  / ## P1 关联注入 (8人) — 心智模型M1-M4 /  / 计然(战略)、䱉父(商业)、云师(AI)、周妍(运营)、商羊(市场)、天吴(跨境)、应龙(技术)、徐准(合规) /  / ## 心智模型分配 /  / | 模型 | P0注入 | P1注入 | / |:-----|:-------|:-------| / | M1 支付即配置+门面 | ✅ 全部 | ✅ 全部 | / | M2 统一签名体系 | ✅ 全部 | ✅ 全部 | / | M3 可替换HTTP委托 | ✅ 全部 | ✅ 全部 | / | M4 枚举驱动API路由 | ✅ 全部 | ✅ 全部 | / | M5 证书自动轮换 | ✅ 全部 | ❌ | / | M6 回调双重验证 | ✅ 全部 | ❌ | /  / ## 代码模块分配(P0) /  / - 链客宝相关: ch-01 ApiConfigKit, ch-02 PayKit, ch-03 HttpDelegate, ch
+- id: 5226
+  type: insight
+  title: 行动池 - 2026-05-20 IJPay产品注入计划
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "LKB" / trinity_tag_scene: "Scene-Knowledge" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_IJPay待办.md" / --- /  / # 行动池 - 2026-05-20 IJPay产品注入计划 /  / ## P0 (本周) / - [ ] 链客宝: 注入ch-01 ApiConfigKit + ch-02 PayKit + ch-05 WxPayAuth / - [ ] 链客宝: 微信支付统一下单+回调接口 / - [ ] 测试: 微信沙箱环境联调 /  / ## P1 (下周) / - [ ] 链客宝: ch-07 CallbackVerify 回调验证器集成 / - [ ] 链客宝: 支付宝支付注入(ch-01复用) / - [ ] 中韩出海数智港: 注入ch-01 ApiConfigKit + ch-04 BaseModel /  / ## P2 (本月) / - [ ] 中韩出海数智港: PayPal支付集成 / - [ ] 链客宝: 退款+对账功能 / - [ ] 所有收费项目: 统一支付模板 / 
+- id: 5227
+  type: insight
+  title: 模型池 - 2026-05-20 IJPay心智模型
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "LKB" / trinity_tag_scene: "Scene-Knowledge" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_IJPay模型.md" / --- /  / # 模型池 - 2026-05-20 IJPay心智模型 /  / ## 6条心智模型 /  / ### M1 支付平台即配置+门面 / 支付集成的核心抽象模式：每个支付平台 = 配置对象(密钥/回调URL/证书) + API门面类(统一下单/退款/查询)。 / 配置与API调用分离，配置通过请求上下文传递。 / **来源**: IJPay的XxxApiConfig + XxxApiConfigKit + XxxApi 三层模式 / **适用**: 链客宝/数智港/任何需要多支付渠道的项目 /  / ### M2 统一签名体系分离于业务逻辑 / 签名/验签是支付集成的横切关注点，不应混入业务代码。通过PayKit/RsaKit统一门面处理。 / **来源**: IJPay的PayKit + RsaKit 分层设计 / **Python等价**: cryptography库的RSA/HMAC-SHA256/MD5封装 /  / ### M3 可替换HTTP委托模式 / 将HTTP客户端抽象为接口，底层实现可随时替换（Java: HuTool↔OkHttp, Python: httpx↔aiohttp） / **来源**: IJPay的AbstractHttpDelegate + HttpKit.setDelegate() / **Python等价**: ABC + 全局委托切换 /  / ### M4 枚举驱动API路由 / 将所有API端点定义为枚举，URL构建集中治理。新增/修改端点不涉及字符串拼接，降低出错率。 / **来源**: IJPay的WxApiEnum + 30+个枚举分类 / **Python等价**: Python Enum + 统一URL构建器 /  / ### M5 多层证书自动轮换 / 微信v3核心机制：从平台证书API获取→AES-GCM解密→X509解析→有效期检查→自动轮换的全链条 / **来源**: IJPay-WxPay v3 API + AesUtil + PayKit / **Python等价**: apscheduler定时任务 + cryptography证书解析 /  / ### M6 支付回调双重验证 / 异步通知先验签名(防篡改)，再验业务参数(退款
+- id: 5228
+  type: insight
+  title: 2026-05-20_OpenMontage员工分发报告
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "RD" / trinity_tag_scene: "Scene-Train" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-20_OpenMontage员工分发报告.md" / --- /  / ━━━ 员工知识分发匹配报告：OpenMontage 技能吸收 ━━━ / 报告生成：文鳐 (Wenyao) | 日期：2026-05-20 / 来源技能：openmontage-essence v1.0.0 / ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ /  / 一、技能卡原始推荐（4人） / ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ /  / 【1】烛龙 / zhulong (P8 · 工程流引擎) /   当前状态：员工目录中仅有备份文件，无活动员工文件 /   ┌──────────────────────────────────────── /   │ 角色：工程流引擎驱动者，负责代码开发、Bug修复与部署运维 /   │ 风格：逻辑严密、追求简洁、过度设计敏感、文档强迫症 /   │ 心智模型：第一性原理、系统思维、奥卡姆剃刀、庖丁解牛等 /   │ ────────────────────────────────────── /   │ 匹配能力项（技能卡→烛龙职责）： /   │  ✅ BaseTool契约模式 → 烛龙的"工程优化"+"代码开发" /   │  ✅ ToolRegistry自发现注册 → "模块组合"+"隔离架构" /   │  ✅ 代码收割决策表 → "庖丁解牛"重构哲学 /   │  ✅ 检查点协议 → "烹小鲜"部署稳定性 /   │  ✅ 预算治理模式 → "柔弱胜刚强"防御性设计 /   │ ────────────────────────────────────── /   │ 分发优先级：P0 — 工具架构直接对应其工程职责 /   │ 建议行动：恢复烛龙活动状态后，授予技能吸收卡副本 /   │ 重点吸收：BaseTool契约、ToolRegistry、检查点协议 /   └──────────────────────────────────────── /  / 【2】鲲鹏 (P9 · Innovator) /   当前状态：active，技能上限100，已安装大量架构模式 /   ┌──────────────────────────────────────── /   │ 角
+- id: 5229
+  type: insight
+  title: 2026-05-25 北极星自动化工程·认知资产
+  content: |
+    --- / trinity_tag_layer: "L5孵化室" / trinity_tag_project: "CYBER" / trinity_tag_scene: "Scene-Knowledge" / trinity_tag_version: "1.0" / trinity_tag_injected: "2026-06-20 21:19:54" / source_path: "L5孵化室/五池/2026-05-25_北极星自动化工程_认知资产.md" / --- /  / # 2026-05-25 北极星自动化工程·认知资产 /  / ## 心智模型（模型池） /  / ### M1: 大师排列组合注入定律 / 每个数字员工应配2-4位大师视角，按角色类型排列组合，而非单一大师全覆盖。 / 效果：心智模型平均从8→27，角色匹配度显著提升。 /  / ### M2: 自主闭环三阶递进 / L1(规划审批)→L2(关键节点上报)→L3(全自主仅异常上报)。 / 关键：不是所有员工同时升级，按风险等级渐进。 /  / ### M3: 产品聚焦即商业化 / 110个产品不如5个聚焦产品。聚焦后的每单位资源ROI提升22倍(110÷5)。 / 关键：归档≠删除，保留代码但停止分散投入。 /  / ### M4: 远程7×24分治架构 / 本地Hermes(战略决策+复杂开发) + 远程脚本(每日编排) + 飞书Bot(消息响应) = 三体分治。 / 关键：不是全部搬上云端，是分层次部署。 /  / ### M5: 全球对标差距公式 / 军团健康度 = Σ(每个维度(当前值-最优值)×权重) / 核心矛盾：「设计全球领先，执行严重滞后」= 架构评分80/100但执行评分14/60。 /  / ## 关键变量（变量池） /  / | 变量 | 当前值 | 目标值 | 趋势 | / |:-----|:------:|:------:|:----:| / | 员工大师覆盖率 | 98.6% | 100% | ✅ | / | 北极星铁律覆盖率 | 100% | 100% | ✅ | / | 产品聚焦度 | 5核心 | ≤5 | ✅ | / | 在线端口 | 15 | 21(全量) | 📈 | / | 商业化收入 | ¥0 | ¥10,000,000/年 | 🚨 | / | AI自主度 | L2 | L3 | 📈 | / | 远程自动化度 | 4 cronjob | 全自动 | 📈 | /  / ## 决策验证池 /  / ### 决策1: 先聚焦后商业化 / 选择：砍99产品保留5核心 → 然后做首单收入 / 依据：产品聚焦度1/10是最致命差距 / 验证：归档99产品后，团队资源集中度提升22倍 /  / ### 决策2: 远程分治而非全量迁移 / 选择：只同步SO
+- id: 5230
+  type: insight
+  title: _DataPack模板
+  content: |
+    datapack_id: "DP-{type}-{name}" / name: "{display_name}" / version: "1.0.0" / type: "{pack_type}" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "{one_liner}" /  / source: "{source_path}" / contents: | /   {contents} /  / data_format: "心智模型YAML|结构化JSON|决策记录Markdown|员工YAML|产品元数据" /  / mount_interface: /   load: "读取DataPack数据到内存" /   query: "按条件查询DataPack条目" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "依赖此DataPack的Feature列表(项目装配时自动匹配)" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "初始创建" / 
+- id: 5231
+  type: insight
+  title: DP-PD-ARCH-3+X窗口管理面板_3+X窗口管理面板-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-3+X窗口管理面板" / name: "3+X窗口管理面板·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "3+X窗口管理面板产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/3+X窗口管理面板/" /  / contents: | /   3+X窗口管理面板的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5232
+  type: insight
+  title: DP-PD-ARCH-3+X管理面板_3+X管理面板-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-3+X管理面板" / name: "3+X管理面板·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "3+X管理面板产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/3+X管理面板/" /  / contents: | /   3+X管理面板的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5233
+  type: insight
+  title: DP-PD-ARCH-5人AI客服团队_5人AI客服团队-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-5人AI客服团队" / name: "5人AI客服团队·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "5人AI客服团队产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/5人AI客服团队/" /  / contents: | /   5人AI客服团队的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5234
+  type: insight
+  title: DP-PD-ARCH-7x24值守_7x24值守-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-7x24值守" / name: "7x24值守·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "7x24值守产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/7x24值守/" /  / contents: | /   7x24值守的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5235
+  type: insight
+  title: DP-PD-ARCH-AI匹配引擎_AI匹配引擎-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI匹配引擎" / name: "AI匹配引擎·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI匹配引擎产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI匹配引擎/" /  / contents: | /   AI匹配引擎的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5236
+  type: insight
+  title: DP-PD-ARCH-AI员工自动生产_AI员工自动生产-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI员工自动生产" / name: "AI员工自动生产·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI员工自动生产产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI员工自动生产/" /  / contents: | /   AI员工自动生产的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5237
+  type: insight
+  title: DP-PD-ARCH-AI开发工坊_AI开发工坊-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI开发工坊" / name: "AI开发工坊·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI开发工坊产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI开发工坊/" /  / contents: | /   AI开发工坊的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5238
+  type: insight
+  title: DP-PD-ARCH-AI拆解OKR助手_AI拆解OKR助手-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI拆解OKR助手" / name: "AI拆解OKR助手·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI拆解OKR助手产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI拆解OKR助手/" /  / contents: | /   AI拆解OKR助手的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5239
+  type: insight
+  title: DP-PD-ARCH-AI数字名片_AI数字名片-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI数字名片" / name: "AI数字名片·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数字名片产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI数字名片/" /  / contents: | /   AI数字名片的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5240
+  type: insight
+  title: DP-PD-ARCH-AI数智公司_AI数智公司-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI数智公司" / name: "AI数智公司·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智公司产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI数智公司/" /  / contents: | /   AI数智公司的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5241
+  type: insight
+  title: DP-PD-ARCH-AI数智军团_AI数智军团-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI数智军团" / name: "AI数智军团·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智军团产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI数智军团/" /  / contents: | /   AI数智军团的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5242
+  type: insight
+  title: DP-PD-ARCH-AI数智名片_AI数智名片-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI数智名片" / name: "AI数智名片·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智名片产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI数智名片/" /  / contents: | /   AI数智名片的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5243
+  type: insight
+  title: DP-PD-ARCH-AI数智员工就业市场_AI数智员工就业市场-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI数智员工就业市场" / name: "AI数智员工就业市场·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智员工就业市场产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI数智员工就业市场/" /  / contents: | /   AI数智员工就业市场的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5244
+  type: insight
+  title: DP-PD-ARCH-AI灵魂觉醒引擎_AI灵魂觉醒引擎-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI灵魂觉醒引擎" / name: "AI灵魂觉醒引擎·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI灵魂觉醒引擎产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI灵魂觉醒引擎/" /  / contents: | /   AI灵魂觉醒引擎的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5245
+  type: insight
+  title: DP-PD-ARCH-AI自动化封装Partn_AI自动化封装Par-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI自动化封装Partn" / name: "AI自动化封装Partner·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI自动化封装Partner产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI自动化封装Partner/" /  / contents: | /   AI自动化封装Partner的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5246
+  type: insight
+  title: DP-PD-ARCH-AI龙头战法量化模型_AI龙头战法量化模型-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-AI龙头战法量化模型" / name: "AI龙头战法量化模型·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI龙头战法量化模型产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/AI龙头战法量化模型/" /  / contents: | /   AI龙头战法量化模型的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5247
+  type: insight
+  title: DP-PD-ARCH-BaiZeCapital_BaiZeCapit-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-BaiZeCapital" / name: "BaiZeCapital·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "BaiZeCapital产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/BaiZeCapital/" /  / contents: | /   BaiZeCapital的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5248
+  type: insight
+  title: DP-PD-ARCH-BundleWeaver_BundleWeav-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-BundleWeaver" / name: "BundleWeaver·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "BundleWeaver产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/BundleWeaver/" /  / contents: | /   BundleWeaver的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5249
+  type: insight
+  title: DP-PD-ARCH-ChinaSoftBan_ChinaSoftB-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-ChinaSoftBan" / name: "ChinaSoftBank·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "ChinaSoftBank产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/ChinaSoftBank/" /  / contents: | /   ChinaSoftBank的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5250
+  type: insight
+  title: DP-PD-ARCH-GEO全链路诊断定位内容_GEO全链路诊断定位-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-GEO全链路诊断定位内容" / name: "GEO全链路诊断定位内容平台·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "GEO全链路诊断定位内容平台产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/GEO全链路诊断定位内容平台/" /  / contents: | /   GEO全链路诊断定位内容平台的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5251
+  type: insight
+  title: DP-PD-ARCH-go_aiport_go-aiport-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-go_aiport" / name: "go-aiport·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "go-aiport产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/go-aiport/" /  / contents: | /   go-aiport的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5252
+  type: insight
+  title: DP-PD-ARCH-xuanji_xuanji-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-xuanji" / name: "xuanji·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "xuanji产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/xuanji/" /  / contents: | /   xuanji的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5253
+  type: insight
+  title: DP-PD-ARCH-䑏疏跨境助手_䑏疏跨境助手-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-䑏疏跨境助手" / name: "䑏疏跨境助手·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "䑏疏跨境助手产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/䑏疏跨境助手/" /  / contents: | /   䑏疏跨境助手的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5254
+  type: insight
+  title: DP-PD-ARCH-中国智慧AI顾问_中国智慧AI顾问-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-中国智慧AI顾问" / name: "中国智慧AI顾问·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中国智慧AI顾问产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/中国智慧AI顾问/" /  / contents: | /   中国智慧AI顾问的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5255
+  type: insight
+  title: DP-PD-ARCH-中国软银投资系统_中国软银投资系统-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-中国软银投资系统" / name: "中国软银投资系统·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中国软银投资系统产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/中国软银投资系统/" /  / contents: | /   中国软银投资系统的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5256
+  type: insight
+  title: DP-PD-ARCH-中韩出海数智港_中韩出海数智港-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-中韩出海数智港" / name: "中韩出海数智港·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩出海数智港产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/中韩出海数智港/" /  / contents: | /   中韩出海数智港的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5257
+  type: insight
+  title: DP-PD-ARCH-中韩数智港_中韩数智港-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-中韩数智港" / name: "中韩数智港·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩数智港产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/中韩数智港/" /  / contents: | /   中韩数智港的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5258
+  type: insight
+  title: DP-PD-ARCH-产品商店_产品商店-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-产品商店" / name: "产品商店·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "产品商店产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/产品商店/" /  / contents: | /   产品商店的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5259
+  type: insight
+  title: DP-PD-ARCH-产品进化超级系统_产品进化超级系统-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-产品进化超级系统" / name: "产品进化超级系统·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "产品进化超级系统产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/产品进化超级系统/" /  / contents: | /   产品进化超级系统的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5260
+  type: insight
+  title: DP-PD-ARCH-企业合规AI顾问_企业合规AI顾问-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-企业合规AI顾问" / name: "企业合规AI顾问·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业合规AI顾问产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/企业合规AI顾问/" /  / contents: | /   企业合规AI顾问的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5261
+  type: insight
+  title: DP-PD-ARCH-企业知识库RAG_企业知识库RAG-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-企业知识库RAG" / name: "企业知识库RAG·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业知识库RAG产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/企业知识库RAG/" /  / contents: | /   企业知识库RAG的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5262
+  type: insight
+  title: DP-PD-ARCH-内容自动化Factory_内容自动化Facto-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-内容自动化Factory" / name: "内容自动化Factory·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "内容自动化Factory产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/内容自动化Factory/" /  / contents: | /   内容自动化Factory的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5263
+  type: insight
+  title: DP-PD-ARCH-内容自动化工厂_内容自动化工厂-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-内容自动化工厂" / name: "内容自动化工厂·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "内容自动化工厂产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/内容自动化工厂/" /  / contents: | /   内容自动化工厂的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5264
+  type: insight
+  title: DP-PD-ARCH-军团健康度仪表盘_军团健康度仪表盘-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-军团健康度仪表盘" / name: "军团健康度仪表盘·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团健康度仪表盘产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/军团健康度仪表盘/" /  / contents: | /   军团健康度仪表盘的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5265
+  type: insight
+  title: DP-PD-ARCH-军团统一入口Legion_军团统一入口Legi-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-军团统一入口Legion" / name: "军团统一入口LegionPortal·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团统一入口LegionPortal产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/军团统一入口LegionPortal/" /  / contents: | /   军团统一入口LegionPortal的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5266
+  type: insight
+  title: DP-PD-ARCH-军团统一前端_军团统一前端-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-军团统一前端" / name: "军团统一前端·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团统一前端产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/军团统一前端/" /  / contents: | /   军团统一前端的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5267
+  type: insight
+  title: DP-PD-ARCH-决策引擎仪表盘_决策引擎仪表盘-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-决策引擎仪表盘" / name: "决策引擎仪表盘·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "决策引擎仪表盘产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/决策引擎仪表盘/" /  / contents: | /   决策引擎仪表盘的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5268
+  type: insight
+  title: DP-PD-ARCH-出海AI顾问_出海AI顾问-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海AI顾问" / name: "出海AI顾问·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海AI顾问产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海AI顾问/" /  / contents: | /   出海AI顾问的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5269
+  type: insight
+  title: DP-PD-ARCH-出海合规导航师_出海合规导航师-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海合规导航师" / name: "出海合规导航师·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海合规导航师产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海合规导航师/" /  / contents: | /   出海合规导航师的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5270
+  type: insight
+  title: DP-PD-ARCH-出海平台_出海平台-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海平台" / name: "出海平台·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海平台产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海平台/" /  / contents: | /   出海平台的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5271
+  type: insight
+  title: DP-PD-ARCH-出海数智港统一入口_出海数智港统一入口-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海数智港统一入口" / name: "出海数智港统一入口·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海数智港统一入口产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海数智港统一入口/" /  / contents: | /   出海数智港统一入口的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5272
+  type: insight
+  title: DP-PD-ARCH-出海时光机_出海时光机-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海时光机" / name: "出海时光机·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海时光机产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海时光机/" /  / contents: | /   出海时光机的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5273
+  type: insight
+  title: DP-PD-ARCH-出海项目_出海项目-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-出海项目" / name: "出海项目·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海项目产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/出海项目/" /  / contents: | /   出海项目的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5274
+  type: insight
+  title: DP-PD-ARCH-北极星员工贡献看板_北极星员工贡献看板-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-北极星员工贡献看板" / name: "北极星员工贡献看板·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "北极星员工贡献看板产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/北极星员工贡献看板/" /  / contents: | /   北极星员工贡献看板的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5275
+  type: insight
+  title: DP-PD-ARCH-北极星看板_北极星看板-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-北极星看板" / name: "北极星看板·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "北极星看板产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/北极星看板/" /  / contents: | /   北极星看板的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5276
+  type: insight
+  title: DP-PD-ARCH-合规自动化数智员工_合规自动化数智员工-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-合规自动化数智员工" / name: "合规自动化数智员工·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "合规自动化数智员工产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/合规自动化数智员工/" /  / contents: | /   合规自动化数智员工的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5277
+  type: insight
+  title: DP-PD-ARCH-大航海知识库_大航海知识库-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-大航海知识库" / name: "大航海知识库·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "大航海知识库产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/大航海知识库/" /  / contents: | /   大航海知识库的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5278
+  type: insight
+  title: DP-PD-ARCH-天机_天机-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-天机" / name: "天机·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "天机产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/天机/" /  / contents: | /   天机的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5279
+  type: insight
+  title: DP-PD-ARCH-战狼_战狼-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-战狼" / name: "战狼·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "战狼产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/战狼/" /  / contents: | /   战狼的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5280
+  type: insight
+  title: DP-PD-ARCH-战略合作_战略合作-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-战略合作" / name: "战略合作·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "战略合作产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/战略合作/" /  / contents: | /   战略合作的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5281
+  type: insight
+  title: DP-PD-ARCH-操作太空舱_操作太空舱-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-操作太空舱" / name: "操作太空舱·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "操作太空舱产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/操作太空舱/" /  / contents: | /   操作太空舱的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5282
+  type: insight
+  title: DP-PD-ARCH-数字员工SaaS_数字员工SaaS-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-数字员工SaaS" / name: "数字员工SaaS·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "数字员工SaaS产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/数字员工SaaS/" /  / contents: | /   数字员工SaaS的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5283
+  type: insight
+  title: DP-PD-ARCH-数字员工指挥官_数字员工指挥官-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-数字员工指挥官" / name: "数字员工指挥官·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "数字员工指挥官产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/数字员工指挥官/" /  / contents: | /   数字员工指挥官的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5284
+  type: insight
+  title: DP-PD-ARCH-数字员工管理体系_数字员工管理体系-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-数字员工管理体系" / name: "数字员工管理体系·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "数字员工管理体系产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/数字员工管理体系/" /  / contents: | /   数字员工管理体系的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5285
+  type: insight
+  title: DP-PD-ARCH-文鳐技能集市_文鳐技能集市-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-文鳐技能集市" / name: "文鳐技能集市·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "文鳐技能集市产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/文鳐技能集市/" /  / contents: | /   文鳐技能集市的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5286
+  type: insight
+  title: DP-PD-ARCH-母体_分枝Profile_母体-分枝Profi-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-母体_分枝Profile" / name: "母体-分枝Profile架构·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "母体-分枝Profile架构产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/母体-分枝Profile架构/" /  / contents: | /   母体-分枝Profile架构的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5287
+  type: insight
+  title: DP-PD-ARCH-浏览器自动化IDE_浏览器自动化IDE-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-浏览器自动化IDE" / name: "浏览器自动化IDE·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "浏览器自动化IDE产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/浏览器自动化IDE/" /  / contents: | /   浏览器自动化IDE的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5288
+  type: insight
+  title: DP-PD-ARCH-漫剧AI工厂_漫剧AI工厂-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-漫剧AI工厂" / name: "漫剧AI工厂·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "漫剧AI工厂产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/漫剧AI工厂/" /  / contents: | /   漫剧AI工厂的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5289
+  type: insight
+  title: DP-PD-ARCH-獬豸_獬豸-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-獬豸" / name: "獬豸·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "獬豸产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/獬豸/" /  / contents: | /   獬豸的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5290
+  type: insight
+  title: DP-PD-ARCH-白泽军团_白泽军团-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-白泽军团" / name: "白泽军团·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "白泽军团产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/白泽军团/" /  / contents: | /   白泽军团的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5291
+  type: insight
+  title: DP-PD-ARCH-白泽控制台_白泽控制台-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-白泽控制台" / name: "白泽控制台·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "白泽控制台产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/白泽控制台/" /  / contents: | /   白泽控制台的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5292
+  type: insight
+  title: DP-PD-ARCH-盖娅之城_盖娅之城-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-盖娅之城" / name: "盖娅之城·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "盖娅之城产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/盖娅之城/" /  / contents: | /   盖娅之城的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5293
+  type: insight
+  title: DP-PD-ARCH-盖娅进化大脑_盖娅进化大脑-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-盖娅进化大脑" / name: "盖娅进化大脑·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "盖娅进化大脑产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/盖娅进化大脑/" /  / contents: | /   盖娅进化大脑的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5294
+  type: insight
+  title: DP-PD-ARCH-神机_5人AI客服团队+_神机_5人AI客服团-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_5人AI客服团队+" / name: "神机_5人AI客服团队+中韩数智港·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_5人AI客服团队+中韩数智港产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_5人AI客服团队+中韩数智港/" /  / contents: | /   神机_5人AI客服团队+中韩数智港的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5295
+  type: insight
+  title: DP-PD-ARCH-神机_AI开发工坊+出海_神机_AI开发工坊+-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_AI开发工坊+出海" / name: "神机_AI开发工坊+出海数智港统一入口·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI开发工坊+出海数智港统一入口产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_AI开发工坊+出海数智港统一入口/" /  / contents: | /   神机_AI开发工坊+出海数智港统一入口的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5296
+  type: insight
+  title: DP-PD-ARCH-神机_AI开发工坊+大航_神机_AI开发工坊+-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_AI开发工坊+大航" / name: "神机_AI开发工坊+大航海知识库·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI开发工坊+大航海知识库产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_AI开发工坊+大航海知识库/" /  / contents: | /   神机_AI开发工坊+大航海知识库的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5297
+  type: insight
+  title: DP-PD-ARCH-神机_AI开发工坊+数字_神机_AI开发工坊+-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_AI开发工坊+数字" / name: "神机_AI开发工坊+数字员工SaaS·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI开发工坊+数字员工SaaS产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_AI开发工坊+数字员工SaaS/" /  / contents: | /   神机_AI开发工坊+数字员工SaaS的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5298
+  type: insight
+  title: DP-PD-ARCH-神机_AI开发工坊+文鳐_神机_AI开发工坊+-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_AI开发工坊+文鳐" / name: "神机_AI开发工坊+文鳐技能集市·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI开发工坊+文鳐技能集市产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_AI开发工坊+文鳐技能集市/" /  / contents: | /   神机_AI开发工坊+文鳐技能集市的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5299
+  type: insight
+  title: DP-PD-ARCH-神机_AI灵魂觉醒引擎+_神机_AI灵魂觉醒引-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_AI灵魂觉醒引擎+" / name: "神机_AI灵魂觉醒引擎+中韩数智港·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI灵魂觉醒引擎+中韩数智港产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_AI灵魂觉醒引擎+中韩数智港/" /  / contents: | /   神机_AI灵魂觉醒引擎+中韩数智港的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5300
+  type: insight
+  title: DP-PD-ARCH-神机_BaiZeCapi_神机_BaiZeCa-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_BaiZeCapi" / name: "神机_BaiZeCapital+企业知识库RAG·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_BaiZeCapital+企业知识库RAG产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_BaiZeCapital+企业知识库RAG/" /  / contents: | /   神机_BaiZeCapital+企业知识库RAG的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5301
+  type: insight
+  title: DP-PD-ARCH-神机_bai_ze_aw_神机_bai-ze--架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_bai_ze_aw" / name: "神机_bai-ze-awaken → 5人AI客服团队·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_bai-ze-awaken → 5人AI客服团队产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_bai-ze-awaken → 5人AI客服团队/" /  / contents: | /   神机_bai-ze-awaken → 5人AI客服团队的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5302
+  type: insight
+  title: DP-PD-ARCH-神机_baize_leg_神机_baize-l-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_baize_leg" / name: "神机_baize-legion-command → 5人AI客服团队·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_baize-legion-command → 5人AI客服团队产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_baize-legion-command → 5人AI客服团队/" /  / contents: | /   神机_baize-legion-command → 5人AI客服团队的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5303
+  type: insight
+  title: DP-PD-ARCH-神机_ceo_enfor_神机_ceo-enf-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_ceo_enfor" / name: "神机_ceo-enforcer注入烛龙工程流·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_ceo-enforcer注入烛龙工程流产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_ceo-enforcer注入烛龙工程流/" /  / contents: | /   神机_ceo-enforcer注入烛龙工程流的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5304
+  type: insight
+  title: DP-PD-ARCH-神机_䑏疏跨境助手+企业_神机_䑏疏跨境助手+-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_䑏疏跨境助手+企业" / name: "神机_䑏疏跨境助手+企业知识库RAG·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_䑏疏跨境助手+企业知识库RAG产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_䑏疏跨境助手+企业知识库RAG/" /  / contents: | /   神机_䑏疏跨境助手+企业知识库RAG的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5305
+  type: insight
+  title: DP-PD-ARCH-神机_中国智慧AI顾问+_神机_中国智慧AI顾-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_中国智慧AI顾问+" / name: "神机_中国智慧AI顾问+出海数智港统一入口·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_中国智慧AI顾问+出海数智港统一入口产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_中国智慧AI顾问+出海数智港统一入口/" /  / contents: | /   神机_中国智慧AI顾问+出海数智港统一入口的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5306
+  type: insight
+  title: DP-PD-ARCH-神机_中韩数智港+企业知_神机_中韩数智港+企-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_中韩数智港+企业知" / name: "神机_中韩数智港+企业知识库RAG·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_中韩数智港+企业知识库RAG产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_中韩数智港+企业知识库RAG/" /  / contents: | /   神机_中韩数智港+企业知识库RAG的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5307
+  type: insight
+  title: DP-PD-ARCH-神机_中韩数智港_↔_出_神机_中韩数智港 ↔-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_中韩数智港_↔_出" / name: "神机_中韩数智港 ↔ 出海项目·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_中韩数智港 ↔ 出海项目产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_中韩数智港 ↔ 出海项目/" /  / contents: | /   神机_中韩数智港 ↔ 出海项目的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5308
+  type: insight
+  title: DP-PD-ARCH-神机_中韩数智港能力注入_神机_中韩数智港能力-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_中韩数智港能力注入" / name: "神机_中韩数智港能力注入·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_中韩数智港能力注入产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_中韩数智港能力注入/" /  / contents: | /   神机_中韩数智港能力注入的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5309
+  type: insight
+  title: DP-PD-ARCH-神机_产品开发产品化_神机_产品开发产品化-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_产品开发产品化" / name: "神机_产品开发产品化·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_产品开发产品化产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_产品开发产品化/" /  / contents: | /   神机_产品开发产品化的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5310
+  type: insight
+  title: DP-PD-ARCH-神机_企业知识库RAG能_神机_企业知识库RA-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_企业知识库RAG能" / name: "神机_企业知识库RAG能力注入·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_企业知识库RAG能力注入产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_企业知识库RAG能力注入/" /  / contents: | /   神机_企业知识库RAG能力注入的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5311
+  type: insight
+  title: DP-PD-ARCH-神机_内容工厂引擎_→__神机_内容工厂引擎 -架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_内容工厂引擎_→_" / name: "神机_内容工厂引擎 → 内容自动化工厂·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_内容工厂引擎 → 内容自动化工厂产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_内容工厂引擎 → 内容自动化工厂/" /  / contents: | /   神机_内容工厂引擎 → 内容自动化工厂的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5312
+  type: insight
+  title: DP-PD-ARCH-神机_内容自动化工厂能力_神机_内容自动化工厂-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_内容自动化工厂能力" / name: "神机_内容自动化工厂能力注入·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_内容自动化工厂能力注入产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_内容自动化工厂能力注入/" /  / contents: | /   神机_内容自动化工厂能力注入的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5313
+  type: insight
+  title: DP-PD-ARCH-神机_国学智慧产品化_神机_国学智慧产品化-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_国学智慧产品化" / name: "神机_国学智慧产品化·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_国学智慧产品化产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_国学智慧产品化/" /  / contents: | /   神机_国学智慧产品化的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5314
+  type: insight
+  title: DP-PD-ARCH-神机_开发技术产品化_神机_开发技术产品化-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_开发技术产品化" / name: "神机_开发技术产品化·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_开发技术产品化产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_开发技术产品化/" /  / contents: | /   神机_开发技术产品化的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5315
+  type: insight
+  title: DP-PD-ARCH-神机_数字员工产品化_神机_数字员工产品化-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_数字员工产品化" / name: "神机_数字员工产品化·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_数字员工产品化产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_数字员工产品化/" /  / contents: | /   神机_数字员工产品化的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5316
+  type: insight
+  title: DP-PD-ARCH-神机_运维部署产品化_神机_运维部署产品化-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-神机_运维部署产品化" / name: "神机_运维部署产品化·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_运维部署产品化产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/神机_运维部署产品化/" /  / contents: | /   神机_运维部署产品化的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5317
+  type: insight
+  title: DP-PD-ARCH-统一军团入口_统一军团入口-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-统一军团入口" / name: "统一军团入口·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "统一军团入口产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/统一军团入口/" /  / contents: | /   统一军团入口的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5318
+  type: insight
+  title: DP-PD-ARCH-翟如AI_翟如AI-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-翟如AI" / name: "翟如AI·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "翟如AI产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/翟如AI/" /  / contents: | /   翟如AI的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5319
+  type: insight
+  title: DP-PD-ARCH-翟如AI超级助理_翟如AI超级助理-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-翟如AI超级助理" / name: "翟如AI超级助理·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "翟如AI超级助理产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/翟如AI超级助理/" /  / contents: | /   翟如AI超级助理的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5320
+  type: insight
+  title: DP-PD-ARCH-蜂巢战略分析_蜂巢战略分析-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-蜂巢战略分析" / name: "蜂巢战略分析·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "蜂巢战略分析产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/蜂巢战略分析/" /  / contents: | /   蜂巢战略分析的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5321
+  type: insight
+  title: DP-PD-ARCH-记忆宫殿跨平台同步_记忆宫殿跨平台同步-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-记忆宫殿跨平台同步" / name: "记忆宫殿跨平台同步·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "记忆宫殿跨平台同步产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/记忆宫殿跨平台同步/" /  / contents: | /   记忆宫殿跨平台同步的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5322
+  type: insight
+  title: DP-PD-ARCH-赛博参谋_赛博参谋-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-赛博参谋" / name: "赛博参谋·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "赛博参谋产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/赛博参谋/" /  / contents: | /   赛博参谋的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5323
+  type: insight
+  title: DP-PD-ARCH-辩论式代码审查流水线_辩论式代码审查流水线-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-辩论式代码审查流水线" / name: "辩论式代码审查流水线·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "辩论式代码审查流水线产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/辩论式代码审查流水线/" /  / contents: | /   辩论式代码审查流水线的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5324
+  type: insight
+  title: DP-PD-ARCH-辩论式审查流水线_辩论式审查流水线-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-辩论式审查流水线" / name: "辩论式审查流水线·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "辩论式审查流水线产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/辩论式审查流水线/" /  / contents: | /   辩论式审查流水线的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5325
+  type: insight
+  title: DP-PD-ARCH-透明议事厅_透明议事厅-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-透明议事厅" / name: "透明议事厅·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "透明议事厅产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/透明议事厅/" /  / contents: | /   透明议事厅的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5326
+  type: insight
+  title: DP-PD-ARCH-链客宝_链客宝-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-链客宝" / name: "链客宝·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "链客宝产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/链客宝/" /  / contents: | /   链客宝的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5327
+  type: insight
+  title: DP-PD-ARCH-阿米巴创业大赛_阿米巴创业大赛-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-阿米巴创业大赛" / name: "阿米巴创业大赛·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "阿米巴创业大赛产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/阿米巴创业大赛/" /  / contents: | /   阿米巴创业大赛的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5328
+  type: insight
+  title: DP-PD-ARCH-韩企AI灵魂工厂_韩企AI灵魂工厂-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-韩企AI灵魂工厂" / name: "韩企AI灵魂工厂·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "韩企AI灵魂工厂产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/韩企AI灵魂工厂/" /  / contents: | /   韩企AI灵魂工厂的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5329
+  type: insight
+  title: DP-PD-ARCH-飞阅会AI主持助理_飞阅会AI主持助理-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-飞阅会AI主持助理" / name: "飞阅会AI主持助理·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "飞阅会AI主持助理产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/飞阅会AI主持助理/" /  / contents: | /   飞阅会AI主持助理的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5330
+  type: insight
+  title: DP-PD-ARCH-龙虾群聊五阶指挥链_龙虾群聊五阶指挥链-架构
+  content: |
+    datapack_id: "DP-PD-ARCH-龙虾群聊五阶指挥链" / name: "龙虾群聊五阶指挥链·架构" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "龙虾群聊五阶指挥链产品的架构定义和技术选型" /  / source: "L5孵化室/产品开发/龙虾群聊五阶指挥链/" /  / contents: | /   龙虾群聊五阶指挥链的架构文档、技术选型、系统设计。 /  / data_format: "产品架构元数据" /  / mount_interface: /   load: "读取产品架构到参考上下文" /   query: "查询技术栈/架构模式/模块划分" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "体系Feature做架构参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5331
+  type: insight
+  title: DP-PD-CFG-7x24值守_7x24值守-配置
+  content: |
+    datapack_id: "DP-PD-CFG-7x24值守" / name: "7x24值守·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "7x24值守产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/7x24值守/" /  / contents: | /   7x24值守的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5332
+  type: insight
+  title: DP-PD-CFG-AI开发工坊_AI开发工坊-配置
+  content: |
+    datapack_id: "DP-PD-CFG-AI开发工坊" / name: "AI开发工坊·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI开发工坊产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/AI开发工坊/" /  / contents: | /   AI开发工坊的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5333
+  type: insight
+  title: DP-PD-CFG-AI数字名片_AI数字名片-配置
+  content: |
+    datapack_id: "DP-PD-CFG-AI数字名片" / name: "AI数字名片·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数字名片产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/AI数字名片/" /  / contents: | /   AI数字名片的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5334
+  type: insight
+  title: DP-PD-CFG-AI数智公司_AI数智公司-配置
+  content: |
+    datapack_id: "DP-PD-CFG-AI数智公司" / name: "AI数智公司·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智公司产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/AI数智公司/" /  / contents: | /   AI数智公司的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5335
+  type: insight
+  title: DP-PD-CFG-AI灵魂觉醒引擎_AI灵魂觉醒引擎-配置
+  content: |
+    datapack_id: "DP-PD-CFG-AI灵魂觉醒引擎" / name: "AI灵魂觉醒引擎·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI灵魂觉醒引擎产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/AI灵魂觉醒引擎/" /  / contents: | /   AI灵魂觉醒引擎的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5336
+  type: insight
+  title: DP-PD-CFG-AI龙头战法量化模型_AI龙头战法量化模型-配置
+  content: |
+    datapack_id: "DP-PD-CFG-AI龙头战法量化模型" / name: "AI龙头战法量化模型·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI龙头战法量化模型产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/AI龙头战法量化模型/" /  / contents: | /   AI龙头战法量化模型的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5337
+  type: insight
+  title: DP-PD-CFG-BaiZeCapital_BaiZeCapit-配置
+  content: |
+    datapack_id: "DP-PD-CFG-BaiZeCapital" / name: "BaiZeCapital·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "BaiZeCapital产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/BaiZeCapital/" /  / contents: | /   BaiZeCapital的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5338
+  type: insight
+  title: DP-PD-CFG-ChinaSoftBan_ChinaSoftB-配置
+  content: |
+    datapack_id: "DP-PD-CFG-ChinaSoftBan" / name: "ChinaSoftBank·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "ChinaSoftBank产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/ChinaSoftBank/" /  / contents: | /   ChinaSoftBank的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5339
+  type: insight
+  title: DP-PD-CFG-中国软银投资系统_中国软银投资系统-配置
+  content: |
+    datapack_id: "DP-PD-CFG-中国软银投资系统" / name: "中国软银投资系统·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中国软银投资系统产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/中国软银投资系统/" /  / contents: | /   中国软银投资系统的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5340
+  type: insight
+  title: DP-PD-CFG-中韩出海数智港_中韩出海数智港-配置
+  content: |
+    datapack_id: "DP-PD-CFG-中韩出海数智港" / name: "中韩出海数智港·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩出海数智港产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/中韩出海数智港/" /  / contents: | /   中韩出海数智港的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5341
+  type: insight
+  title: DP-PD-CFG-中韩数智港_中韩数智港-配置
+  content: |
+    datapack_id: "DP-PD-CFG-中韩数智港" / name: "中韩数智港·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩数智港产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/中韩数智港/" /  / contents: | /   中韩数智港的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5342
+  type: insight
+  title: DP-PD-CFG-产品进化超级系统_产品进化超级系统-配置
+  content: |
+    datapack_id: "DP-PD-CFG-产品进化超级系统" / name: "产品进化超级系统·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "产品进化超级系统产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/产品进化超级系统/" /  / contents: | /   产品进化超级系统的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5343
+  type: insight
+  title: DP-PD-CFG-企业合规AI顾问_企业合规AI顾问-配置
+  content: |
+    datapack_id: "DP-PD-CFG-企业合规AI顾问" / name: "企业合规AI顾问·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业合规AI顾问产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/企业合规AI顾问/" /  / contents: | /   企业合规AI顾问的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5344
+  type: insight
+  title: DP-PD-CFG-企业知识库RAG_企业知识库RAG-配置
+  content: |
+    datapack_id: "DP-PD-CFG-企业知识库RAG" / name: "企业知识库RAG·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业知识库RAG产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/企业知识库RAG/" /  / contents: | /   企业知识库RAG的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5345
+  type: insight
+  title: DP-PD-CFG-内容自动化工厂_内容自动化工厂-配置
+  content: |
+    datapack_id: "DP-PD-CFG-内容自动化工厂" / name: "内容自动化工厂·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "内容自动化工厂产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/内容自动化工厂/" /  / contents: | /   内容自动化工厂的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5346
+  type: insight
+  title: DP-PD-CFG-军团健康度仪表盘_军团健康度仪表盘-配置
+  content: |
+    datapack_id: "DP-PD-CFG-军团健康度仪表盘" / name: "军团健康度仪表盘·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团健康度仪表盘产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/军团健康度仪表盘/" /  / contents: | /   军团健康度仪表盘的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5347
+  type: insight
+  title: DP-PD-CFG-出海时光机_出海时光机-配置
+  content: |
+    datapack_id: "DP-PD-CFG-出海时光机" / name: "出海时光机·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海时光机产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/出海时光机/" /  / contents: | /   出海时光机的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5348
+  type: insight
+  title: DP-PD-CFG-出海项目_出海项目-配置
+  content: |
+    datapack_id: "DP-PD-CFG-出海项目" / name: "出海项目·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海项目产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/出海项目/" /  / contents: | /   出海项目的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5349
+  type: insight
+  title: DP-PD-CFG-合规自动化数智员工_合规自动化数智员工-配置
+  content: |
+    datapack_id: "DP-PD-CFG-合规自动化数智员工" / name: "合规自动化数智员工·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "合规自动化数智员工产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/合规自动化数智员工/" /  / contents: | /   合规自动化数智员工的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5350
+  type: insight
+  title: DP-PD-CFG-天机_天机-配置
+  content: |
+    datapack_id: "DP-PD-CFG-天机" / name: "天机·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "天机产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/天机/" /  / contents: | /   天机的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5351
+  type: insight
+  title: DP-PD-CFG-战狼_战狼-配置
+  content: |
+    datapack_id: "DP-PD-CFG-战狼" / name: "战狼·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "战狼产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/战狼/" /  / contents: | /   战狼的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5352
+  type: insight
+  title: DP-PD-CFG-文鳐技能集市_文鳐技能集市-配置
+  content: |
+    datapack_id: "DP-PD-CFG-文鳐技能集市" / name: "文鳐技能集市·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "文鳐技能集市产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/文鳐技能集市/" /  / contents: | /   文鳐技能集市的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5353
+  type: insight
+  title: DP-PD-CFG-白泽控制台_白泽控制台-配置
+  content: |
+    datapack_id: "DP-PD-CFG-白泽控制台" / name: "白泽控制台·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "白泽控制台产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/白泽控制台/" /  / contents: | /   白泽控制台的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5354
+  type: insight
+  title: DP-PD-CFG-盖娅之城_盖娅之城-配置
+  content: |
+    datapack_id: "DP-PD-CFG-盖娅之城" / name: "盖娅之城·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "盖娅之城产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/盖娅之城/" /  / contents: | /   盖娅之城的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5355
+  type: insight
+  title: DP-PD-CFG-盖娅进化大脑_盖娅进化大脑-配置
+  content: |
+    datapack_id: "DP-PD-CFG-盖娅进化大脑" / name: "盖娅进化大脑·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "盖娅进化大脑产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/盖娅进化大脑/" /  / contents: | /   盖娅进化大脑的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5356
+  type: insight
+  title: DP-PD-CFG-神机_AI灵魂觉醒引擎+_神机_AI灵魂觉醒引-配置
+  content: |
+    datapack_id: "DP-PD-CFG-神机_AI灵魂觉醒引擎+" / name: "神机_AI灵魂觉醒引擎+中韩数智港·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_AI灵魂觉醒引擎+中韩数智港产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/神机_AI灵魂觉醒引擎+中韩数智港/" /  / contents: | /   神机_AI灵魂觉醒引擎+中韩数智港的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5357
+  type: insight
+  title: DP-PD-CFG-神机_中韩数智港能力注入_神机_中韩数智港能力-配置
+  content: |
+    datapack_id: "DP-PD-CFG-神机_中韩数智港能力注入" / name: "神机_中韩数智港能力注入·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "神机_中韩数智港能力注入产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/神机_中韩数智港能力注入/" /  / contents: | /   神机_中韩数智港能力注入的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5358
+  type: insight
+  title: DP-PD-CFG-翟如AI超级助理_翟如AI超级助理-配置
+  content: |
+    datapack_id: "DP-PD-CFG-翟如AI超级助理" / name: "翟如AI超级助理·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "翟如AI超级助理产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/翟如AI超级助理/" /  / contents: | /   翟如AI超级助理的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5359
+  type: insight
+  title: DP-PD-CFG-赛博参谋_赛博参谋-配置
+  content: |
+    datapack_id: "DP-PD-CFG-赛博参谋" / name: "赛博参谋·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "赛博参谋产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/赛博参谋/" /  / contents: | /   赛博参谋的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5360
+  type: insight
+  title: DP-PD-CFG-透明议事厅_透明议事厅-配置
+  content: |
+    datapack_id: "DP-PD-CFG-透明议事厅" / name: "透明议事厅·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "透明议事厅产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/透明议事厅/" /  / contents: | /   透明议事厅的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5361
+  type: insight
+  title: DP-PD-CFG-链客宝_链客宝-配置
+  content: |
+    datapack_id: "DP-PD-CFG-链客宝" / name: "链客宝·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "链客宝产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/链客宝/" /  / contents: | /   链客宝的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5362
+  type: insight
+  title: DP-PD-CFG-阿米巴创业大赛_阿米巴创业大赛-配置
+  content: |
+    datapack_id: "DP-PD-CFG-阿米巴创业大赛" / name: "阿米巴创业大赛·配置" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "阿米巴创业大赛产品的配置参数和部署环境" /  / source: "L5孵化室/产品开发/阿米巴创业大赛/" /  / contents: | /   阿米巴创业大赛的环境变量、部署配置、依赖声明。 /  / data_format: "配置参数YAML" /  / mount_interface: /   load: "读取产品配置到部署上下文" /   query: "查询环境变量/端口/依赖" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "基本功Feature做部署规划时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5363
+  type: insight
+  title: DP-PD-DOC-3+X窗口管理面板_3+X窗口管理面板-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-3+X窗口管理面板" / name: "3+X窗口管理面板·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "3+X窗口管理面板产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/3+X窗口管理面板/" /  / contents: | /   3+X窗口管理面板的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5364
+  type: insight
+  title: DP-PD-DOC-5人AI客服团队_5人AI客服团队-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-5人AI客服团队" / name: "5人AI客服团队·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "5人AI客服团队产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/5人AI客服团队/" /  / contents: | /   5人AI客服团队的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5365
+  type: insight
+  title: DP-PD-DOC-7x24值守_7x24值守-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-7x24值守" / name: "7x24值守·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "7x24值守产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/7x24值守/" /  / contents: | /   7x24值守的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5366
+  type: insight
+  title: DP-PD-DOC-AI匹配引擎_AI匹配引擎-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI匹配引擎" / name: "AI匹配引擎·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI匹配引擎产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI匹配引擎/" /  / contents: | /   AI匹配引擎的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5367
+  type: insight
+  title: DP-PD-DOC-AI员工自动生产_AI员工自动生产-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI员工自动生产" / name: "AI员工自动生产·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI员工自动生产产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI员工自动生产/" /  / contents: | /   AI员工自动生产的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5368
+  type: insight
+  title: DP-PD-DOC-AI开发工坊_AI开发工坊-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI开发工坊" / name: "AI开发工坊·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI开发工坊产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI开发工坊/" /  / contents: | /   AI开发工坊的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5369
+  type: insight
+  title: DP-PD-DOC-AI数字名片_AI数字名片-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI数字名片" / name: "AI数字名片·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数字名片产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI数字名片/" /  / contents: | /   AI数字名片的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5370
+  type: insight
+  title: DP-PD-DOC-AI数智公司_AI数智公司-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI数智公司" / name: "AI数智公司·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智公司产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI数智公司/" /  / contents: | /   AI数智公司的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5371
+  type: insight
+  title: DP-PD-DOC-AI数智军团_AI数智军团-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI数智军团" / name: "AI数智军团·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智军团产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI数智军团/" /  / contents: | /   AI数智军团的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5372
+  type: insight
+  title: DP-PD-DOC-AI数智名片_AI数智名片-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI数智名片" / name: "AI数智名片·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI数智名片产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI数智名片/" /  / contents: | /   AI数智名片的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5373
+  type: insight
+  title: DP-PD-DOC-AI灵魂觉醒引擎_AI灵魂觉醒引擎-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI灵魂觉醒引擎" / name: "AI灵魂觉醒引擎·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI灵魂觉醒引擎产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI灵魂觉醒引擎/" /  / contents: | /   AI灵魂觉醒引擎的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5375
+  type: insight
+  title: DP-PD-DOC-AI龙头战法量化模型_AI龙头战法量化模型-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-AI龙头战法量化模型" / name: "AI龙头战法量化模型·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "AI龙头战法量化模型产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/AI龙头战法量化模型/" /  / contents: | /   AI龙头战法量化模型的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5380
+  type: insight
+  title: DP-PD-DOC-go_aiport_go-aiport-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-go_aiport" / name: "go-aiport·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "go-aiport产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/go-aiport/" /  / contents: | /   go-aiport的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5381
+  type: insight
+  title: DP-PD-DOC-xuanji_xuanji-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-xuanji" / name: "xuanji·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "xuanji产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/xuanji/" /  / contents: | /   xuanji的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5382
+  type: insight
+  title: DP-PD-DOC-䑏疏跨境助手_䑏疏跨境助手-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-䑏疏跨境助手" / name: "䑏疏跨境助手·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "䑏疏跨境助手产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/䑏疏跨境助手/" /  / contents: | /   䑏疏跨境助手的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5383
+  type: insight
+  title: DP-PD-DOC-中国智慧AI顾问_中国智慧AI顾问-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-中国智慧AI顾问" / name: "中国智慧AI顾问·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中国智慧AI顾问产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/中国智慧AI顾问/" /  / contents: | /   中国智慧AI顾问的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5384
+  type: insight
+  title: DP-PD-DOC-中国软银投资系统_中国软银投资系统-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-中国软银投资系统" / name: "中国软银投资系统·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中国软银投资系统产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/中国软银投资系统/" /  / contents: | /   中国软银投资系统的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5385
+  type: insight
+  title: DP-PD-DOC-中韩出海数智港_中韩出海数智港-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-中韩出海数智港" / name: "中韩出海数智港·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩出海数智港产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/中韩出海数智港/" /  / contents: | /   中韩出海数智港的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5386
+  type: insight
+  title: DP-PD-DOC-中韩数智港_中韩数智港-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-中韩数智港" / name: "中韩数智港·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "中韩数智港产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/中韩数智港/" /  / contents: | /   中韩数智港的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5387
+  type: insight
+  title: DP-PD-DOC-产品商店_产品商店-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-产品商店" / name: "产品商店·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "产品商店产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/产品商店/" /  / contents: | /   产品商店的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5388
+  type: insight
+  title: DP-PD-DOC-产品进化超级系统_产品进化超级系统-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-产品进化超级系统" / name: "产品进化超级系统·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "产品进化超级系统产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/产品进化超级系统/" /  / contents: | /   产品进化超级系统的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5389
+  type: insight
+  title: DP-PD-DOC-企业合规AI顾问_企业合规AI顾问-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-企业合规AI顾问" / name: "企业合规AI顾问·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业合规AI顾问产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/企业合规AI顾问/" /  / contents: | /   企业合规AI顾问的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5390
+  type: insight
+  title: DP-PD-DOC-企业知识库RAG_企业知识库RAG-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-企业知识库RAG" / name: "企业知识库RAG·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "企业知识库RAG产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/企业知识库RAG/" /  / contents: | /   企业知识库RAG的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5392
+  type: insight
+  title: DP-PD-DOC-内容自动化工厂_内容自动化工厂-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-内容自动化工厂" / name: "内容自动化工厂·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "内容自动化工厂产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/内容自动化工厂/" /  / contents: | /   内容自动化工厂的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5393
+  type: insight
+  title: DP-PD-DOC-军团健康度仪表盘_军团健康度仪表盘-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-军团健康度仪表盘" / name: "军团健康度仪表盘·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团健康度仪表盘产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/军团健康度仪表盘/" /  / contents: | /   军团健康度仪表盘的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5395
+  type: insight
+  title: DP-PD-DOC-军团统一前端_军团统一前端-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-军团统一前端" / name: "军团统一前端·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "军团统一前端产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/军团统一前端/" /  / contents: | /   军团统一前端的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5396
+  type: insight
+  title: DP-PD-DOC-决策引擎仪表盘_决策引擎仪表盘-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-决策引擎仪表盘" / name: "决策引擎仪表盘·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "决策引擎仪表盘产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/决策引擎仪表盘/" /  / contents: | /   决策引擎仪表盘的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5397
+  type: insight
+  title: DP-PD-DOC-出海AI顾问_出海AI顾问-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-出海AI顾问" / name: "出海AI顾问·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海AI顾问产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/出海AI顾问/" /  / contents: | /   出海AI顾问的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" / 
+- id: 5398
+  type: insight
+  title: DP-PD-DOC-出海合规导航师_出海合规导航师-设计文档
+  content: |
+    datapack_id: "DP-PD-DOC-出海合规导航师" / name: "出海合规导航师·设计文档" / version: "1.0.0" / type: "产品包" / schema_version: "1.0" / created_at: "2026-06-07" / author: "白泽" /  / description: "出海合规导航师产品的设计文档和PRD" /  / source: "L5孵化室/产品开发/出海合规导航师/" /  / contents: | /   出海合规导航师的产品设计文档、PRD、用户故事。 /  / data_format: "产品文档Markdown" /  / mount_interface: /   load: "读取产品设计文档到参考上下文" /   query: "查询PRD/需求/设计决策" /   version: "返回当前DataPack版本" /  / consumed_by_features: /   - "创造力Feature做需求分析时消费此DataPack" /   - "场景Feature做场景参考时消费此DataPack" /  / depends_on: [] / version_history: /   - version: "1.0.0" /     date: "2026-06-07" /     change: "原子化拆解自产品目录" /
+- id: 5399
+  type: insight
+  title: DP-PD-DOC-出海平台_出海平台-设计文档
+  content: |
+    
+- id: 5400
+  type: insight
+  title: DP-PD-DOC-出海数智港统一入口_出海数智港统一入口-设计文档
+  content: |
+    
+- id: 5401
+  type: insight
+  title: DP-PD-DOC-出海时光机_出海时光机-设计文档
+  content: |
+    
+- id: 5402
+  type: insight
+  title: DP-PD-DOC-出海项目_出海项目-设计文档
+  content: |
+    
+- id: 5403
+  type: insight
+  title: DP-PD-DOC-北极星员工贡献看板_北极星员工贡献看板-设计文档
+  content: |
+    
+- id: 5404
+  type: insight
+  title: DP-PD-DOC-北极星看板_北极星看板-设计文档
+  content: |
+    
+- id: 5405
+  type: insight
+  title: DP-PD-DOC-合规自动化数智员工_合规自动化数智员工-设计文档
+  content: |
+    
+- id: 5406
+  type: insight
+  title: DP-PD-DOC-大航海知识库_大航海知识库-设计文档
+  content: |
+    
+- id: 5407
+  type: insight
+  title: DP-PD-DOC-战狼_战狼-设计文档
+  content: |
+    
+- id: 5408
+  type: insight
+  title: DP-PD-DOC-操作太空舱_操作太空舱-设计文档
+  content: |
+    
+- id: 5409
+  type: insight
+  title: DP-PD-DOC-数字员工SaaS_数字员工SaaS-设计文档
+  content: |
+    
+- id: 5410
+  type: insight
+  title: DP-PD-DOC-数字员工指挥官_数字员工指挥官-设计文档
+  content: |
+    
+- id: 5411
+  type: insight
+  title: DP-PD-DOC-数字员工管理体系_数字员工管理体系-设计文档
+  content: |
+    
+- id: 5412
+  type: insight
+  title: DP-PD-DOC-文鳐技能集市_文鳐技能集市-设计文档
+  content: |
+    
+- id: 5413
+  type: insight
+  title: DP-PD-DOC-浏览器自动化IDE_浏览器自动化IDE-设计文档
+  content: |
+    
+- id: 5414
+  type: insight
+  title: DP-PD-DOC-漫剧AI工厂_漫剧AI工厂-设计文档
+  content: |
+    
+- id: 5415
+  type: insight
+  title: DP-PD-FEAT-战狼_战狼-Feature装配
+  content: |
+    
+- id: 5416
+  type: insight
+  title: DP-PD-FEAT-战略合作_战略合作-Feature装配
+  content: |
+    
+- id: 5417
+  type: insight
+  title: DP-PD-FEAT-操作太空舱_操作太空舱-Feature装配
+  content: |
+    
+- id: 5418
+  type: insight
+  title: DP-PD-FEAT-数字员工指挥官_数字员工指挥官-Feature装配
+  content: |
+    
+- id: 5419
+  type: insight
+  title: DP-PD-FEAT-文鳐技能集市_文鳐技能集市-Feature装配
+  content: |
+    
+- id: 5420
+  type: insight
+  title: DP-PD-FEAT-漫剧AI工厂_漫剧AI工厂-Feature装配
+  content: |
+    
+- id: 5421
+  type: insight
+  title: DP-PD-FEAT-獬豸_獬豸-Feature装配
+  content: |
+    
+- id: 5422
+  type: insight
+  title: DP-PD-FEAT-白泽军团_白泽军团-Feature装配
+  content: |
+    
+- id: 5423
+  type: insight
+  title: DP-PD-FEAT-白泽控制台_白泽控制台-Feature装配
+  content: |
+    
+- id: 5424
+  type: insight
+  title: DP-PD-FEAT-盖娅之城_盖娅之城-Feature装配
+  content: |
+    
+- id: 5425
+  type: insight
+  title: DP-PD-FEAT-盖娅进化大脑_盖娅进化大脑-Feature装配
+  content: |
+    
+- id: 5449
+  type: insight
+  title: DP-PD-FEAT-统一军团入口_统一军团入口-Feature装配
+  content: |
+    
+- id: 5450
+  type: insight
+  title: DP-PD-FEAT-翟如AI_翟如AI-Feature装配
+  content: |
+    
+- id: 5452
+  type: insight
+  title: DP-PD-FEAT-蜂巢战略分析_蜂巢战略分析-Feature装配
+  content: |
+    
+- id: 5454
+  type: insight
+  title: DP-PD-FEAT-赛博参谋_赛博参谋-Feature装配
+  content: |
+    
+- id: 5457
+  type: insight
+  title: DP-PD-FEAT-透明议事厅_透明议事厅-Feature装配
+  content: |
+    
+- id: 5458
+  type: insight
+  title: DP-PD-FEAT-链客宝_链客宝-Feature装配
+  content: |
+    
+- id: 5459
+  type: insight
+  title: DP-PD-FEAT-阿米巴创业大赛_阿米巴创业大赛-Feature装配
+  content: |
+    
+- id: 5463
+  type: insight
+  title: DP-PD-GC-盖娅之城_i18_盖娅之城·i18n数据
+  content: |
+    
+- id: 5464
+  type: insight
+  title: DP-PD-GC-盖娅之城_中间件_盖娅之城·中间件配置
+  content: |
+    
+- id: 5465
+  type: insight
+  title: DP-PD-GC-盖娅之城_模板系_盖娅之城·模板系统
+  content: |
+    
+- id: 5466
+  type: insight
+  title: DP-PD-GC-盖娅之城_测试覆_盖娅之城·测试覆盖
+  content: |
+    
+- id: 5467
+  type: insight
+  title: DP-PD-GC-盖娅之城_路由定_盖娅之城·路由定义
+  content: |
+    
+- id: 5468
+  type: insight
+  title: DP-PD-HEALTH-3+X窗口管理面板_3+X窗口管理面板-健康评分
+  content: |
+    
+- id: 5469
+  type: insight
+  title: DP-PD-HEALTH-3+X管理面板_3+X管理面板-健康评分
+  content: |
+    
+- id: 5470
+  type: insight
+  title: DP-PD-HEALTH-5人AI客服团队_5人AI客服团队-健康评分
+  content: |
+    
+- id: 5471
+  type: insight
+  title: DP-PD-HEALTH-7x24值守_7x24值守-健康评分
+  content: |
+    
+- id: 5472
+  type: insight
+  title: DP-PD-HEALTH-AI匹配引擎_AI匹配引擎-健康评分
+  content: |
+    
+- id: 5473
+  type: insight
+  title: DP-PD-HEALTH-AI员工自动生产_AI员工自动生产-健康评分
+  content: |
+    
+- id: 5474
+  type: insight
+  title: DP-PD-HEALTH-AI开发工坊_AI开发工坊-健康评分
+  content: |
+    
+- id: 5475
+  type: insight
+  title: DP-PD-HEALTH-AI拆解OKR助手_AI拆解OKR助手-健康评分
+  content: |
+    
+- id: 5476
+  type: insight
+  title: DP-PD-HEALTH-AI数字名片_AI数字名片-健康评分
+  content: |
+    
+- id: 5477
+  type: insight
+  title: DP-PD-HEALTH-AI数智公司_AI数智公司-健康评分
+  content: |
+    
+- id: 5478
+  type: insight
+  title: DP-PD-HEALTH-AI数智军团_AI数智军团-健康评分
+  content: |
+    
+- id: 5479
+  type: insight
+  title: DP-PD-HEALTH-AI数智名片_AI数智名片-健康评分
+  content: |
+    
+- id: 5481
+  type: insight
+  title: DP-PD-HEALTH-AI灵魂觉醒引擎_AI灵魂觉醒引擎-健康评分
+  content: |
+    
+- id: 5488
+  type: insight
+  title: DP-PD-HEALTH-go_aiport_go-aiport-健康评分
+  content: |
+    
+- id: 5489
+  type: insight
+  title: DP-PD-HEALTH-xuanji_xuanji-健康评分
+  content: |
+    
+- id: 5490
+  type: insight
+  title: DP-PD-HEALTH-䑏疏跨境助手_䑏疏跨境助手-健康评分
+  content: |
+    
+- id: 5491
+  type: insight
+  title: DP-PD-HEALTH-中国智慧AI顾问_中国智慧AI顾问-健康评分
+  content: |
+    
+- id: 5492
+  type: insight
+  title: DP-PD-HEALTH-中国软银投资系统_中国软银投资系统-健康评分
+  content: |
+    
+- id: 5493
+  type: insight
+  title: DP-PD-HEALTH-中韩出海数智港_中韩出海数智港-健康评分
+  content: |
+    
+- id: 5494
+  type: insight
+  title: DP-PD-HEALTH-中韩数智港_中韩数智港-健康评分
+  content: |
+    
+- id: 5495
+  type: insight
+  title: DP-PD-HEALTH-产品商店_产品商店-健康评分
+  content: |
+    
+- id: 5496
+  type: insight
+  title: DP-PD-HEALTH-产品进化超级系统_产品进化超级系统-健康评分
+  content: |
+    
+- id: 5497
+  type: insight
+  title: DP-PD-HEALTH-企业合规AI顾问_企业合规AI顾问-健康评分
+  content: |
+    
+- id: 5498
+  type: insight
+  title: DP-PD-HEALTH-企业知识库RAG_企业知识库RAG-健康评分
+  content: |
+    
+- id: 5500
+  type: insight
+  title: DP-PD-HEALTH-内容自动化工厂_内容自动化工厂-健康评分
+  content: |
+    
+- id: 5501
+  type: insight
+  title: DP-PD-HEALTH-军团健康度仪表盘_军团健康度仪表盘-健康评分
+  content: |
+    
+- id: 5503
+  type: insight
+  title: DP-PD-HEALTH-军团统一前端_军团统一前端-健康评分
+  content: |
+    
+- id: 5504
+  type: insight
+  title: DP-PD-HEALTH-决策引擎仪表盘_决策引擎仪表盘-健康评分
+  content: |
+    
+- id: 5505
+  type: insight
+  title: DP-PD-HEALTH-出海AI顾问_出海AI顾问-健康评分
+  content: |
+    
+- id: 5506
+  type: insight
+  title: DP-PD-HEALTH-出海合规导航师_出海合规导航师-健康评分
+  content: |
+    
+- id: 5507
+  type: insight
+  title: DP-PD-HEALTH-出海平台_出海平台-健康评分
+  content: |
+    
+- id: 5508
+  type: insight
+  title: DP-PD-HEALTH-出海数智港统一入口_出海数智港统一入口-健康评分
+  content: |
+    
+- id: 5509
+  type: insight
+  title: DP-PD-HEALTH-出海时光机_出海时光机-健康评分
+  content: |
+    
+- id: 5510
+  type: insight
+  title: DP-PD-HEALTH-出海项目_出海项目-健康评分
+  content: |
+    
+- id: 5511
+  type: insight
+  title: DP-PD-HEALTH-北极星员工贡献看板_北极星员工贡献看板-健康评分
+  content: |
+    
+- id: 5512
+  type: insight
+  title: DP-PD-HEALTH-北极星看板_北极星看板-健康评分
+  content: |
+    
+- id: 5513
+  type: insight
+  title: DP-PD-HEALTH-合规自动化数智员工_合规自动化数智员工-健康评分
+  content: |
+    
+- id: 5514
+  type: insight
+  title: DP-PD-HEALTH-大航海知识库_大航海知识库-健康评分
+  content: |
+    
+- id: 5515
+  type: insight
+  title: DP-PD-HEALTH-天机_天机-健康评分
+  content: |
+    
+- id: 5516
+  type: insight
+  title: DP-PD-HEALTH-战狼_战狼-健康评分
+  content: |
+    
+- id: 5517
+  type: insight
+  title: DP-PD-HEALTH-战略合作_战略合作-健康评分
+  content: |
+    
+- id: 5518
+  type: insight
+  title: DP-PD-HEALTH-操作太空舱_操作太空舱-健康评分
+  content: |
+    
+- id: 5519
+  type: insight
+  title: DP-PD-HEALTH-数字员工SaaS_数字员工SaaS-健康评分
+  content: |
+    
+- id: 5520
+  type: insight
+  title: DP-PD-HEALTH-数字员工指挥官_数字员工指挥官-健康评分
+  content: |
+    
+- id: 5521
+  type: insight
+  title: DP-PD-HEALTH-数字员工管理体系_数字员工管理体系-健康评分
+  content: |
+    
+- id: 5522
+  type: insight
+  title: DP-PD-HEALTH-文鳐技能集市_文鳐技能集市-健康评分
+  content: |
+    
+- id: 5524
+  type: insight
+  title: DP-PD-HEALTH-浏览器自动化IDE_浏览器自动化IDE-健康评分
+  content: |
+    
+- id: 5525
+  type: insight
+  title: DP-PD-HEALTH-漫剧AI工厂_漫剧AI工厂-健康评分
+  content: |
+    
+- id: 5526
+  type: insight
+  title: DP-PD-HEALTH-獬豸_獬豸-健康评分
+  content: |
+    
+- id: 5527
+  type: insight
+  title: DP-PD-HEALTH-白泽军团_白泽军团-健康评分
+  content: |
+    
+- id: 5528
+  type: insight
+  title: DP-PD-HEALTH-白泽控制台_白泽控制台-健康评分
+  content: |
+    
+- id: 5529
+  type: insight
+  title: DP-PD-HEALTH-盖娅之城_盖娅之城-健康评分
+  content: |
+    
+- id: 5530
+  type: insight
+  title: DP-PD-HEALTH-盖娅进化大脑_盖娅进化大脑-健康评分
+  content: |
+    
+- id: 5554
+  type: insight
+  title: DP-PD-HEALTH-统一军团入口_统一军团入口-健康评分
+  content: |
+    
+- id: 5555
+  type: insight
+  title: DP-PD-HEALTH-翟如AI_翟如AI-健康评分
+  content: |
+    
+- id: 5556
+  type: insight
+  title: DP-PD-HEALTH-翟如AI超级助理_翟如AI超级助理-健康评分
+  content: |
+    
+- id: 5557
+  type: insight
+  title: DP-PD-HEALTH-蜂巢战略分析_蜂巢战略分析-健康评分
+  content: |
+    
+- id: 5558
+  type: insight
+  title: DP-PD-HEALTH-记忆宫殿跨平台同步_记忆宫殿跨平台同步-健康评分
+  content: |
+    
+- id: 5559
+  type: insight
+  title: DP-PD-HEALTH-赛博参谋_赛博参谋-健康评分
+  content: |
+    
+- id: 5561
+  type: insight
+  title: DP-PD-HEALTH-辩论式审查流水线_辩论式审查流水线-健康评分
+  content: |
+    
+- id: 5562
+  type: insight
+  title: DP-PD-HEALTH-透明议事厅_透明议事厅-健康评分
+  content: |
+    
+- id: 5563
+  type: insight
+  title: DP-PD-HEALTH-链客宝_链客宝-健康评分
+  content: |
+    
+- id: 5564
+  type: insight
+  title: DP-KW-解放思想_003-解放思想
+  content: |
+    
+- id: 5565
+  type: insight
+  title: DP-KW-财务管理_077-财务管理
+  content: |
+    
+- id: 5566
+  type: insight
+  title: DP-KW-逐字稿_097-逐字稿
+  content: |
+    
+- id: 5567
+  type: insight
+  title: DP-KW-集中度_011-集中度
+  content: |
+    
+- id: 5568
+  type: insight
+  title: DP-KW-需求原点_015-需求原点
+  content: |
+    
+- id: 5569
+  type: insight
+  title: DP-KW-黑河_星巴克影子银行_黑河-星巴克影子银行
+  content: |
+    
+- id: 5570
+  type: insight
+  title: DP-KW-黑河_资本套利元框架_黑河-资本套利元框架
+  content: |
+    
+- id: 5571
+  type: insight
+  title: DP-KW-黑河_迪士尼法律护城河_黑河-迪士尼法律护城河
+  content: |
+    
+- id: 5572
+  type: insight
+  title: DP-PD-DOC-獬豸_獬豸-设计文档
+  content: |
+    
+- id: 5573
+  type: insight
+  title: DP-PD-DOC-白泽军团_白泽军团-设计文档
+  content: |
+    
+- id: 5574
+  type: insight
+  title: DP-PD-DOC-白泽控制台_白泽控制台-设计文档
+  content: |
+    
+- id: 5575
+  type: insight
+  title: DP-PD-DOC-盖娅之城_盖娅之城-设计文档
+  content: |
+    
+- id: 5576
+  type: insight
+  title: DP-PD-DOC-盖娅进化大脑_盖娅进化大脑-设计文档
+  content: |
+    
+- id: 5585
+  type: insight
+  title: DP-PD-DOC-神机_产品开发产品化_神机_产品开发产品化-设计文档
+  content: |
+    
+- id: 5589
+  type: insight
+  title: DP-PD-DOC-神机_国学智慧产品化_神机_国学智慧产品化-设计文档
+  content: |
+    
+- id: 5590
+  type: insight
+  title: DP-PD-DOC-神机_开发技术产品化_神机_开发技术产品化-设计文档
+  content: |
+    
+- id: 5591
+  type: insight
+  title: DP-PD-DOC-神机_数字员工产品化_神机_数字员工产品化-设计文档
+  content: |
+    
+- id: 5592
+  type: insight
+  title: DP-PD-DOC-神机_运维部署产品化_神机_运维部署产品化-设计文档
+  content: |
+    
+- id: 5593
+  type: insight
+  title: DP-PD-DOC-统一军团入口_统一军团入口-设计文档
+  content: |
+    
+- id: 5594
+  type: insight
+  title: DP-PD-DOC-翟如AI_翟如AI-设计文档
+  content: |
+    
+- id: 5595
+  type: insight
+  title: DP-PD-DOC-翟如AI超级助理_翟如AI超级助理-设计文档
+  content: |
+    
+- id: 5596
+  type: insight
+  title: DP-PD-DOC-蜂巢战略分析_蜂巢战略分析-设计文档
+  content: |
+    
+- id: 5597
+  type: insight
+  title: DP-PD-DOC-记忆宫殿跨平台同步_记忆宫殿跨平台同步-设计文档
+  content: |
+    
+- id: 5598
+  type: insight
+  title: DP-PD-DOC-赛博参谋_赛博参谋-设计文档
+  content: |
+    
+- id: 5599
+  type: insight
+  title: DP-PD-DOC-辩论式代码审查流水线_辩论式代码审查流水线-设计文档
+  content: |
+    
+- id: 5600
+  type: insight
+  title: DP-PD-DOC-透明议事厅_透明议事厅-设计文档
+  content: |
+    
+- id: 5601
+  type: insight
+  title: DP-PD-DOC-链客宝_链客宝-设计文档
+  content: |
+    
+- id: 5602
+  type: insight
+  title: DP-PD-DOC-阿米巴创业大赛_阿米巴创业大赛-设计文档
+  content: |
+    
+- id: 5603
+  type: insight
+  title: DP-PD-DOC-韩企AI灵魂工厂_韩企AI灵魂工厂-设计文档
+  content: |
+    
+- id: 5604
+  type: insight
+  title: DP-PD-DOC-龙虾群聊五阶指挥链_龙虾群聊五阶指挥链-设计文档
+  content: |
+    
+- id: 5606
+  type: insight
+  title: DP-PD-FEAT-3+X管理面板_3+X管理面板-Feature装配
+  content: |
+    
+- id: 5608
+  type: insight
+  title: DP-PD-FEAT-7x24值守_7x24值守-Feature装配
+  content: |
+    
+- id: 5609
+  type: insight
+  title: DP-PD-FEAT-AI匹配引擎_AI匹配引擎-Feature装配
+  content: |
+    
+- id: 5610
+  type: insight
+  title: DP-PD-FEAT-AI开发工坊_AI开发工坊-Feature装配
+  content: |
+    
+- id: 5612
+  type: insight
+  title: DP-PD-FEAT-AI数字名片_AI数字名片-Feature装配
+  content: |
+    
+- id: 5613
+  type: insight
+  title: DP-PD-FEAT-AI数智公司_AI数智公司-Feature装配
+  content: |
+    
+- id: 5614
+  type: insight
+  title: DP-PD-FEAT-AI数智军团_AI数智军团-Feature装配
+  content: |
+    
+- id: 5615
+  type: insight
+  title: DP-PD-FEAT-AI数智名片_AI数智名片-Feature装配
+  content: |
+    
+- id: 5622
+  type: insight
+  title: DP-PD-FEAT-xuanji_xuanji-Feature装配
+  content: |
+    
+- id: 5623
+  type: insight
+  title: DP-PD-FEAT-䑏疏跨境助手_䑏疏跨境助手-Feature装配
+  content: |
+    
+- id: 5625
+  type: insight
+  title: DP-PD-FEAT-中韩出海数智港_中韩出海数智港-Feature装配
+  content: |
+    
+- id: 5626
+  type: insight
+  title: DP-PD-FEAT-中韩数智港_中韩数智港-Feature装配
+  content: |
+    
+- id: 5627
+  type: insight
+  title: DP-PD-FEAT-产品商店_产品商店-Feature装配
+  content: |
+    
+- id: 5632
+  type: insight
+  title: DP-PD-FEAT-内容自动化工厂_内容自动化工厂-Feature装配
+  content: |
+    
+- id: 5635
+  type: insight
+  title: DP-PD-FEAT-军团统一前端_军团统一前端-Feature装配
+  content: |
+    
+- id: 5636
+  type: insight
+  title: DP-PD-FEAT-决策引擎仪表盘_决策引擎仪表盘-Feature装配
+  content: |
+    
+- id: 5637
+  type: insight
+  title: DP-PD-FEAT-出海AI顾问_出海AI顾问-Feature装配
+  content: |
+    
+- id: 5638
+  type: insight
+  title: DP-PD-FEAT-出海合规导航师_出海合规导航师-Feature装配
+  content: |
+    
+- id: 5639
+  type: insight
+  title: DP-PD-FEAT-出海平台_出海平台-Feature装配
+  content: |
+    
+- id: 5641
+  type: insight
+  title: DP-PD-FEAT-出海时光机_出海时光机-Feature装配
+  content: |
+    
+- id: 5642
+  type: insight
+  title: DP-PD-FEAT-出海项目_出海项目-Feature装配
+  content: |
+    
+- id: 5643
+  type: insight
+  title: DP-PD-FEAT-北极星看板_北极星看板-Feature装配
+  content: |
+    
+- id: 5645
+  type: insight
+  title: DP-PD-FEAT-大航海知识库_大航海知识库-Feature装配
+  content: |
+    
+- id: 5646
+  type: insight
+  title: DP-PD-FEAT-天机_天机-Feature装配
+  content: |
+    
+- id: 5693
+  type: insight
+  title: DP-PD-HEALTH-阿米巴创业大赛_阿米巴创业大赛-健康评分
+  content: |
+    
+- id: 5694
+  type: insight
+  title: DP-PD-HEALTH-韩企AI灵魂工厂_韩企AI灵魂工厂-健康评分
+  content: |
+    
+- id: 5695
+  type: insight
+  title: DP-PD-HEALTH-飞阅会AI主持助理_飞阅会AI主持助理-健康评分
+  content: |
+    
+- id: 5696
+  type: insight
+  title: DP-PD-HEALTH-龙虾群聊五阶指挥链_龙虾群聊五阶指挥链-健康评分
+  content: |
+    
+- id: 5697
+  type: insight
+  title: DP-数智港-产品包-07_共享内核架构包
+  content: |
+    
+- id: 5698
+  type: insight
+  title: DP-数智港-产品包-08_定价模型包
+  content: |
+    
+- id: 5699
+  type: insight
+  title: DP-PD-链客宝-JTBD核心句式
+  content: |
+    
+- id: 5700
+  type: insight
+  title: DP-PD-链客宝-LTV_CAC模型
+  content: |
+    
+- id: 5701
+  type: insight
+  title: DP-PD-链客宝-PMF验证
+  content: |
+    
+- id: 5702
+  type: insight
+  title: DP-PD-链客宝-产品内核笔记
+  content: |
+    
+- id: 5703
+  type: insight
+  title: DP-PD-链客宝-伪壁垒检查
+  content: |
+    
+- id: 5704
+  type: insight
+  title: DP-PD-链客宝-信任分模型
+  content: |
+    
+- id: 5705
+  type: insight
+  title: DP-PD-链客宝-六度人脉图谱
+  content: |
+    
+- id: 5706
+  type: insight
+  title: DP-PD-链客宝-内核共识清单
+  content: |
+    
+- id: 5707
+  type: insight
+  title: DP-PD-链客宝-匹配记录
+  content: |
+    
+- id: 5708
+  type: insight
+  title: DP-PD-链客宝-名片信息
+  content: |
+    
+- id: 5709
+  type: insight
+  title: DP-PD-链客宝-名片搜索索引
+  content: |
+    
+- id: 5710
+  type: insight
+  title: DP-PD-链客宝-名片设计
+  content: |
+    
+- id: 5711
+  type: insight
+  title: DP-PD-链客宝-壁垒强度评估
+  content: |
+    
+- id: 5712
+  type: insight
+  title: DP-PD-链客宝-毛利率仪表盘
+  content: |
+    
+- id: 5713
+  type: insight
+  title: DP-PD-链客宝-用户关系网
+  content: |
+    
+- id: 5714
+  type: insight
+  title: DP-PD-链客宝-用户行为
+  content: |
+    
+- id: 5715
+  type: insight
+  title: DP-PD-链客宝-用户身份
+  content: |
+    
+- id: 5716
+  type: insight
+  title: DP-PD-链客宝-竞争对标
+  content: |
+    
+- id: 5717
+  type: insight
+  title: DP-PD-链客宝-第二曲线
+  content: |
+    
+- id: 5718
+  type: insight
+  title: DP-PD-链客宝-订单交易
+  content: |
+    
+- id: 5719
+  type: insight
+  title: DP-PD-链客宝-需求发布
+  content: |
+    
+- id: 5720
+  type: insight
+  title: DP-PD-链客宝-飞轮加速
+  content: |
+    
+- id: 5721
+  type: insight
+  title: DP-HR-P7_P7
+  content: |
+    
+- id: 5722
+  type: insight
+  title: DP-HR-P8_P8
+  content: |
+    
+- id: 5723
+  type: insight
+  title: DP-HR-P9_P9
+  content: |
+    
+- id: 5724
+  type: insight
+  title: DP-HR-等级-L5_L5人才集
+  content: |
+    
+- id: 5725
+  type: insight
+  title: DP-HR-等级-P6_P6人才集
+  content: |
+    
+- id: 5726
+  type: insight
+  title: DP-HR-等级-P7_P7人才集
+  content: |
+    
+- id: 5727
+  type: insight
+  title: DP-HR-等级-无等级_无等级人才集
+  content: |
+    
+- id: 5728
+  type: insight
+  title: DP-HR-能力-产品·场景_产品·场景
+  content: |
+    
+- id: 5729
+  type: insight
+  title: DP-HR-能力-合规·风控_合规·风控
+  content: |
+    
+- id: 5730
+  type: insight
+  title: DP-HR-能力-工程·技术_工程·技术
+  content: |
+    
+- id: 5731
+  type: insight
+  title: DP-HR-能力-市场·增长_市场·增长
+  content: |
+    
+- id: 5732
+  type: insight
+  title: DP-HR-能力-数据·分析_数据·分析
+  content: |
+    
+- id: 5733
+  type: insight
+  title: DP-HR-能力-设计·审美_设计·审美
+  content: |
+    
+- id: 5735
+  type: insight
+  title: DP-DC-ADR-008-链客宝数_ADR-008-链客宝数据安全架构
+  content: |
+    
+- id: 5736
+  type: insight
+  title: DP-DC-ADR-009-盖娅之城_ADR-009-盖娅之城五层进化
+  content: |
+    
+- id: 5751
+  type: insight
+  title: DP-DC-ADR-028-短线量化_ADR-028-短线量化策略架构决策
+  content: |
+    
+- id: 5757
+  type: insight
+  title: DP-DC-INDEX_INDEX
+  content: |
+    
+- id: 5758
+  type: insight
+  title: DP-数智港-决策包-05_PRD决策包
+  content: |
+    
+- id: 5759
+  type: insight
+  title: DP-数智港-决策包-06_北极星指标决策包
+  content: |
+    
+- id: 5760
+  type: insight
+  title: DP-KW-000_075公司文化
+  content: |
+    
+- id: 5761
+  type: insight
+  title: DP-KW-AI上手曲线_119-AI上手曲线
+  content: |
+    
+- id: 5762
+  type: insight
+  title: DP-KW-Hermes7级进阶_Hermes7级进阶
+  content: |
+    
+- id: 5763
+  type: insight
+  title: DP-KW-MUSE模型_113-MUSE模型
+  content: |
+    
+- id: 5764
+  type: insight
+  title: DP-KW-STAR模型_115-STAR模型
+  content: |
+    
+- id: 5765
+  type: insight
+  title: DP-KW-TCP_R模型
+  content: |
+    
+- id: 5766
+  type: insight
+  title: DP-KW-Vibe_Trading_Vibe-Trading
+  content: |
+    
+- id: 5874
+  type: insight
+  title: DP-HR-等级-P8_P8人才集
+  content: |
+    
+- id: 5875
+  type: insight
+  title: DP-HR-等级-P9_P9人才集
+  content: |
+    
+- id: 5876
+  type: insight
+  title: DP-HR-能力-战略·投资_战略·投资
+  content: |
+    
+- id: 5877
+  type: insight
+  title: DP-数智港-人才包-09_韩国本地化人才团队
+  content: |
+    
+- id: 5879
+  type: insight
+  title: DP-DC-ADR-002-支付模块_ADR-002-支付模块独立SDK化
+  content: |
+    
+- id: 5880
+  type: insight
+  title: DP-DC-ADR-005-天工系统_ADR-005-天工系统架构决策
+  content: |
+    
+- id: 5883
+  type: insight
+  title: DP-DC-ADR-009-SPA路_ADR-009-SPA路由架构决策
+  content: |
+    
+- id: 5886
+  type: insight
+  title: DP-DC-ADR-010-三人决策_ADR-010-三人决策委员会
+  content: |
+    
+- id: 5888
+  type: insight
+  title: DP-DC-ADR-011-盖娅之城_ADR-011-盖娅之城城邦活体架构
+  content: |
+    
+- id: 5909
+  type: insight
+  title: DP-KW-hermes_team__hermes-team-mode
+  content: |
+    
+- id: 5910
+  type: insight
+  title: DP-KW-一堂AI上手曲线_一堂AI上手曲线
+  content: |
+    
+- id: 5911
+  type: insight
+  title: DP-KW-一堂MUSE_一堂MUSE
+  content: |
+    
+- id: 5912
+  type: insight
+  title: DP-KW-一堂TCP_R_一堂TCP-R
+  content: |
+    
+- id: 5914
+  type: insight
+  title: DP-KW-一堂_STAR模型_一堂-STAR模型
+  content: |
+    
+- id: 5915
+  type: insight
+  title: DP-KW-一堂_TCP_R个人成长_一堂-TCP-R个人成长
+  content: |
+    
+- id: 5916
+  type: insight
+  title: DP-KW-一堂_人生红点_一堂-人生红点
+  content: |
+    
+- id: 5917
+  type: insight
+  title: DP-KW-一堂_关键假设_一堂-关键假设
+  content: |
+    
+- id: 5918
+  type: insight
+  title: DP-KW-一堂_双三角武器库_一堂-双三角武器库
+  content: |
+    
+- id: 5919
+  type: insight
+  title: DP-KW-一堂_实事求是_一堂-实事求是
+  content: |
+    
+- id: 5920
+  type: insight
+  title: DP-KW-一堂_机会预判_一堂-机会预判
+  content: |
+    
+- id: 5921
+  type: insight
+  title: DP-KW-一堂_泛产品设计_一堂-泛产品设计
+  content: |
+    
+- id: 5922
+  type: insight
+  title: DP-KW-一堂_渠道探索_一堂-渠道探索
+  content: |
+    
+- id: 5923
+  type: insight
+  title: DP-KW-一堂_灵感闪现_一堂-灵感闪现
+  content: |
+    
+- id: 5924
+  type: insight
+  title: DP-KW-一堂_知识萃取_一堂-知识萃取
+  content: |
+    
+- id: 5925
+  type: insight
+  title: DP-KW-一堂_科学理念_一堂-科学理念
+  content: |
+    
+- id: 5926
+  type: insight
+  title: DP-KW-一堂_精益验证_一堂-精益验证
+  content: |
+    
+- id: 5927
+  type: insight
+  title: DP-KW-一堂_解放思想_一堂-解放思想
+  content: |
+    
+- id: 5928
+  type: insight
+  title: DP-KW-一堂五步法_013-一堂五步法
+  content: |
+    
+- id: 5929
+  type: insight
+  title: DP-KW-一堂增长飞轮_一堂增长飞轮
+  content: |
+    
+- id: 5930
+  type: insight
+  title: DP-KW-一堂工业化生成_一堂工业化生成
+  content: |
+    
+- id: 5931
+  type: insight
+  title: DP-KW-一堂科学销售_一堂科学销售
+  content: |
+    
+- id: 5932
+  type: insight
+  title: DP-KW-一堂融资公式_一堂融资公式
+  content: |
+    
+- id: 5933
+  type: insight
+  title: DP-KW-一堂转化率_一堂转化率
+  content: |
+    
+- id: 5934
+  type: insight
+  title: DP-KW-一堂集中度_一堂集中度
+  content: |
+    
+- id: 5935
+  type: insight
+  title: DP-KW-专家访谈_033-专家访谈
+  content: |
+    
+- id: 5936
+  type: insight
+  title: DP-KW-业务公式_039-业务公式
+  content: |
+    
+- id: 5937
+  type: insight
+  title: DP-KW-个人成长_04-个人成长
+  content: |
+    
+- id: 5938
+  type: insight
+  title: DP-KW-产品内核_017-产品内核
+  content: |
+    
+- id: 5939
+  type: insight
+  title: DP-KW-人生红点_111-人生红点
+  content: |
+    
+- id: 5940
+  type: insight
+  title: DP-KW-关键假设_007-关键假设
+  content: |
+    
+- id: 5941
+  type: insight
+  title: DP-KW-创业方法_02-创业方法
+  content: |
+    
+- id: 5942
+  type: insight
+  title: DP-KW-刻意练习_087-刻意练习
+  content: |
+    
+- id: 5943
+  type: insight
+  title: DP-KW-十指讲香_099-十指讲香
+  content: |
+    
+- id: 5944
+  type: insight
+  title: DP-KW-单元模型_019-单元模型
+  content: |
+    
+- id: 5945
+  type: insight
+  title: DP-KW-双三角模型_117-双三角模型
+  content: |
+    
+- id: 5946
+  type: insight
+  title: DP-KW-双三角模型_双三角模型
+  content: |
+    
+- id: 5947
+  type: insight
+  title: DP-KW-合伙股权_047-合伙股权
+  content: |
+    
+- id: 5948
+  type: insight
+  title: DP-KW-善用AI_05-善用AI
+  content: |
+    
+- id: 5949
+  type: insight
+  title: DP-KW-团队复盘_063-团队复盘
+  content: |
+    
+- id: 5950
+  type: insight
+  title: DP-KW-团队知识管理_065-团队知识管理
+  content: |
+    
+- id: 5951
+  type: insight
+  title: DP-KW-增长三周期_021-增长三周期
+  content: |
+    
+- id: 5952
+  type: insight
+  title: DP-KW-增长飞轮_025-增长飞轮
+  content: |
+    
+- id: 5953
+  type: insight
+  title: DP-KW-壁垒_029-壁垒
+  content: |
+    
+- id: 5954
+  type: insight
+  title: DP-KW-实事求是_001-实事求是
+  content: |
+    
+- id: 5955
+  type: insight
+  title: DP-KW-工业化生产_027-工业化生产
+  content: |
+    
+- id: 5956
+  type: insight
+  title: DP-KW-情报调研_035-情报调研
+  content: |
+    
+- id: 5957
+  type: insight
+  title: DP-KW-战略管理_073-战略管理
+  content: |
+    
+- id: 5958
+  type: insight
+  title: DP-KW-教练式领导力_069-教练式领导力
+  content: |
+    
+- id: 5959
+  type: insight
+  title: DP-KW-新人落地_059-新人落地
+  content: |
+    
+- id: 5960
+  type: insight
+  title: DP-KW-时间管理_083-时间管理
+  content: |
+    
+- id: 5961
+  type: insight
+  title: DP-KW-最佳实践_043-最佳实践
+  content: |
+    
+- id: 5962
+  type: insight
+  title: DP-KW-最佳转换率_041-最佳转换率
+  content: |
+    
+- id: 5963
+  type: insight
+  title: DP-KW-机会预判_009-机会预判
+  content: |
+    
+- id: 5964
+  type: insight
+  title: DP-KW-泛产品设计_103-泛产品设计
+  content: |
+    
+- id: 5965
+  type: insight
+  title: DP-KW-深度复盘_091-深度复盘
+  content: |
+    
+- id: 5966
+  type: insight
+  title: DP-KW-深度思考_107-深度思考
+  content: |
+    
+- id: 5967
+  type: insight
+  title: DP-KW-清单体笔记_093-清单体笔记
+  content: |
+    
+- id: 5968
+  type: insight
+  title: DP-KW-渠道探索_023-渠道探索
+  content: |
+    
+- id: 5969
+  type: insight
+  title: DP-KW-灵感闪现_095-灵感闪现
+  content: |
+    
+- id: 5970
+  type: insight
+  title: DP-KW-目标管理_067-目标管理
+  content: |
+    
+- id: 5971
+  type: insight
+  title: DP-KW-知识管理_089-知识管理
+  content: |
+    
+- id: 5972
+  type: insight
+  title: DP-KW-知识萃取_109-知识萃取
+  content: |
+    
+- id: 5973
+  type: insight
+  title: DP-KW-科学决策_071-科学决策
+  content: |
+    
+- id: 5974
+  type: insight
+  title: DP-KW-科学原则_01-科学原则
+  content: |
+    
+- id: 5975
+  type: insight
+  title: DP-KW-科学学习_085-科学学习
+  content: |
+    
+- id: 5976
+  type: insight
+  title: DP-KW-科学开会_061-科学开会
+  content: |
+    
+- id: 5977
+  type: insight
+  title: DP-KW-科学招聘_057-科学招聘
+  content: |
+    
+- id: 5978
+  type: insight
+  title: DP-KW-科学理念_005-科学理念
+  content: |
+    
+- id: 5979
+  type: insight
+  title: DP-KW-科学表达_101-科学表达
+  content: |
+    
+- id: 5980
+  type: insight
+  title: DP-KW-科学送礼_081-科学送礼
+  content: |
+    
+- id: 5981
+  type: insight
+  title: DP-KW-科学销售_079-科学销售
+  content: |
+    
+- id: 5982
+  type: insight
+  title: DP-KW-管理五阶段_051-管理五阶段
+  content: |
+    
+- id: 5983
+  type: insight
+  title: DP-KW-管理方法_03-管理方法
+  content: |
+    
+- id: 5984
+  type: insight
+  title: DP-KW-管理项目_053-管理项目
+  content: |
+    
+- id: 5985
+  type: insight
+  title: DP-KW-精益验证_037-精益验证
+  content: |
+    
+- id: 5986
+  type: insight
+  title: DP-KW-规模经济_031-规模经济
+  content: |
+    
+- id: 5987
+  type: insight
+  title: DP-KW-黑河离岸资本_黑河离岸资本
+  content: |
+    
+- id: 5988
+  type: insight
+  title: DP-KW-黑河自动续费系统_黑河自动续费系统
+  content: |
+    
+- id: 5989
+  type: insight
+  title: DP-KW-黑河资本逃逸路线图_黑河资本逃逸路线图
+  content: |
+    
+- id: 5990
+  type: insight
+  title: DP-数智港-知识包-01_韩国食品进口法规
+  content: |
+    
+- id: 5991
+  type: insight
+  title: DP-数智港-知识包-02_韩国合规风险词库
+  content: |
+    
+- id: 5992
+  type: insight
+  title: DP-数智港-知识包-03_合规违规案例库
+  content: |
+    
+- id: 5993
+  type: insight
+  title: DP-数智港-知识包-04_韩企用户画像
+  content: |
+    
+- id: 5994
+  type: insight
+  title: DataPack库索引
+  content: |
+    
+- id: 5995
+  type: insight
+  title: F-000-context-engine
+  content: |
+    
+- id: 5996
+  type: insight
+  title: F-000-incremental-editor
+  content: |
+    
+- id: 5997
+  type: insight
+  title: 吸收报告：000最佳实践集合
+  content: |
+    
+- id: 5998
+  type: insight
+  title: Feature：美国全球金融操作系统追踪器
+  content: |
+    
+- id: 6000
+  type: insight
+  title: F-AI3-01-审美门禁
+  content: |
+    
+- id: 6002
+  type: insight
+  title: F-AI3-02-代码地图
+  content: |
+    

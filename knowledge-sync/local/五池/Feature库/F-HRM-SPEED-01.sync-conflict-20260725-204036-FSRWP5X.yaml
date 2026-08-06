@@ -1,0 +1,11 @@
+name: F-HRM-SPEED-01
+title: "Hermes效率加速工具箱"
+dimension:
+  layer: "工具层"
+  type: "加速"
+  impact: "高级"
+atoms: ["zero-cost-acceleration-iron-law", "skill-preload-economy", "execute-code-token-saver", "delegate-task-parallelism", "no-agent-cronjob-zero-token"]
+description: "5大杀招工具箱：-q单次查询 / Skill预加载 / execute_code零中间态 / delegate_task并行 / no_agent cronjob零Token"
+status: active
+created: 2026-06-17
+creator: 白泽

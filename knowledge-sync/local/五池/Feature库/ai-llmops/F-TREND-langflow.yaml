@@ -1,0 +1,15 @@
+name: Trending: langflow
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-05
+description: Auto-absorbed from GitHub Trending: langflow-ai/langflow
+atoms:
+  - TREND-langflow-ai-langflow-02: framework, agent, api 模式
+  - TREND-langflow-ai-langflow-03: langflow-ai/langflow的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

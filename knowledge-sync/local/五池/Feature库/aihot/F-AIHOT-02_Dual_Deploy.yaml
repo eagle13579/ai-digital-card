@@ -1,0 +1,52 @@
+# 双部署同构架构 — 同一套业务逻辑同时部署到Node.js进程+Cloudflare Workers
+# AIHOT Bot 核心心智模型 #2
+name: F-AIHOT-02_Dual_Deploy
+dimension: 体系
+domain: 部署架构-跨环境同构
+status: 生产就绪
+priority: P1
+source_models:
+  - M-AIHOT-02_Dual_Deploy
+description: |
+  双部署同构架构是指同一套业务逻辑同时部署到两种完全不同运行环境：
+  - Node.js进程（bot.js）：常规服务器环境，全功能运行
+  - Cloudflare Workers（worker.js）：边缘无服务器环境，轻量运行
+
+  两者共享核心逻辑（API调用+格式化），仅在部署适配层有差异。
+  核心策略是"一次编写，两处运行"，避免为不同环境维护两套代码。
+
+  优势：
+  - 冗余部署：单点故障不影响整体服务
+  - 弹性伸缩：Workers自动扩缩容，Node.js进程作为兜底
+  - 成本优化：高频请求走Workers，复杂计算走Node.js
+input:
+  - 共享核心模块（API调用逻辑、格式化函数、分类逻辑）
+  - 环境适配配置（Node.js环境变量 / Workers KV配置）
+output:
+  - Node.js bot实例（全功能运行）
+  - Cloudflare Workers实例（轻量运行）
+sop: |
+  1. 提取共享核心逻辑为独立模块（API调用+格式化+分类）
+  2. bot.js引入共享模块，添加Node.js专用功能（node-schedule调度、文件日志）
+  3. worker.js引入共享模块，适配Workers API（fetch替代axios，ScheduledEvent替代cron）
+  4. 环境变量统一命名，通过process.env/WORKERS env读取
+  5. 本地/生产双环境部署验证
+quality_gates:
+  - gate: 核心逻辑一致性
+    criteria: bot.js和worker.js共享模块的相同输入必须产生相同输出
+    method: 同一组测试数据分别在两环境运行，比较输出差异
+  - gate: 环境适配分离
+    criteria: 环境专用代码不能污染共享模块
+    method: 共享模块中无process.env/global/WORKERS等环境依赖
+  - gate: 故障切换
+    criteria: 一个部署宕机时另一个可接管
+    method: 模拟一个环境不可用，验证另一环境正常运行
+version: "1.0.0"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-15
+product_mapping:
+  - 白泽: 白泽的跨环境部署策略（本地+服务器+飞书）同此模式
+  - 盖娅之城: 盖娅核心服务需要Node.js+Serverless双部署冗余
+  - 内容工厂: 内容工厂的采集+分发服务可复用此架构

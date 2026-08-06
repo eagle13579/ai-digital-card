@@ -1,0 +1,47 @@
+id: F-000-context-engine
+name: 上下文引擎插件化框架
+version: 1.0.0
+status: active
+source: 000最佳实践集合 → OpenClaw context-engine
+
+description: >
+  提供一套可插拔的ContextEngine接口，支持上下文组装(assemble)、
+  压缩(compact)、注入(ingest)的完整生命周期管理。通过Symbol.for
+  注册表实现跨模块实例共享，支持第三方引擎注入和后向兼容。
+
+mental_models:
+  - "上下文切片与路由"
+  - "插件化接口契约设计"
+
+interface:
+  entrypoint: "index.ts"
+  types: "types.ts — ContextEngine接口定义(9个方法)"
+  registry: "registry.ts — 工厂注册表(owner隔离+跨chunk共享)"
+  legacy: "legacy.ts — 后向兼容包装(Proxy+错误重试)"
+  delegate: "delegate.ts — 运行时压缩桥接"
+  init: "init.ts — 内置引擎初始化守卫"
+
+lifecycle:
+  - bootstrap: 初始化引擎状态，导入历史上下文
+  - ingest: 逐条注入消息
+  - ingestBatch: 批量注入完整turn
+  - assemble: 在token预算内组装模型上下文
+  - compact: 压缩上下文减少token使用
+  - afterTurn: turn完成后持久化/触发后台压缩
+  - prepareSubagentSpawn: 子Agent创建前准备
+  - onSubagentEnded: 子Agent生命周期结束通知
+  - dispose: 释放引擎资源
+
+compatibility:
+  - legacy engine通过Proxy + 错误链遍历实现sessionKey自动降级
+  - 支持6种JSON Schema验证错误模式的自动检测
+  - 注册同一id的不同owner会拒绝
+
+test_coverage:
+  - Engine合同测试
+  - 注册表owner隔离测试
+  - 默认引擎选择测试
+  - 跨chunk隔离测试(#40096)
+  - 并发注册测试
+
+tags: [context-engine, plugin, typescript, sharding, routing]

@@ -1,0 +1,39 @@
+datapack_id: "DP-PD-链客宝-名片设计"
+name: "链客宝·名片设计"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝企业数字名片的UI设计和视觉呈现数据，包含3D名片渲染配置、模板系统、品牌色方案和交互设计规范"
+
+source: "chainke-full/geo-content/2026-06-05-纸质名片正在消亡-2026年AI数字名片全面测评.md | chainke-full/需求评审门禁_v2.md"
+
+contents: |
+  【名片设计数据】
+  1. 3D名片渲染配置: 3D模型参数、材质、光照、动画效果（来源: 需求评审门禁_v2.md惊叹点"3D名片渲染"）
+  2. 名片模板系统: 行业预设模板（制造业/科技/服务/贸易）、自定义模板
+  3. 品牌色方案: 企业品牌色彩、Logo渲染规则、字体规范
+  4. 交互设计规范: 扫码响应逻辑、名片展开/收起动画、信息层级展示
+  5. 名片分享配置: 分享渠道（微信/短信/邮件）、分享缩略图、分享文案模板
+  6. 实时数据仪表盘嵌入: 企业动态数据在名片上的展示布局
+  7. 名片导出格式: 数字链接/二维码/PDF/图片
+
+data_format: "产品元数据"
+
+mount_interface:
+  load: "读取名片设计配置数据到工作内存"
+  query: "按模板ID/行业/企业ID查询名片设计参数"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "企业名片Feature做名片渲染和展示时消费此DataPack"
+  - "用户端Feature做名片编辑时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-名片信息"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原企业名片数据包（KFD-07合规）"

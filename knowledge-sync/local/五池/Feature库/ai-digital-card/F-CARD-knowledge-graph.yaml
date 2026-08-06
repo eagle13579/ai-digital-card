@@ -1,0 +1,17 @@
+name: F-CARD-knowledge-graph
+version: 1.0.0
+status: production
+dimension: backend-data
+description: AI数字名片知识图谱集成 — 实体关系图谱 + 3D可视化 + 自动渲染
+atoms:
+  - F-CARD-kg-01: 知识图谱实体管理API
+  - F-CARD-kg-02: 图谱关系CRUD
+  - F-CARD-kg-03: 3D可视化自动渲染
+products:
+  - ai-digital-card
+employees:
+  - 文鳐P9: 代码收割归档
+tags:
+  - knowledge-graph
+  - visualization
+  - neo4j

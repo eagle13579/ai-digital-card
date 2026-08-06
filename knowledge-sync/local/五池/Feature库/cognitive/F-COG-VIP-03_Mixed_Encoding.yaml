@@ -1,0 +1,26 @@
+name: "F-COG-VIP-03_Mixed_Encoding"
+dimension: "系统架构"
+domain: "neuroscience/bci/cognitive"
+status: "active"
+draft: false
+description: "静态记忆（维持上下文连贯性）与动态规划（前瞻性执行控制）双引擎并行编码策略"
+source: "图宾根大学Nature Communications (2026-06-15吸收)"
+source_type: "research_paper"
+mental_models:
+  - "Mixed Encoding Strategy (混合编码策略)"
+  - "双引擎并行编码"
+products:
+  - "盖娅进化大脑(左右脑双螺旋)"
+applications:
+  - "AGI系统中的短期上下文保持与长期目标规划的并行运作"
+  - "对话系统中历史语境（静态）与推理路径（动态）的协同"
+  - "具身智能体的实时感知保持与动作预计算双重通道"
+keywords:
+  - "VIP"
+  - "Mixed Encoding"
+  - "静态记忆"
+  - "动态规划"
+  - "双引擎"
+  - "系统架构"
+  - "图宾根"
+created_at: "2026-06-15"

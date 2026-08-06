@@ -1,0 +1,15 @@
+name: F-FOLO-03
+version: "1.0.0"
+status: active
+dimension: 数据处理
+source: Folo (RSSNext) - packages/readability
+atoms:
+  - FOLO-03_内容读取安全管道模式
+  - FOLO-04_资源锁并发控制模式
+products:
+  - 内容自动化工厂
+  - 盖娅之城
+  - 䑏疏跨境助手
+description: "Mozilla Readability+DOMPurify+chardet的HTML内容安全提取管道"
+employees:
+  - 数据处理工程师

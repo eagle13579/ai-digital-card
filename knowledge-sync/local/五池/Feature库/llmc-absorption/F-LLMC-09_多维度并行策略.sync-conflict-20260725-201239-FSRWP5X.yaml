@@ -1,0 +1,20 @@
+id: F-LLMC-09
+name: 多维度并行策略
+dimension: 数据
+source_model: "Multi-Dimensional Parallelism — llm.c支持OpenMP CPU并行 + CUDA GPU并行 + 多节点分布式"
+description: "训练系统的层级化并行架构设计"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

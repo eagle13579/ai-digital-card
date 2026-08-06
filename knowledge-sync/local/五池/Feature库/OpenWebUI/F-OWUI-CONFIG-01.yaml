@@ -1,0 +1,25 @@
+id: F-OWUI-CONFIG-01
+name: Three-Layer Config Architecture (Env + Internal + DB)
+source_model: Open WebUI Config System (env.py 42KB + internal/config.py 9.6KB + config.py 129KB) — 三层配置解耦架构
+dimension: 基本功
+
+products:
+  - 通用: 自动匹配
+description: >-
+  三层配置架构从根本上解决了「启动配置vs运行时配置」的矛盾:
+  Layer 1 (env.py): 环境变量驱动的基础配置(198个env var) — 数据库URL/密钥/端口等启动前必须项
+  Layer 2 (internal/config.py): ConfigVar机制 — 带默认值的强类型配置变量，热注册到注册表
+  Layer 3 (config.py): ConfigTable(DB持久化) — 运行时可通过API修改的配置，修改即生效无需重启
+  三层之间有明确的升级路径: Env默认值→ConfigVar覆盖→DB持久化覆盖。
+input: 配置查询(key)/配置修改(key+value)
+output: 当前配置值/配置修改结果
+sop: "① 启动读取: env.py(环境变量) → internal(默认值) → DB覆盖持久配置
+  ② 运行时读取: config.py get_config() → 三层合并后的快照
+  ③ 运行时修改: save_config(data) → 写入DB → 触发所有ConfigVar.refresh()
+  ④ 异步支持: async_save_config(async_save_to_db) for async context
+  ⑤ 配置UI: 前端Settings页面调用config API → 用户可视化编辑"
+quality_gates: 配置读取<1ms、修改<50ms持久化、支持200+配置项、三层合并总有明确优先级
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 链客宝热配置/白泽军团统一配置/AI招商多环境配置/记忆宫殿配置管理

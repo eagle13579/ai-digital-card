@@ -1,0 +1,22 @@
+feature_id: "F-CA-消费主权评估"
+name: "消费主权评估 — 同意定义权审计"
+version: "1.0.0"
+dimension: "体系"
+source_model:
+  - "五池/模型池/_原子/黑河自动续费系统/AR14-消费主权让渡.md"
+  - "五池/模型池/_原子/黑河自动续费系统/AR9-同意定义权.md"
+input: "产品/服务的用户协议+取消流程"
+output: "消费主权评分 + 优化建议"
+sop: |
+  1. 审查用户协议中的消极同意条款
+  2. 检测取消流程的摩擦层级数
+  3. 评估违约金/锁定期合理性
+  4. 输出优化建议
+quality_gate:
+  threshold: 50
+  check: "取消流程必须在3步以内"
+iteration_count: 0
+status: "draft"
+
+products:
+  - 通用: 自动匹配

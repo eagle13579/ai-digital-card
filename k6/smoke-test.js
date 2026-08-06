@@ -4,7 +4,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:8200';
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:8002';
 
 const errorRate = new Rate('errors');
 const healthTrend = new Trend('health_duration');

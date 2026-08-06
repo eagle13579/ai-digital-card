@@ -1,0 +1,16 @@
+---
+id: F-DARWIN-07
+name: 触顶检测与探索性重写
+dimension: 创造力
+source_model: DS-05, DS-08
+
+products:
+  - 通用: 自动匹配
+description: >-
+  hill-climbing停滞时自动检测触顶(Δ<2×2轮)，提议从头重写跳脱局部最优
+sop: |-
+  连续2轮触顶→提出探索性重写→git stash→重写→评分对比→保留更优版
+quality_gate: |-
+  必须征得用户同意后才执行重写，不可自主决定
+draft: false
+created_at: 2026-06-13

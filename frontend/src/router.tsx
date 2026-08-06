@@ -11,12 +11,14 @@ const PricingPageLazy = lazy(() => import('./pages/PricingPage'));
 const PaymentCallbackLazy = lazy(() => import('./pages/PaymentCallback'));
 const ABTestingPageLazy = lazy(() => import('./pages/ABTestingPage'));
 const GDPRSettingsLazy = lazy(() => import('./pages/GDPRSettings'));
+const HealthDashboardPageLazy = lazy(() => import('./pages/HealthDashboardPage'));
 
 // 新多页面 SPA 架构页面
 const DashboardPageLazy = lazy(() => import('./pages/DashboardPage'));
 const CardEditorPageLazy = lazy(() => import('./pages/CardEditorPage'));
 const SettingsPageLazy = lazy(() => import('./pages/SettingsPage'));
 const NetworkPageLazy = lazy(() => import('./pages/NetworkPage'));
+const NetworkGraphPageLazy = lazy(() => import('./pages/NetworkGraphPage'));
 const MatchingPageLazy = lazy(() => import('./pages/MatchingPage'));
 const ApiKeysPageLazy = lazy(() => import('./pages/ApiKeysPage'));
 const CrmListPageLazy = lazy(() => import('./pages/crm/CrmListPage'));
@@ -24,6 +26,7 @@ const CrmContactDetailPageLazy = lazy(() => import('./pages/crm/CrmContactDetail
 const CrmPipelinePageLazy = lazy(() => import('./pages/crm/CrmPipelinePage'));
 const CrmDashboardPageLazy = lazy(() => import('./pages/crm/CrmDashboardPage'));
 const OcrReviewPageLazy = lazy(() => import('./pages/ocr/OcrReviewPage'));
+const AiAnalyticsPageLazy = lazy(() => import('./pages/AIAnalyticsPage'));
 
 /**
  * 带骨架屏的懒加载包装
@@ -99,6 +102,14 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/network/graph"
+        element={
+          <LazyPage skeletonMode="detail">
+            <Layout><NetworkGraphPageLazy /></Layout>
+          </LazyPage>
+        }
+      />
+      <Route
         path="/matching"
         element={
           <LazyPage skeletonMode="card" skeletonCount={3}>
@@ -151,6 +162,14 @@ export default function AppRoutes() {
         element={
           <LazyPage skeletonMode="card" skeletonCount={3}>
             <Layout><OcrReviewPageLazy /></Layout>
+          </LazyPage>
+        }
+      />
+      <Route
+        path="/ai-analytics"
+        element={
+          <LazyPage skeletonMode="card" skeletonCount={3}>
+            <Layout><AiAnalyticsPageLazy /></Layout>
           </LazyPage>
         }
       />
@@ -233,6 +252,14 @@ export default function AppRoutes() {
         element={
           <LazyPage skeletonMode="detail">
             <GDPRSettingsLazy />
+          </LazyPage>
+        }
+      />
+      <Route
+        path="/health"
+        element={
+          <LazyPage skeletonMode="card" skeletonCount={4}>
+            <Layout><HealthDashboardPageLazy /></Layout>
           </LazyPage>
         }
       />

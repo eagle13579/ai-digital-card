@@ -1,0 +1,42 @@
+name: F-CLONER-component-spec-contract
+description: 组件Spec合约模式 — 在builder派单前必须写完整spec文件作为侦察工程师和builder之间的法律合同
+version: 1.0.0
+author: "JCodesMore/ai-website-cloner-template 萃取"
+source: github.com/JCodesMore/ai-website-cloner-template
+license: MIT
+
+mental_models:
+  - Spec文件作为合约模式: 无spec=无builder派单
+  - Completeness over speed: 完整性>速度，builder必须收到一切
+  - 小任务完美结果: prompt >150行拆分为多个Agent
+  - 分层资产发现: 单图=多层合成，逐层枚举DOM树
+
+components:
+  - spec_file_template:
+    - overview: target file/ screenshot/ interaction model
+    - dom_structure: 元素层级关系
+    - computed_styles: getComputedStyle精确值(40+属性)
+    - states_behaviors: 每种状态的CSS diff + 触发条件 + 过渡
+    - per_state_content: 每个状态的文本/图片/数据
+    - assets: 引用图片/视频/图标路径
+    - text_content: 原站文本，逐字复制
+    - responsive_behavior: 桌面/平板/移动端各自变化
+  - pre_dispatch_checklist: 10项门禁检查
+  - post_build_verification: npx tsc --noEmit + 视觉QA对比
+
+agents:
+  - recon_engineer: 逐个section提取→写spec
+  - builder_agent: 收spec→实现组件→验证类型→提交
+
+products:
+  - 烛龙工程流: 每个开发任务先写规格再编码
+  - 狴犴审查流水线: spec作为审查基线
+  - 白泽指挥官协议: 派单=写spec+验证打包
+
+integration:
+  type: workflow
+  dependencies:
+    - browser_extraction: 浏览器MCP getComputedStyle提取
+    - git_worktree: 并行分支管理
+    - typescript: npx tsc --noEmit验证
+  setup: 提取→写spec→派builder(含完整spec inline)→merge→build→QA

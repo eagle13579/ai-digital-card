@@ -1,0 +1,20 @@
+id: F-CA-JURIS-14
+name: 法理控盘检测引擎
+dimension: 💡 创造力
+description: >-
+  基于DB05法理控盘心智模型构建的检测引擎，评估协议/合同对行业的控制力深度。检测维度：协议控盘vs物理控盘占比、协议基础设施化程度、协议体系抗反垄断与抗颠覆能力。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB05: 法理控盘>物理控盘
+products:
+  - 黑河调查局协议分析模块
+  - 法理控盘链评估系统
+employees:
+  - 计然
+  - 烛龙
+  - 长乘
+priority: P0
+maturity: design

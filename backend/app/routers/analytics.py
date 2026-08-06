@@ -17,7 +17,7 @@ from app.services.payment_analytics import get_payment_overview
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/analytics", tags=["付款分析"])
+router = APIRouter(prefix="/api/v1/analytics", tags=["付款分析"])
 
 
 @router.get("/payment/overview")

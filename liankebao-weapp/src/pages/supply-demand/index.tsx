@@ -14,6 +14,8 @@ import { FC, useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import matchApi, { SupplyDemandItem } from '../../api/match'
+import { sagApi } from '../../api/digitalBrochure'
+import { api } from '../../api/client'
 import './index.scss'
 
 /* ========================================================================== */
@@ -34,6 +36,9 @@ interface TabItem {
 /* ========================================================================== */
 
 const PAGE_SIZE = 10
+
+/* ---- 每日推荐查看次数限制 ---- */
+const DAILY_LIMIT = 3
 
 const TABS: TabItem[] = [
   { key: 'square', label: '需求广场' },
@@ -56,6 +61,37 @@ const SupplyDemand: FC = () => {
   const [errorMsg, setErrorMsg] = useState('')
 
   const loadingRef = useRef(false)
+
+  /* ---- 赞/踩反馈 ---- */
+  const [feedbackTick, setFeedbackTick] = useState(0)
+
+  /* ---- 每日推荐查看次数 ---- */
+  const [dailyUsedCount, setDailyUsedCount] = useState<number>(() => {
+    const d = new Date()
+    const key = `daily_recommend_views_${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+    return Number(Taro.getStorageSync(key) || 0)
+  })
+  const dailyRemaining = Math.max(0, DAILY_LIMIT - dailyUsedCount)
+  const limitExceeded = dailyUsedCount >= DAILY_LIMIT
+
+  const handleFeedback = useCallback(async (itemId: string, rating: number) => {
+    try {
+      await api.post(`/api/v1/recommend/${itemId}/feedback`, {
+        rating,
+        source: 'recommend',
+      })
+      const key = 'feedback_done'
+      const doneList: string[] = Taro.getStorageSync(key) || []
+      if (!doneList.includes(itemId)) {
+        doneList.push(itemId)
+        Taro.setStorageSync(key, doneList)
+      }
+      setFeedbackTick((t) => t + 1)
+      Taro.showToast({ title: '感谢反馈，推荐将更精准', icon: 'none' })
+    } catch (e: any) {
+      Taro.showToast({ title: e.message || '反馈失败', icon: 'none' })
+    }
+  }, [])
 
   /* ---- 从 storage 读取 userId / cardId -------------------------------- */
   const getStorage = useCallback(() => {
@@ -95,6 +131,35 @@ const SupplyDemand: FC = () => {
           setList(items)
           setHasMore(false)
           setStatus(items.length > 0 ? 'ready' : 'empty')
+
+          // SAG: 对缺少推荐理由的项调用SAG管道生成补充推荐解释
+          if (items.length > 0) {
+            const itemsToExplain = items.filter(item => !item.match_reason)
+            if (itemsToExplain.length > 0) {
+              ;(async () => {
+                const results = await Promise.allSettled(
+                  itemsToExplain.map(item =>
+                    sagApi.analyze({
+                      mode: 'explain_recommend',
+                      content: JSON.stringify({ title: item.title, company: item.company, industry: item.industry }),
+                      depth: 'fast' as any,
+                    }).then(res => ({ id: item.id, conclusion: (res as any).data?.conclusion || '' }))
+                  )
+                )
+                const updates: Record<string, string> = {}
+                results.forEach(r => {
+                  if (r.status === 'fulfilled' && r.value.conclusion) {
+                    updates[r.value.id] = r.value.conclusion
+                  }
+                })
+                if (Object.keys(updates).length > 0) {
+                  setList(prev => prev.map(item =>
+                    updates[item.id] ? { ...item, match_reason: updates[item.id] } : item
+                  ))
+                }
+              })()
+            }
+          }
         } else {
           /* -- 供需列表 (需求广场 / 我的供需) -- */
           const params: any = { page: pageNum, page_size: PAGE_SIZE }
@@ -147,6 +212,23 @@ const SupplyDemand: FC = () => {
     setStatus('loading')
     loadingRef.current = false
     fetchData(1, false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab])
+
+  /* ---- 每日推荐查看计数 ---- */
+  useEffect(() => {
+    if (activeTab === 'square' || activeTab === 'ai') {
+      const d = new Date()
+      const key = `daily_recommend_views_${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+      const current = Number(Taro.getStorageSync(key) || 0)
+      if (current >= DAILY_LIMIT) {
+        setDailyUsedCount(current)
+        return
+      }
+      const newCount = current + 1
+      Taro.setStorageSync(key, newCount)
+      setDailyUsedCount(newCount)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
@@ -323,6 +405,15 @@ const SupplyDemand: FC = () => {
         ))}
       </View>
 
+      {/* ================ 每日推荐剩余次数 ================ */}
+      {(activeTab === 'ai' || activeTab === 'square') && (
+        <View className='supply-demand__daily-remaining'>
+          <Text className='supply-demand__daily-remaining-text'>
+            今日剩余推荐: {dailyRemaining}/{DAILY_LIMIT}
+          </Text>
+        </View>
+      )}
+
       {/* ================ AI推荐顶部说明 ================ */}
       {activeTab === 'ai' && list.length > 0 && (
         <View className='supply-demand__ai-header'>
@@ -342,7 +433,20 @@ const SupplyDemand: FC = () => {
         </View>
       )}
 
-      {/* ================ 列表 ================ */}
+      {/* ================ 列表（含每日遮罩） ================ */}
+      <View className='supply-demand__list-wrapper'>
+        {limitExceeded && (activeTab === 'ai' || activeTab === 'square') && (
+          <View className='supply-demand__limit-overlay'>
+            <Text className='supply-demand__limit-overlay-icon'>🔒</Text>
+            <Text className='supply-demand__limit-overlay-text'>今日免费次数已用完</Text>
+            <Button
+              className='supply-demand__limit-overlay-btn'
+              onClick={() => Taro.navigateTo({ url: '/pages/membership/index' })}
+            >
+              升级会员获取无限推荐
+            </Button>
+          </View>
+        )}
       <ScrollView
         className='supply-demand__scroll'
         scrollY
@@ -424,6 +528,33 @@ const SupplyDemand: FC = () => {
                     : ''}
                 </Text>
                 <View className='supply-demand__card-actions'>
+                  {activeTab === 'ai' &&
+                    (() => {
+                      const doneList: string[] = Taro.getStorageSync('feedback_done') || []
+                      const isDone = doneList.includes(item.id)
+                      return [
+                        <Text
+                          key='like'
+                          className={`supply-demand__card-action supply-demand__feedback-btn ${isDone ? 'supply-demand__feedback-btn--done' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (!isDone) handleFeedback(item.id, 1)
+                          }}
+                        >
+                          👍 有用
+                        </Text>,
+                        <Text
+                          key='dislike'
+                          className={`supply-demand__card-action supply-demand__feedback-btn ${isDone ? 'supply-demand__feedback-btn--done' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (!isDone) handleFeedback(item.id, -1)
+                          }}
+                        >
+                          👎 不感兴趣
+                        </Text>,
+                      ]
+                    })()}
                   <Text
                     className='supply-demand__card-action'
                     onClick={(e) => handleContact(e, item)}
@@ -456,6 +587,7 @@ const SupplyDemand: FC = () => {
         {/* 底部避让 TabBar */}
         <View className='supply-demand__bottom-spacer' />
       </ScrollView>
+      </View>
     </View>
   )
 }

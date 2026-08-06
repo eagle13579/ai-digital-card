@@ -1,0 +1,16 @@
+name: 团队管理
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-team-crud: 团队CRUD
+  - A-team-member: 团队成员管理
+  - A-team-invite: 团队邀请
+  - A-team-role: 团队角色管理
+  - A-team-permission: 团队权限控制
+description: 团队管理：团队CRUD/成员/邀请/角色权限
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

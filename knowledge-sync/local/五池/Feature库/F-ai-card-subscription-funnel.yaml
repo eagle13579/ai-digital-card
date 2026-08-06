@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-subscription-funnel
+  name: ai-card-subscription-funnel
+  description: "免费→14天试用→标准/企业完整转化"
+  source_project: "AI数智名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数智名片

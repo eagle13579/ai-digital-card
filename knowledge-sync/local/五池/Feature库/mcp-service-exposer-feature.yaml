@@ -1,0 +1,141 @@
+id: "F-A2E-MCP-EXPOSER-01"
+name: "MCP Service Exposer (NestJS @Tool() 装饰器 → MCP Server)"
+version: "1.0.0"
+description: >
+  通过 @yikart/nest-mcp 库将 NestJS 服务方法暴露为 MCP（Model Context Protocol）
+  工具。核心机制：使用 @Tool() 装饰器标记控制器方法，配合 Zod schema 定义参数和
+  输出类型，自动注册到 MCP Server。支持 SSE（Server-Sent Events）和 Streamable HTTP
+  两种传输协议，使 Claude、Cursor 等 AI 客户端能直接调用后端服务的精确能力。
+domain: "backend"
+type: "library-pattern"
+maturity: "production"
+autonomy: "component"
+tags:
+  - "mcp"
+  - "model-context-protocol"
+  - "nest-mcp"
+  - "tool-decorator"
+  - "nestjs"
+  - "zod"
+  - "sse"
+  - "streamable-http"
+input_schema:
+  type: "object"
+  description: "NestJS 服务类 + @Tool() 装饰器"
+  properties:
+    service_class:
+      type: "class"
+      description: "NestJS @Injectable() 控制器类，包含 MCP 工具方法"
+    tool_decorator_config:
+      type: "object"
+      description: "@Tool() 装饰器配置"
+      properties:
+        name:
+          type: "string"
+          description: "MCP 工具名称（唯一标识）"
+        description:
+          type: "string"
+          description: "工具描述，供 AI 理解用途"
+        parameters:
+          type: "z.ZodObject"
+          description: "Zod schema 定义输入参数"
+        output_schema:
+          type: "z.ZodTypeAny"
+          description: "可选：输出类型约束"
+        annotations:
+          type: "object"
+          description: "注解（destructive/readOnly等）"
+    mcp_options:
+      type: "object"
+      description: "MCP 模块配置"
+      properties:
+        transport:
+          type: "string"
+          enum: ["sse", "streamable-http", "stdio"]
+          description: "传输协议"
+        endpoint:
+          type: "string"
+          description: "MCP 端点路径"
+        capabilities:
+          type: "object"
+          description: "能力声明"
+output_schema:
+  type: "object"
+  description: "MCP Server 端点（可供 AI 客户端连接和调用）"
+  properties:
+    server_type:
+      type: "string"
+      enum: ["sse", "streamable-http", "stdio"]
+      description: "传输协议类型"
+    endpoint_url:
+      type: "string"
+      description: "MCP Server 端点 URL"
+    registered_tools:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          description:
+            type: "string"
+          parameters:
+            type: "object"
+      description: "已注册的工具列表"
+    capabilities:
+      type: "object"
+      description: "服务器能力声明"
+source:
+  type: "library-directory"
+  base_path: "project/aitoearn-backend/libs/nest-mcp/"
+  files:
+    - path: "src/decorators/tool.decorator.ts"
+      lines: 41
+      role: "@Tool() 装饰器核心实现（SetMetadata + Zod schema 绑定）"
+    - path: "src/mcp.module.ts"
+      lines: 266
+      role: "MCP 模块（动态配置、传输创建、装饰器发现）"
+    - path: "src/services/mcp-executor.service.ts"
+      role: "MCP 执行器（工具调用分派）"
+    - path: "src/services/mcp-registry.service.ts"
+      role: "MCP 注册表（管理工具/资源/提示）"
+    - path: "src/services/mcp-sse.service.ts"
+      role: "SSE 传输服务"
+    - path: "src/services/mcp-streamable-http.service.ts"
+      lines: 501
+      role: "Streamable HTTP 传输服务"
+    - path: "src/services/sse-ping.service.ts"
+      role: "SSE 心跳保活服务"
+    - path: "src/decorators/resource.decorator.ts"
+      role: "@Resource() 装饰器"
+    - path: "src/decorators/resource-template.decorator.ts"
+      role: "@ResourceTemplate() 装饰器"
+    - path: "src/transport/sse.controller.factory.ts"
+      role: "SSE Controller 工厂"
+    - path: "src/transport/streamable-http.controller.factory.ts"
+      role: "Streamable HTTP Controller 工厂"
+    - path: "src/interfaces/mcp-options.interface.ts"
+      role: "MCP 选项接口定义"
+    - path: "src/utils/capabilities-builder.ts"
+      role: "能力声明构建器"
+  total_files: 30
+  total_lines: 2860
+  usage_examples:
+    - path: "project/aitoearn-backend/apps/aitoearn-server/src/core/channels/mcp/channels.mcp.controller.ts"
+      lines: 279
+      role: "Channels MCP 控制器（20+ @Tool() 方法实例）"
+    - path: "project/aitoearn-backend/apps/aitoearn-server/src/core/unified-mcp/draft-generation.mcp.controller.ts"
+      role: "草稿生成 MCP 控制器"
+    - path: "project/aitoearn-backend/apps/aitoearn-server/src/core/content/content.mcp.controller.ts"
+      role: "内容 MCP 控制器"
+products:
+  - "AiToEarn MCP Server"
+  - "Claude/Cursor/OpenClaw 集成"
+  - "任何需 AI 可访问后端工具的 NestJS 应用"
+evolution_tags:
+  - "mcp"
+  - "nest-mcp"
+  - "tool-decorator"
+  - "nestjs-library"
+  - "model-context-protocol"
+  - "@yikart/nest-mcp"

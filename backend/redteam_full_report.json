@@ -1,0 +1,242 @@
+{
+  "report_title": "战狼红队 AI数智名片 全量安全攻击测试报告",
+  "timestamp": "2026-07-09 09:27:12",
+  "target": "http://localhost:8002",
+  "security_score": 1,
+  "summary": {
+    "total_findings": 38,
+    "p0_critical": 0,
+    "p1_high": 12,
+    "p2_medium": 26
+  },
+  "findings": [
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /docs",
+      "detail": "HTTP 200, 返回934字节",
+      "fix": "生产环境禁用开发文档/调试端点"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /redoc",
+      "detail": "HTTP 200, 返回894字节",
+      "fix": "生产环境禁用开发文档/调试端点"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /openapi.json",
+      "detail": "HTTP 200, 返回323874字节",
+      "fix": "生产环境禁用开发文档/调试端点"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /metrics",
+      "detail": "HTTP 200, 返回4778字节",
+      "fix": "生产环境禁用开发文档/调试端点"
+    },
+    {
+      "severity": "P1",
+      "title": "敏感路径暴露: /api/v1/admin",
+      "detail": "HTTP 200, 返回23字节",
+      "fix": "生产环境禁用开发文档/调试端点"
+    },
+    {
+      "severity": "P1",
+      "title": "响应头信息泄露(Server)",
+      "detail": "暴露Server头: uvicorn",
+      "fix": "SecurityHeadersMiddleware第60行重新添加了'uvicorn'头，应移除"
+    },
+    {
+      "severity": "P1",
+      "title": "响应头信息泄露(Server)",
+      "detail": "暴露Server头: uvicorn",
+      "fix": "SecurityHeadersMiddleware第60行重新添加了'uvicorn'头，应移除"
+    },
+    {
+      "severity": "P1",
+      "title": "响应头信息泄露(Server)",
+      "detail": "暴露Server头: uvicorn",
+      "fix": "SecurityHeadersMiddleware第60行重新添加了'uvicorn'头，应移除"
+    },
+    {
+      "severity": "P1",
+      "title": "响应头信息泄露(Server)",
+      "detail": "暴露Server头: uvicorn",
+      "fix": "SecurityHeadersMiddleware第60行重新添加了'uvicorn'头，应移除"
+    },
+    {
+      "severity": "P1",
+      "title": "API文档暴露: /openapi.json",
+      "detail": "HTTP 200, 返回323874字节",
+      "fix": "生产环境应彻底禁用, 当前ENV检查可能未生效"
+    },
+    {
+      "severity": "P1",
+      "title": "API文档暴露: /docs",
+      "detail": "HTTP 200, 返回934字节",
+      "fix": "生产环境应彻底禁用, 当前ENV检查可能未生效"
+    },
+    {
+      "severity": "P1",
+      "title": "API文档暴露: /redoc",
+      "detail": "HTTP 200, 返回894字节",
+      "fix": "生产环境应彻底禁用, 当前ENV检查可能未生效"
+    },
+    {
+      "severity": "P2",
+      "title": "限流可能未生效",
+      "detail": "10次连续请求未触发限流(可能阈值较高或限流中间件未生效)",
+      "fix": "检查RateLimiterMiddleware配置和IPRateLimitMiddleware"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 redteam_full_attack.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: eval()执行",
+      "detail": "文件 redteam_full_attack.py eval()执行",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: exec()执行",
+      "detail": "文件 redteam_full_attack.py exec()执行",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: os.system()",
+      "detail": "文件 redteam_full_attack.py os.system()",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: debug=True",
+      "detail": "文件 redteam_full_attack.py debug=True",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: reload=True",
+      "detail": "文件 redteam_full_attack.py reload=True",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: subprocess调用",
+      "detail": "文件 app\\agents\\backend_agent.py subprocess调用",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: 不安全的yaml.load",
+      "detail": "文件 app\\agents\\legion_employee.py 不安全的yaml.load",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: subprocess调用",
+      "detail": "文件 app\\agents\\security_agent.py subprocess调用",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: pickle反序列化",
+      "detail": "文件 app\\cache\\redis.py pickle反序列化",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 app\\identity\\adapters\\rbac_adapter.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 app\\identity\\adapters\\simple_tenant_adapter.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 app\\routers\\docs_portal_router.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 app\\routers\\ml_dashboard_router.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: subprocess调用",
+      "detail": "文件 app\\services\\media_service.py subprocess调用",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: pickle反序列化",
+      "detail": "文件 app\\services\\ml_pipeline.py pickle反序列化",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 scripts\\start_agents.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: subprocess调用",
+      "detail": "文件 tests\\test_final_startup.py subprocess调用",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: subprocess调用",
+      "detail": "文件 tests\\test_gaia_7rules.py subprocess调用",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 tests\\test_gaia_brain.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 tests\\test_gaia_e2e.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: format字符串SQL",
+      "detail": "文件 tests\\test_graphql.py format字符串SQL",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 tests\\test_legion_employee.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "代码反模式: __import__()动态导入",
+      "detail": "文件 tests\\test_oauth.py __import__()动态导入",
+      "fix": "移除或审查"
+    },
+    {
+      "severity": "P2",
+      "title": "JWT_SECRET默认值风险",
+      "detail": ".env.example中JWT_SECRET为'your-256-bit-random-hex-key-here'",
+      "fix": "确保生产环境使用openssl rand -hex 32生成强密钥"
+    }
+  ]
+}

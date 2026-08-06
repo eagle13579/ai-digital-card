@@ -1,0 +1,41 @@
+---
+feature_id: F-CHAINKE-STORYBOOK-01
+name: Storybook设计系统
+dimension: 前端/UX
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 8
+source_model: "Storybook 8+3组件18stories+MDX文档"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝前端Storybook设计系统。基于Storybook 8+React+Vite搭建：
+  - 3个核心组件：Button, Card, Modal
+  - 18个stories覆盖各组件的所有状态（loading/empty/error/disabled/Figma变体）
+  - MDX格式组件文档（使用说明+Props表格+最佳实践）
+  - 自动故事生成加速
+inputs:
+  - React前端项目
+  - 已有组件库
+outputs:
+  - .storybook配置
+  - 3组件18stories
+  - MDX文档
+  - 自动故事生成脚本
+sop:
+  1. npx storybook@latest init
+  2. 配置Vite builder + React
+  3. 编写Button/Card/Modal组件stories
+  4. 每个组件覆盖4-6个状态story
+  5. 编写MDX使用文档
+quality_gates:
+  - 所有story渲染无错误
+  - 覆盖组件所有视觉状态
+  - MDX文档包含Props说明
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 8

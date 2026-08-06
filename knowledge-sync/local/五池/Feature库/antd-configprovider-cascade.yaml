@@ -1,0 +1,9 @@
+# antd-ConfigProvider级联上下文
+name: "antd-configprovider-cascade"
+version: "1.0.0"
+category: "Architecture"
+description: "全局配置级联传递(size/variant/theme/locale)。迁移到AI数智军团：产品配置应继承自军团全局配置，子产品可覆盖部分配置。"
+source: "MiniMax-AI/skills + Ant Design"
+
+products:
+  - 通用: 自动匹配

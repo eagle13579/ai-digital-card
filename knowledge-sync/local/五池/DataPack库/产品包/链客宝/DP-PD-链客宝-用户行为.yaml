@@ -1,0 +1,43 @@
+datapack_id: "DP-PD-链客宝-用户行为"
+name: "链客宝·用户行为"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝用户在平台上的行为轨迹数据，包括登录、浏览、搜索、名片交换、课程学习等行为记录"
+
+source: "chainke-full/backend/app/routers/learning_center.py | chainke-full/backend/app/routers/retention_insights.py"
+
+contents: |
+  【用户行为数据】
+  1. 学习行为: 课程报名、模块学习进度、考核认证记录（来源: learning_center.py）
+     - Course: title, category, level, enrolled_count, completion_rate
+     - Module: module_code (X1-X10), content_type, duration_minutes
+  2. 留存行为: 次日/7日/30日留存、登录频率（来源: 增长三周期/放大前自检三条件.md）
+     - 次日留存 > 40%
+     - 7日留存 > 20%
+     - 30日留存趋于稳定（月流失率<10%）
+  3. 行为标签: 活跃/沉默/流失/回流
+  4. 行为评分: 基于行为频次和深度打分（用于信任分模型输入）
+  5. 搜索行为: 关键词搜索、供需匹配浏览
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取用户行为轨迹数据到工作内存"
+  query: "按用户ID/时间段/行为类型查询行为记录"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "留存分析Feature做用户分群时消费此DataPack"
+  - "信任评分Feature做行为评分计算时消费此DataPack"
+  - "增长Feature做增长指标追踪时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户身份"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原用户数据包（KFD-07合规）"

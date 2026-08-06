@@ -1,0 +1,64 @@
+/* Folo-style Apple UIKit Design Tokens
+   Generiert aus Folo (RSSNext) Design System
+   Apple UIKit色彩 → CSS自定义属性
+*/
+
+:root {
+  /* 系统色 */
+  --color-red: #ff3b30;
+  --color-orange: #ff9500;
+  --color-yellow: #ffcc00;
+  --color-green: #34c759;
+  --color-mint: #00c7be;
+  --color-teal: #30b0c7;
+  --color-cyan: #32ade6;
+  --color-blue: #007aff;
+  --color-indigo: #5856d6;
+  --color-purple: #af52de;
+  --color-pink: #ff2d55;
+  --color-brown: #a2845e;
+
+  /* 填充层级 */
+  --fill-primary: rgba(120, 120, 128, 0.2);
+  --fill-secondary: rgba(120, 120, 128, 0.16);
+  --fill-tertiary: rgba(120, 120, 128, 0.12);
+  --fill-quaternary: rgba(120, 120, 128, 0.08);
+
+  /* 材质层级 */
+  --material-ultra-thick: rgba(255, 255, 255, 0.92);
+  --material-thick: rgba(255, 255, 255, 0.84);
+  --material-medium: rgba(255, 255, 255, 0.76);
+  --material-thin: rgba(255, 255, 255, 0.64);
+  --material-ultra-thin: rgba(255, 255, 255, 0.48);
+
+  /* 文字 */
+  --text-primary: #1c1c1e;
+  --text-secondary: rgba(60, 60, 67, 0.6);
+  --text-tertiary: rgba(60, 60, 67, 0.3);
+  --text-quaternary: rgba(60, 60, 67, 0.18);
+
+  /* 界面组件 */
+  --bg-sidebar: rgba(242, 242, 247, 0.96);
+  --bg-tooltip: rgba(44, 44, 46, 0.96);
+  --bg-menu: rgba(242, 242, 247, 0.96);
+  --bg-popover: rgba(255, 255, 255, 0.96);
+  --bg-titlebar: rgba(242, 242, 247, 0.96);
+  --bg-selection: rgba(0, 122, 255, 0.2);
+}
+
+/* Dark mode */
+.dark, [data-theme="dark"] {
+  --material-ultra-thick: rgba(0, 0, 0, 0.92);
+  --material-thick: rgba(0, 0, 0, 0.84);
+  --material-medium: rgba(0, 0, 0, 0.76);
+  --material-thin: rgba(0, 0, 0, 0.64);
+  --material-ultra-thin: rgba(0, 0, 0, 0.48);
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(235, 235, 245, 0.6);
+  --text-tertiary: rgba(235, 235, 245, 0.3);
+  --text-quaternary: rgba(235, 235, 245, 0.18);
+  --bg-sidebar: rgba(28, 28, 30, 0.96);
+  --bg-menu: rgba(28, 28, 30, 0.96);
+  --bg-popover: rgba(28, 28, 30, 0.96);
+  --bg-titlebar: rgba(28, 28, 30, 0.96);
+}

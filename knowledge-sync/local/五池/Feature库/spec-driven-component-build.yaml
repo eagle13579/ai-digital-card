@@ -1,0 +1,29 @@
+name: spec-driven-component-build
+description: >
+  浏览器提取精确CSS → 写spec.md文件 → 派builder agent并行构建。
+  Spec文件是提取和构建之间的契约+审计线索。
+version: "1.0.0"
+source: "AI Website Cloner Template"
+products: ["烛龙工程流", "链客宝", "AI数字名片"]
+triggers:
+  - "精确还原UI"
+  - "组件级逆向工程"
+
+build_gates:
+  - "不写spec不派builder"
+  - "单builder ≤150行spec"
+  - "复杂section拆多个builder"
+  - "每builder验证 npx tsc --noEmit"
+  - "merge后验证 npm run build"
+
+parallelism:
+  mechanism: "git worktree"
+  orchestrator: "白泽解决冲突"
+
+spec_template:
+  sections:
+    - "DOM结构树"
+    - "精确CSS值（getComputedStyle）"
+    - "多状态行为（hover/scroll/click/responsive）"
+    - "资产路径"
+    - "实际文本内容"

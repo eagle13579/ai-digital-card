@@ -1,0 +1,15 @@
+name: 供需大厅
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 供需大厅模块，提供需求广场、我的供需、AI智能推荐与联系匹配功能，连接商机供需双方
+atoms:
+  - SD-001: 需求广场
+  - SD-002: 我的供需
+  - SD-003: AI推荐
+  - SD-004: 联系匹配
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

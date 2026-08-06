@@ -1,0 +1,35 @@
+name: cross-platform-skill-sync
+description: >
+  一份源文件 → 自动生成13个AI IDE平台的技能/命令/规则配置。
+  修改源文件后执行一次sync脚本，所有平台同步更新。
+version: "1.0.0"
+source: "AI Website Cloner Template"
+products: ["白泽控制台", "云师技能集市"]
+triggers:
+  - "同步技能到所有平台"
+  - "跨AI IDE维护技能"
+
+sync_tracks:
+  project_instructions:
+    source: "AGENTS.md"
+    script: "sync-agent-rules.sh"
+    targets:
+      - ".github/copilot-instructions.md"
+      - ".clinerules"
+      - ".continue/rules/project.md"
+      - ".amazonq/rules/project.md"
+      - ".trae/rules/project.md"
+  clone_skill:
+    source: ".claude/skills/clone-website/SKILL.md"
+    script: "sync-skills.mjs"
+    targets:
+      - ".codex/skills/clone-website/SKILL.md"
+      - ".github/skills/clone-website/SKILL.md"
+      - ".cursor/commands/clone-website.md"
+      - ".windsurf/workflows/clone-website.md"
+      - ".gemini/commands/clone-website.toml"
+      - ".opencode/commands/clone-website.md"
+      - ".augment/commands/clone-website.md"
+      - ".continue/commands/clone-website.md"
+      - ".amazonq/cli-agents/clone-website.json"
+      - ".trae/commands/clone-website.md"

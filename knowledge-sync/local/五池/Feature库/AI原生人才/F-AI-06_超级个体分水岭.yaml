@@ -1,0 +1,16 @@
+name: F-AI-06_超级个体分水岭
+dimension: 体系
+domain: AI原生人才
+version: 1.0
+
+products:
+  - 通用: 自动匹配
+description: |-
+  从一个人战斗到指挥一支AI团队的进化路径——超级个体的真正分水岭
+models_referenced:
+  - M9-白泽军团映射
+applications:
+  - 数字员工SaaS
+  - 盖娅之城
+draft: false
+created_at: 2026-06-15

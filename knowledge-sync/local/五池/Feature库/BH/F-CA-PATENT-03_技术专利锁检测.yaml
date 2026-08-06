@@ -1,0 +1,19 @@
+id: F-CA-PATENT-03
+name: 技术专利锁检测
+dimension: 💡 创造力
+description: >-
+  基于BH03技术专利锁心智模型构建的检测器，识别特定矿种/材料的工艺
+  专利网覆盖度。检测目标：专利网完整性、适配成本估算、专利到期分布、
+  替代工艺可行性。适配成本阈值为¥50/吨级别。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH03: 技术专利锁
+products:
+  - 专利网覆盖度分析工具
+  - 技术依赖性评估系统
+employees: [烛龙, 䑏疏, 长乘]
+priority: P0
+maturity: design

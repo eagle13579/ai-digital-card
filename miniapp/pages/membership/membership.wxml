@@ -1,0 +1,98 @@
+<view class="page-container">
+  <loading visible="{{loading}}" text="加载中..." />
+
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading}}">
+
+    <!-- ============ 当前层级 ============ -->
+    <view class="current-level-card {{'level-' + currentLevel}}">
+      <view class="level-bg"></view>
+      <view class="level-content">
+        <text class="level-label">当前层级</text>
+        <view class="level-name-row">
+          <text class="level-name">{{currentLevelText}}</text>
+          <view class="level-badge {{'badge-' + currentLevel}}" wx:if="{{currentLevel === 'pro'}}">⭐ Pro</view>
+        </view>
+        <text class="level-expire" wx:if="{{expireDate}}">到期: {{expireDate}}</text>
+        <text class="level-expire" wx:else>永续免费</text>
+      </view>
+
+      <!-- 使用额度进度条 -->
+      <view class="usage-section">
+        <view class="usage-item">
+          <view class="usage-header">
+            <text class="usage-label">名片数量</text>
+            <text class="usage-value">{{usage.card_count}} / {{usage.card_limit}}</text>
+          </view>
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{usage.card_limit > 0 ? (usage.card_count / usage.card_limit * 100) : 0}}%"></view>
+          </view>
+        </view>
+        <view class="usage-item">
+          <view class="usage-header">
+            <text class="usage-label">OCR次数</text>
+            <text class="usage-value">{{usage.ocr_count}} / {{usage.ocr_limit}}</text>
+          </view>
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{usage.ocr_limit > 0 ? (usage.ocr_count / usage.ocr_limit * 100) : 0}}%"></view>
+          </view>
+        </view>
+        <view class="usage-item">
+          <view class="usage-header">
+            <text class="usage-label">访客浏览</text>
+            <text class="usage-value">{{usage.visitor_count}} 次</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ============ 套餐方案 ============ -->
+    <view class="section-title">选择方案</view>
+
+    <view class="plans-container">
+      <view class="plan-card {{item.highlighted ? 'plan-highlighted' : ''}} {{'plan-' + item.id}}"
+        wx:for="{{plans}}" wx:key="id"
+        data-plan="{{item.id}}" bindtap="selectPlan">
+
+        <view class="plan-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+        <view class="plan-header">
+          <text class="plan-name">{{item.name}}</text>
+          <view class="plan-price-row">
+            <text class="plan-price">{{item.price}}</text>
+            <text class="plan-period">{{item.period}}</text>
+          </view>
+          <text class="plan-original" wx:if="{{item.originalPrice}}">{{item.originalPrice}}</text>
+        </view>
+        <view class="plan-features">
+          <view class="plan-feature" wx:for="{{item.features}}" wx:key="index">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">{{item}}</text>
+          </view>
+        </view>
+        <button class="plan-btn {{item.highlighted ? 'btn-primary' : 'btn-outline'}} small"
+          wx:if="{{item.id !== 'free'}}">
+          {{item.id === currentLevel ? '当前套餐' : '开通' + item.name}}
+        </button>
+      </view>
+    </view>
+
+    <!-- ============ 功能对比表 ============ -->
+    <view class="section-title">功能对比</view>
+
+    <view class="comparison-card">
+      <view class="comparison-header">
+        <text class="comp-col comp-feature">功能</text>
+        <text class="comp-col comp-free">Free</text>
+        <text class="comp-col comp-pro">Pro</text>
+        <text class="comp-col comp-enterprise">Enterprise</text>
+      </view>
+      <view class="comparison-row" wx:for="{{featureComparison}}" wx:key="feature">
+        <text class="comp-col comp-feature">{{item.feature}}</text>
+        <text class="comp-col comp-free {{item.free === '—' ? 'comp-disabled' : ''}}">{{item.free}}</text>
+        <text class="comp-col comp-pro {{item.pro === '—' ? 'comp-disabled' : ''}}">{{item.pro}}</text>
+        <text class="comp-col comp-enterprise {{item.enterprise === '—' ? 'comp-disabled' : ''}}">{{item.enterprise}}</text>
+      </view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+</view>

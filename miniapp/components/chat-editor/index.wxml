@@ -1,0 +1,112 @@
+<!--
+  对话式编辑组件 ChatEditor
+  固定底部输入框 + 语音 + 快捷指令 + 意图预览 + 撤销
+-->
+<view class="chat-editor {{fixed ? 'fixed-bottom' : ''}}">
+  <!-- 快捷指令轮播 -->
+  <view class="quick-commands" wx:if="{{showCommands}}">
+    <view class="commands-header">
+      <text class="commands-title">💡 快捷指令</text>
+    </view>
+    <view class="commands-grid">
+      <view
+        class="command-item spring-press"
+        wx:for="{{filteredCommands}}"
+        wx:key="cmd"
+        data-cmd="{{item.cmd}}"
+        bindtap="onSelectCommand"
+      >
+        <text class="command-cmd">{{item.cmd}}</text>
+        <text class="command-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 意图预览浮层 -->
+  <view class="intent-overlay" wx:if="{{intentPreview}}" bindtap="onCancel">
+    <view class="intent-card" catchtap="">
+      <view class="intent-header">
+        <text class="intent-emoji">🤖</text>
+        <text class="intent-title">AI理解摘要</text>
+      </view>
+      <view class="intent-body">
+        <view class="intent-field" wx:for="{{intentPreview.fields || [intentPreview]}}" wx:for-item="field" wx:key="*this">
+          <text class="intent-field-label" wx:if="{{field.field || field.name}}">{{field.field || field.name}}：</text>
+          <text class="intent-field-value">{{field.value || field.new_value || JSON.stringify(field)}}</text>
+        </view>
+        <text class="intent-summary" wx:if="{{intentPreview.summary || intentPreview.description}}">
+          {{intentPreview.summary || intentPreview.description}}
+        </text>
+      </view>
+      <view class="intent-loader" wx:if="{{executing}}">
+        <text class="loader-text">🔄 执行中...</text>
+      </view>
+      <view class="intent-actions" wx:else>
+        <button class="btn-cancel spring-press" bindtap="onCancel">取消</button>
+        <button class="btn-execute spring-press" bindtap="onConfirm">确认修改</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 输入栏 -->
+  <view class="input-bar">
+    <!-- 快捷指令触发 -->
+    <view
+      class="action-btn cmd-trigger spring-press"
+      bindtap="onSelectCommand"
+      data-cmd="{{''}}"
+    >
+      <text class="action-icon">/</text>
+    </view>
+
+    <!-- 文本输入 -->
+    <view class="input-wrap">
+      <input
+        class="text-input"
+        type="text"
+        placeholder="{{placeholder}}"
+        value="{{inputText}}"
+        bindinput="onInput"
+        confirm-type="send"
+        bindconfirm="onSubmit"
+        disabled="{{interpreting || executing}}"
+      />
+    </view>
+
+    <!-- 语音输入 -->
+    <view
+      class="action-btn voice-btn spring-press {{recording ? 'recording' : ''}}"
+      bindtouchstart="onStartVoice"
+      bindtouchend="onStopVoice"
+    >
+      <text class="action-icon">{{recording ? '🔴' : '🎤'}}</text>
+    </view>
+
+    <!-- 发送按钮 -->
+    <view
+      class="action-btn send-btn spring-press {{inputText.trim() ? 'active' : ''}}"
+      wx:if="{{!recording}}"
+      bindtap="onSubmit"
+      hover-class="spring-scale-mini"
+    >
+      <text class="action-icon">{{interpreting ? '⏳' : '➤'}}</text>
+    </view>
+  </view>
+
+  <!-- 操作历史（撤销条） -->
+  <view class="undo-bar" wx:if="{{actionHistory.length > 0 && !intentPreview}}">
+    <text class="undo-text">已修改 {{actionHistory.length}} 项</text>
+    <view class="undo-btn spring-press" bindtap="onUndo">
+      <text class="undo-icon">↩</text>
+      <text class="undo-label">撤销</text>
+    </view>
+  </view>
+
+  <!-- 加载浮层 -->
+  <view class="loading-overlay" wx:if="{{interpreting && !intentPreview}}">
+    <view class="loading-content">
+      <text class="loading-emoji">🤔</text>
+      <text class="loading-text">AI正在理解您的意图...</text>
+    </view>
+  </view>
+</view>

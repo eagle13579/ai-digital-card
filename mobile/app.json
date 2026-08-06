@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "AI数智名片",
+    "slug": "ai-digital-business-card",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0A0A18"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aidigitalcard",
+      "infoPlist": {
+        "NSCameraUsageDescription": "扫描名片二维码",
+        "NSPhotoLibraryUsageDescription": "上传名片头像"
+      }
+    },
+    "android": {
+      "package": "com.aidigitalcard",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A18"
+      }
+    },
+    "extra": {
+      "apiUrl": "https://api.liankebao.top"
+    },
+    "plugins": [
+      "expo-dev-client"
+    ]
+  }
+}

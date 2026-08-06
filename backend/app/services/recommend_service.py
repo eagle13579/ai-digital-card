@@ -6,6 +6,9 @@ AI数字名片 推荐服务
 反馈数据模型:
   - FeedbackRecommendation: 推荐反馈记录 (recommendation_id, user_id, content_id, action, timestamp)
   - 权重影响: like+1, dislike-1, skip+0
+
+PrivateMatchEngine 集成:
+  - `rerank_with_pme(items, user_id, top_k)`: 对现有推荐结果二次排序
 """
 
 import logging
@@ -25,6 +28,7 @@ from app.services.feedback_service import (
     FeedbackSummary,
     get_feedback_service,
 )
+from app.services.pme_client import PrivateMatchClient
 
 logger = logging.getLogger(__name__)
 
@@ -180,3 +184,40 @@ class RecommendService:
     def trigger_weight_adjustment(self) -> int:
         """手动触发权重调整"""
         return self._feedback_service.trigger_weight_adjustment()
+
+    # ── PrivateMatchEngine 二次排序 ─────────────────────────────
+
+    async def rerank_with_pme(
+        self,
+        items: list[dict[str, Any]],
+        user_id: int,
+        top_k: int = 20,
+    ) -> list[dict[str, Any]]:
+        """使用 PrivateMatchEngine 对推荐结果进行二次排序
+
+        流程:
+          1. 将 items 转为 PME EnterpriseItem 格式
+          2. 调用 PME batch POST /api/v1/score 批量评分
+          3. 按 PME 评分降序重排
+
+        Args:
+            items:  原始推荐结果列表
+            user_id: 当前用户 ID (用作评分上下文)
+            top_k:   返回数量上限
+
+        Returns:
+            二次排序后的结果列表（含 pme_score 字段）
+        """
+        if not items:
+            return []
+
+        pme = PrivateMatchClient()
+        try:
+            context = {"user_id": str(user_id)}
+            ranked = await pme.rerank(items=items, context=context, top_k=top_k)
+            return ranked
+        except Exception as e:
+            logger.warning("PME 二次排序异常（降级返回原始列表）: %s", e)
+            return items[:top_k]
+        finally:
+            await pme.close()

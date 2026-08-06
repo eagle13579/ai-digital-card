@@ -1,0 +1,14 @@
+name: "Graph Workflow编排引擎"
+version: "1.0.0"
+status: absorbed
+dimension: 体系
+source: 一速《7种主流Agent架构深度拆解》
+description: "基于DAG的企业级Agent工作流编排。支持条件分支、并行执行、回退重试、流程可视化。将AI不确定性封装在节点中，工程化流程保证整体确定性。"
+atoms:
+  - AgentArch 07_GraphWorkflow架构
+  - ChatDev 02_DAG编排引擎
+products:
+  - 白泽控制台
+  - 中韩出海数智港
+  - ChatDev工作流引擎集成包
+absorbed_date: 2026-07-10

@@ -1,0 +1,19 @@
+id: F-CA-OFFSHORE-06
+name: 离岸路由增强
+dimension: 💡 创造力
+description: >-
+  基于BH06离岸利润静默心智模型构建的路由增强模块，追踪IP注册地、
+  成本分摊协议(CSA)、特许权使用费支付流向。计算有效税率与法定税率
+  的压缩率，评估BEPS合规风险，检测专利盒路由的完整度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH06: 离岸利润静默(专利盒路由)
+products:
+  - 跨国企业税务结构分析系统
+  - BEPS合规审计引擎
+employees: [计然, 烛龙, 乘黄]
+priority: P0
+maturity: design

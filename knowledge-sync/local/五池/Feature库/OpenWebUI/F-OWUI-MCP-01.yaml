@@ -1,0 +1,24 @@
+id: F-OWUI-MCP-01
+name: MCP Client for Dynamic Tool Discovery
+source_model: Open WebUI MCP Client — Model Context Protocol客户端，动态发现和调用外部工具服务器
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+description: 基于MCP协议的标准客户端实现，连接外部MCP Server动态发现工具列表和资源，使LLM能通过MCP协议调用外部API/数据库/文件系统等工具，无需硬编码工具函数。
+input: MCP Server URL + 认证头
+output: 工具描述列表 / 工具调用结果 / 资源内容
+sop: '① 初始化: MCPClient.connect(url, headers) → SSE/streamable HTTP
+
+  ② 工具发现: list_tool_specs() → 获取工具名称/描述/参数schema
+
+  ③ 工具调用: call_tool(name, args) → LLM发起工具调用 → 返回结果
+
+  ④ 资源操作: list_resources() / read_resource(uri)
+
+  ⑤ 生命周期: connect → use → disconnect (async context manager)'
+quality_gates: 连接超时<5s、工具调用超时<30s、支持流式和非流式、SSE传输兼容
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 7
+application_scope: 白泽MCP工具桥接/链客宝外部系统集成/AI招商数据源接入/盖娅军团工具生态

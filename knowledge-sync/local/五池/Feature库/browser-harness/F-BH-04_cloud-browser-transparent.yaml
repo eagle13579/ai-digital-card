@@ -1,0 +1,24 @@
+name: "F-BH-04_云浏览器透明集成"
+description: "本地Chrome与Browser Use云浏览器通过环境变量透明切换"
+version: "1.0.0"
+dimension: "场景"
+source: "browser-harness"
+source_model: "五池/模型池/BH-07_云浏览器透明扩展模式.md"
+author: "browser-use (MIT)"
+license: "MIT"
+
+mental_models:
+  - "透明切换: BU_CDP_WS环境变量=本地/云端统一接口"
+  - "profile同步: 本地Cookie上传到云浏览器保持登录状态"
+
+components:
+  - "start_remote_daemon(): 云浏览器创建+CDP WS获取+daemon启动"
+  - "list_cloud_profiles() / sync_local_profile(): 配置文件管理"
+
+products:
+  - "内容工厂: 云浏览器批量内容采集"
+  - "AI数字军团: 并行子Agent各自独立浏览器"
+
+integration:
+  type: "workflow"
+  setup: "设置BROWSER_USE_API_KEY环境变量即可使用云浏览器"

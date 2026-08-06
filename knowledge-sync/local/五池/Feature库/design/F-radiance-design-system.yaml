@@ -1,0 +1,29 @@
+name: 辉光设计系统 (Radiance Design System)
+version: 1.0.0
+status: active
+dimension: design
+source: MiniMax Official Skills全量吸收 + shader-dev/frontend-dev/PDF/PPTX (2026-07-05)
+description: 统一产品设计能力，融合Token化设计系统、GLSL着色器视觉效果、电影级动效、AIDA文案框架、多模态媒体生成。5层架构覆盖从配色字体到3D视觉的全频谱设计需求。
+atoms:
+  - RDS-TOKEN: Token化设计系统 — 8种文档类型自动推导配色/字体/间距/圆角/阴影/动效曲线
+  - RDS-SHADER: GLSL着色器视觉效果 — 8种高频产品应用(极光/粒子/波浪/渐变/毛玻璃/光标跟随/星空/故障)
+  - RDS-MOTION: 电影级动效分级 — ScrollTrigger/GSAP Timeline/Framer Motion
+  - RDS-AIDA: AIDA文案框架 — Attention→Interest→Desire→Action + UI组件映射
+  - RDS-MEDIA: 多模态媒体融合 — 图片/TTS/音乐/视频/GIF的正确位置+格式
+products:
+  - AI数字名片 — AnimatedBackground组件(GLSL着色器背景), designTokens系统
+  - 链客宝 — designTokens系统(文档类型自动适配配色)
+  - 中韩出海数智港 — designTokens系统(双语适配), AnimatedBackground(波浪背景)
+  - 内容工厂(阿久) — 多模态媒体生成管线
+  - 赛博参谋(计然) — PPTX演示设计系统
+  - 盖娅之城 — 着色器3D可视化
+employees:
+  - 乘黄P8(产品/设计) — 全栈设计能力
+  - 鹿蜀P8(运营/UI) — Token系统+动效
+  - 烛龙P8(工程) — 着色器组件集成
+  - 商羊P8(市场) — AIDA文案+媒体
+  - 计然P8(商业) — PPTX/PDF文档设计
+  - 文鳐P9(文档) — DOCX/PDF排版
+  - 山膏(视觉设计) — 着色器+动效
+  - 朱獳(3D) — 着色器技术
+  - 毕方(3D) — 着色器技术

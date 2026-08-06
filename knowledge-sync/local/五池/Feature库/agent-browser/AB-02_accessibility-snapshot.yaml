@@ -1,0 +1,6 @@
+name: F-AB-02_可访问性树快照
+description: Accessiblity Tree作为交互基础, @ref引用
+dimension: 审美
+source: vercel-labs/agent-browser
+products:
+  - AI数字军团SAG管道

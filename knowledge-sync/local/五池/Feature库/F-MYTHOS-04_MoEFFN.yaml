@@ -1,0 +1,25 @@
+# 🧠 MoE共享专家池 - MoEFFN
+id: F-MYTHOS-04
+name: MoE细粒度共享专家池
+dimension: 模型
+description: DeepSeekMoE风格的细粒度MoE FFN，包含路由专家（Top-K激活）和共享专家（始终激活），采用辅助损失无关的负载均衡偏置机制
+atoms:
+  - "Fable5-Mythos5-代码收割/04_MoEFFN"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 456-533)
+
+products:
+  - 通用: 自动匹配
+references:
+  - Top-K路由: flat → router → softmax → topk @ main.py:512-516
+  - 负载均衡偏置: router_bias @ main.py:485
+  - 共享专家: 每个token都激活 @ main.py:530-531
+  - Expert (SwiGLU): down(silu(gate)*up) @ main.py:446-453
+
+injection_points:
+  - TransformerBlock(use_moe=True) → self.ffn = MoEFFN(cfg) @ main.py:650
+  - 仅在RecurrentBlock中使用MoE @ main.py:816
+  - 配置: n_experts=64, n_experts_per_tok=4, expert_dim=512 @ main.py:68-71

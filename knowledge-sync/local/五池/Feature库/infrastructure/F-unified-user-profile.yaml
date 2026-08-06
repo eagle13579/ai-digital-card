@@ -1,0 +1,45 @@
+feature:
+  id: F-unified-user-profile
+  version: 1.0.0
+  name: 跨产品统一用户数据层
+  description: 在多个独立产品之上构建统一User Profile虚拟层, 实现跨产品用户身份关联/数据合并/SSO基座
+  
+  domain: infrastructure
+  maturity: product
+  
+  products:
+    - AI数字名片 (锚点产品)
+    - chainke-full (链客宝)
+    - go-aiport (中韩出海数智港)
+    - AI数智军团 (221员工)
+    - 所有含独立User模型的产品
+  
+  architecture:
+    pattern: 适配器模式 + 虚拟索引层
+    layers:
+      - interface: UnifiedProfileInterface (Protocol)
+      - adapters: SQLAlchemyProfileAdapter (每个产品一个)
+      - service: UnifiedProfileService (门面)
+      - routes: /api/unified/profile/*
+  
+  features:
+    - 跨产品用户统一画像查询
+    - 手机号/邮箱关联匹配
+    - 跨产品用户发现
+    - 用户数据合并
+    - SSO基座预留
+  
+  dependencies:
+    - products/identity/adapter-pattern
+  
+  value_proposition:
+    v1_cross_sso: "一个账号登所有产品"
+    v2_data_flywheel: "用户行为数据跨产品反哺"
+    v3_product_matrix: "产品矩阵的数据基座"
+  
+  tags:
+    - 数据架构
+    - 跨产品
+    - 用户数据
+    - SSO
+    - 适配器模式

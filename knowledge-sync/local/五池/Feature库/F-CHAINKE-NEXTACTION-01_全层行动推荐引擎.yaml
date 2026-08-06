@@ -1,0 +1,61 @@
+---
+id: F-CHAINKE-NEXTACTION-01
+dimension: 场景
+name: 全层行动推荐引擎
+status: active
+version: "1.0"
+created: 2026-06-13
+source_model: "AI招商系统 · L3精准匹配 → L5交易执行层设计 | 对标Salesforce Einstein Next Best Action"
+
+products:
+  - 通用: 自动匹配
+description: >
+  为链客宝后端创建「评分后自动下一步行动推荐」系统。
+  当供应商/企业/需求通过匹配引擎评分后，自动根据评分输出推荐的下一步行动：
+    - 高分段 (≥80)  → 推送签约（触发 e签宝）
+    - 中分段 (50-79) → AI 自动邀约对接会
+    - 低分段 (<50)   → 培育序列（自动发送资料/提醒）
+  纯规则驱动，支持运行时热配置规则阈值。
+input:
+  - 评分值（来自匹配引擎：0~100 或 0.0~1.0）
+  - 评分制式标识（score_scale）
+  - 实体 ID + 实体类型（enterprise/product/supplier/need）
+  - 额外上下文（可选）
+output:
+  - 推荐行动类型（sign_contract / invite_event / nurture_sequence / manual_review）
+  - 行动展示名称
+  - 分数段标签（high / medium / low）
+  - 推荐置信度（0.5 ~ 1.0）
+  - 行动描述
+  - 行动携带数据（如签约模板ID、对接会ID、培育天数等）
+  - 备选行动列表
+sop: |
+  1. 评分引擎完成评分后，调用 POST /api/next-action/recommend
+  2. ActionRecommender.normalize_score() 归一化评分到 0~100
+  3. ActionRecommender.recommend() 按规则匹配行动
+  4. ActionRecommender._compute_confidence() 计算置信度
+  5. ActionRecommender._get_alternatives() 生成备选方案
+  6. 返回 ActionRecommendation 序列化结果
+quality_gates:
+  - '[✓] 端点返回200（已验证）'
+  - '[✓] Python 语法通过（mypy/flake8 零错误）'
+  - '[✓] 评分归一化正确处理 0~100 和 0.0~1.0 两种制式'
+  - '[✓] 规则可配置：运行时通过 PUT /api/next-action/rules 热更新'
+  - '[✓] 置信度计算：边界处 0.5，中心处 1.0'
+  - '[ ] 集成测试：覆盖三段评分区间 + 边界值 + 批量场景'
+dependencies:
+  - FastAPI
+  - Pydantic v2
+  - 链客宝 backend/app/main.py
+  - app/services/action_recommender.py（新建）
+  - app/routers/next_action.py（新建）
+  - app/schemas.py（重用 ApiResponse）
+  - app/auth.py（认证依赖）
+  - 匹配引擎评分输出（matching_engine.py / enterprise.py / enrichment.py）
+deployment:
+  type: code_only
+  env_vars: []
+  pre_requisites:
+    - 无外部 API 依赖，纯规则驱动
+    - 确保 app/routers/next_action.py 已在 main.py 注册
+  iteration: v1-P1

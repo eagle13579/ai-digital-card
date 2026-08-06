@@ -1,0 +1,182 @@
+[
+  {
+    "num": 1,
+    "name": "Health Check",
+    "status": 200,
+    "ok": true,
+    "summary": "{'status': 'ok', 'service': 'ai-digital-brochure', 'version': '3.4.0'}",
+    "severity": "P0",
+    "problem": ""
+  },
+  {
+    "num": 2,
+    "name": "Register",
+    "status": 200,
+    "ok": true,
+    "summary": "{'access_token': 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MyIsImV4cCI6MTc4Mzk4NzM1OX0.DT1kaE6rtsssl-7obzqn-k7DVYsBeBA6Ta5Tq5jw8ljdBpSmBncrZuF",
+    "severity": "P0",
+    "problem": ""
+  },
+  {
+    "num": 3,
+    "name": "Login",
+    "status": 200,
+    "ok": true,
+    "summary": "{'access_token': 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MyIsImV4cCI6MTc4Mzk4NzM2MX0.jDv_nhFg0BjP_LexCUG_GY5ROUJjzWuGyEn46w9G1QxWcGXhn8-ekZu",
+    "severity": "P0",
+    "problem": ""
+  },
+  {
+    "num": 4,
+    "name": "User Info",
+    "status": 200,
+    "ok": true,
+    "summary": "{'id': 73, 'username': None, 'phone': '13853043036', 'name': '测试用户_58199659', 'avatar': '', 'company': '测试科技', 'title': '产品经理', 'intro': '', 'role': '",
+    "severity": "P0",
+    "problem": ""
+  },
+  {
+    "num": 5,
+    "name": "Create Card",
+    "status": 201,
+    "ok": true,
+    "summary": "{'id': 32, 'user_id': 73, 'title': '产品经理', 'cover': '', 'purpose': '', 'pages_count': 0, 'status': 'draft', 'share_token': '3f46a496397646f4', 'view_c",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 6,
+    "name": "Card List",
+    "status": 200,
+    "ok": true,
+    "summary": "[{'id': 32, 'user_id': 73, 'title': '产品经理', 'cover': '', 'purpose': '', 'pages_count': 0, 'status': 'draft', 'share_token': '3f46a496397646f4', 'view_",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 6,
+    "name": "Card List (brochures)",
+    "status": 200,
+    "ok": true,
+    "summary": "{'items': [{'id': 1, 'user_id': 51, 'title': 'roger的容蓝名片', 'cover': '', 'purpose': 'partner', 'pages_count': 3, 'status': 'draft', 'share_token': 'ead",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 7,
+    "name": "Create Brochure",
+    "status": 200,
+    "ok": true,
+    "summary": "{'id': 33, 'user_id': 73, 'title': '测试产品画册', 'cover': '', 'purpose': '', 'pages_count': 1, 'status': 'draft', 'share_token': '70a4740e7d64468a', 'view",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 8,
+    "name": "Brochure List",
+    "status": 200,
+    "ok": true,
+    "summary": "{'items': [{'id': 1, 'user_id': 51, 'title': 'roger的容蓝名片', 'cover': '', 'purpose': 'partner', 'pages_count': 3, 'status': 'draft', 'share_token': 'ead",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 9,
+    "name": "Publish Brochure",
+    "status": 200,
+    "ok": true,
+    "summary": "{'id': 33, 'user_id': 73, 'title': '测试产品画册', 'cover': '', 'purpose': '', 'pages_count': 1, 'status': 'published', 'share_token': '9f855ba1fe9045ab', '",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 10,
+    "name": "Share Page",
+    "status": 200,
+    "ok": true,
+    "summary": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximu",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 11,
+    "name": "AI DeepSeek Chat",
+    "status": 200,
+    "ok": true,
+    "summary": "{'reply': '你好！很高兴见到你。有什么我可以帮忙的吗？', 'model': 'deepseek-chat', 'usage': {'prompt_tokens': 5, 'completion_tokens': 11, 'total_tokens': 16, 'prompt_tokens",
+    "severity": "P2",
+    "problem": "需配置DEEPSEEK_API_KEY，否则返回401/5xx"
+  },
+  {
+    "num": 12,
+    "name": "AI Writing Assist",
+    "status": 200,
+    "ok": true,
+    "summary": "{'purpose': 'bio', 'content': '测试用户，测试科技产品经理。擅长产品规划与需求分析，推动多款产品从0到1落地，注重用户体验与商业价值平衡，助力团队高效协作与业务增长。', 'error': ''}",
+    "severity": "P2",
+    "problem": "需要配置AI API Key"
+  },
+  {
+    "num": 13,
+    "name": "Recommend Personal",
+    "status": 403,
+    "ok": false,
+    "summary": "{'detail': {'message': '今日推荐次数已用完', 'remaining': 0, 'limit': 0}}",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 14,
+    "name": "Knowledge Graph",
+    "status": 200,
+    "ok": true,
+    "summary": "{'central': {'id': 'person:73', 'type': 'person', 'label': '测试用户_58199659', 'user_id': 73, 'name': '测试用户_58199659', 'company': '测试科技', 'title': '产品经理'",
+    "severity": "P2",
+    "problem": ""
+  },
+  {
+    "num": 15,
+    "name": "Subscription Plans",
+    "status": 200,
+    "ok": true,
+    "summary": "[{'tier': 'free', 'name_cn': '免费版', 'name_en': 'Free', 'name': '免费版', 'price_cents': 0, 'price_yuan': '0', 'price': '0', 'amount': '0', 'interval': 'm",
+    "severity": "P0",
+    "problem": ""
+  },
+  {
+    "num": 16,
+    "name": "OCR Scan",
+    "status": -1,
+    "ok": false,
+    "summary": "<urlopen error [WinError 10061] 由于目标计算机积极拒绝，无法连接。>",
+    "severity": "P2",
+    "problem": "OCR服务在ai_service(8202)，需要有效文件路径"
+  },
+  {
+    "num": 17,
+    "name": "Semantic Search",
+    "status": 500,
+    "ok": false,
+    "summary": "Internal Server Error",
+    "severity": "P1",
+    "problem": ""
+  },
+  {
+    "num": 18,
+    "name": "AB Test Experiments",
+    "status": 200,
+    "ok": true,
+    "summary": "{'code': 200, 'message': 'ok', 'data': {'items': [], 'total': 0, 'page': 1, 'page_size': 20}}",
+    "severity": "P2",
+    "problem": ""
+  },
+  {
+    "num": 19,
+    "name": "SAG Analyze",
+    "status": 200,
+    "ok": true,
+    "summary": "{'conclusion': '', 'reasoning_chain': [{'step_name': 'single_reasoning', 'input': '### 推理模式：quality_review\\n\\n### 输入内容：\\n{\\n  \"text\": \"测试内容\"\\n}\\n\\n请基于",
+    "severity": "P2",
+    "problem": "需要AI API Key和SAG引擎支持"
+  }
+]

@@ -1,0 +1,46 @@
+feature_id: "F-MATOMO-07"
+name: "插件市场生态 — Matomo Marketplace第三方插件交易"
+version: "1.0.0"
+dimension: "场景"
+source_model: "marketplace.matomo.org — 第三方插件开发/发布/交易/安装的分发生态"
+one_liner: "类似App Store的插件市场：开发者发布付费/免费插件，用户一键安装扩展功能，平台抽成+生态共赢"
+what_it_does: >
+  Matomo Marketplace是一个连接插件开发者与用户的交易平台：
+  
+  面向开发者：发布免费或付费插件，上传到marketplace.matomo.org，供全球用户安装使用。
+  面向用户：在Matomo后台Marketplace页面浏览/搜索/一键安装插件，无需手动下载部署。
+  
+  插件类型包括：
+  — 新报告/可视化 (如热力图、A/B测试、漏斗分析)
+  — 数据导入 (从GA/其他平台迁移数据)
+  — 集成 (CRM/邮件营销/电商平台)
+  — 安全/合规 (额外隐私保护)
+  — 主题 (品牌化界面)
+  
+  生态数据：数百个插件可用，部分免费开源，部分商业付费。
+  Matomo提供SDK/文档/示例插件帮助开发者快速上手。
+  
+  核心价值：平台的价值 = 插件数量 × 插件质量 × 用户基数 — 生态飞轮效应。
+input:
+  - "插件开发者提交的plugin包 (ZIP)"
+  - "用户对扩展功能的需求"
+  - "插件的定价策略 (免费/付费)"
+output:
+  - "插件市场目录 (分类/搜索/评分)"
+  - "一键安装/更新/卸载机制"
+  - "开发者收益分成"
+sop:
+  - "step: 开发者编写插件 (Plugin基类+plugin.json)"
+  - "step: 提交到marketplace.matomo.org审核"
+  - "step: 用户通过Matomo后台Marketplace浏览"
+  - "step: 一键安装 (自动下载+激活)"
+  - "step: 插件扩展Matomo功能"
+quality_gate:
+  - "插件兼容当前Matomo版本"
+  - "插件有完整plugin.json元数据"
+  - "市场审核通过 (安全扫描)"
+  - "安装/卸载不破坏系统"
+dependencies:
+  - "Matomo核心插件管理框架"
+  - "marketplace.matomo.org"
+  - "网络连接 (安装时)"

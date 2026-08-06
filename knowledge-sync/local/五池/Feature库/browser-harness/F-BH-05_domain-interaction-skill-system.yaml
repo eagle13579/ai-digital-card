@@ -1,0 +1,24 @@
+name: "F-BH-05_领域+交互技能双轨系统"
+description: "浏览器自动化知识分为通用交互技能(18个)和领域特定技能(80个)的结构化体系"
+version: "1.0.0"
+dimension: "场景"
+source: "browser-harness"
+source_model: "五池/模型池/BH-09_交互技能与领域技能分离.md"
+author: "browser-use (MIT)"
+license: "MIT"
+
+mental_models:
+  - "知识分离: 交互技能(通用浏览器UI) vs 领域技能(特定网站)"
+  - "持续贡献: Agent发现的网站知识PR回仓库, 团队受益"
+
+components:
+  - "interaction-skills/: 18个浏览器UI机制参考文档"
+  - "domain-skills/: 80个覆盖60+网站的领域技能文档"
+
+products:
+  - "AI数字军团: 网站操作技能系统(SAG管道用)"
+  - "内容工厂: 各平台(抖音/小红书/知乎)操作知识库"
+
+integration:
+  type: "workflow"
+  setup: "Agent自动写入domain-skills/{site}/{topic}.md, 无需手动配置"

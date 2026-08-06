@@ -1,0 +1,33 @@
+name: AI工具集成模式
+version: 1.0.0
+description: The Agency吸收 - AI工具集成模式定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Aider
+  - Antigravity
+  - Claude Code
+  - Cursor
+  - Gemini CLI
+  - GitHub Copilot
+  - Kimi
+  - MCP Memory Backend Architect
+  - OpenClaw
+  - OpenCode
+  - Qwen
+  - Windsurf
+capabilities:
+  - Claude Code原生集成（.md + YAML frontmatter格式）
+  - Cursor编辑器规则集成（.mdc规则文件）
+  - GitHub Copilot智能体集成
+  - Aider约定文件集成（CONVENTIONS.md）
+  - Antigravity技能文件集成（SKILL.md）
+  - Gemini CLI扩展集成
+  - OpenCode/OpenClaw代理格式转换
+  - Cline/MCP内存架构集成
+  - Kimi/Qwen中国AI平台适配
+  - Windsurf编辑器工作流集成
+  - 跨工具Agent格式标准化与转换
+integration: 直接补充AI数字军团工具集成能力

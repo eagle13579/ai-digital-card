@@ -1,0 +1,59 @@
+{
+  "user_flow_bugs": [
+    {
+      "name": "Auth Me",
+      "detail": "Not Found"
+    },
+    {
+      "name": "Create Card",
+      "detail": "'latin-1' codec can't encode characters in position 10-13: Body ('测试名片') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded"
+    },
+    {
+      "name": "Create Brochure",
+      "detail": "'latin-1' codec can't encode characters in position 11-14: Body ('测试画册') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded"
+    },
+    {
+      "name": "AI Chat",
+      "detail": "'latin-1' codec can't encode characters in position 43-45: Body ('你好呀') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded "
+    },
+    {
+      "name": "AI Writing",
+      "detail": "'latin-1' codec can't encode characters in position 28-31: Body ('测试用户') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded"
+    },
+    {
+      "name": "Recommend",
+      "detail": "Method Not Allowed"
+    },
+    {
+      "name": "SAG Analyze",
+      "detail": "'latin-1' codec can't encode characters in position 11-12: Body ('测试') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded i"
+    },
+    {
+      "name": "Match Search",
+      "detail": "'latin-1' codec can't encode characters in position 11-17: Body ('寻找技术合伙人') is not valid Latin-1. Use body.encode('utf-8') if you want to send it enco"
+    }
+  ],
+  "security_bugs": [
+    {
+      "name": "Info Leak: /docs returns 200",
+      "detail": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <link type=\"text/css\" rel=\"styles"
+    },
+    {
+      "name": "Info Leak: /openapi.json returns 200",
+      "detail": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AI数字名片 API\",\"description\":\"AI数字名片后端服务 - 模块化架"
+    },
+    {
+      "name": "Info Leak: /metrics returns 200",
+      "detail": "# HELP ncard_http_requests_total Total HTTP requests by status class\n# TYPE ncar"
+    },
+    {
+      "name": "Info Leak: /redoc returns 200",
+      "detail": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <title>AI数字名片 API - ReDoc</title>"
+    },
+    {
+      "name": "No Rate Limiting: 10/10 same status",
+      "detail": "['404', '404', '404', '404', '404', '404', '404', '404', '404', '404']"
+    }
+  ],
+  "total_bugs": 13
+}

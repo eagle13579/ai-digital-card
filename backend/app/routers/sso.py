@@ -28,7 +28,7 @@ from app.services.sso_service import SSOService, get_sso_service
 
 logger = logging.getLogger("sso.router")
 
-router = APIRouter(prefix="/api/auth/sso", tags=["SSO 认证"])
+router = APIRouter(prefix="/api/v1/auth/sso", tags=["SSO 认证"])
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────

@@ -1,0 +1,11 @@
+feature:
+  id: F-GAIA-TASK-LOOP
+  name: gaia-task-loop
+  description: "烛龙觉醒任务闭环 — 全链路状态机验证（初始→进行中→已完成）"
+  source_project: "盖娅之城"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - 状态机

@@ -1,0 +1,15 @@
+name: AI应用安全防护
+version: 1.0.0
+status: production
+dimension: ai-security
+source: microsoft/generative-ai-for-beginners (Lesson 13)
+description: "AI系统安全威胁与防护: Data Poisoning数据投毒(标签翻转/特征投毒/后门攻击)、OWASP LLM Top 10(Prompt注入/供应链漏洞/过度依赖)、MITRE ATLAS对抗战术知识库、幻觉/有害内容防护"
+atoms:
+  - GAIB-16: 模型虚构识别与缓解
+products:
+  - 战狼红队: 安全攻击模拟
+  - 獬豸P8: 合规安全审查
+  - 产品安全门禁: LLM安全部署检查清单
+employees:
+  - 獬豸P8: AI安全专家
+  - 狴犴P8: 安全审计

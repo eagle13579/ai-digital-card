@@ -1,0 +1,98 @@
+# ============================================================================
+# Feature: 场景套餐与阶梯折扣定价
+# ============================================================================
+id: feature-scene-package-tiered-pricing
+name: 场景套餐与阶梯折扣定价
+module: models/employee.py (SCENE_PACKAGES) + engine/billing.py + api/billing.py
+status: active
+version: 0.1.0
+created: 2026-05-26
+
+# ── 描述 ────────────────────────────────────────────────────────────────────
+description_zh: |
+  提供5大预设场景套餐（获客起步¥699 → 全链通¥4159），
+  按中韩出海业务阶段打包AI员工组合，套餐价比单独购买节省30-35%。
+  同时支持DIY自由组合，自动计算租期折扣（季9折/年7折）和人数折扣（3-4人95折/5-6人9折/7人自动切换全链通套餐价）。
+
+description_en: |
+  5 pre-built scene packages (Acquisition ¥699 → Full-Chain ¥4159) bundled
+  by Korea-market-entry business stage, saving 30-35% vs individual purchase.
+  Also supports DIY combination with period discount (quarterly 10%/yearly 30%)
+  and tiered volume discount (3-4 ppl 5% / 5-6 ppl 10% / 7 ppl auto-switch to scene).
+
+# ── 定价数据 ────────────────────────────────────────────────────────────────
+pricing_tiers:
+  - id: scene-acquisition
+    name_zh: 获客起步
+    price: 699
+    original_price: 999
+    employees: [英招]
+    savings_pct: 30
+  - id: scene-compliance
+    name_zh: 合规无忧
+    price: 1259
+    original_price: 1798
+    employees: [徐准, 獬豸]
+    savings_pct: 30
+  - id: scene-market-entry
+    name_zh: 精准入韩
+    price: 2517
+    original_price: 3596
+    employees: [英招, 徐准, 乘黄, 计然]
+    savings_pct: 30
+  - id: scene-deal-closing
+    name_zh: 交易保障
+    price: 1818
+    original_price: 2597
+    employees: [计然, 獬豸, 烛龙]
+    savings_pct: 30
+  - id: scene-full-chain
+    name_zh: 全链通
+    price: 4159
+    original_price: 6393
+    employees: [英招, 徐准, 乘黄, 计然, 獬豸, 烛龙, 文鳐]
+    savings_pct: 35
+
+# ── 折扣规则 ────────────────────────────────────────────────────────────────
+discount_rules:
+  period:
+    monthly: 1.0   # 无折扣
+    quarterly: 0.9  # 9折
+    yearly: 0.7     # 7折
+  volume:
+    "3-4": 0.95     # 3-4名员工95折
+    "5-6": 0.9      # 5-6名员工9折
+    "7": "auto-switch-to-scene-full-chain"  # 7人自动切换全链通套餐价
+
+# ── API ─────────────────────────────────────────────────────────────────────
+api_endpoints:
+  - method: GET
+    path: /api/v1/market/scenes
+    description: "获取所有场景套餐列表"
+  - method: GET
+    path: /api/v1/market/scenes/{id}
+    description: "获取单个场景套餐详情"
+  - method: POST
+    path: /api/v1/billing/calculate
+    description: "计算价格（支持场景/DIY+租期）"
+  - method: GET
+    path: /api/v1/billing/compare/{employee_id}
+    description: "AI员工 vs 人类成本对比"
+  - method: POST
+    path: /api/v1/billing/refund
+    description: "按天计算退款金额"
+
+# ── 成本对比（vs 人类） ────────────────────────────────────────────────────
+cost_comparison:
+  ai_range: "¥699-4,159/月"
+  human_range: "¥24,000-30,000/月"
+  savings_example:
+    employee: "英招"
+    ai_monthly: 999
+    human_monthly: 25000
+    savings_pct: 96.0
+  ai_advantages:
+    - "7×24全天候工作"
+    - "中/韩/英三语支持"
+    - "¥0解雇免费"
+    - "100%知识可继承"

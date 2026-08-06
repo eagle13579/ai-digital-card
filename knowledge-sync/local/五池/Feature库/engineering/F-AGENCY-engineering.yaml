@@ -1,0 +1,50 @@
+name: 工程军团增强
+version: 1.0.0
+description: The Agency吸收 - 工程军团角色定义
+source: agency-agents
+
+products:
+  - 白泽军团: 自动匹配
+atoms:
+  - AI Data Remediation Engineer
+  - AI Engineer
+  - Autonomous Optimization Architect
+  - Backend Architect
+  - CMS Developer
+  - Codebase Onboarding Engineer
+  - Code Reviewer
+  - Database Optimizer
+  - Data Engineer
+  - DevOps Automator
+  - Email Intelligence Engineer
+  - Embedded Firmware Engineer
+  - Feishu Integration Developer
+  - Filament Optimization Specialist
+  - Frontend Developer
+  - Git Workflow Master
+  - Incident Response Commander
+  - Minimal Change Engineer
+  - Mobile App Builder
+  - Rapid Prototyper
+  - Security Engineer
+  - Senior Developer
+  - Software Architect
+  - Solidity Smart Contract Engineer
+  - SRE
+  - Technical Writer
+  - Threat Detection Engineer
+  - Voice AI Integration Engineer
+  - WeChat Mini Program Developer
+capabilities:
+  - 全栈Web开发（前端/后端/全栈架构）
+  - AI/ML模型开发与生产部署
+  - DevOps与基础设施自动化（CI/CD、SRE）
+  - 数据库优化与数据工程管道
+  - 移动应用开发（原生/跨平台/小程序）
+  - 安全工程与威胁检测
+  - 智能合约与区块链开发
+  - 嵌入式固件工程
+  - 代码审查与质量保障
+  - 技术文档与知识沉淀
+  - 语音AI与飞书集成开发
+integration: 直接补充AI数字军团工程能力

@@ -25,7 +25,7 @@ from app.database import get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/design-qa", tags=["DesignQA 设计审核"])
+router = APIRouter(prefix="/api/v1/design-qa", tags=["DesignQA 设计审核"])
 
 
 # ======================================================================

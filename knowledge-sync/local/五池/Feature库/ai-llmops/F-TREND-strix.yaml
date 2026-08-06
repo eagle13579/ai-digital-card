@@ -1,0 +1,16 @@
+name: Trending: strix
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-07-05
+description: Auto-absorbed from GitHub Trending: usestrix/strix
+atoms:
+  - TREND-usestrix-strix-01: Strix
+  - TREND-usestrix-strix-02: agent, api, pipeline 模式
+  - TREND-usestrix-strix-03: usestrix/strix的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

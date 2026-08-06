@@ -1,0 +1,50 @@
+# Feature: F-REVERSE-INTERVIEW
+# 反向采访法 — 让AI主动采访用户，自动生成配置文档
+
+name: F-REVERSE-INTERVIEW
+version: 1.0.0
+status: draft
+domain: cognitive
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - A1-反向采访法
+
+input_schema:
+  type: object
+  properties:
+    scenario:
+      type: string
+      enum: [soul_init, employee_onboarding, product_onboarding]
+    user_response:
+      type: string
+
+output_schema:
+  type: object
+  properties:
+    user_profile: { type: object }
+    soul_document: { type: object }
+    role_setting: { type: object }
+
+pipeline:
+  - stage: 1
+    name: 反向采访开始
+    prompt: "我是你的AI助手。为了让我更好地服务你，我需要了解一些基本信息。让我来问你几个问题..."
+  - stage: 2
+    name: 多轮信息收集
+    count: 5-8轮
+    template: 从角色/工作流/原则/偏好/痛点五维度逐层深入
+  - stage: 3
+    name: 自动生成配置
+    output_format: 三个核心文档（画像+灵魂+身份）
+
+target_products:
+  - 白泽控制台（:5010）
+  - 招贤SaaS（:5020）
+  - 文鳐（私人助理）
+
+target_employees:
+  - 白泽
+  - 文鳐
+  - 招贤

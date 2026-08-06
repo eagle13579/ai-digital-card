@@ -1,0 +1,42 @@
+# ⚙️ AI JSON容错解析
+id: F-AMOEBA-JSON-FIX-01
+name: AI JSON容错解析
+dimension: 基本功
+description: 3层降级JSON解析，自动修复AI返回的格式错误（注释/尾部逗号/单引号/裸key）
+source_model: 阿米巴三阶段经营闭环
+status: active
+version: "1.0"
+created: 2026-06-14
+
+products:
+  - 通用: 自动匹配
+input:
+  - AI返回的原始文本（可能包含markdown包裹、注释、格式错误）
+
+output:
+  - 解析后的JSON对象
+
+sop: |
+  第1层：JSON.parse 直接解析
+    → 成功则返回
+    → 失败则进入第2层
+
+  第2层：提取{} + 清理
+    a. text.match(/\{[\s\S]*\}/) 提取最外层大括号
+    b. 去注释：.replace(/\/\/.*$/gm, "")
+    c. 去尾部逗号：.replace(/,\s*}/g, "}") + .replace(/,\s*\]/g, "]")
+    d. 去换行：.replace(/\n/g, " ")
+    e. 合并空格：.replace(/\s+/g, " ")
+    → 尝试 JSON.parse → 成功则返回 → 失败则进入第3层
+
+  第3层：逐词修复
+    a. 修复裸key：.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":')
+    b. 修复单引号：.replace(/:\s*'([^']*)'/g, ':"$1"')
+    → JSON.parse → 成功则返回 → 失败则throw
+
+quality_gate:
+  - 必须3层都试过才throw
+  - 第2层的正则必须覆盖所有常见格式错误
+  - 修复后的JSON不能改变原始语义
+
+draft: false

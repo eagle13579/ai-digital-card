@@ -1,0 +1,12 @@
+# 反AI语言门禁
+id: "F-BSC-08"
+name: "反AI语言门禁"
+dimension: "基本功"
+description: >
+  9种AI气味模式检测+替换系统：「不是X而是Y」「关键在于」「装饰性破折号」「总结腔」「教学腔」「误导性诗意开篇」等。用行为替代解释，用图像替代主题，用事件替代过渡。
+atoms:
+  - "QM-07"
+status: "active"
+priority: "P0"
+created: "2026-06-15"
+source: "qiaomu-novel-generator"

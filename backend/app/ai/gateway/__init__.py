@@ -4,3 +4,9 @@ This package defines the stable abstract contracts for AI model invocation.
 Business code MUST depend only on these Protocols, never on concrete implementations.
 Adapters include DeepSeekAdapter, OpenAIAdapter, AnthropicAdapter, OllamaAdapter, etc.
 """
+
+from app.ai.gateway.model_registry import ModelRegistry
+
+__all__ = [
+    "ModelRegistry",
+]

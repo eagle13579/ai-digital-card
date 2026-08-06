@@ -123,8 +123,8 @@ class BrochureRenderer:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{brochure.title} - AI数字名片</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stpageflip@1.0.4/dist/stpageflip.min.js"></script>
+    <script src="https://cdn.tailwindcss.com" onerror="window.__tailwindFailed=true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stpageflip@1.0.4/dist/stpageflip.min.js" onerror="window.__stpageflipFailed=true"></script>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -234,6 +234,29 @@ class BrochureRenderer:
             font-size: 12px;
             padding: 8px 0 24px;
         }}
+        /* ===== CDN 降级样式 ===== */
+        /* Tailwind 降级 — 基础 normalize/hold 样式 */
+        .tailwind-failed body, .tailwind-failed div, .tailwind-failed span,
+        .tailwind-failed h1, .tailwind-failed h2, .tailwind-failed button {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }}
+        /* StPageFlip 降级 — 平铺模式（纵向滚动） */
+        .page-flip-page.flat-mode {{
+            margin-bottom: 20px !important;
+            position: relative !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+            min-height: 200px;
+        }}
+        .flipbook-flat .page-flip-page {{
+            margin-bottom: 20px !important;
+            position: relative !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+            min-height: 200px;
+        }}
     </style>
 </head>
 <body>
@@ -253,18 +276,43 @@ class BrochureRenderer:
     <div class="view-count">👁️ 已浏览 {brochure.view_count} 次</div>
 
     <script>
+        // === CDN 降级检测 ===
+        if (window.__tailwindFailed) {{
+            document.documentElement.classList.add('tailwind-failed');
+        }}
+
         const flipbook = document.getElementById('flipbook');
-        if (typeof StPageFlip !== 'undefined') {{
-            const flip = new StPageFlip(flipbook, {{
-                width: 320,
-                height: 460,
-                showCover: true,
-                maxShadowOpacity: 0.5,
-                flippingTime: 600,
-                autoSize: true,
-                swipeDistance: 30,
+
+        if (window.__stpageflipFailed) {{
+            // StPageFlip 加载失败 → 平铺降级模式
+            flipbook.classList.add('flipbook-flat');
+            // 确保所有页面可见（移除 StPageFlip 可能附加的任何隐藏样式）
+            document.querySelectorAll('.page-flip-page').forEach(function(el) {{
+                el.style.position = 'relative';
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.transform = 'none';
             }});
-            flip.loadFromHTML(document.querySelectorAll('.page-flip-page'));
+        }} else if (typeof StPageFlip !== 'undefined') {{
+            try {{
+                const flip = new StPageFlip(flipbook, {{
+                    width: 320,
+                    height: 460,
+                    showCover: true,
+                    maxShadowOpacity: 0.5,
+                    flippingTime: 600,
+                    autoSize: true,
+                    swipeDistance: 30,
+                }});
+                flip.loadFromHTML(document.querySelectorAll('.page-flip-page'));
+            }} catch (e) {{
+                // 初始化异常时降级为平铺模式
+                flipbook.classList.add('flipbook-flat');
+                console.warn('StPageFlip 初始化失败，已降级为平铺模式:', e);
+            }}
+        }} else {{
+            // StPageFlip 未定义 → 平铺降级模式
+            flipbook.classList.add('flipbook-flat');
         }}
 
         function shareBrochure() {{
