@@ -199,6 +199,7 @@ def create_app():
     from app.routers.membership import router as membership_router
     from app.routers.gaia_router import router as gaia_router
     from app.routers.distill_router import router as distill_router
+    from app.routers.memory_router import router as memory_router
     from app.crm.crm_router import router as crm_router
     from app.crm.campaign_router import router as campaign_router
     from app.crm.prediction_router import router as prediction_router
@@ -337,6 +338,7 @@ def create_app():
     app.include_router(design_qa_router)
     app.include_router(gaia_router)
     app.include_router(distill_router)
+    app.include_router(memory_router)
     app.include_router(crm_router)
     app.include_router(campaign_router)
     app.include_router(prediction_router)
