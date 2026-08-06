@@ -102,3 +102,4 @@ backend/scripts/.gaia_palace*
 backend/data/
 frontend/dist.bak_*/
 >>>>>>> origin/master
+backend/data/jwt_rsa_public.pem
