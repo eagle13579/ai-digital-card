@@ -30,6 +30,7 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -252,6 +253,9 @@ def create_legion_agent(
         agent.register_tool("remember_from_legion", _make_remember(employee))
         agent.register_tool("memorize_to_legion", _make_memorize(employee))
 
+    # 7. Register shared Gaia learning tool — 一个人学会、全员共享
+    agent.register_tool("learn_from_gaia", _make_learn_from_gaia(employee))
+
     logger.info(
         "Legion agent created: %s → %s (soul=%s, tools=%d, models=%d)",
         agent_type,
@@ -328,6 +332,91 @@ def _make_memorize(employee: LegionEmployee):
         return f"Memory stored for {employee.name} (category: {category})"
 
     return memorize_to_legion
+
+
+# 部门 → 专业学习关键词（决定员工向盖娅大脑学什么）
+DEPT_LEARN_KEYWORDS: dict[str, list[str]] = {
+    "backend": ["架构", "后端", "API", "服务", "部署", "性能优化"],
+    "qa": ["测试", "质量", "自动化测试", "回归", "CI"],
+    "security": ["安全", "审计", "合规", "漏洞", "渗透", "隐私"],
+    "growth": ["增长", "获客", "销售", "匹配", "客户", "营销"],
+    "knowledge": ["知识", "蒸馏", "文档", "最佳实践", "方法论"],
+    "architecture": ["架构", "设计", "模式", "系统", "微服务"],
+    "data": ["数据", "分析", "模型", "向量", "推荐"],
+    "sre": ["运维", "监控", "日志", "故障", "告警", "部署"],
+    "support": ["支持", "FAQ", "客户服务", "问题解决"],
+    "design_qa": ["设计", "体验", "UI", "质量"],
+    "research": ["论文", "GitHub", "开源", "研究", "AI前沿", "最新"],
+    "compliance": ["合规", "法规", "安全", "数据保护", "审计"],
+    "acquisition": ["获客", "买家", "匹配", "销售", "市场", "客户"],
+    "general": ["AI", "模式", "方案", "优化", "最佳实践", "技术"],
+}
+
+
+def _make_learn_from_gaia(employee: LegionEmployee):
+    """Return a callable tool that queries the Gaia knowledge base.
+
+    实现「一个人学会、全员共享」：员工工作/空闲时按专业关键词
+    检索盖娅大脑知识库（gaia_knowledge），获取团队最新沉淀。
+    """
+
+    async def learn_from_gaia(query: str = "", limit: int = 5) -> list[dict[str, Any]]:
+        """Query the shared Gaia brain knowledge base for latest learnings.
+
+        Args:
+            query: Optional explicit search term; defaults to the employee's
+                   department-relevant keywords when empty.
+            limit: Max results (default 5).
+
+        Returns:
+            List of knowledge entries {title, knowledge_type, content, tags}.
+        """
+        import urllib.parse
+        import urllib.request
+
+        keywords = DEPT_LEARN_KEYWORDS.get(
+            getattr(employee, "role_id", "") or "",
+            DEPT_LEARN_KEYWORDS.get("general", []),
+        )
+        # 用 identity.role 或 capabilities 匹配更精准的部门关键词
+        role = (employee.identity or {}).get("role", "") if hasattr(employee, "identity") else ""
+        if not query:
+            for dept_key, kw in DEPT_LEARN_KEYWORDS.items():
+                if dept_key in ("general",):
+                    continue
+                if role and dept_key in str(role).lower():
+                    keywords = kw
+                    break
+                if any(dept_key in str(cap).lower() for cap in getattr(employee, "capabilities", []) or []):
+                    keywords = kw
+                    break
+            else:
+                keywords = DEPT_LEARN_KEYWORDS.get(
+                    role.lower().strip() if role else "",
+                    DEPT_LEARN_KEYWORDS.get("general", []),
+                )
+        q = query or " ".join(keywords[:3])
+        base = "http://127.0.0.1:8201"
+        url = f"{base}/api/v1/gaia/knowledge?query={urllib.parse.quote(q)}&limit={int(limit)}"
+        try:
+            req = urllib.request.Request(url, headers={"Accept": "application/json"})
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            items = (data.get("data") or {}).get("items") or []
+            return [
+                {
+                    "title": it.get("title", ""),
+                    "knowledge_type": it.get("knowledge_type", ""),
+                    "content": (it.get("content") or "")[:400],
+                    "tags": it.get("tags", []),
+                }
+                for it in items[: int(limit)]
+            ]
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("learn_from_gaia failed for %s: %s", employee.name, exc)
+            return [{"title": f"学习失败（知识库暂不可达）", "content": str(exc), "knowledge_type": "error", "tags": []}]
+
+    return learn_from_gaia
 
 
 # ── Convenience: Create all agents at once ────────────────────────

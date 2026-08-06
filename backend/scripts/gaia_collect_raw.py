@@ -42,25 +42,47 @@ def _http_get(url: str, timeout: int = 25) -> str | None:
         return None
 
 
+# GitHub 采集 topic 集（覆盖最新 AI 方向，每 topic 取 top N 合并去重）
+GITHUB_TOPICS = [
+    "ai", "llm", "agent", "deep-learning", "multimodal",
+    "rag", "ai-agents", "machine-learning",
+]
+
+
 def _collect_github() -> list[dict]:
-    raw = _http_get("https://api.github.com/search/repositories?q=topic:ai+created:>2026-07-01&sort=stars&order=desc&per_page=15")
-    if not raw:
-        return []
-    try:
-        repos = json.loads(raw)
-        items = []
-        for r in repos.get("items", [])[:15]:
-            items.append({
-                "source": "github",
-                "title": f"[GitHub] {r.get('full_name', '')}",
-                "content": f"描述: {r.get('description') or ''}\nStars: {r.get('stargazers_count', 0)}\n语言: {r.get('language') or 'N/A'}\nURL: {r.get('html_url', '')}",
-                "tags": ["github", "开源", "AI"],
-                "raw": {"full_name": r.get("full_name"), "desc": r.get("description"), "stars": r.get("stargazers_count"), "lang": r.get("language"), "url": r.get("html_url")},
-            })
-        return items
-    except Exception as e:
-        print(f"  [WARN] GitHub 解析失败: {e}", file=sys.stderr)
-        return []
+    """采集 GitHub 最新热门 AI 项目（多 topic，每 topic top 8，合并去重取前 20）。"""
+    seen: set[str] = set()
+    items: list[dict] = []
+    for topic in GITHUB_TOPICS:
+        url = (
+            "https://api.github.com/search/repositories"
+            f"?q=topic:{topic}+created:>2026-07-01&sort=stars&order=desc&per_page=8"
+        )
+        raw = _http_get(url)
+        if not raw:
+            continue
+        try:
+            repos = json.loads(raw)
+            for r in repos.get("items", [])[:8]:
+                full_name = r.get("full_name", "")
+                if not full_name or full_name in seen:
+                    continue
+                seen.add(full_name)
+                items.append({
+                    "source": "github",
+                    "title": f"[GitHub] {full_name}",
+                    "content": (
+                        f"描述: {r.get('description') or ''}\n"
+                        f"Stars: {r.get('stargazers_count', 0)}\n"
+                        f"语言: {r.get('language') or 'N/A'}\n"
+                        f"Topic: {topic}\nURL: {r.get('html_url', '')}"
+                    ),
+                    "tags": ["github", "开源", topic, "AI"],
+                    "raw": {"full_name": full_name, "desc": r.get("description"), "stars": r.get("stargazers_count"), "lang": r.get("language"), "url": r.get("html_url"), "topic": topic},
+                })
+        except Exception as e:
+            print(f"  [WARN] GitHub 解析失败 ({topic}): {e}", file=sys.stderr)
+    return items[:20]  # 对齐用户要求：GitHub 前 20
 
 
 def _collect_arxiv() -> list[dict]:
