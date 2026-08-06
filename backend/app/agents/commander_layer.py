@@ -54,6 +54,7 @@ from app.agents.orchestra_pipeline import (
     ParadigmAdapter,
     ContextDistillation,
 )
+from app.agents.plan_mode_tracker import PlanModeTracker
 
 
 # ── 指挥官配置 ────────────────────────────────────────────────────────────────
@@ -149,6 +150,10 @@ class CommanderLayer:
         self._task_start_time: dict[str, float] = {}
         """task_id → 开始时间戳。"""
 
+        # ── Plan 模式跟踪 ──────────────────────────────────────────────
+        self._plan_tracker: PlanModeTracker = PlanModeTracker()
+        """Plan 模式跟踪器，处理复杂任务的自动拆解与进度管理。"""
+
     # ── 指挥官五合一 API ──────────────────────────────────────────────────
 
     def decompose(self, goal: str) -> list[SubTask]:
@@ -232,6 +237,12 @@ class CommanderLayer:
             - SubAgentSpec（来自 DynamicFactory.spawn()）
             - SubTask（来自 CommanderLayer.decompose()）
 
+        Plan 模式集成：
+            当收到来自 decompose() 的多步任务时，自动进入 Plan 模式：
+                - 创建 plan.md 记录所有子任务
+                - 每步执行后检查 plan.md 中的 [ ] 剩余数量
+                - 0 个 [ ] 时自动退出 Plan 模式
+
         Args:
             spec: 子任务规格。
 
@@ -258,6 +269,41 @@ class CommanderLayer:
                 f"不支持的规格类型: {type(spec).__name__}，"
                 f"需要 SubAgentSpec 或 SubTask"
             )
+
+        # Step 1.5: Plan 模式 — 自动进入（当来自 decompose 的多步任务时）
+        # 触发条件：当前不在 Plan 模式中，且任务来自 commander 生成的 SubTask
+        if not self._plan_tracker._in_plan_mode() and isinstance(spec, SubTask):
+            # 检查是否存在其他待处理或执行中的 commander 子任务
+            pending_tasks = [
+                t
+                for t in self._tasks.values()
+                if t.task_id.startswith("cmd_") and t.status in ("pending", "running")
+            ]
+            # 加上当前任务仍然 > 1，说明是多步任务
+            if len(pending_tasks) + 1 > 1:
+                # 收集所有相关任务
+                all_cmd_tasks = [
+                    {"task_id": t.task_id, "goal": t.goal}
+                    for t in self._tasks.values()
+                    if t.task_id.startswith("cmd_")
+                ]
+                # 确保当前任务也在列表中
+                current_entry = {"task_id": sub_task.task_id, "goal": sub_task.goal}
+                if current_entry not in all_cmd_tasks:
+                    all_cmd_tasks.append(current_entry)
+
+                # 自动创建 plan.md
+                goal = sub_task.goal or "复杂多步任务"
+                plan_path = self._plan_tracker._create_plan_from_tasks(
+                    tasks=all_cmd_tasks,
+                    goal=goal,
+                    plan_dir=None,  # 使用默认的 ./plans/ 目录
+                )
+                print(
+                    f"[CommanderLayer] 已自动进入 Plan 模式: "
+                    f"plan_path={plan_path}, "
+                    f"tasks={len(all_cmd_tasks)}"
+                )
 
         # Step 2: 记录开始状态
         task_id = sub_task.task_id
@@ -319,6 +365,22 @@ class CommanderLayer:
                     status="pending",
                 )
                 self._register_task(child_task)
+
+        # Step 6: Plan 模式 — 标记完成 + 检查进度
+        if self._plan_tracker._in_plan_mode():
+            # 6a: 将当前 task_id 标记为已完成
+            self._plan_tracker._mark_step_completed(task_id)
+
+            # 6b: 检查 plan.md 中剩余 [ ] 数量
+            remaining = self._plan_tracker._check_plan_completion()
+
+            # 6c: 0 个 [ ] 时自动退出 Plan 模式
+            if remaining == 0:
+                self._plan_tracker._exit_plan_mode()
+                print(
+                    f"[CommanderLayer] 所有计划任务已完成，"
+                    f"已自动退出 Plan 模式"
+                )
 
         return sub_result
 

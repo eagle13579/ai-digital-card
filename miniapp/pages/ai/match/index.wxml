@@ -1,4 +1,12 @@
 <view class="page-container">
+  <!-- 模式切换: 人脉匹配(标签) | 企业匹配(三蛋蛋企业库) -->
+  <view class="mode-tabs">
+    <view class="mode-tab {{mode === 'people' ? 'active' : ''}}" data-mode="people" bindtap="switchMode">{{_t.matchPeopleTab}}</view>
+    <view class="mode-tab {{mode === 'company' ? 'active' : ''}}" data-mode="company" bindtap="switchMode">{{_t.matchCompanyTab}}</view>
+  </view>
+
+  <!-- ══════════ 人脉匹配 (自有标签引擎) ══════════ -->
+  <block wx:if="{{mode === 'people'}}">
   <view class="section-header">
     <text class="section-title">{{_t.matchTitle}}</text>
     <text class="section-subtitle">{{_t.matchSubtitle}}</text>
@@ -82,4 +90,73 @@
     <view class="spinner"></view>
     <text class="loading-text" style="margin-top:12px;font-size:var(--text-sm);color:var(--text-tertiary);display:block;text-align:center;">{{_t.loadingText}}</text>
   </view>
+  </block>
+
+  <!-- ══════════ 企业匹配 (三蛋蛋 1000万企业库) ══════════ -->
+  <block wx:if="{{mode === 'company'}}">
+  <view class="section-header">
+    <text class="section-title">{{_t.companyMatchTitle}}</text>
+    <text class="section-subtitle">{{_t.companyMatchSubtitle}}</text>
+  </view>
+
+  <!-- 配额提示 -->
+  <view class="quota-bar" wx:if="{{companyQuota}}">
+    <text class="quota-text">{{_t.companyQuotaLabel}} {{companyQuota.used}}/{{companyQuota.limit}}</text>
+  </view>
+
+  <!-- 卖家信息表单 -->
+  <view class="company-form">
+    <view class="form-item">
+      <text class="form-label">{{_t.companyNameLabel}}</text>
+      <input class="form-input" value="{{companyName}}" bindinput="onCompanyNameInput" placeholder="{{_t.companyNamePlaceholder}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">{{_t.productLabel}}</text>
+      <input class="form-input" value="{{product}}" bindinput="onProductInput" placeholder="{{_t.productPlaceholder}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">{{_t.businessLabel}}</text>
+      <input class="form-input" value="{{business}}" bindinput="onBusinessInput" placeholder="{{_t.businessPlaceholder}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">{{_t.typicalCustomersLabel}}</text>
+      <input class="form-input" value="{{typicalCustomers}}" bindinput="onTypicalCustomersInput" placeholder="{{_t.typicalCustomersPlaceholder}}" />
+    </view>
+    <button class="btn-primary" bindtap="searchCompanyMatch" loading="{{companyLoading}}">{{_t.searchCompanyMatch}}</button>
+  </view>
+
+  <!-- 企业匹配结果 -->
+  <view class="company-result-header" wx:if="{{companyMatches.length > 0}}">
+    <text class="company-result-count">
+      {{_t.companyResultCount}}{{companyTotalLowerBound ? '10000+' : companyTotal}}
+    </text>
+  </view>
+  <view class="match-list company-list">
+    <view class="match-item company-item" wx:for="{{companyMatches}}" wx:key="cname">
+      <view class="company-rank">{{item.rank}}</view>
+      <view class="match-info">
+        <text class="match-name">{{item.cname}}</text>
+        <text class="match-company" wx:if="{{item.industryType || item.industryMain}}">{{item.industryType || item.industryMain}}</text>
+        <text class="match-position" wx:if="{{item.province || item.city}}">{{item.province}} {{item.city}}</text>
+        <view class="match-tags" wx:if="{{item.contacts && item.contacts.length > 0}}">
+          <text class="match-tag" wx:for="{{item.contacts}}" wx:for-item="contact" wx:key="index">{{contact.name_masked || '对接人'}} · {{contact.position}}</text>
+        </view>
+      </view>
+      <view class="match-right" wx:if="{{item.source === 'alliance'}}">
+        <text class="alliance-badge">{{_t.allianceBadge}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 企业匹配翻页 -->
+  <view class="load-more" wx:if="{{companyHasMore}}" bindtap="loadCompanyMore">
+    <text>{{companyLoading ? _t.loadingText : _t.loadMore}}</text>
+  </view>
+
+  <!-- 企业匹配空状态 -->
+  <view class="empty-state" wx:if="{{!companyLoading && companyMatches.length == 0}}">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit" />
+    <text class="text">{{_t.companyMatchEmpty}}</text>
+  </view>
+  </block>
 </view>

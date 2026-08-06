@@ -24,6 +24,7 @@ import requests
 
 from .crm_base import CrmBase, ContactData, SyncResult
 from .salesforce_stub import SalesforceStub
+from .soql_utils import soql_escape, validate_email, validate_limit
 
 logger = logging.getLogger(__name__)
 
@@ -229,13 +230,20 @@ class SalesforceConnector(CrmBase):
             self._real_or_stub()
             return self._stub.search_contacts(query, limit)
 
-        # SOQL 模糊搜索
-        safe_query = query.replace("'", "\\'")
+        # 安全处理：limit 走 int 白名单（非法值回退默认 20）
+        try:
+            safe_limit = validate_limit(limit)
+        except ValueError as e:
+            logger.warning("SalesforceConnector: 非法 limit=%r → %s，回退默认 20", limit, e)
+            safe_limit = 20
+
+        # SOQL 参数化模糊搜索：对 ' % _ \\ 全量转义，防注入 + 防 LIKE 通配符注入
+        safe_query = soql_escape(query)
         soql = (
             f"SELECT Id, FirstName, LastName, Email, Phone, Title "
             f"FROM Contact "
             f"WHERE Name LIKE '%{safe_query}%' OR Email LIKE '%{safe_query}%' "
-            f"LIMIT {limit}"
+            f"LIMIT {safe_limit}"
         )
         from urllib.parse import quote
         url = f"{self._instance_url}/services/data/{SF_API_VERSION}/query?q={quote(soql)}"
@@ -248,7 +256,7 @@ class SalesforceConnector(CrmBase):
                     mapped = _unmap_from_sf(rec)
                     results.append(ContactData.from_dict(mapped))
                 logger.info("SalesforceConnector: search(%s) → %d 条", query, len(results))
-                return results[:limit]
+                return results[:safe_limit]
             return []
         except Exception as e:
             logger.warning("Salesforce search_contacts 失败 → 降级到存根: %s", e)
@@ -364,8 +372,14 @@ class SalesforceConnector(CrmBase):
         return result
 
     def _find_by_email(self, email: str) -> Optional[dict]:
-        """通过 SOQL 按 Email 查找联系人。"""
-        safe_email = email.replace("'", "\\'")
+        """通过 SOQL 按 Email 查找联系人（Email 白名单 + SOQL 严格转义，防注入）。"""
+        # Email 格式白名单：非法值直接返回 None，不拼入 SOQL
+        try:
+            safe_email = validate_email(email)
+        except ValueError as e:
+            logger.warning("SalesforceConnector: 非法 Email → %s", e)
+            return None
+        safe_email = soql_escape(safe_email)
         soql = f"SELECT Id, FirstName, LastName, Email FROM Contact WHERE Email = '{safe_email}' LIMIT 1"
         from urllib.parse import quote
         url = f"{self._instance_url}/services/data/{SF_API_VERSION}/query?q={quote(soql)}"

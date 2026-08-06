@@ -12,7 +12,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.crawlee_service import crawl_service, CardResult, health_check as svc_health
+from crawlee_service import crawl_service, CardResult, health_check as svc_health
 
 logger = logging.getLogger(__name__)
 

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_standards import PaginatedResponse, paginate_cursor
 from app.database import get_db
+from app.dependencies import get_owned_brochure
 from app.models.brochure import Brochure, Page
 from app.models.user import User
 from app.models.tag import UserTag
@@ -248,15 +249,9 @@ async def list_brochures(
 
 @router.get("/{brochure_id}", response_model=BrochureResponse)
 async def get_brochure(
-    brochure_id: int,
-    db: AsyncSession = Depends(get_db),
+    brochure: Brochure = Depends(get_owned_brochure),
 ):
-    """获取画册详情（含页面数据）"""
-    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-
+    """获取画册详情（含页面数据）— 需登录，私有画册仅本人/管理员可见"""
     resp = BrochureResponse.model_validate(brochure)
     resp.pages = [PageSchema.model_validate(p) for p in brochure.pages]
     return resp

@@ -1,6 +1,6 @@
 """Webhook 事件分发服务：
 - 根据事件类型查找所有匹配的活跃订阅
-- 异步发送 HTTP POST 请求（带 HMAC-SHA256 签名）
+- 发送 HTTP POST 请求（带 HMAC-SHA256 签名），通过 safe_fetch 实现 SSRF 防护
 - 支持重试机制
 - 记录触发状态
 """
@@ -10,7 +10,7 @@ import logging
 from datetime import datetime
 from typing import Any
 
-import httpx
+from app.services.safe_fetch import safe_fetch_raw, SSRFError
 
 logger = logging.getLogger("webhook_dispatcher")
 
@@ -19,13 +19,7 @@ class WebhookDispatcher:
     """Webhook 事件分发器"""
 
     def __init__(self) -> None:
-        self._client: httpx.AsyncClient | None = None
         self.stats: dict[str, dict] = {}
-
-    async def get_client(self) -> httpx.AsyncClient:
-        if self._client is None:
-            self._client = httpx.AsyncClient(timeout=30.0)
-        return self._client
 
     async def dispatch(
         self,
@@ -70,7 +64,6 @@ class WebhookDispatcher:
             logger.debug("事件 %s 无匹配 webhook 订阅", event_type)
             return results
 
-        client = await self.get_client()
         event_payload = {
             "event": event_type,
             "timestamp": datetime.utcnow().isoformat() + "Z",
@@ -79,7 +72,7 @@ class WebhookDispatcher:
 
         for sub in matched:
             result = await self._send_single(
-                client, sub, event_payload, db_session_factory
+                sub, event_payload, db_session_factory
             )
             results.append(result)
 
@@ -87,7 +80,6 @@ class WebhookDispatcher:
 
     async def _send_single(
         self,
-        client: httpx.AsyncClient,
         subscription: "WebhookSubscription",
         payload: dict[str, Any],
         db_session_factory,
@@ -117,17 +109,20 @@ class WebhookDispatcher:
             try:
                 if attempt > 1:
                     await asyncio.sleep(delays[attempt - 2])
-                resp = await client.post(
+                status_code, _ = await asyncio.to_thread(
+                    safe_fetch_raw,
                     subscription.url,
+                    max_bytes=1024 * 1024,
+                    timeout=subscription.timeout_seconds,
+                    method="POST",
                     content=body,
                     headers=headers,
-                    timeout=subscription.timeout_seconds,
                 )
-                last_code = resp.status_code
-                if resp.status_code < 500:
+                last_code = status_code
+                if status_code < 500:
                     success = True
                 else:
-                    last_error = f"HTTP {resp.status_code}: {resp.text[:200]}"
+                    last_error = f"HTTP {status_code}"
             except Exception as e:
                 last_error = str(e)
                 logger.warning(
@@ -183,9 +178,8 @@ class WebhookDispatcher:
         }
 
     async def close(self) -> None:
-        if self._client:
-            await self._client.aclose()
-            self._client = None
+        """No-op: no persistent client to close (safe_fetch creates per-request clients)."""
+        pass
 
 
 # 全局单例

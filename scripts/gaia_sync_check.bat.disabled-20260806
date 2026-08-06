@@ -1,0 +1,6 @@
+@echo off
+cd /d D:\AI数智名片
+git pull origin master
+copy /Y backend\scripts\gaia_sync_local.py scripts\gaia_sync_local.py
+cd /d D:\AI数智名片\scripts
+python gaia_sync_local.py --both >> D:\AI数智名片\logs\gaia_sync.log 2>&1

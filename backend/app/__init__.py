@@ -221,6 +221,8 @@ def create_app():
     from app.routers.accuracy_gate_router import router as accuracy_gate_router
     # ── Dify 工具插件 + 应用编排服务 ──
     from app.routers.dify_tool_routes import router as dify_tool_router
+    # ── Graph 知识图谱分析服务 ──
+    from app.routers.graph_analyze import router as graph_analyze_router
 
     # ── ds2api 服务模块 — SSE引擎 + 工具调用服务 ──
     from services.sse_engine import SseEngineService, SSEStreamEngine, SSEParser
@@ -268,6 +270,8 @@ def create_app():
     app.include_router(tag_router)
     app.include_router(ai_assist_router)
     app.include_router(match_router)
+    from app.routers.transphee import router as transphee_router
+    app.include_router(transphee_router)
     from app.routers.inference_gateway import router as inference_gateway_router
     app.include_router(inference_gateway_router)
     app.include_router(brochure_alias_router)
@@ -340,6 +344,8 @@ def create_app():
     app.include_router(accuracy_gate_router)
     # ── Dify 工具插件 + 应用编排服务 ──
     app.include_router(dify_tool_router)
+    # ── Graph 知识图谱分析服务 ──
+    app.include_router(graph_analyze_router)
     # ── F0 多AI Provider Driver 路由 ──
     from app.ai.gateway.provider_router import router as provider_router
     app.include_router(provider_router)

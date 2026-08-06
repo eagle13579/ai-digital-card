@@ -6,6 +6,7 @@ employees. It handles:
     - Cron job scheduling and execution
     - Event routing via EventBusProtocol
     - Status aggregation and reporting
+    - MultiLLMFailover — 多 LLM Session 高可用故障转移
 
 Singleton — one runtime per process.
 """
@@ -18,6 +19,17 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.agents.base_agent import BaseAgent, AgentStatus, CronJob
+
+# Debug: check sys.modules before importing baize_libs
+import sys as _sys_debug
+_has_bl = 'baize_libs' in _sys_debug.modules
+_has_bl_ga = 'baize_libs.generic_agent' in _sys_debug.modules
+print(f"[agent_runtime] baize_libs in sys.modules: {_has_bl}")
+print(f"[agent_runtime] baize_libs.generic_agent in sys.modules: {_has_bl_ga}")
+print(f"[agent_runtime] paths with baize: {[p for p in _sys_debug.path if 'baize' in p.lower() or '记忆' in p]}")
+
+from baize_libs.generic_agent.agent_safety import TurnProgressiveWarnings, TurnSignal
+from baize_libs.generic_agent.mixin_failover import MultiLLMFailover
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +75,75 @@ class AgentRuntime:
         self._scheduler_task: asyncio.Task[None] | None = None
         self._event_listener_task: asyncio.Task[None] | None = None
         self._start_time: datetime | None = None
+
+        # ── MultiLLMFailover — 多 LLM Session 高可用 ─────────────────────
+        self.llm_failover: MultiLLMFailover | None = None
+        """MultiLLMFailover 实例, 提供 LLM 调用故障转移能力."""
+
+        # ── 渐进式安全警告 ─────────────────────────────────────────────
+        self._turn_counter: int = 0
+        """当前执行轮次计数器。每调用 dispatch_event() 递增。"""
+
+        self._progressive_warnings: TurnProgressiveWarnings = TurnProgressiveWarnings()
+        """渐进式警告跟踪器，根据轮次施加安全约束。"""
+
+    # ── LLM High Availability ────────────────────────────────────────────
+
+    def set_llm_failover(
+        self,
+        failover: MultiLLMFailover,
+    ) -> None:
+        """注入 MultiLLMFailover 实例, 启用 LLM 高可用故障转移.
+
+        Args:
+            failover: 已初始化的 MultiLLMFailover 实例.
+        """
+        # 如果 failover 没有 event_bus 但 runtime 有, 自动连接
+        if (
+            self.event_bus is not None
+            and failover._event_bus is None
+        ):
+            # 通过内部属性注入 event_bus — runtime 的事件总线
+            object.__setattr__(failover, "_event_bus", self.event_bus)
+            logger.info(
+                "AgentRuntime: connected MultiLLMFailover to runtime event bus"
+            )
+
+        self.llm_failover = failover
+        logger.info(
+            "AgentRuntime: MultiLLMFailover configured with %d sessions, "
+            "current=%s",
+            len(failover.sessions),
+            failover.current_name,
+        )
+
+    async def chat(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        """通过 MultiLLMFailover 发送 LLM 对话请求 (带故障转移).
+
+        如果未配置 llm_failover, 抛出 RuntimeError.
+
+        Args:
+            messages: 对话消息列表 [{"role": "user", "content": "..."}, ...].
+            tools: 可选工具定义列表.
+
+        Returns:
+            响应字典, 包含 "content" 等键.
+
+        Raises:
+            RuntimeError: 未配置 MultiLLMFailover.
+            AllSessionsExhaustedError: 所有 LLM Session 均失败.
+        """
+        if self.llm_failover is None:
+            raise RuntimeError(
+                "AgentRuntime: MultiLLMFailover not configured. "
+                "Call set_llm_failover() first."
+            )
+
+        return await self.llm_failover.chat(messages, tools=tools)
 
     @classmethod
     async def get_instance(
@@ -160,6 +241,23 @@ class AgentRuntime:
         self._running = True
         self._start_time = datetime.now(timezone.utc)
         logger.info("AgentRuntime starting...")
+
+        # ── 记录 LLM 高可用状态 ────────────────────────────────────────
+        if self.llm_failover is not None:
+            llm_metrics = self.llm_failover.metrics
+            logger.info(
+                "AgentRuntime: LLM HA active — %d sessions, primary=%s, "
+                "total_requests=%d, total_failovers=%d",
+                len(llm_metrics["sessions"]),
+                llm_metrics["active_session"],
+                llm_metrics["total_requests"],
+                llm_metrics["total_failovers"],
+            )
+        else:
+            logger.info(
+                "AgentRuntime: LLM HA not configured — "
+                "use set_llm_failover() to enable MultiLLMFailover"
+            )
 
         # Step 1: Start background loops
         self._event_listener_task = asyncio.create_task(
@@ -282,6 +380,17 @@ class AgentRuntime:
             except Exception:
                 logger.warning("Failed to unsubscribe from event bus")
 
+        # Step 4: Close MultiLLMFailover (gracefully close all sessions)
+        if self.llm_failover is not None:
+            try:
+                await self.llm_failover.close()
+                logger.info("AgentRuntime: MultiLLMFailover closed")
+            except Exception:
+                logger.warning("AgentRuntime: error closing MultiLLMFailover")
+
+        # Step 5: 重置渐进式安全警告状态
+        self._reset_safety()
+
         uptime = (
             (datetime.now(timezone.utc) - self._start_time).total_seconds()
             if self._start_time
@@ -365,6 +474,9 @@ class AgentRuntime:
                 "agent_count": len(self.agents),
                 "event_bus_connected": self.event_bus is not None,
                 "broker_connected": self.broker is not None,
+                "llm_ha": (
+                    self.llm_failover.metrics if self.llm_failover is not None else None
+                ),
             },
             "agents": agent_statuses,
         }
@@ -374,6 +486,11 @@ class AgentRuntime:
     async def dispatch_event(self, event: Any) -> None:
         """Dispatch an event to all subscribed agents.
 
+        每轮事件分发时：
+            1. 递增内部轮次计数器
+            2. 检查 TurnProgressiveWarnings 渐进式安全信号
+            3. 根据信号级别注入警告/约束到事件 payload 中
+
         Each agent's handle_event() is called concurrently.
         If an event bus is configured, the event is also published
         through it for external subscribers.
@@ -381,12 +498,53 @@ class AgentRuntime:
         Args:
             event: The event to dispatch (Event dataclass or compatible).
         """
+        # ── Step 1: 递增轮次计数 ──────────────────────────────────────
+        self._turn_counter += 1
+        self._progressive_warnings._turn = self._turn_counter
+
+        # ── Step 2: 检查渐进式安全信号 ─────────────────────────────────
+        signal = TurnProgressiveWarnings.get_signal(
+            turn=self._turn_counter,
+            in_plan_mode=False,
+        )
+
+        if signal is not None:
+            logger.log(
+                logging.WARNING if signal.level == "warning" else logging.CRITICAL,
+                "[TurnProgressiveWarnings] turn=%d level=%s action=%s message=%s",
+                self._turn_counter,
+                signal.level,
+                signal.action,
+                signal.message,
+            )
+
+            # Step 3: 根据信号级别执行操作
+            # 将安全信号注入到 event payload 中
+            if hasattr(event, "payload") and isinstance(event.payload, dict):
+                event.payload["_safety"] = {
+                    "turn": self._turn_counter,
+                    "level": signal.level,
+                    "message": signal.message,
+                    "action": signal.action,
+                }
+
         # Publish via event bus if available
         if self.event_bus is not None:
             try:
                 await self.event_bus.publish(event)
             except Exception:
                 logger.warning("Failed to publish event via bus: %s", getattr(event, "type", "unknown"))
+
+        # ── 根据安全信号决定是否继续分发 ──────────────────────────────
+        # "break" 级别的危险信号：跳过非关键事件的代理分发
+        if signal is not None and signal.action == "break":
+            logger.critical(
+                "[TurnProgressiveWarnings] 已达执行上限 (turn=%d, action=%s), "
+                "跳过代理事件分发",
+                self._turn_counter,
+                signal.action,
+            )
+            return
 
         # Deliver to all agents concurrently
         tasks = []
@@ -601,6 +759,20 @@ class AgentRuntime:
                 except Exception:
                     logger.warning("Failed to publish health report")
 
+        elif event_type == "runtime.llm_failover_reset":
+            # Reset MultiLLMFailover statistics and session order
+            if self.llm_failover is not None:
+                self.llm_failover.reset()
+                logger.info(
+                    "AgentRuntime: MultiLLMFailover reset via event "
+                    "(requests=%s)", payload
+                )
+            else:
+                logger.warning(
+                    "AgentRuntime: received llm_failover_reset event "
+                    "but failover is not configured"
+                )
+
     async def _handle_escalation(self, event: Any) -> None:
         """Handle support.ticket_escalated events for routing.
 
@@ -632,14 +804,46 @@ class AgentRuntime:
 
     # ── Utility ───────────────────────────────────────────────────────
 
+    def _reset_safety(self) -> None:
+        """重置渐进式安全警告状态。
+
+        在 Runtime 停止时调用，确保下次启动时轮次计数从 0 开始。
+        """
+        self._turn_counter = 0
+        self._progressive_warnings.reset()
+        logger.debug("AgentRuntime 渐进式安全警告状态已重置")
+
+    def get_safety_info(self) -> dict[str, Any]:
+        """获取当前渐进式安全警告状态信息。
+
+        Returns:
+            包含轮次计数和最近信号的字典。
+        """
+        last_signal = self._progressive_warnings.get_last_signal()
+        return {
+            "turn_counter": self._turn_counter,
+            "last_signal": {
+                "turn": last_signal.turn,
+                "level": last_signal.level,
+                "message": last_signal.message,
+                "action": last_signal.action,
+            }
+            if last_signal is not None
+            else None,
+        }
+
     @property
     def is_running(self) -> bool:
         """Whether the runtime is currently active."""
         return self._running
 
     def __repr__(self) -> str:
+        llm_info = ""
+        if self.llm_failover is not None:
+            llm_info = f" llm_ha={self.llm_failover.current_name}"
         return (
             f"<AgentRuntime running={self._running} "
-            f"agents={len(self.agents)} "
-            f"event_bus={'yes' if self.event_bus else 'no'}>"
+            f"agents={len(self.agents)}"
+            f"{llm_info}"
+            f" event_bus={'yes' if self.event_bus else 'no'}>"
         )

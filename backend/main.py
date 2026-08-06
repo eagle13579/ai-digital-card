@@ -16,6 +16,37 @@ import uvicorn
 # 确保 app 模块可导入
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# 2026-08-02 修复: 显式注入 baize_libs 路径 (pth 在 uv venv 下不可靠)
+# 只注入 D:\baize_libs (完整版). 注意: 绝不注入归档版 D:\__archive\...\baize_libs
+# 因为归档版含 secrets.py 会遮蔽 Python 标准库 secrets 模块, 导致 starlette 崩溃
+for _p in (r"D:\baize_libs",):
+    if os.path.isdir(_p) and _p not in sys.path:
+        sys.path.insert(0, _p)
+
+# 2026-08-02 修复: Python 3.14 包导入行为变化, 手动预注册 baize_libs 父包
+# (否则 from .xxx import 在子模块导入时报 "No module named 'baize_libs'")
+try:
+    import importlib.util as _ilu
+    _spec = _ilu.spec_from_file_location(
+        "baize_libs", os.path.join(r"D:\baize_libs", "__init__.py"),
+        submodule_search_locations=[r"D:\baize_libs"],
+    )
+    if _spec and "baize_libs" not in sys.modules:
+        _mod = _ilu.module_from_spec(_spec)
+        sys.modules["baize_libs"] = _mod
+        _spec.loader.exec_module(_mod)
+except Exception:
+    pass  # 预注册失败则回退到 pth/常规导入
+
+# Debug: test baize_libs import before app
+try:
+    import baize_libs.generic_agent.agent_safety
+    print("[boot] baize_libs import OK from:", baize_libs.__file__)
+except Exception as e:
+    print(f"[boot] baize_libs FAILED: {e}")
+    import sys as _sys
+    print(f"[boot] _baize_paths={[p for p in _sys.path if 'baize' in p.lower() or '记忆' in p]}")
+
 from app import create_app
 
 # 主应用

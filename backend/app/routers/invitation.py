@@ -8,6 +8,8 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.invitation_code import InvitationCode
+from app.models.user import User
+from app.routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/invite", tags=["内测邀请"])
@@ -61,8 +63,15 @@ async def verify_code(code: str, db: AsyncSession = Depends(get_db)):
     return {"valid": True, "code": code.upper()}
 
 @router.post("/redeem")
-async def redeem_code(code: str, user_id: int, db: AsyncSession = Depends(get_db)):
+async def redeem_code(
+    code: str,
+    user_id: Optional[int] = None,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     """消耗邀请码（注册时调用）"""
+    # 修复 BUG-006：强制使用当前登录用户，禁止伪造他人 user_id 消耗邀请码
+    user_id = current_user.id
     result = await db.execute(
         select(InvitationCode).where(InvitationCode.code == code.upper())
     )
