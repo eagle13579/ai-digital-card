@@ -189,9 +189,38 @@ def reflect(k: dict, source: str, idx: int = 0) -> bool:
         return False
 
 
+def collect_files(path_str: str) -> list[dict]:
+    """采集指定文件/目录（企业素材蒸馏用）"""
+    p = Path(path_str)
+    files: list[Path] = []
+    if p.is_file():
+        files = [p]
+    elif p.is_dir():
+        files = [f for f in p.rglob("*") if f.is_file() and f.suffix.lower() in (".md", ".txt", ".yaml", ".yml", ".json")]
+    items = []
+    for f in sorted(files):
+        try:
+            content = f.read_text(encoding="utf-8", errors="ignore")
+            if len(content.strip()) < 100:
+                continue
+            title = f.stem[:120]
+            items.append({
+                "source": "enterprise",
+                "title": title,
+                "content": content[:2000],
+                "tags": ["企业蒸馏"],
+                "raw": {"path": str(f), "content": content[:2000]},
+            })
+        except Exception:
+            continue
+    return items
+
+
 def main():
     parser = argparse.ArgumentParser(description="盖娅一键蒸馏管线 v1.0.0 (A8一键+A9安全+A10分级)")
     parser.add_argument("--sources", default="all", help="all|web|local")
+    parser.add_argument("--file", default="", help="蒸馏指定文件/目录（企业素材）")
+    parser.add_argument("--source-tag", default="distill_auto", help="反哺source标记(默认distill_auto)")
     parser.add_argument("--dry", action="store_true", help="预览模式：只采集+评分，不调LLM不入库")
     parser.add_argument("--max", type=int, default=0, help="最多提炼N条(0=全部高价值)")
     parser.add_argument("--premium-model", default="", help="精炼模型(默认同便宜模型)")
@@ -205,20 +234,24 @@ def main():
     print("🧪 盖娅一键蒸馏管线 v1.0.0")
     print("=" * 56)
 
-    # 1. 采集
+    # 1. 采集（--file 优先，否则走标准源）
     print("\n[1/6] 采集素材 ...")
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    r = subprocess.run(
-        [sys.executable, str(COLLECT_SCRIPT), "--sources", args.sources],
-        capture_output=True, text=True, timeout=180,
-    )
-    try:
-        collected = json.loads(r.stdout)
-    except Exception:
-        print("采集失败:", r.stderr[-400:])
-        return
-    items = collected.get("items", [])
-    print(f"  采集 {len(items)} 条")
+    if args.file:
+        items = collect_files(args.file)
+        print(f"  企业素材采集 {len(items)} 条 ({args.file})")
+    else:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(
+            [sys.executable, str(COLLECT_SCRIPT), "--sources", args.sources],
+            capture_output=True, text=True, timeout=180,
+        )
+        try:
+            collected = json.loads(r.stdout)
+        except Exception:
+            print("采集失败:", r.stderr[-400:])
+            return
+        items = collected.get("items", [])
+        print(f"  采集 {len(items)} 条")
 
     # 2. 清洗 + A9 安全过滤
     print("[2/6] 清洗 + 安全过滤 (A9) ...")
@@ -278,7 +311,7 @@ def main():
     print("[5/6] 反哺盖娅大脑 ...")
     saved = 0
     for i, k in enumerate(ok):
-        if reflect(k, source="distill_auto", idx=i):
+        if reflect(k, source=args.source_tag, idx=i):
             saved += 1
     print(f"  入库 {saved} 条")
 
