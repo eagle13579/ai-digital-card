@@ -1,0 +1,91 @@
+feature_id: "F-CZL-链客宝-03"
+name: "创新发现引擎"
+version: "0.1.0"
+dimension: "创造力"
+source_model: "chainke-full/backend/features/innovation_engine/"
+source_project: "chainke-full"
+created_at: "2026-06-08"
+author: "白泽 (向海容授权自动扫描吸收)"
+
+one_liner: "自动扫描用户行为/企业需求/匹配数据中的市场机会信号，经趋势分析+评分排序后生成可执行的创新机会推荐清单"
+what_it_does: |
+  场景：链客宝平台运营需要持续发现新的市场机会——哪些需求未被满足、哪些品类供需失衡、哪些新兴领域正在崛起，从而指导平台战略和资源投放。
+
+  问题：市场机会信息分散在用户行为日志、匹配记录、搜索日志中，靠人工难以系统化发现和量化评估。
+
+  价值：链客宝创新发现引擎构建了完整的创新信号管道：
+
+  1. 机会扫描（OpportunityScanner）：5种信号类型扫描
+     - 匹配失败记录（match_failure）— 供需匹配未能达成的原因分析
+     - 未满足需求（unmet_need）— 长期未获匹配的企业需求
+     - 搜索真空（search_void）— 用户反复搜索但无对应供给
+     - 需求突变（demand_spike）— 某类需求短时间内激增
+     - 供需缺口（supply_gap）— 需求量大但供给方少的领域
+
+  2. 趋势分析（TrendAnalyzer）：5维分析
+     - 品类热度趋势、供需平衡分析、新兴领域识别、企业需求画像、季节性与周期性
+
+  3. 机会推荐（OpportunityRecommender）：
+     - 综合评分（置信度×紧迫性×商业价值）
+     - 去重合并、优先级排序、可执行操作步骤生成
+
+  4. 引擎编排（InnovationEngine）：
+     - 扫描→分析→推荐 三阶段管道
+     - 完整运行报告包含各阶段耗时和结果
+
+input: |
+  - 用户行为数据: 需求发布记录、搜索日志、浏览路径
+  - 匹配事件数据: 匹配成功/失败记录及原因
+  - 企业需求数据: 未满足的供需匹配请求
+  - 品类/行业数据: 现有分类体系和标签
+  - 引擎配置: EngineConfig（启用/禁用各组件、阈值参数）
+
+output: |
+  - EngineResult: 完整引擎运行结果
+  - scan_result: ScanResult（扫描到的所有 OpportunitySignal 列表）
+  - trend_report: TrendReport（趋势洞察列表 + 摘要）
+  - recommendation: RecommendationReport（推荐机会列表 + 排序 + 可执行建议）
+  - 各阶段状态: PipelineStage（阶段名/成功/耗时/错误）
+
+sop: |
+  1. 配置引擎参数（数据源路径、评分权重、阈值设置）
+  2. 扫描阶段：调用 OpportunityScanner 扫描5种市场信号，输出 OpportunitySignal 列表
+  3. 分析阶段：调用 TrendAnalyzer 基于扫描结果进行5维趋势分析，输出 TrendInsight 列表
+  4. 推荐阶段：调用 OpportunityRecommender 对信号和洞察进行评分去重排序，生成 RecommendedOpportunity
+  5. 为每个推荐机会生成 ActionStep（操作类型 + 描述 + 负责人 + 优先级 + 预估工作量）
+  6. 聚合三阶段结果到 EngineResult，记录各阶段耗时
+  7. 输出引擎运行报告
+
+quality_gate:
+  - gate: "信号覆盖完整性"
+    standard: "扫描器至少覆盖 match_failure / unmet_need / search_void / demand_spike / supply_gap 5种信号类型"
+    score: 5
+  - gate: "推荐评分可解释"
+    standard: "每个推荐机会的评分有明确的评分分解（confidence × urgency × business_value）"
+    score: 5
+  - gate: "建议可执行性"
+    standard: "每个推荐机会包含至少1个 ActionStep（含操作类型、描述、负责人、优先级）"
+    score: 4
+  - gate: "扫描→分析→推荐闭环"
+    standard: "recommendation 中的每个机会至少关联1个 source_signals 或 source_insights"
+    score: 5
+
+score_target: "9/10"
+depends_on:
+  - "F-DAT-链客宝-03_统一数据管道"
+enhanced_by:
+  - "F-CZL-链客宝-01_假设验证门禁"
+  - "F-CZL-链客宝-02_增长实验引擎"
+iteration_log: |
+  v0.1.0 - 创建: 2026-06-08 从chainke-full/backend/features/innovation_engine/吸收，MVP版本含3阶段管道（扫描+分析+推荐），初始版本
+
+# ===== 2026-06-08 去重标记 =====
+# 此文件已被新体系替代，建议使用:
+#   F-CZL-IE-创新发现引擎.yaml
+# 保留此文件以保持引用不中断，新功能请使用新体系文件
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: "F-CZL-IE-创新发现引擎.yaml"
+# ==============================

@@ -1,0 +1,24 @@
+id: F-TASTE-DIAL-01
+name: 3-Dial Design Tuning — VARIANCE/MOTION/DENSITY
+source_model: Taste-Skill Section 1 — Three dials gate every design decision. 25+ preset mappings from vibe words to dial values
+dimension: 审美
+
+products:
+  - 通用: 自动匹配
+description: >-
+  三个核心设计旋钮控制所有设计输出:
+  VARIANCE(布局变化度 1-10)、MOTION_INTENSITY(动效强度 1-10)、VISUAL_DENSITY(视觉密度 1-10)。
+  25+预设映射: 「minimalist」→ 5/3/3, 「Awwwards」→ 9/8/3。
+  所有布局/动效/密度决策受这三个旋钮门控。
+input: Design Read + 风格词汇/用例类型
+output: 三个旋钮值 + 调参依据
+sop: "① 匹配风格词汇到预设映射表(25+条目)
+  ② 按页面类型微调(landing/portfolio/editorial/redesign各有基线)
+  ③ 输出三旋钮值 + 每个值的选择理由
+  ④ 旋钮作为全局变量门控所有后续设计决策
+  ⑤ 用户可对话式调整(不需编辑文件)"
+quality_gates: 所有设计决策必须可追溯到三旋钮值、切换页面类型自动重设基线
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 白泽设计助手/AI招商页面生成/链客宝UI/中韩品牌系统

@@ -1,0 +1,47 @@
+feature_id: "F-CZL-ADV-TCP-"
+name: "TCP-R门禁执行器"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "AI-Partner底层模型/顶层思考方法论"
+# 精确source_model溯源 (2026-06-12): 五池/模型池/_原子/一堂-AI-Partner重要底层模型/M5-顶层思考三段论.md
+created_at: "2026-06-07"
+author: "白泽"
+
+one_liner: "对任何假设执行Thesis→Counter→Position→Review四步门禁"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  源自一堂AI-Partner重要底层模型的顶层思考方法论。
+  这是双三角生态中的高级Feature，对应三层架构中的特定层级。
+
+input: |
+  - 任务目标: 需要评估/执行的完整描述
+  - 上下文: 场景/用户/约束
+
+output: |
+  - 标准化执行结果
+  - 质量评分
+  - 迭代建议
+
+sop: |
+  1. 加载顶层思考方法论的完整方法论
+  2. 应用方法论到具体场景
+  3. 执行标准化流程
+  4. 自评并记录
+  5. 输出交付物
+
+quality_gate:
+  - gate: "方法论完整性"
+    standard: "顶层思考方法论的全部步骤已执行"
+    score: 5
+  - gate: "结果可交付"
+    standard: "产出可直接用于决策或下一环节"
+    score: 5
+
+score_target: "10/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-07

@@ -1,0 +1,22 @@
+module_name: 讲香双方向
+module_number: 11
+category: 创业方法-产品内核
+mental_models:
+  - 讲香双方向
+  - 往下做具体(可感知)
+  - 往上拉价值(认同感)
+  - 具象策略vs抽象策略
+learning_objectives:
+  - 掌握产品价值呈现的双方向方法论
+  - 学会将功能转化为用户可感知的价值
+  - 能同时体现具体效果和价值感
+employee_roles:
+  - 产品经理
+  - 销售负责人
+  - 市场营销
+source: 一堂创业课/创业方法-产品内核
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

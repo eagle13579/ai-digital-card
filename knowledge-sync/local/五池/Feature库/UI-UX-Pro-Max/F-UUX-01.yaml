@@ -1,0 +1,16 @@
+---
+id: F-UUX-01
+name: 10优先级设计规则引擎
+dimension: 体系
+source_model: UUX-01
+
+products:
+  - 通用: 自动匹配
+description: >-
+  10层设计决策优先级：Accessibility(CRITICAL)→Charts(LOW)，每层含Impact评分+Must Have+Avoid
+sop: |-
+  详见原子模型 UUX-01
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

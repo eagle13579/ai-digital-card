@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-17
+name: Tool描述优化器
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 自动优化tool前80字描述提高Agent调用准确率
+
+products:
+  - 通用: 自动匹配

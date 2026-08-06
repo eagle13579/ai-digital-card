@@ -1,0 +1,46 @@
+feature_id: F-CJ-软银-03
+name: 双板分歧转一致模型（能科科技型）
+version: "1.0"
+dimension: 场景
+source_model: 能科科技(603859) 2026-06 实战复盘
+source_project: 中国软银投资系统/龙头战法量化模型
+one_liner: 2连板后第2天放量阳线/假阴(分歧)，第3天资金流入拉升(转一致)
+
+products:
+  - 通用: 自动匹配
+what_it_does: 识别「双板分歧转一致」模式——2连板后主力不强封而是换手，分歧日放量不涨停，次日资金流入确认方向
+input:
+  - daily_data: list  # 最近5日K线数据
+  - minute_data: list  # 当日分钟数据
+  - pre_close: float
+output:
+  - is_matched: bool
+  - confidence: float
+  - divergence_volume: float  # 分歧日成交量
+  - confirm_inflow: float  # 确认日资金流入
+sop: |
+  Phase 1 — 确认2个涨停
+    条件: 2个交易日有涨停记录(可非连续)
+    
+  Phase 2 — 分歧日识别
+    条件: 涨停次日放量收阳/假阴
+    特征: 成交量>前日×1.3, 收盘价>开盘价(阳)或<开盘价但>前收(假阴)
+    换手率>10%为有效分歧
+    
+  Phase 3 — 确认日(第3天)
+    条件: 价格拉升>3%
+    资金净流入为正
+    换手率温和(非爆量)
+    
+  Phase 4 — 确认信号
+    外盘>内盘 (主动买盘占优)
+    盘中回调不破分歧日收盘价
+quality_gate:
+  score: 7/10
+  checks:
+    - 基于能科科技2026-06实战验证
+    - 分歧日与确认日的时间间隔≤1天
+    - 分歧日放量但价格不跌是关键特征
+iteration_log:
+  - "2026-06-10: v1.0初始版本，向海容命名「双板分歧转一致」"
+product: "中国软银投资系统"

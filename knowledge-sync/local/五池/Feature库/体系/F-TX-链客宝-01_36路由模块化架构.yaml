@@ -1,0 +1,64 @@
+feature_id: "F-TX-链客宝-01"
+name: "36路由模块化架构"
+version: "1.0.0"
+dimension: "体系"
+source_model: "chainke-full/backend/app/routers/"
+source_project: "chainke-full"
+created_at: "2026-06-08"
+author: "白泽 (向海容授权自动扫描吸收)"
+
+one_liner: "每个业务模块独立为APIRouter，按功能域注入到主应用，实现高内聚低耦合的模块化路由架构"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  场景：链客宝后端API按照业务功能域拆分，每个功能模块独立开发、独立注册、独立维护。
+  问题：单体应用将所有路由写在单一文件中，多人协作易冲突、变更影响面大、测试困难。
+  价值：链客宝采用模块化路由架构——backend/app/routers/ 下每个.py文件是一个独立的功能模块（hypothesis_gate, unit_economics, learning_center, retro_board, retention_insights, sales_script等），每个模块使用fastapi.APIRouter独立声明自己的路由前缀和标签，在main.py中统一注册。这种架构使得：
+  - 每个模块可独立开发和测试
+  - 路由前缀通过prefix统一管理，不会冲突
+  - 功能标签化，API文档自动分组
+  - 可独立决定是否注册（通过try/except判断依赖是否满足）
+
+  核心模式：
+  - 每个模块包含：数据模型(BaseModel) → 内存存储(列表) → 工具函数 → FastAPI路由
+  - 每个模块使用try/except包裹路由注册，允许部分模块在依赖不足时降级
+  - 模块间通过共享数据模型松耦合
+
+input: |
+  - 业务功能需求拆解: 按功能域划分模块边界
+  - 数据模型定义: Pydantic BaseModel 每个模块独立定义
+  - 路由注册点: main.py 统一注册所有APIRouter实例
+
+output: |
+  - 模块化路由文件: 每个功能域一个.py文件
+  - API文档分组: 按tags自动归类于FastAPI自动文档
+  - 模块可测试性: 每个模块可独立运行单元测试
+  - 依赖降级能力: 缺失依赖的模块自动跳过注册
+
+sop: |
+  1. 分析业务功能域，确定模块边界划分原则（单一职责）
+  2. 每个模块创建独立的.py文件，定义数据模型(BaseModel)
+  3. 每个模块创建APIRouter实例，指定prefix前缀和tags标签
+  4. 在模块内部实现CRUD路由和业务逻辑（内存存储先可替换为数据库）
+  5. 使用try/except包裹路由注册，支持依赖不足时的优雅降级
+  6. 每个模块添加print日志输出，确认模块加载状态
+  7. 在main.py中统一引入并include_router所有模块
+
+quality_gate:
+  - gate: "模块独立性"
+    standard: "每个模块可以独立运行，不依赖其他模块的内部状态"
+    score: 5
+  - gate: "路由前缀唯一性"
+    standard: "各模块prefix互不冲突，符合/api/{module-name}命名规范"
+    score: 5
+  - gate: "降级注册机制"
+    standard: "缺失依赖时模块优雅降级（router=None），不影响主应用启动"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 从chainke-full/backend/app/routers/下6个路由模块吸收，初始版本
+product: "链客宝"

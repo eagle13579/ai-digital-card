@@ -1,0 +1,172 @@
+name: "F-TRANS-07"
+title: "分组查询注意力路由(GQA)"
+version: 1.0.0
+category: "注意力路由优化"
+description: "通过分组查询注意力(Grouped Query Attention)减少KV缓存内存占用,Q头数多于KV头数,多个Q共享同一组K/V,在不显著影响质量的前提下大幅降低推理显存"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T03 QKV三重奏"
+  - "T05 MultiHead"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # --- LlamaAttention: GQA核心实现 ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "__init__"
+    lines: 99-123
+    summary: "GQA核心配置: num_key_value_groups = num_attention_heads // num_key_value_heads — Llama-7B: Q=32头,KV=8头,group=4"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "__init__"
+    lines: 109-119
+    summary: "三路投影: q_proj(hidden_size → num_heads×head_dim), k_proj(hidden_size → num_kv_heads×head_dim), v_proj(hidden_size → num_kv_heads×head_dim) — Q和K/V使用不同的投影维度"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    function: "repeat_kv"
+    lines: 52-61
+    summary: "KV头复制: hidden_states(batch, kv_heads, seqlen, dim) → expand(batch, kv_heads, n_rep, seqlen, dim) → reshape(batch, kv_heads*n_rep, seqlen, dim) — 将较少的KV头扩展到与Q头数量一致"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    function: "eager_attention_forward"
+    lines: 67-90
+    summary: "含GQA的注意力函数: key_states = repeat_kv(key, num_key_value_groups); value_states = repeat_kv(value, num_key_value_groups) — 在注意力计算前先复制KV头"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "forward"
+    lines: 125-166
+    summary: "完整GQA前向: Q投影(多头)→K/V投影(少头)→RoPE→repeat_kv→注意力→输出投影"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- 标准MHA对比 ---
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "__init__"
+    lines: 29-48
+    summary: "标准MHA(n_head=12, QKV头数相等) — GQA的改进版本,用于对比理解"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class GQAAttention:
+      """
+      分组查询注意力路由(GQA) — 多Q共享单K/V的分组注意力
+
+      ┌─────────────────────────────────────────────────────────┐
+      │ 结构示意 (Q:KV = 4:1 分组)                              │
+      │                                                         │
+      │  Q_0  Q_1  Q_2  Q_3  |  Q_4  Q_5  Q_6  Q_7  |  ...    │
+      │    \    |    |    /   |    \    |    |    /   |         │
+      │        KV_0           |        KV_1           |         │
+      │   (group 0)           |   (group 1)           |         │
+      └─────────────────────────────────────────────────────────┘
+
+      ===== 架构公式 =====
+      class GQAAttention:
+          def __init__(self, d_model, n_heads, n_kv_heads):
+              self.n_heads = n_heads          # Q头数: 32
+              self.n_kv_heads = n_kv_heads    # KV头数: 8
+              self.n_rep = n_heads // n_kv_heads  # 每组Q数: 4
+              self.head_dim = d_model // n_heads
+
+              # Q投影 (全部头)
+              self.q_proj = Linear(d_model, n_heads * head_dim)
+              # K/V投影 (更少头)
+              self.k_proj = Linear(d_model, n_kv_heads * head_dim)
+              self.v_proj = Linear(d_model, n_kv_heads * head_dim)
+              # 输出投影
+              self.o_proj = Linear(n_heads * head_dim, d_model)
+
+          def repeat_kv(self, x):
+              # 输入 x: (B, n_kv_heads, T, head_dim)
+              # 输出:   (B, n_heads, T, head_dim)
+              B, n_kv, T, D = x.shape
+              x = x[:, :, None, :, :]              # (B, n_kv, 1, T, D)
+              x = x.expand(B, n_kv, self.n_rep, T, D)  # (B, n_kv, n_rep, T, D)
+              return x.reshape(B, n_kv * self.n_rep, T, D)  # (B, n_heads, T, D)
+
+          def forward(self, x, kv_cache=None):
+              B, T, C = x.shape
+
+              # 投影 (Q头多, KV头少)
+              q = self.q_proj(x).view(B, T, self.n_heads, self.head_dim).transpose(1,2)
+              k = self.k_proj(x).view(B, T, self.n_kv_heads, self.head_dim).transpose(1,2)
+              v = self.v_proj(x).view(B, T, self.n_kv_heads, self.head_dim).transpose(1,2)
+
+              # 可选: KV缓存更新
+              if kv_cache:
+                  k, v = kv_cache.update(k, v)
+
+              # GQA核心: 复制KV头
+              k = self.repeat_kv(k)  # (B, n_kv_heads, T, D) → (B, n_heads, T, D)
+              v = self.repeat_kv(v)  # (B, n_kv_heads, T, D) → (B, n_heads, T, D)
+
+              # 标准注意力 (此时Q/K/V头数一致)
+              scores = q @ k.transpose(-2,-1) / sqrt(head_dim)
+              attn = softmax(scores, dim=-1)
+              out = (attn @ v).transpose(1,2).reshape(B, T, -1)
+              return self.o_proj(out)
+
+      ===== 参数量对比 =====
+      以 Llama-7B 为例:
+      - 标准MHA: QKV投影 = 3×d_model×n_heads×head_dim = 3×4096×4096 = 50.3M
+      - GQA(32Q/8KV): Q=4096×4096, K=V=4096×(4096*8/32)=4096×1024
+                      总参数量 = 4096*(4096+1024+1024) = 25.2M
+      节省: ~50% 的注意力投影参数量, 75% 的KV缓存内存
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "多Q共享单KV: 同一分组内的Q头共享相同的Key和Value,减少KV头数量而不影响Q头的表达灵活性"
+  - "推理内存与模型质量的帕累托折中: KV头越少缓存越小,Q头越多表达越精细,8KV/32Q是Llama的优选比例"
+  - "训练后无损适配: GQA可以从MHA权重通过池化或复制K/V头的方式转换,无需完整重新训练"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "大规模供需路由缓存优化"
+    description: >
+      当链客宝的供需匹配系统扩展到百万级供给方时,每个匹配请求都需要缓存大量
+      Key-Value对。GQA将KV缓存减少75%: 原本32头×64维的KV缓存压缩为8头×64维,
+      使得百万级供给方的实时匹配在单卡GPU上即可完成,降低了服务器成本。
+
+  - product: "AI名片"
+    component: "移动端轻量推理引擎"
+    description: >
+      AI名片的个人推荐在移动端运行时,显存极度受限(手机GPU通常<4GB)。
+      GQA将KV缓存从32头降为4头(Q头保持32),使推荐模型可在边缘设备上
+      实时运行,无需请求云端,保护用户隐私同时降低延迟。
+
+  - product: "数智港"
+    component: "多租户模型服务中间件"
+    description: >
+      数智港为多个团队提供模型推理服务,GQA的KV缓存压缩使得
+      同一个GPU可以承载更多并发的推理请求。32Q/4KV的极端GQA配置下,
+      可同时服务8个租户的推理请求而不触发OOM。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "自适应GQA: 根据任务复杂度动态调整KV头数(简单任务用更少的KV头)"
+  - "跨层GQA: 不同层使用不同的GQA比率(浅层更多KV头,深层更少)"
+  - "与MoE结合: 专家路由与GQA分组的联合优化"
+  - "从GQA到MLA(Multi-head Latent Attention): DeepSeek提出的低秩KV压缩,更进一步降低缓存"

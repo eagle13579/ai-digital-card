@@ -1,0 +1,15 @@
+name: "AI员工全生命周期管理"
+description: "Agent状态状态机+原子Checkout双锁+Goal继承路由+审批门禁+层级授权"
+version: "1.0.0"
+status: "atomic"
+dimension: "体系"
+source: "Paperclip agents.ts, issues.ts, routines.ts"
+atoms:
+  - PP-16_agent-status-state-machine
+  - PP-17_atomic-issue-checkout-dual-lock
+  - PP-18_goal-inherited-issue-routing
+  - PP-20_approval-gate-for-agent-creation
+  - PP-21_org-hierarchy-task-authorization
+products:
+  - AI数字军团 (员工管理)
+  - 招贤 (数字员工SaaS)

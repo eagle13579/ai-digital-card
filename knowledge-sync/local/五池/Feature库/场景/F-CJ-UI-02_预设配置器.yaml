@@ -1,0 +1,24 @@
+feature_id: "F-CJ-UI-02"
+name: "预设配置器"
+version: "1.0.0"
+dimension: "场景"
+source_model: "UI-TARSM10"
+one_liner: "可保存/导入/导出的模型预设系统"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  模型参数保存为预设，支持导入导出和切换。
+input: |-
+  预设名称+参数
+output: |-
+  预设保存成功
+sop: |-
+  1. 定义参数 2. 保存JSON 3. 导入导出 4. 切换验证
+quality_gate: |-
+  1. ≥3个预设 2. 导入导出可用
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: UI-TARS-desktop全量吸收

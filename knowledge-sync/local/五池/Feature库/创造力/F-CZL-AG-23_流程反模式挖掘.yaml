@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-23
+name: 流程反模式挖掘
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 从执行失败中挖掘新的Red Flags
+
+products:
+  - 通用: 自动匹配

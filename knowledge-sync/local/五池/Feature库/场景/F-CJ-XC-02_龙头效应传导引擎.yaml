@@ -1,0 +1,24 @@
+feature_id: "F-CJ-XC-02"
+name: "龙头效应传导引擎"
+version: "1.0.0"
+dimension: "场景"
+source_model: "XCrawlerM8"
+one_liner: "识别板块龙头并计算其涨跌对其他股票的传导效应"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  先识别板块龙头(涨幅/成交额/涨停次数)，再计算龙头股价变动对板块内其他股票的传导系数。
+input: |-
+  板块股票行情数据
+output: |-
+  龙头识别+传导系数矩阵(每只股对龙头的敏感度)
+sop: |-
+  1. 识别板块龙头 2. 计算龙头与其他股的相关系数 3. 设定传导阈值 4. 输出传导矩阵
+quality_gate: |-
+  1. 龙头识别准确 2. 相关系数计算准确 3. 传导矩阵完整
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

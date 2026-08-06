@@ -1,0 +1,19 @@
+feature_id: F-CP-AUTO-01
+name: criptogusHermesOffice
+version: 1.0.0
+dimension: 产品
+source_model: auto_absorb_daemon(外部知识吸收)
+one_liner: 从github_trending自动吸收的8个心智模型
+source_url: https://github.com/criptogus/HermesOffice
+absorb_score: 7.75
+absorb_date: 2026-08-06
+
+mental_models:
+  - AI原生分叉: 复用成熟开源，注入AI原生能力
+  - 代理优先设计: AI代理作为系统核心而非附加功能
+  - 模块化集成层: 通过抽象层解耦AI与业务逻辑
+  - 开源许可杠杆: 利用宽松许可构建生态护城河
+  - 上下文感知代理: 代理理解用户当前工作上下文
+  - 渐进式AI集成: AI功能分阶段渗透，降低用户学习成本
+  - 性能感知架构: AI调用与渲染分离，保证流畅体验
+  - 数据主权控制: 用户数据本地处理，增强隐私信任

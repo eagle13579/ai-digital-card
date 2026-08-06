@@ -1,0 +1,9 @@
+name: scripts-场景
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - Flask路由架构
+  - 缓存
+  - 认证

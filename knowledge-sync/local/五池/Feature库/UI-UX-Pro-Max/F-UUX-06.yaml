@@ -1,0 +1,16 @@
+---
+id: F-UUX-06
+name: 栈无关设计适配器
+dimension: 基本功
+source_model: UUX-06
+
+products:
+  - 通用: 自动匹配
+description: >-
+  同一设计规则自动适配12种技术栈(React/Next/Vue/Svelte/SwiftUI等)
+sop: |-
+  详见原子模型 UUX-06
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

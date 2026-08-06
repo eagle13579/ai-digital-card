@@ -1,0 +1,58 @@
+feature_id: "F-TX-SRC-跨环境双向同步桥"
+name: "跨环境双向同步桥模式"
+version: "1.0.0"
+dimension: "体系"
+source_model: "scripts/sync_bridge_bidi.py 完整实现(512行)，含BasicAuth认证+本地YAML↔远程API双向同步+状态持久化+增量追加"
+one_liner: "本地(Windows白泽)↔远程(阿里云飞书白泽)双向同步引擎，推送本地YAML进展到远程API、拉取远程飞书数据追加到本地，支持full-sync/dry-run/status三模式"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  跨环境双向同步桥是盖娅系统的跨主机数据同步基础设施:
+  
+  核心架构:
+  1. 双通道双向 — push(本地→远程) + pull(远程→本地) = full-sync完整同步
+  2. YAML数据源 — local_progress.yaml(本地进展) + feishu_sync.yaml(飞书同步数据)
+  3. BasicAuth凭证 — 环境变量→.env文件→空, 三优先级递进读取
+  4. 远程API — POST到REMOTE_SYNC_URL(https://ai.47.100.160.250.nip.io/api/sync-progress)
+  5. 状态持久化 — .sync_bridge_status.json + sync_history.log记录每次同步
+  6. 安全YAML读取 — read_yaml_safe()确保path.exists检查+缺省返回{"entries":[]}
+  
+  使用场景: 中韩出海数智港项目，本地Windows开发环境↔阿里云远程服务器的进展同步。
+  支持--push仅推送、--pull仅拉取、--full-sync全同步、--dry-run预览不发送。
+input:
+  - local_progress.yaml(本地进展条目)
+  - feishu_sync.yaml(飞书数据条目)
+  - .sync_bridge.env或环境变量(BasicAuth凭证)
+output:
+  - 推送结果: 成功推送条目数/失败条目数
+  - 拉取结果: 新增条目数/更新条目数
+  - 同步状态文件: {last_push, last_pull, push_count, pull_count, errors}
+  - sync_history.log: 每次同步时间戳+结果摘要
+sop: |
+  1. 解析参数: --push/--pull/--full-sync/--dry-run/--status
+  2. get_basic_auth(): 环境变量→.env文件→空 三级凭证获取
+  3. read_yaml_safe()读取local_progress.yaml和feishu_sync.yaml
+  4. --push: 读取本地YAML→JSON序列化→POST到REMOTE_SYNC_URL(含BasicAuth)
+     - 成功→更新STATUS_FILE的last_push时间戳+push_count
+     - 失败→记录错误到status.errors
+  5. --pull: GET远程API→解析响应JSON→追加到feishu_sync.yaml(entries增量追加)
+     - 去重: 按条目ID/时间戳判断是否已存在
+     - 成功→更新last_pull时间戳+pull_count
+  6. --full-sync: push + pull 组合执行
+  7. --dry-run: 打印即将执行的操作但不发送网络请求
+  8. --status: 读取STATUS_FILE显示上次同步的时间/数量/错误
+  9. 全部操作追加到sync_history.log
+quality_gate:
+  score: 7
+  checks:
+    - "BasicAuth三优先级凭证(env→.env→空)"
+    - "YAML安全读取(path.exists+缺省返回)"
+    - "增量追加去重(entries防重复)"
+    - "状态持久化(status_file+history_log)"
+    - "dry-run预览模式不发送"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从sync_bridge_bidi.py双向同步架构提取"

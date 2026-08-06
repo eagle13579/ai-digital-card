@@ -1,0 +1,89 @@
+metadata:
+
+products:
+  - 通用: 自动匹配
+  name: settlement-engine-feature
+  version: 1.0.0
+  date: 2026-07-02
+  author: 白泽
+  domain: distributed-model-marketplace
+  category: payment
+
+description: >
+  贡献分账引擎Feature。实现链下用量追踪、贡献比例计算、链上批量结算三阶段流水线。
+  确保模型发布者、推理节点运营者和平台三方之间的收益分配公平、透明、可审计。
+  通过Solana智能合约自动分账，利用Solana低Gas高TPS特性实现高频低额批量结算。
+
+components:
+  - name: usage-tracker
+    function: |
+      链下用量追踪服务。实时捕获并聚合每次推理调用的token消耗数据。
+      按模型+版本+用户+日粒度实时聚合，每15分钟生成中间Snapshot。
+      每日末生成最终日结快照，附带Merkle Tree根哈希作为完整性证明。
+    tech_stack:
+      - Apache Kafka (用量事件流)
+      - PostgreSQL / TimescaleDB (时序聚合存储)
+      - merkletools (Merkle Tree证明)
+    priority: P0
+
+  - name: contribution-calculator
+    function: |
+      贡献比例计算引擎。按约定比例计算各方分账。
+      读取Registry中的revenue_share_pct，平台固定抽成10-20%。
+      支持多模型组合请求场景的加权分账。
+      输出：批次结算明细（各参与方、应得金额、币种）。
+    tech_stack:
+      - Python / Rust (高性能计算)
+      - PostgreSQL (结算规则持久化)
+    priority: P0
+
+  - name: solana-settlement-contract
+    function: |
+      Solana链上智能合约。自动执行批量分账。
+      接收链下传来的批次结算明细（Merkle Root验证），调用SPL Token Program转账。
+      每批结算包含N笔分账，单笔Gas约$0.0002。
+    tech_stack:
+      - Solana / Rust / Anchor框架
+      - SPL Token Program
+    priority: P1
+
+  - name: threshold-trigger
+    function: |
+      阈值触发引擎。决定何时触发链上结算。
+      满足任一条件触发：金额阈值(累积待结算>=10美元)或时间阈值(距上次结算>=24小时)。
+    tech_stack: Cron / APScheduler
+    priority: P1
+
+  - name: merkle-auditor
+    function: |
+      Merkle审计证明系统。每次结算批次生成Merkle Tree，Root哈希上链存证。
+      贡献者可查询自己的Merkle Proof验证结算金额。
+    tech_stack: merkletools + Solana
+    priority: P2
+
+interfaces:
+  input_schema:
+    type: object
+    properties:
+      inference_records: {type: array, items: {type: object}}
+      settlement_threshold: {type: number, default: 10}
+  output_schema:
+    type: object
+    properties:
+      settlement_id: {type: string}
+      total_amount: {type: number}
+      platform_fee: {type: number}
+      contributors: {type: array, items: {type: object}}
+      merkle_root: {type: string}
+
+dependencies:
+  - model-registry-feature: {required: true}
+  - moe-routing-feature: {required: true}
+
+maturity:
+  stage: concept
+  readiness: 0.1
+  roadmap:
+    - P0: 用量追踪器 + 贡献比例计算器
+    - P1: 链上结算合约 + 阈值触发引擎
+    - P2: Merkle审计证明

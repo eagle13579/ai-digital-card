@@ -1,0 +1,22 @@
+name: 项目管理
+version: 1.0.0
+description: The Agency吸收 - 项目管理角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Experiment Tracker
+  - Jira Workflow Steward
+  - Project Shepherd
+  - Studio Operations
+  - Studio Producer
+  - Senior Project Manager
+capabilities:
+  - 跨职能项目协调与全周期管理
+  - Jira工作流管理与工单跟踪
+  - 实验追踪与A/B测试管理
+  - 工作室运营与制作管理
+  - 高级项目治理与干系人管理
+  - 资源规划与风险管理
+integration: 直接补充AI数字军团项目管理能力

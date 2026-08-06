@@ -1,0 +1,48 @@
+feature_id: F-ARC-A2A-03
+name: A2A通信层 — Agent注册表
+version: "1.0"
+dimension: 体系
+source_model: 虾评Skill A2A-CHAT v1.0.0
+# 精确source_model溯源 (2026-06-12): 五池/模型池/A2A-CHAT注入清单_2026-06-08.md
+source_project: Feature总线/a2a/agent_registry.py
+one_liner: 基于employee.yaml构建的Agent注册表，按能力/话题/角色/部门索引
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  扫描记忆宫殿/employees/下的所有员工档案(employee.yaml)，
+  构建Agent注册索引，支持：
+  - 按能力(子串/精确)查找Agent
+  - 按话题查找订阅Agent
+  - 按角色/部门筛选Agent
+  - 自动推断话题订阅（基于部门映射+能力关键词+特殊Agent硬编码）
+input:
+  - agent_id: str  # 员工唯一标识
+  - query.capability: str  # 查找能力
+  - query.topic: str  # 查找话题
+  - query.role: str  # 查找角色
+  - query.department: str  # 查找部门
+output:
+  - agents: list[dict]  # Agent信息列表
+  - agent_count: int  # 总数
+  - capabilities: list[str]  # 所有能力列表
+  - topics: list[str]  # 所有话题列表
+  - departments: list[str]  # 所有部门列表
+sop: |
+  1. AgentRegistry(employees_dir) -> 初始化
+  2. load() -> 扫描emp-*目录/读取employee.yaml/解析/索引
+  3. find_by_capability(cap) -> 能力子串匹配
+  4. find_by_topic(topic) -> 话题精确匹配
+  5. find_by_role(role) / find_by_department(dept) -> 角色/部门筛选
+  6. register_agent(agent_info) -> 手动注册临时Agent
+  7. refresh() -> 重新加载
+quality_gate:
+  - score: 7/10
+  - checks:
+    - 纯stdlib实现(无外部依赖)
+    - 简易YAML解析器支持扁平+列表结构
+    - 按能力/话题/角色/部门4种索引查询
+    - 自动话题推断(部门映射+关键词+特殊Agent)
+    - 支持手动注册临时Agent
+iteration_log:
+  - "2026-06-08: v1.0初始版本, 从a2a/agent_registry.py提取Feature YAML"

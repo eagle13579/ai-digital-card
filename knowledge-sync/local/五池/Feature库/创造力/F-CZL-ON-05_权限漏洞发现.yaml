@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-05
+name: 权限漏洞发现
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 从权限矩阵中自动发现越权路径和权限漏洞
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,53 @@
+id: multi-tenant-circuit-breaker
+name: 多租户三维熔断体系
+version: 1.0.0
+status: production
+
+products:
+  - 通用: 自动匹配
+description: >
+  三维联动熔断系统：全局六层(纵向)、项目租户(横向)、
+  业务场景(纵深)各自独立检测水位并按维度精确熔断。
+  四级水位(70%-85%-95%-100%)触发差异化动作，
+  单项目触达95%仅限流该项目，其他项目正常运行。
+
+watermark_levels:
+  warning_70:
+    label: 预警水位
+    global_action: "L1清理提速、模型T2→T1降级、查重复用"
+    project_scoped: true
+    scene_scoped: true
+  throttle_85:
+    label: 限流水位
+    global_action: "暂停非营收场景T2、检索Top10→Top5、关闭海外模型"
+    project_scoped: true
+    scene_scoped: true
+  emergency_fuse_95:
+    label: 紧急熔断
+    global_action: "清空L1/L2、关停Pro/海外模型"
+    project_action: "仅限流该项目，其余项目正常"
+    scene_action: "仅关停该场景新写入，同项目其他场景不受影响"
+  hard_protection_100:
+    label: 硬保护
+    global_action: "仅保留盖亚大脑基础调度+客户获客最小链路"
+    project_scoped: true
+    scene_scoped: true
+
+special_fuse_configs:
+  - target: Scene-Quant
+    threshold: 0.80
+    actions:
+      - "强制T0(Qwen3.5-Turbo)，禁止Flash/Pro"
+      - "单调用≤4K Token输入 / ≤800 Token输出"
+      - "日上限: 输入4M Token / 输出400K Token"
+      - "压缩比≥6"
+      - "单小时≤20次调用"
+  - target: Project-Quant
+    threshold: 0.80
+    actions:
+      - "预算系数0.3(相比默认↓70%)"
+      - "L3: 1GB(相比同规模↓75%)"
+      - "强制T0模型"
+
+fuse_rule: "any_dimension_touch_triggers_corresponding_action"
+check_order: ["global_hermes", "project_budget", "scene_compute"]

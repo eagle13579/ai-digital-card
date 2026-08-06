@@ -1,0 +1,63 @@
+feature_id: "F-CZL-IE-001"
+name: "创新发现引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "链客宝KFD Feature化实战"
+# 精确source_model溯源 (2026-06-12): 五池/模型池/2026-05-21_IJPay支付注入_模型.md + 五池/模型池/2026-06-01_链客宝数据安全心智模型.md + 五池/模型池/2026-06-02_链客宝会员心智模型.md
+created_at: "2026-06-08"
+author: "乘黄 (P9, 产品经理)"
+tags:
+  - "链客宝"
+  - "KFD生产化冲刺"
+  - "市场机会发现"
+  - "趋势分析"
+
+one_liner: "自动扫描用户行为与市场信号，经趋势分析与交叉推荐生成创新机会清单"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  源自链客宝KFD生产化冲刺的Feature化实战项目。
+  创新发现引擎系统化地发现和评估市场创新机会：
+  
+  1. 机会扫描（OpportunityScanner）：检测匹配失败、未满足需求、搜索真空、需求突变、供需缺口5类信号
+  2. 趋势分析（TrendAnalyzer）：品类热度、供需平衡、新兴领域、企业画像、季节性5维分析
+  3. 交叉推荐（OpportunityRecommender）：综合评分排序去重，生成可执行推荐清单
+
+input: |
+  - 用户行为数据: 需求发布记录、搜索日志、浏览路径
+  - 匹配事件数据: 匹配成功/失败记录及原因
+  - 企业需求数据: 未满足的供需匹配请求
+  - 引擎配置: 数据源路径、评分权重、阈值设置
+
+output: |
+  - EngineResult: 完整引擎运行结果
+  - scan_result: 扫描信号列表（含信号类型/置信度/来源）
+  - trend_report: 趋势洞察列表与摘要
+  - recommendation: 推荐机会清单（含评分分解与执行建议）
+
+sop: |
+  1. 机会扫描阶段：加载配置参数，调用OpportunityScanner扫描5种市场信号类型（match_failure/unmet_need/search_void/demand_spike/supply_gap），输出标准化OpportunitySignal列表
+  2. 趋势分析阶段：基于扫描结果调用TrendAnalyzer执行品类热度、供需平衡、新兴领域、企业画像、季节性5维分析，输出TrendInsight列表与摘要报告
+  3. 交叉推荐阶段：调用OpportunityRecommender对各信号与洞察进行综合评分（置信度×紧迫性×商业价值），合并去重后按优先级排序，为每个推荐机会生成可执行ActionStep
+
+quality_gate:
+  - gate: "烟雾测试通过"
+    standard: "三大阶段（扫描/分析/推荐）闭环运行无报错，返回完整报告"
+    score: 5
+  - gate: "发现数量达标"
+    standard: "返回报告含≥3项独立发现（机会或洞察），每项有明确的评分分解"
+    score: 5
+  - gate: "建议可执行性"
+    standard: "每个推荐机会包含至少1个ActionStep（含操作类型/描述/负责人/优先级）"
+    score: 4
+
+score_target: "8/10"
+depends_on:
+  - "F-DAT-链客宝-03_统一数据管道"
+enhanced_by:
+  - "F-CZL-链客宝-01_假设验证门禁"
+  - "F-CZL-链客宝-02_增长实验引擎"
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 注册到Feature库，标准版含3阶段管道（扫描+分析+交叉推荐）
+product: "链客宝"

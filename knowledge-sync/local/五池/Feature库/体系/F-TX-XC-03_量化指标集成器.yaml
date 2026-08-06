@@ -1,0 +1,24 @@
+feature_id: "F-TX-XC-03"
+name: "量化指标集成器"
+version: "1.0.0"
+dimension: "体系"
+source_model: "XCrawlerM6+M12"
+one_liner: "集成talib技术指标(金叉/死叉/超买超卖/乖离率)为可配置评分因子"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  将MACD/KDJ/RSI/布林带等talib指标封装为标准评分因子，可配置权重、阈值、组合。
+input: |-
+  股票行情数据(OHLCV)
+output: |-
+  技术指标评分报告(每指标得分+综合评分+信号方向)
+sop: |-
+  1. 加载行情数据 2. 计算各技术指标 3. 对比阈值生成信号 4. 加权综合评分 5. 输出信号方向
+quality_gate: |-
+  1. 支持≥6种指标 2. 阈值可配置 3. 信号延迟<1s
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

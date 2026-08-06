@@ -1,0 +1,9 @@
+feature_id: F-AS-08_废弃审计引擎
+name: 代码是负债
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 代码是负债。废弃计划在设计时开始。定时扫描未使用资产生成废弃建议。
+
+products:
+  - 通用: 自动匹配

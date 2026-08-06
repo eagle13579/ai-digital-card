@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-27
+name: 废弃时机推荐
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 基于使用频率分析推荐代码废弃/迁移时机
+
+products:
+  - 通用: 自动匹配

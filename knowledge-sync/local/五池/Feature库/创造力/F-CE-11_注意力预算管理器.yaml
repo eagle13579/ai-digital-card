@@ -1,0 +1,8 @@
+feature_id: F-CE-11_注意力预算管理器
+name: 注意力预算管理器
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+
+products:
+  - 通用: 自动匹配

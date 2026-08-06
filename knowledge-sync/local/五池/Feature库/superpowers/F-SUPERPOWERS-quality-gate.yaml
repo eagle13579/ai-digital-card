@@ -1,0 +1,23 @@
+name: superpowers-quality-gate
+dimension: 基本功
+description: 证据驱动质量门禁 — 每个交付物必须附带可验证的证据
+source: obra/superpowers (GitHub 245K Stars)
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - L0-L5五级证据等级体系
+  - 子Agent交付物自动审查门禁
+  - 证据不达标自动打回机制
+  - 独立可验证性检查
+  - 需求一致性比对
+mental_models:
+  - SP-08_Evidence-Driven-Quality-Gate
+triggers:
+  - 任何子Agent提交交付物时
+  - 任何"完成"声明时
+  - 任何"部署成功"报告时
+integration:
+  - 对齐军团「实事求数据铁律」
+  - 增强「有壳无芯陷阱」防御
+  - 补充三端验证的证据等级标注

@@ -1,0 +1,66 @@
+feature_id: "F-体系-原子挖掘-10"
+name: "Mx模块化增量注入"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M23-Mx模块化增量注入"
+source_project: "chainke-full"
+source_location: "D:/chainke-full/routers/: 各Mx路由=纯新增不修改现有业务逻辑"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "纯新增不修改现有逻辑的Mx增量注入标准流程，保障功能迭代零侵入"
+what_it_does: |
+  场景：链客宝需要在现有系统上持续增加功能模块，但不能影响已有业务。
+  问题：功能迭代常导致现有系统被修改，引入回归风险和技术债务。
+  价值：Mx规则——"纯新增，不修改现有业务逻辑"，每个模块以Mx_名称.py独立存在，Pydantic模型先行，中台化路由设计。
+  架构亮点：Mx_独立文件→Pydantic v2模型先行→FastAPI APIRouter统一前缀→零侵入注入。
+
+input: |
+  - 功能需求: 新功能的产品和业务需求文档
+  - 数据模型: 新功能所需的数据结构和字段定义
+  - API设计: 新功能的API接口设计(路径/方法/参数)
+  - 现有系统: 对现有系统的接口和数据依赖分析
+
+output: |
+  - Mx模块文件: 独立的Mx_功能名称.py文件
+  - Pydantic模型: 新功能的数据模型定义
+  - APIRouter路由: 统一前缀的新功能路由
+  - 依赖声明: 对现有系统接口的依赖清单
+  - 零侵入证明: 代码审查确认无现有逻辑修改
+
+sop: |
+  1. 需求分析：明确功能边界，确认是纯新增而非修改
+  2. 模型先行：先定义Pydantic v2数据模型，再写业务逻辑
+  3. 独立文件：创建Mx_功能名称.py，不修改任何现有文件
+  4. APIRouter：使用FastAPI APIRouter + prefix定义路由
+  5. 依赖注入：声明对现有系统接口的依赖(dependency injection)
+  6. 中台化注册：在main.py中挂载新路由(仅在此处注册)
+  7. 零侵入审查：代码审查确保没有修改任何现有业务逻辑
+  8. 独立测试：新模块的单元测试和集成测试独立运行
+
+quality_gate:
+  - gate: "零侵入原则"
+    standard: "新模块不修改任何现有业务逻辑代码(包括一行代码)"
+    score: 5
+  - gate: "模型先行"
+    standard: "所有数据模型在业务逻辑之前完整定义"
+    score: 5
+  - gate: "路由统一"
+    standard: "使用FastAPI APIRouter + prefix统一注册"
+    score: 5
+  - gate: "独立可测试"
+    standard: "新模块可独立运行单元测试，不依赖现有系统环境"
+    score: 5
+
+score_target: "10/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从chainke-full Mx模块化增量注入模式提取，为链客宝功能迭代的安全注入标准流程
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

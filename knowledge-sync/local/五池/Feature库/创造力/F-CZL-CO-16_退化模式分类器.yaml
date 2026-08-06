@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-16
+name: 退化模式分类器
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 自动分类当前context的退化类型(Lost/中间/稀缺)
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-03
+name: 反事实沙盒模拟
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 在Dream Sandbox中模拟'如果...会怎样'的反事实场景
+
+products:
+  - 通用: 自动匹配

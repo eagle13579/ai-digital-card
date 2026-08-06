@@ -1,0 +1,27 @@
+feature_id: F-CJ-NEURO-02
+name: 准备电位预热
+version: 1.0.0
+dimension: 场景
+source_model: 脑神经间断平衡/H4-准备电位.md
+one_liner: AI系统复杂切换前的静默预热阶段，预加载上下文减少切换成本
+
+products:
+  - 通用: 自动匹配
+what_it_does: 在执行完整唤醒/检查流程前，静默预读MEMORY.md、状态总览.md、3+X窗口context，实现16秒等效预热
+input: 记忆宫殿各核心文件路径
+output: 上下文缓存就绪状态
+sop: '1. Phase 0完成后进入Phase 0.5
+
+  2. 静默预读MEMORY.md最后100行
+
+  3. 静默预读状态总览.md
+
+  4. 静默预读3+X窗口各context第一行
+
+  5. 确认缓存就绪后进入Phase 1'
+quality_gate: '评分7/10: 预热后首轮响应速度提升30%'
+score: 7
+depends_on: []
+enhanced_by: []
+implementation: bai-ze-complete-wake-protocol/SKILL.md Phase 0.5
+draft: false

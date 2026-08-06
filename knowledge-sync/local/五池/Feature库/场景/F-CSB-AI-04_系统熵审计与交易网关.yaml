@@ -1,0 +1,16 @@
+---
+id: F-CSB-AI-04
+name: 系统熵审计与交易网关
+category: 场景
+dimension: 系统监控
+description: 系统熵健康度审计 + 交易网关 + 券商连接器 + 交易追踪
+version: 1.0.0
+status: draft
+source: BaiZeCapital_旧版 entropy_engine.py + trading_gateway.py + bzc_connector.py + trade_tracker.py
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - 2026-06-23_CSB-系统熵审计引擎
+  - 2026-06-23_CSB-交易网关与券商连接器
+dependencies: []

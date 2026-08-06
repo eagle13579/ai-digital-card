@@ -1,0 +1,62 @@
+feature_id: "F-TX-名片-03"
+name: "名片生命周期管理"
+version: "1.0.0"
+dimension: "体系"
+source_model: "链客宝 business_card.py router (1241行) + BusinessCard model"
+source_location: "D:/链客宝/backend/app/routers/business_card.py + D:/链客宝/backend/app/models.py (BusinessCard类)"
+
+one_liner: "数字名片从创建→分享→浏览→匹配→删除的完整CRUD生命周期管理，含12端点+三层身份验证+PostHog埋点"
+
+products:
+  - AI数字名片: 自动匹配
+what_it_does: |
+  场景：数字名片产品需要完整的后端API支持名片全生命周期管理。
+  问题：没有标准化的名片CRUD会导致各产品各自实现，数据孤岛。
+  价值：12个标准化API端点覆盖名片全生命周期——AI扫描创建/手动生成/公开浏览/Token分享/QR码/小程序同步/vCard导出/邮件签名/OpenGraph预览/供需匹配/列表/删除。三层身份验证(强制Token→可选Token→开放公开)。PostHog埋点追踪名片生成事件。
+  数据模型: 12字段BusinessCard表含fields(JSON)/share_token/album_meta/version(乐观锁)/membership_tier/match_credits等。
+
+input: |
+  - 创建: CardGenerateRequest (fields JSON) + 用户Token
+  - 查询: card_id 或 share_token (公开)
+  - 分享: card_id (生成QR码/vCard/邮件签名/OG预览)
+  - 匹配: card_id + 用户Token + top_k
+  - 列表: 用户Token + page/page_size
+  - 删除: card_id + 用户Token (软删除)
+
+output: |
+  标准统一格式: {code: 200, message, data}
+  特殊格式: vCard(.vcf) / 邮件签名HTML / QR码PNG / OpenGraph JSON
+
+sop: |
+  1. POST /api/card/scan — 上传文件→AI提取→返回字段JSON
+  2. POST /api/card/generate — 字段JSON→持久化→返回名片(含share_url)
+  3. GET /api/card/{id} — 公开查询(+1浏览计数)
+  4. GET /api/card/token/{token} — Token查询(+1浏览计数)
+  5. GET /api/card — 我的名片列表(分页)
+  6. DELETE /api/card/{id} — 软删除(仅所有者)
+  7. POST /api/card/{id}/match — 供需匹配(仅所有者)
+  8. GET /api/card/{id}/qrcode — QR码PNG生成
+  9. GET /api/card/{id}/vcard — vCard导出
+  10. GET /api/card/{id}/share-preview — OpenGraph元数据
+  11. GET /api/card/{id}/email-signature — 邮件签名HTML
+  12. POST /api/card/sync-from-miniapp — 小程序同步(三级身份识别)
+
+  6. 生命周期状态机: 定义名片状态(创建→活跃→沉默→归档→删除)及转换触发条件
+  7. 过期自动提醒: 名片超过90天未更新时触发创建者提醒+自动降级展示权重
+
+quality_gate:
+  score: 9
+  checks:
+    - "12个API端点全部实现"
+    - "三层身份验证(强制/可选/公开)"
+    - "软删除 + 乐观锁(version字段)"
+    - "PostHog埋点(名片生成事件追踪)"
+    - "vCard/邮件签名/QR码/OG预览四种分享格式"
+  reusable_by: ["链客宝", "AI数字名片", "企业名片", "任何需要联系人管理的产品"]
+product:
+  - "AI数字名片"
+  - "链客宝"
+
+iteration_log:
+- "2026-06-12: v1.2.0 成熟度打磨 — 白泽补充SOP执行步骤+QualityGate评分升级至9/10"
+# 成熟度标记: 2026-06-12 白泽打磨到9+

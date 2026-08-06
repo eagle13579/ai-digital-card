@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-04
+name: 极端情景推演
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 在最乐观和最悲观情景下设计应对
+
+products:
+  - 通用: 自动匹配

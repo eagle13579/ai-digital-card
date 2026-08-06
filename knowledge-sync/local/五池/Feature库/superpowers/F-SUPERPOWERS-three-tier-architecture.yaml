@@ -1,0 +1,18 @@
+name: superpowers-three-tier-architecture
+version: v1.0.0
+description: 三层架构管理 — 主Agent(战略层)→子Agent(战术层)→执行Agent(执行层)的分层管理体系。基于Superpowers SDD方法论，主Agent负责需求澄清、MECE拆解与审查；子Agent负责计划制定与任务调度；执行Agent负责编码实现。三层之间通过证据驱动门禁衔接，形成战略-战术-执行闭环。
+
+atomic_models:
+  - MM-01: SDD (Subagent-Driven Development) — 编码Agent完整SDLC方法论
+  - MM-04: Agent-as-Orchestrator (Agent即项目经理) — 主Agent不做编码只做管理
+  - MM-06: Design-First Iteration — 先展示设计再动手编码
+
+entry_points:
+  - 任何编码任务开始前，主Agent自动进入Ask-First阶段
+  - 复杂度>50行或涉及多文件时，强制触发三层拆解
+  - 子Agent完成交付物后，自动触发证据审查门禁
+
+products:
+  - 通用: 自动匹配
+
+created_at: 2026-07-05

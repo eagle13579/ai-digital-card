@@ -1,0 +1,9 @@
+name: payment-创造力
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - FastAPI架构
+  - ORM映射
+  - 异步编程

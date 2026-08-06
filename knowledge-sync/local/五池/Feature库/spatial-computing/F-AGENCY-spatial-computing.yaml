@@ -1,0 +1,19 @@
+# 🥽 Feature: 空间计算能力 (Spatial Computing)
+id: F-AGENCY-SPATIAL
+name: spatial-computing
+version: 1.0.0
+description: The Agency吸收 - 空间计算角色定义 (6角色: visionOS/macOS/XR/WebXR)
+source: agency-agents/spatial-computing/
+status: absorbed
+atoms:
+  - spatial-metal: macOS Spatial/Metal Engineer GPU编程/空间渲染
+  - visionos-spatial: visionOS Spatial Engineer Vision Pro/空间UI
+  - xr-immersive: XR Immersive Developer WebXR/沉浸式开发
+  - xr-interface: XR Interface Architect空间UI/UX/手势系统
+  - xr-cockpit: XR Cockpit Interaction Specialist工业XR/控制交互
+  - terminal-integration: Terminal Integration Specialist CLI/自动化工作流
+capabilities:
+  - spatial-ui: 空间UI设计原则(深度/尺度/存在感)
+  - xr-development: WebXR跨平台XR开发
+  - metal-gpu: Metal GPU编程(高性能计算/渲染)
+integration: 补充空间计算知识, Terminal Integration Specialist心智模型最实用

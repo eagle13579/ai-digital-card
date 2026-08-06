@@ -1,0 +1,9 @@
+feature_id: F-CZL-企业-32
+name: 推广瓶颈预测
+version: 1.0.0
+dimension: 创造力
+source_model: 企业AI吸收
+one_liner: 从使用数据预测下一个推广卡点在哪个部门
+
+products:
+  - 通用: 自动匹配

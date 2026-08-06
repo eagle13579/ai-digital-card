@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-08
+name: 多Agent拓扑优化器
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 根据任务特征自动推荐最优的多Agent编排拓扑
+
+products:
+  - 通用: 自动匹配

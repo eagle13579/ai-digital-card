@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-45
+name: 反直觉发现器
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 从数据中挖掘与常识相反的隐藏模式
+
+products:
+  - 通用: 自动匹配

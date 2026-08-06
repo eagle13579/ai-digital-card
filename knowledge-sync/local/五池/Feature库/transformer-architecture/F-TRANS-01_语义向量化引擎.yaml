@@ -1,0 +1,119 @@
+name: "F-TRANS-01"
+title: "语义向量化引擎"
+version: 2.0.0
+category: "嵌入表示"
+description: "将离散Token映射为连续语义向量空间,为下游任务提供统一的数值化语义表示基座"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T01 Token向量化"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "__init__"
+    lines: 124-126
+    summary: "wte = nn.Embedding(vocab_size, n_embd) — 可学习的Token嵌入表,将离散Token索引映射为768/512维稠密向量"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "forward"
+    lines: 168-177
+    summary: "tok_emb = self.transformer.wte(idx) — 前向传播中将输入索引序列(b,t)查表得到(b,t,n_embd)嵌入张量,与位置编码求和后送入Transformer块"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "paper_Models.py"
+    class: "Encoder"
+    method: "__init__"
+    lines: 60-61
+    summary: "src_word_emb = nn.Embedding(n_src_vocab, d_word_vec) — 原论文编码器词嵌入,支持padding_idx和缩放因子sqrt(d_model)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "Decoder"
+    method: "__init__"
+    lines: 99-100
+    summary: "trg_word_emb = nn.Embedding(n_trg_vocab, d_word_vec) — 原论文解码器词嵌入,与编码器可共享权重(Weight Tying)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "Transformer"
+    method: "__init__"
+    lines: 182-187
+    summary: "权重共享机制: trg_word_prj.weight = decoder.trg_word_emb.weight (嵌入层与输出投影层参数同享)及encoder-decoder跨语种embedding共享"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class SemanticEmbedding:
+      """
+      语义向量化引擎 — 将离散Token ID映射为连续语义向量
+
+      架构模式:
+        Token索引 → 查表(nn.Embedding) → 稠密向量 → 可选缩放 → +位置编码 → 下游
+
+      关键设计决策:
+        1. vocab_size × n_embd 参数量: 小模型(vocab=5w, dim=768)约3800万参数
+        2. 权重共享(Weight Tying): 嵌入层权重 = LM Head权重,减少约50%嵌入参数量
+        3. 可学习 vs 固定: 现代架构(如GPT)使用可学习嵌入,原论文也支持缩放因子 √d_model
+      """
+      def __init__(self, vocab_size: int, d_model: int, padding_idx: int = None, scale_emb: bool = False):
+          self.embedding = nn.Embedding(vocab_size, d_model, padding_idx=padding_idx)
+          self.d_model = d_model
+          self.scale_emb = scale_emb
+
+      def forward(self, token_ids: Tensor) -> Tensor:
+          # token_ids: (batch, seq_len) 离散索引
+          emb = self.embedding(token_ids)   # → (batch, seq_len, d_model)
+          if self.scale_emb:
+              emb = emb * math.sqrt(self.d_model)  # 原论文缩放技巧
+          return emb
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "语义密度最大化的低维连续空间映射 — 每个嵌入维度编码独立的语义特征"
+  - "各Token独立嵌入,无参数共享的细粒度语义基座 — 同Token始终映射到同一向量空间位置"
+  - "权重共享(Weight Tying)减少参数量,同时强制嵌入层与输出层语义空间一致"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "供需匹配语义基座"
+    description: >
+      将链客宝中的需求方发布内容(如招商需求、资源描述)和供给方资质(如产品详情、服务能力)
+      统一编码为768维语义向量,为后续的QKV匹配路由提供标准化的语义输入表示。
+      其中vocab_size由链客宝领域词典决定(~5w),d_model统一为768。
+
+  - product: "AI名片"
+    component: "用户画像嵌入层"
+    description: >
+      将用户自我介绍、标签、履历描述等离散文本Token化为语义向量。
+      每张名片的嵌入向量(512维)作为用户的语义身份证,用于精准匹配推荐。
+      支持多语言混合输入(中英文名片),embedding表覆盖中英文混合词表。
+
+  - product: "数智港"
+    component: "多源数据标准化接入层"
+    description: >
+      将来自不同数据源(结构化表格、非结构化文本、日志)的离散Token统一映射
+      到同一语义空间,实现异构数据的数值化对齐,为后续的跨模态检索和智能分析提供基座。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "引入动态上下文感知嵌入替代静态词表嵌入(如GPT的上下文Embedding)"
+  - "支持多模态对齐的跨模态嵌入扩展(文本→图像→音频联合嵌入空间)"
+  - "亚词级分词(BPE/WordPiece)与嵌入的联合优化,降低OOV率"
+  - "嵌入维度自适应:根据任务复杂度动态选择d_model大小"

@@ -1,0 +1,8 @@
+name: F-SDCN-01_代码所有权分发
+description: 组件以源码存在于项目中, 用户可控
+version: 1.0.0
+dimension: 创造力
+source: shadcn-ui/ui
+products:
+  - AI数字名片
+  - 链客宝

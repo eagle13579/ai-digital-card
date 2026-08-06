@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-49
+name: 类比创新引擎
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 从自然界/其他行业找类比映射到当前问题
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-10
+name: Ontology盲点发现
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 从Agent提问中发现业务对象的Ontology注册盲点
+
+products:
+  - 通用: 自动匹配

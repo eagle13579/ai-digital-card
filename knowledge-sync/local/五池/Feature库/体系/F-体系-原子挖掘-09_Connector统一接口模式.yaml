@@ -1,0 +1,64 @@
+feature_id: "F-体系-原子挖掘-09"
+name: "Connector统一接口模式"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M20-Connector统一接口模式"
+source_project: "Vibe-Trading"
+source_location: "D:/Vibe-Trading/Vibe-Trading/connector-first: profile list/use/check/account/positions/orders 统一接口"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "多外部系统统一接入的Connector接口模式：list/use/check/account/positions/orders六统一"
+what_it_does: |
+  场景：链客宝需要对接微信/企微/飞书/支付宝/微信支付等多个外部系统。
+  问题：每个外部系统接入方式不同，导致集成代码重复、维护成本高、切换风险大。
+  价值：借鉴Vibe-Trading的Connector-first架构，定义统一接口规范(profile list/use/check/account/positions/orders)，所有外部系统接入遵循同一契约，切换只需换connector配置。
+  架构亮点：统一connector profile接口(IBKR/Robinhood/老虎/长桥/Alpaca/OKX/币安/富途等)，可平移到链客宝的多支付/多物流/多平台接入。
+
+input: |
+  - Connector类型: 对接的外部系统标识(微信/企微/支付宝等)
+  - Connector配置: 认证信息、API端点、超时设置等
+  - 操作命令: list/use/check/account/positions/orders
+  - 操作参数: 各操作的具体参数(如订单查询需要订单ID)
+
+output: |
+  - Profile确认: Connector配置验证结果
+  - 统一响应: 所有connector返回统一格式的响应
+  - 错误标准化: 外部系统错误统一转换为标准错误码
+  - 连接状态: Connector的健康状态和最近一次通信时间
+
+sop: |
+  1. 注册Connector：配置外部系统信息(类型/认证/端点)
+  2. Profile验证：通过check操作验证connector配置有效性
+  3. 统一操作：使用6个标准操作(list/use/check/account/positions/orders)与外部系统交互
+  4. 错误标准化：将外部系统原始错误统一转换为标准错误码
+  5. 健康监控：定时检查各connector的连接状态
+  6. 动态切换：运行时切换connector配置(如从支付宝切换到微信支付)
+  7. 审计日志：记录所有connector调用日志
+
+quality_gate:
+  - gate: "接口统一"
+    standard: "所有connector必须实现list/use/check/account/positions/orders六统一接口"
+    score: 5
+  - gate: "错误标准化"
+    standard: "所有外部系统错误统一转换为标准错误码格式"
+    score: 5
+  - gate: "热切换能力"
+    standard: "支持运行时动态切换connector配置"
+    score: 5
+  - gate: "性能兜底"
+    standard: "connector超时时间可配置，默认5s"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从Vibe-Trading Connector-first架构提取，可平移到链客宝多外部系统接入
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

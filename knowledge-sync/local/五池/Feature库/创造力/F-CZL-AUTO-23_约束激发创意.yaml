@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-23
+name: 约束激发创意
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 在有限规则内找到最大创造空间
+
+products:
+  - 通用: 自动匹配

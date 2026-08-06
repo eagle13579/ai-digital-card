@@ -1,0 +1,158 @@
+name: "F-TRANS-04"
+title: "多头并行分析框架"
+version: 2.0.0
+category: "并行计算"
+description: "将注意力计算拆分为多个独立子空间并行执行,使模型同时关注不同位置的多种语义关系,是多视角信息融合的核心架构"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T05 MultiHead"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # --- nanoGPT: 多头因果自注意力 ---
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "__init__"
+    lines: 29-48
+    summary: "n_head=12, n_embd=768, head_dim=64 — 12头并行,每头处理64维子空间;Flash Attention/因果掩码"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "forward"
+    lines: 50-74
+    summary: "q.view(B,T,nh,hs).transpose(1,2) → split heads → attention → y.transpose(1,2).contiguous().view(B,T,C) → concat heads — 标准的分头→计算→合头流水线"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 原论文: 标准多头注意力 ---
+  - file: "paper_SubLayers.py"
+    class: "MultiHeadAttention"
+    method: "__init__"
+    lines: 17-32
+    summary: "n_head=8, d_k=d_v=64 — 8个注意力头,每头捕获不同语义模式;独立QKV投影支持d_k≠d_v"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  - file: "paper_SubLayers.py"
+    class: "MultiHeadAttention"
+    method: "forward"
+    lines: 35-64
+    summary: "q = w_qs(q).view(sz_b, len_q, n_head, d_k).transpose(1,2) → attn → q.transpose(1,2).contiguous().view(sz_b, len_q, -1) → fc — 完整的分头→SDPA→合头→输出投影流水线"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  # --- BERT: 标准多头 ---
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertSelfAttention"
+    method: "__init__"
+    lines: 46-69
+    summary: "num_attention_heads=12, attention_head_size=64, all_head_size=768 — BERT-base标准12头配置"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  # --- Llama: GQA多头(非均匀) ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "__init__"
+    lines: 96-123
+    summary: "num_key_value_groups = num_attention_heads // num_key_value_heads — Llama-7B: Q=32头,KV=8头(每组4个Q共享1个KV),非均匀多头分布"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    function: "repeat_kv"
+    lines: 52-61
+    summary: "KV头复制扩展: 将8个KV头扩展为32个,实现一个KV服务多个Q头的分组共享机制"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class MultiHeadAnalyzer:
+      """
+      多头并行分析框架 — 多视角语义关系的并行捕获与融合
+
+      核心操作模式:
+        Input → [Q_proj, K_proj, V_proj] → split_heads → [Head_1 ... Head_N] → attention → concat_heads → output_proj
+
+      Variant A: 标准MHA (原论文/nanoGPT/BERT)
+        n_head = 12, head_dim = 64
+        # 分头: (B, T, n_head*head_dim) → view(B, T, n_head, head_dim) → transpose(1,2) → (B, n_head, T, head_dim)
+        # 每头独立计算 attention(q_i, k_i, v_i)
+        # 合头: transpose(1,2) → contiguous → view(B, T, n_head*head_dim)
+        # 输出投影: Linear(n_head*head_dim, d_model)
+
+      Variant B: GQA多头 (Llama风格, 非均匀)
+        n_query_heads = 32, n_kv_heads = 8, groups = 32/8 = 4
+        # Q: (B, 32, T, head_dim) — 每个Q独立
+        # K: (B, 8, T, head_dim) — 先复制为(B, 32, T, head_dim)
+        # V: (B, 8, T, head_dim) — 先复制为(B, 32, T, head_dim)
+        # 复制后: 标准的32头注意力
+        # 优势: KV缓存只需存8头,显存节省75%
+
+      Variant C: 带掩码的多头注意力 (Encoder vs Decoder)
+        Encoder: 无掩码/填充掩码,每个Token看到所有Token
+        Decoder: 因果掩码(三角掩码),每个Token只看左边
+        Cross-Attn: K/V来自编码器输出,Q来自解码器
+
+      def split_heads(tensor, n_heads):
+          B, T, C = tensor.shape
+          return tensor.view(B, T, n_heads, C//n_heads).transpose(1, 2)
+
+      def merge_heads(tensor):
+          B, n_heads, T, head_dim = tensor.shape
+          return tensor.transpose(1, 2).contiguous().view(B, T, n_heads * head_dim)
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "多视角语义关系并行提取,各头捕获不同维度的语义模式(语法、语义、实体关系、语篇等)"
+  - "输出拼接与再投影实现多视角信息的无损融合 — 保持每个头的独立输出,由输出投影学习融合策略"
+  - "头间冗余与多样性平衡: 适当增加头数提升容量(GPT-3 96头),但需注意过参数化"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "多维度供需匹配分析器"
+    description: >
+      在链客宝的供需匹配中,不同注意力头分别关注不同维度的匹配信号:
+      - 头1-4: 行业匹配度 (餐饮/科技/教育)
+      - 头5-8: 规模匹配度 (预算/团队/地域)
+      - 头9-12: 时间匹配度 (时效/周期/紧急度)
+      12头并行分析后融合输出综合匹配评分。GQA模式可在头数增加时保持KV缓存可控。
+
+  - product: "AI名片"
+    component: "多视角人脉洞察引擎"
+    description: >
+      同时从多个角度分析人脉关系:
+      - 技术视角头: 技术栈匹配度
+      - 商业视角头: 行业/职位契合度
+      - 社交视角头: 共同联系人/圈子重叠度
+      - 兴趣视角头: 个人兴趣标签匹配度
+      各头独立打分,最终融合生成综合人脉推荐列表。
+
+  - product: "数智港"
+    component: "多维度产品审计分析器"
+    description: >
+      对产品/模块进行多维度并行审计:
+      - 功能完整性头: 检测功能覆盖度
+      - 代码质量头: 分析代码复杂度/可维护性
+      - 安全合规头: 检查安全漏洞与合规风险
+      - 用户体验头: 评估交互流程/界面一致性
+      各头并行审计,汇聚后生成综合审计报告。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "已落地: GQA非均匀多头 — 从LlamaAttention吸收,不同粒度头配置,详见F-TRANS-07"
+  - "动态头裁剪: 根据任务复杂度自动调整活跃头数(简单任务4头,复杂任务32头)"
+  - "专家混合(MoE)多头: 每个头路由到不同的专家网络,实现条件计算"
+  - "多尺度注意力头: 不同头使用不同head_dim(大头捕获全局,小头捕获局部)"

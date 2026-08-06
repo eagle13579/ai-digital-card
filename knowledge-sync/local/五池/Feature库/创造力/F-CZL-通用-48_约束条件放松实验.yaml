@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-48
+name: 约束条件放松实验
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 逐个放松约束条件看系统行为如何变化
+
+products:
+  - 通用: 自动匹配

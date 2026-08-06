@@ -1,0 +1,19 @@
+id: F-VIC-04
+name: 龙头锁定评分器
+description: 在供需失衡环节中，对候选企业进行双维度评分(壁垒强度×增长速度)，自动排序输出龙头标的，附带选股逻辑报告
+dimension: 场景
+type: 评分引擎
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 英招_P9
+source_atoms:
+- VIC-LEADER-04
+- VIC-BARRIER-TYPE-08
+quality_score: 0
+iterations: 0

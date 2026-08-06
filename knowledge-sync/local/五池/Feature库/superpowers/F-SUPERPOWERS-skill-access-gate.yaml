@@ -1,0 +1,18 @@
+name: superpowers-skill-access-gate
+version: v1.0.0
+description: Agent技能门禁系统 — 对Agent技能(Skill)的激活、执行、交付全流程进行门禁管控。包含Ask-First前置需求确认门禁（不弄清需求不执行技能）、Evidence-Driven后置质量审查门禁（无证据不交付）、以及Silent Activation上下文感知的自动技能激活门禁。三者构成完整的技能进入→执行→出口管控链。
+
+atomic_models:
+  - MM-02: Ask-First Protocol (先问再写铁律) — 任何技能执行前必须先确认需求
+  - MM-05: Silent Activation (静默触发) — 技能根据上下文自动激活，无需命令
+  - MM-08: Evidence-Driven Quality Gate (证据驱动质量门) — 无证据不交付
+
+entry_points:
+  - 用户输入自然语言需求时，静默激活匹配的Skill门禁
+  - 技能执行前，触发Ask-First需求确认门禁
+  - 技能交付时，触发Evidence-Driven质量审查门禁
+
+products:
+  - 文鳐技能集市: 自动匹配
+
+created_at: 2026-07-05

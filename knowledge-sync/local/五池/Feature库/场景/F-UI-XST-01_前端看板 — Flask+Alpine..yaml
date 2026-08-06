@@ -1,0 +1,28 @@
+feature_id: F-UI-XST-01
+name: 前端看板 — Flask+Alpine.js管理界面
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态 frontend/app.py + templates/ (3个HTML)
+
+products:
+  - 通用: 自动匹配
+description: Flask驱动的深色主题招商看板，含总览/经销商分级/城市热力图三页
+
+input: 后端API数据（overview/distribution/heatmap/dealers）
+
+output: HTML页面，Chart.js图表+Alpine.js交互
+
+sop: |
+  Flask app → 调用API → Jinja2渲染 → 前端Chart.js展示
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

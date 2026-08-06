@@ -1,0 +1,6 @@
+feature_id: F-KG-04_目标驱动验证循环
+name: 04目标驱动验证循环
+version: 1.0.0
+dimension: 体系
+source_model: Karpathy Guidelines吸收
+one_liner: 04目标驱动验证循环

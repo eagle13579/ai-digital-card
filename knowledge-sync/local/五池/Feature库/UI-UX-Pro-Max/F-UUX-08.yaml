@@ -1,0 +1,16 @@
+---
+id: F-UUX-08
+name: 预交付设计审计
+dimension: 审美
+source_model: UUX-08
+
+products:
+  - 通用: 自动匹配
+description: >-
+  上线前5维度20+项质量门禁(对比度/响应式/动画/交互/可访问性)
+sop: |-
+  详见原子模型 UUX-08
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

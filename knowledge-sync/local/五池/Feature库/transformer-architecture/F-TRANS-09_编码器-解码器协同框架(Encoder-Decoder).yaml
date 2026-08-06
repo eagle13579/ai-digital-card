@@ -1,0 +1,209 @@
+name: "F-TRANS-09"
+title: "编码器-解码器协同框架(Encoder-Decoder)"
+version: 1.0.0
+category: "序列到序列架构"
+description: "编码器-解码器(Encoder-Decoder)架构通过双向编码器理解源序列,自回归解码器结合交叉注意力生成目标序列,实现序列到序列(Seq2Seq)的完整映射"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T08 Encoder-Decoder"
+  - "T09 层叠深度"
+  - "T10 自回归生成"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # ===== 完整Transformer (原论文) =====
+
+  # --- 编码器: 双向自注意力 ---
+  - file: "paper_Models.py"
+    class: "Encoder"
+    method: "__init__"
+    lines: 54-68
+    summary: "编码器: src_word_emb + position_enc → N×EncoderLayer → layer_norm — 双向自注意力,没有因果掩码,输入序列的所有Token互相可见"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "Encoder"
+    method: "forward"
+    lines: 70-87
+    summary: "前向: 嵌入→缩放→位置编码→LN→N层EncoderLayer→输出编码表示 — 编码器输出作为交叉注意力的K/V"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # --- 解码器: 自回归+交叉注意力 ---
+  - file: "paper_Models.py"
+    class: "Decoder"
+    method: "__init__"
+    lines: 93-107
+    summary: "解码器: trg_word_emb + position_enc → N×DecoderLayer → LN — 每个DecoderLayer包含: 自注意力(因果掩码)+交叉注意力(编码器输出)+FFN"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "Decoder"
+    method: "forward"
+    lines: 109-128
+    summary: "前向: 嵌入→位置编码→LN→N层DecoderLayer(接收enc_output)→输出解码表示 — enc_output作为交叉注意力的K/V"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # --- EncoderLayer: 自注意力+FFN ---
+  - file: "paper_Layers.py"
+    class: "EncoderLayer"
+    method: "__init__"
+    lines: 13-19
+    summary: "slf_attn(MultiHeadAttention) + pos_ffn(PositionwiseFeedForward) — 编码器层 = 自注意力 + 前馈网络"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Layers.py"
+
+  - file: "paper_Layers.py"
+    class: "EncoderLayer"
+    method: "forward"
+    lines: 21-25
+    summary: "enc_output, attn = slf_attn(enc_input, enc_input, enc_input, mask) → enc_output = pos_ffn(enc_output) — Q=K=V=编码器输入(自注意力)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Layers.py"
+
+  # --- DecoderLayer: 自注意力+交叉注意力+FFN ---
+  - file: "paper_Layers.py"
+    class: "DecoderLayer"
+    method: "__init__"
+    lines: 31-35
+    summary: "slf_attn(因果自注意力) + enc_attn(交叉注意力) + pos_ffn(FFN) — 解码器有三层子层,比编码器多一个交叉注意力"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Layers.py"
+
+  - file: "paper_Layers.py"
+    class: "DecoderLayer"
+    method: "forward"
+    lines: 37-45
+    summary: "dec_output = slf_attn(dec_input, dec_input, dec_input, causal_mask) → dec_output = enc_attn(dec_output, enc_output, enc_output, src_mask) → dec_output = pos_ffn(dec_output) — 交叉注意力的Q来自解码器,K/V来自编码器"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Layers.py"
+
+  # --- 完整Transformer组装 ---
+  - file: "paper_Models.py"
+    class: "Transformer"
+    method: "__init__"
+    lines: 134-188
+    summary: "Encoder + Decoder + trg_word_prj — 完整模型: 编码器嵌入→编码器→解码器→输出投影;支持权重共享(嵌入投影同参,跨语种同参)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "Transformer"
+    method: "forward"
+    lines: 190-201
+    summary: "src_mask = get_pad_mask(src_seq, src_pad_idx) → trg_mask = pad_mask & subsequent_mask → enc_output = encoder(src_seq, src_mask) → dec_output = decoder(trg_seq, trg_mask, enc_output, src_mask) → seq_logit = trg_word_prj(dec_output)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # --- 掩码生成 ---
+  - file: "paper_Models.py"
+    function: "get_pad_mask"
+    lines: 14-15
+    summary: "(seq != pad_idx).unsqueeze(-2) — 填充掩码,忽略padding位置的注意力"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    function: "get_subsequent_mask"
+    lines: 18-23
+    summary: "(1 - triu(ones(1,len_s,len_s), diagonal=1)).bool() — 因果子序列掩码,解码器的自回归约束"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class EncoderDecoderFramework:
+      """
+      编码器-解码器协同框架 — Seq2Seq的完整架构
+
+      ===== 架构示意 =====
+      ┌─────────────────────────────────────────────────┐
+      │ 编码器(双向)            解码器(自回归+交叉)      │
+      │ ┌─────────────────┐    ┌──────────────────┐    │
+      │ │ PositionalEnc   │    │ PositionalEnc    │    │
+      │ │    + Embed      │    │    + Embed       │    │
+      │ └────────┬────────┘    └────────┬─────────┘    │
+      │          ▼                     ▼               │
+      │ ┌─────────────────┐    ┌──────────────────┐    │
+      │ │  EncoderLayer 1 │    │  DecoderLayer 1  │    │
+      │ │  - SelfAttn(双向)│    │  - SelfAttn(因果) │    │
+      │ │  - FFN          │    │  - CrossAttn(→Enc)│    │
+      │ └────────┬────────┘    │  - FFN           │    │
+      │          │             └────────┬─────────┘    │
+      │         ...                    ...             │
+      │          ▼                     ▼               │
+      │ ┌─────────────────┐    ┌──────────────────┐    │
+      │ │  EncoderLayer N │    │  DecoderLayer N  │    │
+      │ └────────┬────────┘    └────────┬─────────┘    │
+      │          │                      │              │
+      │          └───────enc_output─────┤              │
+      │                                 ▼              │
+      │                          ┌─────────────┐      │
+      │                          │   LM Head   │      │
+      │                          │ (Linear→SM) │      │
+      │                          └─────────────┘      │
+      └─────────────────────────────────────────────────┘
+
+      ===== 前向传播 =====
+      def forward(self, src_ids, trg_ids):
+          # 编码器: 双向理解源序列
+          src_mask = (src_ids != pad_idx).unsqueeze(1)  # 填充掩码
+          enc_output = self.encoder(src_ids, src_mask)
+
+          # 解码器: 自回归生成目标序列
+          trg_mask = self._make_causal_mask(trg_ids)  # 因果+填充掩码
+          dec_output = self.decoder(trg_ids, trg_mask, enc_output, src_mask)
+
+          # 输出投影: 解码器表示→词汇概率
+          logits = self.lm_head(dec_output)
+          return logits
+
+      ===== 关键区别 =====
+      Encoder: Q=K=V=编码器输入 (双向自注意力)
+      Decoder Self-Attn: Q=K=V=解码器输入 (因果自注意力)
+      Decoder Cross-Attn: Q=解码器, K=V=编码器输出 (信息提取)
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "编码器理解输入/解码器生成输出: 角色分离使模型在处理输入时能看到全局(双向),生成输出时保持单向(自回归)"
+  - "交叉注意力桥接编码器与解码器: 解码器通过Cross-Attention从编码器输出中提取信息,实现'理解→生成'的完整链路"
+  - "权重共享减少参数量: 编码器/解码器嵌入层可共享,嵌入层与输出投影层也可共享(Weight Tying)"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "需求理解→方案生成的端到端引擎"
+    description: >
+      链客宝的"需求→方案"场景:
+      - 编码器: 双向理解需求方发布的复杂需求文档(含技术要求、预算范围、时间限制)
+      - 解码器: 自回归生成匹配方案(推荐供应链方案、分配供应商、生成合作计划)
+      交叉注意力确保每一步生成都参考原始需求,防止方案偏离。
+
+  - product: "AI名片"
+    component: "名片摘要→人脉故事生成器"
+    description: >
+      - 编码器: 读取用户名片上的结构化信息(姓名/公司/职位/标签/简介)
+      - 解码器: 生成个性化的人脉推荐理由和故事化介绍
+      交叉注意力机制确保生成的推荐理由精准基于名片原始信息,同时保持
+      叙述的流畅性和个性化。支持多语言: 编码器处理中文名片/解码器输出英文推荐。
+
+  - product: "数智港"
+    component: "数据→报告生成干线"
+    description: >
+      - 编码器: 处理多源异构数据(结构化表格+非结构化文本+图表描述)
+      - 解码器: 逐步生成分析报告(摘要→方法→数据→分析→结论)
+      交叉注意力实现数据驱动的报告生成,每一步都参考原始数据。
+      支持批处理: 一次编码N份数据,解码器依次生成N份报告,充分利用编码器并行性。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "Prefix-LM: 统一编码器-解码器为单一解码器,前缀部分双向,后缀部分因果"
+  - "T5架构: 编码器-解码器的现代升级,去掉LayerNorm偏置,使用相对位置编码"
+  - "非自回归编码器-解码器: 解码器一步生成所有Token,由交叉注意力保证对齐"
+  - "分块编码器-解码器: 超长文档的分块编码+交叉注意力稀疏化"

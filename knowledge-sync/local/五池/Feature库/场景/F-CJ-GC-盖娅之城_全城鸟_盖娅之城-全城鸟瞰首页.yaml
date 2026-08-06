@@ -1,0 +1,47 @@
+feature_id: "F-CJ-GC-盖娅之城_全城鸟"
+name: "盖娅之城-全城鸟瞰首页"
+version: "1.0.0"
+dimension: "场景"
+source_model: "盖娅之城产品分析/KFD标定"
+# 精确source_model溯源 (2026-06-12): 五池/模型池/2026-05-31_盖娅之城五层进化心智模型.md + 五池/模型池/2026-06-01_路由白名单+双轨验证+负面约束优先.md + 五池/模型池/2026-06-02_盖娅之城P0P2心智模型.md
+created_at: "2026-06-07"
+author: "白泽 (KFD标定)"
+
+one_liner: "盖娅之城的场景维度Feature — 由KFD标定分析识别"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  从盖娅之城现有功能中识别并标定的场景维度Feature。
+  KFD Phase 1分析发现，属于零风险文档标注。
+
+input: |
+  标准Feature输入（由具体实现定义）
+
+output: |
+  标准Feature输出（由具体实现定义）
+
+sop: |
+  1. 此Feature已在盖娅之城中实现
+  2. KFD标定仅为注册到Feature库
+  3. 零代码改动
+
+  6. 数据刷新时效监控: 首页各卡片数据源标注更新时间, 超过30分钟未刷新告警
+  7. 用户热点图: 记录首页各区域点击频次, 月度输出布局优化建议
+
+quality_gate:
+  - gate: "功能存在"
+    standard: "盖娅之城中此功能已实现"
+    score: 9
+
+score_target: "8/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - KFD标定: 从现有功能识别，零改动
+  v1.2.0 - 成熟度打磨: 2026-06-12 白泽执行SOP完善+QualityGate升级 (评分: 9/10)
+product:
+  - "盖娅之城"
+  - "盖娅进化大脑"
+# 成熟度标记: 2026-06-12 白泽打磨到9+

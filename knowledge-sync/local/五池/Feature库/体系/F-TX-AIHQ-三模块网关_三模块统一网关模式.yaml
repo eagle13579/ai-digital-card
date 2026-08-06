@@ -1,0 +1,31 @@
+feature_id: F-TX-AIHQ-三模块网关_三模块统一网关模式
+name: 三模块统一网关模式
+version: 1.0.0
+dimension: 体系
+source_model: AI获客/gateway.py
+# 精确source_model溯源 (2026-06-12): * 2026-06-12: 来源待进一步溯源
+source_project: AI获客
+one_liner: 多子系统统一入口设计：一个API网关接收所有流量，按路径前缀转发到不同后端服务
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从AI获客/gateway.py中提取的三模块统一网关模式模式。单网关入口(/api/2b/* /api/2c/* /api/social/*)
+  + 路由转发 + 零外部依赖
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载三模块统一网关模式模式
+
+  2. 根据单网关入口(/api/2b/* /api/2c/* /api/social/*) + 路由转发 + 零外部依赖执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从AI获客/gateway.py提取初始版本

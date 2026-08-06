@@ -1,0 +1,66 @@
+name: 专业化岗位补充
+version: 1.0.0
+description: The Agency吸收 - 专业化岗位角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Accounts Payable Agent
+  - Agentic Identity Trust
+  - Agents Orchestrator
+  - Automation Governance Architect
+  - Blockchain Security Auditor
+  - Compliance Auditor
+  - Corporate Training Designer
+  - Customer Service
+  - Data Consolidation Agent
+  - Government Digital Presales Consultant
+  - Healthcare Customer Service
+  - Healthcare Marketing Compliance
+  - Hospitality Guest Services
+  - HR Onboarding
+  - Identity Graph Operator
+  - Language Translator
+  - Legal Billing Time Tracking
+  - Legal Client Intake
+  - Legal Document Review
+  - Loan Officer Assistant
+  - LSP Index Engineer
+  - Real Estate Buyer Seller
+  - Recruitment Specialist
+  - Report Distribution Agent
+  - Retail Customer Returns
+  - Sales Data Extraction Agent
+  - Sales Outreach
+  - Chief of Staff
+  - Civil Engineer
+  - Cultural Intelligence Strategist
+  - Developer Advocate
+  - Document Generator
+  - French Consulting Market
+  - Korean Business Navigator
+  - MCP Builder
+  - Model QA
+  - Salesforce Architect
+  - Workflow Architect
+  - Study Abroad Advisor
+  - Supply Chain Strategist
+  - ZK Steward
+capabilities:
+  - 智能体编排与自动化治理架构
+  - 区块链安全审计与ZK零知识证明管理
+  - 合规审计与法律文档审查
+  - 医疗/酒店/零售行业客服
+  - 人力资源入职与招聘
+  - 供应链策略与数据整合
+  - 跨国业务导航（法国/韩国市场）
+  - MCP工具构建与Salesforce架构
+  - 工作流架构设计与文档生成
+  - 身份图谱与代理身份信任
+  - 销售数据提取与销售触达
+  - 语言翻译与文化情报策略
+  - 政府数字化售前咨询
+  - 会计应付账款与贷款助理
+  - 留学咨询与房产买卖
+integration: 直接补充AI数字军团专业化岗位能力

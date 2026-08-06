@@ -1,0 +1,52 @@
+id: triple-tag-memory-control
+name: 三元标签记忆管控系统
+version: 1.0.0
+status: production
+
+products:
+  - 通用: 自动匹配
+description: >
+  盖娅体系核心工业化管控方案。每一条记忆数据强制携带
+  [记忆层级L1-L6｜项目ID｜场景SceneID] 三维正交标签，
+  实现全局六层温控、项目租户隔离、场景精细化计量的三层防护闭环。
+
+context: 工业化三正交维度记忆管控完整方案（适配你的盖亚全体系）
+
+system_architecture:
+  control_loop:
+    - 外部需求/谛听情报 → 逻辑师(三维权限校验) → 盖亚大脑/白泽军团(任务分配) → Hermes Agent(六层记忆执行) → 三维标签存储层
+  orthogonal_dimensions:
+    - dimension: 金宫殿六层(L1-L6)
+      focus: 生命周期/冷热介质/容量管控
+      type: vertical_global
+    - dimension: 项目租户(Project-ID)
+      focus: 产品线隔离/独立预算/独立熔断
+      type: horizontal_business
+    - dimension: 业务场景(Scene-ID)
+      focus: 精细计量/差异化配额/检索降噪
+      type: depth_workload
+
+core_models:
+  - TX01: 三元标签正交切割
+  - TX02: 金宫殿六层温控
+  - TX03: 四级预算熔断
+  - TX04: 场景精细化计量
+  - TX05: 项目租户隔离
+  - TX06: 认知成果固化流水线
+  - TX07: 三层Token预算管控
+  - TX08: 增量识别与摘要复用
+  - TX09: 战略核心背景复用
+  - TX10: 技能-Gaia大脑联动
+  - TX11: 阿米巴经济系统
+  - TX12: 三级记忆隔离策略
+
+key_metrics:
+  - metric: 记忆承载力
+    target: "110产品 × 12分类 × 14场景 × 17项目租户"
+  - metric: Token增长控制
+    baseline: "旧版10轮后+460%"
+    target: "新版10轮后<15%"
+  - metric: 存储复用降本
+    target: "L4/L5全局共享减少60%+重复Embedding"
+  - metric: 熔断响应
+    latency: "实时水位检测+自动执行"

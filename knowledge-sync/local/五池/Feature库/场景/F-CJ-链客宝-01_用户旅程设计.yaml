@@ -1,0 +1,82 @@
+feature_id: "F-CJ-链客宝-01"
+name: "用户旅程设计"
+version: "1.0.0"
+dimension: "场景"
+source_model: "chainke-full/src/pages/business-card/BusinessCardPage.tsx + chainke-full/src/pages/business-card/hooks.ts"
+source_project: "chainke-full"
+created_at: "2026-06-08"
+author: "白泽 (向海容授权自动扫描吸收)"
+
+one_liner: "从上传名片到AI匹配推荐的四步用户旅程（上传→校验→预览→匹配），每个步骤有明确的引导和反馈机制"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  场景：新用户第一次使用链客宝名片功能时，需要清晰的引导流程完成从上传名片到获得AI匹配推荐的完整旅程。
+  问题：产品功能复杂但用户引导缺失，新用户容易迷失、中途流失，无法体验核心价值。
+  价值：链客宝设计了四阶段用户旅程，每一步都有明确的输入、操作和输出：
+
+  阶段1 - 上传（Upload）：
+  - 用户操作：拖拽或点击上传名片照片/PDF
+  - 系统响应：文件类型验证 + 加载指示 + OCR智能提取
+  - 成功信号：字段被自动填充到表单
+
+  阶段2 - 校验（Review）：
+  - 用户操作：逐字段核对OCR结果 + AI建议补充
+  - 系统响应：表单实时更新 + 智能建议展示
+  - 成功信号：所有字段确认无误后点击生成
+
+  阶段3 - 预览（Preview）：
+  - 用户操作：翻页浏览数字画册 + 查看共同人脉
+  - 系统响应：翻页动画 + 人脉可视化 + 分享入口
+  - 成功信号：生成分享链接和二维码
+
+  阶段4 - 匹配（Matched）：
+  - 用户操作：查看AI匹配推荐列表
+  - 系统响应：按匹配度展示潜在合作伙伴
+  - 成功信号：找到感兴趣的合作对象
+
+  每一步的驱动逻辑在 hooks.ts 的 useBusinessCard() 中实现，通过 step 状态机控制流程跳转。
+
+input: |
+  - 当前步骤状态: upload | review | preview | matched
+  - 用户上传的文件: 名片图片或PDF
+  - OCR提取的字段: CardFields 键值对
+  - AI匹配推荐列表: MatchItem[] 
+  - 用户操作事件: 拖拽/点击/填写/翻页/分享
+
+output: |
+  - 步骤指示器: StepIndicator 显示当前进度和总步骤
+  - 界面内容: 按当前步骤渲染对应的UI组件
+  - 数据流: fields → cardData → shareUrl → matchResults
+  - 成功信号: 每个步骤完成后的视觉反馈
+
+sop: |
+  1. 用户首次进入时自动定位到upload步骤，展示文件上传区域
+  2. 用户上传文件后触发OCR处理，步骤自动推进到review
+  3. review步骤展示OCR识别结果+AI建议字段，用户逐项确认
+  4. 用户点击"生成"按钮，步骤推进到preview，展示翻页画册
+  5. 用户在preview步骤浏览画册，点击分享生成链接
+  6. 用户点击"AI匹配"按钮，步骤推进到matched，展示匹配结果
+  7. 每个步骤切换时更新StepIndicator进度条并提供视觉反馈
+
+quality_gate:
+  - gate: "步骤顺序完整性"
+    standard: "用户必须按顺序完成每一步，不可跳跃（upload→review→preview→matched）"
+    score: 5
+  - gate: "步骤回退能力"
+    standard: "用户可从任意后置步骤回退到前置步骤重新操作"
+    score: 5
+  - gate: "步骤间数据流转"
+    standard: "前置步骤生成的数据在后置步骤中自动可用，无重复输入"
+    score: 5
+
+score_target: "9/10"
+depends_on:
+  - "F-SJ-链客宝-01_名片视觉设计系统"
+enhanced_by:
+  - "F-DAT-链客宝-01_信任评分引擎"
+  - "F-CJ-链客宝-02_产品内核定义"
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 从chainke-full/src/pages/business-card/BusinessCardPage.tsx的Step状态机+hooks.ts的useBusinessCard逻辑吸收，初始版本
+product: "链客宝"

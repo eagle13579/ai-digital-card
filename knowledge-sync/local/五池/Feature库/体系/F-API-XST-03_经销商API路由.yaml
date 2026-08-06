@@ -1,0 +1,28 @@
+feature_id: F-API-XST-03
+name: 经销商API路由
+dimension: 体系
+version: "1.0"
+status: active
+source_model: 芯森态 api/routers/dealers.py
+
+products:
+  - 通用: 自动匹配
+description: 按A/B/C/D等级获取经销商清单，含画像卡片和话术模板
+
+input: GET /api/dealers/grade/{grade}
+
+output: 经销商列表(含nickname/city/total_score/profile_json/script_text)
+
+sop: |
+  GET→get_dealers_by_grade(grade)→查询scores+dealer_grades→返回
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

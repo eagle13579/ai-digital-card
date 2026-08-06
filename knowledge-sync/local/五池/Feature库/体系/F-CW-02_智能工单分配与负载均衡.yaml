@@ -1,0 +1,12 @@
+name: F-CW-02_智能工单分配与负载均衡
+version: 1.0.0
+status: active
+dimension: 体系
+source: ChatWoot (chatwoot/chatwoot) — Agent Assignment + Round-Robin
+description: 任务/工单智能分配引擎。在线状态感知+round-robin轮转+优先级插队+SLA升级提醒。对话自动分配给在线坐席，团队级分配，忙碌检测防压垮。解决「少数人忙死、多数人闲死」的负载不均问题。
+atoms:
+- CW-03 Agent分配与轮转负载均衡
+products:
+- 数字员工SaaS
+- 链客宝
+- 招贤

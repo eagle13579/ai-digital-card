@@ -1,0 +1,52 @@
+feature_id: "F-CZL-名片-02"
+name: "名片供需匹配引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "链客宝 matching_engine v2.1 (1219行) + business_card_ai.py enterprise知识图谱增强"
+
+products:
+  - AI数字名片: 自动匹配
+source_location: "D:/链客宝/backend/matching_engine.py: MatchEngine类 + D:/链客宝/backend/app/business_card_ai.py: _run_matching_v2()"
+
+one_loader: "名片信息→企业知识图谱查询→MatchEngine jieba/TF-IDF/冷启动/MMR多样性匹配 → 综合排序返回供需结果"
+what_it_does: |
+  场景：数字名片不仅是联系方式展示，更是商业机会入口。访客浏览名片后应自动匹配相关供需。
+  问题：简单标签匹配(Jaccard相似度)精度不足，缺少企业级语义理解。
+  价值：双层匹配架构——①企业知识图谱增强(Enterprise表模糊匹配+关系图谱注入行业/地区/经营范围) ②MatchEngine v2.1四核引擎(jieba分词+TF-IDF余弦相似度+冷启动加权+MMR多样性重排序+AB测试框架)
+  架构亮点：保持原企业画像查询 + 匹配委托给MatchEngine (TF-IDF 0.7权重 + 类目匹配0.3权重 + 企业画像加分) = backward-compatible格式。
+
+input: |
+  - card_data: {fields: {name, company, position}, cover_image}
+  - top_k: 返回最大匹配数(默认10)
+  - db_session: 数据库会话(可选)
+
+output: |
+  {enterprise_profile, items: [{type, id, title, category, score, reasons}]}
+
+sop: |
+  1. 从名片提取公司名 → 查询Enterprise表(精确/模糊/反向三级匹配)
+  2. 构建企业画像: 行业/地区/经营范围/关系图谱(上下游企业)
+  3. 注入画像关键词到搜索文本
+  4. 调用MatchEngine.match() — jieba分词→TF-IDF向量→余弦相似度(0.7) + 类目匹配(0.3) + 企业画像加分
+  5. MMR多样性重排序 → 取top_k → 返回结果(含企业画像信息)
+
+  6. 匹配质量反馈闭环: 每次匹配后收集用户反馈(有用/无用), 反馈率目标≥30%
+  7. 供需平衡预警: 当某领域供给/需求比<0.3或>3.0时触发人工调配
+
+quality_gate:
+  score: 9
+  checks:
+    - "企业知识图谱查询(Enterprise表三级模糊匹配)"
+    - "企业关系图谱构建(上下游企业关联)"
+    - "MatchEngine v2.1四核引擎集成"
+    - "输出格式与旧版backward-compatible"
+    - "TF-IDF + 类目 + 企业画像三层加权"
+  reusable_by: ["链客宝", "AI数字名片", "企业撮合", "供需匹配平台"]
+product:
+  - "AI匹配引擎"
+  - "AI数字名片"
+  - "链客宝"
+
+iteration_log:
+- "2026-06-12: v1.2.0 成熟度打磨 — 白泽补充SOP执行步骤+QualityGate评分升级至9/10"
+# 成熟度标记: 2026-06-12 白泽打磨到9+

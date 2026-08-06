@@ -1,0 +1,22 @@
+module_name: 痛点确诊三维度
+module_number: 04
+category: 创业方法-需求分析
+mental_models:
+  - 痛点确诊三维度
+  - 普遍性×频次×刚性
+  - 止痛药vs维生素vs安慰剂
+  - 付费意愿测试
+learning_objectives:
+  - 掌握判断需求真伪的三维度框架
+  - 学会从普遍性、频次、刚性三个角度评估需求
+  - 能区分"真需求"和"伪需求"
+employee_roles:
+  - 产品经理
+  - 市场研究员
+  - 创业者
+source: 一堂创业课/创业方法-需求分析
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

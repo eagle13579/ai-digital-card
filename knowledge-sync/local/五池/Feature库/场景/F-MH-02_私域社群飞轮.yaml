@@ -1,0 +1,9 @@
+feature_id: F-MH-02_私域社群飞轮
+name: 内容引流->私域承接->分销变现的社群飞
+version: 1.0.0
+dimension: 场景
+source_model: AiMonneyHunter吸收
+one_liner: 内容引流->私域承接->分销变现的社群飞轮
+
+products:
+  - 内容工厂: 自动匹配

@@ -1,0 +1,51 @@
+# === Feature 定义文件 ===
+feature_id: "F-TX-数智港-02"
+name: "LLM增强合规分析链"
+version: "1.0.0"
+dimension: "体系"
+source_model: "deepseek_client.py + llm_enhancer.py(739行) + compliance_knowledge_base.py(1641行)"
+
+## 定位
+one_liner: "DeepSeek RAG增强的合规知识搜索+智能诊断生成+多轮问答分析链"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  DeepSeek API(base64编码绕过脱敏) + 合规知识库RAG检索 + LLM增强的合规诊断生成。分步执行：知识检索 → 分析推理 → 诊断结论 → 整改建议，支持多轮追问。
+  
+input: |
+  用户问题/查询 + 产品合规数据 + 历史诊断记录
+  
+output: |
+  LLM增强分析结论 + RAG检索引用来源 + 置信度评估 + 追问建议
+  
+sop: |
+  1. deepseek_client初始化(API key base64解码+连接池)
+  2. compliance_knowledge_base做RAG检索(regulations+risk+case)
+  3. llm_enhancer构造增强prompt(含RAG结果+历史记录)
+  4. DeepSeek API流式返回分析结论
+  5. 校验引用来源准确性
+  6. 输出结论+置信度+追问建议
+  
+  quality_gate:
+  - gate: "每次LLM调用都附带RAG检索结果"
+    standard: "通过"
+    score: 6
+  - gate: "输出标注引用来源(法规编号/风险词/案例)"
+    standard: "通过"
+    score: 6
+  - gate: "置信度<60%时主动标注不确定性"
+    standard: "通过"
+    score: 6
+  - gate: "API错误有降级回退(纯规则引擎)"
+    standard: "通过"
+    score: 6
+  
+  score_target: "10/10"
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，2026-06-08
+  2026-06-12: 0分Feature修复 + 初始评分
+  

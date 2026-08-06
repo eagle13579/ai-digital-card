@@ -1,0 +1,22 @@
+module_name: 奥斯卡调研模型
+module_number: 05
+category: 创业方法-需求分析
+mental_models:
+  - 奥斯卡调研模型(OSCAR)
+  - O目标-S范围-C清单-A获取-R归因
+  - 调研闭环
+  - 第0轮原则
+learning_objectives:
+  - 掌握系统化调研方法OSCAR五步法
+  - 学会从目标到归因的完整调研流程
+  - 能高效获取和分析市场情报
+employee_roles:
+  - 市场研究员
+  - 产品经理
+  - 战略分析师
+source: 一堂创业课/创业方法-需求分析
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,37 @@
+feature_id: F-CJ-BIO-05
+name: Web看板 — 芯森态招商管理界面
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态前端看板 (code/frontend/)
+
+products:
+  - 通用: 自动匹配
+description: 基于Flask+Alpine.js+Chart.js的交互式招商管理看板，展示评分总览/城市热力图/经销商分级
+
+input:
+  - 评分数据（来自 /api/dashboard/*）
+  - 经销商分级数据（来自 /api/dealers/*）
+
+output:
+  - 总览看板：4指标卡(总用户/城市数/分级统计/更新时间) + 评分分布图表
+  - 城市热力图：城市维度用户排名+均分
+  - 经销商分级页：A/B/C级详情列表+画像卡片+话术模板
+
+sop: |
+  1. 前端调用 /api/dashboard/overview 获取总览数据
+  2. 调用 /api/dashboard/distribution 获取分布
+  3. 调用 /api/dashboard/city-heatmap 获取城市热度
+  4. 跳转到 /dealers/<grade> 查看各分级详情
+
+quality_gate:
+  score: 6
+  checks:
+  - 所有API端点返回200
+  - 看板数据实时反映评分结果
+  - 前端加载时间 <3s
+  - 深色主题一致性
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

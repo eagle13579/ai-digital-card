@@ -1,0 +1,8 @@
+feature_id: F-CE-10_推理轨迹优化闭环
+name: 推理轨迹优化闭环
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+
+products:
+  - 通用: 自动匹配

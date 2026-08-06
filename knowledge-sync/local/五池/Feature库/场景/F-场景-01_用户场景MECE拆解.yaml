@@ -1,0 +1,54 @@
+feature_id: "F-场景-01"
+name: "用户场景MECE拆解"
+version: "1.0.0"
+dimension: "场景"
+source_model: "需求原点(015) + 泛产品设计(103)"
+created_at: "2026-06-07"
+author: "白泽"
+
+one_liner: "对目标用户的完整场景进行MECE拆解，发现高价值嵌入点"
+what_it_does: |
+  场景：需要理解用户在什么场景下使用AI、有什么痛点、哪里能嵌入。
+  问题：场景分析容易笼统（「用户需要XX」），缺乏颗粒度。
+  价值：MECE拆解到每个子场景，精确发现AI嵌入点。
+
+input: |
+  - 用户画像: 目标用户的角色/技术素养/痛点
+  - 场景范围: 工作流/生活/某个具体任务
+  - 已有方案: 用户当前用什么解决
+
+output: |
+  - 场景全景图: 按阶段拆解的所有子场景
+  - 高价值嵌入点: 每个子场景的AI嵌入机会评分
+  - 优先级排序: 哪些场景先做/哪些后做
+
+sop: |
+  1. 定义用户角色和场景边界
+  2. 按阶段拆解(发现→评估→决策→执行→反馈)
+  3. 每个阶段拆解到3-5个子场景
+  4. 对每个子场景评估: 痛点强度×AI可行度×替代成本
+  5. 排序输出高价值嵌入点
+
+quality_gate:
+  - gate: "MECE完整性"
+    standard: "子场景覆盖用户完整任务流程"
+    score: 4
+  - gate: "嵌入评分"
+    standard: "每个子场景有AI嵌入可行性评分"
+    score: 4
+  - gate: "优先级明确"
+    standard: "P0/P1/P2优先级划分清晰"
+    score: 4
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: ["F-创造力-01", "F-数据-01"]
+
+iteration_log: |
+  v1.0.0 - 创建: 初始版本
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

@@ -1,0 +1,46 @@
+feature_id: "F-TX-SRC-技能缺口自动发现"
+name: "技能缺口自动发现模式"
+version: "1.0.0"
+dimension: "体系"
+source_model: "scripts/gaia_cortex.py L0感知层 layer0_sense() 第138-322行"
+one_liner: "从执行日志和复盘文件中自动发现高频任务类型，匹配已有SKILL.md，输出技能缺口和新增建议"
+
+products:
+  - 文鳐技能集市: 自动匹配
+what_it_does: |
+  盖娅进化大脑L0感知层内置的技能缺口自动化发现管道。通过扫描agent.log、errors.log、
+  进化日志(exec_*.json)、L4博物馆/复盘/目录的.md文件，提取所有delegate_task的出现模式。
+  对同一task_type出现≥3次的模式，检查skills/目录下是否有对应SKILL.md，若无则标记为
+  技能缺口并生成新增技能建议信号。是整个七层飞轮中"自省"能力的体现，确保系统持续发现
+  自身能力盲区。
+input:
+  - agent.log (delegate_task派发记录)
+  - exec_*.json (进化日志目录中的JSON执行记录)
+  - L4博物馆/复盘/ 目录下的.md复盘文件
+  - skills/ 目录现有哪些SKILL.md
+output:
+  - SkillGap列表: {task_type, occurrences, has_skill, source, recent_records}
+  - 信号列表: "任务类型「X」出现N次但无对应SKILL.md，建议新建技能"
+  - 委派队列: P0优先创建技能到queue
+sop: |
+  1. layer0_sense()启动，扫描assets全景
+  2. 调用_find_delegate_logs()收集agent.log + 进化日志 + 复盘文件
+  3. 对每条记录调用_extract_task_type_from_agent_log() 或 _extract_task_type_from_review_filename()提取任务类型
+  4. Counter统计各task_type出现频次
+  5. 遍历skills/目录，收集所有SKILL.md路径建立existing_skills集合
+  6. 对频次≥3的task_type，调用_has_matching_skill()匹配关键词
+  7. 无匹配则创建SkillGap记录，追加到out.skill_gaps
+  8. 生成信号("技能缺口-新技能建议")
+  9. L3创造层读取skill_gaps生成委派项，P0优先级创建新skill
+quality_gate:
+  score: 7
+  checks:
+    - "频次阈值≥3可配置(默认3次)"
+    - "关键词匹配len≥3防误判"
+    - "三种编码(utf-8/gbk/latin-1)容错读取"
+    - "fallback到复盘文件扫描(日志无可用时)"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从gaia_cortex.py L0感知层提取"

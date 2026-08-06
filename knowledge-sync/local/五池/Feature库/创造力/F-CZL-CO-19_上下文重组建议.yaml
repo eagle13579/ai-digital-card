@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-19
+name: 上下文重组建议
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 当退化严重时建议context重组方案
+
+products:
+  - 通用: 自动匹配

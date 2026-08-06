@@ -1,0 +1,83 @@
+metadata:
+
+products:
+  - 通用: 自动匹配
+  name: moe-routing-feature
+  version: 1.0.0
+  date: 2026-07-02
+  author: 白泽
+  domain: distributed-model-marketplace
+  category: core-engine
+
+description: >
+  MoE门控路由Feature。一段用户请求进入后，经过意图分类、模型匹配(Top-K)、组合优化器
+  三级流水线，将请求智能路由到最合适的模型实例上执行推理。
+  支持三档渐进式路由策略：规则路由(关键词硬匹配) → Embedding路由(语义相似度) → 学习型Router(历史效果排序)。
+
+components:
+  - name: intent-classifier
+    function: |
+      请求意图分类器。分析用户输入的自然语言查询，提取意图标签。
+      输入：原始用户查询文本。输出：意图标签列表。
+      冷启动阶段基于规则的关键词/正则分类，成熟阶段可替换为轻量分类模型。
+    tech_stack:
+      - Python / scikit-learn (规则分类)
+      - DistilBERT / MiniLM (可选分类模型)
+    priority: P0
+
+  - name: model-matcher
+    function: |
+      模型匹配器。根据意图标签与路由策略，从Registry中选出Top-K候选模型。
+      三种路由策略可选：Rule-based(标签映射) / Embedding(向量相似度) / Learning(排序模型)
+      支持权重混合策略（如70% Embedding + 30% Learning）
+    tech_stack:
+      - FAISS / HNSW (Embedding近似最近邻搜索)
+      - XGBoost / LightGBM (学习型排序模型)
+      - Redis (路由结果缓存)
+    priority: P0
+
+  - name: combinatory-optimizer
+    function: |
+      组合优化器。对Top-K候选进行成本-质量联合优化，输出最终路由决策。
+      优化目标：min(延迟×alpha + 价格×beta - 匹配度×gamma)
+      支持约束过滤（预算上限、最大延迟容忍、许可协议白名单）
+    tech_stack:
+      - Python / SciPy (优化求解)
+      - OR-Tools / CVXPY (约束规划)
+    priority: P1
+
+  - name: fallback-router
+    function: |
+      降级路由。当主路由无匹配模型或所有候选模型不可达时的兜底策略。
+      无匹配时回退到通用大模型，匹配模型都过载时按延迟排序选最快可用的。
+    tech_stack: Python
+    priority: P0
+
+interfaces:
+  input_schema:
+    type: object
+    required: [query]
+    properties:
+      query: {type: string}
+      domain_hint: {type: string, optional: true}
+      max_models: {type: integer, default: 2}
+      budget_limit: {type: number, optional: true}
+  output_schema:
+    type: object
+    properties:
+      selected_models: {type: array, items: {type: string}}
+      routing_strategy: {type: string, enum: [rule, embedding, learning]}
+      routing_latency_ms: {type: integer}
+      estimated_cost: {type: number}
+      confidence: {type: number}
+
+dependencies:
+  - model-registry-feature: {required: true}
+
+maturity:
+  stage: concept
+  readiness: 0.15
+  roadmap:
+    - P0: 意图分类器 + 模型匹配引擎(规则) + 降级路由
+    - P1: 组合优化器 + Embedding路由
+    - P2: 学习型Router

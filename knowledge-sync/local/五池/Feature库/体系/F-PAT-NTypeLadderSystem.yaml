@@ -1,0 +1,45 @@
+id: F-PAT-NTypeLadderSystem
+name: 量价启动模式家族体系
+dimension: 体系
+domain: 龙头战法框架
+description: >-
+  完整的量价启动模式家族: 覆盖10cm主板(有洗盘/无洗盘/全一字) +
+  20cm科创板/创业板(换手板) 四种启动模式。
+  统一框架: 试盘/蓄势/洗盘 → 首板 → 二板确认 → 分歧 → 转一致 → 加速。
+source_model: 和远气体002971 / 海亮股份002203 / 宿迁联盛603065 / 福光股份688010
+
+products:
+  - 通用: 自动匹配
+signals:
+  - "前期有涨停试盘/蓄势/洗盘记录"
+  - "N型左侧涨停封死"
+  - "N型底部缩量不破前低"
+  - "N型右侧放量突破左侧高点"
+  - "突破后缩量加速=主升浪确认"
+composition:
+  - F-PAT-NTypeAttack
+  - F-PAT-StaircaseVolume
+  - F-PAT-BreakPreviousHigh
+  - F-CJ-HLB-01
+  - F-CJ-SQLS-01
+  - F-CJ-FGGP-01
+score: 9.5
+iterations: 3
+created_at: 2026-06-13 13:34
+updated_at: 2026-06-13 14:30
+variants:
+  - type: "N型(10cm·有洗盘)"
+    stock: "和远气体002971"
+    description: "标准N型: 首板到洗盘到二波到加速, 有洗盘回调, 量能阶梯"
+  - type: "三阶递进(10cm·无洗盘·有T板)"
+    stock: "海亮股份002203"
+    description: "P1蓄势到P2一字加速到P3T板高潮, 无洗盘直接递进"
+    feature: "F-CJ-HLB-01"
+  - type: "试盘-连续一字(10cm·全一字·振幅=0)"
+    stock: "宿迁联盛603065"
+    description: "P-1试盘到P0-P3连续一字, 全程振幅=0, 量能V型"
+    feature: "F-CJ-SQLS-01"
+  - type: "20cm换手板(科创/创业·全换手·大振幅)"
+    stock: "福光股份688010"
+    description: "P-1洗盘到P0首板巨量换手到P1二板继续放量, 振幅>15%"
+    feature: "F-CJ-FGGP-01"

@@ -1,0 +1,216 @@
+name: "F-TRANS-05"
+title: "残差增强学习框架"
+version: 2.0.0
+category: "训练优化"
+description: "通过残差连接(Residual Connection)与层归一化(Layer Normalization)构建深层可训练网络,配合前馈网络(FFN)实现非线性变换,缓解梯度消失与表示退化"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T06 Add&Norm"
+  - "T07 FFN"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # ===== 残差结构 (三种风格) =====
+
+  # --- nanoGPT: Pre-LN残差 ---
+  - file: "nanoGPT_model.py"
+    class: "Block"
+    method: "forward"
+    lines: 101-104
+    summary: "x = x + attn(ln_1(x)) → x = x + mlp(ln_2(x)) — Pre-LayerNorm残差: 先归一化→子层→残差加和,梯度更稳定"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "LayerNorm"
+    method: "forward"
+    lines: 16-25
+    summary: "F.layer_norm(input, weight.shape, weight, bias, 1e-5) — 标准LayerNorm,支持可选的bias参数"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 原论文: Post-LN残差 ---
+  - file: "paper_SubLayers.py"
+    class: "MultiHeadAttention"
+    method: "forward"
+    lines: 56-62
+    summary: "q = q + residual → q = layer_norm(q) — Post-LN风格: 子层输出→残差加和→层归一化"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  - file: "paper_SubLayers.py"
+    class: "PositionwiseFeedForward"
+    method: "forward"
+    lines: 77-86
+    summary: "x = w_2(ReLU(w_1(x))) → x = x + residual → x = layer_norm(x) — Post-LN: FFN后同样先残差后归一化"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  # --- Llama: RMSNorm (无偏置归一化) ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaRMSNorm"
+    method: "forward"
+    lines: 20-25
+    summary: "RMSNorm: hidden_states * rsqrt(mean(x²) + eps) * weight — 无偏置、无均值中心的层归一化,计算量减少约30%,训练更稳定"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- LlamaDecoderLayer: Pre-LN + RMSNorm残差 ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaDecoderLayer"
+    method: "forward"
+    lines: 184-213
+    summary: "residual = x → x = input_layernorm(x) → attn → x = residual + x → residual = x → x = post_attention_layernorm(x) → mlp → x = residual + x — Pre-RMSNorm双残差结构"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- BERT: Post-LN残差 (SelfOutput) ---
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertSelfOutput"
+    method: "forward"
+    lines: 121-125
+    summary: "LayerNorm(dropout(dense(attn_output)) + input_tensor) — Post-LN: 子层输出→dropout→残差加和→LN"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  # ===== FFN前馈网络 (三种变体) =====
+
+  # --- nanoGPT: GELU-FFN ---
+  - file: "nanoGPT_model.py"
+    class: "MLP"
+    method: "forward"
+    lines: 85-90
+    summary: "x = Linear(n_embd, 4*n_embd) → GELU → Linear(4*n_embd, n_embd) → Dropout — 标准FFN+ReLU的GELU升级版,训练更平滑"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 原论文: ReLU-FFN ---
+  - file: "paper_SubLayers.py"
+    class: "PositionwiseFeedForward"
+    method: "forward"
+    lines: 77-86
+    summary: "x = w_2(ReLU(w_1(x))) — 经典的两层线性+ReLU结构,隐藏层维度 d_inner = 4*d_model"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  # --- Llama: SwiGLU-FFN ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaMLP"
+    method: "__init__"
+    lines: 32-45
+    summary: "gate_proj, up_proj, down_proj = 三个Linear — SwiGLU结构: down_proj(SiLU(gate_proj(x)) * up_proj(x)),中间维度约(8/3)*d_model"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaMLP"
+    method: "forward"
+    lines: 43-45
+    summary: "down_proj(self.act_fn(gate_proj(x)) * up_proj(x)) — SiLU门控: 输入经gate门控后与up分支逐元素乘,比标准FFN多一个门控信号"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- BERT: GELU-FFN (Intermediate+Output) ---
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertIntermediate"
+    method: "forward"
+    lines: 170-173
+    summary: "dense(hidden_states) → intermediate_act_fn — FFN第一层: Linear→GELU"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertOutput"
+    method: "forward"
+    lines: 186-190
+    summary: "LayerNorm(dropout(dense(hidden_states)) + input_tensor) — FFN第二层+Post-LN残差"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class ResidualBlock:
+      """
+      残差增强学习框架 — 深层网络训练的基础架构
+
+      ===== 残差连接模式 =====
+
+      ┌─────────────────────────────┬───────────────────────────────┬──────────────┐
+      │ 模式                        │ 结构                          │ 代表模型     │
+      ├─────────────────────────────┼───────────────────────────────┼──────────────┤
+      │ Post-LN (原论文)            │ x → SubLayer → +residual → LN │ Transformer  │
+      │ Pre-LN (nanoGPT/Llama)     │ x → LN → SubLayer → +residual │ GPT-2/Llama  │
+      │ RMSNorm+Pre (Llama)        │ x → RMSNorm → SubLayer → +res │ Llama        │
+      └─────────────────────────────┴───────────────────────────────┴──────────────┘
+
+      Post-LN:
+        x = LayerNorm(x + SubLayer(x))   # 残差→归一化: 原始设计,深层次不稳定
+
+      Pre-LN:
+        x = x + SubLayer(LayerNorm(x))   # 归一化→残差: 更稳定,深层次首选
+
+      RMSNorm (Llama):
+        x = x + SubLayer(RMSNorm(x))     # 无偏置归一化,计算更高效
+        # RMSNorm(x) = x / sqrt(mean(x²) + eps) * weight
+
+      ===== FFN前馈网络变体 =====
+
+      ┌──────────┬──────────────────────────────┬──────────────────────┐
+      │ 变体     │ 计算公式                     │ 代表模型/效果        │
+      ├──────────┼──────────────────────────────┼──────────────────────┤
+      │ ReLU-FFN │ W₂(ReLU(W₁(x)))             │ 原论文,基础方案      │
+      │ GELU-FFN │ W₂(GELU(W₁(x)))             │ GPT/BERT,更平滑      │
+      │ SwiGLU   │ W_down(SiLU(W_gate(x))*W_up)│ Llama,多门控更强     │
+      └──────────┴──────────────────────────────┴──────────────────────┘
+
+      class TransformerBlock:
+          def forward(self, x):
+              # 自注意力残差
+              x = x + self.self_attn(self.norm1(x))   # Pre-LN
+              # 前馈网络残差
+              x = x + self.ffn(self.norm2(x))          # Pre-LN
+              return x
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "恒等映射旁路保证梯度直达浅层,防止深层网络梯度消失 — 残差连接使信息/梯度绕过非线性层直通"
+  - "层归一化稳定每层输出分布(均值为0、方差为1),加速收敛并提升训练稳定性"
+  - "FFN作为非线性的主力: 将注意力混合后的表示通过大中间层(4×d_model)投影到更高维空间再做非线性变换"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "能力阶梯叠加引擎"
+    description: >
+      链客宝的能力升级采用残差设计:
+      - 基础能力层(Base Layer): 证件核验、关键词匹配
+      - 增量能力分支(Residual Branch): AI语义匹配→智能排序→个性化推荐
+      每个新能力模块作为残差分支叠加到基础能力之上,保留原能力的同时持续增强。
+      RMSNorm用于跨版本能力融合时保持输出分布稳定。
+
+  - product: "AI名片"
+    component: "增量画像增强器"
+    description: >
+      用户画像的持续更新采用Pre-LN残差模式:
+      - 基础画像(x): 用户注册时填写的静态信息
+      - 增量画像(SubLayer): 每次新交互(点赞、浏览、交换名片)产生的动态信号
+      - 残差连接: x = x + SubLayer(Norm(x)),确保新行为不会覆盖已有画像
+      SwiGLU-FFN用于画像的非线性增强: 用户标签从128维提升到512维再做特征交互。
+
+  - product: "数智港"
+    component: "增量改进叠加器"
+    description: >
+      数智港的产品迭代采用残差增量策略:
+      - 每次改进(新功能/优化)作为残差分支叠加到现有版本之上
+      - 归一化层确保新功能输出分布与原系统兼容,不会导致系统崩溃
+      - FFN层实现新功能与原系统的非线性交互(如新规则引擎与旧逻辑的联合决策)
+      此设计对应"铁律155"的增量改进原则: 保稳增量,不改根基。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "已落地: RMSNorm + Pre-LN + SwiGLU — 从Llama吸收的归一化与FFN优化组合"
+  - "Pre-Norm与Post-Norm的自适应切换策略 — 不同层使用不同的归一化位置"
+  - "归一化位置可学习的参数化层归一化变体"
+  - "门控FFN进一步优化: 从SwiGLU扩展到GeGLU、ReGLU等门控变体的选择"

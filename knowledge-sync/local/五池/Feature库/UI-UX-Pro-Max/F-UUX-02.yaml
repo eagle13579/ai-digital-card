@@ -1,0 +1,16 @@
+---
+id: F-UUX-02
+name: 设计系统生成器
+dimension: 创造力
+source_model: UUX-02
+
+products:
+  - 通用: 自动匹配
+description: >-
+  Pattern+Style+Colors+Typography+Effects→完整设计系统的AI推理引擎
+sop: |-
+  详见原子模型 UUX-02
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

@@ -1,0 +1,55 @@
+feature_id: "F-场景-吸收969"
+name: "吸收_营销获客_场景_20260806"
+version: "1.0.0"
+dimension: "场景"
+source_model: "五池/模型池/场景/20260806_营销_GEO_SEO统一场景模型.md"
+created_at: "20260806"
+updated_at: "20260806"
+author: "盖娅六维知识吸收 (cronjob 营销获客/每4h)"
+last_execution: "20260806"
+
+one_liner: "2026 B2B SaaS获客场景: 超垂直利基定位 + GEO-SEO统一场景 + 桥接关键词 + 场景格式匹配"
+
+what_it_does: |
+  由盖娅六维知识吸收管道自动蒸馏生成。
+  来源: web_search "B2B SaaS growth marketing best practices 2026" + "SEO GEO content strategy 2026"。
+  维度: 场景 (营销获客归入 数据·场景·创造力)。
+  核心: 超垂直利基策略(frankhusmann)、GEO-SEO统一场景(技术共享+内容分化)、
+  桥接关键词10-15个(trysight)、实体丰富内容(statuslabs)、场景格式匹配(searchengineland)、ICP自动化(makeautomation)。
+
+input: |
+  - 目标市场/人群定义
+  - 内容资产与技术底座清单
+  - 关键词与实体图谱
+
+output: |
+  - 超垂直利基市场定位建议
+  - GEO-SEO统一内容策略(桥接关键词+实体丰富化)
+  - 按场景格式(视频/问答/摘要/长文)的内容预算分配
+  - 自动化ICP驱动获客方案
+
+sop: |
+  1. 加载source_model指向的原子心智模型
+  2. 评估当前定位是否过度泛化 → 收敛为超垂直利基
+  3. 识别10-15个桥接关键词
+  4. 内容按场景格式分配GEO预算
+  5. 搭建ICP自动化获客链路
+
+quality_gate:
+  - gate: "原子应用正确"
+    standard: "超垂直定位/GEO-SEO统一/桥接关键词被正确应用到任务"
+    score: 5
+  - gate: "产出可交付"
+    standard: "定位与内容策略可直接落地执行"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 20260806 盖娅六维知识吸收(cronjob 营销获客)
+  来源: B2B SaaS growth + SEO GEO 双搜索, 首次即成功无重试
+  状态: 初始版本, 需通过真实执行提升评分

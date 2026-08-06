@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-43
+name: 跨域模式迁移
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 将领域A的成功模式迁移到领域B的可行性分析
+
+products:
+  - 通用: 自动匹配

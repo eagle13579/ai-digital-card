@@ -1,0 +1,38 @@
+feature_id: F-CJ-软银-04
+name: 跌停反包跃升模型（大有能源型）
+version: "1.0"
+dimension: 场景
+source_model: 大有能源(600403) 2026-06-10 实战复盘
+source_project: 中国软银投资系统/龙头战法量化模型
+one_liner: 前日跌停→今日低开→翻红→大涨5%+，7日6天涨停的强势反包
+
+products:
+  - 通用: 自动匹配
+what_it_does: 识别「跌停反包」模式——前期连板龙头急跌跌停后次日低开高走反包，是龙回头/二波的启动信号
+input:
+  - daily_boards: int  # 7日连板天数
+  - prev_day_chg: float  # 前日涨跌幅
+  - today_minute_data: list  # 今日分钟数据
+output:
+  - is_matched: bool
+  - strength: str  # 反包强度
+sop: |
+  Phase 1 — 确认龙头身份
+    7日连续涨停≥3天, 确认是市场龙头
+  Phase 2 — 急跌发生
+    前日跌幅≥-7%(跌停或接近跌停)
+  Phase 3 — 今日反包
+    低开(≤-2%)→盘中翻红→涨幅≥3%
+    成交量和换手率温和(非恐慌放量)
+  Phase 4 — 确认信号
+    分时均价线上方运行
+    资金净流入为正
+quality_gate:
+  score: 8/10
+  checks:
+    - 大有能源: 7日6天涨停+前日-9.94%+今日低开-3.23%→+5.21%
+    - 适用于前期连板龙头的急跌反包
+    - 反包成功次日通常继续走强
+iteration_log:
+  - "2026-06-10: v1.0初始版本，基于大有能源实战数据创建"
+product: "中国软银投资系统"

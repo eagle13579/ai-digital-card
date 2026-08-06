@@ -1,0 +1,28 @@
+feature_id: F-CJ-QUANTUM-02
+name: 盲盒沙盘推演
+version: 1.0.0
+dimension: 场景
+source_model: 量子时间逆转/Q1-隐藏变量窗口.md, Q2-量子纠缠跨时间干预.md
+one_liner: 赛博参谋决策沙盘：在盲盒没打开前，模拟所有可能的世界线
+
+products:
+  - 通用: 自动匹配
+what_it_does: 将量子隐藏变量窗口映射为AI决策沙盘——在选择执行前，所有可能结果处于叠加态。沙盘推演就是在掀开盲盒前探索多种路径
+input: 决策问题描述 + 可选方案列表
+output: 多世界线模拟结果 + 推荐路径 + 后选择概率
+sop: '1. 输入决策问题
+
+  2. 展开所有可行路径(多世界线)
+
+  3. 每条路径模拟结果
+
+  4. 后选择滤镜保留最优路径
+
+  5. 输出推荐方案'
+quality_gate: '评分7/10: 沙盘路径覆盖主要可行方案90%'
+score: 7
+depends_on: []
+enhanced_by:
+- F-CJ-NEURO-04
+implementation: 概念Feature — 指导赛博参谋沙盘设计
+draft: false

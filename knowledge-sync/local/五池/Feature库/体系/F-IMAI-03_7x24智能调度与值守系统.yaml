@@ -1,0 +1,29 @@
+{
+  "name": "F-IMAI-03 7x24智能调度与值守系统",
+  "version": "1.0.0",
+  "status": "released",
+  "dimension": "体系",
+  "source": "IMAI-PC-Executor",
+  "description": "三级时间窗口调度器(SchedulerV2)+进程看门狗(Watchdog)+浏览器崩溃自动恢复，实现零人工介入的7x24无人值守",
+  "mental_models": [
+    "IMAI-03: 时间窗口调度器",
+    "IMAI-05: 进程看门狗自恢复模式",
+    "IMAI-11: 浏览器崩溃自动恢复模式"
+  ],
+  "components": [
+    "scheduler.py: SchedulerV2时间窗口调度器(462行)",
+    "watchdog.py: 进程看门狗(338行)",
+    "browser_manager.py: 浏览器崩溃恢复逻辑"
+  ],
+  "products": [
+    "AI数智军团: 数字员工值守调度基底",
+    "赛博参谋: 7x24策略监控调度"
+  ],
+  "integration": {
+    "type": "pipeline",
+    "dependencies": [
+      "playwright"
+    ],
+    "setup": "配置时间窗口和频率限制 → 启动scheduler.run() 即可进入7x24模式"
+  }
+}

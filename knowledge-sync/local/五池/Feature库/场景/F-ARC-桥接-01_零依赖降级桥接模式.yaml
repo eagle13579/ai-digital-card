@@ -1,0 +1,43 @@
+feature_id: F-ARC-桥接-01
+name: 零依赖降级桥接模式
+version: 1.0.0
+dimension: 场景
+source_model: AI数智名片/services/chainke_bridge.py
+source_project: AI数智名片
+one_liner: 使用纯Python stdlib(urllib)实现跨平台数据同步，主服务可达时同步数据，不可达时自动fallback到本地缓存，零外部依赖
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从AI数智名片/services/chainke_bridge.py中提取的零依赖降级桥接模式(M9)。
+  urllib-only HTTP请求 → JSON解析 → 主服务可达则同步远端数据 → 不可达则自动fallback到本地缓存/本地匹配。
+  纯stdlib实现，无任何第三方包依赖，适合嵌入任意Python环境。
+input: 参见source中的输入参数
+output: 结构化输出
+sop: |
+  1. 加载零依赖降级桥接模式
+
+  2. 根据urllib-only请求 → JSON解析 → 主服务可达则同步 → 不可达则自动fallback到本地缓存执行
+
+  3. 验证输出'
+  6. 降级触发记录: 每次降级记录原因+持续时间+恢复时间, 周报输出降级统计
+  7. 桥接质量打分: 按延迟/错误率/吞吐量三维度给桥接状态评分, <6分告警
+
+  quality_gate:
+  score: 9
+  checks:
+  - 有真实原子来源(AI数智名片/services/chainke_bridge.py)
+  - 可执行
+  - 有适用场景(微服务间数据同步/跨平台桥接)
+  - 零外部依赖(纯stdlib实现)
+  status: draft
+  iteration_log:
+  - date: '2026-06-08'
+  version: 1.0.0
+  change: 从AI数智名片/services/chainke_bridge.py提取初始版本(M9)
+  - "2026-06-12: v1.2.0 成熟度打磨 — 白泽补充SOP执行步骤+QualityGate评分升级至9/10"
+  product:
+  - "AI数字名片"
+  - "AI数智名片"
+  - "链客宝"
+  # 成熟度标记: 2026-06-12 白泽打磨到9+
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

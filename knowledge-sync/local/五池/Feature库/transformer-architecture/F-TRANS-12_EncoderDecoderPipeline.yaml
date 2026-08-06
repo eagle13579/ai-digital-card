@@ -1,0 +1,25 @@
+name: "F-TRANS-12"
+title: "EncoderDecoderPipeline — 编码器-解码器翻译管道"
+version: 1.0.0
+category: "Transformer产品注入"
+description: "Encoder理解(意图/实体/语气)→Decoder生成(本地化译文)。已注入中韩出海数智港。"
+
+atoms:
+  - "T08 Encoder-Decoder"
+
+code_references:
+  - file: "encoder_decoder_pipeline.py"
+    class: "EncoderDecoderPipeline"
+    methods: "encode() + decode() + translate()"
+    summary: "Encoder双向分析→Context→Decoder自回归生成, Cross-Attention在规则间流转"
+    link: "D:\\go-aiport\\backend\\services\\encoder_decoder_pipeline.py"
+
+product_injection:
+  - product: "中韩出海数智港"
+    path: "D:\\go-aiport\\backend\\services\\encoder_decoder_pipeline.py"
+    verified: true
+
+demo_result:
+  input: "您好,我们是做AI出海SaaS的企业"
+  encoder: "意图=商务合作, 实体=[AI,出海,SaaS], 语气=formal"
+  decoder: "译文已本地化, 置信度=0.792"

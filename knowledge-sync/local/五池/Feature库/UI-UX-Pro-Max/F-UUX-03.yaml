@@ -1,0 +1,16 @@
+---
+id: F-UUX-03
+name: 三层Token架构
+dimension: 体系
+source_model: UUX-03
+
+products:
+  - 通用: 自动匹配
+description: >-
+  Primitive→Semantic→Component三层的可维护设计标记系统
+sop: |-
+  详见原子模型 UUX-03
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13
