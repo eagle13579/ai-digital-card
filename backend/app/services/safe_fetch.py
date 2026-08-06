@@ -2,10 +2,12 @@
 import os
 import sys
 
-# baize_libs 路径环境感知（服务器 /var/www，本地 Windows D:/）— 禁止硬编码单平台路径
-_BL_ROOT = "/var/www/baize_libs" if os.path.isdir("/var/www/baize_libs") else "D:/baize_libs"
-if _BL_ROOT not in sys.path:
-    sys.path.insert(0, _BL_ROOT)
+# baize_libs 路径环境感知（服务器 /var/www/baize_libs，本地 D:/baize_libs）
+# ⚠️ 双层级：父目录(import baize_libs) + baize_libs自身(import 子包如 graph_tools)
+_BL = "/var/www/baize_libs" if os.path.isdir("/var/www/baize_libs") else "D:/baize_libs"
+for _p in (os.path.dirname(_BL), _BL):
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
 from graph_tools.security_fetch import (
     validate_url as _validate_url,
     safe_fetch as _safe_fetch,
