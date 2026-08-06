@@ -159,22 +159,30 @@ class SREAgent(BaseAgent):
         if len(self._health_history) > self._max_history:
             self._health_history.pop(0)
 
-        # Learn from health check
-        await self.learn(
-            observation=(
-                f"SRE health check completed: overall={overall}, "
-                f"latency={latency_level}, db={checks['database'].get('status')}, "
-                f"redis={checks['redis'].get('status')}, "
-                f"gateway={checks['ai_gateway'].get('status')}, "
-                f"flywheel={checks['flywheel'].get('status')}"
-            ),
-            metadata={
-                "check_type": "full_health",
-                "overall": overall,
-                "latency_level": latency_level,
-                "max_latency_ms": max_latency,
-            },
-        )
+        # Learn from health check — only when status CHANGES (avoid polluting
+        # the knowledge base with 7496 identical "overall=error" rows)
+        prev_overall = self._health_history[-2].get("overall") if len(self._health_history) >= 2 else None
+        if prev_overall is None or prev_overall != overall:
+            await self.learn(
+                observation=(
+                    f"SRE health check completed: overall={overall}, "
+                    f"latency={latency_level}, db={checks['database'].get('status')}, "
+                    f"redis={checks['redis'].get('status')}, "
+                    f"gateway={checks['ai_gateway'].get('status')}, "
+                    f"flywheel={checks['flywheel'].get('status')}"
+                ),
+                metadata={
+                    "check_type": "full_health",
+                    "overall": overall,
+                    "latency_level": latency_level,
+                    "max_latency_ms": max_latency,
+                },
+            )
+        else:
+            logger.debug(
+                "SRE health status unchanged (%s) — skip knowledge ingest (anti-pollution)",
+                overall,
+            )
 
         # Auto-remediate if issues found
         if overall == "error":
@@ -199,11 +207,25 @@ class SREAgent(BaseAgent):
                 logger.warning("SREAgent failed to publish health event")
 
         logger.info(
-            "Health check: overall=%s, latency=%s, max_latency=%dms",
+            "Health check: overall=%s, latency=%s, max_latency=%dms | "
+            "db=%s redis=%s gateway=%s flywheel=%s",
             overall,
             latency_level,
             max_latency,
+            checks["database"].get("status"),
+            checks["redis"].get("status"),
+            checks["ai_gateway"].get("status"),
+            checks["flywheel"].get("status"),
         )
+        if overall in ("error", "degraded"):
+            for comp_name, comp in checks.items():
+                if comp.get("status") != "ok":
+                    logger.warning(
+                        "  [SRE] component=%s status=%s error=%s",
+                        comp_name,
+                        comp.get("status"),
+                        comp.get("error", ""),
+                    )
         return result
 
     async def _check_db(self) -> dict[str, Any]:
@@ -216,23 +238,21 @@ class SREAgent(BaseAgent):
         try:
             # Try to query the database via broker or directly
             if self.broker is not None:
-                from app.broker.interfaces import ServiceRequest
+                try:
+                    from app.broker.interfaces import ServiceRequest
 
-                resp = await self.broker.call(ServiceRequest(
-                    service="database",
-                    method="check_connection",
-                    timeout_ms=10_000,
-                ))
-                if resp.success:
-                    elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
-                    return {"status": "ok", "latency_ms": round(elapsed, 2)}
-                else:
-                    elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
-                    return {
-                        "status": "error",
-                        "latency_ms": round(elapsed, 2),
-                        "error": resp.error or "DB check returned failure",
-                    }
+                    resp = await self.broker.call(ServiceRequest(
+                        service="database",
+                        method="check_connection",
+                        timeout_ms=10_000,
+                    ))
+                    if resp.success:
+                        elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
+                        return {"status": "ok", "latency_ms": round(elapsed, 2)}
+                    # 服务未注册/调用失败 → 不直接返回，继续走直连兜底
+                except Exception:
+                    # broker 异常也走直连兜底
+                    pass
 
             # Fallback: try a direct DB query
             try:
@@ -274,7 +294,8 @@ class SREAgent(BaseAgent):
         """
         start = datetime.now(timezone.utc)
 
-        # Try Redis via broker if available
+        # Try Redis via broker if available — but NEVER return error here;
+        # broker service may be unregistered, fall through to direct ping.
         if self.broker is not None:
             try:
                 from app.broker.interfaces import ServiceRequest
@@ -287,18 +308,14 @@ class SREAgent(BaseAgent):
                 elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
                 if resp.success:
                     return {"status": "ok", "latency_ms": round(elapsed, 2)}
-                return {
-                    "status": "error",
-                    "latency_ms": round(elapsed, 2),
-                    "error": resp.error or "Redis ping failed",
-                }
+                # 服务未注册/调用失败 → 不直接返回，继续走直连兜底
+                logger.debug(
+                    "Redis broker call failed (%s), falling back to direct ping",
+                    resp.error,
+                )
             except Exception as exc:
-                elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
-                return {
-                    "status": "error",
-                    "latency_ms": round(elapsed, 2),
-                    "error": f"{type(exc).__name__}: {exc}",
-                }
+                # broker 异常也走直连兜底
+                logger.debug("Redis broker call exception, falling back to direct ping: %s", exc)
 
         # Fallback: try importing redis directly
         try:
@@ -338,11 +355,18 @@ class SREAgent(BaseAgent):
     async def _check_ai_gateway(self) -> dict[str, Any]:
         """Check AI Gateway responsiveness with a minimal chat call.
 
+        Priority:
+            1. Brain's embedded gateway (if the backend exposes one)
+            2. Real DeepSeek API ping via DeepSeekClient (production path)
+            3. Broker-based gateway call (if registered)
+            4. Unavailable fallback
+
         Returns:
             Dict with status, latency_ms, and optional error.
         """
         start = datetime.now(timezone.utc)
         try:
+            # 1. Brain's embedded gateway
             from app.ai.gateway.interfaces import AIRequest
 
             if self.brain is not None and hasattr(self.brain, "_backend"):
@@ -356,13 +380,49 @@ class SREAgent(BaseAgent):
                     elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
                     if resp.content and resp.finish_reason != "error":
                         return {"status": "ok", "latency_ms": round(elapsed, 2)}
+                    # gateway returned an error → fall through to real DeepSeek ping
+                    logger.warning(
+                        "Embedded gateway returned error, falling back to DeepSeek ping: %s",
+                        str(resp.content)[:100],
+                    )
+
+            # 2. Real DeepSeek API ping (production path, key from settings/.env)
+            try:
+                from app.ai.rag_pipeline import DeepSeekClient
+
+                client = DeepSeekClient()
+                try:
+                    resp = await client.chat(
+                        messages=[{"role": "user", "content": "ping"}],
+                        model="deepseek-chat",
+                        max_tokens=5,
+                    )
+                    elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
+                    if isinstance(resp, dict) and resp.get("content") and not resp.get("error"):
+                        return {"status": "ok", "latency_ms": round(elapsed, 2)}
+                    err = resp.get("error") if isinstance(resp, dict) else str(resp)
                     return {
                         "status": "error",
                         "latency_ms": round(elapsed, 2),
-                        "error": f"Gateway returned error: {resp.content[:100]}",
+                        "error": f"DeepSeek ping failed: {err}",
                     }
+                finally:
+                    await client.close()
+            except ImportError as exc:
+                # DeepSeekClient not importable → try broker path below
+                logger.warning(
+                    "DeepSeekClient import failed in SRE gateway check (falling back to broker): %s",
+                    repr(exc),
+                )
+            except Exception as exc:
+                elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
+                return {
+                    "status": "error",
+                    "latency_ms": round(elapsed, 2),
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
 
-            # Try broker-based gateway call
+            # 3. Try broker-based gateway call
             if self.broker is not None:
                 from app.broker.interfaces import ServiceRequest
 
@@ -384,7 +444,7 @@ class SREAgent(BaseAgent):
                     "error": resp.error or "AI Gateway call failed",
                 }
 
-            # No gateway available
+            # 4. No gateway available
             elapsed = (datetime.now(timezone.utc) - start).total_seconds() * 1000
             return {
                 "status": "unavailable",
