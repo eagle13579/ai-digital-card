@@ -810,7 +810,9 @@ class AgentRuntime:
         在 Runtime 停止时调用，确保下次启动时轮次计数从 0 开始。
         """
         self._turn_counter = 0
-        self._progressive_warnings.reset()
+        reset = getattr(self._progressive_warnings, "reset", None)
+        if callable(reset):
+            reset()
         logger.debug("AgentRuntime 渐进式安全警告状态已重置")
 
     def get_safety_info(self) -> dict[str, Any]:

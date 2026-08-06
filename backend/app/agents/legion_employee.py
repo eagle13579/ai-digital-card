@@ -28,8 +28,11 @@ import yaml
 logger = logging.getLogger(__name__)
 
 # ── Legion root path ───────────────────────────────────────────────
-
-LEGION_PATH = "D:/向海容的知识库/wiki/wiki/记忆宫殿/employees"
+# 服务器优先（/app/gaia-commercial 的 roster/soul），本地 Windows 路径兜底
+LEGION_PATH = os.environ.get(
+    "LEGION_PATH",
+    "/app/gaia-commercial/apps/services/ai_legion/employees",
+)
 
 
 # ── Safe YAML loader (handles custom !tag types gracefully) ────────
@@ -588,7 +591,15 @@ class LegionEmployee:
         if not self.emp_dir:
             return {}
         path = f"{self.emp_dir}/{filename}"
-        return _safe_load_yaml(path)
+        data = _safe_load_yaml(path)
+        if not isinstance(data, dict):
+            return {}
+        # 模板池兼容：soul-injection.yaml 顶层可能是 {soul_injection: {...}}
+        if filename == "soul-injection.yaml" and "soul_injection" in data:
+            inner = data["soul_injection"]
+            if isinstance(inner, dict):
+                data = {**data, **inner}  # 合并 inner 到顶层
+        return data
 
     def _find_memory_db(self) -> str | None:
         """Find the memory.db path for this employee."""
@@ -607,8 +618,21 @@ class LegionEmployee:
         - Simple strings: ['烹小鲜', '奇正相生']
         - Dicts with keys: [{'name': '...', 'content': '...'}, ...]
         - Dicts with employee_id/memory_type: [{'employee_id': '...', 'content': '...'}, ...]
+        - mind_model_config (模板池格式): {base_persona, core_capabilities, ...}
         """
         raw = self.soul.get("mental_models", [])
+        # 模板池兼容：从 mind_model_config 提取心智模型
+        if not isinstance(raw, list) or not raw:
+            mmc = self.soul.get("mind_model_config", {})
+            if isinstance(mmc, dict):
+                persona = mmc.get("base_persona", "")
+                caps = mmc.get("core_capabilities", [])
+                raw = []
+                if persona:
+                    raw.append({"name": "核心人格", "content": persona, "source": "mind_model_config"})
+                for cap in caps:
+                    raw.append({"name": str(cap), "content": f"核心能力：{cap}", "source": "mind_model_config"})
+                self.soul["mental_models"] = raw  # 缓存回 soul 供后续使用
         if not isinstance(raw, list):
             return []
 
