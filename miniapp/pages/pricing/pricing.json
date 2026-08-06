@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "定价套餐",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "light",
+  "usingComponents": {
+    "loading": "/components/loading/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

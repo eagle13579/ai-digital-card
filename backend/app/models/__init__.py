@@ -48,7 +48,7 @@ from app.models.rate_limit import RateLimitRecord
 from app.models.review import Review
 from app.models.revoked_token import RevokedToken
 from app.models.six_degrees import UserRelation, RelationEvent, SixDegreePathCache, ReferralLink
-from app.models.subscription import Subscription
+from app.models.subscription import Subscription, Plan
 from app.models.token_budget import (
     DegradeStrategy,
     TokenBudgetRule,
@@ -181,7 +181,7 @@ __all__ = [
     "Review",
     "RevokedToken",
     "UserRelation", "RelationEvent", "SixDegreePathCache", "ReferralLink",
-    "Subscription",
+    "Subscription", "Plan",
     "DegradeStrategy", "TokenBudgetRule", "TokenBudgetEvent", "TokenBudgetStatus",
     "UserEvent",
     "Wallet", "WalletTransaction",

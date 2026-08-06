@@ -1,0 +1,231 @@
+/**
+ * 定价套餐页面 — 复用 app.wxss Global Design System v2.0
+ * Dark Minimal · Glassmorphism · Purple Accent
+ * 统一使用全局 design tokens：主色/间距/圆角/阴影
+ */
+
+.pricing-page {
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+/* ===== 头部 ===== */
+.pricing-header {
+  text-align: center;
+  padding: var(--space-8) var(--space-4) var(--space-4);
+}
+
+.pricing-title {
+  display: block;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.pricing-subtitle {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+/* ===== 月付/年付切换 ===== */
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  margin: var(--space-4) var(--space-4) var(--space-4);
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+.billing-option {
+  flex: 1;
+  text-align: center;
+  padding: 9px 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+}
+
+.billing-option.billing-active {
+  background: var(--gradient-accent);
+  color: #ffffff;
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-glow);
+}
+
+.billing-save {
+  font-size: var(--text-xs);
+  margin-left: 4px;
+  opacity: 0.92;
+}
+
+/* ===== 套餐卡片 ===== */
+.plan-list {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.plan-card {
+  position: relative;
+  margin-bottom: var(--space-4);
+  padding: var(--space-6);
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.plan-card:last-child {
+  margin-bottom: 0;
+}
+
+.plan-card-hot {
+  border-color: rgba(139, 92, 246, 0.45);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.06));
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.plan-badge {
+  position: absolute;
+  top: 0;
+  right: var(--space-5);
+  transform: translateY(-50%);
+  padding: 4px 14px;
+  background: var(--gradient-accent);
+  color: #ffffff;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-glow);
+}
+
+.plan-name {
+  display: block;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.plan-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.plan-price {
+  font-size: 32px;
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.plan-period {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-left: 6px;
+}
+
+.plan-original {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+  margin-left: var(--space-2);
+}
+
+.plan-annual-hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--accent-light);
+}
+
+/* ===== 权益列表（勾选图标） ===== */
+.plan-features {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.plan-feature {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.feature-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--success);
+  color: #ffffff;
+  font-size: 11px;
+  border-radius: 50%;
+  margin-right: var(--space-2);
+  flex-shrink: 0;
+}
+
+.feature-text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ===== 错误兜底 ===== */
+.pricing-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--space-6);
+}
+
+.retry-btn {
+  width: 240px;
+  height: 40px;
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+}
+
+/* ===== 底部固定升级按钮 ===== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: var(--space-3);
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 12px));
+  background: rgba(15, 15, 26, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-subtle);
+  z-index: var(--z-sticky);
+}
+
+.upgrade-btn {
+  height: 48px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  background: var(--gradient-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.bottom-note {
+  display: block;
+  text-align: center;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* 内容底部留白，避免被固定栏遮挡（覆盖全局 .bottom-placeholder） */
+.bottom-placeholder {
+  height: 140px;
+}

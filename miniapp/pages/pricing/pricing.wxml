@@ -1,0 +1,58 @@
+<view class="page-container pricing-page">
+  <!-- 加载中 -->
+  <loading visible="{{loading}}" text="加载套餐中..." />
+
+  <!-- 错误兜底（接口未部署 / 网络异常） -->
+  <view class="pricing-error" wx:if="{{!loading && error}}">
+    <empty-state visible="{{true}}" text="{{errorText}}" />
+    <button class="btn-outline retry-btn" bindtap="onRetry">重新加载</button>
+  </view>
+
+  <!-- 套餐内容 -->
+  <scroll-view scroll-y class="page-scroll" wx:if="{{!loading && !error}}">
+
+    <!-- 头部 -->
+    <view class="pricing-header">
+      <text class="pricing-title">选择适合你的套餐</text>
+      <text class="pricing-subtitle">随时升级或降级 · 权益即时生效</text>
+    </view>
+
+    <!-- 月付 / 年付 切换（年付约17%折扣） -->
+    <view class="billing-toggle">
+      <view class="billing-option {{billingPeriod === 'monthly' ? 'billing-active' : ''}}"
+        data-period="monthly" bindtap="onToggleBilling">月付</view>
+      <view class="billing-option {{billingPeriod === 'annual' ? 'billing-active' : ''}}"
+        data-period="annual" bindtap="onToggleBilling">年付<text class="billing-save">省{{annualSavePercent}}%</text></view>
+    </view>
+
+    <!-- 套餐卡片 -->
+    <view class="plan-list">
+      <view class="plan-card {{item.highlighted ? 'plan-card-hot' : ''}}"
+        wx:for="{{plans}}" wx:key="id">
+        <view class="plan-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+        <text class="plan-name">{{item.name}}</text>
+        <view class="plan-price-row">
+          <text class="plan-price">{{item.priceText}}</text>
+          <text class="plan-period">{{item.periodText}}</text>
+          <text class="plan-original" wx:if="{{item.originalText}}">{{item.originalText}}</text>
+        </view>
+        <text class="plan-annual-hint" wx:if="{{item.annualHint}}">{{item.annualHint}}</text>
+
+        <view class="plan-features">
+          <view class="plan-feature" wx:for="{{item.features}}" wx:for-item="feature" wx:key="*this">
+            <text class="feature-icon">✓</text>
+            <text class="feature-text">{{feature}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+
+  <!-- 底部固定升级按钮 -->
+  <view class="bottom-bar" wx:if="{{!loading && !error}}">
+    <button class="btn-primary upgrade-btn" bindtap="onUpgradePro">升级Pro</button>
+    <text class="bottom-note">月付随时取消 · 年付更优惠</text>
+  </view>
+</view>

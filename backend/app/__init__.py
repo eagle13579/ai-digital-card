@@ -197,6 +197,7 @@ def create_app():
     from app.routers.invoice import router as invoice_router
     from app.routers.knowledge_graph import router as knowledge_graph_router
     from app.routers.subscription_router import router as subscription_router
+    from app.routers.plan_router import router as plan_router
     from app.routers.membership import router as membership_router
     from app.routers.gaia_router import router as gaia_router
     from app.routers.distill_router import router as distill_router
@@ -458,6 +459,7 @@ def create_app():
     app.include_router(invoice_router)
     app.include_router(knowledge_graph_router)
     app.include_router(subscription_router)
+    app.include_router(plan_router)
     app.include_router(skill_registry_router)
     # ── CloakBrowser 智能爬虫 ──
     app.include_router(cloak_scraper_router)

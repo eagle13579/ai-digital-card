@@ -23,6 +23,38 @@ from app.identity.unified_profile import (
     UnifiedUserProfile,
 )
 
+# NOTE: 认证依赖在本地定义(复用 app.auth_jwt), 避免导入 app.routers.auth 造成
+# app.routers.auth <-> crm_router 循环导入 (crm_router 会 import auth 的 get_current_user)
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.auth_jwt import decode_access_token
+from app.models.user import User
+
+_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
+
+
+async def _get_current_user(
+    token: str | None = Depends(_oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """本地认证依赖: 从 JWT 解析当前用户 (与 auth.py::get_current_user 等价)。"""
+    from fastapi import HTTPException
+    cred_exc = HTTPException(status_code=401, detail="无法验证凭证")
+    if not token:
+        raise cred_exc
+    try:
+        payload = decode_access_token(token)
+        user_id = int(payload.get("sub", 0))
+    except (JWTError, ValueError, TypeError):
+        raise cred_exc
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().first()
+    if user is None:
+        raise cred_exc
+    return user
+
 router = APIRouter(prefix="/api/unified/profile", tags=["统一用户画像"])
 
 
@@ -104,12 +136,35 @@ class ProfileUpsertRequest(BaseModel):
 # ======================================================================
 
 
-def _get_profile_service() -> UnifiedProfileService:
-    """FastAPI dependency: create a UnifiedProfileService instance."""
-    from app.database import get_db as _get_db
+async def _get_profile_service(db: AsyncSession = Depends(get_db)):
+    """FastAPI dependency: create a UnifiedProfileService instance.
 
-    adapter = SQLAlchemyProfileAdapter(_get_db)
+    复用 FastAPI 注入的同一个 db session (不再内部新建 session),
+    避免多重 AsyncSession 导致 IllegalStateChangeError 关闭时序冲突。
+    """
+    async def _yield_once(_session: AsyncSession):
+        yield _session
+
+    adapter = SQLAlchemyProfileAdapter(lambda: _yield_once(db))
     return UnifiedProfileService(adapter)
+
+
+def _mask_pii(resp: ProfileResponse, is_self: bool = False, is_admin: bool = False) -> ProfileResponse:
+    """脱敏 PII: 非本人/非admin时掩码 phone/email (与 match.py::_desensitize_user 风格一致)。
+
+    规则:
+      - phone: 保留前3后4 → 138****0001
+      - email: 保留用户名首字符 + *** + @域名
+    """
+    if is_self or is_admin:
+        return resp
+    if resp.phone:
+        p = resp.phone
+        resp.phone = (p[:3] + "*" * max(0, len(p) - 7) + p[-4:]) if len(p) >= 7 else p[:1] + "***"
+    if resp.email and "@" in resp.email:
+        local, _, domain = resp.email.partition("@")
+        resp.email = (local[:1] + "***@" + domain) if local else resp.email
+    return resp
 
 
 # ======================================================================
@@ -121,12 +176,15 @@ def _get_profile_service() -> UnifiedProfileService:
 async def get_profile(
     user_id: str,
     service: UnifiedProfileService = Depends(_get_profile_service),
+    current_user: User = Depends(_get_current_user),
 ):
-    """Retrieve a single unified profile by user ID."""
+    """Retrieve a single unified profile by user ID. (需登录; 非本人/非admin返回脱敏PII)"""
     profile = await service.get_profile(user_id)
     if profile is None:
         raise_http_error(404, "NOT_FOUND", f"Profile not found: {user_id}")
-    return ProfileResponse.from_profile(profile)
+    is_self = str(current_user.id) == str(user_id) or str(current_user.phone) == str(profile.phone)
+    is_admin = getattr(current_user, "role", "") == "admin"
+    return _mask_pii(ProfileResponse.from_profile(profile), is_self=is_self, is_admin=is_admin)
 
 
 @router.post("/merge", response_model=ProfileResponse)
@@ -150,14 +208,16 @@ async def search_profiles(
     limit: int = Query(20, ge=1, le=200, description="Max results"),
     skip: int = Query(0, ge=0, description="Pagination offset"),
     service: UnifiedProfileService = Depends(_get_profile_service),
+    current_user: User = Depends(_get_current_user),
 ):
-    """Search profiles by keyword, or list all with pagination."""
+    """Search profiles by keyword, or list all with pagination. (需登录; PII脱敏)"""
     if keyword:
         profiles = await service.search_profiles(keyword, limit=limit)
     else:
         profiles = await service.list_all_profiles(skip=skip, limit=limit)
 
-    items = [ProfileResponse.from_profile(p) for p in profiles]
+    is_admin = getattr(current_user, "role", "") == "admin"
+    items = [_mask_pii(ProfileResponse.from_profile(p), is_self=False, is_admin=is_admin) for p in profiles]
     return PaginatedResponse(
         items=items,
         total=len(items),
@@ -170,8 +230,9 @@ async def search_profiles(
 async def get_cross_product_users(
     product_name: str,
     service: UnifiedProfileService = Depends(_get_profile_service),
+    current_user: User = Depends(_get_current_user),
 ):
-    """List all user profiles belonging to a specific product.
+    """List all user profiles belonging to a specific product. (需登录; PII脱敏)
 
     Examples:
       - ``ai-digital-brochure``  → local users table
@@ -179,7 +240,8 @@ async def get_cross_product_users(
       - ``go-aiport``            → (requires RemoteApiAdapter)
     """
     profiles = await service.get_cross_product_users(product_name)
-    return [ProfileResponse.from_profile(p) for p in profiles]
+    is_admin = getattr(current_user, "role", "") == "admin"
+    return [_mask_pii(ProfileResponse.from_profile(p), is_self=False, is_admin=is_admin) for p in profiles]
 
 
 @router.post("", response_model=ProfileResponse, status_code=status.HTTP_201_CREATED)
