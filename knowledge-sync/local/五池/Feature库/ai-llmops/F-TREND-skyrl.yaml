@@ -1,0 +1,16 @@
+name: Trending: SkyRL
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-08-06
+description: Auto-absorbed from GitHub Trending: NovaSky-AI/SkyRL
+atoms:
+  - TREND-NovaSky-AI-SkyRL-01: SkyRL: A Modular Full-stack RL Library for LLMs
+  - TREND-NovaSky-AI-SkyRL-02: framework, pipeline, agent 模式
+  - TREND-NovaSky-AI-SkyRL-03: NovaSky-AI/SkyRL的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

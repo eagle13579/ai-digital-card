@@ -1,0 +1,13 @@
+# 经典桥段重构引擎
+id: "F-CR-52"
+name: "经典桥段重构引擎"
+dimension: "创造力"
+description: >
+  25+经典桥段可复用函数库（食神式/基督山式/灰姑娘式/罗生门式等）。每个拆成功能+新鲜转化。至少改3要素。12+风格转译映射表。禁止直接复制和在世作者文风模仿。
+atoms:
+  - "QM-05"
+  - "QM-06"
+status: "active"
+priority: "P1"
+created: "2026-06-15"
+source: "qiaomu-novel-generator"

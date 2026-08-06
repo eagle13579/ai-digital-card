@@ -1,0 +1,53 @@
+# Feature YAML — AI数智名片
+name: "F-AI数智名片-RAG+SAG混合推理"
+version: "1.0"
+status: "implemented"
+date: "2026-07-08"
+tags: ["AI", "RAG", "SAG", "LLM", "推理管道", "DeepSeek"]
+
+description: >
+  业界领先的RAG+SAG混合推理架构。RAG负责外部知识检索(向量搜索+图谱+画像)，
+  SAG负责内部逻辑推理(6种推理模式)，Hybrid融合策略根据置信度动态选择输出。
+
+architecture:
+  layers:
+    - layer: RAG管道
+      file: backend/app/ai/rag_pipeline.py
+      class: "RAGPipeline"
+      retrieval_sources:
+        - VectorSearchEngine (语义检索)
+        - UserProfile (用户画像)
+        - KnowledgeGraph (关系图谱)
+        - ConversationHistory (对话历史)
+      llm: DeepSeek API (流式/非流式)
+    - layer: SAG管道
+      file: backend/app/ai/sag_pipeline.py
+      class: "SAGPipeline"
+      modes:
+        - quality_review — 名片质量评审
+        - matching_reasoning — 匹配逻辑推理
+        - trust_inference — 信任链推理
+        - explain_recommend — 推荐解释
+        - contradiction_detect — 矛盾检测
+        - optimize_suggest — 优化建议
+    - layer: Hybrid管道
+      file: backend/app/ai/hybrid_pipeline.py
+      class: "HybridPipeline"
+      fusion_strategy:
+        - RAG置信度<0.6 → 用SAG修正
+        - SAG检测矛盾 → 标记降级
+        - SAG置信度显著更高 → 切换策略
+    - layer: API路由
+      files:
+        - backend/app/routers/pipeline_router.py
+        - backend/app/routers/ai_assist.py
+        - backend/app/routers/ai_chat.py
+
+mental_models:
+  - "RAG+SAG混合推理管道"
+
+diagram: |
+  Query → RAG(Context Build + Vector Search + LLM)
+    ├─ confidence ≥ 0.6 → Output (默认路径)
+    └─ confidence < 0.6 → SAG(6种推理模式)
+                            └─ FusionStrategy.merge → Output

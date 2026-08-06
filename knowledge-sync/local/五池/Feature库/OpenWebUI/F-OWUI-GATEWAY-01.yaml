@@ -1,0 +1,25 @@
+id: F-OWUI-GATEWAY-01
+name: Provider-Agnostic LLM Gateway
+source_model: Open WebUI Provider Gateway Pattern — 统一接口封装Ollama/OpenAI/Anthropic/Google
+  GenAI等多模型提供商，共享流式响应协议
+dimension: 体系
+
+products:
+  - 通用: 自动匹配
+description: 通过统一的chat/completions接口向下游提供多供应商LLM接入，支持Ollama本地模型、OpenAI/Anthropic/Google等云端API，自动处理流式SSE、工具调用、多模态输入格式差异。
+input: 模型标识 + Prompt/Messages + 参数覆盖
+output: 统一流式SSE响应 + 工具调用交还
+sop: '① 请求进入→识别model_id→路由到对应provider适配器
+
+  ② 适配器将通用格式转为provider原生格式
+
+  ③ 流式返回SSE块，处理中间tool_call
+
+  ④ 非流式聚合完整response后返回
+
+  ⑤ 统一注入system prompt/过滤/审计拦截点'
+quality_gates: Provider切换可零停机(运行时热配)、流式中断自动重试3次、token用量统一计费
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 链客宝AI聊天/AI招商客服/中国软银投资分析/中韩出海数智港AI助手

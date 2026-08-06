@@ -1,0 +1,25 @@
+id: F-GRAPHIFY-PIPELINE-01
+name: 7-Stage Knowledge Graph Pipeline
+source_model: "Graphify Architecture — detect()->extract()->build_graph()->cluster()->analyze()->report()->export() 七阶段流水线，纯函数无副作用"
+dimension: 体系
+
+products:
+  - 企业知识库RAG: 自动匹配
+description: >-
+  7-stage纯净流水线架构, 每阶段单一函数, 模块间通过普通Python dict和NetworkX图通信,
+  无共享状态, 无副作用(除最后export写文件)。每一阶段可独立运行/调试/替换。
+  输入: 任意目录 → 输出: 可查询的知识图谱(HTML/Obsidian/JSON)。
+input: 目录路径
+output: 知识图谱(nx.Graph) + 分析报告 + 多种格式导出
+sop: "① detect(): 遍历目录→按类型分类文件→过滤敏感/噪音文件
+  ② extract(): 每个文件→tree-sitter AST解析→提取{node,edge}
+  ③ build_graph(): 合并所有提取→去重→构建NetworkX图
+  ④ cluster(): Leiden社区检测→发现自然模块/子系统
+  ⑤ analyze(): God节点检测→惊喜连接发现→建议问题生成
+  ⑥ report(): 渲染GRAPH_REPORT.md分析报告
+  ⑦ export(): 多格式输出(graph.html/obsidian/json/cypher/wiki)"
+quality_gates: 每阶段纯函数可独立测试、71.5x token节省 vs 原始文件、社区检测F1>0.8
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 记忆宫殿知识图谱/594技能关联/167员工关系/AI招商知识库

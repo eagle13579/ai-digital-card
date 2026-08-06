@@ -1,0 +1,13 @@
+datapack_id: "DP-KW-数智港-03"
+name: "合规违规案例库"
+version: "1.0.0"
+type: "知识包"
+description: >
+  韩国进口违规真实案例库，来自server_deploy/data/violation_cases.yaml(173行)
+source: "server_deploy/data/violation_cases.yaml"
+contents: >
+  食品违规案例(65个) + 化妆品违规案例(58个) + 保健食品违规案例(50个)
+consumed_by_features: >
+  F-TX-数智港-02 LLM增强合规分析链 / F-TX-数智港-03 合规报告生成管线
+project: "中韩出海数智港"
+created_at: "2026-06-08"

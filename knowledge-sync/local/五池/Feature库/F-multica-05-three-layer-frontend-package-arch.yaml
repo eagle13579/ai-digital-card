@@ -1,0 +1,22 @@
+name: "F5: 三层前端 Package 架构"
+version: v1.0.0
+source: multica
+type: architecture-pattern
+inputs:
+  - React 组件需求
+  - 业务功能需求
+outputs:
+  - 平台无关的跨端代码
+  - 模块化前端项目
+products: [multica-agent-skill-pipeline, multica-agent-runtime-gateway]
+related_atoms:
+  - task-instance-frontend-state
+  - websocket-hub-pattern
+  - react-query-zustand-bisection
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  四层递进架构：core（纯逻辑层）→ ui（纯组件层）→ views（组装层）→ apps（部署层）。
+  逻辑、组件、页面、应用严格分层，实现平台无关的跨端代码复用。
+  对标 Linear 前端架构。可作为 AI 数智军团的前端架构模板，
+  确保多项目间的前端资产高度可复用。

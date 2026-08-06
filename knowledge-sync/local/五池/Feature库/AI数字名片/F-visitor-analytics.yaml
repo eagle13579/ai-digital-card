@@ -1,0 +1,16 @@
+name: 访客日志与数据分析
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-visitor-log: 访客访问记录
+  - A-interest-expression: 兴趣表达采集
+  - A-visitor-analytics: 访客行为分析
+  - A-growth-analysis: 增长趋势分析
+  - A-report-generation: 报表生成
+description: 访客日志与数据分析：访问记录/兴趣表达/增长分析
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

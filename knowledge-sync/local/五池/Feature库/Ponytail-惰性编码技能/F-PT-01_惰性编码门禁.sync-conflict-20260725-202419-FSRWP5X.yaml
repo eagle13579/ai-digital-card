@@ -1,0 +1,27 @@
+# === Feature定义 ===
+feature_id: "F-PT-01"
+name: "惰性编码门禁"
+version: "1.0.0"
+dimension: "基本功"
+source_model: "Ponytail-惰性编码技能/PT01, PT02, PT11"
+status: active
+score: 7
+
+## 定位
+one_liner: "delegate_task前注入惰性决策阶梯到子Agent的context，强制YAGNI+标准库优先+最少代码"
+what_it_does: |
+  delegate_task前注入惰性决策阶梯到子Agent的context，强制YAGNI+标准库优先+最少代码
+
+## SOP
+sop: |
+  1. 读取task类型
+  2. 检测context是否含惰性指令
+  3. 如无，追加惰性阶梯
+  4. 记录注入次数
+
+## 质量门禁
+quality_gate:
+  score: 7
+  checks:
+    - "可执行性: SOP步骤清晰可执行"
+    - "可验证: 有明确的输出/验证方法"

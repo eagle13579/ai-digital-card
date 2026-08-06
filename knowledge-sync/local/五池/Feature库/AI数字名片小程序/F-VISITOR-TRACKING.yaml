@@ -1,0 +1,44 @@
+name: "F-VISITOR-TRACKING"
+title: "名片访客追踪与统计"
+product: "AI数字名片小程序"
+version: "1.0.0"
+status: "implemented"
+
+description: >
+  当用户分享名片后，系统自动记录访客信息（谁看了、看了什么、看了多久），
+  并提供多维度的数据统计面板，帮助用户衡量名片传播效果。
+
+triggers:
+  - 访客通过分享链接/小程序码访问名片
+  - 用户打开首页查看数据概览
+  - 用户打开名片详情页
+
+flow:
+  - "1. 用户创建/编辑名片并发布"
+  - "2. 通过分享或二维码传播名片"
+  - "3. 访客访问时调用 visitorApi.logVisit() 记录"
+  - "4. 访客可点击感兴趣（visitorApi.expressInterest）"
+  - "5. 名片主人查看 stats 面板"
+  - "6. 名片主人查看访客列表（visitorApi.getLogs）"
+
+data_points:
+  view_count: 总浏览量
+  total_visits: 总访客数_去重
+  matches: 匹配数
+  trust: 信任连接数
+  visitor_list: 访客详情列表
+
+api_endpoints:
+  - POST /api/visitors/{brochureId}/log (noAuth)
+  - POST /api/visitors/{brochureId}/interest (noAuth)
+  - GET /api/visitors/{brochureId}
+  - GET /api/visitors/{brochureId}/stats
+
+components:
+  - pages/index/index.js (首页 stats 展示)
+  - pages/card/card.js (名片详情 stats 展示)
+  - pages/profile/profile.js (个人中心 stats 展示)
+  - utils/api.js (visitorApi)
+
+data_flow:
+  load_page: userApi.getProfile() + visitorApi.getStats(id) -> setData stats

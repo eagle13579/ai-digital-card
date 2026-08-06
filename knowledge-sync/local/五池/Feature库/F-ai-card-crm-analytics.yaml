@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-crm-analytics
+  name: ai-card-crm-analytics
+  description: "CRM报表4API: pipeline/转化率/趋势/仪表盘"
+  source_project: "AI数字名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数字名片

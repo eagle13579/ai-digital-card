@@ -1,0 +1,23 @@
+id: F-OWUI-TOOL-01
+name: Tool-Everything Pattern — LLM可发现的全资源工具系统
+source_model: Open WebUI Builtin Tool System (builtin.py 131KB, 45 tools) — 将所有内部资源(记忆/笔记/聊天/频道/知识库/技能/自动化/日历)暴露为LLM可调用工具
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+description: >-
+  45个内置工具覆盖7大域，每个工具都有完整name/description/parameter schema，
+  LLM通过function calling动态发现和调用。关键设计: 工具既包含外部能力(web_search/fetch_url)
+  也包含内部资源(memories/notes/chats/knowledge/skills/automations)，使LLM能全面操作平台。
+input: LLM function calling请求 (tool_name + args)
+output: 工具执行结果 (text/json/file)
+sop: "① 工具注册: 每工具一个async def函数 + pydantic参数模型
+  ② 工具发现: LLM通过function calling协议获取所有工具name/description/parameters
+  ③ 工具调用: LLM选择工具→填入参数→执行→结果返回LLM
+  ④ 权限管控: _has_read_access_to_file() 控制文件级别访问
+  ⑤ 双模式: 内部工具(记忆/笔记/聊天) + 外部工具(搜索/抓取/图片生成)"
+quality_gates: 工具执行超时<30s、45工具零冲突命名、文件访问审计可追溯、新增工具≤100行
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 白泽数字员工工具系统/链客宝AI助手工具/中国软银数据工具/AI招商工具集

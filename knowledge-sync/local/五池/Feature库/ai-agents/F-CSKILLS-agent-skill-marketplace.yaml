@@ -1,0 +1,17 @@
+name: Agent 技能市场与角色技能包
+version: 1.0.0
+status: draft
+dimension: ai-agents
+source: github/alirezarezvani/claude-skills
+description: "337个Claude Code技能与插件集合。覆盖30+Agent类型、70+自定义命令、330+技能。按角色领域（工程/市场/产品/合规/战略等）预配置技能组合，跨8+编码Agent平台兼容。"
+atoms:
+  - F-CSKILLS-01: 技能市场的网络效应模型
+  - F-CSKILLS-02: 领域预设角色技能模板
+  - F-CSKILLS-03: 跨平台技能兼容性适配器
+products:
+  - AI数智军团: 军团技能市场基础设施
+  - AI原生人才: 角色技能包生成器
+  - Hermes Agent: 技能跨平台兼容层
+employees:
+  - 商羊P8: 技能市场运营策略
+  - 乘黄P9: 技能商业变现模型

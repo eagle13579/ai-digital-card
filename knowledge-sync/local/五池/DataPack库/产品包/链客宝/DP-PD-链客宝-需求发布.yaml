@@ -1,0 +1,42 @@
+datapack_id: "DP-PD-链客宝-需求发布"
+name: "链客宝·需求发布"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-08"
+author: "白泽"
+
+description: "链客宝用户发布的企业供需需求数据，包括采购需求、供应能力、合作意向、需求分类和优先级标记"
+
+source: "chainke-full/geo-content/2026-06-05-中小企业供需匹配痛点与解决方案-从信息孤岛到智能撮合.md | chainke-full/geo-content/2026-06-05-2026年企业供需匹配新趋势-AI如何改变B2B对接效率.md"
+
+contents: |
+  【需求发布数据】
+  1. 需求类型: 采购需求/供应能力/技术合作/资本对接/渠道合作
+  2. 需求详情: 标题、描述、预算范围、期望合作方式、时效性（来源: geo-content供需文章）
+     - 核心痛点: 信息不对称、信任缺失、效率低下
+     - 解决方案: 智能算法+实名认证体系
+  3. 需求分类标签: 按行业/品类/金额规模/紧急程度
+  4. 需求状态: 草稿/发布中/已匹配/已完成/已关闭
+  5. 需求优先级: P0(紧急)/P1(重要)/P2(普通)/P3(观察)
+  6. 需求发布者: 关联企业身份、认证等级、历史需求匹配率
+  7. 需求服务数据: 服务超100家企业，累计完成500+次成功对接（来源: geo-content供需文章）
+
+data_format: "结构化JSON"
+
+mount_interface:
+  load: "读取需求发布数据到工作内存"
+  query: "按类型/行业/状态/优先级查询需求"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "匹配Feature做供需撮合时消费此DataPack"
+  - "搜索Feature做需求检索时消费此DataPack"
+  - "场景Feature做场景参考时消费此DataPack"
+
+depends_on:
+  - "DP-PD-链客宝-用户身份"
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-08"
+    change: "原子化拆解自原供需需求数据包（KFD-07合规）"

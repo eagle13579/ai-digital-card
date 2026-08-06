@@ -1,0 +1,14 @@
+name: F-ORG-AXLE-03
+title: "AI数字军团自主进化体系"
+dimension:
+  layer: "AI"
+  type: "进化"
+  impact: "战略级"
+atoms: ["employee-from-tool-to-agent", "ceo-from-commander-to-guardian", "bai-ze-self-axle-demolition"]
+description: "员工从工具人到自主行动者的完整转型路径。白泽从指挥官到边界守护者的角色重塑"
+status: active
+created: 2026-06-17
+
+products:
+  - 通用: 自动匹配
+creator: 白泽

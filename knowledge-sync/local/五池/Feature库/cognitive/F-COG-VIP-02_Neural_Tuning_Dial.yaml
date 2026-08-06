@@ -1,0 +1,27 @@
+name: "F-COG-VIP-02_Neural_Tuning_Dial"
+dimension: "认知架构"
+domain: "neuroscience/bci/cognitive"
+status: "active"
+draft: false
+description: "每个处理单元拥有专属响应频段，目标值触发峰值激活，偏离值触发抑制衰减"
+source: "图宾根大学Nature Communications (2026-06-15吸收)"
+source_type: "research_paper"
+mental_models:
+  - "Neural Tuning Dial (神经元调音台)"
+  - "频段响应模型"
+products:
+  - "AI数字员工路由"
+  - "专家系统匹配"
+applications:
+  - "动态路由：按任务类型匹配最适配的专家模型/处理单元"
+  - "AI数字员工的职能精准调度与负载均衡"
+  - "多智能体系统中基于频段相似度的合作筛选"
+keywords:
+  - "VIP"
+  - "Neural Tuning Dial"
+  - "响应频段"
+  - "峰值激活"
+  - "抑制衰减"
+  - "认知架构"
+  - "图宾根"
+created_at: "2026-06-15"

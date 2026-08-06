@@ -1,0 +1,28 @@
+name: a2a-task-lifecycle
+description: A2A Task状态机 — 标准化的Agent任务生命周期管理，支持6状态流转+3种异步追踪机制
+version: 1.0.0
+author: Google A2A Protocol v1.0.0 萃取
+source: github.com/a2aproject/A2A
+license: Apache 2.0
+
+mental_models:
+  - A2A-04: Task状态机生命周期
+  - A2A-05: Message ⇔ Task决策模式
+  - A2A-09: 异步优先设计
+
+components:
+  - task_states: SUBMITTED → WORKING → COMPLETED/FAILED/CANCELED/REJECTED
+  - task_interrupted: INPUT_REQUIRED / AUTH_REQUIRED
+  - async_polling: GET /tasks/{id}
+  - async_sse: POST /message:stream (Server-Sent Events)
+  - async_push: POST webhook (Push Notification)
+
+products:
+  - AI数智军团: 任务编排引擎
+  - 白泽指挥官协议: 任务状态追踪
+  - 盖娅之城: 跨Agent工作流
+
+integration:
+  type: specification
+  dependencies: []
+  setup: 将当前delegate_task返回机制升级为A2A Task标准状态机

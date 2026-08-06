@@ -1,0 +1,13 @@
+datapack_id: "DP-DC-数智港-01"
+name: "PRD决策包"
+version: "1.0.0"
+type: "决策包"
+description: >
+  10个PRD的完整决策记录，覆盖首页/数字员工/SEO/表单/合规/多语言等
+source: "01_PRD/PRD-001~010"
+contents: >
+  PRD-001时光机战略(22KB) + PRD-002数字员工展示(20KB) + PRD-003 SEO(7KB) + PRD-005表单(23KB) + PRD-006服务咨询(16KB) + PRD-007合规自检(16KB) + PRD-008演示预约(11KB) + PRD-009 KOI-BD(13KB) + PRD-010多语言(10KB)
+consumed_by_features: >
+  F-CZL-数智港-03 跨境商业创新引擎
+project: "中韩出海数智港"
+created_at: "2026-06-08"

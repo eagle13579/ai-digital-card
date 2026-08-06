@@ -1,0 +1,14 @@
+name: 会员中心
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 会员中心模块，展示会员套餐与权益，支持在线升级，呈现用量进度条，引导用户持续付费转化
+atoms:
+  - MC-001: 套餐展示
+  - MC-002: 升级
+  - MC-003: 用量进度
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

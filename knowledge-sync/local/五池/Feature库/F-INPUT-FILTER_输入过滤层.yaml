@@ -1,0 +1,73 @@
+# Feature: F-INPUT-FILTER
+# 输入过滤层 — 信息存入前强制过滤，只保留决策/承诺/洞察
+
+name: F-INPUT-FILTER
+version: 1.0.0
+status: draft
+domain: cognitive
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - A3-输入过滤层
+
+input_schema:
+  type: object
+  properties:
+    raw_content:
+      type: string
+    content_type:
+      type: string
+      enum: [meeting, article, note, chat]
+
+output_schema:
+  type: object
+  properties:
+    decisions:
+      type: array
+      items:
+        type: object
+        properties:
+          decision: { type: string }
+          reason: { type: string }
+    commitments:
+      type: array
+      items:
+        type: object
+        properties:
+          commitment: { type: string }
+          owner: { type: string }
+          deadline: { type: string }
+    insights:
+      type: array
+      items:
+        type: object
+        properties:
+          insight: { type: string }
+          domain: { type: string }
+
+prompt_template: |
+  从以下内容中提取三类信息：
+
+  1. 决策（必须）：做了什么决定？为什么？
+  格式：[决策] {内容}，原因：{原因}
+
+  2. 承诺（可选）：谁承诺了什么？DDL？
+  格式：[承诺] {内容}，负责人：{谁}，DDL：{时间}
+
+  3. 洞察（可选）：学到了什么新认知？
+  格式：[洞察] {内容}，相关领域：{领域}
+
+  不提取：寒暄、过程描述、情绪表达、重复内容。
+
+target_products:
+  - 鸣蜩（会议助理 :5014）
+  - 翟如（飞阅会助理）
+  - 文鳐（私人助理）
+  - 盖娅大脑反哺引擎
+
+target_employees:
+  - 鸣蜩
+  - 翟如
+  - 文鳐
+  - 师旷

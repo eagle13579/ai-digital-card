@@ -1,0 +1,59 @@
+# 多调度器定时推送 — 同一套推送逻辑在不同调度器上复用
+# AIHOT Bot 核心心智模型 #5
+name: F-AIHOT-05_Multi_Scheduler
+dimension: 体系
+domain: 任务调度-跨平台定时器
+status: 生产就绪
+priority: P0
+source_models:
+  - M-AIHOT-05_Multi_Scheduler
+description: |
+  多调度器定时推送实现同一套推送逻辑在三种完全不同调度器上复用，
+  确保无论运行环境如何，定时推送任务都能可靠执行。
+
+  三种调度器：
+  - node-schedule（Node.js）：常规进程内调度，适合服务器环境
+  - cron（GitHub Actions）：GitHub基础设施调度，CI/CD集成
+  - Workers scheduled event（Cloudflare）：边缘调度，无服务器环境
+
+  核心策略："一次编写推送逻辑，到处定时执行"
+  调度逻辑与推送业务逻辑完全解耦。
+
+  优势：
+  - 冗余保障：三种调度互备，单调度器失效不影响
+  - 环境适配：根据部署环境自动选择最优调度器
+  - 统一配置：定时策略通过环境变量或统一配置文件管理
+input:
+  - 推送业务函数（fetchNews + formatMessage + sendMessage）
+  - 调度配置（cron表达式 / 间隔时间 / 时区）
+  - 运行环境标识（Node.js / GitHub Actions / Workers）
+output:
+  - 定时触发的推送任务执行
+  - 调度器运行日志
+  - 下一次执行时间预报告知
+sop: |
+  1. 提取推送逻辑为纯函数（fetch→format→send）
+  2. 检测运行环境 → 选择对应调度器
+  3. 环境A（Node.js）：new node-schedule cronJob
+  4. 环境B（GitHub Actions）：.github/workflows/*.yml cron表达式
+  5. 环境C（Workers）：scheduled event handler
+  6. 统一日志记录（调度触发时间+执行结果+耗时）
+quality_gates:
+  - gate: 调度准时性
+    criteria: 实际执行时间与计划偏差 < 30秒
+    method: 记录scheduled_time与actual_time对比
+  - gate: 推送逻辑一致性
+    criteria: 三种调度器触发的推送内容完全一致
+    method: 同一时间点三种调度器分别执行，比较输出
+  - gate: 调度器故障切换
+    criteria: 一种调度器失效时其他调度器正常执行
+    method: 禁用一种调度器，验证另两种正常工作
+version: "1.0.0"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-15
+product_mapping:
+  - cronjob值守体系: Gateway cron + Windows Task Scheduler + GitHub Actions 复用此多调度器模式
+  - 内容工厂: 内容工厂的定时采集任务可复用此架构
+  - 盖娅之城: 盖娅的定时任务系统可参考多调度器设计

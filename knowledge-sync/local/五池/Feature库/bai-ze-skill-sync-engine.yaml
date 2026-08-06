@@ -1,0 +1,38 @@
+name: bai-ze-skill-sync-engine
+description: >
+  白泽单源多平台技能同步引擎。一份SKILL.md源文件→自动生成7个AI IDE平台的适配配置。
+  源自AI Website Cloner Template的sync-skills.mjs模式。
+version: "2.0.0"
+source: "AI Website Cloner Template (JCodesMore) → 白泽技能体系适配"
+products:
+  - "白泽控制台"
+  - "云师技能集市"
+  - "烛龙工程流"
+  - "AI数字名片"
+
+entrypoint: "scripts/sync-bai-ze-skills.mjs"
+
+capabilities:
+  - "409个skill → 7平台 = 2863文件自动生成"
+  - "按类别同步: --category cognitive"
+  - "全量同步: --all"
+  - "单skill同步: --skill <name>"
+  - "指定平台: --platforms claude-code,cursor"
+  - "统计分布: --stats"
+
+supported_platforms:
+  - "claude-code: .claude/skills/"
+  - "cursor: .cursor/commands/"
+  - "github-copilot: .github/skills/"
+  - "windsurf: .windsurf/workflows/"
+  - "gemini-cli: .gemini/commands/"
+  - "trae: .trae/commands/"
+  - "opencode: .opencode/commands/"
+
+cron: "0 */6 * * * (白泽技能自动同步·每6h, job_id=d8660ef2afda)"
+
+triggers:
+  - "同步白泽技能到所有平台"
+  - "跨AI IDE使用白泽技能"
+  - "在Cursor里用铁律执行器"
+  - "在Claude Code里用出海方法论"

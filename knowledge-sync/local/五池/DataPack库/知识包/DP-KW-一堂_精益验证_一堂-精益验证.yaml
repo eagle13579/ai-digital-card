@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-一堂_精益验证"
+name: "一堂-精益验证"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "原子心智模型集/一堂-精益验证 — 包含9个相关心智模型"
+
+source: "L5孵化室/五池/模型池/_原子/一堂-精益验证/"
+
+contents: |
+  9个INDEX.md}､M54-精益验证核心理念.md}､M55-低成本验证四大原则.md}､M56-精益修炼段位L1-L6.md}､M57-关键假设三板斧Ω模型.md...等心智模型
+
+data_format: "心智模型Markdown"
+
+mount_interface:
+  load: "读取全部9个心智模型到工作内存"
+  query: "按维度/标签/适用场景检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应一堂-精益验证相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自_原子目录"

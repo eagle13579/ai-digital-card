@@ -1,0 +1,13 @@
+---
+id: F-DARWIN-06
+name: 测试Prompt设计器
+dimension: 场景
+source_model: DS-10
+description: >-
+  优化前先设计2-3个典型测试prompt覆盖happy path+边缘场景
+sop: |-
+  ① 读SKILL.md理解用途 ② 设计2-3prompts ③ 存test-prompts.json ④ 展示给用户确认
+quality_gate: |-
+  无test-prompts不可进入优化循环。dim8权重23%不可凭空打分
+draft: false
+created_at: 2026-06-13

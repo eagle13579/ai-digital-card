@@ -1,0 +1,58 @@
+# Feature: F-KNOWLEDGE-GRAPH
+# 知识图谱可视化 — 让用户看到知识库在生长
+
+name: F-KNOWLEDGE-GRAPH
+version: 1.0.0
+status: draft
+domain: visualization
+
+products:
+  - 企业知识库RAG: 自动匹配
+atoms:
+  - A5-图谱可视化
+
+tech_stack:
+  suggested: Three.js (复用谛听3D地球技术栈)
+  fallback: D3.js force-directed graph
+  library: react-force-graph-3d
+
+node_types:
+  - type: card
+    color: "#4A90D9"
+    label: 知识卡片
+  - type: project
+    color: "#7ED321"
+    label: 项目
+  - type: person
+    color: "#F5A623"
+    label: 人物
+  - type: decision
+    color: "#D0021B"
+    label: 决策
+
+edge_types:
+  - type: references
+    label: 引用
+  - type: similar
+    label: 相似
+  - type: causal
+    label: 因果
+  - type: depends
+    label: 依赖
+
+features:
+  - 力导向图布局
+  - 悬停预览节点摘要
+  - 点击跳转到原文
+  - 分类筛选
+  - 时间轴回放（可看知识库从第一天到今天的成长过程）
+
+target_products:
+  - 白泽控制台首页
+  - 师旷知识管理面板
+  - 盖娅进化大脑展示
+
+target_employees:
+  - 谛听（复用Three.js经验）
+  - 乘黄（产品设计）
+  - 师旷（认知导航）

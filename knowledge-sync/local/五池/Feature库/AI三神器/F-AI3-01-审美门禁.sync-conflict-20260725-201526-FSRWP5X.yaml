@@ -1,0 +1,79 @@
+name: 审美门禁
+version: 0.1.0
+dimension: 审美
+status: draft
+draft: true
+source_model: Taste
+description: >
+  AI设计产出必须过审美关。基于Taste心智模型，强制对所有AI生成的设计进行
+  排版/留白/配色三大规范校验，根除"塑料感"问题。支持多风格体系
+  （Swiss极简、粗野主义等），风格可一句话切换，确保视觉产出的一致性
+  与专业度。
+sop:
+  - step: 1
+    name: 设计产出接收
+    action: 接收AI生成的设计产出（UI稿/海报/页面布局等）
+    input: design_output
+    output: raw_design_artifact
+  - step: 2
+    name: 三规范检查
+    action: 逐项检查排版规范（对齐/层级/间距）、留白规范（呼吸感/区块间距）、配色规范（色板一致性/对比度/语义色彩）
+    tools:
+      - 排版检测引擎
+      - 留白分析器
+      - 配色校验器
+    output: compliance_report
+  - step: 3
+    name: 风格一致性验证
+    action: 根据当前激活风格体系（默认Swiss极简），验证产出满足该风格的设计语言约束
+    variants:
+      - Swiss极简: 网格系统、无衬线字体、高对比度
+      - 粗野主义: 粗重边框、大字号、高饱和度色块
+      - 和风: 大留白、自然色系、低饱和度
+    output: style_validation_result
+  - step: 4
+    name: 通过/打回
+    action: 若全部通过则输出"通过"并归档；否则输出"打回"及具体违规项，附修改建议
+    condition:
+      if: compliance_report.passed && style_validation_result.passed
+      then: output_status = "passed"
+      else: output_status = "rejected"
+    output: gate_decision
+input:
+  - name: design_output
+    type: image|layout_spec|html_css
+    description: AI生成的设计产出，可以是视觉稿、布局描述或前端样式代码
+  - name: style_preset
+    type: string
+    description: 风格预设名称（如 Swiss极简 / 粗野主义 / 和风），默认为Swiss极简
+    default: Swiss极简
+output:
+  - name: gate_decision
+    type: object
+    fields:
+      status: passed|rejected
+      violations: array of violation_detail
+      suggestions: array of improvement_tip
+  - name: compliance_report
+    type: object
+    fields:
+      排版评分: float
+      留白评分: float
+      配色评分: float
+      总体分: float
+quality_gates:
+  - name: 排版基线
+    metric: 对齐偏差 <= 2px，层级结构清晰，行距比例1.5~2.0
+    severity: critical
+  - name: 留白充足
+    metric: 区块间距 >= 16px，页面边距 >= 24px
+    severity: major
+  - name: 配色合规
+    metric: 色板内色彩偏差 deltaE < 2.3，对比度 >= 4.5:1
+    severity: critical
+  - name: 风格忠实度
+    metric: 风格特征矩阵相似度 >= 85%
+    severity: major
+  - name: 反塑料感检测
+    metric: 无过度渐变/投影/拟物装饰，自然度评分 >= 70
+    severity: normal

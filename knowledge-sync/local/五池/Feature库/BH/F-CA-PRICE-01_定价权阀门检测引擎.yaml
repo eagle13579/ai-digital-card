@@ -1,0 +1,19 @@
+id: F-CA-PRICE-01
+name: 定价权阀门检测引擎
+dimension: 💡 创造力
+description: >-
+  基于BH01定价权阀门心智模型构建的检测引擎，识别指数定价机制中卖方
+  主导定价的特征。检测维度：指数编制方利益关联、样本偏向、定价公式
+  不对称性、卖方对定价机制的掌控程度。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH01: 定价权阀门
+products:
+  - 黑河调查局定价分析模块
+  - 产业链利润分配分析系统
+employees: [计然, 烛龙, 长乘]
+priority: P0
+maturity: design

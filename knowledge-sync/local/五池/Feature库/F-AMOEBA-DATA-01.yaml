@@ -1,0 +1,30 @@
+# 💾 阿米巴数据持久化
+id: F-AMOEBA-DATA-01
+name: 阿米巴数据持久化
+dimension: 数据
+description: JSON文件存储阿米巴经营状态（营收/利润/轮次/调研/复盘），支持随时重启恢复
+source_model: 阿米巴三阶段经营闭环
+status: active
+version: "1.0"
+created: 2026-06-14
+
+products:
+  - 通用: 自动匹配
+input:
+  - AmoebaState 对象
+
+output:
+  - data/amoeba/state.json 持久化文件
+
+sop: |
+  1. ensureDir() 确保data/amoeba/存在
+  2. JSON.stringify(state, null, 2) 格式化写入
+  3. 读时 try/catch 包裹，文件不存在则 createInitialState()
+  4. 每次循环结束后自动 saveState()
+
+quality_gate:
+  - 数据写入必须原子操作（write + 验证）
+  - 读失败时必须返回初始状态而非崩溃
+  - 文件格式保持人类可读（缩进2空格）
+
+draft: false

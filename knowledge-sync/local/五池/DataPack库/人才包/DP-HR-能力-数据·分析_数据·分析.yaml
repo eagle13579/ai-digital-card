@@ -1,0 +1,38 @@
+datapack_id: "DP-HR-能力-数据·分析"
+name: "数据·分析人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "数据·分析领域8名员工的能力档案"
+
+source: "employees/ 按能力关键词分类"
+
+contents: |
+  8名数据·分析领域员工:
+  - 合规分析师-3ae6380c
+      - 数据分析专家-579ad6a0
+      - 数据合规官
+      - 白猿-增长分析
+      - 谛听
+      - 谛听-情报
+      - 龙虾实习数据分析-87d4dc2a
+      - 龙虾数据管道-b2c3d4e5
+
+data_format: "员工YAML + 能力矩阵"
+
+mount_interface:
+  load: "加载此领域全部员工档案"
+  query: "按具体技能/等级检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应数据·分析相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按能力领域重新拆分为原子DataPack"

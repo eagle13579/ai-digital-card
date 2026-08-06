@@ -1,0 +1,26 @@
+# 💰 SessionBudget - 会话Token/轮次预算限制
+id: F-MYTHOS-08
+name: 会话预算限制器
+dimension: 基础设施
+description: 双重会话预算限制（Token总量+交互轮次），80%警告触发优雅保存到MEMORY.md，支持模型精确计费和恢复，--no-budget专家模式绕过
+atoms:
+  - "Fable5-Mythos5-代码收割/08_SessionBudget"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: mythos-router/src/budget.ts (lines 77-271)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 默认限制: 500,000 tokens / 25 turns @ budget.ts:93-94
+  - 警告阈值: 80% @ budget.ts:95
+  - 计费支持: calculateCost(modelId, input, output) @ budget.ts:110
+  - 恢复: restore() @ budget.ts:117-128
+
+injection_points:
+  - 每次API调用前: check() 预检 @ budget.ts:131-173
+  - 每次API调用后: record() 更新 @ budget.ts:104-114
+  - 80%警告: formatWarning() → 优雅保存 @ budget.ts:234-260
+  - --no-budget: expert模式禁用 @ budget.ts:100

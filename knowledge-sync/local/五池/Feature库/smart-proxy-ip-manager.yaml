@@ -1,0 +1,85 @@
+feature:
+  name: smart-proxy-ip-manager
+  version: v1.0.0
+  description: >
+    多供应商代理IP统一管理与智能轮换系统。聚合多家代理供应商（快代理/芝麻/
+    讯代理/星空/携趣等），构建本地IP缓存池 + 自动过期刷新 + 可用性探测 +
+    双客户端（httpx/aiohttp）自动适配。为爬虫引擎提供透明、高可用、低延迟
+    的代理IP通道，是MediaCrawler反爬体系的基础设施层。
+  products:
+    - 谛听情报系统
+    - 竞品监控
+    - 内容工厂
+    - AnyMediaPlatformer 多平台发布器
+    - 蚕茧帝国
+  atoms:
+    - MC04   # 代理IP管理
+  inputs:
+    - name: proxy_providers
+      type: array[string]
+      description: "启用的代理供应商列表，如 ['kuaidaili', 'zhima', 'xundaili', 'xingkong', 'xiequ']"
+      default: ["kuaidaili"]
+    - name: pool_size
+      type: integer
+      description: "IP缓存池最大容量"
+      default: 200
+      minimum: 10
+      maximum: 2000
+    - name: expiry_check_interval
+      type: integer
+      description: "过期探测间隔（秒）"
+      default: 60
+    - name: client_type
+      type: string
+      description: "HTTP客户端类型: httpx / aiohttp"
+      default: "httpx"
+    - name: target_url
+      type: string
+      description: "可用性探测目标URL"
+      default: "https://httpbin.org/ip"
+    - name: min_availability
+      type: float
+      description: "代理最低可用率阈值（0-1），低于此值触发告警轮换"
+      default: 0.7
+  outputs:
+    - name: proxy_pool
+      type: array[object]
+      description: "当前IP缓存池状态快照，每项包含 ip:port / provider / latency_ms / success_rate / expire_at / region"
+    - name: next_proxy
+      type: object
+      description: "（同步调用）本次请求分配的最优代理，包含 ip:port / protocol / provider"
+    - name: pool_stats
+      type: object
+      description: "池统计数据: total / alive / dead / avg_latency / rotation_count / hit_rate"
+  capabilities:
+    - 多供应商聚合: 统一接口接入10+代理供应商，按权重/价格/可用率动态调度
+    - IP缓存池: 内存LRU缓存池，避免重复向供应商API请求，降低延迟和费用
+    - 自动过期刷新: 定时任务扫描过期IP并自动从供应商补充新IP
+    - 可用性探测: 并发探测每个IP的真实可用性（连接时间/状态码/目标可达）
+    - 智能路由: 根据请求平台/地域/协议（HTTP/HTTPS/SOCKS5）自动选择最优IP
+    - 双客户端适配: httpx（同步）和aiohttp（异步）双驱动，自动注入proxy参数
+    - 失败自动摘除: 连续N次失败的IP自动标记病过期，不再分配
+    - 统计看板: 实时输出池命中率/可用率/平均延迟/轮换频次，用于Debug
+  architecture: >
+    四层架构: (1) Provider Adapter层 — 每个供应商实现标准ProxyProvider接口
+    （fetch/refresh/balance），注册到供应商注册表；(2) Pool Manager层 —
+    维护内存缓存池（dict+heap），按过期时间排序，定时GC死IP；(3) Router层 —
+    按最少连接/最低延迟/地域亲和性算法从池中选择最优IP；(4) Client Injector
+    层 — 根据client_type自动创建httpx或aiohttp Transport，将proxy参数原生
+    注入。外部通过ProxyManager单例访问，支持with上下文自动释放。
+  anti_patterns:
+    - 每次请求都调供应商API: 延迟高且费用贵 — 必须使用本地IP缓存池
+    - 单一供应商锁定: 某家供应商IP质量下降导致全盘崩溃 — 必须多供应商+权重轮换
+    - 无可用性检测: 拿了不可用的IP直接请求导致白白耗时 — 必须后台异步探测
+    - 全池扫描: 大规模同步扫描所有IP导致阻塞 — 必须用异步批量探测
+    - 硬编码代理格式: 不同client要求不同格式 — 必须通过抽象Transport层适配
+  evolution_flywheel: >
+    第一步: 先接入1-2家供应商（快代理+芝麻），实现基础fetch/refresh + 简单
+    缓存池 → 第二步: 添加可用性探测和自动过期，降低无效IP率 → 第三步: 扩展
+    供应商接口，注册表模式接入更多供应商 → 第四步: 加入智能路由（地域/协议/
+    最低延迟），积累路由策略 → 第五步: 加入统计看板和告警，根据历史数据自动
+    调优各供应商权重 → 回到第一步优化单供应商获取延迟。每圈循环降低5%获取
+    延迟，提升10%代理可用率。
+
+products:
+  - 通用: 自动匹配

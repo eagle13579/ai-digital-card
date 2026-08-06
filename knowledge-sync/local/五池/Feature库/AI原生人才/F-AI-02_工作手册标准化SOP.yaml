@@ -1,0 +1,16 @@
+name: F-AI-02_工作手册标准化SOP
+dimension: 基本功
+domain: AI原生人才
+version: 1.0
+
+products:
+  - 通用: 自动匹配
+description: |-
+  提示词一次性指令 vs 工作手册长期标准——写一次工作手册AI持续产出符合标准的成果
+models_referenced:
+  - M3-白泽军团映射
+applications:
+  - 数字员工SaaS
+  - 盖娅之城
+draft: false
+created_at: 2026-06-15

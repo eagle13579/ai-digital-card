@@ -1,0 +1,102 @@
+feature_id: F-CADAM-05
+feature_name: Browser-Native Implicit CAD（GLSL-Raymarch渲染引擎）
+feature_type: 心智模型 / 浏览器原生计算模式
+version: 1.0.0
+created: 2026-06-15
+author: CADAM项目 -> Feature吸收
+
+# ============================================================
+# 核心理念
+# ============================================================
+
+products:
+  - 通用: 自动匹配
+core_concept: >
+  使用GLSL signed-distance fields (SDF) 作为CAD表示，
+  在浏览器中通过WebGL raymarching直接渲染，
+  无需服务器编译，无需安装任何软件。
+  模型是标准ES Module（.implicit.js），
+  可包含参数、动画和程序化颜色。
+  这是"浏览器即编译器"理念的工程实现。
+
+# ============================================================
+# CADAM实现
+# ============================================================
+cadam_implementation:
+  description: >
+    CADAM的implicit-cad skill定义了一种全新的CAD表示范式：
+    (1) 模型是JS ES Module，导出schema/name/glsl对象
+    (2) GLSL字符串包含float sdf(vec3 p)和可选的vec3 color()
+    (3) 内置implicit_* GLSL辅助函数库（sphere/box/torus等）
+    (4) 参数自动成为GLSL uniforms
+    (5) 支持TPMS点阵结构（gyroid/schwarz/diamond等）
+    (6) 支持动画（breathe/rotate等）
+    (7) 头快照CLI使用Playwright渲染PNG/GIF
+    (8) 可导出为GLB/STL/3MF网格
+    这套系统完全在浏览器中运行，
+    不需要OpenSCAD、FreeCAD或任何本地CAD引擎。
+  key_components:
+    - implicitjs运行时（npm包）
+    - GLSL SDF函数
+    - ES Module模型格式（.implicit.js）
+    - param/animations声明式配置
+    - headless snapshot CLI
+    - mesh export CLI（STL/3MF/GLB）
+  invariant: >
+    Implicit CAD是传统STEP CAD的补充而非替代。
+    适合探索性、有机形态、参数化演示，
+    不适合需要精确工程配合的生产级设计。
+
+# ============================================================
+# 映射盖娅进化大脑
+# ============================================================
+mapping_to_gaiya:
+  description: >
+    这一模式对应"在客户端执行计算而非依赖服务器"
+  baize_analogy:
+    - 浏览器作为CAD编译器 -> Agent本地执行推理
+    - GLSL SDF作为表示层 -> 领域特定语言
+    - 无需服务器依赖 -> 去中心化推理
+  analogy: >
+    正如CADAM把CAD编译从服务器搬到浏览器，
+    盖娅生态中的某些计算任务应当从中心化API
+    搬到Agent本地环境执行，
+    减少延迟、保护隐私、提高可用性。
+
+# ============================================================
+# 适用场景
+# ============================================================
+applicable_scenarios:
+  - 需要实时交互参数调节的3D预览
+  - 有机形态和拓扑优化结构
+  - TPMS点阵结构设计
+  - 离线/本地优先的CAD展示
+  - 参数化艺术/设计探索
+
+# ============================================================
+# 心智模型详细描述
+# ============================================================
+mental_model_detail:
+  name: Browser-Native Computation with GLSL Raymarch (浏览器原生GLSL计算)
+  level: L5孵化室 - 核心心智模型
+  description: >
+    核心洞察：WebGL着色器是一种被低估的通用计算平台。
+    通过SDF+Raymarching，可以在浏览器中实时渲染
+    复杂的CAD几何，无需任何后端服务。
+    模型文件是纯文本JS Module，
+    天然适合版本控制、diff、LLM生成。
+    参数自动映射为GLSL uniform，
+    让实时交互调节成为浏览器原生能力。
+  principles:
+    - 浏览器即运行时: 无需安装、无需编译、零配置
+    - 文本即模型: .implicit.js是纯文本，可版本控制
+    - GLSL作为DSL: 着色器语言作为几何描述语言
+    - 参数即uniform: 声明式参数自动映射到GPU
+    - 快照即验证: headless渲染作为验证手段
+  workflow:
+    - "1. 编写GLSL SDF + color函数"
+    - "2. 声明参数和动画（可选）"
+    - "3. CAD Viewer浏览器实时渲染"
+    - "4. 用户交互调节参数"
+    - "5. headless snapshot快速验证"
+    - "6. 导出为GLB/STL/3MF（可选）"

@@ -1,0 +1,31 @@
+name: F-AI投资-multi-agent-hedge-fund
+version: 1.0.0
+description: 多大师Agent对冲基金决策引擎 — 将19位投资大师的投资哲学Agent化，通过LangGraph编排形成分析→风控→决策三级流水线
+status: seed
+tags:
+  - AI投资
+  - 多Agent
+  - 对冲基金
+  - LangGraph
+  - 投资决策
+source: D:/AI投资/ai-hedge-fund
+dependencies: []
+architecture:
+  pattern: Pipeline
+  description: >
+    Analyst Agents（分析师层 并行）→ Risk Manager（风险管理 单体）→ Portfolio Manager（投资组合经理 单体）。
+    分析师数量可配置（0-19位大师+4位技术分析师），通过LangGraph StateGraph编译为可执行Workflow。
+    支持Docker部署+CLI/Web双入口。
+  components:
+    - AnalystsLayer: 19位投资大师Agent + 4位技术分析Agent(估值/情绪/基本面/技术)
+    - RiskManager: 风险指标计算+持仓限制
+    - PortfolioManager: 最终交易决策+订单生成
+    - WebApp: FastAPI后端+React前端
+infrastructure:
+  docker:
+    - ollama/ollama:latest (可选本地LLM)
+    - ai-hedge-fund (Python应用镜像)
+  env:
+    - OPENAI_API_KEY
+    - FINANCIAL_DATASETS_API_KEY
+    - OLLAMA_BASE_URL (可选)

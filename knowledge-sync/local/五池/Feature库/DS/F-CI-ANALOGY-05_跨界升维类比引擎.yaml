@@ -1,0 +1,19 @@
+id: F-CI-ANALOGY-05
+name: 跨界升维类比引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS05跨界升维类比心智模型构建的类比映射引擎，自动为用户选择最
+  合适的源领域进行概念类比。检测维度：源领域匹配度、关系结构映射完整度、
+  类比准确性、认知降维效果评估。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS05: 跨界升维类比
+products:
+  - 跨领域知识桥接系统
+  - 概念可视化映射工具
+employees: [白泽, 长乘]
+priority: P0
+maturity: design

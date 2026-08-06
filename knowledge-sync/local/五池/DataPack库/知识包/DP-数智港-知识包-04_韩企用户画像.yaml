@@ -1,0 +1,13 @@
+datapack_id: "DP-KW-数智港-04"
+name: "韩企用户画像"
+version: "1.0.0"
+type: "知识包"
+description: >
+  韩国目标企业综合画像分析，含市场/竞品/合规/渠道四维分析
+source: "01_PRD/韩企用户画像.md(14KB) + 17_韩国客户/"
+contents: >
+  企业画像模板 + 忠清南道14,000家企业名录索引 + 品类分布分析
+consumed_by_features: >
+  F-CZL-数智港-01 韩企市场侦察引擎 / F-CZL-数智港-02 AI智能选品分析引擎 / F-DATA-数智港-02 韩企销售管道分析器
+project: "中韩出海数智港"
+created_at: "2026-06-08"

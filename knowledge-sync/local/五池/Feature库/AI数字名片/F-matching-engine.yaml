@@ -1,0 +1,17 @@
+name: 用户匹配引擎
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-tag-scoring: 标签评分引擎
+  - A-vector-scoring: 向量相似度评分
+  - A-weight-scoring: 权重评分调节
+  - A-three-tier-matching: 三层评分匹配
+  - A-semantic-search: 语义搜索
+  - A-recommend-engine: 推荐引擎
+description: 用户匹配引擎：三层评分(tag+vector+weight)/语义搜索/推荐
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

@@ -1,0 +1,21 @@
+name: F-CARD-ai-engine
+version: 1.0.0
+status: production
+dimension: backend-ai
+description: AI数字名片AI引擎 — SAG/Hybrid/RAG三管道 + OCR + 向量搜索 + 在线学习 + 反馈闭环
+atoms:
+  - F-CARD-ai-01: SAGPipeline六步推理深度推理
+  - F-CARD-ai-02: Hybrid三通道路由
+  - F-CARD-ai-03: 向量搜索引擎
+  - F-CARD-ai-04: 在线学习引擎
+  - F-CARD-ai-05: 用户反馈闭环
+products:
+  - ai-digital-card
+employees:
+  - 文鳐P9: 代码收割归档
+tags:
+  - ai
+  - sage
+  - rag
+  - vector-search
+  - online-learning

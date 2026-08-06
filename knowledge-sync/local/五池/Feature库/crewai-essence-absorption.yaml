@@ -1,0 +1,36 @@
+name: "crewai-essence-absorption"
+version: "v1.0.0"
+type: "knowledge-absorption"
+description: "CrewAI v1.13.0a6全量吸收 — 10心智模型+8架构模式+代码收割"
+created: "2026-07-07"
+products:
+  - "AI数智军团"                 # Agent-as-Actor/Crew编排/EventBus → 军团核心架构
+  - "企业知识库RAG"              # RAG四层架构直接复用
+  - "员工MCP工具桥接"            # BaseTool契约用于MCP工具集成
+  - "白泽军团"                   # ToolCollection/Converter → 工具系统升级
+atoms:
+  - "skills/cognitive/crewai-essence-absorption"
+  - "skills/cognitive/crewai-eventbus-pattern"
+  - "skills/cognitive/crewai-converter-pattern"
+  - "skills/cognitive/crewai-tool-adapter-pattern"
+code_harvest:
+  - "L1图书馆/代码资产库/crewAI/event_bus.py"
+  - "L1图书馆/代码资产库/crewAI/handler_graph.py"
+  - "L1图书馆/代码资产库/crewAI/converter.py"
+  - "L1图书馆/代码资产库/crewAI/base_tool.py"
+  - "L1图书馆/代码资产库/crewAI/client.py"
+employee_injection:
+  - "鲲鹏(P9架构师)"
+  - "烛龙-P8(系统架构)"
+  - "烛龙(架构设计)"
+  - "狴犴(架构设计)"
+  - "量化数据工程师"
+  - "ML科学家"
+  - "Chatwoot Rails后端"
+  - "Chatwoot Vue前端"
+  - "Chatwoot AI工程师"
+value_rating:
+  V1_payment_willingness: 4
+  V2_replacement_cost: 4
+  V3_delivery_difficulty: 4
+  overall: 4.0

@@ -1,0 +1,24 @@
+id: F-OWUI-PLUGIN-01
+name: Pipeline Plugin Middleware
+source_model: Open WebUI Pipelines Framework — 热插拔Python中间件，在LLM调用前/后注入自定义逻辑
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+description: 允许用户/管理员编写轻量Python函数作为Pipeline，在LLM调用前（修改请求体/注入context）或调用后（过滤响应/后处理）执行。支持上传、热加载、版本管理。
+input: Python函数 + 触发条件(pre/post/both) + 配置参数(Valves)
+output: 变换后的请求体/响应体
+sop: '① 用户上传Pipeline.py文件 → 语法校验+沙箱隔离
+
+  ② 注册到pipeline注册表(DB持久化)
+
+  ③ LLM调用时按优先级链式执行所有匹配的Pipeline
+
+  ④ pre-pipeline修改请求 → LLM → post-pipeline过滤响应
+
+  ⑤ 支持Valves配置UI，用户可在Web界面调整参数'
+quality_gates: Pipeline执行超时<10s、沙箱隔离禁止os.system、热加载无需重启服务、可禁用单个Pipeline不影响其他
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 盖娅蜂巢/白泽指挥官/AI招商内容过滤/链客宝合规检查

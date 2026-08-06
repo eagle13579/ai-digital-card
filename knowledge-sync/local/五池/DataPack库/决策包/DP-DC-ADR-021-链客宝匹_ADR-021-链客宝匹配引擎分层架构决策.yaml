@@ -1,0 +1,30 @@
+datapack_id: "DP-DC-ADR-021-链客宝匹"
+name: "ADR-021-链客宝匹配引擎分层架构决策"
+version: "1.0.0"
+type: "决策包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "架构决策记录: ADR-021-链客宝匹配引擎分层架构决策"
+
+source: "L1图书馆/ADR/ADR-021-链客宝匹配引擎分层架构决策.md"
+
+contents: |
+  此ADR记录的完整决策上下文: 问题/可选方案/决策/理由/二阶效应
+
+data_format: "决策记录Markdown"
+
+mount_interface:
+  load: "读取此ADR到决策参考上下文"
+  query: "检索决策的关联影响"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "体系Feature做架构决策时参考此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自ADR目录"

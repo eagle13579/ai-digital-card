@@ -1,0 +1,73 @@
+# ============================================================
+# Feature: 自进化图谱引擎
+# 文件名: feature_财经图谱_self_evolving_graph_engine.yaml
+# ============================================================
+名称: 自进化图谱引擎
+
+products:
+  - 通用: 自动匹配
+描述: >
+  每日接收数百条新数据（三元组、事件、实体更新），通过增量更新、
+  实体去重、关系强度计算与冲突消解，自动维护和进化语义图谱，
+  确保图谱始终保持高时效性与准确性，无需人工干预。
+
+输入:
+  type: 每日增量数据流
+  format:
+    新增三元组:
+      - 实体A: string
+        关系类型: string
+        实体B: string
+        置信度: float
+        来源: string
+        时间戳: datetime
+    新增事件:
+      - 事件ID: string
+        描述: string
+        关联实体: [string]
+        时间: datetime
+    实体更新:
+      - 实体名称: string
+        属性变更: dict
+  volume: 每日 500-2000 条
+
+输出:
+  type: 更新后的语义图谱
+  schema:
+    新增节点:
+      - id: string
+        名称: string
+        类型: string
+        属性: dict
+        首次出现时间: datetime
+    新增边:
+      - source: string
+        target: string
+        关系类型: string
+        关系强度: float         # [0,1] 基于共现/置信度加权
+        首次发现时间: datetime
+        最后更新时间: datetime
+    更新统计:
+      - 新增节点数: integer
+      - 新增边数: integer
+      - 去重合并数: integer
+      - 关系强度更新数: integer
+
+核心:
+  - 增量更新 (非全量重建, O(n) 复杂度)
+  - 实体去重 (别名识别 + 指代消解)
+  - 关系强度计算 (时间衰减 + 共现频率 + 来源权威度)
+  - 冲突消解 (置信度投票 + 时间优先级)
+
+技术栈:
+  - 图数据库: NebulaGraph / Neo4j (增量写入)
+  - 去重模型: BERT-EntityLinking + 编辑距离混合策略
+  - 关系强度: 自定义加权函数 (TF-IDF变体 + 时间衰减)
+  - 流处理: Apache Kafka + Flink
+  - 冲突消解: D-S证据理论 / 多数投票
+  - 监控: Prometheus + Grafana (图谱健康度仪表盘)
+
+关联产品:
+  - 盖娅进化大脑
+
+成熟度: ⭐⭐ (需构建)

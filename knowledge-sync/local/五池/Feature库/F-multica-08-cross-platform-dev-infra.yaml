@@ -1,0 +1,23 @@
+name: "F8: 跨平台开发基础设施 (Worktree + PG共享)"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - Git worktree
+  - 开发环境配置
+outputs:
+  - 并行开发环境
+  - 端口派生配置
+products: [multica-agent-skill-pipeline, multica-agent-runtime-gateway]
+related_atoms:
+  - postgres-multi-database-pattern
+  - worktree-aware-port-derivation
+  - monorepo-dev-environment
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  基于 Git worktree 的跨平台并行开发基础设施。主要特性：
+  1) 单 PostgreSQL 容器承载多数据库（按 worktree 分支命名）
+  2) worktree 感知的端口自动派生（避免端口冲突）
+  3) 可复用的并行开发脚本
+  对标现代 monorepo 开发环境。产品化后可用于军团多项目并行的标准化开发基础设施。

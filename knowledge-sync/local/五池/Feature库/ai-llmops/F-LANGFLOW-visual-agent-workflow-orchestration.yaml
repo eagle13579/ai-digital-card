@@ -1,0 +1,17 @@
+name: 可视化 AI Agent 工作流编排
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github/langflow-ai/langflow
+description: "Langflow可视化AI Agent工作流构建平台。拖拽式组件化管道编排，覆盖从实验原型到生产部署全流程。降低Agent工作流构建门槛，支持非技术成员参与。"
+atoms:
+  - F-LANGFLOW-01: 可视化组件化Agent管道编排
+  - F-LANGFLOW-02: 原型到生产的无缝过渡
+  - F-LANGFLOW-03: 低门槛Agent工作流构建
+products:
+  - AI数智军团: 军团工作流编排平台
+  - AI开发工坊: 低代码Agent构建环境
+  - 盖娅之城: 公民行为工作流编辑器
+employees:
+  - 烛龙P8: 工作流引擎架构集成
+  - 乘黄P9: 产品化落地策略

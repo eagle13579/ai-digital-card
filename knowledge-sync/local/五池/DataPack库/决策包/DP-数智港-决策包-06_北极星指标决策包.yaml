@@ -1,0 +1,13 @@
+datapack_id: "DP-DC-数智港-02"
+name: "北极星指标决策包"
+version: "1.0.0"
+type: "决策包"
+description: >
+  北极星指标体系+代码缺口映射+运营指引
+source: "13_北极星/"
+contents: >
+  polaris_config.yaml(8KB, 含15+北极星指标) + 北极星代码缺口映射报告(12KB) + 运营指引(9KB)
+consumed_by_features: >
+  F-DATA-数智港-03 大航海北极星数据看板 / F-JBG-数智港-03 AI权益计量引擎
+project: "中韩出海数智港"
+created_at: "2026-06-08"

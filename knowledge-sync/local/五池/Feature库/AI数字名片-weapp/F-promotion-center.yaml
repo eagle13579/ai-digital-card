@@ -1,0 +1,15 @@
+name: 推广中心
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 推广中心模块，展示收益概览与趋势图，生成推广码海报，管理推广员团队，助力裂变传播
+atoms:
+  - PC-001: 收益概览
+  - PC-002: 趋势图
+  - PC-003: 推广码海报
+  - PC-004: 推广员管理
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

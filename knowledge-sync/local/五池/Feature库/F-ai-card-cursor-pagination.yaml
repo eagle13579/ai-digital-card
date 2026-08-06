@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-cursor-pagination
+  name: ai-card-cursor-pagination
+  description: "brochure/crm 3路由全量cursor分页"
+  source_project: "AI数字名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数字名片

@@ -1,0 +1,16 @@
+name: Trending: Speech
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-08-06
+description: Auto-absorbed from GitHub Trending: NVIDIA-NeMo/Speech
+atoms:
+  - TREND-NVIDIA-NeMo-Speech-01: **NVIDIA NeMo Speech**
+  - TREND-NVIDIA-NeMo-Speech-02: architecture, workflow, api 模式
+  - TREND-NVIDIA-NeMo-Speech-03: NVIDIA-NeMo/Speech的应用场景
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

@@ -1,0 +1,14 @@
+name: auto-learned-2026-07-05
+description: emp-烛龙自主学习的知识封装
+version: 1.0.0
+author: "emp-烛龙 自主学习产出"
+created_at: "2026-07-05T23:11:17.121367"
+
+mental_models:
+  - 自主学习途径
+
+products:
+  - AI数智军团
+
+integration:
+  type: autonomous_learning

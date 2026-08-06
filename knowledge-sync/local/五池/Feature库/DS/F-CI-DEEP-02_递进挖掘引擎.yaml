@@ -1,0 +1,19 @@
+id: F-CI-DEEP-02
+name: 递进挖掘引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS02递进挖掘心智模型构建的追问生成引擎，自动检测AI回答中的模糊
+  关键词、逻辑断层和未展开断言，生成递进追问链。检测维度：模糊术语识别、
+  逻辑跳跃检测、前提挖掘、追问深度评级。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS02: 递进挖掘
+products:
+  - 深度对话追问系统
+  - 认知深度爬虫
+employees: [白泽, 烛龙]
+priority: P0
+maturity: design

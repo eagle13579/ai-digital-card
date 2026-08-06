@@ -1,0 +1,38 @@
+name: F-CLONER-website-clone-pipeline
+description: 网站克隆5阶段流水线 — 从URL到像素级克隆的AI Agent自动化管线
+version: 1.0.0
+author: "JCodesMore/ai-website-cloner-template 萃取"
+source: github.com/JCodesMore/ai-website-cloner-template
+license: MIT
+
+mental_models:
+  - 观测驱动克隆流水线: 先观测再spec再构建，杜绝猜测
+  - 小任务完美结果原则: builder prompt >150行就要拆分
+  - spec文件作为合约模式: 每个组件派单前必须写spec文件
+  - build永远可编译铁律: tsc --noEmit + npm run build门禁
+  - worktree并行建造模式: git worktree隔离并行构建再合并
+
+components:
+  - phase_1_reconnaissance: 全页截图/设计令牌提取/交互扫描(滚/点/悬停/响应式)/页面拓扑
+  - phase_2_foundation: 字体配置/全局CSS/TS类型/SVG提取/资产下载 → npm run build验证
+  - phase_3_spec_and_dispatch: 每个section提取→写spec→派builder入worktree ≤150行规格
+  - phase_4_assembly: 合并worktree分支→接线page.tsx→页面级行为实现→build验证
+  - phase_5_visual_qa: 原始站vs克隆站并排对比→桌面+移动端→回查spec修复
+
+agents:
+  - reconnaissance_agent: 浏览目标站截屏/CSS提取/交互扫描/资产发现
+  - builder_agent: 收到完整spec后实现组件+验证tsc --noEmit
+  - qa_agent: 并排对比原始vs克隆，逐区块验证
+
+products:
+  - 阿久内容工厂: 竞品网站页面克隆
+  - 䑏疏跨境助手: 海外独立站克隆与本地化
+  - 白泽军团: 任何需要反向工程+重建的场景
+
+integration:
+  type: pipeline
+  dependencies:
+    - browser_automation: Chrome MCP/Puppeteer
+    - nextjs_scaffold: Next.js 16 + shadcn/ui + Tailwind v4
+    - git_worktree: git worktree并行分支管理
+  setup: clone模板→npm install→claude/chrome→/clone-website <url>

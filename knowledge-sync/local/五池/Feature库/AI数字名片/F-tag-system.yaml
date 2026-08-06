@@ -1,0 +1,16 @@
+name: 标签系统
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-tag-crud: 标签CRUD
+  - A-tag-provide: 提供标签(provide)维度
+  - A-tag-need: 需求标签(need)维度
+  - A-tag-match: 标签匹配引擎
+  - A-tag-recommend: 标签推荐
+description: 标签系统：provide/need双维度/标签匹配
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

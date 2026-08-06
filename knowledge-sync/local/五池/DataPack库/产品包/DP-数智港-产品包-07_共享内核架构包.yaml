@@ -1,0 +1,13 @@
+datapack_id: "DP-PD-数智港-01"
+name: "共享内核架构包"
+version: "1.0.0"
+type: "产品包"
+description: >
+  baize_shared共享内核的架构定义与模块依赖
+source: "baize_shared/SHARED_KERNEL_REPORT.md(10KB)"
+contents: >
+  内核模块定义(5个模块) + 模块依赖图 + 跨项目复用规范
+consumed_by_features: >
+  F-JBG-数智港-02 远程部署运维SOP
+project: "中韩出海数智港"
+created_at: "2026-06-08"

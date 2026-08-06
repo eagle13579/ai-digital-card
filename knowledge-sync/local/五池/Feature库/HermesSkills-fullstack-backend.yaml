@@ -1,0 +1,190 @@
+# ============================================================================
+# Feature: Hermes Skills — Full-Stack + Backend Development
+# ============================================================================
+# 该 Feature 整合了 Hermes Agent 官方 skills 库中 fullstack-dev (35KB)
+# 和 backend-dev (8KB) 的核心知识与心智模型，适用于构建全栈和
+# 后端服务的架构设计、代码实现与生产部署场景。
+# ============================================================================
+name: "Hermes Skills: Full-Stack & Backend Development"
+description: >
+  融合 fullstack-dev 和 backend-dev 两大 Hermes Agent 官方 skill 的核心
+  实践与心智模型，覆盖从后端 API 设计、三层架构、认证授权、数据库管理、
+  缓存策略、实时通信到生产加固的全链路后端与全栈开发知识体系。
+
+source: "hermes-agent/skills"
+
+products:
+  - 文鳐技能集市: 自动匹配
+skills:
+  - name: fullstack-dev
+    size: "35KB"
+    description: "Full-stack backend architecture and frontend-backend integration guide"
+    source: "D:/skills/skills/fullstack-dev/SKILL.md"
+  - name: backend-dev
+    size: "8KB"
+    description: "Backend development expertise covering API design, database, auth, deployment, performance"
+    source: "D:/skills/skills/backend-dev/SKILL.md"
+
+mental_models:
+  # --- fullstack-dev 心智模型 (7个) ---
+  - name: "Three-Layer Separation of Concerns"
+    file: "2026-07-02_HermesSkills_fullstack-dev_ThreeLayerSeparation.md"
+    category: "architecture"
+    summary: "Controller(HTTP) → Service(Business Logic) → Repository(Data Access) 严格三层分离"
+    key_concepts:
+      - Controller 不含业务逻辑
+      - Service 不导入 HTTP 类型
+      - Repository 不做业务判断
+      - 依赖注入使各层可测试
+
+  - name: "Feature-First Architecture"
+    file: "2026-07-02_HermesSkills_fullstack-dev_FeatureFirstArchitecture.md"
+    category: "architecture"
+    summary: "按业务特性（feature）组织代码，而非按技术层次（layer）"
+    key_concepts:
+      - 同功能代码高内聚在同一目录
+      - 跨功能通过 Service 接口通信
+      - 共享代码下沉到 shared/
+
+  - name: "Fail-Fast Configuration"
+    file: "2026-07-02_HermesSkills_fullstack-dev_FailFastConfiguration.md"
+    category: "operations"
+    summary: "配置从环境变量注入，启动时验证并类型化，缺少关键配置直接崩溃"
+    key_concepts:
+      - Twelve-Factor App 配置原则
+      - 启动时验证必需变量
+      - 绝不硬编码或散落 process.env
+
+  - name: "Typed Error Hierarchy"
+    file: "2026-07-02_HermesSkills_fullstack-dev_TypedErrorHierarchy.md"
+    category: "resilience"
+    summary: "领域特定类型化错误继承体系 + 全局错误处理器 + 跨边界用户友好映射"
+    key_concepts:
+      - AppError 基类 + 领域子类
+      - 操作性 vs 编程错误区分
+      - 前端 API 错误映射为用户消息
+
+  - name: "API Client Decision Tree"
+    file: "2026-07-02_HermesSkills_fullstack-dev_APIClientDecisionTree.md"
+    category: "integration"
+    summary: "根据团队结构和技术栈选择前后端集成方式：tRPC / OpenAPI / React Query / Fetch"
+    key_concepts:
+      - 同团队 TS → tRPC
+      - 不同语言 → OpenAPI codegen
+      - 公开 API → REST + SDK
+
+  - name: "Cache-Aside with TTL Discipline"
+    file: "2026-07-02_HermesSkills_fullstack-dev_CacheAsideWithTTL.md"
+    category: "performance"
+    summary: "惰性加载缓存，必须设置 TTL，写入时失效，缓存不视为权威状态"
+    key_concepts:
+      - 读时缓存、写时失效
+      - 永不过期缓存是反模式
+      - 缓存层挂掉可降级查库
+
+  - name: "Real-Time Communication Spectrum"
+    file: "2026-07-02_HermesSkills_fullstack-dev_RealTimeCommunicationSpectrum.md"
+    category: "architecture"
+    summary: "从 Polling → SSE → WebSocket 的光谱，选择最简单的可行方案"
+    key_concepts:
+      - Polling: 简单状态检查
+      - SSE: 服务器推送通知/流式AI
+      - WebSocket: 双向通信聊天/协作
+
+  # --- backend-dev 心智模型 (5个) ---
+  - name: "RESTful API Design"
+    file: "2026-07-02_HermesSkills_backend-dev_RESTfulAPIDesign.md"
+    category: "api-design"
+    summary: "围绕资源（Resource）设计 API，名词 URL + HTTP 方法 + 标准状态码"
+    key_concepts:
+      - Resource-based URLs
+      - HTTP 方法语义化
+      - 无状态设计
+      - 边界输入验证
+
+  - name: "Database Lifecycle Management"
+    file: "2026-07-02_HermesSkills_backend-dev_DatabaseLifecycleManagement.md"
+    category: "database"
+    summary: "选型 → 设计 → ORM → 迁移 → 优化的数据库全生命周期管理"
+    key_concepts:
+      - 按场景选数据库
+      - 迁移版本化且可逆
+      - N+1 预防、索引、分页
+
+  - name: "Authentication Triad"
+    file: "2026-07-02_HermesSkills_backend-dev_AuthenticationTriad.md"
+    category: "security"
+    summary: "JWT / Session / OAuth 2.0 三种范式 + RBAC 授权 + 安全最佳实践"
+    key_concepts:
+      - JWT 短寿命 access + httpOnly refresh
+      - RBAC 中间件模式
+      - 密码 bcrypt 哈希
+
+  - name: "Defense-in-Depth Security"
+    file: "2026-07-02_HermesSkills_backend-dev_DefenseInDepthSecurity.md"
+    category: "security"
+    summary: "从 HTTPS → CORS → Input Validation → 参数化查询的多层防御"
+    key_concepts:
+      - 8 层防护栈
+      - 常见漏洞针对性防护
+      - 生产加固（health check、graceful shutdown）
+
+  - name: "Performance Optimization Triad"
+    file: "2026-07-02_HermesSkills_backend-dev_PerformanceOptimizationTriad.md"
+    category: "performance"
+    summary: "代码优化(Async) → 缓存(Redis) → 水平扩展，按序排查瓶颈"
+    key_concepts:
+      - Async I/O 非阻塞
+      - Redis 缓存热点数据
+      - 无状态设计支持水平扩展
+
+applicable_scenarios:
+  - scenario: "全栈应用开发"
+    description: "从零构建全栈应用（前端+后端），需要架构决策、集成方案和生产部署准备"
+    models_used:
+      - Three-Layer Separation of Concerns
+      - Feature-First Architecture
+      - Fail-Fast Configuration
+      - Typed Error Hierarchy
+      - API Client Decision Tree
+      - RESTful API Design
+      - Database Lifecycle Management
+      - Authentication Triad
+      - Defense-in-Depth Security
+
+  - scenario: "后端 API 微服务"
+    description: "构建 RESTful / GraphQL API 服务，需要数据库集成、认证授权和性能优化"
+    models_used:
+      - Three-Layer Separation of Concerns
+      - RESTful API Design
+      - Database Lifecycle Management
+      - Authentication Triad
+      - Typed Error Hierarchy
+      - Cache-Aside with TTL Discipline
+      - Performance Optimization Triad
+      - Defense-in-Depth Security
+
+  - scenario: "前后端集成优化"
+    description: "改善现有前后端分离项目的集成方式、类型安全、错误处理和认证流程"
+    models_used:
+      - API Client Decision Tree
+      - Typed Error Hierarchy
+      - Authentication Triad
+      - Real-Time Communication Spectrum
+      - Cache-Aside with TTL Discipline
+
+  - scenario: "生产环境加固"
+    description: "将已有后端服务加固到生产级别，包括错误处理、日志、安全、健康检查和优雅关闭"
+    models_used:
+      - Fail-Fast Configuration
+      - Typed Error Hierarchy
+      - Defense-in-Depth Security
+      - Performance Optimization Triad
+
+  - scenario: "实时功能（SSE/WebSocket）"
+    description: "为应用添加实时通知、聊天、AI 流式响应等功能"
+    models_used:
+      - Real-Time Communication Spectrum
+      - Three-Layer Separation of Concerns
+      - Authentication Triad
+      - Defense-in-Depth Security

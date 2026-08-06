@@ -1,0 +1,22 @@
+id: F-CA-PATTERN-18
+name: 法理控盘模式库
+dimension: 💡 创造力
+description: >-
+  基于DB10同一种模式+BH跨案例心智模型构建的法理控盘模式库。系统梳理戴比尔斯(协议站)、孟山都(种子专利)、BHP(四件套)等案例的共同模式——不控制物，控制物的合法身份。支持新行业案例自动匹配模式。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB10: 同一种模式(孟山都→戴比尔斯)
+  - BH01-BH10: 必和必拓四件套
+products:
+  - 黑河调查局协议分析模块
+  - 跨案例模式匹配系统
+employees:
+  - 计然
+  - 烛龙
+  - 长乘
+  - 白泽
+priority: P0
+maturity: design

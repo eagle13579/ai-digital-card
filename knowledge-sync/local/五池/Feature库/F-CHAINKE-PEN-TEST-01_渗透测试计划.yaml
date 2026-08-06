@@ -1,0 +1,41 @@
+---
+feature_id: F-CHAINKE-PEN-TEST-01
+name: 渗透测试计划
+dimension: 安全/合规
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 7
+source_model: "渗透测试计划文档+OWASP Top 10+安全审计清单"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝渗透测试计划文档。覆盖OWASP Top 10主要风险面：
+  SQL注入、XSS、CSRF、SSRF、认证绕过、敏感数据暴露、XXE、
+  不安全反序列化、已知漏洞组件、日志/监控不足。
+  包含安全审计清单22项、上线检查表16项、紧急响应流程12步。
+inputs:
+  - 链客宝API服务
+  - 前端应用
+  - nginx配置
+outputs:
+  - 渗透测试计划文档（pen-test-plan.md）
+  - 安全审计清单22项
+  - 上线检查表16项
+  - 紧急响应流程12步
+sop:
+  1. 分析OWASP Top 10风险面
+  2. 对照链客宝实际架构编制测试用例
+  3. 创建安全审计清单
+  4. 编制上线检查表
+  5. 设计紧急响应流程
+quality_gates:
+  - 覆盖OWASP Top 10全部风险面
+  - 审计清单可操作（每项可验证）
+  - 紧急响应流程有明确的恢复步骤
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 7

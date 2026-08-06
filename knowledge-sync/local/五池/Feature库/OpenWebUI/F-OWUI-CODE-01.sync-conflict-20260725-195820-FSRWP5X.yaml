@@ -1,0 +1,22 @@
+id: F-OWUI-CODE-01
+name: Code Interpreter Sandbox (Pyodide + Restricted Python)
+source_model: Open WebUI Code Execution — 浏览器内Pyodide WASM执行 + 后端RestrictedPython沙箱
+  + 内置工具函数库
+dimension: 创造力
+description: 双重代码执行模式：前端Pyodide(WASM Python在浏览器执行，零延迟) + 后端RestrictedPython沙箱。内置50+预置工具函数(数据分析/文件操作/网络请求)，代码可自动被LLM生成并执行。
+input: Python代码 + 执行环境(browser/server)
+output: 执行结果(stdout/图像/数据表格)
+sop: '① LLM生成代码或用户手写 → 语法校验
+
+  ② 前端模式: 发送到Pyodide Worker(WASM沙箱)
+
+  ③ 后端模式: RestrictedPython沙箱执行，限制文件系统/网络访问
+
+  ④ 结果渲染: stdout文本/HTML/Chart.js图表/DataFrame表格
+
+  ⑤ 代码和执行结果保存在聊天历史'
+quality_gates: 前端执行<100ms、后端执行<30s、RestrictedPython禁止os/subprocess/socket、内置工具白名单控制
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 白泽数据分析/中国软银量化回测/AI招商数据洞察/盖娅军团自动化脚本

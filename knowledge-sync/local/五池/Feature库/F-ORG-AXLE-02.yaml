@@ -1,0 +1,14 @@
+name: F-ORG-AXLE-02
+title: "干字形组织架构模式"
+dimension:
+  layer: "组织"
+  type: "架构"
+  impact: "架构级"
+atoms: ["gan-shaped-future-org", "flow-not-hierarchy", "ai-revolution-reboot"]
+description: "决策核心层+前线精英小队+AI执行层的三层干型结构。金字塔的终结者"
+status: active
+created: 2026-06-17
+
+products:
+  - 通用: 自动匹配
+creator: 白泽

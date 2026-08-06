@@ -1,0 +1,30 @@
+datapack_id: "DP-KW-黑河_麦肯锡定义权"
+name: "黑河-麦肯锡定义权"
+version: "1.0.0"
+type: "知识包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "原子心智模型集/黑河-麦肯锡定义权 — 包含11个相关心智模型"
+
+source: "L5孵化室/五池/模型池/_原子/黑河-麦肯锡定义权/"
+
+contents: |
+  11个INDEX.md}､M1-行业定义权本质.md}､M10-三合一闭环.md}､M2-笔尖上的税法.md}､M3-公式里的利润.md...等心智模型
+
+data_format: "心智模型Markdown"
+
+mount_interface:
+  load: "读取全部11个心智模型到工作内存"
+  query: "按维度/标签/适用场景检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应黑河-麦肯锡定义权相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "批量创建自_原子目录"

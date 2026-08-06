@@ -1,0 +1,14 @@
+name: 推广生态
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 推广生态模块，展示推广商品列表，支持Tab切换不同分类，呈现收益明细数据，打造完整推广闭环
+atoms:
+  - PE-001: 推广商品
+  - PE-002: Tab切换
+  - PE-003: 收益明细
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

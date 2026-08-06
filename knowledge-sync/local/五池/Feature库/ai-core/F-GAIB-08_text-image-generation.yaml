@@ -1,0 +1,16 @@
+name: 文本与图像生成应用模式
+version: 1.0.0
+status: production
+dimension: ai-core/generation
+source: microsoft/generative-ai-for-beginners (Lesson 06, 09)
+description: "文本生成与图像生成应用的标准模式。Streaming、结构化输出、DALL-E图像生成、变体生成"
+atoms:
+  - GAIB-04: 上下文窗口与Token成本管理
+  - GAIB-08: Text Embeddings
+products:
+  - 阿久(内容自动化工厂): 文本/图像内容生产
+  - 漫剧AI: 图像生成流水线
+  - GEO内容工厂: 批量内容生产
+employees:
+  - 乘黄P8: 内容生成产品设计
+  - 计然P8: 成本优化

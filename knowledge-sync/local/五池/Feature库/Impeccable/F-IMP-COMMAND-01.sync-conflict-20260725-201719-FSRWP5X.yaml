@@ -1,0 +1,21 @@
+id: F-IMP-COMMAND-01
+name: 23-Command Design System — 统一AI设计词汇
+source_model: "Impeccable — 1 skill → 23 commands: init/craft/polish/audit/critique/distill/animate/bolder/quieter/adapt/colorize/extract/harden/optimize 每个命令一个reference.md"
+dimension: 审美
+description: >-
+  23个设计命令构成AI与人类设计师的共享设计词汇表。每个命令对应一个设计操作
+  (抛光/审计/评审/简化/动效/大胆/安静等)，通过/impeccable <command> <target>调用。
+  命令路由表在SKILL.src.md定义，每个命令独立reference/<cmd>.md文件。
+  两个register: brand(品牌/营销/落地页) vs product(产品UI/仪表盘/工具)使用不同设计体系。
+input: 设计任务 + 命令 + 目标
+output: 经过指定操作的界面代码
+sop: "① init: 询问brand vs product → 生成PRODUCT.md + DESIGN.md
+  ② craft: shape-then-build全流程 + 浏览器实时迭代
+  ③ polish: 视觉抛光(间距/对齐/层级/可读性)
+  ④ audit: 41条确定性规则扫描 + LLM评审
+  ⑤ critique: UX审查(信息架构/认知负荷/可访问性)"
+quality_gates: 每个命令独立可调用、reference文件<500行、两个register不可混用
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝设计流程/AI招商UI生成/白泽前端工作流/中韩数智港品牌

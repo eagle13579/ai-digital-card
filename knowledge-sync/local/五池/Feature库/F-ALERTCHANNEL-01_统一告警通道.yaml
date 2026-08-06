@@ -1,0 +1,60 @@
+# 统一告警通道 — 飞书Webhook+邮件+日志三重通道
+# 事件管理 4.0→7.0 的告警基础设施升级
+name: F-ALERTCHANNEL-01_统一告警通道
+dimension: 体系
+domain: 运维监控-告警基础设施
+status: 生产就绪
+priority: P1
+source_models:
+  - scripts/alert_channel.py (AlertChannel类)
+  - scripts/unified_watchdog.py (集成告警v3.0)
+  - scripts/alert_rules.yaml (告警规则配置)
+  - gateway/feishu_flock_gateway.py (飞书API参考)
+description: |
+  统一告警通道是事件管理 4.0→7.0 的基础设施升级，将巡检狗从
+  「只检不报」升级为「检+报+愈」三刀流闭环。
+
+  三层通道：
+  - 第一层（飞书Webhook）：在线模式下推送消息卡片到飞书群，
+    支持不同优先级（P0/P1/P2）不同颜色模板
+  - 第二层（SMTP邮件）：SSL/TLS邮件通道，支持HTML与纯文本
+  - 第三层（本地日志）：始终可用，JSON格式落盘，按天滚动
+
+  智能降级策略：
+  - 网络不可达时自动跳过飞书和邮件，仅写日志
+  - 引力池模式下（连续全离线）不发送远程告警，避免轰炸
+  - 静默模式（--quiet）仅日志，不发远程
+input:
+  - 服务巡检结果（online_list + offline_list）
+  - 自愈结果（success/fail per service）
+  - 网络状态（在线/离线）
+  - 引力池模式状态
+output:
+  - 飞书群消息卡片（交互式告警）
+  - SMTP邮件通知（带优先级头部）
+  - JSON日志文件（按天滚动，logs/alerts/）
+sop: |
+  1. 巡检狗检测服务端口 → 生成在线/离线列表
+  2. 确定优先级：全离线=P0 / 多个离线=P1 / 单个离线=P2
+  3. 检测网络状态：在线→三重通道并行；离线→仅日志
+  4. 引力池检查：引力池模式→仅日志，避免告警轰炸
+  5. 自愈执行后 → 再次发告警（自愈成功=INFO，自愈失败=P1）
+  6. 全部在线 → 仅写一条INFO日志
+quality_gates:
+  - gate: 飞书通道可用性
+    criteria: 飞书Webhook推送成功率 > 95%
+    method: 环境变量FEISHU_WEBHOOK配置后，CLI测试推送
+  - gate: 邮件通道可用性
+    criteria: SMTP发送成功率 > 95%
+    method: ALERT_SMTP_HOST/ALERT_EMAIL_USER等环境变量配置后测试
+  - gate: 离线降级准确性
+    criteria: 断网时自动跳过飞书/邮件，不报错
+    method: 拔网线后运行巡检，验证无网络相关异常
+  - gate: 引力池防轰炸
+    criteria: 连续全离线时不重复发飞书告警
+    method: 模拟连续全离线，检查仅日志落盘
+version: "1.0.0"
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-14

@@ -1,0 +1,23 @@
+id: F-LLMC-03
+name: 算子粒度CUDA模块化
+dimension: 体系
+source_model: "Operator-Granularity CUDA Modularization — llmc/dev/cuda/每个算子独立文件，attention/layernorm/matmul各一个"
+description: "GPU计算管线的模块化设计，每个kernel独立开发、测试、优化"
+version: "1.0"
+created: 2026-06-13
+author: 白泽 — llm.c全链路吸收
+
+products:
+  - 通用: 自动匹配
+tags:
+  - llm
+  - karpathy
+  - cuda
+  - transformer
+quality_gates:
+  scoring: false
+  review: false
+evolution_log:
+  - date: 2026-06-13
+    event: 初始创建
+    score: 6/10

@@ -1,0 +1,13 @@
+name: "架构选型决策系统"
+version: "1.0.0"
+status: absorbed
+dimension: 设计
+source: 一速《7种主流Agent架构深度拆解》
+description: "基于7维度(复杂度/控制力/成本/稳定性/灵活性/可观测/可评估)的Agent架构选型决策引擎。输入业务场景→推荐最佳架构+权衡分析。"
+atoms:
+  - AgentArch 08_架构选型决策框架
+  - AgentArch 11_Agent架构演进路径
+products:
+  - 白泽控制台
+  - 赛博参谋
+absorbed_date: 2026-07-10

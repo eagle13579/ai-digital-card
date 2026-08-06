@@ -1,0 +1,17 @@
+name: Agent Skills 开放标准
+version: 1.0.0
+status: draft
+dimension: ai-agents
+source: github/agentskills/agentskills
+description: "Agent Skills开放标准规范与文档。定义Agent能力的原子化声明格式、发现机制、互操作协议。是AI军团技能体系的基础设施标准参考。"
+atoms:
+  - F-AGENTSKILLS-01: 技能原子化声明式定义
+  - F-AGENTSKILLS-02: 标准驱动的跨Agent互操作
+  - F-AGENTSKILLS-03: 技能发现与注册协议
+products:
+  - AI数智军团: 标准化军团技能体系
+  - Hermes Agent: 技能加载器兼容层
+  - 盖娅AI公民: 公民技能声明规范
+employees:
+  - 烛龙P8: 技能标准架构对齐
+  - 白泽P9: Agent技能经济生态设计

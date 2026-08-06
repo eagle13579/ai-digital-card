@@ -1,0 +1,19 @@
+id: F-CA-HIGHWAY-07
+name: 隐形利润高速追踪
+dimension: 💡 创造力
+description: >-
+  基于BH07隐形利润高速公路心智模型构建的追踪器，绘制从运营国到最终
+  利润归集地的完整资金链路。检测每段交易的商业合理性、低税区实体
+  的实质性功能、以及各节点利润留存比例的异常分布。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH07: 隐形利润高速公路
+products:
+  - 资金链路追踪系统
+  - 利润转移分析平台
+employees: [烛龙, 䑏疏, 计然]
+priority: P0
+maturity: design

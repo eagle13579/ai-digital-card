@@ -1,0 +1,40 @@
+---
+name: skill-match-engine
+version: 1.0.0
+status: production
+dimension: 认知增强
+source: auto-skill-matcher skill实战提炼
+created: 2026-07-03
+description: >
+  根据用户输入自动匹配最相关的技能/能力，支持中英文混合输入。
+  核心流程：分词→评分→排序→同category去重→返回top-N。
+  已生产验证：731技能索引、6层评分矩阵、双字滑动窗口分词。
+atoms:
+  - atm-skill-001_input-tokenization
+  - atm-skill-002_scoring-matrix
+  - atm-skill-003_auto-load-workflow
+  - atm-skill-004_skill-registry
+interfaces:
+  cli: "python scripts/skill_matcher.py '输入文本' --top N"
+  library: "from skill_matcher import match_skills"
+  api: "import skill_matcher; skill_matcher.match_skills(input, skills, top_n=N)"
+products:
+  - gaia-commercial (sandbox intent routing → 用户输入自动映射角色)
+  - 链客宝 (intent analyzer enhancement → 匹配引擎增加技能端点)
+  - 白泽自身 (auto-skill loading → 每次回复前自动匹配加载)
+validation:
+  - 强匹配(>=10)必须skill_view()加载
+  - 中匹配(6-9)建议skill_view()加载
+  - 弱匹配(3-5)记录但忽略
+  - 同category技能只保留最高分
+metrics:
+  total_scanned: 731
+  avg_response_time: "< 50ms (731 skills)"
+  token_saved: "每次回复避免手动转发全部索引，节省~10K tokens"
+changelog:
+  - version: 1.0.0
+    date: 2026-07-03
+    changes:
+      - 从 auto-skill-matcher 实战提炼产品化
+      - 提取4个原子心智模型
+      - 代码收割到资产库
