@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-knowledge-graph
+  name: ai-card-knowledge-graph
+  description: "人物关系图谱6节点类型8边类型4API端点"
+  source_project: "AI数智名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数智名片

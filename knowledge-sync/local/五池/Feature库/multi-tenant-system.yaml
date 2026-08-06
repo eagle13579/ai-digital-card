@@ -1,0 +1,42 @@
+# 多租户系统 Feature 定义
+# 创建时间: 2026-06-24 23:12:13
+# 来源: 链客宝多租户P1交付
+
+name: multi-tenant-system
+version: 1.0.0
+
+products:
+  - 通用: 自动匹配
+category: 基础设施
+
+description: >
+  多租户隔离系统，每个租户拥有独立workspace目录、
+  独立API Key鉴权、独立匹配引擎进程。
+  适用于任何需要数据隔离的2B SaaS产品。
+
+capabilities:
+  - workspace_isolation: 目录级别文件系统隔离，每个租户独立input/output/logs/config
+  - api_key_auth: SHA256 API Key鉴权，所有端点（除register）强制验证
+  - engine_isolation: subprocess Popen隔离，每个租户独立PID管理
+  - self_registration: 租户自助注册，自动workspace初始化+API Key分配
+  - rate_limiting: 60req/min（普通端点）, 10req/min（注册端点）
+
+atoms:
+  - MT-01: 目录即租户 — 每个租户一个workspace目录，文件系统就是隔离层
+  - MT-02: API Key即产品 — API Key不仅是鉴权，更是「数据安全」的产品承诺
+  - MT-03: 沙箱落地校验 — 子Agent产出必须CEO亲自验证
+  - MT-04: 内联快于分离 — 小工具用Flask内联HTML+Tailwind CDN
+  - MT-05: 测试门禁不低于80%
+
+tech_stack:
+  backend: Flask + subprocess + SHA256
+  frontend: Tailwind CSS (CDN) + 内联HTML
+  isolation: 文件系统目录
+  auth: X-Tenant-API-Key header
+
+适用员工:
+  - 烛龙 (工程架构)
+  - 乘黄 (产品设计)
+  - 獬豸 (合规/数据安全)
+  - 耳鼠 (跨境数据隔离)
+  - 䑏疏 (跨境SaaS多租户)

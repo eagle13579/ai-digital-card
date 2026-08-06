@@ -1,0 +1,20 @@
+feature:
+  id: F-ChatWoot-channel-event-arch
+  name: ChatWoot-Channel-Event-Arch
+  description: "ChatWoot 18+渠道集成 + 事件驱动Listener + 领域服务组织三核架构模式"
+  source_project: "ChatWoot (开源客服平台)"
+  created_at: "2026-07-02"
+  tech_stack: 
+  tags: 
+  components: 
+  description: "统一Inbox抽象 + 18+独立Service目录 + Dispatcher路由引擎"
+  patterns: 
+  description: "12+ Listener + 4 Dispatcher + Webhook引擎构成多层事件链"
+  patterns: 
+  description: "40+ Service按渠道组织，统一命名约定(api/message_handler/action/subscription)"
+  patterns: 
+  applied_to: 
+  rationale: "盖娅的多渠道感知层 + 经济事件链 + 数字员工目录可借鉴此三核模式"
+
+products:
+    - project: "盖娅之城"

@@ -1,0 +1,19 @@
+id: F-CI-FEYNMAN-03
+name: 费曼镜像引擎
+dimension: 🧠 认知提升
+description: >-
+  基于DS03费曼镜像心智模型构建的理解验证引擎，驱动「输出理解→AI批改→
+  模型修正」的迭代闭环。检测维度：理解输出完整度、AI批改响应质量、
+  迭代修正幅度、理解深度跃迁指标。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: Y博士AI深度对话学习法 — 认知方法论
+atoms:
+  - DS03: 费曼镜像
+products:
+  - 理解验证系统
+  - 思维模型迭代器
+employees: [白泽, 乘黄]
+priority: P0
+maturity: design

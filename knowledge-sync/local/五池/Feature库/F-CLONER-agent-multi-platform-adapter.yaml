@@ -1,0 +1,37 @@
+name: F-CLONER-agent-multi-platform-adapter
+description: AI Agent多平台适配模式 — 单源真相skill.yaml通过sync脚本自动分发到13+种AI编码Agent
+version: 1.0.0
+author: "JCodesMore/ai-website-cloner-template 萃取"
+source: github.com/JCodesMore/ai-website-cloner-template
+license: MIT
+
+mental_models:
+  - 单源真相分发: AGENTS.md是所有Agent配置的单源真相
+  - Agent多平台适配: 同一skill适配Claude Code/Codex/Gemini CLI/Cursor等13平台
+  - 自动同步飞轮: 改源文件→run sync脚本→全平台更新，消除漂移
+
+components:
+  - source_of_truth: AGENTS.md — 项目配置单源真相文件
+  - platform_adapters:
+    - CLAUDE.md: '"@AGENTS.md" import模式'
+    - GEMINI.md: '"@AGENTS.md" import模式'
+    - .clinerules: '"# BEGIN/END" import模式'
+    - .windsurfrules: agent rules import模式
+    - .cursorrules: cursor rules import模式
+    - .copilotrules: copilot rules import模式
+  - skill_sync: 技能定义→多平台技能文件→自动分发
+  - sync_scripts:
+    - sync-agent-rules.sh: AGENTS.md → 全平台Agent指令
+    - sync-skills.mjs: SKILL.md → 全平台skill命令
+
+products:
+  - 白泽军团: 技能定义一次→分发到所有数字员工
+  - 文鳐技能集市: 技能包多平台分发
+  - 招贤数字员工SaaS: 员工能力卡多平台适配
+
+integration:
+  type: configuration
+  dependencies:
+    - bash: sync-agent-rules.sh
+    - node: sync-skills.mjs
+  setup: 编辑AGENTS.md→bash scripts/sync-agent-rules.sh→全平台就绪

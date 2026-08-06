@@ -1,0 +1,37 @@
+datapack_id: "DP-HR-等级-L5"
+name: "L5人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "L5等级6名核心员工的完整档案"
+
+source: "employees/ 按等级分类"
+
+contents: |
+  6名L5等级员工:
+  - 战狼-7f3a1b9c
+      - 战狼-商鞅-m9n8o7p6
+      - 战狼-墨子-q1w2e3r4
+      - 战狼-白起-b7c3d1f8
+      - 战狼-苏秦-z1x2c3v4
+      - 战狼-韩信-a1e2k3l4
+
+data_format: "员工YAML + 等级矩阵"
+
+mount_interface:
+  load: "加载此等级全部员工档案"
+  query: "按技能/活跃度检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做能力分析时消费"
+  - "体系Feature做组织规划时消费"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按等级重新拆分为原子DataPack"

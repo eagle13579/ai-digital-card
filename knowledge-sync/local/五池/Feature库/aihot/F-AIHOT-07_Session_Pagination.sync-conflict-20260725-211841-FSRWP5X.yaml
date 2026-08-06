@@ -1,0 +1,55 @@
+# Session分页内容管理 — 大列表用分页+session缓存状态，用户交互流不断
+# AIHOT Bot 核心心智模型 #7
+name: F-AIHOT-07_Session_Pagination
+dimension: 场景
+domain: 交互设计-分页导航
+status: 生产就绪
+priority: P1
+source_models:
+  - M-AIHOT-07_Session_Pagination
+description: |
+  Session分页内容管理处理大列表场景下的分页导航问题，通过内存session缓存
+  用户的分页状态，实现无中断的翻页交互流。
+
+  核心实现：
+  - userSessions Map（chatId → session对象）：每个用户独立session
+  - session内容（当前列表数据、当前页码、每页条数、总页数）
+  - 导航按钮（prev/next/first/last）：前后翻页+首尾跳转
+  - 无刷新：editMessageText原地更新，用户感知零延迟
+
+  设计原则：
+  - 状态持久化：翻页过程中列表数据不重复请求
+  - 会话隔离：每个chatId的session独立互不干扰
+  - 自动清理：长时间无操作的session自动回收
+  - 边界保护：第一页禁用prev，最后一页禁用next
+input:
+  - 完整列表数据（需要分页展示的项目数组）
+  - 分页配置（pageSize，默认5条/页）
+  - 用户当前分页状态（session缓存）
+output:
+  - 当前页内容（pageSize条数据）
+  - 分页导航键盘（prev/next/first/last + 页码显示）
+  - 更新后的session状态
+sop: |
+  1. 用户请求列表 → 生成完整列表数据
+  2. 创建/获取userSessions[chatId]（含page/pageSize/totalPages）
+  3. 计算当前页数据切片：[ (page-1)*pageSize , page*pageSize )
+  4. 渲染当前页内容 + 分页导航按钮
+  5. 用户点击翻页 → 更新session.page → 重新切片渲染
+  6. 超时未操作（>30分钟）→ 清理session
+quality_gates:
+  - gate: 分页边界正确性
+    criteria: 第一页/最后一页时对应按钮禁用
+    method: 翻到首/尾页，检查键盘按钮状态
+  - gate: session隔离
+    criteria: 不同chatId的分页状态互不影响
+    method: 模拟两个用户同时翻页，验证状态独立
+  - gate: session自动清理
+    criteria: 超时session被正确回收
+    method: 设置短超时，等待后检查session是否清理
+version: "1.0.0"
+created_at: 2026-06-15
+product_mapping:
+  - 盖娅之城: 盖娅之城公民数据的分页加载参考此模式
+  - 产品列表: 所有产品列表的分页导航复用此session分页设计
+  - 内容工厂: 内容工厂的搜索/列表页面采用此分页模式

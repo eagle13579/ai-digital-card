@@ -1,0 +1,29 @@
+datapack_id: "DP-{type}-{name}"
+name: "{display_name}"
+version: "1.0.0"
+type: "{pack_type}"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "{one_liner}"
+
+source: "{source_path}"
+contents: |
+  {contents}
+
+data_format: "心智模型YAML|结构化JSON|决策记录Markdown|员工YAML|产品元数据"
+
+mount_interface:
+  load: "读取DataPack数据到内存"
+  query: "按条件查询DataPack条目"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "依赖此DataPack的Feature列表(项目装配时自动匹配)"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "初始创建"

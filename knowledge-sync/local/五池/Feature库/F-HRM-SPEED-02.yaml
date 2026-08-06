@@ -1,0 +1,14 @@
+name: F-HRM-SPEED-02
+title: "Hermes架构加速默认系统"
+dimension:
+  layer: "架构层"
+  type: "自动化"
+  impact: "架构级"
+atoms: ["smart-model-routing", "no-agent-cronjob-zero-token", "memory-as-cheatsheet"]
+description: "智能模型路由 + 零Token定时架构 + Memory速查表，让快成为系统默认状态"
+status: active
+created: 2026-06-17
+
+products:
+  - 通用: 自动匹配
+creator: 白泽

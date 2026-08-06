@@ -1,0 +1,11 @@
+feature:
+  id: F-GAIA-LLM-PROXY-V2
+  name: gaia-llm-proxy-v2
+  description: "LLM代理v2.0 — 统一异常捕获+健康增强+DeepSeek切换"
+  source_project: "盖娅之城"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - 推理

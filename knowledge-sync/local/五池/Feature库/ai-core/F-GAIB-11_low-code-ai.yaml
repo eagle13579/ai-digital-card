@@ -1,0 +1,13 @@
+name: Low-Code AI平台集成
+version: 1.0.0
+status: production
+dimension: ai-core/platform
+source: microsoft/generative-ai-for-beginners (Lesson 10)
+description: "低代码AI构建: Copilot自然语言描述生成应用、AI Builder预构建模型(表单处理/OCR/文本分类)、Power Platform集成(Apps/Automate/BI)"
+products:
+  - 云师(AI觉醒引擎): 低代码AI员工创建
+  - 招贤(数字员工SaaS): 可视化AI员工配置
+  - 阿久(内容工厂): 自动化工作流
+employees:
+  - 乘黄P8: 低代码产品设计
+  - 鹿蜀P8: 自动化运营

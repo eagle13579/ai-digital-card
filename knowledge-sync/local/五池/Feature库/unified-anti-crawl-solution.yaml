@@ -1,0 +1,63 @@
+feature:
+  name: unified-anti-crawl-solution
+  version: v1.0.0
+  description: >
+    统一的多平台反爬对抗方案汇总层。提取MediaCrawler各平台实践中的反爬
+  products: 
+  atoms: 
+  inputs: 
+  type: string
+  description: "目标平台标识"
+  type: string
+  description: "请求端点类型: search / detail / comment / user_profile"
+  type: string
+  description: "爬取模式: light（低风险）/ medium（中等风险）/ heavy（高风险）"
+  default: "medium"
+  type: object
+  description: "上次使用的策略历史（用于自动升/降级决策）"
+  required: false
+  outputs: 
+  type: object
+  description: "反爬方案详情，包含以下结构"
+  properties: 
+  signature_algorithm: 
+  type: string
+  description: "签名算法类型: none / simple_md5 / wbi / a-bogus / x-s / custom"
+  signature_params: 
+  type: object
+  description: "签名所需参数键值对"
+  proxy_level: 
+  type: integer
+  description: "代理等级: 0=不用代理 / 1=透明代理 / 2=高匿代理 / 3=家庭IP"
+  enum: [0, 1, 2, 3]
+  rate_limit: 
+  type: object
+  description: "速率限制: qps / burst / interval_ms"
+  cookie_required: 
+  type: boolean
+  description: "是否需要有效Cookie"
+  captcha_probability: 
+  type: float
+  description: "验证码出现概率 0-1"
+  browser_required: 
+  type: boolean
+  description: "是否需要真实浏览器"
+  user_agent_template: 
+  type: string
+  description: "UA模板，含随机化规则"
+  type: array[object]
+  description: "降级链路: 按优先级排列的备用方案，当主方案失效时依次尝试"
+  type: object
+  description: "风险评估: level / confidence / suggested_action"
+  capabilities: 
+  architecture: >
+    三层路由架构: (1) Strategy Registry层 — 以platform+endpoint为键，
+  anti_patterns: 
+  evolution_flywheel: >
+    第一步: 整理已有平台的L0-L5方案分类，建立初始策略注册表 → 第二步:
+  实现自动升降级回路，采集每次请求的反馈 → 第三步: 添加新平台时强制
+  先注册策略（即使未知也填conservative默认方案）→ 第四步: 当平台数量
+  达到10+后，训练预测模型（基于时间/IP段/请求频率预测风控概率）→ 第五步: 
+
+products:
+    - 签名硬编码: 签名算法写在字符串里不动 — 必须模块化签名引擎，可热更新

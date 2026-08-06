@@ -1,0 +1,24 @@
+id: F-OWUI-MEMORY-01
+name: User-Scoped Persistent Memory with LLM Tool Access
+source_model: Open WebUI Memory System (memories.py 5KB + router 12KB) — 用户级持久记忆，LLM可直接读写
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+description: >-
+  每个用户拥有独立的记忆存储(键值对+时间戳+内容)，LLM通过内置工具
+  (search_memories/add_memory/replace_memory_content/delete_memory/list_memories)
+  直接读写用户记忆。记忆用于跨会话保持用户偏好、上下文、个性化信息。
+  与RAG知识库不同——记忆是「关于用户的信息」，知识库是「世界知识」。
+input: 记忆内容(text) + 操作类型(search/add/replace/delete/list)
+output: 记忆查询结果/添加确认/删除确认
+sop: "① 存储: Memory表(user_id + content + created_at + updated_at)
+  ② LLM读取: search_memories(query) → 语义搜索top-K记忆 → LLM理解用户上下文
+  ③ LLM写入: add_memory(content) → 自动关联当前用户 → 持久化到DB
+  ④ LLM更新: replace_memory_content(id, content) → 覆盖指定记忆
+  ⑤ 用户视角: 用户可在UI手动管理记忆(查看/编辑/删除)"
+quality_gates: 记忆检索<500ms、写入即持久化不丢数据、用户可完全控制(删除全部)、语义搜索支持
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 白泽/烛龙/乘黄等数字员工的持久记忆系统/链客宝用户个性化记忆/中国软银客户偏好管理

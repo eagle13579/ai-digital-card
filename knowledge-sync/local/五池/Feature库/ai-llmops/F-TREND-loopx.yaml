@@ -1,0 +1,14 @@
+name: Trending: loopx
+version: 1.0.0
+status: draft
+dimension: ai-llmops
+source: github trending 2026-08-06
+description: Auto-absorbed from GitHub Trending: huangruiteng/loopx
+atoms:
+  - TREND-huangruiteng-loopx-02: agent 模式
+products:
+  - 盖娅进化大脑
+  - 白泽控制台
+employees:
+  - 烛龙P8
+  - 文鳐P9

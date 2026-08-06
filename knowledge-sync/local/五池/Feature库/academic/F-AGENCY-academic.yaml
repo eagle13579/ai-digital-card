@@ -1,0 +1,19 @@
+# 📚 Feature: 学术研究能力 (Academic Research)
+id: F-AGENCY-ACADEMIC
+name: academic-research
+version: 1.0.0
+description: The Agency吸收 - 学术研究角色定义 (5角色: 人类学/地理/历史/叙事学/心理学)
+source: agency-agents/academic/
+status: absorbed
+atoms:
+  - anthropology: Anthropologist文化分析/田野调查/民族志
+  - geography: Geographer空间分析/GIS/区域研究
+  - history: Historian历史分析/时期划分/模式识别
+  - narratology: Narratologist叙事理论/故事结构/话语分析
+  - psychology: Psychologist行为理论/人格理论/动机分析
+capabilities:
+  - user-research: 用户研究方法论(田野调查/民族志/访谈)
+  - historical-pattern: 历史模式识别(周期/趋势/战略预判)
+  - narrative-framework: 叙事框架设计(品牌故事/内容策略)
+  - behavioral-insight: 行为洞察(用户心理/动机/行为设计)
+integration: 方法论导向, 可注入计然(心理学)+乘黄(人类学)+文鳐(叙事学)

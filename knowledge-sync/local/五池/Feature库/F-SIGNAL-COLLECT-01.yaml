@@ -1,0 +1,36 @@
+# 🌊 多源并行情报采集器
+id: F-SIGNAL-COLLECT-01
+name: 多源并行情报采集器
+dimension: 场景
+description: 从GitHub Trending/HackerNews/RSS等公开信源并行采集商业信号，部分失败不影响整体
+source_model: 多源并行情报采集
+status: active
+version: "1.0"
+created: 2026-06-14
+
+products:
+  - 通用: 自动匹配
+input:
+  - 无（自动采集公开信源）
+
+output:
+  - RealSignal[]（含来源/热度/摘要/部门分配建议）
+
+sop: |
+  1. Promise.allSettled 并行采集所有信源
+  2. 每源独立 timeout=10s，AbortSignal 保护
+  3. 成功→结构化收集 / 失败→日志记录
+  4. 真实源失败后自动降级到AI模拟（标注「模拟」）
+  5. 聚合去重后输出
+
+dependencies:
+  - cheerio (GitHub页面解析)
+  - rss-parser (RSS Feed解析)
+  - fetch (原生, HN API/知乎)
+
+quality_gate:
+  - 每条信号必须标注 source 字段
+  - 模拟数据必须标注「模拟」
+  - 采集耗时 >30s 触发告警
+
+draft: false

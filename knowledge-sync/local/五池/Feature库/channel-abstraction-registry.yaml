@@ -1,0 +1,27 @@
+name: channel-abstraction-registry
+description: 通道抽象基类+注册表模式 — 为任意数量外部平台/数据源创建统一的检测、诊断、路由接口
+version: 1.0.0
+author: Agent Reach v1.3.0 萃取
+source: github.com/Panniantong/agent-reach
+license: MIT
+
+mental_models:
+  - AR-02: 通道抽象基类模式
+  - AR-03: 三级Tier可用性分层
+  - AR-06: Tier-0自主诊断模式
+
+components:
+  - base_channel_class: 可复用的 Channel(ABC) 抽象基类，含 name/description/backends/tier + can_handle/check 方法
+  - channel_registry: ALL_CHANNELS 列表 + get_channel/get_all_channels 函数
+  - doctor_engine: 遍历所有通道执行check()，按Tier分组输出报告
+  - tier_classification: 三层分级（0零配置/1免费Key/2需配置）
+
+products:
+  - 蚕茧帝国: 平台接入层
+  - 链客宝: 外部数据源连接器
+  - 中韩出海数智港: 跨境平台数据管道
+
+integration:
+  type: python_library
+  dependencies: []
+  setup: 复制 channels/ 目录到项目，继承 Channel 基类实现新平台，注册到 ALL_CHANNELS

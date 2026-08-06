@@ -1,0 +1,22 @@
+name: "F7: Daemon 自检自愈运行时"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - Agent CLI 可执行文件
+  - 用户配置
+outputs:
+  - 稳定在线的 Agent 运行环境
+  - Agent Runtime 注册记录
+products: [multica-agent-runtime-gateway]
+related_atoms:
+  - daemon-pull-engine
+  - agent-backend-plugin-pattern
+  - multica-pull-based-task-scheduler
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  守护进程自动检测 PATH 中的 Agent CLI，注册为可用 Runtime。
+  包含三环自检机制：30s syncLoop（同步循环）、15s heartbeat（心跳）、
+  1h gcLoop（垃圾回收）。对标 GitHub Actions Runner 的 Worker 模型。
+  产品化后可作为白泽军团的 Worker 部署模式，确保 Agent 执行环境长时间稳定运行。

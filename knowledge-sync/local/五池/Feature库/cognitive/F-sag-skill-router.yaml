@@ -1,0 +1,18 @@
+name: SAG Skill Router
+version: 1.0.0
+status: active
+dimension: cognitive
+source: sag-skill-router SKILL.md (2026-07-05)
+description: SAG驱动的意图→技能路由引擎。不是关键词匹配，是SAG推理用户意图后自动加载最合适的skill。
+atoms:
+  - SR-SAG-INFER: SAG推理三维度 — intent_type/domain/topic
+  - SR-INTENT-MAP: 意图→Skill映射表 — 40+ pinned skills注册
+  - SR-SCORING: 三级评分 — intent+20 / domain+15 / topic+10
+  - SR-FALLBACK: 无映射时SAG直接推理fallback
+  - SR-EVOLVE: 用户纠正→自动调整权重的自进化机制
+products:
+  - 白泽控制台
+  - AI数字名片
+  - 所有产品（通用方法论）
+employees:
+  - 白泽P9

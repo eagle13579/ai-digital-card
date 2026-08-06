@@ -1,0 +1,20 @@
+name: 产品管理
+version: 1.0.0
+description: The Agency吸收 - 产品管理角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Behavioral Nudge Engine
+  - Feedback Synthesizer
+  - Product Manager
+  - Sprint Prioritizer
+  - Trend Researcher
+capabilities:
+  - 产品全生命周期管理（从洞察到交付）
+  - 行为助推策略与用户增长
+  - 用户反馈综合分析与洞察
+  - Sprint优先级排序与路标规划
+  - 市场趋势研究与竞品分析
+integration: 直接补充AI数字军团产品管理能力

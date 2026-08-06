@@ -1,0 +1,20 @@
+name: F-CARD-brochure
+version: 1.0.0
+status: production
+dimension: backend-content
+description: AI数字名片画册系统 — 画册CRUD + StPageFlip翻页展示 + 分享Token + 智能匹配池
+atoms:
+  - F-CARD-brochure-01: 画册CRUD含分页和游标
+  - F-CARD-brochure-02: StPageFlip翻页渲染
+  - F-CARD-brochure-03: 分享Token+访问计数
+  - F-CARD-brochure-04: 用途推荐模板系统
+  - F-CARD-brochure-05: 智能匹配池触发
+products:
+  - ai-digital-card
+employees:
+  - 文鳐P9: 代码收割归档
+tags:
+  - brochure
+  - brochure
+  - share
+  - flipbook

@@ -1,0 +1,25 @@
+id: F-IMP-LIVE-01
+name: Live Browser Iteration — 实时设计迭代模式
+source_model: "Impeccable — 浏览器实时迭代: 修改代码→浏览器自动刷新→视觉验证→继续修改 的快速闭环"
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+description: >-
+  实时浏览器迭代模式: AI修改代码 → 浏览器自动热更新 → AI视觉验证 →
+  发现不足 → 继续修改。循环直到设计达标。此模式将「写代码→看结果→修改」
+  的反馈周期从分钟级压缩到秒级。结合41条检测规则的自动扫描，
+  每次迭代自动检查是否引入了新的反模式。
+input: UI代码 + 迭代目标
+output: 经过N轮迭代的最终代码
+sop: "① 启动开发服务器(hmr热更新)
+  ② 修改代码 → 浏览器自动反映变更
+  ③ AI截屏/视觉验证 → 对比迭代目标
+  ④ 发现差距 → 继续修改(回到②)
+  ⑤ 每轮自动运行detect-antipatterns扫描
+  ⑥ 达标→输出最终代码+审计报告"
+quality_gates: 迭代周期<5秒、每轮自动审计、最多N轮后有终止条件
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 白泽UI迭代/链客宝前端开发/AI招商页面生成

@@ -1,0 +1,14 @@
+id: F-HA-QUEUE-01
+name: Q5排队调度引擎
+dimension: 部署/监控
+domain: 系统架构
+atoms:
+  - HA-01 Q5排队不阻塞
+  - HA-02 Background独立进程
+description: 将Hermes Agent的Q5排队+Background后台任务模式封装为标准化调度引擎。任何耗时任务自动走Q5排队或Background独立进程，前台不阻塞。
+products:
+  - 白泽控制台: 后台数据预加载走Q5，用户查数据时直接命中缓存
+  - 盖娅进化大脑: brain_daemon走Background独立进程，不阻塞其他任务
+  - 内容工厂: 批量内容生成走Background，用户继续操作其他功能
+status: active
+priority: P1

@@ -1,0 +1,11 @@
+feature:
+  id: F-ai-card-storybook-design-system
+  name: ai-card-storybook-design-system
+  description: "17stories+5新组件+9类设计Tokens"
+  source_project: "AI数智名片"
+  created_at: "2026-07-01"
+  tech_stack: 
+  tags: 
+
+products:
+    - AI数智名片

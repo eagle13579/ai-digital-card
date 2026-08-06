@@ -1,0 +1,41 @@
+---
+feature_id: F-CHAINKE-ESIGN-01
+name: e签宝电子签约集成
+dimension: 场景
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 8
+source_model: "e签宝开放平台API集成模式"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝AI招商系统的交易执行层组件。集成e签宝电子签约平台，
+  提供合同模板管理、发起签署、签署状态追踪、回调处理、
+  签署链接生成等完整签约生命周期管理。
+inputs:
+  - 合同模板ID（选模板/自定义参数）
+  - 签署方信息（签名位置/角色）
+  - 回调通知URL
+outputs:
+  - 签署流程ID
+  - 签署链接（短链接/嵌入链接）
+  - 签署状态（待签/进行中/完成/拒签/撤销）
+  - 已签署合同PDF下载链接
+sop:
+  1. 企业认证（e签宝企业实名认证）
+  2. 模板管理（创建/列表/详情）
+  3. 发起签署（填写模板变量+指定签署方）
+  4. 状态查询（轮询签署进展）
+  5. 回调处理（异步接收签署事件）
+  6. 合同归档（完成后归档到本地DB）
+quality_gates:
+  - 签署流程创建成功率 > 99%
+  - 回调处理延迟 < 5s
+  - 模板变量渲染正确率 100%
+iteration_history:
+  - date: 2026-06-13
+    action: 创建P0版本
+    status: active
+    score: 8

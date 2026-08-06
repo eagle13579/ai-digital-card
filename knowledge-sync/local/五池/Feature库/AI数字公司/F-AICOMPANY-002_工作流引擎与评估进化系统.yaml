@@ -1,0 +1,94 @@
+# ============================================================
+# Feature: AI数字公司工作流与评估进化引擎
+# ============================================================
+id: F-AICOMPANY-002
+name: 工作流引擎与AI员工评估进化系统
+product: AI数字公司操作系统
+status: draft
+priority: P0
+owner: AI数字公司
+
+## 标签
+tags:
+  - workflow
+  - evaluation
+  - kpi
+  - learning
+  - evolution
+
+## 业务描述
+description: |
+  工作流引擎提供顺序/并行/条件分支三种步骤类型的嵌套编排，支持版本管理和插件扩展。
+  评估进化系统通过Evaluation Engine + KPI Engine + Learning Engine三引擎联动，
+  实现AI员工的绩效评估、能力追踪和持续进化。
+
+## 用户价值
+value: |
+  1. 复杂多步骤任务可编排为自动化工作流
+  2. AI员工的能力与效率可量化追踪
+  3. 系统可自我学习、自我改进，越用越聪明
+  4. 管理者可基于数据做AI团队优化决策
+
+## 功能点
+features:
+  - id: F-07
+    name: 工作流引擎(Workflow Engine)
+    description: 支持顺序/并行/条件步骤、并发控制、版本管理、插件系统
+    status: implemented
+    details: |
+      核心能力:
+      - validateWorkflowDefinition: 递归校验嵌套步骤
+      - 并行步骤组(type='parallel')
+      - 条件分支(type='condition') 
+      - 最大并发工作流控制
+      - 持久化/版本管理/监控(可选组件)
+
+  - id: F-08
+    name: 评估引擎(Evaluation Engine)
+    description: 四维加权评分(准确率/速度/质量/合规)，生成改进建议
+    status: implemented
+    details: |
+      score = accuracy×0.4 + speed×0.25 + quality×0.25 + compliance×0.1
+      三维度: 效率(efficiency)、可靠性(reliability)、完整性(completeness)
+
+  - id: F-09
+    name: KPI引擎(KPI Engine)
+    description: 五维KPI追踪(生产力/质量/效率/创新/合规)，日/周/月聚合
+    status: implemented
+    details: |
+      weight: 生产力0.3, 质量0.25, 效率0.2, 创新0.15, 合规0.1
+
+  - id: F-10
+    name: 学习引擎(Learning Engine)
+    description: 技能学习记录、等级升级(0→1.0)、技能差距识别与推荐
+    status: implemented
+
+  - id: F-11
+    name: DAG工作流可视化
+    description: 工作流步骤的DAG图可视化与执行状态追踪
+    status: designed
+
+## 技术架构
+architecture: |
+  工作流执行管线:
+  定义 → 校验 → 入队 → 调度执行 → 步骤管理 → 监控记录 → 持久化
+
+  进化闭环管线:
+  任务执行 → EvaluationEngine评分 → KPIEngine追踪 → LearningEngine升级 → 能力提升
+
+  关键设计:
+  - 工作流步骤支持递归嵌套(同一套validateSteps函数)
+  - 所有引擎基于内存Map存储(可替换为数据库持久化)
+  - KPI和学习数据按employeeId聚合
+
+## 依赖
+dependencies:
+  - Node.js (Express, Jest for test)
+  - 可选: PostgreSQL(持久化)
+
+## 验收标准
+acceptance:
+  - 可定义包含并行组和条件分支的3层嵌套工作流
+  - 评估引擎能对任务执行结果生成0-100的评分和改进建议
+  - KPI引擎能按日/周/月聚合计算员工综合绩效
+  - 学习引擎完成学习后技能等级递增

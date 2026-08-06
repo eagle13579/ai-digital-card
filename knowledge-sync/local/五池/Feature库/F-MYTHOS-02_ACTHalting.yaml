@@ -1,0 +1,23 @@
+# ⏱ 自适应计算时间门控 - ACTHalting
+id: F-MYTHOS-02
+name: 自适应计算时间门控
+dimension: 模型
+description: 每位置独立决定循环停驻时刻，易token早停难token多轮计算，通过ACT剩余技巧分配概率质量，使模型图灵完备并在批内实现可变计算量
+atoms:
+  - "Fable5-Mythos5-代码收割/02_ACTHalting"
+status: active
+priority: P0
+version: "1.0"
+created: 2026-06-15
+source: OpenMythos/open_mythos/main.py (lines 750-780, 853-889)
+
+products:
+  - 通用: 自动匹配
+references:
+  - 停驻公式: halting_score = sigmoid(W_h · h + b_h) @ main.py:780
+  - ACT累积逻辑: main.py:853-889
+  - 配置参数: act_threshold=0.99 @ main.py:73
+
+injection_points:
+  - RecurrentBlock.forward 每循环调用 self.act(h) @ main.py:865
+  - 提前退出条件: halted.all() && kv_cache==None @ main.py:888-889

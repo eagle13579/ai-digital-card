@@ -1,0 +1,16 @@
+name: 全局搜索
+version: 1.0.0
+status: draft
+dimension: ai-digital-card-weapp
+source: D:\AI数智名片\liankebao-weapp\src
+description: 全局搜索系统，支持跨模块搜索产品、名片、供需内容，记录搜索历史，展示热门搜索，提升信息检索效率
+atoms:
+  - SS-001: 产品搜索
+  - SS-002: 名片搜索
+  - SS-003: 供需搜索
+  - SS-004: 历史记录
+  - SS-005: 热门搜索
+products:
+  - AI数字名片
+employees:
+  - 乘黄P8

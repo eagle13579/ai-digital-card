@@ -1,0 +1,50 @@
+name: 营销获客矩阵
+version: 1.0.0
+description: The Agency吸收 - 营销获客角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Agentic Search Optimizer
+  - AI Citation Strategist
+  - App Store Optimizer
+  - Baidu SEO Specialist
+  - Bilibili Content Strategist
+  - Book Co-Author
+  - Carousel Growth Engine
+  - China Ecommerce Operator
+  - China Market Localization Strategist
+  - Content Creator
+  - Cross-Border Ecommerce
+  - Douyin Strategist
+  - Growth Hacker
+  - Instagram Curator
+  - Kuaishou Strategist
+  - LinkedIn Content Creator
+  - Livestream Commerce Coach
+  - Podcast Strategist
+  - Private Domain Operator
+  - Reddit Community Builder
+  - SEO Specialist
+  - Short Video Editing Coach
+  - Social Media Strategist
+  - TikTok Strategist
+  - Twitter Engager
+  - Video Optimization Specialist
+  - WeChat Official Account
+  - Weibo Strategist
+  - Xiaohongshu Specialist
+  - Zhihu Strategist
+capabilities:
+  - 全球SEO优化（百度/Google/Agentic搜索）
+  - 社交媒体全平台运营（抖音/小红书/微博/B站/微信）
+  - 海外社媒运营（Instagram/TikTok/Twitter/LinkedIn/Reddit）
+  - 内容创作与短视频编辑
+  - 跨境电商与直播电商
+  - 私域流量运营
+  - 中国本地化策略
+  - 播客与内容出版策略
+  - ASO应用商店优化
+  - 增长黑客与AI引文策略
+integration: 直接补充AI数字军团营销获客能力

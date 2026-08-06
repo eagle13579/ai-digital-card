@@ -1,0 +1,95 @@
+feature_id: F-CADAM-04
+feature_name: Skill 解耦 + Viewer Handoff 协议
+feature_type: 心智模型 / 微服务架构模式
+version: 1.0.0
+created: 2026-06-15
+author: CADAM项目 -> Feature吸收
+
+# ============================================================
+# 核心理念
+# ============================================================
+core_concept: >
+  每个Agent skill是独立自治的运行时单元，
+  不可互相import源码依赖。
+  文件生成后必须通过统一的Viewer Handoff协议
+  交给cad-viewer skill返回预览链接。
+  Skill之间通过文件系统和Viewer URL通信，
+  而非通过代码级导入。
+
+# ============================================================
+# CADAM实现
+# ============================================================
+cadam_implementation:
+  description: >
+    CADAM定义了严格的Skill边界契约：
+    (1) 每个skill在skills/下独立目录，有SKILL.md作为入口
+    (2) skill之间不能有sys.path、PYTHONPATH、NODE_PATH的依赖
+    (3) 共享运行时在packages/下作为真相来源
+    (4) 每个生成skill完成后必须handoff给cad-viewer
+    (5) viewer通过 agent:start 自动分配端口和管理生命周期
+    (6) 每个viewer server有 --shutdown-after 12h 自动清理
+    Skill生态：cad、urdf、srdf、sdf、gcode、dxf、step-parts、
+    implicit-cad、bambu-labs、sendcutsend全都通过cad-viewer统一预览。
+  key_components:
+    - skills/ 下独立目录+SKILL.md
+    - packages/ 共享运行时（非skill间直接依赖）
+    - cad-viewer作为统一视觉交接点
+    - npm run agent:start 自动端口管理
+    - --shutdown-after 自动清理机制
+  invariant: >
+    skill A永远不能import skill B的源码。
+    共享逻辑必须通过packages/下沉。
+
+# ============================================================
+# 映射盖娅进化大脑
+# ============================================================
+mapping_to_gaiya:
+  description: >
+    这一模式对映盖娅生态的Agent微服务架构
+  baize_analogy:
+    - 独立SKILL.md -> 每个白泽员工的职责说明书
+    - 不跨skill import -> Agent不越权调用其他Agent内部逻辑
+    - Viewer Handoff -> 白泽员工间通过统一消息总线交接
+    - packages/共享运行时 -> 公共工具库
+  analogy: >
+    正如CADAM的skill之间只通过文件+Viewer URL通信，
+    白泽员工之间应当通过标准消息/事件总线通信，
+    而非直接调用彼此内部方法。
+
+# ============================================================
+# 适用场景
+# ============================================================
+applicable_scenarios:
+  - 多Agent协作系统设计
+  - 插件化/可插拔功能架构
+  - 有统一预览/审查环节的工作流
+  - 需要独立部署、独立升级的微服务
+  - 每个服务需要独立的运行环境和依赖
+
+# ============================================================
+# 心智模型详细描述
+# ============================================================
+mental_model_detail:
+  name: Decoupled Skills + Viewer Handoff Protocol (解耦技能+统一视觉交接协议)
+  level: L5孵化室 - 核心心智模型
+  description: >
+    微服务架构在Agent生态中的实践映射。
+    每个skill是一个有明确职责边界的独立服务，
+    有自己的SKILL.md（API文档）、scripts（实现）、
+    references（知识库）。skill之间不共享内存、
+    不互相import、不共享运行时路径。
+    唯一的交接通道是文件系统（产出文件）+ Viewer（预览链接）。
+    cad-viewer是统一的"验收窗口"，
+    所有生成的文件最终都通过它呈现给用户。
+  principles:
+    - 独立自治: 每个skill可独立安装、运行、升级
+    - 无代码耦合: 禁止跨skill的import/PYTHONPATH依赖
+    - 共享下沉: 公共逻辑必须进packages/而非留在skill中
+    - 统一交接: 所有生成文件通过Viewer Handoff协议交付
+    - 自动治理: viewer server有自动清理和端口管理
+  workflow:
+    - "1. skill A处理请求生成文件"
+    - "2. skill A调用cad-viewer的agent:start"
+    - "3. cad-viewer返回预览URL"
+    - "4. skill A将URL返回给用户"
+    - "5. 12小时后viewer server自动关闭"

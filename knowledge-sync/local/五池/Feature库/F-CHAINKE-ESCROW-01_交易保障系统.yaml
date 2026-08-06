@@ -1,0 +1,39 @@
+---
+feature_id: F-CHAINKE-ESCROW-01
+name: AI招商交易保障系统
+dimension: 体系
+domain: chainke-ai-zhaoshang
+version: "1.0"
+status: active
+score: 8
+source_model: "8状态状态机+信任评分模式"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝AI招商系统的信任构建层。基于8状态状态机的
+  交易全生命周期管理（pending→paid→fulfilled→completed，
+  可进入disputed/cancelled）。信任评分算法（满分100，AAA/C等级）。
+inputs:
+  - 交易创建信息（买卖双方/金额/里程碑）
+  - 里程碑完成确认
+  - 争议描述
+outputs:
+  - 交易状态（8态状态机）
+  - 信任评分（按规则公式：完成率40+纠纷率30+速度20+交易量10）
+  - 争议处理结果
+sop:
+  1. 创建交易（设定里程碑+金额）
+  2. 里程碑管理（创建/更新/确认）
+  3. 付款释放（里程碑完成后自动触发）
+  4. 争议管理（发起/调解/裁决）
+  5. 信任评分更新（每次交易完成自动计算）
+quality_gates:
+  - 状态机转换正确率 100%
+  - 信任评分一致性 100%
+  - 争议处理时效 < 48h
+iteration_history:
+  - date: 2026-06-13
+    action: 创建P2版本
+    status: active
+    score: 8

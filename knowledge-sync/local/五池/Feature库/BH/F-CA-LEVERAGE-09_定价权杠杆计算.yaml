@@ -1,0 +1,19 @@
+id: F-CA-LEVERAGE-09
+name: 定价权杠杆计算
+dimension: 💡 创造力
+description: >-
+  基于BH10 1美元杠杆3亿美元利润心智模型构建的计算器，量化大宗商品
+  生产商的销量×指数波动=营收杠杆倍数。评估企业利润对指数价格的敏感度，
+  对比同行业杠杆率以识别定价权最强的企业。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH10: 1美元杠杆3亿美元利润
+products:
+  - 指数杠杆分析工具
+  - 大宗商品定价权评分系统
+employees: [计然, 乘黄, 长乘]
+priority: P0
+maturity: design

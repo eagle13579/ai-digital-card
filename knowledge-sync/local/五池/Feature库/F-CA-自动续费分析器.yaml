@@ -1,0 +1,21 @@
+feature_id: "F-CA-自动续费分析器"
+name: "自动续费分析器 — 消费端套利检测"
+version: "1.0.0"
+dimension: "数据"
+source_model:
+  - "五池/模型池/_原子/黑河自动续费系统/ (15原子)"
+input: "消费品牌名称或商业模式描述"
+output: "自动续费设计评分 + 三层锁链检测报告 + 取消成本分析"
+sop: |
+  1. 分析标的的注册/取消流程不对称度
+  2. 检测三层锁链(迷宫/合同/算法)的覆盖度
+  3. 评估基础设施锁定程度
+  4. 综合评分(0-100)
+quality_gate:
+  threshold: 60
+  check: "三层检测必须全部执行"
+iteration_count: 0
+status: "draft"
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,16 @@
+# 情绪承诺驱动引擎
+id: "F-CR-51"
+name: "情绪承诺驱动引擎"
+dimension: "创造力"
+description: >
+  10种读者情绪承诺（逆袭/复仇/打脸/燃/悬疑/甜/虐/女性成长/生存/黑色反转）+ 14种高压关系 + 14种冲突场域 + 22种剧情引擎的组合选择系统。先定情绪再选引擎。
+atoms:
+  - "QM-02"
+  - "QM-03"
+  - "QM-04"
+  - "QM-09"
+  - "QM-12"
+status: "active"
+priority: "P1"
+created: "2026-06-15"
+source: "qiaomu-novel-generator"

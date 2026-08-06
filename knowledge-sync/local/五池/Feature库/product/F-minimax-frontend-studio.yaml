@@ -1,0 +1,20 @@
+name: MiniMax前端工作室 — 五能力编排引擎
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — frontend-dev (2026-07-05)
+description: 五能力(Framer Motion/GSAP动画 + MiniMax媒体 + AIDA文案 + p5.js生成艺术 + React/Tailwind)编排构建前端页面。
+atoms:
+  - FE-5CAP: 五能力编排框架(设计/动效/AI媒体/文案/生成艺术)
+  - FE-AIDA: AIDA文案框架(Attention→Interest→Desire→Action)
+  - FE-MOTION: 动效分层(CSS基础 / Framer Motion进阶 / GSAP专业)
+  - FE-MEDIA-PROMPT: 媒体提示工程(图片/TTS/音乐/视频各有规则)
+products:
+  - AI数字名片 — 营销落地页
+  - 链客宝 — 企业官网/产品页
+  - 中韩出海数智港 — 多语言着陆页
+  - 内容工厂 — 营销素材自动生成
+employees:
+  - 乘黄P8(前端/产品)
+  - 商羊P8(市场/文案)
+  - 阿久(内容工厂)

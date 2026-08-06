@@ -1,0 +1,34 @@
+# code-base-embeddingless-semantic-search Feature
+
+name: code-base-embeddingless-semantic-search
+version: v1.0.0
+source: codebase-memory-mcp (DeusData)
+origin: https://github.com/DeusData/codebase-memory-mcp
+
+description: 零外部模型、纯算法驱动的代码语义搜索引擎。11个信号综合评分，无需embedding模型、无需GPU、无需API key。
+
+products:
+  - 代码资产库  # 代码检索需要语义理解
+  - 企业知识库RAG  # 搜索增强
+
+atoms:
+  - 11信号语义搜索
+  - TF-IDF元数据评分
+  - Random Indexing共现
+  - MinHash结构化指纹
+  - AST结构特征向量
+  - 数据流近似分析
+  - Halstead复杂度
+
+signals:
+  1: TF-IDF 元数据词汇重叠
+  2: Random Indexing 共现同义词桥接
+  3: MinHash 结构指纹 Jaccard
+  4: API签名向量 (调用的函数→相关)
+  5: 类型签名向量 (参数/返回类型→相关)
+  6: 模块邻近度 (同目录→加分)
+  7: 装饰器模式向量 (同注解→相关)
+  8: AST结构特征 (控制流/嵌套/表达式)
+  9: 数据流近似 (参数→返回值/条件)
+  10: 图扩散 (传递闭包)
+  11: Halstead复杂度

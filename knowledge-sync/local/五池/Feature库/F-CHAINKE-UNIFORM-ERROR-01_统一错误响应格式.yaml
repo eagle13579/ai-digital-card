@@ -1,0 +1,37 @@
+---
+feature_id: F-CHAINKE-UNIFORM-ERROR-01
+name: 统一错误响应格式
+dimension: API
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 9
+source_model: "ErrorCode枚举+{code,message,details}标准格式+全局异常处理器"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝全后端统一错误响应格式。ErrorCode枚举集中定义所有错误码，
+  所有API响应统一为{code, message, details}格式，全局异常处理器
+  自动将未捕获异常转为标准响应。前端使用统一的fetch.enhance处理逻辑。
+inputs:
+  - 后端FastAPI应用
+  - 原有分散的错误处理代码
+outputs:
+  - 所有API响应统一格式
+  - ErrorCode枚举（30+错误码）
+  - 全局异常处理中间件
+sop:
+  1. 修复ErrorCode枚举文本（如PAYMENT_FALED→PAYMENT_FAILED，7处）
+  2. 创建统一响应模型BaseResponse(code, message, details)
+  3. 实现全局异常处理器ExceptionHandlerMiddleware
+  4. 所有路由handler返回BaseResponse
+quality_gates:
+  - ErrorCode枚举100%覆盖已知异常类型
+  - 所有响应格式验证通过
+  - 前端无需自定义错误解析
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 9

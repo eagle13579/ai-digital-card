@@ -1,0 +1,34 @@
+datapack_id: "DP-HR-能力-合规·风控"
+name: "合规·风控人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "合规·风控领域4名员工的能力档案"
+
+source: "employees/ 按能力关键词分类"
+
+contents: |
+  4名合规·风控领域员工:
+  - 化妆品合规官
+      - 獬豸
+      - 獬豸法-8346fa87
+      - 食品合规官
+
+data_format: "员工YAML + 能力矩阵"
+
+mount_interface:
+  load: "加载此领域全部员工档案"
+  query: "按具体技能/等级检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "对应合规·风控相关Feature执行时消费此DataPack"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按能力领域重新拆分为原子DataPack"

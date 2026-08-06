@@ -1,0 +1,20 @@
+name: 金融财务
+version: 1.0.0
+description: The Agency吸收 - 金融财务角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Bookkeeper Controller
+  - Financial Analyst
+  - FPA Analyst
+  - Investment Researcher
+  - Tax Strategist
+capabilities:
+  - 记账与财务管控
+  - 财务分析与建模
+  - FP&A预算预测与分析
+  - 投资研究与尽职调查
+  - 税务策略与合规规划
+integration: 直接补充AI数字军团金融财务能力

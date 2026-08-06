@@ -1,0 +1,16 @@
+name: 信任网络
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-trust-relation: 信任关系管理
+  - A-trust-degree: 信任度数计算
+  - A-trust-network-query: 信任网络查询
+  - A-trust-score: 信任评分
+  - A-trust-path: 信任路径发现
+description: 信任网络：信任关系/度数计算/网络查询
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

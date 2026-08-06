@@ -1,0 +1,16 @@
+name: 模型选择与架构决策框架
+version: 1.0.0
+status: production
+dimension: ai-core/strategy
+source: microsoft/generative-ai-for-beginners (Lesson 02, 16)
+description: "开源vs闭源模型选择、Foundation Models vs LLMs、多模态能力评估、Benchmark驱动选型"
+atoms:
+  - GAIB-02: Transformer & Attention机制
+  - GAIB-15: 开源 vs 闭源模型选择策略
+products:
+  - Mac Mini推理: 开源模型部署
+  - 盖娅推理中间件: 多模型路由
+  - 中国软银: 模型投资决策
+employees:
+  - 白泽P9: 模型策略决策
+  - 计然P8: TCO分析

@@ -1,0 +1,31 @@
+datapack_id: "DP-PD-FEAT-神机_内容自动化工厂能力"
+name: "神机_内容自动化工厂能力注入·Feature装配"
+version: "1.0.0"
+type: "产品包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "神机_内容自动化工厂能力注入产品装配的Feature清单"
+
+source: "L5孵化室/产品开发/神机_内容自动化工厂能力注入/"
+
+contents: |
+  神机_内容自动化工厂能力注入当前装配了哪些Feature，以及每个Feature的状态。
+
+data_format: "Feature装配清单YAML"
+
+mount_interface:
+  load: "读取产品Feature装配清单到工作内存"
+  query: "查询已装配/待装配/废弃的Feature"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "体系Feature做产品全景扫描时消费此DataPack"
+  - "基本功Feature做能力分析时参考"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "原子化拆解自产品目录"

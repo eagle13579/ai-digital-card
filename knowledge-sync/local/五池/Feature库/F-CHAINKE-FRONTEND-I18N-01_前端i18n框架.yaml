@@ -1,0 +1,42 @@
+---
+feature_id: F-CHAINKE-FRONTEND-I18N-01
+name: 前端i18n框架
+dimension: 国际化
+domain: chainke-p1p2
+version: "1.0"
+status: active
+score: 7
+source_model: "react-i18next+zh/en/ko三语言+后端翻译文件双层架构"
+
+products:
+  - 通用: 自动匹配
+description: >
+  链客宝前端国际化框架。基于react-i18next实现三语言
+  （中文/英文/韩文）支持：
+  - 前端：react-i18next框架，语言自动检测，用户可切换
+  - 后端：Python翻译文件（系统级/错误信息/模板文本）
+  - 三语言翻译文件：zh.json, en.json, ko.json
+  - 语言检测：navigator.language → localStorage → 默认中文
+inputs:
+  - React前端项目
+  - 原有中文硬编码UI文案
+outputs:
+  - react-i18next配置
+  - zh/en/ko三语言翻译JSON
+  - 语言切换组件
+  - 后端翻译文件
+sop:
+  1. npm install react-i18next i18next
+  2. 创建i18n配置+语言检测逻辑
+  3. 创建zh/en/ko翻译JSON文件
+  4. 用useTranslation hook替换硬编码文本
+  5. 创建语言切换组件
+quality_gates:
+  - 三语言全部可切换
+  - 语言检测自动匹配浏览器设置
+  - 无硬编码中文残留
+iteration_history:
+  - date: 2026-07-01
+    action: 链客宝P1-P2创建
+    status: active
+    score: 7

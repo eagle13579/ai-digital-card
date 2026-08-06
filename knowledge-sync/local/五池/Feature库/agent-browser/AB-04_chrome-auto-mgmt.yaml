@@ -1,0 +1,7 @@
+name: F-AB-04_Chrome自动管理
+description: Chrome for Testing自动下载+检测, 零配置
+dimension: 基本功
+source: vercel-labs/agent-browser
+products:
+  - 内容工厂
+  - AI数字军团

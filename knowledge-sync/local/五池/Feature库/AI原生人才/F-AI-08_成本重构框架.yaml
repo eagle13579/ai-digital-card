@@ -1,0 +1,16 @@
+name: F-AI-08_成本重构框架
+dimension: 数据
+domain: AI原生人才
+version: 1.0
+
+products:
+  - 通用: 自动匹配
+description: |-
+  人工编辑成本大于AI成本的工作会被先重构——帮助企业识别AI优先替代/增强/重塑的工作环节
+models_referenced:
+  - M8-白泽军团映射
+applications:
+  - 赛博参谋
+  - 链客宝
+draft: false
+created_at: 2026-06-15

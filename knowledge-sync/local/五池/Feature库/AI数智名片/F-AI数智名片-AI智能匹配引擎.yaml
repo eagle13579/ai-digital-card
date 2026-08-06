@@ -1,0 +1,38 @@
+# Feature YAML — AI数智名片
+name: "F-AI数智名片-AI智能匹配引擎"
+version: "1.0"
+status: "implemented"
+date: "2026-07-08"
+tags: ["AI", "匹配", "推荐系统", "向量搜索"]
+
+description: >
+  基于用户供需标签(provide/need)、语义相似度和ML特征评分的多维度智能匹配引擎。
+  支持三层评分：标签重叠40% + 语义相似40% + 标签权重20%，并提供ML评分修正。
+
+architecture:
+  layers:
+    - layer: 路由层
+      file: backend/app/routers/match.py
+      endpoints:
+        - POST /api/v1/match/engine — 触发匹配
+        - GET /api/v1/match/records — 匹配记录
+        - POST /api/v1/match/semantic-search — 语义搜索
+        - POST /api/v1/match/{id}/unlock — 付费解锁
+    - layer: AI引擎层
+      file: backend/app/ai/recommendation.py
+      class: "RealTimeRecommender"
+      sub_components:
+        - FeatureBasedScorer (LogisticRegression)
+        - VectorSearchEngine (M3E Embedding)
+        - FeedbackLoop
+    - layer: 小程序前端
+      file: liankebao-weapp/src/api/match.ts
+
+dependencies:
+  - M3E Embedding模型/DeepSeek API
+  - SQLite/PostgreSQL数据库
+  - scikit-learn (LogisticRegression)
+
+mental_models:
+  - "三层供需匹配引擎"
+  - "ML特征工程反馈闭环"

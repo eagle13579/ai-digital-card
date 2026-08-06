@@ -1,0 +1,16 @@
+name: 人际关系知识图谱
+version: 1.0.0
+status: draft
+dimension: ai-digital-card
+source: D:\AI数智名片\backend\app
+atoms:
+  - A-knowledge-graph: 知识图谱构建
+  - A-bfs-subgraph: BFS用户子图查询
+  - A-insight-analysis: 洞察分析引擎
+  - A-connection-recommend: 连接推荐
+  - A-relationship-visualization: 关系可视化
+description: 人际关系知识图谱：BFS用户子图/洞察分析/连接推荐
+products:
+  - AI数字名片
+employees:
+  - 文鳐P9

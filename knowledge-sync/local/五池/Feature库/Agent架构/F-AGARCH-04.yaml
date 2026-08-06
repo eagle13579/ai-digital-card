@@ -1,0 +1,14 @@
+name: "上下文隔离框架"
+version: "1.0.0"
+status: absorbed
+dimension: 设计
+source: 一速《7种主流Agent架构深度拆解》
+description: "多Agent系统中确保上下文独立、避免污染的设计模式。进程级隔离+结构化消息传递+读写分离的完整实现。"
+atoms:
+  - AgentArch 09_上下文隔离原则
+  - AgentArch 04_多Agent架构
+products:
+  - 白泽数字军团
+  - 蜂巢协作模式
+  - 白泽指挥官协议
+absorbed_date: 2026-07-10

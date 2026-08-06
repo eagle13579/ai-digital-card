@@ -1,0 +1,15 @@
+name: AI应用UX设计原则
+version: 1.0.0
+status: production
+dimension: ai-ux
+source: microsoft/generative-ai-for-beginners (Lesson 12)
+description: "AI应用UX四要素: Useful有用(功能匹配)、Reliable可靠(一致无错)、Accessible可访问(无障碍)、Pleasant愉悦。信任设计: 可解释性(Explainability)+可控性(Control)。Overtrust(过度信任)和Mistrust(不信任)的平衡"
+atoms:
+  - GAIB-14: Chat UX与个性化设计
+products:
+  - 盖娅之城: 公民对话UX
+  - 招贤(数字员工SaaS): 员工对话界面
+  - 云师(AI灵魂觉醒): 灵魂注入对话设计
+employees:
+  - 乘黄P8: UX设计
+  - 鹿蜀P8: 用户体验优化

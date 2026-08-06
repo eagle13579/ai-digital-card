@@ -1,0 +1,47 @@
+---
+id: F-AOU-PLUS-arbitrage-calculator
+name: 跨境套利计算引擎
+version: 1.0.0
+type: feature
+status: active
+module: backend/app.py
+dependencies: [config.py]
+
+description: >
+  基于中国采购价(1688)、物流成本和平台费率，计算
+  中国→越南跨境套利的预计售价、利润和利润率，
+  并自动分级推荐（立即上架/测试上架/谨慎评估）。
+
+endpoints:
+  - method: POST
+    path: /api/arbitrage/calculate
+    request_schema:
+      name: string
+      category: string
+      cn_price: float
+      weight: float (optional, default=0.5)
+      target_market: string (default="越南")
+    response_schema:
+      product: string
+      cn_price: float
+      estimated_price: float
+      profit: float
+      profit_margin: float
+      arbitrage_type: string
+      recommendation: string
+      target_market: string
+
+business_rules:
+  - name: 套利分级
+    logic: |
+      profit_margin > 30% → "高价套利" + "立即上架"
+      profit_margin 15%~30% → "平价套利" + "测试上架"
+      profit_margin < 15% → "低价套利" + "谨慎评估"
+  - name: 成本构成
+    items:
+      - 采购成本: cn_price / 7.2 (USD)
+      - 物流成本: 1.5(海运) + 0.3(关税) + 0.2(仓储) + 0.8(末端) = 2.8 USD
+      - 平台费用: estimated_price × (6%+5%+2%) = 13%
+
+related_models:
+  - AOU-PLUS_26-07-08_01 (跨境套利三角模型)

@@ -1,0 +1,54 @@
+---
+id: F-AOU-PLUS-agent-pipeline
+name: Agent三层自动化运营流水线
+version: 1.0.0
+type: feature
+status: active
+module: backend/agents/
+dependencies: [backend/config.py]
+
+description: >
+  由MarketIntelligenceAgent、StrategyDecisionAgent、ExecutionEngine
+  三个智能体组成的三层流水线，覆盖从市场情报采集、策略决策到
+  自动上架/订单处理的完整跨境电商运营流程。
+
+agents:
+  - name: MarketIntelligenceAgent
+    class: backend.agents.market_intelligence.MarketIntelligenceAgent
+    functions:
+      - scan_shopee_vietnam(keywords) → List[Dict]
+      - query_1688_price(product_name) → Dict
+      - calculate_arbitrage(sell_price_usd, buy_price_cny) → Dict
+      - find_opportunities(keywords, min_margin=15) → List[Dict]
+    data_sources:
+      - Shopee越南站API (Mock/Real)
+      - 1688采购价映射表 (Mock/Real)
+
+  - name: StrategyDecisionAgent
+    class: backend.agents.strategy_agent.StrategyDecisionAgent
+    functions:
+      - pricing_strategy(product, competitors) → Dict
+      - listing_optimization(product, target_market) → Dict
+      - risk_assessment(product, market) → Dict
+    strategies:
+      - 成本加成定价: cost × 1.5
+      - 竞争导向定价: avg_price × 0.95
+      - 价值定价: avg_price × (0.8 + quality_score × 0.4)
+    markets_supported: [越南, 泰国]
+
+  - name: ExecutionEngine
+    class: backend.agents.execution_engine.ExecutionEngine
+    functions:
+      - auto_listing_pipeline(products) → List[Dict]
+      - order_processing_pipeline() → Dict
+    pipelines:
+      - 自动上架: 生成描述→处理图片→设置价格→设置库存→提交
+      - 订单处理: 确认订单→通知供应商→生成物流→更新状态
+    scheduling:
+      - 订单检查: 每30分钟
+      - 批量上架: 每天02:00
+      - 价格更新: 每小时
+
+related_models:
+  - AOU-PLUS_26-07-08_02 (Agent三层流水线模型)
+  - AOU-PLUS_26-07-08_04 (自动化运营流水线模型)

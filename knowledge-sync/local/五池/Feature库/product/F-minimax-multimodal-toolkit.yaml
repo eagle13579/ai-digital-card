@@ -1,0 +1,21 @@
+name: MiniMax多模态生成引擎
+version: 1.0.0
+status: active
+dimension: product
+source: MiniMax Official Skills — minimax-multimodal-toolkit (2026-07-05)
+description: 统一多模态内容生成引擎，通过MiniMax API生成TTS语音/音乐/视频/图片。支持语音克隆、情感注入、异步视频轮询。
+atoms:
+  - MM-MULTI-API: 统一REST API设计(双域名/统一认证/统一错误)
+  - MM-TTS-3LAYER: 三层语音定制(预设/克隆/设计) + 情感注入
+  - MM-VIDEO-ASYNC: 视频异步轮询 (CREATE→POLL→DOWNLOAD→CONVERT)
+  - MM-FFMPEG: FFmpeg后处理管线(格式转换/拼接/裁剪)
+products:
+  - 内容工厂(阿久) — 短视频/播客AI语音和音乐生成
+  - AI数字名片 — 数字人语音和形象展示
+  - 中韩出海数智港 — 多语言视频内容生成
+  - 赛博参谋(计然) — 演讲/路演媒体素材生成
+employees:
+  - 乘黄P8(内容工厂)
+  - 阿久(内容自动化)
+  - 䑏疏P8(出海)
+  - 商羊P8(市场)

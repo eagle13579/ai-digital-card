@@ -1,0 +1,14 @@
+name: AI→Code→Compile→Render 四段式管道
+dimension: 体系
+description: LLM生成可执行代码→编译器编译→渲染器展示。三段解耦，各段独立技术栈。核心范式转变：AI产出可验证的程序而非直接成品。
+applies_to:
+  - 盖娅之城3D建筑生成
+  - 任何AI需要产生物理输出的场景
+mental_model: |
+  AI输出的是源码(可编辑、可验证、可版本控制)，不是最终渲染结果。
+  编译失败 = AI输出质量的门禁。编译通过 = 输出正确的第一道保障。
+source: CADAM (Adam-CAD/CADAM), 4k stars
+
+products:
+  - 通用: 自动匹配
+cadam_ref: skills/cad + packages/cadjs + viewer

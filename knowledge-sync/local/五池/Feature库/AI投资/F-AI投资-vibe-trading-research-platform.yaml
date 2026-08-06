@@ -1,0 +1,36 @@
+name: F-AI投资-vibe-trading-research-platform
+version: 1.0.0
+description: 自然语言驱动的量化研究平台 — 从假设生成→Alpha回测→严格门控→证据归档的全链路AI量化研究流水线
+status: seed
+tags:
+  - AI投资
+  - 量化研究
+  - Alpha因子
+  - 回测
+  - 多经纪商
+  - MCP
+source: D:/AI投资/Vibe-Trading
+dependencies:
+  - langgraph>=1.0.10
+  - fastapi>=0.104.0
+  - pandas>=2.0.0
+  - scikit-learn>=1.3.0
+architecture:
+  pattern: Layered-Service
+  description: >
+    四层架构：前端(React 19 + Vite) → API层(FastAPI + MCP Server) → 核心引擎层(Agent Loop + Backtest + Swarm + Alpha Zoo) → 数据层(多源接入: tushare/akshare/ccxt/通达信)。
+    452个预构建Alpha因子(4个子Zoo)，6+经纪商连接器，Research Goal全生命周期管理。
+  components:
+    - AlphaZoo: qlib158/alpha101/gtja191/academic 452个因子
+    - BacktestEngine: 多周期回测+绩效评估
+    - SwarmEngine: DAG任务编排+Worker MCP
+    - BrokerConnectors: IBKR/Robinhood/Tiger/Alpaca/Binance/OKX/Futu/Longbridge
+    - ResearchGoal: 假设-证据-结论闭环管理
+    - SecurityLayer: Mandate授权+预交易门禁+审计账本
+infrastructure:
+  docker:
+    - vibe-trading (Python后端)
+    - node:20 (前端)
+  env:
+    - OPENAI_API_KEY
+    - VIBE_TRADING_* (多配置项)

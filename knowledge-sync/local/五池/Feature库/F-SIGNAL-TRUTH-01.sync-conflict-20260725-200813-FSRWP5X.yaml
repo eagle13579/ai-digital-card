@@ -1,0 +1,32 @@
+# ⚙️ 情报真实性标记协议
+id: F-SIGNAL-TRUTH-01
+name: 情报真实性标记协议
+dimension: 基本功
+description: 每条情报必须标注来源和证据等级，区分真实数据与AI模拟数据
+source_model: 多源并行情报采集
+status: active
+version: "1.0"
+created: 2026-06-14
+
+input:
+  - 原始情报数据（来自真实采集或AI生成）
+
+output:
+  - 标注后的结构化情报包含:
+    - 来源名称
+    - 来源URL
+    - 采集时间
+    - 模式: real | ai_simulated
+
+sop: |
+  1. 真实信源：自动标记 mode=real + 保留原始URL
+  2. AI模拟：标记 mode=ai_simulated + 标注「模拟」
+  3. 混合输出：前端显示不同颜色的来源标签
+  4. 用户可追溯每条情报的原始出处
+
+quality_gate:
+  - 不允许未标注来源的情报进入生产
+  - 真实数据误标为模拟 → P0 bug
+  - 模拟数据误标为真实 → 信任危机
+
+draft: false

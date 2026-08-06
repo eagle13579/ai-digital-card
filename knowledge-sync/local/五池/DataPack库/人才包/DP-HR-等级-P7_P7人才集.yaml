@@ -1,0 +1,36 @@
+datapack_id: "DP-HR-等级-P7"
+name: "P7人才集"
+version: "1.0.0"
+type: "人才包"
+schema_version: "1.0"
+created_at: "2026-06-07"
+author: "白泽"
+
+description: "P7等级5名核心员工的完整档案"
+
+source: "employees/ 按等级分类"
+
+contents: |
+  5名P7等级员工:
+  - 化妆品合规官
+      - 数据合规官
+      - 计名-digital-card
+      - 谛听-情报
+      - 食品合规官
+
+data_format: "员工YAML + 等级矩阵"
+
+mount_interface:
+  load: "加载此等级全部员工档案"
+  query: "按技能/活跃度检索"
+  version: "返回当前DataPack版本"
+
+consumed_by_features:
+  - "基本功Feature做能力分析时消费"
+  - "体系Feature做组织规划时消费"
+
+depends_on: []
+version_history:
+  - version: "1.0.0"
+    date: "2026-06-07"
+    change: "按等级重新拆分为原子DataPack"

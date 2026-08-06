@@ -1,0 +1,19 @@
+id: F-CA-QUAD-05
+name: 四件套并网检测
+dimension: 💡 创造力
+description: >-
+  基于BH05四套榨取工具并网心智模型构建的综合检测器，评估目标企业
+  是否同时拥有定价权+技术壁垒+合同锁定+离岸路由四套工具，以及四者
+  之间的协同度。输出四件套完整度评分和并网效应倍率。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 必和必拓四件套
+atoms:
+  - BH05: 四套榨取工具并网
+products:
+  - 企业利润模式全景分析系统
+  - 产业链统治力评估平台
+employees: [计然, 长乘, 䑏疏, 乘黄]
+priority: P0
+maturity: design

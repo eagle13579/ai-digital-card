@@ -1,0 +1,17 @@
+name: Agentic Coding 终端原生范式
+version: 1.0.0
+status: draft
+dimension: ai-agents
+source: github/anthropics/claude-code
+description: "Claude Code模式——终端原生的Agent编码工具范式。代码库理解优先、自然语言驱动全栈操作、git工作流集成。定义了现代Agentic Coding的最佳实践。"
+atoms:
+  - F-CLAUDE-CODE-01: 终端原生Agent交互范式
+  - F-CLAUDE-CODE-02: 代码库理解优先的上下文构建
+  - F-CLAUDE-CODE-03: 自然语言驱动开发工作流
+products:
+  - AI数智军团: 军团编码Agent参考实现
+  - 烛龙工程流: Agent化开发流水线
+  - AI开发工坊: 自然语言编程环境
+employees:
+  - 烛龙P8: Agent编码模式落地
+  - 计然P8: 开发效率度量分析

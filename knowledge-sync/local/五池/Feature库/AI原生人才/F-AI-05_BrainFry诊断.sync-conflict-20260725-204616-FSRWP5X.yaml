@@ -1,0 +1,12 @@
+name: F-AI-05_BrainFry诊断
+dimension: 场景
+domain: AI原生人才
+version: 1.0
+description: |-
+  检测用户当前AI工具使用模式的健康度——是否陷入工具越多效率越低的脑炸状态
+models_referenced:
+  - M7-白泽军团映射
+applications:
+  - 白泽控制台
+draft: false
+created_at: 2026-06-15

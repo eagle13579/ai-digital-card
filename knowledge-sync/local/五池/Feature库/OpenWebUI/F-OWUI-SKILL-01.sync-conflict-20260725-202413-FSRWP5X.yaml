@@ -1,0 +1,20 @@
+id: F-OWUI-SKILL-01
+name: Skill System with CRUD + Access Control
+source_model: Open WebUI Skill System (skills.py 12.4KB model + 13.8KB router) — 技能作为一等实体，完整生命周期管理
+dimension: 体系
+description: >-
+  技能(Skill)是Open WebUI的一等资源，具有: 创建/读取/更新/删除/导出/启用禁用。
+  每个技能关联具体LLM模型，可独立配置访问权限(谁可以看/谁可以用)。
+  技能定义包含: id/name/meta(description+model+系统提示+工具关联)/访问控制。
+input: 技能定义(content+meta+access_grants)
+output: 技能响应(内容+上下文+工具调用权)
+sop: "① 创建: POST /skills/create → 写入skills表+赋默认权限
+  ② 发现: GET /skills/list → 当前用户可见的全部技能(含访问等级)
+  ③ 使用: 聊天时关联skill → LLM获得技能定义的system prompt+工具
+  ④ 开关: POST /skills/id/{id}/toggle → 启用/禁用不停机
+  ⑤ 导出: GET /skills/export → 批量导出技能(跨实例迁移)"
+quality_gates: 技能启用/禁用零停机、访问控制<5ms决策、导出格式自包含可独立部署、支持1000+技能并发
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 白泽SKILL.md产品化/数字员工技能市场/链客宝AI技能商店/中韩数智港技能集市

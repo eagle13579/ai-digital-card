@@ -1,0 +1,21 @@
+name: "F2: Pull-based 分布式任务调度"
+version: v1.0.0
+source: multica
+type: infrastructure-pattern
+inputs:
+  - Task Queue (agent_task_queue 表)
+  - Agent 任务条目
+outputs:
+  - completed / failed 任务状态
+  - 原子认领的任务记录
+products: [multica-agent-runtime-gateway]
+related_atoms:
+  - daemon-pull-engine
+  - agent-backend-plugin-pattern
+  - multica-daemon-self-healing-runtime
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  Daemon 以 3s 间隔轮询任务队列，通过 FOR UPDATE SKIP LOCKED 实现原子认领，
+  每个任务在隔离的执行环境中运行，结果流式上报。对标 Celery + Redis RQ。
+  可用于白泽军团的去中心化任务分配，无需中心化的消息代理。

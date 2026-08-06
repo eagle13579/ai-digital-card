@@ -1,0 +1,7 @@
+name: F-GHMCP-05_PR自动化工作流
+description: Issue→PR→Merge全自动化的MCP工具链
+dimension: 创造力
+source: github/github-mcp-server
+products:
+  - AI数字军团
+  - 烛龙工程流

@@ -1,0 +1,22 @@
+name: "F6: TanStack Query + Zustand 状态二分法"
+version: v1.0.0
+source: multica
+type: architecture-pattern
+inputs:
+  - API 数据请求
+  - UI 操作事件
+outputs:
+  - 无状态冲突的前端数据流
+  - 清晰的关注点分离
+products: [multica-agent-skill-pipeline, multica-agent-runtime-gateway]
+related_atoms:
+  - task-instance-frontend-state
+  - three-layer-frontend-package-arch
+  - react-query-best-practice
+maturity: stable
+created_at: "2026-07-07"
+description: >
+  严格的状态二分法：TanStack Query 拥有服务端状态 (issues / users / workspaces)，
+  Zustand 拥有客户端状态 (UI / filters / drafts)。从根本上消除状态冲突，
+  避免服务端状态和客户端状态互相污染。对标现代前端状态管理最佳实践，
+  可作为军团前端开发的核心数据流规范。

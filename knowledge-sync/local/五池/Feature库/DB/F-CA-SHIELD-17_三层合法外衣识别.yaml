@@ -1,0 +1,20 @@
+id: F-CA-SHIELD-17
+name: 三层合法外衣识别
+dimension: 💡 创造力
+description: >-
+  基于DB09三层合法外衣心智模型构建的识别引擎，检测控制性协议是否通过合法的商业形式进行包装。识别维度：特许经销授权伪装、标准化采购流程伪装、行业自律与商业惯例伪装。
+status: active
+version: 1.0.0
+created: 2026-06-18
+source: 黑河调查局 — 戴比尔斯钻石协议站
+atoms:
+  - DB09: 三层合法外衣
+products:
+  - 黑河调查局协议分析模块
+  - 合法化包装检测系统
+employees:
+  - 计然
+  - 烛龙
+  - 乘黄
+priority: P0
+maturity: design
