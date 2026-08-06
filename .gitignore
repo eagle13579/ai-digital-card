@@ -94,3 +94,7 @@ backend/_verify_notification.py
 backend/scripts/.gaia_*.json
 backend/data/self_study/
 backend/scripts/.gaia_palace*
+
+# 运行数据与构建产物（不入版本库）
+backend/data/
+frontend/dist.bak_*/
