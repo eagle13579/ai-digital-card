@@ -25,10 +25,10 @@ MOUNT = "/"
 
 # 飞书 Webhook（从 .env 读取，未配置则尝试 App API 模式）
 ENV_FILE = Path("/var/www/ai-digital-card/backend/.env")
-# 飞书 App 凭据（API 模式，来自 /opt/hermes-remote/home/config.yaml）
-FEISHU_APP_ID = os.environ.get("FEISHU_APP_ID", "CHANGEME_APP_ID")
-FEISHU_APP_SECRET = os.environ.get("FEISHU_APP_SECRET", "CHANGEME_APP_SECRET")
-FEISHU_CHAT_ID = os.environ.get("FEISHU_HOME_CHANNEL", "oc_427ae7771ef28926307655eacf9ce0cd")
+# 飞书 App 凭据（API 模式，从环境变量读取；生产环境由 systemd EnvironmentFile 提供）
+FEISHU_APP_ID = os.environ.get("FEISHU_APP_ID", "")
+FEISHU_APP_SECRET = os.environ.get("FEISHU_APP_SECRET", "")
+FEISHU_CHAT_ID = os.environ.get("FEISHU_HOME_CHANNEL", "")
 
 
 def load_env() -> dict:
@@ -39,6 +39,10 @@ def load_env() -> dict:
             if line and "=" in line and not line.startswith("#"):
                 k, v = line.split("=", 1)
                 env[k] = v.strip().strip('"').strip("'")
+    # 补充飞书 App 凭据（无默认值，从环境或 .env 读取）
+    for k in ("FEISHU_APP_ID", "FEISHU_APP_SECRET", "FEISHU_HOME_CHANNEL"):
+        if k in os.environ:
+            env[k] = os.environ[k]
     return env
 
 
@@ -121,12 +125,17 @@ def _send_via_webhook(msg: str, webhook: str) -> bool:
         return False
 
 
-def _get_tenant_token() -> str | None:
+def _get_tenant_token(env: dict | None = None) -> str | None:
     """用 App 凭据换 tenant_access_token。"""
+    env = env or {}
+    app_id = env.get("FEISHU_APP_ID") or FEISHU_APP_ID
+    app_secret = env.get("FEISHU_APP_SECRET") or FEISHU_APP_SECRET
+    if not app_id or not app_secret:
+        return None
     url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
     payload = json.dumps({
-        "app_id": FEISHU_APP_ID,
-        "app_secret": FEISHU_APP_SECRET,
+        "app_id": app_id,
+        "app_secret": app_secret,
     }).encode("utf-8")
     try:
         req = urllib.request.Request(
@@ -144,15 +153,17 @@ def _get_tenant_token() -> str | None:
         return None
 
 
-def _send_via_api(msg: str) -> bool:
+def _send_via_api(msg: str, env: dict | None = None) -> bool:
     """飞书 App API 发送消息到 home_channel。"""
-    token = _get_tenant_token()
-    if not token:
+    env = env or {}
+    chat_id = env.get("FEISHU_HOME_CHANNEL") or FEISHU_CHAT_ID
+    token = _get_tenant_token(env)
+    if not token or not chat_id:
         print(f"[disk_watchdog] 告警仅日志（无发送通道）:\n{msg}")
         return False
     url = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id"
     payload = json.dumps({
-        "receive_id": FEISHU_CHAT_ID,
+        "receive_id": chat_id,
         "msg_type": "interactive",
         "content": json.dumps({
             "header": {
