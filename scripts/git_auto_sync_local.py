@@ -12,7 +12,7 @@ git_auto_sync_local.py — 代码自动双向同步（本地 Windows 侧）
   5. 静默原则: 有变化才输出，无变化零输出
 
 用法:
-  python git_auto_sync_local.py               # 同步默认仓库 D:\AI数智名片
+  python git_auto_sync_local.py               # 同步默认仓库 D:/AI数智名片
   python git_auto_sync_local.py --repo <dir>  # 指定仓库
   python git_auto_sync_local.py --setup       # 注册 Windows 计划任务（每15分钟，静默）
 """
