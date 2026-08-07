@@ -95,21 +95,25 @@ def main() -> int:
     args = ap.parse_args()
 
     dbs = sorted(glob.glob(str(SOUL_BASE / "*" / "memory" / "memory.db")))
-    print(f"扫描 {len(dbs)} 个 memory.db ...")
 
     total = {"dup_removed": 0, "truncated": 0, "pruned_old": 0}
+    errors: list[str] = []
     for db in dbs:
         s = prune_db(Path(db), args.dry)
         for k in ("dup_removed", "truncated", "pruned_old"):
             total[k] += s.get(k, 0)
         if s.get("error"):
-            print(f"  ⚠️ {db}: {s['error']}")
+            errors.append(f"  ⚠️ {db}: {s['error']}")
     mode = "预览(dry)" if args.dry else "完成"
-    print(f"\n🧹 修剪{mode}: 去重 {total['dup_removed']} | 截断 {total['truncated']} | 裁剪 {total['pruned_old']}")
-    if total["dup_removed"] or total["truncated"] or total["pruned_old"]:
-        print("（本次有修剪动作 — 可接受）")
-    else:
-        print("✅ 记忆健康，无修剪需要")
+
+    # 静默策略：无修剪、无错误 → 不输出（cron 空输出=不推送）
+    did_work = total["dup_removed"] or total["truncated"] or total["pruned_old"]
+    if not did_work and not errors:
+        return 0
+
+    if errors:
+        print("\n".join(errors))
+    print(f"🧹 修剪{mode}: 去重 {total['dup_removed']} | 截断 {total['truncated']} | 裁剪 {total['pruned_old']}（扫描 {len(dbs)} 库）")
     return 0
 
 

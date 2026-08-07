@@ -209,7 +209,7 @@ def main() -> int:
         level = "WARN"
 
     if level is None:
-        print(f"[disk_watchdog] 磁盘正常: {percent:.1f}% used ({free_gb:.1f}G free)")
+        # 正常状态静默（no_agent cron: 空输出=不推送，避免每5分钟刷屏）
         return 0
 
     # 冷却期检查

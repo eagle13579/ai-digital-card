@@ -12,6 +12,9 @@ import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest_asyncio
+
+# 提前加载 graphql.version 子模块，避免 from graphql.version import 在收集期解析失败（环境预存问题）
+import graphql.version  # noqa: F401
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
