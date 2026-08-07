@@ -13,6 +13,23 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
+# ── 优先从环境变量读取 DATABASE_URL（生产 PostgreSQL），回退到 alembic.ini ──
+import os as _os
+
+from dotenv import load_dotenv
+
+# 从 backend/.env 加载（若存在）
+_load_dotenv_paths = [
+    _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), ".env"),
+    ".env",
+]
+for _p in _load_dotenv_paths:
+    if _os.path.exists(_p):
+        load_dotenv(_p)
+
+if _os.environ.get("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", _os.environ["DATABASE_URL"])
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -28,6 +45,13 @@ from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
+from app.models.trust_score import (
+    TrustQualification,
+    TrustScoreSnapshot,
+    TrustAuditReport,
+    TrustReview,
+    TrustScoreLog,
+)
 from app.models.social_connection import SocialConnection
 from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
 from app.models.webhook import WebhookSubscription
@@ -38,7 +62,7 @@ from app.models.api_key import ApiKey, ApiKeyUsage
 from app.models.message import Message
 from app.models.invoice import Invoice
 from app.models.usage_counter import UsageCounter
-from app.models.resource_platform import ResourcePlatform, PlatformMember, PlatformOpportunity
+from app.models.resource_platform import ResourcePlatform, ResourcePlatformMember, PlatformOpportunity
 from app.models.gaia import (
     GaiaKnowledge,
     GaiaEvolutionEvent,

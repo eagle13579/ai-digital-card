@@ -3,6 +3,13 @@ from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
+from app.models.trust_score import (
+    TrustQualification,
+    TrustScoreSnapshot,
+    TrustAuditReport,
+    TrustReview,
+    TrustScoreLog,
+)
 from app.models.payment import PaymentOrder, EnterpriseSubscription, TrialRecord
 from app.models.webhook import WebhookSubscription
 from app.models.integration import Integration
