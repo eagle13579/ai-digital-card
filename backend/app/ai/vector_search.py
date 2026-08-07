@@ -482,7 +482,8 @@ class VectorSearchIndex:
         """初始化 SQLite 表结构（如果不存在）"""
         try:
             os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
-            conn = sqlite3.connect(self._db_path)
+            conn = sqlite3.connect(self._db_path, timeout=30)
+            conn.execute("PRAGMA journal_mode=WAL")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS vector_index (
                     id INTEGER PRIMARY KEY,
@@ -578,8 +579,9 @@ class VectorSearchIndex:
         count = 0
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            conn = sqlite3.connect(path)
+            conn = sqlite3.connect(path, timeout=30)
             # 确保表存在
+            conn.execute("PRAGMA journal_mode=WAL")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS vector_index (
                     id INTEGER PRIMARY KEY,
@@ -615,7 +617,7 @@ class VectorSearchIndex:
                 )
                 conn.execute(
                     """
-                    INSERT INTO vector_index
+                    INSERT OR REPLACE INTO vector_index
                         (content_hash, content_type, content_id, content, embedding, updated_at)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """,
@@ -647,7 +649,7 @@ class VectorSearchIndex:
                 logger.info(f"向量索引数据库不存在: {path}")
                 return 0
 
-            conn = sqlite3.connect(path)
+            conn = sqlite3.connect(path, timeout=30)
             rows = conn.execute("""
                 SELECT id, content_hash, content_type, content_id, content, embedding
                 FROM vector_index
@@ -706,7 +708,7 @@ class VectorSearchIndex:
 
         # 检查数据库中是否已有且 hash 相同（内容未变化）
         try:
-            conn = sqlite3.connect(self._db_path)
+            conn = sqlite3.connect(self._db_path, timeout=30)
             existing = conn.execute(
                 "SELECT id, content_hash FROM vector_index WHERE content_type=? AND content_id=?",
                 (content_type, content_id),
@@ -760,7 +762,7 @@ class VectorSearchIndex:
 
         # 从 SQLite 中删除
         try:
-            conn = sqlite3.connect(self._db_path)
+            conn = sqlite3.connect(self._db_path, timeout=30)
             conn.execute(
                 "DELETE FROM vector_index WHERE content_type=? AND content_id=?",
                 (content_type, content_id),
@@ -778,7 +780,7 @@ class VectorSearchIndex:
         """检查是否存在向量索引条目"""
         # 先检查 SQLite（权威数据源）
         try:
-            conn = sqlite3.connect(self._db_path)
+            conn = sqlite3.connect(self._db_path, timeout=30)
             existing = conn.execute(
                 "SELECT 1 FROM vector_index WHERE content_type=? AND content_id=?",
                 (content_type, content_id),
@@ -1375,7 +1377,7 @@ def sync_vector_index(db_session: Session | None = None) -> dict[str, int]:
             if index.has_entry("user", user.id):
                 # 检查 hash 是否变化
                 try:
-                    conn = sqlite3.connect(index._db_path)
+                    conn = sqlite3.connect(index._db_path, timeout=30)
                     existing = conn.execute(
                         "SELECT content_hash FROM vector_index WHERE content_type='user' AND content_id=?",
                         (user.id,),
