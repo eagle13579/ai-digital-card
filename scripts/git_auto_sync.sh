@@ -48,20 +48,23 @@ for dir in "$REPO" /var/www/liankebao; do
       fi
     fi
 
-    # --- 拉取方向: 落后且工作区干净 → ff-only 快进 ---
+    # --- 拉取方向: 落后且工作区干净 → ff-only 快进（只对当前分支 pull）---
     if [ "$BEHIND" -gt 0 ]; then
-      if [ "$DIRTY" -eq 0 ] || [ "$BRANCH" != "$(git branch --show-current)" ]; then
-        OUT=$(git pull --ff-only origin "$BRANCH" 2>&1)
-        if [ $? -eq 0 ]; then
-          CHANGES="${CHANGES}[$REPO_NAME] PULL $BRANCH (-$BEHIND)\n"
-          echo "$(date '+%F %T') PULL $BRANCH (-$BEHIND) $OUT" >> "$LOG"
+      CUR=$(git branch --show-current 2>/dev/null)
+      if [ "$BRANCH" = "$CUR" ]; then
+        if [ "$DIRTY" -eq 0 ]; then
+          OUT=$(git pull --ff-only 2>&1)
+          if [ $? -eq 0 ]; then
+            CHANGES="${CHANGES}[$REPO_NAME] PULL $BRANCH (-$BEHIND)\n"
+            echo "$(date '+%F %T') PULL $BRANCH (-$BEHIND) $OUT" >> "$LOG"
+          else
+            CHANGES="${CHANGES}[$REPO_NAME] PULL_FAIL $BRANCH: $OUT\n"
+            echo "$(date '+%F %T') PULL_FAIL $BRANCH $OUT" >> "$LOG"
+          fi
         else
-          CHANGES="${CHANGES}[$REPO_NAME] PULL_FAIL $BRANCH: $OUT\n"
-          echo "$(date '+%F %T') PULL_FAIL $BRANCH $OUT" >> "$LOG"
+          CHANGES="${CHANGES}[$REPO_NAME] SKIP $BRANCH (工作区有WIP，-${BEHIND}待拉)\n"
+          echo "$(date '+%F %T') SKIP $BRANCH (WIP) behind=$BEHIND" >> "$LOG"
         fi
-      else
-        CHANGES="${CHANGES}[$REPO_NAME] SKIP $BRANCH (工作区有WIP，-${BEHIND}待拉)\n"
-        echo "$(date '+%F %T') SKIP $BRANCH (WIP) behind=$BEHIND" >> "$LOG"
       fi
     fi
   done < <(git for-each-ref --format='%(refname:short)' refs/heads/)
