@@ -418,6 +418,9 @@ def create_app():
     app.include_router(miniapp_code_router)
     app.include_router(visitor_router)
     app.include_router(trust_router)
+    # 信任体系（链客宝迁移）— 评分/资质/审计/评价
+    from app.routers.trust_score_router import router as trust_score_router
+    app.include_router(trust_score_router)
     app.include_router(i18n_router)
     app.include_router(public_router)
     app.include_router(payment_router)
