@@ -14,7 +14,7 @@ import logging
 from datetime import date, datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -228,3 +228,37 @@ def _tier_label(level: str) -> str:
         "top": "顶级",
     }
     return labels.get(level, level)
+
+
+# ── Mac mini 模型状态上报（供 MLX 推理节点推送） ───────────────────────────
+import json as _json
+import os as _os
+import time as _time
+
+_MAC_REPORT_TOKEN = _os.environ.get("MAC_REPORT_TOKEN", "mac-mini-report-2026")
+_MAC_OUT = _os.path.join(
+    _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))),
+    "data/mac_mini/models_status.json",
+)
+
+
+@router.post("/mac-status", summary="Mac mini 模型状态上报（MLX 节点推送）")
+async def receive_mac_status(request: Request):
+    """接收 Mac mini 上报的模型状态，写入 data/mac_mini/models_status.json。
+
+    鉴权: header `X-Mac-Token` 必须等于 MAC_REPORT_TOKEN（或默认开发值）。
+    """
+    token = request.headers.get("X-Mac-Token", "")
+    if token != _MAC_REPORT_TOKEN:
+        raise HTTPException(status_code=401, detail="无效的 Mac 上报令牌")
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="请求体必须是 JSON")
+    if payload.get("device") != "Mac mini":
+        raise HTTPException(status_code=400, detail="device 字段必须为 Mac mini")
+    payload["received_at"] = _time.strftime("%Y-%m-%d %H:%M:%S")
+    _os.makedirs(_os.path.dirname(_MAC_OUT), exist_ok=True)
+    with open(_MAC_OUT, "w", encoding="utf-8") as f:
+        _json.dump(payload, f, ensure_ascii=False, indent=2)
+    return {"ok": True, "received": payload.get("model_count", 0)}

@@ -44,6 +44,7 @@ EXCLUDED_PATHS = (
     "/api/brochure/",
     "/api/match/",
     "/api/trust/",
+    "/api/v1/trust/",
     "/api/card/",
     "/api/visitors/",
     "/api/graph/",
