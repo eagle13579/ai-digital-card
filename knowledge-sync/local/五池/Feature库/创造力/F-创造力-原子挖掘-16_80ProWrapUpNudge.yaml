@@ -1,0 +1,67 @@
+feature_id: "F-创造力-原子挖掘-16"
+name: "80% Wrap-Up Nudge"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "M21-80% wrap-up nudge"
+source_project: "Vibe-Trading"
+source_location: "D:/Vibe-Trading/Vibe-Trading/agent loop: 迭代预算80%处注入wrap-up nudge，最后迭代丢掉tool定义强制文本输出"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "AI Agent迭代循环的收尾引导机制——预算消耗80%时注入收尾提示，最后迭代强制丢掉工具输出纯文本，防止无限循环"
+what_it_does: |
+  场景：链客宝AI对话引擎/流程引擎/自动回复Agent需要在有限迭代内完成任务，防止无限循环和资源耗尽。
+  问题：AI Agent在没有明确终止条件时容易陷入无限循环(反复调用工具/修改输出/自我对话)，浪费Token和延迟响应。
+  价值：借鉴Vibe-Trading Agent Loop的80% wrap-up nudge模式——在迭代预算消耗80%时注入收尾引导提示，
+  让AI意识到需要总结收尾；在最后一次迭代强制删除工具定义，迫使AI输出纯文本结果，确保循环自然终止。
+  架构亮点：预算阈值触发器(80%) + wrap-up nudge注入 + 最后迭代tool定义消隐 + 强制文本输出模式切换。
+
+input: |
+  - Agent循环状态: 当前迭代次数/总预算迭代数/已消耗Token
+  - 任务上下文: 用户原始请求和中间结果
+  - 工具集: Agent可调用的工具函数列表
+  - 预算配置: 最大迭代数/最大Token消耗/最大耗时
+
+output: |
+  - 收尾引导提示: 注入到AI上下文的nudge消息(如"请尽快总结并输出最终结果")
+  - 工具消隐: 最后迭代时从上下文中移除工具定义，强制文本输出
+  - 终止信号: 循环结束标志和最终输出
+  - 审计记录: 迭代次数/耗时/Token消耗/终止原因
+  - 未完成标记: 若超时未完成，标记任务状态为"未完成+当前进度"
+
+sop: |
+  1. Agent循环启动，设置总预算(最大迭代次数/最大Token数)
+  2. 每次迭代开始时检查消耗比例 = 已消耗/总预算
+  3. 若消耗比例 < 80%: 正常模式，AI可自由调用工具和生成中间结果
+  4. 若消耗比例 ≥ 80%: 在AI上下文中注入wrap-up nudge("任务时间即将用尽，请尽快收尾并给出最终结论")
+  5. 到达最后一次迭代: 从AI上下文中移除所有工具定义，强制AI只能输出文本
+  6. 若到达预算边界仍无最终输出: 强制终止循环，输出"任务超时+已完成的中间结果"
+  7. 记录完整的迭代轨迹(每次调用的入参/出参/Token消耗)到审计日志
+  8. 返回最终输出和审计摘要
+
+quality_gate:
+  - gate: "收尾触发"
+    standard: "预算消耗≥80%时必触发wrap-up nudge"
+    score: 5
+  - gate: "强制终止"
+    standard: "到达预算边界时100%终止循环，不遗漏"
+    score: 5
+  - gate: "工具消隐"
+    standard: "最后一次迭代的AI上下文中无任何工具定义"
+    score: 5
+  - gate: "审计完整"
+    standard: "记录每次迭代的关键指标(耗时/Token/动作类型)"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从Vibe-Trading agent loop 80% wrap-up nudge提取
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

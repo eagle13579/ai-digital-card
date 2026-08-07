@@ -1,0 +1,28 @@
+feature_id: F-GETKE-XST-03
+name: 社交裂变 — 分享海报+奖励发放
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态 api/getke/referral_tool.py (226行)
+
+products:
+  - 通用: 自动匹配
+description: 生成分享海报+裂变规则+奖励发放+数据追踪
+
+input: 活动名称+分享门槛+奖励描述
+
+output: 活动ID+分享码+参与链接+奖励状态
+
+sop: |
+  ReferralTool().create_campaign()→process_share()→get_stats()
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

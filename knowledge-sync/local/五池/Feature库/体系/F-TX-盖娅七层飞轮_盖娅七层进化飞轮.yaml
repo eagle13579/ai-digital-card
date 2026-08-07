@@ -1,0 +1,64 @@
+feature_id: "F-TX-盖娅七层飞轮"
+name: "盖娅七层进化飞轮"
+version: "1.0.0"
+dimension: "体系"
+source_model: "gaia-cortex SKILL.md §架构总览 + L5孵化室/产品开发/盖娅进化大脑/ARCHITECTURE.md + scripts/gaia_cortex.py"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "七层飞轮(L0-L6)自动驱动AI数智军团进化：感知→分析→组合→创造→反哺→值守→追溯，每30分钟自动循环"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  盖娅进化大脑的核心循环引擎。L0扫描资产，L1分析缺口，L2组合方案，L3创造产出，L4反哺归档，L5值守调度，L6追溯审计。复用gaia_cortex.py(22KB)编排，不重复已有功能。
+
+input: |
+  - L1-L5记忆宫殿全量资产路径
+  - 铁律七十复用优先清单
+  - 外部信号(执行日志/告警)中的技能缺口
+
+output: |
+  - 资产快照+缺口列表+组合方案
+  - 新skill/心智/原子/产品
+  - 进化日志(L5孵化室/进化日志/)
+
+sop: |
+  1. 运行 `python gaia_cortex.py` 触发完整七层
+2. L0感知: 扫描员工/产品/技能/代码/心智模型+外部信号
+3. L1分析: 四维缺口+ROI排序
+4. L2组合: 排列组合产生方案,三维评分
+5. L3创造: 执行TOP方案
+6. L4反哺: 归档L1-L5对应位置,只新增不覆盖
+7. L5值守: 安排下个30分钟周期
+8. L6追溯: 写入进化日志
+可选: --dry-run预览, --layer L0单层运行, --daemon值守, --status状态查看
+
+quality_gate:
+  - gate: "七层完整性"
+    standard: "全部L0-L6通过无报错"
+    score: 7
+  - gate: "复用检查"
+    standard: "L0自动执行复用优先检查清单"
+    score: 7
+  - gate: "循环日志"
+    standard: "L6写完进化日志+状态总览"
+    score: 6
+
+score_target: "9/10"
+depends_on:
+  - "F-体系-01_系统架构MECE拆解"
+  - "F-TX-系统架构与工程体系"
+
+enhanced_by:
+  - "F-CZL-盖娅组合发现"
+  - "F-DAT-盖娅资产扫描"
+  - "F-JBG-盖娅cronjob值守"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

@@ -1,0 +1,170 @@
+name: "F-TRANS-03"
+title: "QKV匹配路由器"
+version: 2.0.0
+category: "注意力路由"
+description: "通过Query-Key-Value三路投影实现Token间语义相关性计算与信息加权聚合,是注意力机制的核心数学引擎"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T03 QKV三重奏"
+  - "T04 注意力机制"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # --- nanoGPT: 合并QKV投影 ---
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "__init__"
+    lines: 29-48
+    summary: "c_attn = nn.Linear(n_embd, 3*n_embd) — 将Q、K、V三个投影合并为一个线性层,提高GPU计算效率;c_proj为输出投影"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "CausalSelfAttention"
+    method: "forward"
+    lines: 50-74
+    summary: "q,k,v = self.c_attn(x).split(n_embd, dim=2) — 一次矩阵乘法后拆分三份;然后reshape分头、因果掩码、softmax、聚合、concat、输出投影"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 原论文: 独立QKV投影 ---
+  - file: "paper_SubLayers.py"
+    class: "MultiHeadAttention"
+    method: "__init__"
+    lines: 17-32
+    summary: "独立Q/K/V投影: w_qs = Linear(d_model, n_head*d_k), w_ks = Linear(d_model, n_head*d_k), w_vs = Linear(d_model, n_head*d_v) — 三路投影可不同维度(d_k和d_v可不同)"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  - file: "paper_SubLayers.py"
+    class: "MultiHeadAttention"
+    method: "forward"
+    lines: 35-64
+    summary: "q = w_qs(q).view(sz_b, len_q, n_head, d_k).transpose(1,2) — 投影→分头→转置→注意力→合头→输出投影→残差→LN"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_SubLayers.py"
+
+  # --- 原论文: Scaled Dot-Product Attention (最核心的数学) ---
+  - file: "paper_Modules.py"
+    class: "ScaledDotProductAttention"
+    method: "forward"
+    lines: 21-31
+    summary: "Attention(Q,K,V) = softmax(Q × K^T / temperature + mask) × V — 最纯粹最简的注意力数学,是整个Transformer的数学根基"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Modules.py"
+
+  # --- HuggingFace BERT: 标准QKV ---
+  - file: "huggingface_BertSelfAttention.py"
+    class: "BertSelfAttention"
+    method: "__init__"
+    lines: 46-69
+    summary: "self.query/key/value = nn.Linear(hidden_size, all_head_size) — 三路独立投影,支持KV缓存(decoder模式)"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  - file: "huggingface_BertSelfAttention.py"
+    function: "eager_attention_forward"
+    lines: 11-40
+    summary: "attn_weights = softmax(Q @ K^T * scaling + mask); output = attn_weights @ V — 共用量产函数,被BERT和Llama共用"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_BertSelfAttention.py"
+
+  # --- HuggingFace Llama: GQA型QKV (Q头数 > KV头数) ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "__init__"
+    lines: 96-123
+    summary: "q_proj(num_heads×dim) / k_proj(num_kv_heads×dim) / v_proj(num_kv_heads×dim) — Q头数32, KV头数8(4:1分组),大幅降低KV缓存内存"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    function: "repeat_kv"
+    lines: 52-61
+    summary: "将num_key_value_heads复制扩展到num_attention_heads数量,是GQA的核心操作: hidden_states = hidden_states[:,:,None,:,:].expand(batch, kv_heads, n_rep, slen, dim).reshape(...)"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class QKVMatcher:
+      """
+      QKV匹配路由器 — 三路投影 + 注意力评分 + 加权聚合
+
+      核心数学: Attention(Q,K,V) = softmax( Q @ K^T / √d_k + mask ) @ V
+
+      架构模式:
+        ┌──────┐   ┌───┐         ┌─────────────────────────┐   ┌──────┐
+        │ Input │──→│ Q │──┐     │                         │   │      │
+        │ (x)   │──→│ K │──┤────→│  softmax( QK^T/√d ) @ V │──→│output│
+        │       │──→│ V │──┘     │                         │   │      │
+        └──────┘   └───┘         └─────────────────────────┘   └──────┘
+
+      Variant A: 合并投影 (nanoGPT风格) — 一次矩阵乘法出QKV
+        qkv = nn.Linear(d_model, 3 * d_model)
+        q, k, v = qkv(x).split(d_model, dim=-1)
+
+      Variant B: 独立投影 (原论文风格) — 三路独立Linear
+        w_qs = nn.Linear(d_model, n_head * d_k)
+        w_ks = nn.Linear(d_model, n_head * d_k)
+        w_vs = nn.Linear(d_model, n_head * d_v)
+
+      Variant C: GQA投影 (Llama风格) — Q多KV少,节省缓存
+        q_proj = nn.Linear(d_model, num_heads * head_dim)       # Q: 32头
+        k_proj = nn.Linear(d_model, num_kv_heads * head_dim)    # K: 8头
+        v_proj = nn.Linear(d_model, num_kv_heads * head_dim)    # V: 8头
+        # 前向时: repeat_kv(k, n_rep) 将8头复制为32头
+
+      掩码控制:
+        - Causal mask: 下三角矩阵,确保只能看到当前位置及之前Token (自回归)
+        - Padding mask: 忽略填充位置
+        - Cross-attn mask: 编码器→解码器注意力映射
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "Query主动寻址,Key被动响应,Value承载待聚合信息 — 三路投影的角色分离使模型能灵活控制'谁来问、谁被问、传什么'"
+  - "注意力权重归一化(softmax)确保聚合后的语义向量尺度稳定,同时实现稀疏聚焦"
+  - "缩放因子 √d_k: 防止高维向量点积后数值过大导致softmax梯度消失"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "供需智能匹配引擎"
+    description: >
+      将需求方Query与供给方Key进行注意力匹配:
+      - Q = 需求方描述编码 (如"寻找餐饮供应链资源")
+      - K = 供给方标签编码 (如"冷链物流/食材供应/中央厨房")
+      - V = 供给方的完整能力描述
+      注意力权重即匹配分数,加权V即融合了最匹配的供给方信息。GQA模式可扩展支持
+      数十万供给方(更多的Q头,更少的KV缓存)。
+
+  - product: "AI名片"
+    component: "人脉精准推荐路由器"
+    description: >
+      Q = 当前用户的画像向量(行业角色/需求标签)
+      K = 其他名片的标签摘要
+      V = 名片的完整履历/自我介绍
+      通过QKV匹配路由找出与当前用户最相关的人脉,注意力权重作为推荐置信度。
+      支持"以人找关系"的多跳路由(链式QKV匹配)。
+
+  - product: "数智港"
+    component: "三通道路由中间件"
+    description: >
+      将数智港中不同数据源的查询请求编码为Query,数据源元信息编码为Key,
+      数据内容编码为Value,实现智能路由。支持三种路由模式:
+      1. 精确路由 (hard attention): 直接选择最高分Key的Value
+      2. 模糊路由 (soft attention): 加权融合多个数据源的Value
+      3. 混合路由 (top-k sparse): 选择Top-3数据源后做soft融合
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "已落地: GQA分组查询注意力 — 从LlamaAttention吸收,减少KV缓存内存75%,详见F-TRANS-07"
+  - "稀疏注意力路由: 通过Top-K或ReLU门控使注意力矩阵稀疏化,降低长序列O(n²)复杂度"
+  - "Flash Attention: 分块计算+IO优化的注意力,无需显式构造完整注意力矩阵"
+  - "线性注意力: 使用核方法将注意力复杂度降低到O(n)"

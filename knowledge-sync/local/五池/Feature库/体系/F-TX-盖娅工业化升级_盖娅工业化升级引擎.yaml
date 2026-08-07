@@ -1,0 +1,57 @@
+feature_id: "F-TX-盖娅工业化升级"
+name: "盖娅工业化升级引擎"
+version: "1.0.0"
+dimension: "体系"
+source_model: "gaia-cortex SKILL.md §工业化升级模式 + references/gaia-city-industrialization-3.8-to-7.9.md + references/transparent-hall-industrialization-case-study.md"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "将七层飞轮切换为工业化升级模式：10维度工业级评分→P0/P1/P2分诊→3+3+3并行执行，已验证3.8→7.9/10(35min)"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  gaia_cortex的工业化升级模式。输入一个代码库产品→10维度评分(架构/测试/CI/CD/监控/灵魂/经济/前端/安全/国际化/i18n)→P0优先分诊→并行修复→重新评分验证。已实战验证盖娅之城3.8→7.9/10(7轮/35min)和透明议事厅20→85/10(28min)。
+
+input: |
+  - 代码库产品路径
+  - 10维度权重配置(默认:架构15%/数据15%/测试10%/监控10%/灵魂15%/经济10%/前端10%/CI/CD5%/安全5%/国际化5%)
+
+output: |
+  - 10维度评分卡(0-10分/每维度)
+  - P0→P1→P2优先级分诊表
+  - 每轮执行总结+评分变化追踪
+
+sop: |
+  1. 全景扫描: 代码行数/路由数/测试行数/API数/依赖
+2. 10维度评分: 10维度×权重=总分
+3. P0→P1→P2分诊: 按权重×差距选TOP3
+4. 3+3+3并行: 每批3路delegate_task并行
+5. 安全加固: P1第一项必做安全基线
+6. 验证: 重新10维度评分+差异报告
+关键战术: BCA排序(Business>Community>Architecture), 超时拆分, 先读后改, 三明治验证
+
+quality_gate:
+  - gate: "10维度全覆盖"
+    standard: "全部10维度均评分"
+    score: 7
+  - gate: "P0止血完成"
+    standard: "测试+CI+监控+架构四件套全部补齐"
+    score: 8
+
+score_target: "9/10"
+depends_on:
+  - "F-TX-盖娅七层飞轮"
+  - "F-CZL-盖娅左脑发散"
+
+enhanced_by:
+  - "F-CJ-盖娅饱和攻击"
+  - "F-JBG-盖娅cronjob值守"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

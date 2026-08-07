@@ -1,0 +1,37 @@
+feature_id: F-ARC-A2A-01
+name: A2A通信层 — 消息总线
+version: "1.0"
+dimension: 场景
+source_model: 虾评Skill A2A-CHAT v1.0.0
+# 精确source_model溯源 (2026-06-12): 五池/模型池/A2A-CHAT注入清单_2026-06-08.md
+source_project: Feature总线/a2a/message_bus.py
+one_liner: SQLite持久化的Agent间结构化消息总线
+
+products:
+  - 通用: 自动匹配
+what_it_does: 让数字员工之间通过标准化消息结构直接通信，消息持久化到SQLite，支持publish/consume/poll/task_chain全生命周期
+input:
+  - from_agent: str  # 发送方
+  - to_agent: str | None  # 接收方(None=广播到话题)
+  - topic: str  # 话题分类
+  - type: str  # task/discussion/error_report/status_sync
+  - payload: dict  # 消息体
+  - correlation_id: str | None  # 关联链追踪
+output:
+  - msg_id: str  # UUID
+  - status: str  # pending/delivered/read/failed
+  - chain: list  # 关联消息链
+sop: |
+  1. 发送方publish() -> SQLite插入消息
+  2. 接收方consume(agent_id) -> 拉取自己的消息
+  3. 接收方poll(topic, agent_id) -> 拉取关注话题的消息
+  4. 接收方mark_read(msg_id) -> 标记已读
+  5. 错误上报沿correlation_id链追踪
+quality_gate:
+  - score: 7/10
+  - checks:
+    - 纯stdlib实现(sqlite3)
+    - publish/consume/poll/get_chain全部测试通过
+    - 消息sqlite持久化不丢失
+iteration_log:
+  - "2026-06-08: v1.0初始版本, 基于虾评Skill A2A-CHAT核心思想"

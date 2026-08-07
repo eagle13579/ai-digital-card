@@ -1,0 +1,8 @@
+name: F-SDCN-05_复合组件+Radix解耦
+description: React Context复合组件+行为/外观解耦
+version: 1.0.0
+dimension: 创造力
+source: shadcn-ui/ui
+products:
+  - AI数字名片
+  - 盖娅之城

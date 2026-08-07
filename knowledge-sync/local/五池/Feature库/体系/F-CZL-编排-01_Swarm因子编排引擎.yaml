@@ -1,0 +1,40 @@
+feature_id: F-CZL-编排-01
+name: Swarm因子编排引擎
+version: 1.0.0
+dimension: 体系
+source_model: Vibe-Trading/agent/swarm
+source_project: Vibe-Trading
+one_liner: 多智能体DAG任务编排引擎：子Agent集群协作 → 因子生命周期管理 → Goal自动拆解 → 并行执行，上游失败阻断下游
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从Vibe-Trading/agent/swarm中提取的Swarm多智能体DAG编排模式(M17)。
+  子Agent集群协作 → 因子生命周期管理 → Goal自动拆解 → 并行执行 → DAG依赖链(上游失败阻断下游) → worker间MCP通信。
+  适合多Agent协作(客服+推荐+数据分析)的架构编排。
+input: 参见source中的输入参数
+output: 结构化输出
+sop: |
+  1. 加载Swarm因子编排引擎模式
+
+  2. 根据子Agent集群 → 因子生命周期 → Goal自动拆解 → 并行执行 → DAG依赖链执行
+
+  3. 验证输出'
+  6. Swarm因子收敛检查: 每次编排后记录各因子权重变化，若连续3次不变则标记为收敛
+  7. 编排结果可解释性报告: 输出各因子贡献度占比Top5, 支持人工审查
+
+  quality_gate:
+  score: 9
+  checks:
+  - 有真实原子来源(Vibe-Trading/agent/swarm)
+  - 可执行
+  - 有适用场景(多Agent协作/DAG任务编排)
+  - 有DAG依赖管理和失败阻断机制
+  status: draft
+  iteration_log:
+  - date: '2026-06-08'
+  version: 1.0.0
+  change: 从Vibe-Trading/agent/swarm提取初始版本(M17)
+
+  - "2026-06-12: v1.2.0 成熟度打磨 — 白泽补充SOP执行步骤+QualityGate评分升级至9/10"
+  # 成熟度标记: 2026-06-12 白泽打磨到9+
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

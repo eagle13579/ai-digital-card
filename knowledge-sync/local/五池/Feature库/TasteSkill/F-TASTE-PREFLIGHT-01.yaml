@@ -1,0 +1,30 @@
+id: F-TASTE-PREFLIGHT-01
+name: Pre-Flight Check — 12项硬规则代码输出前检查
+source_model: Taste-Skill — 代码生成前的12项硬规则检查清单
+dimension: 基本功
+
+products:
+  - 通用: 自动匹配
+description: >-
+  代码输出前执行的12项质量门禁: 字体加载方式(禁止Google Fonts CDN link)、
+  响应式viewport(dvh禁止h-screen)、Grid布局禁止flex百分比数学、
+  依赖验证(import前检查package.json)、动效性能(motionValue替代useState)、
+  图标策略(禁止手绘SVG，必须用库)、emoji策略(默认禁止)、
+  serif合法性检查、紫色渐变检查、暖色默认检查、统一色板检查、描边宽度统一。
+input: 即将输出的代码
+output: 通过/拦截 + 未通过项详细报告
+sop: "① 扫描代码中的字体引用(link tag vs next/font)
+  ② 扫描h-screen → 替换为min-h-dvh
+  ③ 检查flex百分比数学 → 替换为CSS Grid
+  ④ 验证package依赖存在
+  ⑤ 检查useState用于连续值 → 替换为motionValue
+  ⑥ 手绘SVG检测 → 替换为图标库
+  ⑦ emoji检测 → 替换为图标(除非playful模式)
+  ⑧ serif合规性 → 检查品牌明确指定
+  ⑨ 暖色默认检测 → 替换为候选色板
+  ⑩ 跨组件色板一致性 → 单色板锁定"
+quality_gates: 12项检查全通过才允许输出代码、每项有自动修复建议
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: 白泽代码输出自检/AI招商前端审查/链客宝UI一致性

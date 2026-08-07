@@ -1,0 +1,57 @@
+feature_id: "F-CJ-盖娅饱和攻击"
+name: "盖娅饱和攻击战斗小组"
+version: "1.0.0"
+dimension: "场景"
+source_model: "gaia-cortex SKILL.md §饱和攻击战斗小组模式 + scripts/saturation_battle_scheduler.py"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "选一个点投全部资源打穿→穿透后萃取RORY→再换下一个点的饱和攻击战斗模式"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  不平均分配资源，选一个Feature/产品/维度集中全部火力打穿到10/10。三角色架构(指挥官定方向/攻坚手饱和攻击/工匠打磨交付)。六步战斗节奏(选点→攻击→穿透→萃取→RORY→转向)。已组建3个战斗小组(赛博参谋/出海内容平台/军团健康看板)。
+
+input: |
+  - 目标点: 哪个Feature/产品/维度需要打穿
+  - 三角色: 指挥官/攻坚手/工匠分配
+  - 底座评估: 基本功+数据能否支撑饱和攻击
+
+output: |
+  - 打穿到10/10的Feature/产品
+  - RORY萃取文档
+  - 下一个攻击点的建议
+
+sop: |
+  1. 选点: 从缺口列表或用户指令选单点
+  2. 组建: 指挥官(宏观)+攻坚手(中观)+工匠(微观)
+  3. 饱和攻击: 全资源投入,不限次数迭代
+  4. 穿透验证: 通过三迭代门(60→80→95)
+  5. 萃取RORY: 可复用方法论+心智模型
+  6. 转向: 选下一个点
+  CLI: `python saturation_battle_scheduler.py` 扫描+组建, `--status` 看活跃小组, `--disband` 解散
+
+quality_gate:
+  - gate: "单点击穿"
+    standard: "目标Feature评分≥9/10"
+    score: 7
+  - gate: "RORY萃取"
+    standard: "至少产出1个可复用心智模型"
+    score: 7
+
+score_target: "9/10"
+depends_on:
+  - "F-CJ-盖娅右脑收敛"
+  - "F-TX-盖娅七层飞轮"
+
+enhanced_by:
+  - "F-TX-盖娅工业化升级"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+  # 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

@@ -1,0 +1,36 @@
+feature_id: F-CJ-BIO-06
+name: AI获客工具箱 — LBS+短信+裂变
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态getke_tools (code/api/getke/)
+
+products:
+  - 通用: 自动匹配
+description: 三合一AI获客工具：LBS附近推·短信批量触达·社交裂变，已封装为FastAPI端点
+
+input:
+  - LBS: 经纬度·半径·推送内容
+  - SMS: 手机号·模板ID·参数
+  - 裂变: 活动名称·奖励规则·分享目标
+
+output:
+  - LBS: 覆盖人群数·推送成功数
+  - SMS: 发送成功数·送达率
+  - 裂变: 活动链接·分享码·参与链接
+
+sop: |
+  1. LBS: POST /api/getke/lbs → 调用lbs_tool.py
+  2. SMS: POST /api/getke/sms → 调用sms_tool.py
+  3. 裂变: POST /api/getke/referral → 调用referral_tool.py
+  4. 工具列表: GET /api/getke/tools
+
+quality_gate:
+  score: 6
+  checks:
+  - 三个端点都注册在API中
+  - 工具代码在 code/api/getke/ 下
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

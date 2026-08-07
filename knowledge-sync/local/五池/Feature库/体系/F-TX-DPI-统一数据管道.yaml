@@ -1,0 +1,67 @@
+feature_id: "F-TX-DPI-001"
+name: "统一数据管道"
+version: "1.0.0"
+dimension: "体系"
+source_model: "链客宝KFD Feature化实战"
+# 精确source_model溯源 (2026-06-12): 五池/模型池/2026-05-21_IJPay支付注入_模型.md + 五池/模型池/2026-06-01_链客宝数据安全心智模型.md + 五池/模型池/2026-06-02_链客宝会员心智模型.md
+created_at: "2026-06-08"
+author: "乘黄 (P9, 产品经理)"
+tags:
+  - "链客宝"
+  - "KFD生产化冲刺"
+  - "数据处理"
+  - "管道编排"
+
+one_liner: "将散落在各路由模块的数据采集、清洗、分析、输出能力整合为统一数据管道，支持多类型数据源的组合编排"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  源自链客宝KFD生产化冲刺的Feature化实战项目。
+  统一数据管道构建端到端的数据处理基础体系设施：
+  
+  1. 采集阶段（COLLECT）：支持多种数据采集器并行运行，统一输出标准化DataSource结构
+  2. 清洗阶段（CLEAN）：对采集数据进行去重、格式标准化、异常值检测
+  3. 分析阶段（ANALYZE）：依次运行各分析器，每个输出标准AnalysisResult含metrics/insights/warnings/recommendations
+  4. 输出阶段（OUTPUT）：聚合所有分析结果，格式化输出
+  5. 管道调度：支持严格模式（出错即中止）和容错模式（继续执行），运行报告记录各阶段状态与耗时
+
+input: |
+  - 各路由模块原始数据: retention_insights / learning_center / unit_economics / hypothesis_gate 的数据
+  - 管道配置: PipelineConfig（数据源开关、分析器开关、日志级别、运行模式）
+  - 运行模式: strict（严格）/ tolerant（容错）
+  - 各采集器/分析器配置: CollectorConfig / AnalyzerConfig
+
+output: |
+  - PipelineReport: 完整管道运行报告（各阶段状态、耗时、记录数、错误数）
+  - collect_stage: 标准化 DataSource[] 对象列表
+  - clean_stage: 清洗后记录（去重+标准化）
+  - analyze_stage: 各分析器的 metrics + insights + warnings + recommendations
+  - output_stage: 格式化输出结果
+  - 错误日志: 各阶段错误记录列表
+
+sop: |
+  1. 数据采集阶段：加载PipelineConfig，设置日志级别和运行模式，调用collect_all()并行运行所有启用的采集器，每个采集器输出统一DataSource结构（含records/total_count/error_count/elapsed_seconds）
+  2. 数据清洗阶段：对采集的原始数据进行去重（基于记录唯一键）、格式标准化（统一字段名和类型）、异常值检测与标记，记录清洗统计信息
+  3. 数据分析阶段：依次运行各启用的分析器（如Retention→Learning→Economics→Hypothesis），每个分析器输出标准AnalysisResult（含metrics/insights/warnings/recommendations四个标准字段）
+  4. 结果输出阶段：聚合所有分析结果，计算综合指标与洞察结论，格式化输出报告，支持多种输出格式
+
+quality_gate:
+  - gate: "多数据类型处理"
+    standard: "管道可处理≥3种数据类型（如留存数据/学习数据/经济数据/假设数据），每种类型独立采集与分析"
+    score: 5
+  - gate: "输出完整性"
+    standard: "输出报告同时包含定量指标（metrics）和定性洞察（insights），缺一不可"
+    score: 5
+  - gate: "容错机制"
+    standard: "容错模式下单个采集器/分析器失败不影响其他模块执行，错误被记录但管道继续运行至完成"
+    score: 4
+
+score_target: "8/10"
+depends_on: []
+enhanced_by:
+  - "F-DAT-链客宝-02_单元经济仪表盘"
+  - "F-DAT-链客宝-01_信任评分引擎"
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 注册到Feature库，标准版含采集→清洗→分析→输出四阶段管道
+product: "链客宝"

@@ -1,0 +1,116 @@
+feature_id: F-SIM-04
+feature_name: 双语言SDK与开发者平台 (TS+Python SDK & Developer Platform)
+feature_type: 生态能力 / 开发者工具
+version: 1.0.0
+created: 2026-07-04
+
+products:
+  - 通用: 自动匹配
+source_project: Sim (AI Agent工作空间平台)
+source_link: https://sim.ai
+
+# ============================================================
+# Sim产品中的原始定义
+# ============================================================
+sim_definition: >
+  Sim提供TypeScript和Python双语言SDK，让开发者可以用代码方式构建和部署Agent应用。
+  SDK核心能力:
+  - Agent定义: 用代码定义Agent行为/工具/记忆/知识库
+  - 工作流编程: 代码方式构建DAG工作流 (SDK API清晰映射可视化画布)
+  - 工具调用: 一行代码集成1000+工具
+  - 知识库操作: 上传/索引/检索文档
+  - 部署: SDK内置部署命令, 一键部署到Sim云
+  - 类型安全: TS SDK完整类型定义, Python SDK完整类型提示
+  - CLI: 命令行创建/开发/测试/部署工作流
+  - Playground: 本地开发服务器, 实时测试Agent行为
+  文档系统: API文档 + 教程 + 示例代码 + 视频
+
+sim_implementation:
+  - TS SDK: npm包 @sim-ai/sdk
+  - Python SDK: pip包 sim-ai-sdk
+  - CLI: npx sim / sim (命令行)
+  - 本地开发服务器: sim dev (热重载)
+  - 部署命令: sim deploy
+  - 示例代码库: 100+示例项目
+  - 文档站: docs.sim.ai (自动生成+人工编写)
+
+# ============================================================
+# 可注入产品分析
+# ============================================================
+injectable_products:
+  - product: 盖娅之城
+    priority: P0 (最高优先级)
+    gap_analysis: >
+      盖娅之城当前342 Python文件, 57个Flask Blueprint, 架构耦合度高。
+      缺面向第三方开发者的SDK: 外部开发者无法编程式操作盖娅之城、
+      无法构建自定义公民(只能通过白泽创建)、无法批量管理经济系统。
+      当前只有内部API (20/21在线), 但无SDK封装和文档。
+    injection_method: >
+      构建「盖娅之城开放SDK」:
+      (1) Python SDK (盖娅核心引擎是Python): gaia-city-sdk pip包
+      (2) SDK暴露核心API的编程接口: 公民管理、任务系统、经济系统、知识库、治理系统
+      (3) CLI: gaia deploy (部署自定义公民), gaia task (批量任务管理)
+      (4) SDK内置类型: Citizen, Task, KnowledgeModel, Transaction等
+      (5) SDK内置认证: 自动管理JWT Token
+      (6) Playground: 本地盖娅沙箱环境, 开发和测试公民行为
+      (7) 文档站: gaia-city.dev (自动API文档+教程)
+      (8) 从现有20个API中生成SDK方法 (自动从OpenAPI规范生成)
+    effort_estimate: "3-4周 (SDK生成工具1周 + 核心方法封装1周 + CLI 1周 + 文档站1周)"
+    expected_impact: >
+      ★★★ 极大提升: 盖娅之城从「内部系统」变为「开放平台」,
+      外部开发者可以构建自定义公民和工具, 形成生态效应
+      对标: LangChain SDK / AutoGPT SDK
+
+  - product: AI数字军团
+    priority: P1
+    gap_analysis: >
+      AI数字军团已有742个技能和184名员工, 但管理和编程这些员工只能通过内部脚本。
+      缺标准化SDK: (1) 编程式员工管理(创建/训练/评估) (2) 技能批量管理
+      (3) 飞轮(Flywheel)自动化
+    injection_method: >
+      数字军团SDK: (1) Python SDK: legion-sdk (2) SDK暴露: employee.create(), skill.evaluate(),
+      flywheel.run(), knowledge.query() (3) 与现有MCP Server集成 (4) SDK内置铁律二十四闭环
+    effort_estimate: "2-3周"
+    expected_impact: "★★☆ 数字军团从「手动管理」到「编程管理」, 为1000+员工规模做准备"
+
+  - product: 链客宝
+    priority: P1
+    gap_analysis: >
+      链客宝已有完整的6层可叠加架构, 包括RepositoryProtocol, ServiceBrokerProtocol,
+      AIGatewayProtocol等接口定义, 但当前的接口主要为内部使用,
+      缺面向企业开发者和ISV(独立软件开发商)的SDK。
+    injection_method: >
+      链客宝开放SDK: (1) Python SDK: liankebao-sdk (2) 核心API: 客户管理、订单、支付、
+      AI员工调用 (2) 插件开发SDK: 简化集成开发 (3) 基于已有Protocol接口生成
+    effort_estimate: "2周"
+    expected_impact: "★★☆ 吸引ISV开发扩展, 加速集成生态"
+
+  - product: 中韩出海数智港
+    priority: P2
+    gap_analysis: >
+      中韩出海数智港当前以Web UI为核心, 缺SDK让合作伙伴编程接入。
+      韩国合作伙伴需要API/SDK才能将平台能力嵌入自有系统。
+    injection_method: >
+      Python SDK + 韩文文档: (1) Python SDK: ck-port-sdk (2) 供应商匹配、产品发布、订单管理SDK
+      (3) 韩文API文档和示例代码
+    effort_estimate: "2周"
+    expected_impact: "★★☆ 帮助韩国合作伙伴技术集成, 降低合作门槛"
+
+# ============================================================
+# 心智模型(原子能力)
+# ============================================================
+mental_models:
+  - name: API即产品
+    description: SDK和API是产品的第一界面, 优先级应等同于UI
+  - name: 开发者优先
+    description: 构建一个开发者就绪的平台比构建一个用户就绪的产品拥有更长的复合价值
+  - name: 自文档化
+    description: 类型系统和代码应是活的文档, API文档应自动从代码生成
+
+# ============================================================
+# 注入时序建议
+# ============================================================
+injection_timeline:
+  phase_1_now: "盖娅之城SDK (Python SDK + CLI + 自动文档)"
+  phase_2_next: "链客宝开放SDK + 数字军团SDK"
+  phase_3_future: "中韩出海数智港韩文SDK"

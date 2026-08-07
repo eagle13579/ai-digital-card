@@ -1,0 +1,21 @@
+name: 北极星路线图生成器
+version: 1.0.0
+status: active
+dimension: product
+source: polaris-roadmap-builder SKILL.md (2026-07-05)
+description: T-MAP五层分解 + 四阶段P级演进 + 瓶颈预判 + 验收标准。自动产出完整的产品北极星路线图。
+atoms:
+  - R-TMAP-L1: 北极星目标定义 — 量化/有时限/有验证标准
+  - R-TMAP-L2: MECE拆解 — 北极星→3-5个互斥穷尽因子
+  - R-TMAP-L3: 量化推演 — 三阶段沙盘+瓶颈预判
+  - R-TMAP-L4: 动作集 — 按P级组织+Feature依赖+工时
+  - R-TMAP-L5: 甘特图 — 18个月时间线落地
+  - R-PHASE: 四阶段演进 — P0核心闭环→P1增长→P2生态→P3亿级
+  - R-ACCEPT: 验收标准生成 — 4级×5维量化标准
+products:
+  - AI数字名片
+  - 所有产品（通用方法论）
+employees:
+  - 白泽P9
+  - 乘黄P8
+  - 计然P8

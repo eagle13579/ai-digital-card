@@ -1,0 +1,30 @@
+feature_id: F-CJ-LKB-X1X10_X1X10能力进阶管道
+name: X1-X10能力进阶管道
+version: 1.0.0
+dimension: 场景
+source_model: chainke-full/backend/app/routers/learning_center.py
+source_project: chainke-full
+one_liner: 从入门到精通的结构化学习管道：层级递进（课程→模块→课时），可追踪（进度+测验+认证），前后衔接
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从chainke-full/backend/app/routers/learning_center.py中提取的X1-X10能力进阶管道模式。课程→模块(X1-X10)→课时→进度追踪→测验→认证考核
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载X1-X10能力进阶管道模式
+
+  2. 根据课程→模块(X1-X10)→课时→进度追踪→测验→认证考核执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从chainke-full/backend/app/routers/learning_center.py提取初始版本
+product: "链客宝"

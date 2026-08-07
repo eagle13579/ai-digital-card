@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-47
+name: 极端情景规划
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 为当前策略规划乐观/中性/悲观三种世界线
+
+products:
+  - 通用: 自动匹配

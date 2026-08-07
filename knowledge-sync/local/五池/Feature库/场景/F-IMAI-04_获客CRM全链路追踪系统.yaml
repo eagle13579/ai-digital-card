@@ -1,0 +1,27 @@
+{
+  "name": "F-IMAI-04 获客CRM全链路追踪系统",
+  "version": "1.0.0",
+  "status": "released",
+  "dimension": "场景",
+  "source": "IMAI-PC-Executor",
+  "description": "SQLite三表CRM（users/comments/wechat_records）+ 状态机流转（pending→commented→wechat_added→converted）+ 关键词归因 + CLI运营工具",
+  "mental_models": [
+    "IMAI-06: 获客CRM状态机模型",
+    "IMAI-10: 评论内容池与三级分发模式"
+  ],
+  "components": [
+    "crm.py: CRM核心(930行, SQLite实现)",
+    "docs/crm_design.md: CRM设计方案"
+  ],
+  "products": [
+    "链客宝: 客户线索管理模块",
+    "内容工厂: 获客CRM与数据看板"
+  ],
+  "integration": {
+    "type": "pipeline",
+    "dependencies": [
+      "sqlite3(Python内置)"
+    ],
+    "setup": "python crm.py init 初始化数据库 → 引擎集成自动记录 → python crm.py stats 查看数据"
+  }
+}

@@ -1,0 +1,29 @@
+feature_id: F-CJ-NEURO-04
+name: 切换成本量化
+version: 1.0.0
+dimension: 场景
+source_model: 脑神经间断平衡/H10-切换代价量化.md
+one_liner: 基于H10模型量化任务切换成本，输出评分+时间预估+建议模式
+
+products:
+  - 通用: 自动匹配
+what_it_does: 4维度加权评估(context_load/memory_recovery/dependency_traversal/focus_loss)计算切换成本评分1-10，含指数衰减记忆恢复模型
+input: task_description + current_context + context_file_count + dependency_depth
+  + hours_since_similar
+output: transition_cost_score(1-10) + load_time_estimate + recovery_mode + recommendation
+sop: '1. 接收任务描述和上下文参数
+
+  2. 4维度加权计算
+
+  3. 指数衰减模型评估记忆恢复度
+
+  4. 归一化输出1-10评分
+
+  5. 返回建议模式(最佳/批量/串行)'
+quality_gate: '评分7/10: 评估推荐与人工判断一致率80%'
+score: 7
+depends_on: []
+enhanced_by:
+- F-CJ-NEURO-02
+implementation: 产品开发/赛博参谋/transition_cost_analyzer.py
+draft: false

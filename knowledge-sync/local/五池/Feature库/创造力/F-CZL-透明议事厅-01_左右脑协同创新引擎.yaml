@@ -1,0 +1,49 @@
+feature_id: 'F-CZL-透明议事厅-01'
+name: '左右脑协同创新引擎'
+type: 'feature'
+dimension: '创造力'
+source_model: '透明议事厅 — core/beehive_orchestrator.py（左右脑角色定义+LLM创新发散） + core/need_discovery.py（需求发现引擎） + core/hypothesis_engine.py（假设提取引擎）'
+source_path: 'D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\透明议事厅\'
+description: >
+  透明议事厅的创造力引擎体系，通过AI模拟左右脑12角色协同创新产生产品方案：
+  ①需求发现驱动——NeedDiscovery引擎从4信号源(五池动态/员工提案/外部信号/定时扫描)
+  自动发现潜在产品需求，支持真实记忆宫殿数据采集和模板降级双模式。
+  ②左脑6角色创新发散——乘黄(产品设计)·计然(战略发散·多方案生成)·鹿蜀(视觉创意)·
+  商羊(内容创意·叙事结构)·山膏(流程设计)·文鳐(质量标准)，每位有独立LLM角色设定，
+  从不同创新维度生成方案并评分(0.6-0.95)。
+  ③胼胝体TCP-R创造力碰撞——左脑主张方案价值→右脑提出反例质疑→跨角色碰撞后修正定位，
+  迭代收敛直至方案成熟度≥0.7，这是跨左右半脑的创造性对话机制。
+  ④假设提取引擎——HypothesisEngine从左右脑和红队产出中结构化提取可验证假设，
+  从4大支柱(产品内核/单元模型/增长/壁垒)+风险维度生成假设，含TCP-R迭代记录。
+inputs:
+  - '记忆宫殿信号源: 五池(认知池/灵感池/问题池/方案池/成果池) markdown文件'
+  - '员工信号源: 7位AI员工(乘黄P9/计然P8/商羊P8/獬豸P8/白泽P7/当康P7/钦原P7)'
+  - '外部信号源: 用户反馈/市场趋势/竞品动态/技术突破/政策变化'
+  - '议题内容: 需讨论的产品创新方向'
+  - 'LLM客户端: 用于生成左右脑成员的创新方案和反例分析'
+  - '置信度阈值: 默认0.6，用于过滤低质量需求'
+outputs:
+  - 'discovered_needs: 需求扫描结果（含title/description/source/source_type/urgency/confidence/pillar_focus）'
+  - 'left_brain_proposals: 左脑发散方案（6份LLM生成的创新方案，每份含author/role/content/score/expertise）'
+  - 'tcp_r_dialogue: 创造性对话记录（每轮含thesis/counters/position/score，最多3轮迭代）'
+  - 'extracted_hypotheses: 结构化假设列表（从4大支柱+风险维度提取，含status/proposer/evidence/counter_evidence/tcp_r_result/test_method）'
+  - 'new_sessions: 由高评分需求触发的蜂巢会议Session（自动过滤与现有讨论相似的主题）'
+sop:
+  - '1. 需求发现阶段：run_discovery_cycle()，NeedDiscovery从记忆宫殿五池/复盘文件/员工/外部4类信号源扫描，生成需求信号列表'
+  - '2. 需求评估门禁：evaluate_need()，计算urgency×confidence评分，＞0.35且不与现有Session重复则自动创建议事'
+  - '3. 左脑创新发散阶段：left_brain_divergence()，6位左脑角色通过LLM各自产出方案，每方案附带评分'
+  - '4. 创造力碰撞阶段：corpus_callosum_dialogue()，TCP-R最多3轮迭代，左脑主张→右脑反例→修正→复盘，直至评分≥0.7'
+  - '5. 假设结构化提取：extract_from_discussion()，从左右脑产出+红队风险中提取4支柱+风险维度的可验证假设'
+  - '6. 假设管理：支持假设状态更新(proposed→testing→validated/falsified)和全局统计'
+quality_gate:
+  min_score: 5
+  score: 7
+current_score: 7
+status: 'active'
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-10'
+product:
+  - "文鳐技能集市"
+  - "透明议事厅"

@@ -1,0 +1,158 @@
+name: "F-TRANS-08"
+title: "旋转位置编码引擎(RoPE)"
+version: 1.0.0
+category: "位置编码增强"
+description: "旋转位置编码(Rotary Position Embedding)通过旋转矩阵对Query和Key向量施加位置感知的旋转变换,使注意力分数天然编码相对位置信息,兼具绝对位置编码的并行性和相对位置编码的外推能力"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T02 位置编码"
+  - "T03 QKV三重奏"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+
+code_references:
+
+  # --- LlamaAttention: RoPE应用 ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "forward"
+    lines: 141-143
+    summary: "cos, sin = position_embeddings → query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin) — 对Q和K施加旋转位置编码,注意: V不参与旋转"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "forward"
+    lines: 125-166
+    summary: "完整调用链: 接收position_embeddings(cos,sin) → RoPE应用到Q/K → 注意力计算 — RoPE嵌入在Q/K投影之后、注意力计算之前"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- LlamaDecoderLayer: RoPE的位置嵌入传递 ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaDecoderLayer"
+    method: "forward"
+    lines: 184-213
+    summary: "position_embeddings从外部传入,通过self_attn转发给LlamaAttention — RoPE的位置信息由外层注入,支持动态位置ID"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+  # --- 对比: 原论文正弦波编码 ---
+  - file: "paper_Models.py"
+    class: "PositionalEncoding"
+    method: "_get_sinusoid_encoding_table"
+    lines: 34-45
+    summary: "正弦波PE: PE(pos,2i)=sin(pos/10000^{2i/d}), PE(pos,2i+1)=cos(...) — 传统方式将位置编码加到输入,RoPE改为旋转Q/K"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # --- 对比: nanoGPT可学习位置编码 ---
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "__init__"
+    lines: 126
+    summary: "wpe = nn.Embedding(block_size, n_embd) — 可学习位置编码,与RoPE对比: 可学习编码需要预设最大长度,RoPE天然支持外推"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class RotaryPositionEncoding:
+      """
+      旋转位置编码引擎(RoPE) — 在自注意力中编码相对位置
+
+      ===== 核心数学原理 =====
+      RoPE的思想: 对Q和K向量的每对连续维度(dim=2i, dim=2i+1)施加旋转
+
+      f(q, m) = q * cos(m * θ_i) + rotate_half(q) * sin(m * θ_i)
+
+      其中:
+      - m 是位置索引
+      - θ_i = 10000^{-2i/d} (与正弦波编码相同的频率)
+      - rotate_half: 将向量分成两半并交换,同时前半取负
+
+      关键性质:
+      <f(q_m, m), f(k_n, n)> = <q_m, k_n> * cos((m-n) * θ_i) + ... 旋转不变性
+      → 注意力分数只依赖于相对位置(m-n)
+
+      ===== Python伪代码 =====
+      class RotaryEmbedding:
+          def __init__(self, dim, max_position_embeddings=2048, base=10000):
+              inv_freq = 1.0 / (base ** (torch.arange(0, dim, 2).float() / dim))
+              # 预计算cos/sin表
+              t = torch.arange(max_position_embeddings)
+              freqs = torch.einsum('i,j->ij', t, inv_freq)  # (max_pos, dim/2)
+              self.cos = cos(freqs)     # (max_pos, dim/2)
+              self.sin = sin(freqs)     # (max_pos, dim/2)
+
+          def rotate_half(self, x):
+              # 将最后两维分成两半,交换并取负
+              x1 = x[..., :x.shape[-1]//2]
+              x2 = x[..., x.shape[-1]//2:]
+              return torch.cat((-x2, x1), dim=-1)
+
+          def apply_rotary_pos_emb(self, q, k, cos, sin):
+              # q/k: (B, n_heads, T, head_dim)
+              # cos/sin: (T, head_dim/2) 或 (1, T, head_dim/2)
+              q_embed = q * cos + self.rotate_half(q) * sin
+              k_embed = k * cos + self.rotate_half(k) * sin
+              return q_embed, k_embed
+
+      ===== 与位置编码对比 =====
+      ┌────────────────┬───────────────────┬────────────────────┬────────────────┐
+      │ 特性            │ Sinusoidal(原论文) │ Learned(nanoGPT)   │ RoPE(Llama)    │
+      ├────────────────┼───────────────────┼────────────────────┼────────────────┤
+      │ 参数            │ 无(固定)          │ block_size × d    │ 无(固定频率)    │
+      │ 加到            │ 输入Embedding      │ 输入Embedding      │ Q/K向量         │
+      │ 相对位置感知    │ 间接              │ 不感知             │ 直接编码        │
+      │ 长度外推        │ 支持              │ 不支持             │ 良好支持        │
+      │ 对V的影响       │ 有                │ 有                │ 无(V不旋转)     │
+      └────────────────┴───────────────────┴────────────────────┴────────────────┘
+      """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "旋转不变性: RoPE保持注意力分数的相对位置依赖性 — <q_m, k_n>只依赖于(m-n)而非绝对位置"
+  - "只作用于Q和K,不作用于V: 位置编码只影响'匹配什么位置',不影响'传输什么信息'"
+  - "无需额外参数且支持长度外推: RoPE使用固定频率,训练时未见过的长度也能泛化"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "变长供需匹配序列处理器"
+    description: >
+      链客宝的供需匹配场景中,需求描述的序列长度从短句(10 tokens)到长文档
+      (2000 tokens)差异巨大。RoPE天然支持长度外推,无需预设最大匹配长度。
+      对于超长序列(如企业年报分析),RoPE的旋转编码比可学习位置编码更稳定,
+      训练时用512长度,推理时可扩展到4096。
+
+  - product: "AI名片"
+    component: "动态社交网络时序分析"
+    description: >
+      AI名片用户的社交网络随时间演化: 新名片不断加入,关系动态变化。
+      RoPE将时间点编码为旋转角度,使模型能感知"近期互动vs历史互动"的相对时序。
+      对于无限增长的时间线,RoPE的外推能力保证即使10年前的记录也能正确处理。
+
+  - product: "数智港"
+    component: "长文档智能分析引擎"
+    description: >
+      数智港处理的分析报告可达数万Token(如年度财报、尽调报告)。
+      RoPE的外推能力使模型能处理训练时未见的超长序列。
+      与F-TRANS-02的Sinusoidal编码组合使用(多尺度位置感知),
+      同时捕获token级和文档级的位置关系。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "NTK-aware RoPE: 通过修改频率基数(base)使RoPE支持更长的上下文外推"
+  - "YaRN: 通过缩放RoPE的波长和旋转频率实现更好的长上下文外推"
+  - "xPOS: 结合RoPE和ALiBi的外推能力增强版"
+  - "RoPE与GQA的联合优化: Q头分组后不同组的RoPE旋转频率可不同"

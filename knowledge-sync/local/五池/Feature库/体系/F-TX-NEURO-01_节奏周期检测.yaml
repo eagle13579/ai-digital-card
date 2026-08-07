@@ -1,0 +1,27 @@
+feature_id: F-TX-NEURO-01
+name: 节奏周期检测
+version: 1.0.0
+dimension: 体系
+source_model: 脑神经间断平衡/H1-间断平衡.md, H9-探索-利用权衡.md
+one_liner: 检测AI系统当前处于稳态执行期还是混沌跃迁期，自适应调整运行模式
+
+products:
+  - 通用: 自动匹配
+what_it_does: 基于3信号(盖娅大脑活跃度/30min进化产出/1h吸收记录)判断系统节奏周期，稳态期跳过L3创造/D2审美/D3体系/ReACT以降低能耗，跃迁期全量运行
+input: 盖娅收敛状态JSON + 进化日志目录 + MEMORY.md修改时间
+output: steady或transition状态标记 + 对应运行模式切换
+sop: '1. 读取gaia_convergence_status.json
+
+  2. 扫描进化日志最近30min产出
+
+  3. 检查MEMORY.md最后修改时间
+
+  4. 3信号综合判定
+
+  5. 返回周期类型'
+quality_gate: '评分7/10: 3信号检测准确率85%'
+score: 7
+depends_on: []
+enhanced_by: []
+implementation: scripts/gaia_cortex.py _detect_rhythm_cycle()
+draft: false

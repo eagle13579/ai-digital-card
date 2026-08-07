@@ -1,0 +1,28 @@
+feature_id: F-GETKE-XST-02
+name: 短信批量触达 — AI话术模板+送达追踪
+dimension: 场景
+version: "1.0"
+status: active
+source_model: 芯森态 api/getke/sms_tool.py (195行)
+
+products:
+  - 通用: 自动匹配
+description: 批量发送AI生成话术短信，含模板引擎+送达追踪
+
+input: 手机号列表+模板ID+变量列表
+
+output: 活动ID+发送结果(成功/失败/送达率)
+
+sop: |
+  SmsTool().send_campaign(phone_list, template_id, variables_list)
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

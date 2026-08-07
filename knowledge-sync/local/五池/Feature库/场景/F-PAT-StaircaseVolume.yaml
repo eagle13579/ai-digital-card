@@ -1,0 +1,24 @@
+id: F-PAT-StaircaseVolume
+name: 阶梯式放量上涨模型
+dimension: 场景
+domain: N型涨停模式
+description: >-
+  每波攻击的成交量呈阶梯式递增:首板(温和)->整理(缩量)->二波(放量)->加速(巨量)
+source_model: 和远气体002971
+
+products:
+  - 通用: 自动匹配
+signals:
+  - "每轮涨停波峰值成交量逐步放大"
+  - "两波之间整理期缩量"
+  - "放量倍数1.5-2.5倍为健康"
+  - "最后一波放量最大=情绪高潮需警惕"
+sop:
+  - Step1:记录每波涨停日的成交量
+  - Step2:对比相邻两波量比
+  - Step3:量比1.5-2.5倍=健康
+  - Step4:量比>3倍=过热警惕
+score: 9.0
+iterations: 1
+created_at: 2026-06-13 13:34
+source_stock: 和远气体(002971)

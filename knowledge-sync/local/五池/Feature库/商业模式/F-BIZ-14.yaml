@@ -1,0 +1,16 @@
+# F-BIZ-14: 108天标准化孵化
+id: "F-BIZ-14"
+name: "108天标准化孵化"
+dimension: "🌊 场景"
+domain: "商业模式"
+description: "3阶段×36天=108天，初成后注册独立项目公司"
+source_model: "M-BIZ-14"
+source: "新坐标公司会议纪要 (2026-06-14)"
+sop: |
+  Phase1(36天)搭建→Phase2(36天)验证→Phase3(36天)冲刺→注册项目公司
+quality_gate: "评分≥7/10"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

@@ -1,0 +1,24 @@
+feature_id: "F-CZL-JG-01"
+name: "等级跃迁诊断器"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "结构思维M11"
+one_liner: "诊断在'三流学步骤→一流拆结构'跃迁路径上的当前等级"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  识别三个等级中的当前位置，给出跃迁方案。
+input: |-
+  学习习惯和能力描述
+output: |-
+  等级跃迁方案(当前诊断+目标+路径+里程碑)
+sop: |-
+  1. 评估当前等级 2. 识别瓶颈 3. 设计跃迁路径 4. 设定验证标准
+quality_gate: |-
+  1. 等级诊断有标准 2. 跃迁路径可执行 3. 有验证里程碑
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: 结构思维·提取结构一通百通吸收

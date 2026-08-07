@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-18
+name: 评估反例生成
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 为评估管道自动生成困难的边界测试用例
+
+products:
+  - 通用: 自动匹配

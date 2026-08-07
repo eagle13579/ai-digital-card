@@ -1,0 +1,15 @@
+name: "AI技能沙箱执行框架"
+description: "逐技能独立Worker进程+JSON-RPC over stdio+能力门控Host API"
+version: "1.0.0"
+status: "atomic"
+dimension: "体系"
+source: "Paperclip plugin-loader.ts, plugin-worker-manager.ts"
+atoms:
+  - PP-09_three-phase-plugin-lifecycle
+  - PP-10_process-per-plugin-json-rpc
+  - PP-11_defense-in-depth-plugin-sandbox
+  - PP-12_exponential-backoff-self-heal
+  - PP-13_three-stage-graceful-shutdown
+products:
+  - 数字员工技能引擎 (技能隔离执行)
+  - 文鳐技能集市 (技能沙箱)

@@ -1,0 +1,13 @@
+name: F-CW-01_多渠道统一收件箱
+version: 1.0.0
+status: active
+dimension: 场景
+source: ChatWoot (chatwoot/chatwoot) — Inbox + Channel适配器架构
+description: 多渠道客户沟通统一收件箱能力。所有渠道(实时聊天/邮件/WhatsApp/API/Webhook)抽象为Channel适配器，统一收敛到Inbox。客服团队一个队列处理所有渠道客户，渠道差异隔离在适配层，新增渠道=新增适配器不动核心。含对话生命周期状态机(open/pending/resolved/reopened)。
+atoms:
+- CW-01 统一收件箱Inbox抽象
+- CW-02 对话为中心数据模型
+products:
+- 链客宝
+- 数字员工SaaS
+- 中韩出海数智港

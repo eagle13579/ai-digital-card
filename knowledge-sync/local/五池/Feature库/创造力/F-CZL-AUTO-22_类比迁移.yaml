@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-22
+name: 类比迁移
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 将领域A的模式创造性地迁移到B
+
+products:
+  - 通用: 自动匹配

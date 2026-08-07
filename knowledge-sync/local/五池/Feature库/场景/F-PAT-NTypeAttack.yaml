@@ -1,0 +1,24 @@
+id: F-PAT-NTypeAttack
+name: N型涨停攻击模型
+dimension: 场景
+domain: N型涨停模式
+description: >-
+  涨停->缩量整理1-3天->再涨停的N型上涨结构。每次涨停后不急于连板，而是缩量震荡洗盘后再进攻
+source_model: 和远气体002971
+
+products:
+  - 通用: 自动匹配
+signals:
+  - "首板必须封死涨停(封板度=1.0)"
+  - "次日不连板而是震荡整理(涨跌幅-2%~+5%)"
+  - "整理日成交量递减(缩量洗盘)"
+  - "N型右侧涨停时需放量突破前高"
+sop:
+  - Step1:识别首板封死涨停
+  - Step2:观察次日是否转为缩量整理
+  - Step3:整理期成交量<首板量=健康
+  - Step4:放量突破整理平台时买入
+score: 9.0
+iterations: 1
+created_at: 2026-06-13 13:34
+source_stock: 和远气体(002971)

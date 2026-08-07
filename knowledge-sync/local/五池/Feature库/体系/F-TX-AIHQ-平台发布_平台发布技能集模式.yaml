@@ -1,0 +1,30 @@
+feature_id: F-TX-AIHQ-平台发布_平台发布技能集模式
+name: 平台发布技能集模式
+version: 1.0.0
+dimension: 体系
+source_model: AI获客/社媒运营/skills/
+# 精确source_model溯源 (2026-06-12): * 2026-06-12: 来源待进一步溯源
+source_project: AI获客
+one_liner: 多平台发布管理：用统一注册接口管理各平台发布技能，每个平台一个独立技能文件，新增平台不修改核心引擎
+
+products:
+  - 文鳐技能集市: 自动匹配
+what_it_does: 从AI获客/社媒运营/skills/中提取的平台发布技能集模式模式。统一接口注册表 + 各平台独立技能文件(xhs-publisher/twitter-post/youtube-upload等)
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载平台发布技能集模式模式
+
+  2. 根据统一接口注册表 + 各平台独立技能文件(xhs-publisher/twitter-post/youtube-upload等)执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从AI获客/社媒运营/skills/提取初始版本

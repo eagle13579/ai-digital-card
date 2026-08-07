@@ -1,0 +1,11 @@
+feature_id: F-AES-20260806-05
+name: p5创意编码生成器
+version: 1.0.0
+dimension: 创造力
+source_model: aesthetic-creative-self-evolution
+created_at: 2026-08-06 06:07:51
+one_liner: 生成艺术sketch: 噪声/粒子/分形, 参数化视觉产出
+mind_models:
+  - 代码即画笔: 用参数化代码生成视觉 (Perlin噪声/粒子/分形), 审美=算法×随机种子
+  - 生成艺术循环: 每个sketch = 状态更新 + 绘制 + 交互, 三循环结构是创意编码的通用骨架
+  - 创意约束: 在有限代码空间内产出无限变化, 约束反而激发创造力 (随机种子+参数范围)

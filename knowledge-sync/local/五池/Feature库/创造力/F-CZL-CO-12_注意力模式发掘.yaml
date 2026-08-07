@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-12
+name: 注意力模式发掘
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 分析Agent在长context中的注意力分布模式
+
+products:
+  - 通用: 自动匹配

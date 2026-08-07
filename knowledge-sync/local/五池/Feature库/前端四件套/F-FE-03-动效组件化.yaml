@@ -1,0 +1,65 @@
+name: "动效组件化"
+version: "1.0.0"
+dimension: "创造力"
+status: "draft"
+draft: true
+source_model: "React Beats"
+
+products:
+  - 通用: 自动匹配
+description: >
+  页面活靠动效，从组件库直接挑选动效组件注入页面，不手写动画代码。
+  通过标准化的动效组件拼装，大幅降低动效开发成本，
+  同时保证动效品质和性能达标。
+
+sop:
+  - step: 1
+    action: "完成静态页面设计"
+    description: "页面的结构、样式、内容全部就位，进入动效装配阶段"
+  - step: 2
+    action: "识别动效需求点"
+    description: >
+      遍历页面交互节点，分类标注动效需求：
+      (a) 页面加载——入场动画/骨架屏过渡/渐变显现
+      (b) 悬停反馈——按钮缩放/卡片抬升/链接下划线展开
+      (c) 切换过渡——Tab切换/手风琴展开/轮播滑动
+      (d) 滚动触发——视差滚动/渐入动画/数字滚动
+      (e) 微反馈——Toast弹出/徽章跳动/表单校验抖动
+  - step: 3
+    action: "从动效库挑选组件"
+    description: >
+      按需求类型从标准动效组件库中选择合适组件：
+      支持Framer Motion / GSAP / CSS Animations / Motion One等方案
+      例如：FadeIn, SlideUp, ScaleOnHover, StaggerChildren, ParallaxScroll
+  - step: 4
+    action: "注入页面"
+    description: "将选中的动效组件包裹目标元素，配置参数（持续时长/缓动函数/延迟/循环/触发条件）"
+  - step: 5
+    action: "验证流畅度"
+    description: "检查动效帧率(FPS≥55)、触发的精准度、无闪烁/卡顿/跳帧，移动端低功耗模式下表现正常"
+
+input:
+  format: "静态页面代码 + 交互设计说明"
+  content: |
+    已完成的静态React/Vue页面代码
+    可选：动效需求标注文档（标注需要动效的元素及期望效果类型）
+
+output:
+  format: "注入动效后的页面代码 + 动效清单"
+  includes:
+    - "完整页面代码（含动效组件注入）"
+    - "动效组件清单（组件名/位置/参数配置/所属库）"
+    - "流畅度验证报告（FPS/内存/CPU采样数据）"
+    - "动效回退方案（不支持动画的终端优雅降级）"
+
+quality_gates:
+  - gate: "帧率达标"
+    description: "页面运行时FPS≥55，无视觉可感知的卡顿（采用Performance API或Lighthouse检测）"
+  - gate: "动效有意义"
+    description: "每个动效都有功能目的（引导注意/提供反馈/创造连续性），不添加纯装饰性动效"
+  - gate: "降级策略"
+    description: "prefers-reduced-motion场景下全部动效优雅降级，不影响功能使用"
+  - gate: "组件化交付"
+    description: "动效均为组件化引用而非手写，后续可替换/升级/按需加载"
+  - gate: "无布局偏移"
+    description: "动效执行前后不引起CLS（Cumulative Layout Shift），不影响页面内容排布"

@@ -1,0 +1,19 @@
+id: F-VIC-02
+name: 三高筛选引擎
+description: 对BOM拆解结果，用高增长/高利润/高壁垒三维度加权评分，自动排序所有环节，输出三高重合的黄金环节TOP3
+dimension: 数据
+type: 筛选引擎
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 英招_P9
+source_atoms:
+- VIC-THREEHIGH-02
+- VIC-BARRIER-TYPE-08
+quality_score: 0
+iterations: 0

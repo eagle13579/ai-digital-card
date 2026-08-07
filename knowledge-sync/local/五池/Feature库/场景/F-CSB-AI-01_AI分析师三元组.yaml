@@ -1,0 +1,15 @@
+---
+id: F-CSB-AI-01
+name: AI分析师三元组
+category: 场景
+dimension: 投研智能
+description: 三种AI分析师并行分析→共识聚合→风控校验→组合优化的全链路AI投研
+version: 1.0.0
+status: draft
+source: BaiZeCapital_旧版 quant_engine/agents/ + ai_analyst/
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - 2026-06-23_CSB-AI分析师三元组
+dependencies: []

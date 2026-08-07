@@ -1,0 +1,49 @@
+feature_id: "F-TX-SRC-多Agent任务编排MECE"
+name: "多Agent任务编排与MECE拆解模式"
+version: "1.0.0"
+dimension: "体系"
+source_model: "scripts/task_orchestrator.py TaskOrchestrator类 + decomposition_strategies + TaskDelegate + AlertHandler"
+one_liner: "策略注册表驱动的多Agent任务编排系统，支持MECE/TOP_DOWN/BOTTOM_UP等7种拆解策略，TaskDelegate可替换执行器，AlertHandler可插拔告警"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  任务编排核心架构。TaskOrchestrator主编排器管理Goal→Task→SubTask全生命周期。
+  DecompositionStrategy策略注册表提供7种拆解模式(MECE/自顶向下/自底向上/顺序/并行/
+  依赖图/阶段/混合)，支持递归拆解到叶子任务。TaskDelegate是可替换执行器接口(子进程/
+  LLM/SSH等)。AlertHandler可插拔告警系统(Logging/File/飞书等)。SQLite持久化，
+  与kanban_engine.py 7态流转对接。与fission_monitor.py集成做裂变熔断防护。
+  
+  数据类型: Task(含task_id, goal, status, priority, parent_id, sub_task_ids, depends_on等)
+  Goal顶层目标映射root_task_id, DecompositionResult含sub_goals+dependencies。
+input:
+  - Goal: {goal_id, goal_text, context, priority}
+  - DecompositionStrategy枚举选择
+  - 告警配置(AlertHandler子类)
+output:
+  - Task树(从Goal递归拆解到叶子Task)
+  - DecompositionResult(子目标+依赖关系)
+  - 告警事件(按级别分发)
+  - SQLite持久化记录
+sop: |
+  1. 编排器接收goal + decomposition_strategy参数
+  2. 策略注册表查找对应拆解器(MECE/TOP_DOWN等)
+  3. Goal → Task树递归拆解(每个子Task含depends_on依赖信息)
+  4. Task进入kanban 7态流转: triage→todo→ready→running→blocked→done→archived
+  5. running态触发TaskDelegate.execute()执行(子进程/LLM/SSH等)
+  6. 执行失败→重试(max_retries=3)→AlertHandler告警
+  7. 与fission_monitor集成: start_task前check_fission(), task_done时release()
+  8. 完成→归档→回写结果到Task.result
+quality_gate:
+  score: 7
+  checks:
+    - "拆解策略注册表含≥5种策略(实际7种)"
+    - "Task依赖图支持DAG拓扑排序"
+    - "TaskDelegate可替换(至少子进程+SSH两种)"
+    - "AlertHandler可插拔(日志+文件两种已实现)"
+    - "与Kanban 7态严格对齐，无跳状态"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从task_orchestrator.py策略注册表+编排架构提取"

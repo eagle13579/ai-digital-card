@@ -1,0 +1,28 @@
+feature_id: F-CJ-NEURO-06
+name: 稳态跃迁员工路由
+version: 1.0.0
+dimension: 场景
+source_model: 脑神经间断平衡/H2-稳态巡航.md, H3-混沌跃迁.md
+one_liner: 根据任务类型匹配稳态员工(资深)或跃迁员工(学习型)，评估准备度
+
+products:
+  - 数字员工SaaS: 自动匹配
+what_it_does: 基于H2/H3模型将任务分为稳态(已知类型推荐资深员工)和跃迁(新领域推荐学习型员工)，同时查询历史完成次数评估准备度
+input: task_type + task_domain + employee_id
+output: suggested_state(steady/transition) + readiness_score(1-10)
+sop: '1. 判断任务类型是否已知
+
+  2. 判断领域是否含跃迁关键词
+
+  3. 映射到稳态/跃迁状态
+
+  4. 查询员工历史完成次数
+
+  5. 反比计算跃迁准备度'
+quality_gate: '评分7/10: 路由匹配准确率80%'
+score: 7
+depends_on: []
+enhanced_by:
+- F-CJ-NEURO-04
+implementation: scripts/employee_router.py suggest_employee_state
+draft: false

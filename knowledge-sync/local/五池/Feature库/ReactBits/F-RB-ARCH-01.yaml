@@ -1,0 +1,25 @@
+id: F-RB-ARCH-01
+name: 4-Variant Component Architecture — 同一组件4种技术栈版本
+source_model: "React Bits — 每个组件同时提供JS-CSS/JS-TW/TS-CSS/TS-TW四种变体, 开发者选自己技术栈的版本直接复制"
+dimension: 体系
+
+products:
+  - 通用: 自动匹配
+description: >-
+  130+组件每个提供4种技术栈变体: 纯JS+CSS / JS+Tailwind / TypeScript+CSS / TypeScript+Tailwind。
+  开发者无需安装任何npm包, 直接复制组件文件到自己的项目中即可使用。
+  四个变体共享同一设计逻辑, 只是技术选型不同。
+  这解决了「组件库绑定技术栈」的核心问题——不论你用JS还是TS, CSS还是Tailwind, 都有现成版本。
+input: 组件设计 + 技术栈偏好(JS/TS + CSS/Tailwind)
+output: 对应技术栈的组件代码(可直接复制使用)
+sop: "① 设计组件逻辑和交互行为
+  ② 用纯JS实现第一版(JS-CSS or JS-TW)
+  ③ 自动生成TypeScript类型版本
+  ④ 自动生成CSS和Tailwind版本
+  ⑤ 通过jsrepo构建系统统一发布
+  ⑥ 开发者从reactbits.dev复制所需版本"
+quality_gates: 4变体功能完全一致、类型安全、零运行时依赖
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝UI组件库/AI招商前端/AI数智军团组件体系

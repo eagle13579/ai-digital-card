@@ -1,0 +1,24 @@
+id: F-RB-COPYPAS-01
+name: Copy-Paste Component Distribution Model
+source_model: "React Bits — 无npm包安装, 从网站复制组件文件到项目直接使用, 配合jsrepo构建系统"
+dimension: 场景
+
+products:
+  - 通用: 自动匹配
+description: >-
+  React Bits采用「复制使用」分发模型: 无需npm install、无需package.json依赖、
+  直接从reactbits.dev/TextAnimations/DecryptedText复制组件文件到本地项目即可使用。
+  配合jsrepo构建系统可批量管理组件版本。这解决了传统npm包的版本锁定/依赖膨胀/构建体积问题。
+  开发者获得完全的所有权——代码在本地, 随时可修改。
+input: 开发者想使用的组件名
+output: 组件文件内容(可直接保存到项目)
+sop: "① 访问reactbits.dev → 按类别浏览组件
+  ② 点击组件 → 选择技术栈版本(4变体)
+  ③ 复制代码或下载文件
+  ④ 粘贴到项目components/目录
+  ⑤ 导入使用"
+quality_gates: 复制即用零配置、组件零外部依赖(除React)、支持jsrepo批量管理
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 8
+application_scope: AI数字员工前端开发工作流/链客宝快速原型

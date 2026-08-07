@@ -1,0 +1,24 @@
+feature_id: "F-TX-UI-02"
+name: "Operator插件注册表"
+version: "1.0.0"
+dimension: "体系"
+source_model: "UI-TARSM2"
+one_liner: "统一Operator接口+插件注册表，支持按需切换执行后端"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  将执行层抽象为Operator接口，不同后端独立实现。
+input: |-
+  Operator类型
+output: |-
+  Operator实例
+sop: |-
+  1. 定义接口 2. 各后端实现 3. 注册表 4. 按需选择
+quality_gate: |-
+  1. 接口统一 2. ≥3种后端
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: UI-TARS-desktop全量吸收

@@ -1,0 +1,18 @@
+id: F-RR-05
+name: 安全认证架构
+description: 整合RR04身份认证与RR06权限管理体系，构建多层次的安全认证架构。基于OAuth2.0/OIDC协议实现统一身份认证，支持SSO单点登录、MFA多因子认证与第三方身份源集成；结合RBAC/ABAC混合权限模型实现细粒度的数据级访问控制，为RedRoom情报平台的机密情报分级保护与操作审计提供全链路安全保障。
+dimension: 场景
+domain: 安全/认证授权
+status: 孵化中
+tags:
+  - 安全认证
+  - OAuth2.0
+  - RBAC
+  - ABAC
+  - SSO
+  - 权限管理
+  - 审计
+source: RedRoom情报平台 / RR04+RR06
+
+products:
+  - 通用: 自动匹配

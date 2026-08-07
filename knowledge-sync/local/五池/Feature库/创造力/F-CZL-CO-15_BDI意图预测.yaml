@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-15
+name: BDI意图预测
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 基于历史Belief变化预测Agent的下一个Intention
+
+products:
+  - 通用: 自动匹配

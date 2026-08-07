@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-30
+name: 多Persona角色发现
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 从任务日志中发现新Persona角色的需求
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,24 @@
+feature_id: "F-CZL-UI-01"
+name: "暂停恢复生命周期"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "UI-TARSM7"
+one_liner: "Agent完善的暂停/恢复/停止状态管理"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  暂停保持上下文，恢复继续循环，停止清理资源。用户可随时干预。
+input: |-
+  控制指令
+output: |-
+  状态变更确认
+sop: |-
+  1. isPaused标志 2. 等待Promise 3. 恢复继续 4. 停止清理
+quality_gate: |-
+  1. 暂停不丢上下文
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: UI-TARS-desktop全量吸收

@@ -1,0 +1,82 @@
+feature_id: F-ARC-A2A-04
+name: A2A通信层 — 盖娅之城通信协议
+version: "1.0"
+dimension: 场景
+source_model: 盖娅之城A2A集成桥 (integration/gaia_city_bridge.py)
+source_project: Feature总线/integration/gaia_city_bridge.py
+one_liner: 盖娅之城「提议→匹配→讨论→沉淀」四阶段流程到A2A消息总线的结构化映射协议
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  将盖娅之城的原有流程（讨论引擎+会议蓝图中的提议、匹配参与者、讨论、沉淀）
+  映射为A2A消息总线的标准化四阶段通信协议：
+
+  | 阶段       | A2A映射                                  |
+  |:-----------|:-----------------------------------------|
+  | 提议       | message_bus.publish(topic='proposal')    |
+  | 匹配公民   | agent_registry.find_by_capability()      |
+  | 讨论       | message_bus.publish(type='discussion',
+  |             |   correlation_id=proposal_id)            |
+  | 沉淀       | message_bus.get_chain(correlation_id)    |
+
+  协议消息类型定义:
+  - gaia.proposal   : 提议消息 (发起新议题)
+  - gaia.match      : 匹配结果 (参与的Agent列表)
+  - gaia.discussion : 讨论消息 (Agent对议题的发言/投票)
+  - gaia.settle     : 沉淀消息 (结论/行动项/心智模型)
+
+  话题命名空间:
+  - gaia.* 前缀: 盖娅之城专属话题命名空间
+  - gaia.proposal.* : 按proposal_id隔离的讨论子话题
+
+  不修改盖娅之城现有任何代码(铁律九十二)。
+  桥接器通过import引入A2A组件完成通信，独立可测试。
+input:
+  - action: proposal | match | discuss | settle
+  - from_agent: str  # 发起者
+  - proposal_id: str | None  # 关联提议ID
+  - topic: str  # 议题标题/话题
+  - payload: dict  # 消息体
+output:
+  - correlation_id: str  # 追踪链ID
+  - message_id: str  # 消息ID
+  - chain: list[dict]  # 完整消息链(沉淀时)
+  - participants: list[dict]  # 匹配到的参与者(匹配阶段)
+sop: |
+  提议阶段:
+    1. gaia_city_bridge.publish_proposal(from_agent, title, description)
+    2. → message_bus.publish(topic='gaia.proposal', type='event',
+         correlation_id=auto_generated, payload={title, description, ...})
+
+  匹配阶段:
+    1. gaia_city_bridge.match_participants(proposal_id, required_capabilities)
+    2. → agent_registry.find_by_capability(capability) 对每个必要能力
+    3. → message_bus.publish(topic='gaia.match', correlation_id=proposal_id,
+         payload={matched_agents: [...]})
+
+  讨论阶段:
+    1. gaia_city_bridge.publish_discussion(proposal_id, agent_id, content, stance)
+    2. → message_bus.publish(topic=f'gaia.proposal.{proposal_id}',
+         type='discussion', correlation_id=proposal_id,
+         payload={agent_id, content, stance})
+
+  沉淀阶段:
+    1. gaia_city_bridge.get_settle_chain(proposal_id)
+    2. → message_bus.get_chain(correlation_id=proposal_id)
+    3. 返回完整消息链作为沉淀结果
+
+quality_gate:
+  - score: 6/10
+  - checks:
+    - 四阶段完整映射: proposal→match→discuss→settle
+    - 使用gaia.*命名空间隔离盖娅之城消息
+    - correlation_id链贯穿全流程
+    - 不修改盖娅之城任何现有文件
+    - 复用已有的a2a/message_bus.py/a2a/agent_registry.py
+    - Python语法验证通过
+iteration_log:
+  - "2026-06-08: v1.0初始版本, 基于盖娅之城discussion_engine+meeting_bp分析"
+product:
+  - "盖娅之城"
+  - "盖娅进化大脑"

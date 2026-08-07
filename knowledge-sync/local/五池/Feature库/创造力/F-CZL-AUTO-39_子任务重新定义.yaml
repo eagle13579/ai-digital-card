@@ -1,0 +1,9 @@
+feature_id: F-CZL-AUTO-39
+name: 子任务重新定义
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 重新定义问题本身而非解决原问题
+
+products:
+  - 通用: 自动匹配

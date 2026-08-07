@@ -1,0 +1,40 @@
+feature_id: 'F-CZL-链客宝-04'
+name: '创新引擎'
+type: 'feature'
+dimension: '创造力'
+source_model: '链客宝 innovation_engine — 创新机会发现引擎'
+source_path: 'D:\链客宝\backend\features\innovation_engine\'
+description: >
+  自动扫描用户行为与市场信号（匹配失败、未满足需求、搜索真空、需求突变、供需缺口5类信号），
+  经趋势分析（品类热度、供需平衡、新兴领域、企业画像、季节性5维分析）与交叉推荐
+  （置信度×紧迫性×商业价值综合评分排序去重），最终生成可执行的创新机会推荐清单。
+  核心组件：engine.py（引擎编排）+ opportunity_scanner.py（机会扫描器）
+  + recommender.py（交叉推荐器）+ trend_analyzer.py（趋势分析器）。
+inputs:
+  - '用户行为数据: 需求发布记录、搜索日志、浏览路径'
+  - '匹配事件数据: 匹配成功/失败记录及原因'
+  - '企业需求数据: 未满足的供需匹配请求'
+  - '品类/行业数据: 现有分类体系和标签'
+  - '引擎配置: EngineConfig（启用/禁用各组件、评分权重、阈值参数）'
+outputs:
+  - 'EngineResult: 完整引擎运行结果（含scan_result/trend_report/recommendation）'
+  - 'scan_result: OpportunitySignal列表（信号类型/置信度/来源/时间戳）'
+  - 'trend_report: TrendInsight列表 + 摘要报告（含品类热度/供需/新兴领域等）'
+  - 'recommendation: RecommendedOpportunity列表（综合评分+评分分解+可执行ActionStep）'
+sop:
+  - '1. 配置引擎参数：加载EngineConfig（数据源路径、评分权重、阈值设置），初始化各组件'
+  - '2. 机会扫描阶段：调用OpportunityScanner.scan()，扫描5种市场信号（match_failure/unmet_need/search_void/demand_spike/supply_gap），输出标准化OpportunitySignal列表'
+  - '3. 趋势分析阶段：调用TrendAnalyzer.analyze()，基于扫描结果执行5维趋势分析（品类热度/供需平衡/新兴领域/企业画像/季节性），输出TrendInsight列表与摘要'
+  - '4. 交叉推荐阶段：调用OpportunityRecommender.recommend()，对各信号与洞察进行综合评分（置信度×紧迫性×商业价值），合并去重后按优先级排序'
+  - '5. 为每个推荐机会生成ActionStep（操作类型+描述+负责人+优先级+预估工作量）'
+  - '6. 聚合三阶段结果到EngineResult，记录各阶段耗时与状态，输出引擎运行报告'
+quality_gate:
+  min_score: 5
+  score: 7
+current_score: 7
+status: 'active'
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-09'
+product: "链客宝"

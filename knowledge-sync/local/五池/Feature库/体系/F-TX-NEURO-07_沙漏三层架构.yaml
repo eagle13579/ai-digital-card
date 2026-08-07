@@ -1,0 +1,29 @@
+feature_id: F-TX-NEURO-07
+name: 沙漏三层架构
+version: 1.0.0
+dimension: 体系
+source_model: 脑神经间断平衡/H6-沙漏模型.md
+one_liner: AI系统的三层状态架构设计：活跃执行/待机值守/深度重构
+
+products:
+  - 通用: 自动匹配
+what_it_does: 将沙漏模型(清醒行动/休息引力池/睡眠混沌重组)映射为AI系统三层状态：上层活跃开发执行、中层待机监控值守、下层深度重构吸收
+input: 系统当前任务优先级和资源状态
+output: 建议的系统状态层 + 切换触发条件
+sop: '1. 评估当前系统负载和任务优先级
+
+  2. 如果P0任务量大则活跃执行层
+
+  3. 如果低负载无高优任务则待机值守层
+
+  4. 如果有深度吸收/重构任务则重构层
+
+  5. 按层执行对应操作集'
+quality_gate: '评分6/10: 三层架构覆盖80%系统场景'
+score: 7
+depends_on: []
+enhanced_by:
+- F-TX-NEURO-01
+implementation: scripts/system_state_manager.py
+draft: false
+last_upgraded: 2026-06-13

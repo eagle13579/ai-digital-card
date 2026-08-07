@@ -1,0 +1,50 @@
+id: amoeba-economy-agent-market
+name: 阿米巴经济与Agent自治市场
+version: 1.0.0
+status: beta
+
+products:
+  - 通用: 自动匹配
+description: >
+  基于阿米巴经营模式的Agent自治经济系统。每个智能体/团队拥有
+  独立账户、独立核算、自主经营。通过完成任务赚取收入、消费资源、
+  投资成长、团队分红，形成Agent内部市场经济闭环。
+
+architecture:
+  account_model:
+    - account_id: 唯一标识
+    - owner: agent_id / team_id
+    - balance_rmb: 可用余额
+    - frozen_rmb: 冻结金额（任务押金）
+    - level: NEWBIE→APPRENTICE→SKILLED→EXPERT→MASTER
+
+  transaction_types:
+    - INCOME: 完成任务获得奖励
+    - CONSUMPTION: 使用服务/资源
+    - INVESTMENT: 团队建设/技能培训
+    - DIVIDEND: 团队收益分配
+    - BONUS: 额外奖励
+    - PENALTY: 违规扣款
+
+  team_lifecycle:
+    - INCUBATING: 孵化中
+    - ACTIVE: 活跃运营
+    - MATURED: 成熟期
+    - LIQUIDATED: 已清算
+
+  growth_stages:
+    newbie: {tasks: "0-5", label: "新手"}
+    apprentice: {tasks: "5-20", label: "学徒"}
+    skilled: {tasks: "20-50", label: "熟练"}
+    expert: {tasks: "50-100", label: "专家"}
+    master: {tasks: "100+", label: "大师"}
+
+key_formula:
+  available_balance: "balance_rmb - frozen_rmb"
+  team_profit: "total_revenue_rmb - total_cost_rmb"
+  success_rate: "completed_tasks / total_tasks"
+
+integration:
+  - "指挥官(Commander)分配任务 → Agent认领 → 完成后发放奖励"
+  - "成本看板统计全系统经济流水"
+  - "Agent成长阶段影响模型Tier分配和任务优先级"

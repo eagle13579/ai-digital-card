@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-11
+name: 上下文泄露检测
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 检测context中的冗余/过时/冲突信息
+
+products:
+  - 通用: 自动匹配

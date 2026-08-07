@@ -1,0 +1,16 @@
+---
+id: F-UUX-04
+name: 反模式先行门禁
+dimension: 创造力
+source_model: UUX-04
+
+products:
+  - 通用: 自动匹配
+description: >-
+  每个设计决策先列出Avoid再列出Do，从根上减少试错成本
+sop: |-
+  详见原子模型 UUX-04
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

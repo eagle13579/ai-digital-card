@@ -1,0 +1,23 @@
+module_name: 风险-知识矩阵：P0致命盲区识别
+module_number: 15
+category: 创业方法-精益验证
+mental_models:
+  - 风险-知识矩阵
+  - P0致命盲区
+  - 不知道不知道
+  - 创业六大浪费
+  - 热爱憋大招
+learning_objectives:
+  - 掌握识别项目最大风险点的方法
+  - 学会区分P0盲区和一般风险
+  - 能制定优先级验证计划
+employee_roles:
+  - 产品经理
+  - 项目负责人
+  - 创业者
+source: 一堂创业课/创业方法-精益验证
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

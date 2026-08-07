@@ -1,0 +1,23 @@
+module_name: L型业务负责人
+module_number: 02
+category: 创业方法-机会预判
+mental_models:
+  - L型业务负责人
+  - P型vsL型思维模式
+  - 钻石模型
+  - 战略选项池
+  - 系统筛选方法论
+learning_objectives:
+  - 区分P型(激情型)和L型(逻辑型)创业者思维模式
+  - 掌握建立战略选项池和系统筛选的方法
+  - 理解L型思维如何将成功率从10%提升至30%+
+employee_roles:
+  - 业务负责人
+  - 创业团队核心成员
+  - 战略决策者
+source: 一堂创业课/创业方法-机会预判
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

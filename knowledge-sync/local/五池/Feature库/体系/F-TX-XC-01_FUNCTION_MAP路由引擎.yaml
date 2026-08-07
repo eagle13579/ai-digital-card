@@ -1,0 +1,24 @@
+feature_id: "F-TX-XC-01"
+name: "FUNCTION_MAP路由引擎"
+version: "1.0.0"
+dimension: "体系"
+source_model: "XCrawlerM1"
+one_liner: "用字典映射实现动态任务路由，取代if-else链"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  将任意函数注册到FUNCTION_MAP字典，通过字符串key动态调用。适用于任务调度、路由分发场景。
+input: |-
+  函数列表(名称+引用)
+output: |-
+  FUNCTION_MAP注册表+动态调用接口
+sop: |-
+  1. 定义FUNCTION_MAP字典 2. 注册函数 3. 通过字符串key路由 4. 支持Process/Thread并发调用
+quality_gate: |-
+  1. 路由延迟<1ms 2. 支持运行时注册 3. 函数签名兼容
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

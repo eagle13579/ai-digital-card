@@ -1,0 +1,57 @@
+feature_id: "F-TX-SRC-七层服务自愈保活"
+name: "七层服务自愈保活模式"
+version: "1.0.0"
+dimension: "体系"
+source_model: "scripts/service_watchdog_v2.py 完整实现(1070行)，含双探针+systemd保活+崩溃恢复+飞书告警+健康DB联动"
+one_liner: "基于service_registry.yaml注册表驱动的全服务自动保活系统，TCP+HTTP双探针轮询、3次递增重试自愈、飞书卡片告警、健康看板联动"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  军团看门狗系统是全服务的7层自愈基础设施:
+  
+  1. 服务发现 — service_registry.yaml注册表驱动，自动扫描ALL_KNOWN_PORTS(40+端口)
+  2. 双探针 — TCP connect_ex(1.5s超时) + HTTP /health健康端点(4s超时)双重验证
+  3. systemd保活 — 每60秒扫描，离线自动重启(PYTHON_CMD subprocess)
+  4. 崩溃恢复 — 最多3次重试，递增延迟(2s/4s/6s)，每次记录self_heal_records表
+  5. 飞书告警 — 自愈成功/失败/升级/恢复 → FEISHU_WEBHOOK_URL POST飞书卡片消息
+  6. 健康DB — SQLite(health_dashboard.db)统一存储uptime_log/state_changes/
+     alert_history/self_heal_records四张表
+  7. 双模式 — --cron单次执行(5分钟调度)/--daemon守护进程(60秒循环)
+  
+  覆盖P0核心(5003/5004/5010/8088等) + 出海(5030-5046) + 工具(5060/5111等) +
+  高级(5120/5150/5040等)四大类40+端口。
+input:
+  - service_registry.yaml (服务注册表)
+  - ALL_KNOWN_PORTS 端口列表(40+)
+  - health_dashboard.db (历史健康记录)
+output:
+  - 每个端口的健康状态(running/down/unknown)
+  - 自愈记录(attempt_count/success/action)
+  - 飞书告警事件(alert_type/title/content/color)
+  - 健康看板数据(uptime/state_changes趋势)
+sop: |
+  1. --daemon启动: while True循环，每60秒一轮
+  2. 读取service_registry.yaml获取服务名→端口映射
+  3. 对每个端口: TCP connect_ex检查(1.5s超时)
+  4. TCP通过→HTTP GET /health检查(4s超时, 验证status_code)
+  5. 若TCP失败: 标记down→尝试重启(PYTHON_CMD scripts/xxx.py)
+  6. 重启后等待HEALTH_POLL_WAIT=3s→再次TCP检查
+  7. 失败→重试, RETRY_DELAY_BASE递增(2/4/6s), 最多MAX_RETRIES=3次
+  8. 3次全失败→发送飞书告警(红色卡片)→写入alert_history
+  9. 成功恢复→发送飞书恢复告警(绿色卡片)
+  10. 全部状态写入health_dashboard.db(四张表)
+  11. --cron模式: 执行一轮后退出(适合crontab每5分钟)
+quality_gate:
+  score: 7
+  checks:
+    - "双探针验证(TCP+HTTP)减少误报"
+    - "3次递增重试(auto-heal)不轻易放弃"
+    - "飞书告警区分升级/恢复颜色"
+    - "健康DB四张表完备(uptime/state/alert/heal)"
+    - "覆盖核心+出海+工具+高级40+端口"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从service_watchdog_v2.py保活自愈架构提取"

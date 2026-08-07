@@ -1,0 +1,52 @@
+feature_id: 'F-TX-透明议事厅-01'
+name: '四阶段蜂巢会议编排体系'
+type: 'feature'
+dimension: '体系'
+source_model: '透明议事厅 — core/beehive_orchestrator.py（蜂巢编排引擎, 15KB） + scripts/hall_daemon.py（7x24值守体系） + core/session_tracker.py（Session生命周期管理）'
+source_path: 'D:\向海容的知识库\wiki\wiki\记忆宫殿\L5孵化室\产品开发\透明议事厅\'
+description: >
+  透明议事厅的核心编排体系，将AI产品创新过程标准化为四阶段蜂巢会议流程：
+  ①左脑发散阶段——6位左脑成员(乘黄P9·计然P8·鹿蜀P7·商羊P8·山膏P7·文鳐P9)
+  从产品/战略/设计/创意/体系/质量六维发散方案，每位成员有独立LLM角色系统提示词。
+  ②胼胝体TCP-R对话阶段——T-Thesis(左脑主张)→C-Counter(右脑反例)→P-Position(修正定位)
+  →R-Review(复盘评分)，最多3轮迭代至评分≥0.7阈值通过。
+  ③右脑收敛验证阶段——6位右脑成员(狴犴P8·烛龙P8·獬豸P8·䑏疏P8·谛听P8·耳鼠P7)
+  对TCP-R迭代后的方案从审查/工程/合规/场景/数据/调研六维验证。
+  ④红队终审裁决阶段——狴犴+獬豸做最终裁决(approve/approve_with_conditions/reject)，
+  综合评分=左脑评分×0.4 + 右脑验证率×0.6。
+  完整Session生命周期管理：discovery→discussing→validating→precipitated，
+  配套7x24值守体系(hall_daemon.py每30分钟循环)和Web API体系(Flask端口5055)。
+inputs:
+  - '议题内容: 需讨论的产品需求或创新方向（来自CLI用户输入或need_discovery自动发现）'
+  - '左右脑角色配置: LEFT_BRAIN_TEAM 6人 + RIGHT_BRAIN_TEAM 6人的name/role/expertise/grade'
+  - 'LLM系统提示词: LEFT_SYSTEM_PROMPTS 6条 + RIGHT_SYSTEM_PROMPTS 6条角色定义'
+  - '编排参数: max_rounds(默认3轮), score_threshold(默认0.7)'
+  - 'LLM客户端: LLMClient(支持DeepSeek API调用和mock降级双模式)'
+outputs:
+  - 'left_brain_divergence: 左脑发散结果（6份方案+评分+摘要）'
+  - 'tcp_r_result: 胼胝体TCP-R对话结果（轮次/评分/通过状态/对话日志）'
+  - 'right_brain_convergence: 右脑收敛结果（6项验证+通过率+摘要）'
+  - 'red_team_result: 红队终审裁决（verdict/c红队评论/风险清单/缓解措施）'
+  - 'completed_session: 完整Session记录（含四阶段产出/假设列表/沉淀记录）'
+sop:
+  - '1. Session创建：调用SessionTracker.create_session(topic)，初始化four_pillars(产品内核/单元模型/增长/壁垒)状态为pending'
+  - '2. 左脑发散阶段：BeehiveOrchestrator.left_brain_divergence()，LLM依次调6位左脑成员从专业角度提方案，每方案含content+score'
+  - '3. 胼胝体TCP-R对话：corpus_callosum_dialogue()，循环执行T(左脑主张)→C(右脑反例)→P(修正定位)→R(复盘评分)，最多max_rounds轮'
+  - '4. 右脑收敛阶段：right_brain_convergence()，6位右脑成员对TCP-R结果逐项验证(verified/confidence)'
+  - '5. 红队终审阶段：red_team_final()，狴犴+獬豸LLM分析左右脑产出，计算综合评分并输出裁决+标准风险模板+缓解措施'
+  - '6. Session完成：tracker.complete_session()，状态变更为precipitated，记录四阶段摘要/假设数/沉淀数'
+  - '7. 值守循环体系：hall_daemon.py每30分钟自动执行需求发现→蜂巢会议→验证→沉淀→循环'
+quality_gate:
+  min_score: 5
+  score: 8
+current_score: 8
+status: 'active'
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-10'
+product:
+  - "7x24值守"
+  - "文鳐技能集市"
+  - "獬豸"
+  - "透明议事厅"

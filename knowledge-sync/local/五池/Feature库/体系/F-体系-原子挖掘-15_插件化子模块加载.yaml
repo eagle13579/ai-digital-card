@@ -1,0 +1,66 @@
+feature_id: "F-体系-原子挖掘-15"
+name: "插件化子模块加载"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M16-插件化子模块加载"
+source_project: "AI获客"
+source_location: "D:/AI获客/gateway.py: try/except ImportError 插件化模块发现加载机制"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "通过try/except ImportError实现可插拔子模块自动发现与按需加载，未安装模块自动跳过不报错"
+what_it_does: |
+  场景：链客宝功能模块(名片/匹配/支付/消息/AI)需要可插拔——部署时按需启用，缺失模块不阻断启动。
+  问题：传统导入方式中缺失的依赖会导致整个应用启动失败，无法实现功能模块的按需部署和优雅降级。
+  价值：借鉴AI获客gateway.py的插件化加载模式——通过sys.path.insert动态添加模块搜索路径，
+  配合try/except ImportError实现模块的自动发现和按需加载，缺失模块自动跳过并记录日志，不影响其他功能。
+  架构亮点：sys.path动态扩展 + try/except ImportError容错导入 + 模块注册表 + 优雅降级(缺失模块返回友好提示)。
+
+input: |
+  - 模块搜索路径: 待扫描的子模块目录列表
+  - 模块注册表: 已知模块名→处理函数的映射(可选)
+  - 依赖检查: 每个模块的第三方依赖列表
+  - 降级策略: 模块加载失败时的处理方式(skip/fallback/error)
+
+output: |
+  - 已加载模块列表: 成功发现并加载的模块清单
+  - 跳过模块列表: 因依赖缺失跳过的模块清单+原因
+  - 模块处理器映射: URL路径→已加载模块处理器的路由表
+  - 加载报告: 各模块加载状态/耗时/依赖检查结果
+
+sop: |
+  1. 遍历配置的模块搜索路径，收集所有可导入的Python模块
+  2. 对每个候选模块: sys.path.insert(0, 模块目录) 将其加入搜索路径
+  3. try: __import__(模块名) 尝试导入
+  4. except ImportError: 记录缺失依赖到日志，跳过该模块(不阻断启动)
+  5. except Exception: 记录异常到日志，跳过(模块实现问题)
+  6. else: 成功加载，将模块处理器注册到路由表
+  7. 所有模块处理完毕后，输出加载报告(已加载/跳过/异常)
+  8. 运行时: 请求到达时根据路由表分发到已加载模块，未加载模块返回503+友好提示
+
+quality_gate:
+  - gate: "故障隔离"
+    standard: "任一模块加载失败不影响其他模块和整体服务"
+    score: 5
+  - gate: "自动发现"
+    standard: "新增模块放入搜索目录后无需配置即可自动加载"
+    score: 5
+  - gate: "依赖声明"
+    standard: "每个模块声明其第三方依赖，缺失时给出明确安装指引"
+    score: 5
+  - gate: "优雅降级"
+    standard: "缺失模块的API端点返回503+JSON错误，不抛5xx"
+    score: 5
+
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从AI获客gateway.py插件化模块加载机制提取
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

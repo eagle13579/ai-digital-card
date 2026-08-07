@@ -1,0 +1,9 @@
+feature_id: F-CZL-AG-29
+name: 发货门禁动态调整
+version: 1.0.0
+dimension: 创造力
+source_model: agent-skills吸收
+one_liner: 根据项目风险等级动态调整12维门禁权重
+
+products:
+  - 通用: 自动匹配

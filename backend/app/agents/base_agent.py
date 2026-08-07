@@ -358,7 +358,7 @@ class BaseAgent(abc.ABC):
             try:
                 ingest_kwargs = {
                     "source": f"agent_{self.agent_id}",
-                    "source_id": f"obs_{self.memory['experience_count']}",
+                    "source_id": f"obs_{self.agent_name}_{self.memory['experience_count']}",
                     "knowledge_type": "insight",
                     "title": f"{self.agent_name}: {observation[:80]}",
                     "content": observation,
@@ -366,12 +366,24 @@ class BaseAgent(abc.ABC):
                 if metadata:
                     ingest_kwargs["tags"] = list(metadata.keys())[:5]
                     ingest_kwargs["confidence"] = metadata.get("confidence", 0.8)
-                await self.brain.ingest_knowledge(**ingest_kwargs)
-            except Exception:
-                logger.warning(
-                    "Agent '%s' failed to feed observation to brain",
-                    self.agent_name,
-                )
+                # brain.ingest_knowledge 需要 db session（AsyncSession 位置参数）
+                from app.database import AsyncSessionLocal
+                async with AsyncSessionLocal() as db:
+                    await self.brain.ingest_knowledge(db, **ingest_kwargs)
+                    await db.commit()
+            except Exception as exc:
+                # 幂等：重复 source_id（UniqueViolation）静默跳过，不算失败
+                if "UniqueViolation" in repr(exc) or "duplicate key" in repr(exc).lower():
+                    logger.debug(
+                        "Agent '%s' knowledge already ingested (idempotent skip)",
+                        self.agent_name,
+                    )
+                else:
+                    logger.warning(
+                        "Agent '%s' failed to feed observation to brain: %s",
+                        self.agent_name,
+                        repr(exc),
+                    )
         else:
             logger.debug(
                 "Agent '%s' learned (brain not available): %s",

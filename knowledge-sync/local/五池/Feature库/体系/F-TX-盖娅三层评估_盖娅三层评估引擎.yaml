@@ -1,0 +1,56 @@
+feature_id: "F-TX-盖娅三层评估"
+name: "盖娅三层评估引擎"
+version: "1.0.0"
+dimension: "体系"
+source_model: "gaia-cortex SKILL.md §三层评估引擎 + scripts/gaia_cortex_three_layer.yaml + double-triangle-model-absorption v4.0"
+created_at: "2026-06-08"
+updated_at: "2026-06-08"
+author: "白泽 (盖娅进化大脑Feature化)"
+last_execution: "2026-06-08"
+
+one_liner: "宏观·中观·微观三层评估(0-10分)，综合健康度=macro×0.4+meso×0.35+micro×0.25，每次进化循环后自动触发"
+
+products:
+  - 盖娅之城: 自动匹配
+what_it_does: |
+  在七层飞轮完成后并行运行的三层评估引擎。宏观层评估商业竞争力/领域穿透/AI for Business；中观层评估饱和攻击聚焦/实事求是门禁；微观层评估迭代深度/交付评分/Feature RORY。双格式报告(JSON+MD)。
+
+input: |
+  - 产品目录+进化日志+代码资产
+  - 目标市场/用户需求/护城河数据
+  - Feature迭代次数+评分记录
+
+output: |
+  - 三层评分(0-10分): 宏观/中观/微观
+  - 综合健康度 + 薄弱维度排名
+  - JSON(机器可读)+Markdown(人类可读)
+
+sop: |
+  1. `python gaia_cortex.py --assess` 全三层评估
+  2. 宏观层: 商业竞争力·领域穿透·AIBusiness成熟度
+  3. 中观层: 战场聚焦·单点打穿·实事求是门禁
+  4. 微观层: 迭代深度·三迭代门·Feature RORY
+  5. 综合健康度 = macro×0.4 + meso×0.35 + micro×0.25
+  6. 注入L0感知层信号→下一轮飞轮循环感知
+  可选: --assess-layer macro/meso/micro 单层评估
+
+  quality_gate:
+  - gate: "三层全覆盖"
+    standard: "三层各至少3个维度评分"
+    score: 7
+  - gate: "薄弱标注"
+    standard: "评分<5维度的improvement路径"
+    score: 6
+
+score_target: "9/10"
+depends_on:
+  - "F-TX-盖娅七层飞轮"
+
+enhanced_by:
+  - "F-CZL-盖娅左脑发散"
+
+aggregate_components: []
+
+iteration_log: |
+  v1.0.0 - 创建: 2026-06-08 盖娅进化大脑Feature化
+  # 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

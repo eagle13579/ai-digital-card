@@ -1,0 +1,24 @@
+name: 测试能力
+version: 1.0.0
+description: The Agency吸收 - 测试角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Accessibility Auditor
+  - API Tester
+  - Evidence Collector
+  - Performance Benchmarker
+  - Reality Checker
+  - Test Results Analyzer
+  - Tool Evaluator
+  - Workflow Optimizer
+capabilities:
+  - API自动化测试与接口验证
+  - 无障碍审计与合规检查
+  - 性能基准测试与压力测试
+  - 测试证据收集与结果分析
+  - 回归检测与真实场景校验
+  - 工具评估与工作流优化
+integration: 直接补充AI数字军团测试能力

@@ -1,0 +1,9 @@
+feature_id: F-MH-04_AI副业资源矩阵
+name: 6大AI副业领域+30个子类的完整资源矩
+version: 1.0.0
+dimension: 场景
+source_model: AiMonneyHunter吸收
+one_liner: 6大AI副业领域+30个子类的完整资源矩阵
+
+products:
+  - 通用: 自动匹配

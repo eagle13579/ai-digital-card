@@ -1,0 +1,13 @@
+name: "Markdown公司包"
+description: "将AI数字军团/盖娅之城编码为可移植Markdown包，含COMPANY.md清单+YAML前言"
+version: "1.0.0"
+status: "atomic"
+dimension: "体系"
+source: "Paperclip company-portability.ts"
+atoms:
+  - PP-01_markdown-as-manifest
+  - PP-02_dual-temporal-id
+  - PP-08_two-phase-commit-import
+products:
+  - 盖娅之城 (城市导入导出)
+  - AI数字军团 (军团配置迁移)

@@ -1,0 +1,64 @@
+feature_id: "F-体系-原子挖掘-01"
+name: "多策略加权匹配评分"
+version: "1.0.0"
+dimension: "体系"
+source_model: "M1-多策略加权匹配评分"
+source_project: "链客宝主工程"
+source_location: "D:/链客宝/matching_engine.py: 类目40%+关键词40%+价格20%, 支持A/B策略(v1/v2)"
+created_at: "2026-06-08"
+author: "Hermes Agent (原子挖掘)"
+
+one_liner: "多维度加权评分匹配引擎，支持A/B策略切换和多样性重排序"
+what_it_does: |
+  场景：链客宝供需匹配场景需要综合多个维度计算匹配分数。
+  问题：单一维度匹配准确性不足，业务方需要灵活调整各维度权重。
+  价值：通过类目/关键词/价格加权评分+TF-IDF增强+MMR多样性重排序，显著提升匹配精度和用户体验。
+  架构亮点：规则匹配(v1) + TF-IDF增强(v2) + 特征管道(feature_pipeline) + 多样性重排序(MMR) + 反馈闭环。
+
+input: |
+  - 用户画像: 用户类目偏好、关键词、预算范围
+  - 候选池: 待匹配的供应/需求条目列表
+  - 策略版本: v1(规则)/v2(TF-IDF增强)
+  - 历史反馈: 用户之前的点击/曝光数据(可选)
+
+output: |
+  - 排序结果: 按综合评分降序排列的匹配列表
+  - 维度得分: 每个维度的独立评分(类目/关键词/价格)
+  - 多样性增益: MMR重排序后的多样性提升指标
+  - A/B实验标签: 当前命中策略版本
+
+sop: |
+  1. 接收用户画像和候选池
+  2. 按配置权重计算各维度评分(类目40%+关键词40%+价格20%)
+  3. 如启用v2策略，执行TF-IDF语义增强
+  4. 运行特征管道(feature_pipeline)提取附加特征
+  5. 执行MMR多样性重排序
+  6. 输出排序结果和维度得分
+  7. 记录曝光(impression)日志供数据飞轮消费
+
+quality_gate:
+  - gate: "权重合规"
+    standard: "各维度权重之和为100%，可配置化"
+    score: 5
+  - gate: "A/B实验隔离"
+    standard: "v1/v2策略实验结果互不影响，有独立指标追踪"
+    score: 5
+  - gate: "MMR多样性达标"
+    standard: "前N结果中同一类目占比不超过50%"
+    score: 5
+  - gate: "延迟性能"
+    standard: "单次匹配计算不超过500ms"
+    score: 5
+
+score_target: "9/10"
+depends_on: ["F-数据-原子挖掘-02"]
+enhanced_by: []
+
+iteration_log: |
+  v1.0.0 - 创建: 从链客宝主工程matching_engine.py提取，初始版本
+
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: 

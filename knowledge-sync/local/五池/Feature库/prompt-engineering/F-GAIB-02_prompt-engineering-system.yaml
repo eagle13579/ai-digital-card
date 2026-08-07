@@ -1,0 +1,17 @@
+name: Prompt Engineering 完整体系
+version: 1.0.0
+status: production
+dimension: prompt-engineering
+source: microsoft/generative-ai-for-beginners (Lesson 04, 05)
+description: "从System Message到高级提示技术的完整Prompt Engineering体系。覆盖Zero-shot、Few-shot、CoT、Self-Refine、Chained Prompts"
+atoms:
+  - GAIB-03: Prompt Engineering 迭代心智
+  - GAIB-06: 核心提示技术体系
+  - GAIB-07: Instruction-Tuned LLM & System Message
+products:
+  - 白泽控制台: 所有数字员工的System Message模板
+  - 赛博参谋: 决策Prompt模板
+  - 盖娅推理中间件: 五阶段推理prompt设计
+employees:
+  - 文鳐P9: Prompt模板管理
+  - 白泽P9: System Message设计

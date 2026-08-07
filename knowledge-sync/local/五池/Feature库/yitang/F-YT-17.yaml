@@ -1,0 +1,22 @@
+module_name: 第0轮原则
+module_number: 17
+category: 创业方法-精益验证
+mental_models:
+  - 第0轮原则
+  - 先类比/竞品调研
+  - 能烧别人的钱不烧自己的
+  - 第0轮vs第1轮验证
+learning_objectives:
+  - 掌握正式验证前先做类比和竞品调研的原则
+  - 学会用最低成本获取已有认知
+  - 能判断何时进入第1轮验证
+employee_roles:
+  - 产品经理
+  - 创业者
+  - 研究员
+source: 一堂创业课/创业方法-精益验证
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

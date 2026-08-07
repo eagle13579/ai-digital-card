@@ -1,0 +1,17 @@
+feature_id: F-场景-行动项-Are_you_expected_to_run_five_Python_type-checkers_
+name: Are you expected to run five Python type-checkers now?
+description: Are you expected to run five Python type-checkers now?
+type: 行动项
+draft: false
+source: D:\向海容的知识库\wiki\wiki\记忆宫殿\五池\行动池\Are_you_expected_to_run_five_Python_type-checkers_now__precip-1781070395.md
+status: pending_review
+
+products:
+  - 通用: 自动匹配
+created_at: '2026-06-13T02:45:14'
+tags:
+- 行动项
+- 行动池
+- 自动化注入
+related_employees: []
+capabilities: []

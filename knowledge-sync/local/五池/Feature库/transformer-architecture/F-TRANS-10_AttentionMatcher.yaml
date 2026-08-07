@@ -1,0 +1,39 @@
+name: "F-TRANS-10"
+title: "Attention Matcher — QKV供需匹配引擎"
+version: 1.0.0
+category: "Transformer产品注入"
+description: "将Transformer Attention(Q,K,V)=softmax(Q·K^T/√d)·V映射到企业家供需匹配。Q=需求标签,K=企业家能力标签,V=负载可用性。已注入链客宝匹配引擎。"
+
+atoms:
+  - "T03 QKV三重奏"
+  - "T04 注意力机制"
+  - "T05 Multi-Head"
+
+code_references:
+  - file: "attention_matcher.py"
+    class: "AttentionMatcher"
+    method: "match"
+    lines: 72-120
+    summary: "核心Attention匹配: Q=query_tags向量,K=候选对象tags向量,V=1-load/max_load。softmax归一化后加权得到综合分"
+    link: "L5孵化室/五池/Feature库/transformer-architecture/"
+
+product_injection:
+  - product: "链客宝"
+    path: "D:\\chainke-full\\backend\\features\\trust_engine\\attention_matcher.py"
+    module: "features.trust_engine.attention_matcher"
+    integration_point: "matching.py中可导入AttentionMatcher替代当前关键字匹配"
+    verified: true
+
+features:
+  - name: "负载感知路由"
+    desc: "V=availability确保不会把任务派给已过载的员工/企业家"
+  - name: "温度调节"
+    desc: "temperature参数控制注意力分布的集中度(低温度→更集中派给第一名)"
+  - name: "自动词表扩展"
+    desc: "新能力标签自动注册到词表,无需预定义"
+
+demo_result:
+  query: "ai,出海,融资"
+  top1: "张总(ai,saas,融资), attention=0.2834"
+  top2: "赵总(saas,企业服务,融资), attention=0.1868"
+  note: "王总(ai,电商,出海)虽标签匹配但因负载高(8/10)被降权"

@@ -1,0 +1,9 @@
+feature_id: F-MH-01_三方共赢传播引擎
+name: 博主-用户-平台三方共赢的病毒传播机制设
+version: 1.0.0
+dimension: 场景
+source_model: AiMonneyHunter吸收
+one_liner: 博主-用户-平台三方共赢的病毒传播机制设计
+
+products:
+  - 通用: 自动匹配

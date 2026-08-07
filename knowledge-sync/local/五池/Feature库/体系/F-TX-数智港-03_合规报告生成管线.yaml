@@ -1,0 +1,53 @@
+# === Feature 定义文件 ===
+feature_id: "F-TX-数智港-03"
+name: "合规报告生成管线"
+version: "1.0.0"
+dimension: "体系"
+source_model: "compliance_knowledge_base.py + routes/compliance.py(1305行)"
+
+## 定位
+one_liner: "从合规诊断到PDF/HTML报告自动生成+监控预警的完整管线"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  完整合规报告生命周期：前端问卷输入→诊断评分→风险分析→报告生成HTML/PDF→客户展示→监控预警。含路由层(compliance.py 1305行)全量API接口。
+  
+input: |
+  客户注册信息 + 产品资料 + 合规问卷答案
+  
+output: |
+  合规诊断报告HTML + PDF导出 + 风险监控预警 + 多产品对比视图
+  
+sop: |
+  1. 客户注册(company/product/contact信息)
+  2. 产品资料上传(品类/成分/标签/包装图)
+  3. 合规问卷自动生成(基于品类)
+  4. 合规诊断引擎执行评分
+  5. LLM增强分析生成报告文本
+  6. 渲染为品牌化HTML报告
+  7. 可选PDF导出
+  8. 注册风险监控
+  
+  quality_gate:
+  - gate: "报告包含>=5个诊断维度"
+    standard: "通过"
+    score: 6
+  - gate: "风险分级(低/中/高/严重)有明确标准"
+    standard: "通过"
+    score: 6
+  - gate: "支持PDF导出(打印样式)"
+    standard: "通过"
+    score: 6
+  - gate: "监控预警周期可配置(7/15/30天)"
+    standard: "通过"
+    score: 6
+  
+  score_target: "10/10"
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，2026-06-08
+  2026-06-12: 0分Feature修复 + 初始评分
+  

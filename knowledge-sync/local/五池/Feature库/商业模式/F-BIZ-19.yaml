@@ -1,0 +1,13 @@
+# F-BIZ-19: 标杆案例验证引擎
+id: "F-BIZ-19"
+name: "标杆案例验证引擎"
+dimension: "🧱 基本功"
+domain: "商业模式"
+description: "跑通一个真实标杆案例→提炼可复用模型→复制到N个行业"
+source_model: "M-BIZ-19"
+source: "向海容与合作伙伴对话 2026-06-14"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

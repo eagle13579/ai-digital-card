@@ -1,0 +1,6 @@
+feature_id: F-CZL-AUTO-01
+name: 多方案发散
+version: 1.0.0
+dimension: 创造力
+source_model: 自主进化
+one_liner: 不满足于第一个方案,强制生成3+方案

@@ -1,0 +1,16 @@
+---
+id: F-UUX-05
+name: 域感知搜索引擎
+dimension: 场景
+source_model: UUX-05, UUX-10
+
+products:
+  - 通用: 自动匹配
+description: >-
+  7域(product/style/typography/color/landing/ux/chart)BM25+Regex设计数据库
+sop: |-
+  详见原子模型 UUX-05, UUX-10
+quality_gate: |-
+  设计门禁不可跳过
+draft: false
+created_at: 2026-06-13

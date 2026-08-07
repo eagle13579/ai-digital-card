@@ -1,0 +1,7 @@
+name: wiki-创造力
+dimension: 创造力
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - 异步编程

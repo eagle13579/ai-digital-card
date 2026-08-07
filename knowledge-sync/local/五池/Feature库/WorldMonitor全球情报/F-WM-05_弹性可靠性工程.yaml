@@ -1,0 +1,20 @@
+id: F-WM-05
+name: 弹性可靠性工程
+description: >
+  结合 WM09 健康检查与自愈机制以及 WM11 自动化混沌工程，建立WorldMonitor
+  全链路的弹性可靠性体系。服务网格层内置熔断、限流、重试与舱壁隔离策略；
+  混沌平台定期注入网络延迟、节点宕机、磁盘IO毛刺等故障场景，验证系统在
+  极端条件下的自愈能力与SLO达标率。所有演练结果自动生成可靠性报告。
+dimension: 基本功
+domain: WorldMonitor
+status: 规划中
+tags:
+  - 混沌工程
+  - 弹性设计
+  - 服务网格
+  - 自愈
+  - SLO
+source: WM09 + WM11
+
+products:
+  - 通用: 自动匹配

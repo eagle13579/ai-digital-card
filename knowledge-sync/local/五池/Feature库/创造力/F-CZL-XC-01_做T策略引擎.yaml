@@ -1,0 +1,24 @@
+feature_id: "F-CZL-XC-01"
+name: "做T策略引擎"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "XCrawlerM9"
+one_liner: "基于分时图量价+MACD+均线回归的日内做T策略"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  在震荡市中执行高抛低吸：5日均线回归均值，分时图MACD金叉/死叉决策，成交量确认。
+input: |-
+  分时数据(OHLCV)+5日均线值
+output: |-
+  做T信号(买入/卖出/持有+价格区间+置信度)
+sop: |-
+  1. 识别震荡区间 2. 计算5日均线回归 3. 分析分时MACD 4. 成交量确认 5. 输出做T信号
+quality_gate: |-
+  1. 信号延迟<30s 2. 胜率要求>60% 3. 每笔交易有止盈止损
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: XCrawler吸收+代码收割

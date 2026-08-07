@@ -1,0 +1,26 @@
+feature_id: F-CJ-软银-05
+name: 双板趋势阳升模型（红星发展型）
+version: "1.0"
+dimension: 场景
+source_model: 2026-06-10 向海容实战复盘
+one_liner: 2连板后不回调，连续阳线推升走趋势
+
+products:
+  - 通用: 自动匹配
+what_it_does: 识别并量化该模式
+sop: |
+  Phase 1 — 确认2连板
+  Phase 2 — 确认趋势
+  连板后连续3日以上收阳线
+  每日涨幅2-5%，不回补涨停缺口
+  沿5日线上行
+  Phase 3 — 量能确认
+  趋势日成交量温和（非爆量）
+  资金持续小幅流入
+quality_gate:
+  score: 7
+  checks:
+    - 基于实战数据验证
+iteration_log:
+  - "2026-06-10: v1.0初始版本，向海容命名"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

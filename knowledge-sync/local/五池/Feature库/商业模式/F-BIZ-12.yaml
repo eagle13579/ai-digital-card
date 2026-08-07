@@ -1,0 +1,16 @@
+# F-BIZ-12: 四梁八柱价值隔离
+id: "F-BIZ-12"
+name: "四梁八柱价值隔离"
+dimension: "🧱 体系"
+domain: "商业模式"
+description: "核心价值留存在有限公司实体，风险隔离收益共享"
+source_model: "M-BIZ-12"
+source: "新坐标公司会议纪要 (2026-06-14)"
+sop: |
+  识别4梁8柱→有限公司持股→项目公司运营→收益回流
+quality_gate: "评分≥7/10"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

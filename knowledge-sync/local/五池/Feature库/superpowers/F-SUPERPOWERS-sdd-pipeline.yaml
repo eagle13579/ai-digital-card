@@ -1,0 +1,25 @@
+name: superpowers-sdd-pipeline
+dimension: 体系
+description: SDD六阶流水线 — 编码Agent的完整SDLC方法论
+source: obra/superpowers (GitHub 245K Stars)
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - Ask-First需求澄清协议
+  - Design-First架构设计前置
+  - MECE任务拆解与计划制定
+  - Subagent并行执行与动态编队
+  - Evidence-Driven质量审查
+  - 渐进式交付与变更管理
+mental_models:
+  - SP-01_SDD-Subagent-Driven-Development
+  - SP-02_Ask-First-Protocol
+  - SP-06_Design-First-Iteration
+triggers:
+  - 任何编码任务开始前自动激活
+  - 复杂度>50行或文件>3个时强制执行
+integration:
+  - 对齐龙虾群聊五阶指挥链
+  - 增强delegate_task的审查后门禁
+  - 补充SKILL.md的「设计展示」阶段

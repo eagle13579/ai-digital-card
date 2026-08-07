@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-46
+name: 组合创新方案
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 将N个现有Feature排列组合发现新产品机会
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,9 @@
+feature_id: F-AS-01_六阶段开发生命周期引擎
+name: 六阶段开发生命周期引擎
+version: 1.0.0
+dimension: 体系
+source_model: agent-skills吸收
+one_liner: 六阶段开发生命周期引擎。DEFINE->PLAN->BUILD->VERIFY->REVIEW->SHIP标准化流程，每阶段有对应skill。
+
+products:
+  - 通用: 自动匹配

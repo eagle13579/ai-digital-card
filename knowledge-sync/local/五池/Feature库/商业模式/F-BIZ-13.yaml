@@ -1,0 +1,16 @@
+# F-BIZ-13: DAO式进退机制
+id: "F-BIZ-13"
+name: "DAO式进退机制"
+dimension: "⚙️ 基本功"
+domain: "商业模式"
+description: "规则代替管理：进绑定、停2次、退4次按比例"
+source_model: "M-BIZ-13"
+source: "新坐标公司会议纪要 (2026-06-14)"
+sop: |
+  规则写入智能合约→自动执行→争议仲裁
+quality_gate: "评分≥7/10"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

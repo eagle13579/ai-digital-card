@@ -1,0 +1,141 @@
+name: "F-TRANS-02"
+title: "位置感知编码器"
+version: 2.0.0
+category: "序列建模"
+description: "通过位置编码注入序列中Token的相对/绝对位置信息,打破自注意力的置换不变性,使模型感知语序关系"
+
+# ============================================================
+# 关联原子心智模型
+# ============================================================
+atoms:
+  - "T02 位置编码"
+
+# ============================================================
+# 核心实现: 代码引用
+# ============================================================
+code_references:
+
+  # --- 可学习位置编码 (nanoGPT/GPT-2) ---
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "__init__"
+    lines: 126
+    summary: "wpe = nn.Embedding(block_size, n_embd) — 可学习位置嵌入表,block_size=1024,n_embd=768,每个位置一个独立学习参数"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "forward"
+    lines: 172-177
+    summary: "pos_emb = self.transformer.wpe(pos) → x = tok_emb + pos_emb — 获取与Token嵌入等维的位置向量,逐元素求和注入位置信息"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  - file: "nanoGPT_model.py"
+    class: "GPT"
+    method: "crop_block_size"
+    lines: 193-202
+    summary: "self.transformer.wpe.weight = wpe.weight[:block_size] — 模型外科手术:裁剪位置嵌入表以支持更短的序列长度,无需重新训练"
+    link: "L1图书馆/代码资产库/transformer-architecture/nanoGPT_model.py"
+
+  # --- 正弦波位置编码 (原论文) ---
+  - file: "paper_Models.py"
+    class: "PositionalEncoding"
+    method: "_get_sinusoid_encoding_table"
+    lines: 34-45
+    summary: "正弦波编码: PE(pos,2i)=sin(pos/10000^{2i/d}), PE(pos,2i+1)=cos(...) — 无需学习参数,可外推到训练时未见的更长序列"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  - file: "paper_Models.py"
+    class: "PositionalEncoding"
+    method: "forward"
+    lines: 47-48
+    summary: "x + self.pos_table[:, :x.size(1)] — 从预计算编码表中切片对应位置,直接加到输入Token嵌入上"
+    link: "L1图书馆/代码资产库/transformer-architecture/paper_Models.py"
+
+  # --- RoPE旋转位置编码 (Llama) — 新增! ---
+  - file: "huggingface_LlamaAttention.py"
+    class: "LlamaAttention"
+    method: "forward"
+    lines: 141-143
+    summary: "cos, sin = position_embeddings → query_states, key_states = apply_rotary_pos_emb(q, k, cos, sin) — 对Q和K向量施加旋转矩阵,在注意力计算时隐式编码相对位置"
+    link: "L1图书馆/代码资产库/transformer-architecture/huggingface_LlamaAttention.py"
+
+# ============================================================
+# 实现模式: Python伪代码
+# ============================================================
+implementation_pattern: |
+  class PositionEncoder:
+      """
+      位置感知编码器 — 注入序列位置信息
+
+      三种编码模式:
+      ┌──────────┬──────────────────────────────────────┬──────────────────────┐
+      │  模式    │ 实现方式                             │ 适用场景             │
+      ├──────────┼──────────────────────────────────────┼──────────────────────┤
+      │ Learned  │ nn.Embedding(block_size, d_model)   │ GPT-2/BERT(固定长度) │
+      │ Sinusoidal│ sin/cos预计算表                     │ 原论文(可外推)        │
+      │ RoPE     │ 旋转矩阵作用于Q/K向量               │ Llama(相对位置)       │
+      └──────────┴──────────────────────────────────────┴──────────────────────┘
+
+      Mode 1: Learned Encoding (nanoGPT风格)
+        pos_ids = arange(0, seq_len)                        # 整数位置索引
+        pos_emb = wpe(pos_ids)                               # 查表: (seq_len, d_model)
+        output = token_emb + pos_emb                         # 逐元素加和
+
+      Mode 2: Sinusoidal Encoding (原论文风格)
+        def _sinusoid(pos, i, d_model):
+            angle = pos / (10000 ** (2 * i // 2 / d_model))
+            return sin(angle) if i % 2 == 0 else cos(angle)
+        # 预计算全表: pos_table[0..max_pos, 0..d_model-1]
+        output = token_emb + pos_table[:seq_len]
+
+      Mode 3: Rotary Position Encoding (RoPE, Llama风格)
+        # 对Q和K向量的每两个连续维度施加旋转
+        # RoPE(q, pos) = q * cos(pos*theta) + rotate(q) * sin(pos*theta)
+        # 核心优势: 注意力分数自动编码相对位置,无需显式位置嵌入
+        cos, sin = precomputed_cos_sin[position_ids]
+        q_rotated = apply_rotary_pos_emb(q, cos, sin)
+        k_rotated = apply_rotary_pos_emb(k, cos, sin)
+        scores = q_rotated @ k_rotated.T  # 自动包含相对位置信息
+  """
+
+# ============================================================
+# 设计原则
+# ============================================================
+design_principles:
+  - "序列序关系无损注入,保持自注意力并行计算优势 — 位置编码不破坏注意力计算的矩阵并行性"
+  - "支持绝对位置与相对位置的双模切换与融合 — Learned/Sinusoidal(绝对) vs RoPE(相对)"
+  - "可学习vs固定的权衡: Learned更灵活(需预训),Sinusoidal可外推(无参数),RoPE兼顾精度与外推"
+
+# ============================================================
+# 产品适配 (链客宝/AI名片/数智港)
+# ============================================================
+product_adaptations:
+  - product: "链客宝"
+    component: "供需匹配时序分析引擎"
+    description: >
+      在链客宝的供需动态匹配中,时间顺序至关重要(如"先发布需求→后匹配资源")。
+      采用RoPE位置编码编码时间序列,使匹配模型天然感知"最近发布"与"历史发布"的相对时序关系,
+      提升时效性匹配准确率。
+
+  - product: "AI名片"
+    component: "多语言混合序列编码器"
+    description: >
+      AI名片中的自我介绍可能包含中英文混合内容。使用Sinusoidal编码(可外推)处理
+      任意长度的自我介绍文本,不限制名片文本最大长度,支持从短简介到长履历的灵活接入。
+      未来RoPE适配后可处理多语言混合输入的语序感知。
+
+  - product: "数智港"
+    component: "时序数据分析管线"
+    description: >
+      处理金融时序/日志序列/传感器数据流等场景。RoPE编码天然适合变长序列的时间外推,
+      无需预设最大序列长度,可灵活处理数智港中不同粒度的时序数据(秒级~日级聚合)。
+
+# ============================================================
+# 演进路径
+# ============================================================
+evolution_potential:
+  - "已落地: RoPE旋转位置编码 — 从LlamaAttention中吸收,作为F-TRANS-02的增强模式"
+  - "ALiBi(Attention with Linear Biases)位置偏差: 对注意力分数加线性偏置,无需额外参数"
+  - "xPOS(相对位置外推): 结合RoPE与ALiBi的外推能力增强"
+  - "多尺度位置编码: 不同注意力头使用不同频率的位置编码,捕获不同粒度的序列关系"

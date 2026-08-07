@@ -1,0 +1,50 @@
+# Feature: 委派队列消费端
+# ID: F-EMP-EVO-07
+# 维度: 场景
+# 创建: 2026-06-10
+
+name: "委派队列消费端"
+id: "F-EMP-EVO-07"
+dimension: "场景"
+version: "1.0"
+status: "active"
+
+description: >
+  自动消费gaia_delegation_queue.json中的任务项。
+  cronjob每15分钟读取队列，对auto_assign=True的P0项
+  调用delegate_task分配给推荐员工。
+  解决「队列有45项但无人消费」的系统性断裂。
+
+source_model: "M_委派队列模式 + M_硬编码路由陷阱"
+
+products:
+  - 通用: 自动匹配
+input:
+  - "cache/gaia_delegation_queue.json (进化引擎写入的委派队列)"
+  - "employees/*/employee.yaml (确认推荐员工有基本能力配置)"
+
+output:
+  - "delegate_task: 实际分配任务给L0员工"
+  - "队列中标记已消费项(从队列移除)"
+  - "每15分钟最多消费2项"
+
+sop:
+  step_1: "读取委派队列JSON"
+  step_2: "筛选auto_assign=True且未消费的P0项"
+  step_3: "读取推荐员工的employee.yaml确认配置"
+  step_4: "调用delegate_task分配简单任务(文档/测试/知识整理)"
+  step_5: "队列中标记该任务为consumed"
+  step_6: "每tick最多处理2项"
+
+constraints:
+  - "每15分钟最多2项(避免单次超时)"
+  - "优先消费P0 > P1"
+  - "跳过recommended_employee=未指定的项(需CEO确认)"
+  - "队列为空时跳过消费阶段"
+
+iterations:
+  - date: "2026-06-10"
+    action: "白泽更新cronjob为15分钟周期含消费逻辑"
+    score: 7
+    note: "消费端依赖Hermes cronjob agent的delegate_task能力"
+product: "AI数智军团"

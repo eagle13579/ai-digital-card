@@ -1,0 +1,7 @@
+name: backend-体系
+dimension: 体系
+
+products:
+  - 通用: 自动匹配
+capabilities:
+  - FastAPI架构

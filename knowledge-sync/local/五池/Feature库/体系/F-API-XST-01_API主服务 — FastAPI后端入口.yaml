@@ -1,0 +1,28 @@
+feature_id: F-API-XST-01
+name: API主服务 — FastAPI后端入口
+dimension: 体系
+version: "1.0"
+status: active
+source_model: 芯森态 api/main.py (62行)
+
+products:
+  - 通用: 自动匹配
+description: 芯森态FastAPI后端主入口，注册所有路由、CORS中间件、数据库初始化
+
+input: 无（服务启动时初始化）
+
+output: FastAPI应用实例，端口5080，12个API端点
+
+sop: |
+  uvicorn api.main:app --host 0.0.0.0 --port 5080
+
+quality_gate:
+  score: 6
+  checks:
+  - 端点返回200
+  - 数据流验证通过
+  - 错误处理完善
+
+evolution: []
+created_at: "2026-06-10"
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

@@ -1,0 +1,46 @@
+# === Feature 定义文件 ===
+feature_id: "F-CJ-数智港-03"
+name: "AI数字员工展示区"
+version: "1.0.0"
+dimension: "场景"
+source_model: "PRD-002数字员工展示 + 三个产品演示脚本"
+
+## 定位
+one_liner: "向韩国客户演示AI数字员工如何为其产品提供全链路服务"
+
+products:
+  - 数字员工SaaS: 自动匹配
+what_it_does: |
+  三个Demo场景(抹茶拿铁/济州海苔/韩天红参)展示AI数字员工完整能力：小红书内容生成、合规知识库问答、合规监控预警。每个场景有演示脚本+截图Demo。
+  
+input: |
+  产品资料(品牌/品类/数据) + 演示场景选择(内容/合规/监控)
+  
+output: |
+  演示脚本.md + 截图demo.html + 演示门户页面
+  
+sop: |
+  1. 选择目标产品(已有3个产品演示模板)
+  2. 按场景类型(内容/合规/监控)加载对应演示脚本
+  3. 用产品真实数据填充demo
+  4. 生成截图demo.html
+  5. 输出演示门户页面
+  
+  quality_gate:
+  - gate: "演示数据是真实产品数据(非虚构)"
+    standard: "通过"
+    score: 5
+  - gate: "3个场景都有完整操作流程"
+    standard: "通过"
+    score: 5
+  - gate: "客户可直接打开demo页面体验"
+    standard: "通过"
+    score: 5
+  
+  score_target: "10/10"
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，2026-06-08
+  

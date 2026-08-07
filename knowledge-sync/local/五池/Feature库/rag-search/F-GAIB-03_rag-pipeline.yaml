@@ -1,0 +1,17 @@
+name: RAG完整流水线
+version: 1.0.0
+status: production
+dimension: rag-search
+source: microsoft/generative-ai-for-beginners (Lesson 08, 15)
+description: "端到端RAG流水线：文档分块→Embedding→向量数据库存储→语义检索→上下文增强→LLM生成。含Hybrid Search、Chunking策略"
+atoms:
+  - GAIB-08: Text Embeddings & 语义向量搜索
+  - GAIB-09: 检索增强生成（RAG）
+  - GAIB-18: RAG完整流水线
+products:
+  - 盖娅进化大脑: 知识库RAG问答
+  - 奎(企业知识库RAG): 完整RAG实现
+  - 藏经(大航海知识库): 出海知识RAG
+employees:
+  - 烛龙P8: RAG管道实现
+  - 耳鼠P8: 数据索引与分块

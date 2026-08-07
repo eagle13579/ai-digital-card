@@ -1,0 +1,32 @@
+feature_id: F-CZL-LKB-ABACC_ABACC说服框架
+name: ABACC说服框架
+version: 1.0.0
+dimension: 创造力
+source_model: chainke-full/backend/app/routers/sales_script.py
+source_project: chainke-full
+one_liner: 任何说服场景的五步结构：破冰抓注意→痛点具象化→方案可视化→差异化好奇→明确行动号召
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从chainke-full/backend/app/routers/sales_script.py中提取的ABACC说服框架模式。Attention
+  → Before (pain) → After (solution) → Curiosity (differentiator) → Call-to-Action
+input: 参见source中的输入参数
+output: 结构化输出
+sop: '1. 加载ABACC说服框架模式
+
+  2. 根据Attention → Before (pain) → After (solution) → Curiosity (differentiator) →
+  Call-to-Action执行
+
+  3. 验证输出'
+quality_gate:
+  score: 7
+  checks:
+  - 有真实原子来源
+  - 可执行
+  - 有适用场景
+  status: draft
+iteration_log:
+- date: '2026-06-08'
+  version: 1.0.0
+  change: 从chainke-full/backend/app/routers/sales_script.py提取初始版本
+product: "链客宝"

@@ -1,0 +1,9 @@
+feature_id: F-CZL-通用-44
+name: 二阶效应推演
+version: 1.0.0
+dimension: 创造力
+source_model: 多源吸收
+one_liner: 每个决策推演3层因果链(直接->间接->系统级)
+
+products:
+  - 通用: 自动匹配

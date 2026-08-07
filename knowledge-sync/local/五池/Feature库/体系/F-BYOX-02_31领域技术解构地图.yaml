@@ -1,0 +1,17 @@
+{
+  "name": "F-BYOX-02 31领域技术解构地图",
+  "version": "1.0.0",
+  "status": "released",
+  "dimension": "体系",
+  "source": "build-your-own-x",
+  "description": "31个技术领域的核心组件解构矩阵(BYOX-02)，作为军团吸收外部项目的「技术分类式」",
+  "mental_models": [
+    "BYOX-02 技术解构矩阵"
+  ],
+  "components": [
+    "31领域×3-5核心组件 = 100+技术本质卡片"
+  ],
+  "products": [
+    "AI数智军团: 吸收分类体系基底"
+  ]
+}

@@ -1,0 +1,132 @@
+feature_id: F-SIM-02
+feature_name: 多LLM统一接口与智能路由 (Unified Multi-LLM Gateway)
+feature_type: 核心能力 / AI基础设施
+version: 1.0.0
+created: 2026-07-04
+
+products:
+  - 通用: 自动匹配
+source_project: Sim (AI Agent工作空间平台)
+source_link: https://sim.ai
+
+# ============================================================
+# Sim产品中的原始定义
+# ============================================================
+sim_definition: >
+  Sim提供统一的LLM网关层，支持50+模型提供商(OpenAI, Anthropic, Google, Mistral, 
+  AWS Bedrock, Azure OpenAI, 国内厂商等)的统一接口调用。
+  核心能力:
+  - 统一API格式: 同一接口切换不同提供商, 零代码修改
+  - 智能路由: 根据任务类型/成本/延迟/质量自动化选择最优模型
+  - 故障转移: 主模型失败自动切换到备用模型
+  - 成本追踪: 每次调用的提供商/模型/Token/成本明细
+  - 模型评估: A/B测试不同模型在相同任务上的表现
+  - 流式支持: 所有模型统一流式输出格式
+
+sim_implementation:
+  - 统一Completion/Chat/Embedding接口抽象
+  - 模型路由策略: 成本优先/质量优先/延迟优先/负载均衡
+  - Fallback链: 最多3级备用模型自动切换
+  - 调用日志: 全量记录输入/输出/耗时/成本
+  - Provider SDK自动安装和版本管理
+  - API Key安全管理(加密存储+轮换)
+
+# ============================================================
+# 可注入产品分析
+# ============================================================
+injectable_products:
+  - product: 盖娅之城
+    priority: P0 (最高优先级)
+    gap_analysis: >
+      盖娅之城当前173公民调用LLM的方式分散在各Blueprint中,
+      没有统一的LLM抽象层。每个公民硬编码模型选择和API调用,
+      导致: (1) 模型切换需要修改代码 (2) 无法按任务类型智能分配模型
+      (3) 成本无法集中追踪 (4) 没有故障转移机制
+    injection_method: >
+      构建「盖娅LLM网关」:
+      (1) 抽象统一LLM接口层, 所有公民通过网关调用LLM
+      (2) 智能路由: 简单任务→低成本模型(如DeepSeek), 复杂推理→高端模型(GPT-4o/Claude)
+      (3) 自动故障转移: 主模型超时/失败→备用模型
+      (4) 集中成本仪表盘: 每个公民/每小时的LLM花费
+      (5) 模型A/B测试: 对比不同模型在同一公民任务上的表现
+    effort_estimate: "1-2周 (接口抽象3天 + 路由引擎3天 + 成本追踪3天 + 迁移1周)"
+    expected_impact: >
+      ★★★ 极大提升: 成本降低30-50%, 系统可靠性大幅提升, 为模型管理提供数据基础
+
+  - product: AI数字军团
+    priority: P0 (最高优先级)
+    gap_analysis: >
+      AI数字军团184名有灵魂的员工依赖各种LLM调用, 技能评估运行器(194人)需要批量模型评测。
+      当前缺统一网关导致: (1) 技能评估难以标准化对比 (2) 无法指定模型类型
+      (3) 大规模评估成本不可控 (4) 缺降级机制
+    injection_method: >
+      数字军团LLM网关:
+      (1) 统一接管所有军团员工LLM调用
+      (2) 技能评估专用策略: 评估任务统一使用同一模型保证公平性
+      (3) 成本配额: 为不同等级员工设置每月LLM预算
+      (4) DAG编排中的LLM节点自动使用网关
+    effort_estimate: "1-2周"
+    expected_impact: >
+      ★★★ 极大提升: 技能评估标准化, 成本可控化, 管理智能化
+
+  - product: 链客宝
+    priority: P1
+    gap_analysis: >
+      链客宝AI网关层(AIGatewayProtocol)已有接口定义(Phase 0: DirectAIGateway),
+      但缺多模型智能路由和故障转移的完整实现。
+    injection_method: >
+      增强链客宝AIGatewayProtocol: (1) 增加多Provider支持 (2) 实现智能路由策略
+      (3) 故障转移链 (4) 成本追踪集成到Metrics
+    effort_estimate: "1周 (增强已有协议)"
+    expected_impact: "★★☆ 成本优化+可靠性提升"
+
+  - product: 白泽控制台
+    priority: P1
+    gap_analysis: >
+      白泽作为CEO决策中枢, 使用LLM做情报分析和决策建议, 对可靠性和成本敏感。
+      当前没有多模型降级机制。
+    injection_method: >
+      白泽决策LLM网关: (1) 战略决策→最强大模型 (2) 日常情报→经济模型
+      (3) 自动降级保障7x24可用
+    effort_estimate: "1周"
+    expected_impact: "★★☆ 决策引擎可用性提升"
+
+  - product: 赛博参谋
+    priority: P2
+    gap_analysis: >
+      赛博参谋作为创业决策系统, 需要调用LLM进行市场分析和策略生成。
+      当前模型调用硬编码, 缺乏优化。
+    injection_method: >
+      参谋LLM网关: (1) 按分析类型路由模型 (2) 市场趋势→大模型深度分析
+      (3) 快速扫描→经济模型高吞吐
+    effort_estimate: "1周"
+    expected_impact: "★★☆ 成本优化, 响应速度提升"
+
+  - product: 中韩出海数智港
+    priority: P2
+    gap_analysis: >
+      跨境场景需要多语言模型(中文/韩文/英文), 当前使用单一模型效果有限。
+    injection_method: >
+      多语言LLM网关: (1) 语言检测→选择对应语言的最优模型
+      (2) 翻译任务→专门翻译模型 (3) 跨境合规分析→高安全性模型
+    effort_estimate: "1周"
+    expected_impact: "★★☆ 多语言质量提升, 符合韩国数据合规要求"
+
+# ============================================================
+# 心智模型(原子能力)
+# ============================================================
+mental_models:
+  - name: 统一抽象原则
+    description: 所有LLM调用应经过统一抽象层, 而非直接硬编码
+  - name: 智能路由思维
+    description: 根据任务特征自动选择最优模型, 而非固定使用单一模型
+  - name: 可观测性内建
+    description: 每次LLM调用的成本/延迟/质量都应被记录和可分析
+
+# ============================================================
+# 注入时序建议
+# ============================================================
+injection_timeline:
+  phase_1_now: "盖娅之城LLM网关 + AI数字军团LLM网关 (并行构建, 共享核心代码)"
+  phase_2_next: "链客宝AIGatewayProtocol增强 + 白泽决策网关"
+  phase_3_future: "赛博参谋LLM网关 + 中韩出海多语言网关"

@@ -1,0 +1,46 @@
+feature_id: "F-CJ-名片-04"
+name: "名片分享传播系统"
+version: "1.0.0"
+dimension: "场景"
+source_model: "链客宝 business_card.py - QR码/vCard/邮件签名/OpenGraph预览 四个分享端点"
+source_location: "D:/链客宝/backend/app/routers/business_card.py: get_card_qrcode() + get_card_vcard() + get_card_share_preview() + get_card_email_signature()"
+
+one_liner: "四种分享渠道(QR码/vCard/OpenGraph/邮件签名) + 两种公开查看方式(ID/Token)，覆盖线上+线下全场景传播"
+
+products:
+  - AI数字名片: 自动匹配
+what_it_does: |
+  场景：数字名片需要多种分享方式以适应不同场景——线下扫码/线上传播/邮件签名/通讯录导入。
+  问题：单一分享链接覆盖场景有限，用户在不同场景需要不同格式。
+  价值：四种分享格式覆盖完整传播链路——①QR码(线下扫码/名片印刷, ERROR_CORRECT_H高容错) ②vCard(.vcf联系人导出, 通讯录一键导入) ③OpenGraph(微信/H5分享的标题+描述+缩略图预览) ④邮件签名HTML(商务邮件尾缀, 标准化表格设计+Powered by品牌露出)。两种公开查询(ID路径+Token路径)。
+
+input: |
+  - card_id (用于QR码/vCard/邮签/OG预览)
+  - share_token (用于Token公开查询)
+  - download参数 (QR码: 预览/下载切换)
+
+output: |
+  - QR码: image/png (qrcode库, ERROR_CORRECT_H)
+  - vCard: text/vcard (VERSION:3.0标准格式)
+  - 邮件签名: text/html (HTML表格, 字段缺失自动跳过)
+  - OG预览: application/json ({title, description, image, url, type})
+
+sop: |
+  1. QR码: 查询名片→构建分享URL→qrcode库(ERROR_CORRECT_H高容错)→返回PNG
+  2. vCard: 查询名片→构建VERSION:3.0标准vCard→返回.vcf附件
+  3. OG预览: 查询名片→构建{title, description, image, url, type}→返回JSON
+  4. 邮件签名: 查询名片→构建HTML表格(姓名/职位/公司/电话/邮箱/网站)→追加Powered by→返回HTML
+  5. 公共查询: ID查询 或 Token查询 → 返回统一格式名片详情
+
+quality_gate:
+  score: 7
+  checks:
+    - "QR码支持预览(inline)和下载(attachment)两种模式"
+    - "vCard遵循VERSION:3.0标准, 兼容iOS/Android通讯录"
+    - "OpenGraph含title/description/image/url/type五字段"
+    - "邮件签名HTML转义防XSS, 字段缺失自动跳过"
+    - "两种公开查询链路(ID + Token)"
+  reusable_by: ["链客宝", "AI数字名片", "任何需要联系人分享的产品"]
+product:
+  - "AI数字名片"
+  - "链客宝"

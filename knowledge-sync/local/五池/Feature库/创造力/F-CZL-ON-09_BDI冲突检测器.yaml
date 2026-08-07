@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-09
+name: BDI冲突检测器
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 检测Agent的Belief和Desire之间的矛盾
+
+products:
+  - 通用: 自动匹配

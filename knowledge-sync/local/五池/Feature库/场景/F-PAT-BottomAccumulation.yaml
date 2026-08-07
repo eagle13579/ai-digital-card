@@ -1,0 +1,19 @@
+id: F-PAT-BottomAccumulation
+name: 底部堆量蓄势启动模型
+dimension: 场景
+domain: 连板模式识别
+description: >-
+  长期阴跌后，底部出现放量下影线+首板封死涨停的底部启动模式
+source_model: 宗申动力2026-06-08~06-12走势
+
+products:
+  - 通用: 自动匹配
+signals:
+  - 前期跌幅≥15%，持续时间≥20个交易日
+  - 底部出现长下影线(最低→收盘涨幅>3%)
+  - 首板日成交量较前日放大≥2倍
+  - 首板封板度=1.0（封死涨停，收盘=最高）
+score: 9.0
+iterations: 1
+created_at: 2026-06-13 13:21
+source_stock: 宗申动力(001696)

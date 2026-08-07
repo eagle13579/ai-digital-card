@@ -1,0 +1,32 @@
+name: NEXUS协同框架
+version: 1.0.0
+description: The Agency吸收 - NEXUS协同框架策略角色定义
+source: agency-agents
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - Agent Activation Prompts
+  - Handoff Templates
+  - Executive Brief
+  - NEXUS Strategy
+  - Phase 0 Discovery
+  - Phase 1 Strategy
+  - Phase 2 Foundation
+  - Phase 3 Build
+  - Phase 4 Hardening
+  - Phase 5 Launch
+  - Phase 6 Operate
+  - Quickstart
+  - Scenario Enterprise Feature
+  - Scenario Incident Response
+  - Scenario Marketing Campaign
+  - Scenario Startup MVP
+capabilities:
+  - 多智能体协同编排与NEXUS操作模型
+  - 战略阶段化管理（发现→策略→基础→构建→加固→上线→运维）
+  - 智能体激活提示与交接模板
+  - 场景化Runbook（企业特性/事件响应/营销活动/初创MVP）
+  - 执行简报与快速启动指南
+  - 跨Agent协调与任务分发策略
+integration: 直接补充AI数字军团策略协同能力

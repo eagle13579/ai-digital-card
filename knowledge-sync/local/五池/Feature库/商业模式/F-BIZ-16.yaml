@@ -1,0 +1,16 @@
+# F-BIZ-16: 能量集中控制
+id: "F-BIZ-16"
+name: "能量集中控制"
+dimension: "🎨 审美"
+domain: "商业模式"
+description: "名字/风水/法律/财务四项核心集中一人，效率最大风险最小"
+source_model: "M-BIZ-16"
+source: "新坐标公司会议纪要 (2026-06-14)"
+sop: |
+  IP统一→文化统一→合规统一→财务统一→单点管控
+quality_gate: "评分≥7/10"
+status: "active"
+
+products:
+  - 通用: 自动匹配
+created_at: "2026-06-14"

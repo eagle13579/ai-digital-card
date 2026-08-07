@@ -1,0 +1,23 @@
+id: F-TASTE-READ-01
+name: Brief Inference Before Design — 先理解再输出
+source_model: Taste-Skill Section 0 — Before touching code, infer what the user wants. Read 6 signals (page kind/vibe/reference/audience/brand/constraint), output one-line Design Read
+dimension: 审美
+
+products:
+  - 通用: 自动匹配
+description: >-
+  从用户零散的需求中提取6个设计信号(页面类型/风格词汇/参考/受众/品牌资产/约束)，
+  输出一行Design Read作为设计宣言。禁止跳入默认方案。
+  核心: 不是「我想要X」，而是「我读出需求是X」。
+input: 用户需求文本(可能模糊/多义)
+output: 一行Design Read + 推断依据
+sop: "① 解析6信号: 页面类型→风格词汇→参考链接→受众→已有品牌→隐式约束
+  ② 如模糊则只问1个澄清问题(而非多问题dump)
+  ③ 输出Design Read: '读取为: <页面类型> for <受众>, <风格>, 倾向<设计体系>'
+  ④ 设置三旋钮: VARIANCE/MOTION/DENSITY
+  ⑤ 开始设计前以Design Read为锚"
+quality_gates: Design Read必须在任何代码前输出、模糊时只问1个问题、禁止默认AI风格
+created_at: '2026-06-13'
+iteration_count: 1
+last_score: 9
+application_scope: 链客宝UI设计/AI招商前端/白泽控制台/中韩数智港品牌

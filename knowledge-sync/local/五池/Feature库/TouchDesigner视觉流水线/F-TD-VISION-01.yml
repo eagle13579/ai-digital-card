@@ -1,0 +1,16 @@
+id: "F-TD-VISION-01"
+name: "实时手势交互引擎"
+dimension: "场景"
+domain: "视觉交互"
+
+products:
+  - 通用: 自动匹配
+atoms:
+  - "TD-01"
+  - "TD-04"
+description: "用普通摄像头+MediaPipe实现实时手势追踪→触发的完整交互链路"
+p0_priority: true
+tags:
+  - "MediaPipe"
+  - "手势识别"
+  - "实时交互"

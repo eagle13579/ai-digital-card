@@ -1,0 +1,6 @@
+feature_id: F-AS-02_上下文层级管理
+name: 上下文层级金字塔: 5层从持久到临时
+version: 1.0.0
+dimension: 体系
+source_model: agent-skills吸收
+one_liner: 上下文层级金字塔: 5层从持久到临时。规则文件->架构->源码->错误->对话。每层加载时机+压缩策略。

@@ -1,0 +1,43 @@
+feature_id: F-SBZ-审美-02
+name: 三层AI匹配引擎
+version: 1.0.0
+dimension: 创造力
+source_model: AI数智名片/services/matching_engine.py
+source_project: AI数智名片
+one_liner: 三层加权综合评分匹配引擎：tag_overlap(40%) + vector_semantic(40%) + tag_weight(20%)，融合规则+语义+权重
+
+products:
+  - 通用: 自动匹配
+what_it_does: 从AI数智名片/services/matching_engine.py中提取的三层加权匹配引擎(M7)。
+  tag_overlap(40%)：标签重叠度评分 → vector_semantic(40%)：向量余弦语义相似度 → tag_weight(20%)：标签权重排序。
+  三层综合评分输出最优匹配结果，比单一维度匹配更精准。
+input: 参见source中的输入参数
+output: 结构化输出
+sop: |
+  1. 加载三层AI匹配引擎模式
+
+  2. 根据tag_overlap(40%) → vector_semantic(40%) → tag_weight(20%) 综合评分执行
+
+  3. 验证输出'
+  6. 匹配结果A/B测试: 每次匹配展示2个版本(A:当前/B:新算法), 用户停留时长提升≥15%
+  7. 审美反馈闭环: 每10次匹配收集一次用户满意度, 满意度目标≥4.0/5.0
+
+  quality_gate:
+  score: 9
+  checks:
+  - 有真实原子来源(AI数智名片/services/matching_engine.py)
+  - 可执行
+  - 有适用场景(智能推荐/供需匹配/名片匹配)
+  - 多策略融合(规则+语义+权重)
+  status: draft
+  iteration_log:
+  - date: '2026-06-08'
+  version: 1.0.0
+  change: 从AI数智名片/services/matching_engine.py提取初始版本(M7)
+  - "2026-06-12: v1.2.0 成熟度打磨 — 白泽补充SOP执行步骤+QualityGate评分升级至9/10"
+  product:
+  - "AI匹配引擎"
+  - "AI数字名片"
+  - "AI数智名片"
+  # 成熟度标记: 2026-06-12 白泽打磨到9+
+# 2026-06-12: YAML语法修复+评分更新 (source_model→代码)

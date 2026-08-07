@@ -1,0 +1,50 @@
+# === Feature 定义文件 ===
+feature_id: "F-TX-数智港-01"
+name: "合规诊断引擎"
+version: "1.0.0"
+dimension: "体系"
+source_model: "risk_engine.py(1145行) + compliance_rules.py(938行) + input_recognizer.py(732行)"
+
+## 定位
+one_liner: "多规则引擎风险评估器，对韩国进口产品做食品/化妆品/保健食品三级诊断"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  三层合规诊断：input_recognizer预处理(品类识别+成分提取) → compliance_rules规则匹配(违禁词+标签规范+限量) → risk_engine综合评分(7个评分器)。输出结构化风险报告。
+  
+input: |
+  产品品类 + 成分列表 + 标签文本 + 包装信息
+  
+output: |
+  风险评分(0-100) + 各评分器明细 + 违规条款引用 + 整改建议
+  
+sop: |
+  1. input_recognizer解析输入提取品类+成分+标签
+  2. compliance_rules匹配违禁词/标签规范/限量标准
+  3. risk_engine执行7个评分器(违禁/标签/转基因/辐照/营养/致敏/综合)
+  4. 加权计算综合风险分
+  5. 输出风险报告(评分+风险等级+违规项+整改建议)
+  
+  quality_gate:
+  - gate: "7个评分器各返回独立评分(0-100)"
+    standard: "通过"
+    score: 6
+  - gate: "违规条款精确引用regulations.yaml编号"
+    standard: "通过"
+    score: 6
+  - gate: "整改建议具体可执行"
+    standard: "通过"
+    score: 6
+  - gate: "单次诊断<5秒"
+    standard: "通过"
+    score: 6
+  
+  score_target: "10/10"
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，2026-06-08
+  2026-06-12: 0分Feature修复 + 初始评分
+  

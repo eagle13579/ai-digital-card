@@ -1,0 +1,9 @@
+feature_id: F-CZL-ON-07
+name: Harness规则自进化
+version: 1.0.0
+dimension: 创造力
+source_model: Ontology吸收
+one_liner: 基于历史违规数据自动推荐新的Harness校验规则
+
+products:
+  - 通用: 自动匹配

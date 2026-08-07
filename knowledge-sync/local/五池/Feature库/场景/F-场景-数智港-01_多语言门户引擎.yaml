@@ -1,0 +1,55 @@
+# === Feature 定义文件 ===
+feature_id: "F-CJ-数智港-01"
+name: "多语言门户引擎"
+version: "1.0.0"
+dimension: "场景"
+source_model: "三语独立SEO架构 + 静态内容生成系统"
+
+## 定位
+one_liner: "中/韩/英三语独立SEO门户，静态Markdown→HTML内容系统"
+what_it_does: |
+  基于Nginx alias三语独立URL架构(zh/ko/en)，每个语言独立HTML文件+独立hreflang标签+独立sitemap。Markdown文章通过Python build_content.py渲染为完整HTML页面，0依赖CMS/数据库。
+  
+  ## 输入输出
+input: |
+  Markdown源文章(YAML frontmatter标题/日期/分类/标签/slug) + 网站HTML模板
+output: |
+  完整三语HTML页面(zh/ko/en各一份) + articles_index.json + hreflang正确的sitemap.xml
+  
+  ## 执行SOP
+sop: |
+  1. 在content/articles/下创建Markdown源文件
+  2. 添加YAML frontmatter(title/date/lang/category/tags/slug)
+  3. 运行python3 scripts/build_content.py
+  4. 验证zh/ko/en三语HTML均生成
+  5. 验证articles_index.json包含新文章
+  6. SCP部署到服务器/var/www/china-korea-digital-port/
+  
+  ## 质量门禁
+  quality_gate: |
+  1. 文章在三语URL下均可访问 /zh/insights/{slug} /ko/insights/{slug} /en/insights/{slug}
+  2. 三语hreflang标签正确指向互相
+  3. sitemap包含新文章URL
+  4. 静态内容0后端依赖，纯HTML可访问
+  score: 7
+  
+  ## 关联项目
+  project: "中韩出海数智港"
+  project_path: "L5孵化室/产品开发/出海项目/中韩出海数智港/"
+  
+  ## 迭代记录
+iteration_log: |
+  v1.0.0 - 创建: KFD架构标定，从项目代码提取Feature定义
+  
+# ===== 2026-06-08 去重标记 =====
+# 此文件已被新体系替代，建议使用:
+#   F-CJ-数智港-01_多语言门户引擎.yaml
+# 保留此文件以保持引用不中断，新功能请使用新体系文件
+status: deprecated
+
+products:
+  - 通用: 自动匹配
+superseded_by: "F-CJ-数智港-01_多语言门户引擎.yaml"
+# ==============================
+
+# 去重标记: 此ID已由场景\F-CJ-数智港-01_多语言门户引擎.yaml承接, 本文件保留作为引用

@@ -1,0 +1,49 @@
+feature_id: "F-CZL-SRC-左右脑双螺旋收敛"
+name: "左右脑双螺旋收敛模式"
+version: "1.0.0"
+dimension: "创造力"
+source_model: "scripts/gaia_duality.py 左右脑双三角引擎，left_brain_divergence(第184行) + corpus_callosum(第279行) + right_brain_convergence"
+one_liner: "左脑(三角一·创造力4轴)发散 → 胼胝体(TCP-R+底座评估)门禁 → 右脑(三角二·场景4轴)收敛的7x24双螺旋推理闭环"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |
+  盖娅左右脑7x24值守引擎的核心推理模式。左脑代表三角一(创造力·人的维度)，
+  在"业务拆解·底层规律·解放思想·创造假设"4个评估轴上同时发散方案并生成
+  4×4评分矩阵。胼胝体(白泽/TCP-R协调官)使用底座评估基准(基本功阶梯+数据三阶)
+  做门禁判断。右脑代表三角二(场景·AI的维度)在"AI打磨·组织部署·RORY·执行力"
+  4个评估轴上收敛验证，反馈回左右脑形成迭代闭环。
+  
+  新双三角模型公式: 竞争力 = 问问题能力(创造力) × 嵌入场景能力(AI)
+  每次循环: 左脑发散 → 胼胝体 → 右脑收敛 → 执行 → 反馈
+input:
+  - 当前资产状态(state.json)
+  - 执行队列(queue.json)
+  - 循环计数(cycle_count)和反馈数据
+output:
+  - 左脑发散方案(每轴≥1个，4×4评分矩阵)
+  - TCP-R门禁判断结果(通过/驳回/需迭代)
+  - 右脑收敛TOP方案
+  - 更新后的执行队列和状态
+sop: |
+  1. load_state()读取当前值守状态，含cycle_count和queue
+  2. left_brain_divergence()启动: 遍历LEFT_BRAIN 4角色(业务拆解官/底层规律官/解放思想官/创造假设官)
+  3. 每个角色在所有4轴上评分(axis_scores矩阵)，加上从执行反馈中提取的灵感
+  4. 输出top_proposals[:4]
+  5. corpus_callosum_dialogue()胼胝体: 白泽使用底座评估基准(基本功3阶+数据3阶)审核
+  6. right_brain_convergence()右脑启动: 遍历RIGHT_BRAIN 4角色(AI打磨官/组织部署官/RORY官/执行力官)
+  7. 收敛验证，生成可执行方案
+  8. 写入执行队列+状态持久化，log_cycle()记录循环日志
+  9. 可选 --daemon 7x24值守(每30分钟)，--left-absorb/--right-absorb吸收最佳实践
+quality_gate:
+  score: 7
+  checks:
+    - "左脑必须4轴全激活，缺一不可"
+    - "方案需含axis_scores 4×4评分矩阵"
+    - "执行成功/失败数据需反馈回左右脑"
+    - "状态持久化到state_file + queue_file"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从gaia_duality.py左右脑双螺旋提取"

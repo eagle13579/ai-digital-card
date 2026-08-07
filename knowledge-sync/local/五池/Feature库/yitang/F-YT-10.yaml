@@ -1,0 +1,22 @@
+module_name: FALSE模型(借假修真)
+module_number: 10
+category: 创业方法-产品内核
+mental_models:
+  - FALSE模型
+  - F直面用户-A人工模拟-L借用工具-S替代方案-E最小版本
+  - MVP设计方法论
+  - 借假修真
+learning_objectives:
+  - 掌握MVP设计的五种低成本验证方式
+  - 学会用最小成本验证关键假设
+  - 能灵活选择验证手段降低试错成本
+employee_roles:
+  - 产品经理
+  - 创业者
+  - 增长负责人
+source: 一堂创业课/创业方法-产品内核
+created_at: 2026-06-17
+status: active
+
+products:
+  - 通用: 自动匹配

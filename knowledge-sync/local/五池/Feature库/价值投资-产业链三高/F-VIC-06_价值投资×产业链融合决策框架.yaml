@@ -1,0 +1,21 @@
+id: F-VIC-06
+name: 价值投资×产业链融合决策框架
+description: 八步决策流程引擎：能力圈→BOM拆解→三高筛选→供需分析→龙头锁定→安全边际→护城河检验→仓位管理。输出完整的投资决策报告
+dimension: 体系
+type: 决策框架
+status: active
+version: '1.0'
+
+products:
+  - 通用: 自动匹配
+created_at: 2026-06-17 12:40
+employees:
+- 计然_P8
+- 英招_P9
+- 乘黄_P8
+- 巴菲特视角
+source_atoms:
+- VIC-MODEL-COMPARE-10
+- VIC-CYCLE-07
+quality_score: 0
+iterations: 0

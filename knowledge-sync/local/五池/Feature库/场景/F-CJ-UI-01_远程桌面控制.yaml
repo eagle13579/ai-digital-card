@@ -1,0 +1,24 @@
+feature_id: "F-CJ-UI-01"
+name: "远程桌面控制"
+version: "1.0.0"
+dimension: "场景"
+source_model: "UI-TARSM9"
+one_liner: "通过VNC/WebRTC远程控制他人桌面"
+
+products:
+  - 通用: 自动匹配
+what_it_does: |-
+  远程授权→屏幕共享→远程操作→断开。支持审计日志。
+input: |-
+  目标机信息+授权码
+output: |-
+  远程桌面连接
+sop: |-
+  1. 安装agent 2. 授权 3. 屏幕共享 4. 操作 5. 审计日志
+quality_gate: |-
+  1. 显式授权 2. 操作可审计
+score_target: "9/10"
+depends_on: []
+enhanced_by: []
+iteration_log: |-
+  v1.0.0 - 创建: UI-TARS-desktop全量吸收

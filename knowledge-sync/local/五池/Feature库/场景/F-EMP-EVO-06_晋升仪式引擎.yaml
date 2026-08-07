@@ -1,0 +1,48 @@
+# Feature: 晋升仪式引擎
+# ID: F-EMP-EVO-06
+# 维度: 场景
+# 创建: 2026-06-10
+
+name: "晋升仪式引擎"
+id: "F-EMP-EVO-06"
+dimension: "场景"
+version: "1.0"
+status: "active"
+
+description: >
+  检测达到L1门槛的L0员工并自动追加晋升记录。
+  复用data_loader.py的成熟度计算，扫描全员找出晋升候选，
+  在employee.yaml和soul-injection.yaml末尾追加晋升注释标记。
+  37名员工已晋升(L0→L1)。
+
+source_model: "M_L0飞轮启动"
+
+products:
+  - 通用: 自动匹配
+input:
+  - "data_loader.load_all_employees() 全员数据"
+  - "data_loader.compute_maturity_for_employee() 成熟度计算"
+
+output:
+  - "employee.yaml追加晋升注释(# 晋升: L0→L1 YYYY-MM-DD)"
+  - "soul-injection.yaml追加晋升注释"
+  - "L5孵化室/进化日志/promotion_*.json 晋升日志"
+
+sop:
+  step_1: "加载全员数据(data_loader)"
+  step_2: "对每个员工计算成熟度"
+  step_3: "筛选达到L1门槛(avg>=20或任一维度>=25)但无晋升记录的员工"
+  step_4: "dry-run模式只检测不修改"
+  step_5: "live模式追加晋升注释到employee.yaml和soul-injection.yaml"
+  step_6: "写晋升日志到进化日志目录"
+  step_7: "触发/api/evolution/trigger刷新面板"
+
+promotion_threshold:
+  L1: "avg >= 20 或 autonomy >= 25 或 quality >= 25 或 collaboration >= 25"
+
+iterations:
+  - date: "2026-06-10"
+    action: "乘黄创建promotion_ceremony.py, 37人晋升"
+    score: 8
+    note: "晋升是意图标记，真实L0→L1需任务委派积累数据"
+product: "AI数智军团"

@@ -1,0 +1,55 @@
+feature_id: "F-CJ-SRC-员工路由轮值分配"
+name: "员工路由轮值分配模式"
+version: "1.0.0"
+dimension: "场景"
+source_model: "scripts/employee_router.py 完整实现(394行)，含TASK_TYPES映射+SQLite活跃度追踪+轮询分配算法"
+one_liner: "基于能力关键词匹配+轮询分配+活跃度追踪+任务多样性的四维路由分配系统，自动匹配任务到最合适的数字员工"
+
+products:
+  - 数字员工SaaS: 自动匹配
+what_it_does: |
+  员工路由分配器解决"谁来干活"的问题。核心原则四条:
+  
+  1. 能力匹配 — 不凭印象选人。TASK_TYPES定义了11种任务类型的keywords+weight映射，
+     从employee.yaml读取员工技能标签做余弦关键词匹配
+  2. 轮询分配 — 不总派同一个人。SQLite记录task_assignments表，轮询策略确保负载均衡
+  3. 活跃度追踪 — 长期不活跃的优先。从task_assignments表按assigned_at时间倒序，
+     不活跃时长×权重因子=活跃度分数
+  4. 任务多样性 — 不让一个人做所有同类型任务。同一员工连续分配同类型的次数限制
+  
+  路由数据库(employee_router.db)持久化所有分配历史，含employee_name/task_type/
+  assigned_at等字段，支持活跃度SQL查询和轮询索引。
+  
+  11种任务类型覆盖: backend-api, frontend-ui, data-pipeline, code-review,
+  documentation, architecture, ml-model, devops-deploy, testing-qa, compliance-security。
+input:
+  - 任务描述 + 任务类型
+  - employees/ 目录下所有员工的employee.yaml(含skills+role)
+  - employee_router.db (历史分配记录)
+output:
+  - 最优员工匹配: {employee_name, employee_dir, match_score, reason}
+  - 活跃度排序列表
+  - 路由统计: 各员工分配次数/各任务类型分配统计
+sop: |
+  1. 解析任务类型(从任务描述提取或直接指定)
+  2. TASK_TYPES查表获取该类型的keywords+weight
+  3. 扫描employees/目录下所有employee.yaml提取skills标签
+  4. 计算员工能力匹配分: 关键词交集/技能总数 × weight
+  5. 查询employee_router.db获取该员工历史分配记录
+  6. 活跃度评分: 距离上次分配的时间越长分数越高
+  7. 多样性惩罚: 同类型连续分配≥3次扣分
+  8. 综合评分 = 匹配分×0.5 + 活跃度×0.3 + 多样性×0.2
+  9. 选最高分员工, 写入task_assignments表
+  10. 支持 --dry-run预览, --force-employee强制指定
+quality_gate:
+  score: 7
+  checks:
+    - "能力关键词映射覆盖≥10种任务类型(实际11种)"
+    - "SQLite活跃度追踪(含assigned_at时间戳)"
+    - "轮询分配防单点过载"
+    - "任务多样性惩罚(同类型连续≥3次)"
+  status: "draft"
+iteration_log:
+  - date: "2026-06-08"
+    version: "1.0.0"
+    change: "初始版本 - 从employee_router.py路由分配算法提取"

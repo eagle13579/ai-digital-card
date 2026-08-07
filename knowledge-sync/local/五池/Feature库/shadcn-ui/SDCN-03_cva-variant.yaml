@@ -1,0 +1,7 @@
+name: F-SDCN-03_CVA类型安全变体
+description: class-variance-authority+cn()合并
+version: 1.0.0
+dimension: 创造力
+source: shadcn-ui/ui
+products:
+  - AI数字名片

@@ -1,0 +1,9 @@
+feature_id: F-CZL-CO-14
+name: 记忆遗忘曲线
+version: 1.0.0
+dimension: 创造力
+source_model: Context-Engineering吸收
+one_liner: 模拟长期记忆中信息的遗忘曲线,推荐复习时机
+
+products:
+  - 通用: 自动匹配

@@ -1,0 +1,8 @@
+name: F-SAAS-04_RBAC用户团队模型
+description: Owner/Member双层权限+活动日志追踪
+version: 1.0.0
+dimension: 场景
+source: nextjs/saas-starter
+products:
+  - AI数字名片企业版
+  - 链客宝
