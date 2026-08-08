@@ -234,6 +234,223 @@ CHAIN_GRAPH: Dict[str, Dict[str, Any]] = {
         "upstream": [{"node": "poly_silicon", "coef": 0.9}],
         "downstream": [],
     },
+    "lithium": {
+        "id": "lithium", "name": "碳酸锂/锂矿", "type": "raw_material",
+        "companies": [{"ticker": "002466", "name": "天齐锂业", "mkt": "CN"}, {"ticker": "002460", "name": "赣锋锂业", "mkt": "CN"}, {"ticker": "300390", "name": "天华新能", "mkt": "CN"}],
+        "elasticity": 2.6, "domestic_rate": 0.65, "policy_weight": 0.6,
+        "upstream": [{"node": "mine", "coef": 0.9}],
+        "downstream": [{"node": "cathode", "coef": 0.9}, {"node": "battery", "coef": 0.5}],
+    },
+    "cathode": {
+        "id": "cathode", "name": "正极材料", "type": "raw_material",
+        "companies": [{"ticker": "002245", "name": "蔚蓝锂芯", "mkt": "CN"}, {"ticker": "300073", "name": "当升科技", "mkt": "CN"}],
+        "elasticity": 1.8, "domestic_rate": 0.8, "policy_weight": 0.4,
+        "upstream": [{"node": "lithium", "coef": 0.9}, {"node": "rare_metal", "coef": 0.6}],
+        "downstream": [{"node": "battery", "coef": 0.9}],
+    },
+    "anode": {
+        "id": "anode", "name": "负极材料", "type": "raw_material",
+        "companies": [{"ticker": "300035", "name": "中科电气", "mkt": "CN"}, {"ticker": "603659", "name": "璞泰来", "mkt": "CN"}],
+        "elasticity": 1.6, "domestic_rate": 0.85, "policy_weight": 0.3,
+        "upstream": [{"node": "mine", "coef": 0.5}],
+        "downstream": [{"node": "battery", "coef": 0.9}],
+    },
+    "electrolyte": {
+        "id": "electrolyte", "name": "电解液", "type": "raw_material",
+        "companies": [{"ticker": "002709", "name": "天赐材料", "mkt": "CN"}, {"ticker": "300037", "name": "新宙邦", "mkt": "CN"}],
+        "elasticity": 1.7, "domestic_rate": 0.85, "policy_weight": 0.3,
+        "upstream": [{"node": "resin", "coef": 0.6}],
+        "downstream": [{"node": "battery", "coef": 0.9}],
+    },
+    "separator": {
+        "id": "separator", "name": "隔膜", "type": "raw_material",
+        "companies": [{"ticker": "300568", "name": "星源材质", "mkt": "CN"}, {"ticker": "002812", "name": "恩捷股份", "mkt": "CN"}],
+        "elasticity": 1.5, "domestic_rate": 0.75, "policy_weight": 0.3,
+        "upstream": [{"node": "resin", "coef": 0.5}],
+        "downstream": [{"node": "battery", "coef": 0.9}],
+    },
+    "pv_wafer": {
+        "id": "pv_wafer", "name": "光伏硅片", "type": "raw_material",
+        "companies": [{"ticker": "601012", "name": "隆基绿能", "mkt": "CN"}, {"ticker": "688223", "name": "晶科能源", "mkt": "CN"}],
+        "elasticity": 1.9, "domestic_rate": 0.95, "policy_weight": 0.4,
+        "upstream": [{"node": "poly_silicon", "coef": 0.9}],
+        "downstream": [{"node": "pv_cell", "coef": 0.9}],
+    },
+    "pv_cell": {
+        "id": "pv_cell", "name": "光伏电池片", "type": "component",
+        "companies": [{"ticker": "688599", "name": "天合光能", "mkt": "CN"}, {"ticker": "002459", "name": "晶澳科技", "mkt": "CN"}],
+        "elasticity": 1.8, "domestic_rate": 0.95, "policy_weight": 0.4,
+        "upstream": [{"node": "pv_wafer", "coef": 0.9}, {"node": "silver", "coef": 0.4}],
+        "downstream": [{"node": "pv_module", "coef": 0.9}],
+    },
+    "pv_module": {
+        "id": "pv_module", "name": "光伏组件", "type": "product",
+        "companies": [{"ticker": "601012", "name": "隆基绿能", "mkt": "CN"}, {"ticker": "688223", "name": "晶科能源", "mkt": "CN"}],
+        "elasticity": 1.5, "domestic_rate": 0.95, "policy_weight": 0.4,
+        "upstream": [{"node": "pv_cell", "coef": 0.9}, {"node": "glass", "coef": 0.4}],
+        "downstream": [{"node": "solar", "coef": 0.9}],
+    },
+    "inverter": {
+        "id": "inverter", "name": "逆变器", "type": "component",
+        "companies": [{"ticker": "300274", "name": "阳光电源", "mkt": "CN"}, {"ticker": "688390", "name": "固德威", "mkt": "CN"}],
+        "elasticity": 1.6, "domestic_rate": 0.8, "policy_weight": 0.4,
+        "upstream": [{"node": "copper", "coef": 0.5}, {"node": "pcb", "coef": 0.4}],
+        "downstream": [{"node": "solar", "coef": 0.8}, {"node": "power_grid", "coef": 0.6}],
+    },
+    "glass": {
+        "id": "glass", "name": "光伏玻璃", "type": "raw_material",
+        "companies": [{"ticker": "601865", "name": "福莱特", "mkt": "CN"}, {"ticker": "300393", "name": "中来股份", "mkt": "CN"}],
+        "elasticity": 1.4, "domestic_rate": 0.95, "policy_weight": 0.3,
+        "upstream": [{"node": "oil_gas", "coef": 0.5}],
+        "downstream": [{"node": "pv_module", "coef": 0.4}],
+    },
+    "silver": {
+        "id": "silver", "name": "白银/银浆", "type": "raw_material",
+        "companies": [{"ticker": "601899", "name": "紫金矿业", "mkt": "CN"}, {"ticker": "000630", "name": "铜陵有色", "mkt": "CN"}],
+        "elasticity": 2.3, "domestic_rate": 0.7, "policy_weight": 0.4,
+        "upstream": [{"node": "mine", "coef": 0.9}],
+        "downstream": [{"node": "pv_cell", "coef": 0.4}, {"node": "solar", "coef": 0.3}],
+    },
+    "memory": {
+        "id": "memory", "name": "存储芯片(HBM/DRAM)", "type": "device",
+        "companies": [{"ticker": "603986", "name": "兆易创新", "mkt": "CN"}, {"ticker": "688008", "name": "澜起科技", "mkt": "CN"}, {"ticker": "MU", "name": "美光", "mkt": "US"}],
+        "elasticity": 2.0, "domestic_rate": 0.3, "policy_weight": 0.9,
+        "upstream": [{"node": "wafer", "coef": 0.6}, {"node": "eda_equip", "coef": 0.5}],
+        "downstream": [{"node": "ai_server", "coef": 0.7}, {"node": "smartphone", "coef": 0.5}],
+    },
+    "packaging": {
+        "id": "packaging", "name": "半导体封测", "type": "service",
+        "companies": [{"ticker": "002156", "name": "通富微电", "mkt": "CN"}, {"ticker": "600584", "name": "长电科技", "mkt": "CN"}],
+        "elasticity": 1.3, "domestic_rate": 0.5, "policy_weight": 0.8,
+        "upstream": [{"node": "wafer", "coef": 0.7}, {"node": "ai_chip", "coef": 0.5}],
+        "downstream": [{"node": "ai_server", "coef": 0.6}, {"node": "smartphone", "coef": 0.4}],
+    },
+    "llm": {
+        "id": "llm", "name": "大模型/AI应用", "type": "service",
+        "companies": [{"ticker": "002230", "name": "科大讯飞", "mkt": "CN"}, {"ticker": "300418", "name": "昆仑万维", "mkt": "CN"}, {"ticker": "MSFT", "name": "微软", "mkt": "US"}],
+        "elasticity": 1.5, "domestic_rate": 0.5, "policy_weight": 0.7,
+        "upstream": [{"node": "ai_chip", "coef": 0.6}, {"node": "data_center", "coef": 0.7}],
+        "downstream": [],
+    },
+    "robot": {
+        "id": "robot", "name": "人形机器人", "type": "product",
+        "companies": [{"ticker": "300124", "name": "汇川技术", "mkt": "CN"}, {"ticker": "002472", "name": "双环传动", "mkt": "CN"}, {"ticker": "688017", "name": "绿的谐波", "mkt": "CN"}],
+        "elasticity": 2.2, "domestic_rate": 0.4, "policy_weight": 0.8,
+        "upstream": [{"node": "ai_chip", "coef": 0.5}, {"node": "battery", "coef": 0.5}, {"node": "rare_metal", "coef": 0.4}],
+        "downstream": [],
+    },
+    "innov_drug": {
+        "id": "innov_drug", "name": "创新药", "type": "product",
+        "companies": [{"ticker": "688235", "name": "百济神州", "mkt": "CN"}, {"ticker": "600276", "name": "恒瑞医药", "mkt": "CN"}, {"ticker": "002821", "name": "凯莱英", "mkt": "CN"}],
+        "elasticity": 1.3, "domestic_rate": 0.6, "policy_weight": 0.5,
+        "upstream": [{"node": "cxo", "coef": 0.7}, {"node": "resin", "coef": 0.3}],
+        "downstream": [],
+    },
+    "cxo": {
+        "id": "cxo", "name": "CXO研发外包", "type": "service",
+        "companies": [{"ticker": "603259", "name": "药明康德", "mkt": "CN"}, {"ticker": "300347", "name": "泰格医药", "mkt": "CN"}],
+        "elasticity": 1.2, "domestic_rate": 0.7, "policy_weight": 0.4,
+        "upstream": [],
+        "downstream": [{"node": "innov_drug", "coef": 0.7}],
+    },
+    "medical_device": {
+        "id": "medical_device", "name": "医疗器械", "type": "product",
+        "companies": [{"ticker": "300760", "name": "迈瑞医疗", "mkt": "CN"}, {"ticker": "688271", "name": "联影医疗", "mkt": "CN"}],
+        "elasticity": 1.1, "domestic_rate": 0.5, "policy_weight": 0.4,
+        "upstream": [{"node": "rare_metal", "coef": 0.3}, {"node": "resin", "coef": 0.3}],
+        "downstream": [],
+    },
+    "defense": {
+        "id": "defense", "name": "军工电子", "type": "device",
+        "companies": [{"ticker": "002179", "name": "中航光电", "mkt": "CN"}, {"ticker": "600893", "name": "航发动力", "mkt": "CN"}],
+        "elasticity": 1.4, "domestic_rate": 0.7, "policy_weight": 0.9,
+        "upstream": [{"node": "ai_chip", "coef": 0.4}, {"node": "rare_metal", "coef": 0.5}, {"node": "copper", "coef": 0.4}],
+        "downstream": [],
+    },
+    "satellite": {
+        "id": "satellite", "name": "卫星互联网", "type": "infra",
+        "companies": [{"ticker": "002465", "name": "海格通信", "mkt": "CN"}, {"ticker": "688311", "name": "盟升电子", "mkt": "CN"}],
+        "elasticity": 1.7, "domestic_rate": 0.4, "policy_weight": 0.9,
+        "upstream": [{"node": "ai_chip", "coef": 0.4}, {"node": "optical_module", "coef": 0.3}],
+        "downstream": [],
+    },
+    "wind": {
+        "id": "wind", "name": "风电", "type": "product",
+        "companies": [{"ticker": "600875", "name": "东方电气", "mkt": "CN"}, {"ticker": "300274", "name": "阳光电源", "mkt": "CN"}],
+        "elasticity": 1.4, "domestic_rate": 0.9, "policy_weight": 0.6,
+        "upstream": [{"node": "rare_metal", "coef": 0.4}, {"node": "copper", "coef": 0.5}],
+        "downstream": [{"node": "power_grid", "coef": 0.7}],
+    },
+    "nuclear": {
+        "id": "nuclear", "name": "核电", "type": "product",
+        "companies": [{"ticker": "601985", "name": "中国核电", "mkt": "CN"}, {"ticker": "003816", "name": "中国广核", "mkt": "CN"}],
+        "elasticity": 1.2, "domestic_rate": 0.9, "policy_weight": 0.7,
+        "upstream": [{"node": "mine", "coef": 0.5}],
+        "downstream": [{"node": "power_grid", "coef": 0.8}],
+    },
+    "hydrogen": {
+        "id": "hydrogen", "name": "氢能", "type": "product",
+        "companies": [{"ticker": "600989", "name": "宝丰能源", "mkt": "CN"}, {"ticker": "002733", "name": "雄韬股份", "mkt": "CN"}],
+        "elasticity": 2.0, "domestic_rate": 0.5, "policy_weight": 0.8,
+        "upstream": [{"node": "oil_gas", "coef": 0.5}],
+        "downstream": [{"node": "ev", "coef": 0.4}],
+    },
+    "white_wine": {
+        "id": "white_wine", "name": "白酒", "type": "product",
+        "companies": [{"ticker": "600519", "name": "贵州茅台", "mkt": "CN"}, {"ticker": "000858", "name": "五粮液", "mkt": "CN"}],
+        "elasticity": 0.8, "domestic_rate": 1.0, "policy_weight": 0.3,
+        "upstream": [{"node": "grain", "coef": 0.6}],
+        "downstream": [],
+    },
+    "dairy": {
+        "id": "dairy", "name": "乳制品", "type": "product",
+        "companies": [{"ticker": "600887", "name": "伊利股份", "mkt": "CN"}, {"ticker": "002570", "name": "贝因美", "mkt": "CN"}],
+        "elasticity": 0.7, "domestic_rate": 1.0, "policy_weight": 0.2,
+        "upstream": [{"node": "grain", "coef": 0.5}],
+        "downstream": [],
+    },
+    "home_appliance": {
+        "id": "home_appliance", "name": "家电", "type": "product",
+        "companies": [{"ticker": "000333", "name": "美的集团", "mkt": "CN"}, {"ticker": "000651", "name": "格力电器", "mkt": "CN"}],
+        "elasticity": 1.0, "domestic_rate": 0.9, "policy_weight": 0.3,
+        "upstream": [{"node": "copper", "coef": 0.5}, {"node": "pcb", "coef": 0.3}],
+        "downstream": [],
+    },
+    "grain": {
+        "id": "grain", "name": "粮食/农产品", "type": "raw_material",
+        "companies": [{"ticker": "600598", "name": "北大荒", "mkt": "CN"}, {"ticker": "002311", "name": "海大集团", "mkt": "CN"}],
+        "elasticity": 1.0, "domestic_rate": 0.9, "policy_weight": 0.5,
+        "upstream": [{"node": "mine", "coef": 0.3}, {"node": "oil_gas", "coef": 0.3}],
+        "downstream": [{"node": "white_wine", "coef": 0.6}, {"node": "dairy", "coef": 0.5}],
+    },
+    "steel": {
+        "id": "steel", "name": "钢铁", "type": "raw_material",
+        "companies": [{"ticker": "600019", "name": "宝钢股份", "mkt": "CN"}, {"ticker": "000708", "name": "中信特钢", "mkt": "CN"}],
+        "elasticity": 1.3, "domestic_rate": 0.95, "policy_weight": 0.4,
+        "upstream": [{"node": "mine", "coef": 0.7}, {"node": "coal", "coef": 0.6}],
+        "downstream": [{"node": "ev", "coef": 0.4}, {"node": "wind", "coef": 0.4}],
+    },
+    "aluminum": {
+        "id": "aluminum", "name": "铝", "type": "raw_material",
+        "companies": [{"ticker": "601600", "name": "中国铝业", "mkt": "CN"}, {"ticker": "000807", "name": "云铝股份", "mkt": "CN"}],
+        "elasticity": 1.8, "domestic_rate": 0.85, "policy_weight": 0.4,
+        "upstream": [{"node": "mine", "coef": 0.8}, {"node": "coal", "coef": 0.5}],
+        "downstream": [{"node": "ev", "coef": 0.5}, {"node": "pv_module", "coef": 0.4}],
+    },
+    "coal": {
+        "id": "coal", "name": "煤炭", "type": "raw_material",
+        "companies": [{"ticker": "601088", "name": "中国神华", "mkt": "CN"}, {"ticker": "601898", "name": "中煤能源", "mkt": "CN"}],
+        "elasticity": 1.1, "domestic_rate": 0.95, "policy_weight": 0.4,
+        "upstream": [{"node": "mine", "coef": 0.8}],
+        "downstream": [{"node": "steel", "coef": 0.6}, {"node": "aluminum", "coef": 0.5}, {"node": "power_grid", "coef": 0.6}],
+    },
+    "gold": {
+        "id": "gold", "name": "黄金", "type": "raw_material",
+        "companies": [{"ticker": "600547", "name": "山东黄金", "mkt": "CN"}, {"ticker": "600489", "name": "中金黄金", "mkt": "CN"}],
+        "elasticity": 2.0, "domestic_rate": 0.8, "policy_weight": 0.5,
+        "upstream": [{"node": "mine", "coef": 0.9}],
+        "downstream": [],
+    },
 }
 
 # 事件模板（真实世界事件 → 冲击环节 + 方向 + 强度 + 时间窗口）
@@ -306,8 +523,11 @@ class SupplyChainEngine:
         visited = set()
 
         def _forward(node_id: str, cur_score: float, path: List[str], hops: int, direction_flow: str):
-            """沿产业链传导：direction_flow='down'=向下游, 'up'=向上游"""
-            if hops > max_hops or node_id in visited and hops > 2:
+            """沿产业链传导：direction_flow='down'=向下游, 'up'=向上游
+            分数模型：每跳 cur * coef(≤1衰减) * 弹性(局部放大) * 国产替代(局部加成)
+            保证随跳数单调递减（coef 连乘 < 1），避免多路径指数爆炸
+            """
+            if hops > max_hops:
                 return
             key = (node_id, hops)
             if key in visited:
@@ -315,14 +535,13 @@ class SupplyChainEngine:
             visited.add(key)
 
             node = self.graph[node_id]
-            # 弹性放大 + 政策敏感度（政策冲击才乘 policy_weight_scale）
-            score = cur_score * node.get("elasticity", 1.0)
-            # 国产替代逻辑：供给受限时国产化率低的环节 = 替代受益大
+            # 弹性放大（每跳最多一次，限制 ≤2.5 防爆炸）
+            elasticity = min(node.get("elasticity", 1.0), 2.5)
+            score = cur_score * elasticity
+            # 国产替代逻辑：供给受限时国产化率低的环节 = 替代受益大（上限 +40%）
             if direction == "supply" and direction_flow == "down":
-                subst = (1 - node.get("domestic_rate", 0.5)) * 0.5
+                subst = min((1 - node.get("domestic_rate", 0.5)) * 0.5, 0.4)
                 score *= (1 + subst)
-            if direction_flow == "up" and direction == "demand":
-                score *= node.get("elasticity", 1.0) / max(node.get("domestic_rate", 0.5), 0.1)
 
             if node_id not in impact or score > impact[node_id]["score"]:
                 impact[node_id] = {
@@ -334,7 +553,7 @@ class SupplyChainEngine:
                     "type": node.get("type", ""),
                 }
 
-            # 继续传播
+            # 继续传播（coef 连乘天然衰减：路径越长分数越低）
             if direction_flow == "down":
                 for edge in node.get("downstream", []):
                     _forward(edge["node"], score * edge["coef"], impact[node_id]["path"], hops + 1, "down")
