@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from app.database import get_db
 from app.ai.gaia_evolution_brain import get_gaia_brain, GaiaEvolutionBrain
 from app.ai.gaia_trainer import get_gaia_trainer, GaiaTrainer
+from app.middleware.rbac import require_role
 
 logger = logging.getLogger(__name__)
 
@@ -64,9 +65,10 @@ class EvolutionTriggerRequest(BaseModel):
 @router.post("/knowledge")
 async def ingest_knowledge(
     data: KnowledgeIngestRequest,
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """摄取一条进化知识（来自复盘、反馈、A/B测试等来源）"""
+    """摄取一条进化知识（来自复盘、反馈、A/B测试等来源）（修复 BUG-017：仅管理员）"""
     brain = get_gaia_brain()
     knowledge = await brain.ingest_knowledge(
         db=db,
@@ -103,6 +105,7 @@ async def ingest_knowledge(
 
 @router.get("/knowledge")
 async def query_knowledge(
+    _: bool = Depends(require_role(["admin"])),
     query: str = Query(..., description="检索查询文本"),
     limit: int = Query(10, ge=1, le=100, description="返回结果数量上限"),
     knowledge_type: str | None = Query(None, description="按知识类型过滤"),
@@ -133,9 +136,10 @@ async def query_knowledge(
 @router.post("/feedback")
 async def ingest_feedback(
     data: FeedbackIngestRequest,
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """摄取用户反馈（极端评分自动转化为进化知识）"""
+    """摄取用户反馈（极端评分自动转化为进化知识）（修复 BUG-017：仅管理员）"""
     brain = get_gaia_brain()
     knowledge = await brain.ingest_feedback(
         db=db,
@@ -163,9 +167,10 @@ async def ingest_feedback(
 
 @router.get("/evolution/status")
 async def get_evolution_status(
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取进化大脑状态概览"""
+    """获取进化大脑状态概览（修复 BUG-017：仅管理员）"""
     brain = get_gaia_brain()
     status = await brain.get_status(db)
     return {
@@ -178,9 +183,10 @@ async def get_evolution_status(
 @router.post("/evolution/trigger")
 async def trigger_evolution(
     data: EvolutionTriggerRequest = EvolutionTriggerRequest(),
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """手动触发一次进化循环
+    """手动触发一次进化循环（修复 BUG-017：仅管理员，防任意触发训练/进化任务）
 
     执行知识聚合、向量化、权重更新全链路。
     """
@@ -199,9 +205,10 @@ async def trigger_evolution(
 @router.post("/training/trigger")
 async def trigger_training(
     trigger: str = Query("api", description="触发方式: manual | scheduled | automatic"),
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """手动触发一次完整训练管线
+    """手动触发一次完整训练管线（修复 BUG-017：仅管理员，防任意触发训练任务）
 
     执行: 数据收集 → 向量索引更新 → 权重计算 → 权重部署。
     比进化循环更深入，执行权重部署到数据库。
@@ -226,9 +233,10 @@ async def trigger_training(
 @router.get("/weights/{module}")
 async def get_evolved_weights(
     module: str,
+    _: bool = Depends(require_role(["admin"])),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取指定模块的当前进化权重
+    """获取指定模块的当前进化权重（修复 BUG-017：仅管理员）
 
     可用模块: recommendation | search | extractor | writing | optimization | rag | knowledge_graph
     """
@@ -264,6 +272,7 @@ async def get_evolved_weights(
 
 @router.get("/events")
 async def list_events(
+    _: bool = Depends(require_role(["admin"])),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(50, ge=1, le=200, description="每页条数"),
     event_type: str | None = Query(None, description="事件类型过滤"),
@@ -291,6 +300,7 @@ async def list_events(
 
 @router.get("/training-runs")
 async def list_training_runs(
+    _: bool = Depends(require_role(["admin"])),
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(50, ge=1, le=200, description="每页条数"),
     status: str | None = Query(None, description="训练状态过滤: pending | running | completed | failed"),

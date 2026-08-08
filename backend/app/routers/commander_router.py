@@ -20,9 +20,10 @@ API 列表:
 from __future__ import annotations
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from pydantic import BaseModel, Field
 
+from app.middleware.rbac import require_role
 from app.models.commander import (
     CommanderTaskStatus,
     DAGDefinition,
@@ -61,8 +62,8 @@ class WorkerActionRequest(BaseModel):
 
 
 @router.post("/tasks", summary="提交新任务")
-async def submit_task(req: SubmitTaskRequest):
-    """提交任务到 Commander 调度层"""
+async def submit_task(req: SubmitTaskRequest, _: bool = Depends(require_role(["admin"]))):
+    """提交任务到 Commander 调度层（修复 BUG-013：仅管理员）"""
     commander = get_commander()
 
     # 参数校验
@@ -114,6 +115,7 @@ async def submit_task(req: SubmitTaskRequest):
 
 @router.get("/tasks", summary="查询任务列表")
 async def list_tasks(
+    _: bool = Depends(require_role(["admin"])),
     status: Optional[str] = None,
     page: int = Query(default=1, ge=1, description="页码"),
     page_size: int = Query(default=20, ge=1, le=100, description="每页数量"),
@@ -155,8 +157,9 @@ async def list_tasks(
 @router.get("/tasks/{task_id}", summary="查询任务详情")
 async def get_task_detail(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """查询单个任务的完整详情"""
+    """查询单个任务的完整详情（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     task = commander.get_task(task_id)
     if task is None:
@@ -176,8 +179,9 @@ async def get_task_detail(
 @router.get("/tasks/{task_id}/dag", summary="获取任务 DAG 定义")
 async def get_task_dag(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """获取任务的完整 DAG 定义（含所有节点及依赖关系）"""
+    """获取任务的完整 DAG 定义（含所有节点及依赖关系）（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     dag = commander.get_dag(task_id)
     if dag is None:
@@ -196,8 +200,9 @@ async def get_task_dag(
 @router.post("/tasks/{task_id}/stop", summary="停止任务")
 async def stop_task(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """停止/取消正在运行的任务"""
+    """停止/取消正在运行的任务（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     success = await commander.stop_task(task_id)
     if not success:
@@ -219,8 +224,9 @@ async def stop_task(
 @router.post("/tasks/{task_id}/retry", summary="重试失败任务")
 async def retry_task(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """重试失败的任务（重置所有 FAILED 节点为 PENDING）"""
+    """重试失败的任务（重置所有 FAILED 节点为 PENDING）（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     success = await commander.retry_task(task_id)
     if not success:
@@ -242,8 +248,9 @@ async def retry_task(
 @router.post("/tasks/{task_id}/pause", summary="暂停任务")
 async def pause_task(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """暂停运行中的任务"""
+    """暂停运行中的任务（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     success = await commander.pause_task(task_id)
     if not success:
@@ -265,8 +272,9 @@ async def pause_task(
 @router.post("/tasks/{task_id}/resume", summary="恢复任务")
 async def resume_task(
     task_id: str = Path(..., description="任务 ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """恢复暂停的任务"""
+    """恢复暂停的任务（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     success = await commander.resume_task(task_id)
     if not success:
@@ -286,8 +294,8 @@ async def resume_task(
 
 
 @router.get("/workers", summary="查询 Worker Agent 列表")
-async def list_workers():
-    """列出所有 Worker Agent 及其当前状态"""
+async def list_workers(_: bool = Depends(require_role(["admin"]))):
+    """列出所有 Worker Agent 及其当前状态（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     workers = commander.list_workers()
 
@@ -307,8 +315,9 @@ async def list_workers():
 @router.get("/workers/{worker_id}", summary="查询 Worker 详情")
 async def get_worker_detail(
     worker_id: str = Path(..., description="Worker ID"),
+    _: bool = Depends(require_role(["admin"])),
 ):
-    """查询单个 Worker Agent 的详细信息"""
+    """查询单个 Worker Agent 的详细信息（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     worker = commander.get_worker(worker_id)
     if worker is None:
@@ -325,8 +334,8 @@ async def get_worker_detail(
 
 
 @router.get("/stats", summary="Commander 全局统计")
-async def commander_stats():
-    """Commander 调度层全局统计信息"""
+async def commander_stats(_: bool = Depends(require_role(["admin"]))):
+    """Commander 调度层全局统计信息（修复 BUG-013：仅管理员）"""
     commander = get_commander()
     stats = commander.get_stats()
 

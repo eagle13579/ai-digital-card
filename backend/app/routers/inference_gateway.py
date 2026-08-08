@@ -15,9 +15,12 @@ import os
 import json
 import datetime
 from pathlib import Path
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+
+from app.dependencies import require_api_key
+from app.middleware.rbac import require_role
 
 router = APIRouter(prefix="/api/v1", tags=["推理网关"])
 
@@ -138,8 +141,8 @@ class PredictResponse(BaseModel):
 # ── API端点 ──
 
 @router.get("/models", response_model=ModelListResponse)
-async def list_models():
-    """列出所有已训练模型+版本"""
+async def list_models(_: bool = Depends(require_role(["admin"]))):
+    """列出所有已训练模型+版本（修复 BUG-016：仅管理员可查看）"""
     models = []
     for mid, cfg in _MODEL_REGISTRY.items():
         fpath = cfg.get("file")
@@ -164,8 +167,8 @@ async def list_models():
 
 
 @router.get("/models/{model_id}", response_model=ModelInfo)
-async def get_model(model_id: str):
-    """单个模型详情"""
+async def get_model(model_id: str, _: bool = Depends(require_role(["admin"]))):
+    """单个模型详情（修复 BUG-016：仅管理员可查看）"""
     cfg = _MODEL_REGISTRY.get(model_id)
     if not cfg:
         raise HTTPException(status_code=404, detail=f"模型 {model_id} 不存在")
@@ -190,8 +193,12 @@ async def get_model(model_id: str):
 
 
 @router.post("/predict/matching", response_model=PredictResponse)
-async def predict_matching(request: PredictRequest):
-    """名片匹配推理 — 读取online_weights计算匹配分"""
+async def predict_matching(
+    request: PredictRequest,
+    _: bool = Depends(require_role(["admin"])),
+    __: Any = Depends(require_api_key),
+):
+    """名片匹配推理 — 读取online_weights计算匹配分（修复 BUG-016：admin + API Key 双保险）"""
     weights = _load_json(DATA_DIR / "online_weights.json")
     result = {
         "model": "matching_model_v2",
@@ -202,8 +209,12 @@ async def predict_matching(request: PredictRequest):
 
 
 @router.post("/predict/recommend", response_model=PredictResponse)
-async def predict_recommend(request: PredictRequest):
-    """推荐推理 — 权重+反馈数据"""
+async def predict_recommend(
+    request: PredictRequest,
+    _: bool = Depends(require_role(["admin"])),
+    __: Any = Depends(require_api_key),
+):
+    """推荐推理 — 权重+反馈数据（修复 BUG-016：admin + API Key 双保险）"""
     weights = _load_json(DATA_DIR / "online_weights.json")
     learning_log = DATA_DIR / "learning_log.jsonl"
     recent_feedback = []
@@ -224,8 +235,12 @@ async def predict_recommend(request: PredictRequest):
 
 
 @router.post("/predict/sales", response_model=PredictResponse)
-async def predict_sales(request: PredictRequest):
-    """销售预测推理"""
+async def predict_sales(
+    request: PredictRequest,
+    _: bool = Depends(require_role(["admin"])),
+    __: Any = Depends(require_api_key),
+):
+    """销售预测推理（修复 BUG-016：admin + API Key 双保险）"""
     model_data = _load_json(DATA_DIR / "sales_prediction_model.json")
     result = {
         "model_trained": model_data.get("trained", False),
@@ -236,8 +251,12 @@ async def predict_sales(request: PredictRequest):
 
 
 @router.post("/predict/embedding", response_model=PredictResponse)
-async def predict_embedding(request: PredictRequest):
-    """向量嵌入推理 — bge-m3 嵌入服务代理"""
+async def predict_embedding(
+    request: PredictRequest,
+    _: bool = Depends(require_role(["admin"])),
+    __: Any = Depends(require_api_key),
+):
+    """向量嵌入推理 — bge-m3 嵌入服务代理（修复 BUG-016：admin + API Key 双保险）"""
     # 实际调 embedding_service 或 Mac Mini :9091
     result = {
         "service": "embedding_service",
@@ -249,8 +268,8 @@ async def predict_embedding(request: PredictRequest):
 
 
 @router.get("/predict/health")
-async def predict_health():
-    """推理网关健康状态"""
+async def predict_health(_: bool = Depends(require_role(["admin"]))):
+    """推理网关健康状态（修复 BUG-016：仅管理员可查看）"""
     model_count = len(_MODEL_REGISTRY)
     available = sum(1 for m in _MODEL_REGISTRY.values()
                     if m.get("file") is None or m["file"].exists())

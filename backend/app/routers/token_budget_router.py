@@ -12,10 +12,11 @@ API:
   DELETE /api/token-budget/reset/{name}        — 重置指定预算用量
   DELETE /api/token-budget/reset               — 重置所有预算用量
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 
+from app.middleware.rbac import require_permission
 from app.services.token_budget import (
     token_budget_registry,
     TokenBudget,
@@ -103,8 +104,8 @@ def _resolve_budget(rule_name: str) -> TokenBudget:
 # ── GET /status — 所有预算状态列表 ──────
 
 @router.get("/status", response_model=EstimateResponse)
-async def list_all_budgets():
-    """获取所有预算规则的状态列表"""
+async def list_all_budgets(_: bool = Depends(require_permission("system:metrics"))):
+    """获取所有预算规则的状态列表（修复 BUG-013：读操作 system:metrics）"""
     statuses = token_budget_registry.all_status()
     return EstimateResponse(data={
         "budgets": [s.to_dict() for s in statuses],
@@ -115,8 +116,8 @@ async def list_all_budgets():
 # ── GET /status/{name} — 指定预算状态 ──
 
 @router.get("/status/{name}", response_model=EstimateResponse)
-async def get_budget_status(name: str):
-    """获取指定预算规则的详细状态"""
+async def get_budget_status(name: str, _: bool = Depends(require_permission("system:metrics"))):
+    """获取指定预算规则的详细状态（修复 BUG-013：读操作 system:metrics）"""
     budget = token_budget_registry.get(name)
     if budget is None:
         raise HTTPException(
@@ -129,8 +130,8 @@ async def get_budget_status(name: str):
 # ── POST /estimate — 估算 Token 用量 ────
 
 @router.post("/estimate", response_model=EstimateResponse)
-async def estimate(req: EstimateRequest):
-    """估算指令+内容的 Token 用量，并给出预算建议"""
+async def estimate(req: EstimateRequest, _: bool = Depends(require_permission("system:metrics"))):
+    """估算指令+内容的 Token 用量，并给出预算建议（修复 BUG-013：读操作 system:metrics）"""
     budget = _resolve_budget(req.rule_name)
     result = budget.estimate(req.instruction, req.content)
     return EstimateResponse(data=result)
@@ -139,8 +140,11 @@ async def estimate(req: EstimateRequest):
 # ── POST /process — 执行指令并应用预算 ──
 
 @router.post("/process", response_model=EstimateResponse)
-async def process_instruction(req: ProcessRequest):
-    """执行指令，自动应用预算控制（截断/降级/拒绝）"""
+async def process_instruction(
+    req: ProcessRequest,
+    _: bool = Depends(require_permission("system:settings")),
+):
+    """执行指令，自动应用预算控制（截断/降级/拒绝）（修复 BUG-013：写操作 system:settings）"""
     budget = _resolve_budget(req.rule_name)
     result = budget.process(req.instruction, req.content)
     return EstimateResponse(
@@ -152,8 +156,8 @@ async def process_instruction(req: ProcessRequest):
 # ── GET /quota — 所有预算配额概览 ──────
 
 @router.get("/quota", response_model=EstimateResponse)
-async def list_all_quotas():
-    """获取所有预算规则的配额概览"""
+async def list_all_quotas(_: bool = Depends(require_permission("system:metrics"))):
+    """获取所有预算规则的配额概览（修复 BUG-013：读操作 system:metrics）"""
     statuses = token_budget_registry.all_status()
     quotas = [
         QuotaSummary(
@@ -187,8 +191,8 @@ async def list_all_quotas():
 # ── GET /quota/{name} — 指定预算配额 ──
 
 @router.get("/quota/{name}", response_model=EstimateResponse)
-async def get_quota(name: str):
-    """获取指定预算规则的配额详情"""
+async def get_quota(name: str, _: bool = Depends(require_permission("system:metrics"))):
+    """获取指定预算规则的配额详情（修复 BUG-013：读操作 system:metrics）"""
     budget = token_budget_registry.get(name)
     if budget is None:
         raise HTTPException(
@@ -217,8 +221,11 @@ async def get_quota(name: str):
 # ── POST /create — 创建自定义预算规则 ──
 
 @router.post("/create", response_model=EstimateResponse)
-async def create_budget_rule(req: CreateRuleRequest):
-    """创建自定义 Token 预算规则（如果已存在则更新）"""
+async def create_budget_rule(
+    req: CreateRuleRequest,
+    _: bool = Depends(require_permission("system:settings")),
+):
+    """创建自定义 Token 预算规则（如果已存在则更新）（修复 BUG-013：写操作 system:settings）"""
     try:
         strategy = DegradeStrategy(req.degrade_strategy.lower())
     except ValueError:
@@ -246,8 +253,8 @@ async def create_budget_rule(req: CreateRuleRequest):
 # ── DELETE /reset/{name} — 重置指定预算 ──
 
 @router.delete("/reset/{name}", response_model=ResetResponse)
-async def reset_budget(name: str):
-    """重置指定预算规则的用量计数"""
+async def reset_budget(name: str, _: bool = Depends(require_permission("system:settings"))):
+    """重置指定预算规则的用量计数（修复 BUG-013：写操作 system:settings）"""
     budget = token_budget_registry.get(name)
     if budget is None:
         raise HTTPException(
@@ -261,8 +268,8 @@ async def reset_budget(name: str):
 # ── DELETE /reset — 重置所有预算 ──────
 
 @router.delete("/reset", response_model=ResetResponse)
-async def reset_all_budgets():
-    """重置所有预算规则的用量计数"""
+async def reset_all_budgets(_: bool = Depends(require_permission("system:settings"))):
+    """重置所有预算规则的用量计数（修复 BUG-013：写操作 system:settings）"""
     count = token_budget_registry.reset_all()
     return ResetResponse(
         message=f"已重置所有预算规则",
@@ -270,11 +277,12 @@ async def reset_all_budgets():
     )
 
 
-# ── GET /health — 预算子系统健康检查 ──
+# ── GET /health — 预算子系统健康检查（公开白名单，PUBLIC-BYPASS） ──
 
 @router.get("/health", response_model=EstimateResponse)
+# PUBLIC-BYPASS: 健康检查端点，设计上公开（BUG-013 P2 公开白名单登记）
 async def token_budget_health():
-    """Token 预算子系统健康检查"""
+    """Token 预算子系统健康检查（PUBLIC-BYPASS）"""
     statuses = token_budget_registry.all_status()
     exceeded = [s for s in statuses if s.is_exceeded]
     warning = [s for s in statuses if s.is_warning]

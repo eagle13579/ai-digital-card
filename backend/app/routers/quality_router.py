@@ -7,10 +7,11 @@ API:
   GET    /api/quality/samples      — 评测样本管理（列表/创建/删除）
   GET    /api/quality/baseline     — 基线查询与对比
 """
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import Any, Optional
 
+from app.middleware.rbac import require_permission
 from app.services.quality_evaluator import (
     quality_evaluator,
     QualityEvaluator,
@@ -75,8 +76,12 @@ class BaselineCompareRequest(BaseModel):
 # ──────────────────────────────────────────────
 
 @router.post("/evaluate", response_model=ApiResponse)
-async def evaluate(req: EvaluateRequest, background_tasks: BackgroundTasks):
-    """执行LM-as-Judge质量评估
+async def evaluate(
+    req: EvaluateRequest,
+    background_tasks: BackgroundTasks,
+    _: bool = Depends(require_permission("system:settings")),
+):
+    """执行LM-as-Judge质量评估（修复 BUG-013：写操作 system:settings）
 
     支持三种模式：
       1. 直接传入 input_text + agent_output 评估单条
@@ -159,8 +164,8 @@ async def evaluate(req: EvaluateRequest, background_tasks: BackgroundTasks):
 # ──────────────────────────────────────────────
 
 @router.get("/dashboard", response_model=ApiResponse)
-async def get_dashboard():
-    """获取质量评估看板统计数据"""
+async def get_dashboard(_: bool = Depends(require_permission("system:metrics"))):
+    """获取质量评估看板统计数据（修复 BUG-013：读操作 system:metrics）"""
     try:
         stats = await quality_evaluator.get_dashboard_stats()
         return ApiResponse(data=stats)
@@ -174,6 +179,7 @@ async def get_dashboard():
 
 @router.get("/samples", response_model=ApiResponse)
 async def list_samples(
+    _: bool = Depends(require_permission("system:metrics")),
     category: Optional[str] = Query(None, description="按分类过滤"),
     status: Optional[str] = Query(None, description="按状态过滤: pending/running/completed/failed"),
     agent_version: Optional[str] = Query(None, description="按Agent版本过滤"),
@@ -205,8 +211,11 @@ async def list_samples(
 
 
 @router.post("/samples", response_model=ApiResponse)
-async def create_sample(req: SampleCreateRequest):
-    """创建评测样本"""
+async def create_sample(
+    req: SampleCreateRequest,
+    _: bool = Depends(require_permission("system:settings")),
+):
+    """创建评测样本（修复 BUG-013：写操作 system:settings）"""
     try:
         sample = await quality_evaluator.create_sample(
             input_text=req.input_text,
@@ -228,8 +237,11 @@ async def create_sample(req: SampleCreateRequest):
 
 
 @router.delete("/samples/{sample_id}", response_model=ApiResponse)
-async def delete_sample(sample_id: str):
-    """删除评测样本"""
+async def delete_sample(
+    sample_id: str,
+    _: bool = Depends(require_permission("system:settings")),
+):
+    """删除评测样本（修复 BUG-013：写操作 system:settings）"""
     deleted = await quality_evaluator.delete_sample(sample_id)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"样本不存在: {sample_id}")

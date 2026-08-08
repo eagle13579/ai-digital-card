@@ -30,7 +30,7 @@ import logging
 import os
 from typing import Any
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, Header, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -41,6 +41,7 @@ from app.broker.interfaces import ServiceBrokerProtocol
 from app.events.interfaces import EventBusProtocol
 from app.ai.gateway.interfaces import AIGatewayProtocol
 from app.database import get_db
+from app.models.api_key import ApiKey
 from app.models.brochure import Brochure
 from app.models.user import User
 from app.routers.auth import get_current_user
@@ -536,3 +537,23 @@ async def get_owned_brochure(
             return brochure
         raise HTTPException(status_code=403, detail="无权查看此画册")
     return brochure
+
+
+async def require_api_key(
+    x_api_key: str = Header(default="", alias="X-API-Key"),
+    db: AsyncSession = Depends(get_db),
+) -> ApiKey:
+    """公共依赖：强制校验 X-API-Key 请求头（修复 BUG-016 推理网关无鉴权）。
+
+    校验规则：
+        - 请求头 X-API-Key 缺失或为空 → 401
+        - Key 不存在或已停用（is_active=False）→ 401
+    通过后返回 ApiKey 记录。
+    """
+    if not x_api_key:
+        raise HTTPException(status_code=401, detail="缺少 API Key（X-API-Key）")
+    result = await db.execute(select(ApiKey).where(ApiKey.key == x_api_key))
+    api_key = result.scalars().first()
+    if api_key is None or not api_key.is_active:
+        raise HTTPException(status_code=401, detail="API Key 无效或已停用")
+    return api_key
