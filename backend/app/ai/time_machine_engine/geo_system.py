@@ -172,6 +172,7 @@ TOOLKIT_EVENTS = [
 CARRIER_CN = {
     "wti": "原油WTI", "copper": "铜", "vix": "VIX恐慌指数",
     "fed_funds": "联邦基金利率", "dxy": "美元指数",
+    "gold": "黄金", "silver": "白银",
 }
 
 
@@ -185,8 +186,8 @@ class GeoSystemEngine:
     # ── 数据加载 ──────────────────────────────────────────
 
     def _load_carriers(self):
-        """加载载体层 CSV（FRED 数据）"""
-        for name in ("wti", "copper", "vix"):
+        """加载载体层 CSV（FRED 数据 + 贵金属自积累）"""
+        for name in ("wti", "copper", "vix", "gold", "silver"):
             path = os.path.join(DATA_DIR, f"{name}.csv")
             rows = []
             if os.path.exists(path):
@@ -242,10 +243,14 @@ class GeoSystemEngine:
             if len(rows) < 4:
                 status[name] = {"label": label, "ok": False}
                 continue
-            # 一年前均值 vs 当前值
+            # 一年前均值 vs 当前值；贵金属历史短（自积累）→ 用序列最早点做基准
             cur = rows[-1][1]
-            one_year_ago = [r[1] for r in rows if r[0] < f"{datetime.now().year - 1}-12-31"]
-            base = sum(one_year_ago[-60:]) / max(1, len(one_year_ago[-60:])) if one_year_ago else cur
+            if name in ("gold", "silver"):
+                # 用序列第一个数据点作为基准（今年至今涨幅）
+                base = rows[0][1] if rows else cur
+            else:
+                one_year_ago = [r[1] for r in rows if r[0] < f"{datetime.now().year - 1}-12-31"]
+                base = sum(one_year_ago[-60:]) / max(1, len(one_year_ago[-60:])) if one_year_ago else cur
             chg = (cur - base) / base * 100 if base else 0
             # 12个月窗口内最大摆动（波动性）
             window = rows[-252:] if name in ("wti", "vix", "dxy") else rows[-12:]
@@ -296,8 +301,21 @@ class GeoSystemEngine:
         else:
             regime = "calm"
 
-        # 大宗商品信号（通胀/需求代理）
+        # 大宗商品信号（通胀/需求代理）+ 贵金属避险信号
         commodity_up = (wti.get("yoy_change_pct", 0) > 10) or (carrier.get("copper", {}).get("yoy_change_pct", 0) > 10)
+        gold = carrier.get("gold", {})
+        silver = carrier.get("silver", {})
+        gold_surge = gold.get("yoy_change_pct", 0) > 20          # 黄金年涨>20% = 避险/通胀信号
+        silver_surge = silver.get("yoy_change_pct", 0) > 30     # 白银更猛
+        precious_metal_signal = gold_surge or silver_surge
+        # 贵金属暴涨与 VIX 同高 → 避险共振（收割期特征）；与 VIX 低 → 通胀预期（pump 特征）
+        if precious_metal_signal:
+            if fear in ("extreme", "high"):
+                regime_hint = "避险共振"
+            else:
+                regime_hint = "通胀预期"
+        else:
+            regime_hint = ""
 
         return {
             "regime": regime,
@@ -305,6 +323,10 @@ class GeoSystemEngine:
             "vix_current": vix_cur,
             "dxy_yoy_pct": dxy_chg,
             "commodity_up": commodity_up,
+            "gold_surge": gold_surge,
+            "silver_surge": silver_surge,
+            "precious_metal_signal": precious_metal_signal,
+            "regime_hint": regime_hint,
             "tide_stage": tide_stage,
             "risk_mode": risk_mode,
             "carrier": carrier,
@@ -420,8 +442,19 @@ class GeoSystemEngine:
             "## ② 载体层 · 五大通道状态",
             "",
         ]
+        # 贵金属信号行（2026-08-08 新增：黄金/白银暴涨 = 避险或通胀信号）
+        _carrier_regime = regime.get("carrier", {})
+        _g = _carrier_regime.get("gold", {})
+        _s = _carrier_regime.get("silver", {})
+        if regime.get("precious_metal_signal"):
+            lines.append(
+                f"- 贵金属信号: 🔔 **{regime.get('regime_hint', '')}** — "
+                f"黄金 {_g.get('yoy_change_pct', 0):+.1f}% (当前 {_g.get('current', '-')}), "
+                f"白银 {_s.get('yoy_change_pct', 0):+.1f}% (当前 {_s.get('current', '-')})"
+            )
+            lines.append("")
         carrier = regime.get("carrier", {})
-        for name in ("fed_funds", "dxy", "wti", "copper", "vix"):
+        for name in ("fed_funds", "dxy", "wti", "copper", "gold", "silver", "vix"):
             c = carrier.get(name)
             if not c or not c.get("ok"):
                 lines.append(f"- {CARRIER_CN.get(name, name)}: 数据不足")
