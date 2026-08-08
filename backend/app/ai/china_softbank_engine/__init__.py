@@ -229,6 +229,24 @@ class ChinaSoftBankEngine:
         except Exception as e:
             result["supply_chain"] = {"error": str(e)}
 
+        # 6.6 双链发现 + 群体智能预判（2026-08-08 海容: 学习 Obsidian 双向链接 + MiroFish 群体智能逻辑）
+        try:
+            from china_softbank_engine.dual_link import DualLinkEngine
+            from china_softbank_engine.supply_chain import EVENT_TEMPLATES as _EVT
+            dle = DualLinkEngine()
+            result["dual_link"] = {
+                "engine": "双链发现+群体智能预判引擎 v1.0.0",
+                "sources": [
+                    "Obsidian 双向链接: 节点+双链，任意节点沿链接跳转发现隐藏路径",
+                    "MiroFish 群体智能: 种子→图谱→多智能体演化→预测 (github.com/666ghj/MiroFish 70.7k★ 盛大出品)",
+                ],
+                "discover": dle.discover("铜", max_hops=2),
+                "find_path": dle.find_path("光模块", "金属铜"),
+                "swarm": dle.swarm_report(_EVT["us_chip_restriction"]),
+            }
+        except Exception as e:
+            result["dual_link"] = {"error": str(e)}
+
         # 7. 出海时光机（模式复制机会 Top）—— 轻量：读最近报告，不跑全量 run()
         try:
             import glob
@@ -370,6 +388,26 @@ class ChinaSoftBankEngine:
                 lines.append("")
         else:
             lines.append(f"- ⚠️ {sc.get('error')}")
+        lines.append("")
+
+        dl = data.get("dual_link") or {}
+        lines.append("## 🔄 双链发现 + 🧠 群体智能预判（Obsidian + MiroFish 融合）")
+        if dl.get("discover"):
+            disc = dl.get("discover") or {}
+            lines.append(f"- **Obsidian 双链**（{disc.get('seed_node')} → {disc.get('found')} 个关联环节）:")
+            for r in (disc.get("results") or [])[:6]:
+                comps = " / ".join(c.get("name", "") for c in r.get("companies", [])[:2])
+                lines.append(f"  - [{r.get('hops')}跳] {r.get('name')} | {comps}")
+            paths = dl.get("find_path") or []
+            if paths:
+                lines.append(f"- **传导路径**（光模块→金属铜）: {' 或 '.join(' → '.join(p) for p in paths[:2])}")
+        else:
+            lines.append(f"- ⚠️ {dl.get('error')}")
+        if dl.get("swarm"):
+            lines.append("")
+            lines.append("**MiroFish 群体智能预判**（芯片管制，4轮演化收敛）:")
+            for line in (dl.get("swarm") or "").splitlines()[2:14]:
+                lines.append(line)
         lines.append("")
 
         lines.append("---")
