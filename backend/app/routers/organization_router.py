@@ -259,10 +259,12 @@ async def add_organization_member(
 @router.get("/{org_id}/members")
 async def list_organization_members(
     org_id: int,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取组织成员列表"""
-    await _get_org_or_404(db, org_id)
+    """获取组织成员列表（仅组织成员可查看）"""
+    # 修复 BUG-008：需登录且为组织成员
+    await _require_org_member(db, org_id, current_user)
 
     members = await db.run_sync(lambda s: org_service.get_org_members(s, org_id))
 
