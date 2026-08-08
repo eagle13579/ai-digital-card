@@ -287,6 +287,19 @@ class TimeMachineV3Engine:
         except Exception as e:
             logger.warning("地缘预警失败: %s", e)
 
+        # ── 第13步: 科技战维度（2026-08-08 海容科技参数注入）──
+        tech_warfare = None
+        try:
+            from .tech_warfare import TechWarfareEngine
+            twe = TechWarfareEngine()
+            tech_warfare = twe.run()
+            logger.info("科技战: %s (信号分%d, 强信号%d条)",
+                        tech_warfare.get("regime", {}).get("label", "?"),
+                        tech_warfare.get("regime", {}).get("score", 0),
+                        tech_warfare.get("regime", {}).get("strong_hits", 0))
+        except Exception as e:
+            logger.warning("科技战引擎失败: %s", e)
+
         return {
             "mode": "env_migration_match",
             "engine_version": self.VERSION,
@@ -303,6 +316,7 @@ class TimeMachineV3Engine:
             "dollar_tide": dollar_data,
             "geo_system": geo_data,
             "geopolitics_alert": geo_alert,
+            "tech_warfare": tech_warfare,
             "lingshu_synced": synced,
             "duration_s": duration,
         }
@@ -469,6 +483,13 @@ class TimeMachineV3Engine:
                 win = "已到" if d["window_years"] is None or d["window_years"] < 1 else f"{d['window_years']:.0f}年"
                 lines.append(f"| {icon} | {d['mode_name']} | {d['country']} | "
                              f"{d['similarity']:.0%} | {win} | {d['action'][:36]} |")
+            lines.append("")
+
+        # 科技战维度（2026-08-08 海容科技参数注入：美国收割主赛道）
+        tw = data.get("tech_warfare")
+        if tw:
+            from .tech_warfare import TechWarfareEngine
+            lines.append(TechWarfareEngine().to_report(tw))
             lines.append("")
         return "\n".join(lines)
 
