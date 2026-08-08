@@ -1,31 +1,41 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-全球税收政策影响引擎 (tax_policy.py) — 2026-08-08
+全球税收政策影响引擎 (tax_policy.py) — 2026-08-08 v2（数据准确性修正）
 ==================================================
 海容要求新增维度：税收政策对出海操作盘子的影响不可少。
 
+⚠️ v2 修正（2026-08-08）：上一版将「境外保险预扣2%个税」「离岸信托设立预征20%个税」
+当作已落地的 2026 新政写入，经核实**无公开政策文号支持**（中国现行个税法下保险赔款免征，
+保单收益/信托装入资产的征管存在争议且以申报为主），属不准确数据。v2 改为：
+- 区分「现行法律规定（可信）」与「监管趋势/传闻（低置信度标注）」
+- 每条注明 confidence 与来源，绝不把未证实政策当事实输出
+
 核心场景：
-- 中国居民海外投资/资产配置的税收（海外保险个税、信托税、CRS、资本利得）
+- 中国居民海外投资/资产配置的税收（境外保单收益、信托架构、CRS、资本利得）
 - 出海目的地的企业所得税/预提税/转让定价
 - 税收对「机会评分」的修正（低税负国 = 机会加分，高税负/新增税 = 机会减分）
 
-数据: 静态档案（各国最新税收政策要点）+ 政策变更事件流（可扩展抓取）
+数据: 静态档案（各国税收政策要点，带置信度）+ 政策变更事件流（可扩展抓取）
 输出: {regime, alerts, country_adjust, china_specific, report}
 """
-import json, os, time, datetime
+import json, os, time
 
-# ── 中国税收政策（2026 年要点）──
+# ── 中国税收政策（2026 年核实版）──
+# confidence: 高=有法律明文/文号; 中=征管实践/官方表态; 低=传闻/未证实
 CHINA_TAX = {
     "country": "中国",
     "iso3": "CHN",
     "notes": [
-        {"policy": "境外保险个税", "rate": "2%", "effective": "2026-08",
-         "impact": "中国居民境外保单收益/现金价值增值按2%预扣个税（新增），影响海外保险配置",
-         "confidence": 80, "source": "2026年个人所得税新政"},
-        {"policy": "离岸信托个税", "rate": "20%", "effective": "2026-08",
-         "impact": "设立离岸信托时点按信托资产规模预征20%个税（新增），大幅提高信托架构成本",
-         "confidence": 80, "source": "2026年个税新政"},
+        {"policy": "保险赔款免征个税", "rate": "0%（免征）", "effective": "现行（个税法§4）",
+         "impact": "理赔性质保险赔款依法免征个税；但境外储蓄/投资型保单的现金价值增值与退保收益征管存在争议",
+         "confidence": 90, "source": "《个人所得税法》第四条第三项"},
+        {"policy": "境外保单收益征管", "rate": "按20%（有争议）", "effective": "现行",
+         "impact": "境外投资型保单收益是否按『利息股息红利/财产转让』20%征税，实务执行不一，以自行申报为主",
+         "confidence": 55, "source": "个税法第3条+征管实践（无2%预扣政策）"},
+        {"policy": "离岸信托税务处理", "rate": "视同转让按20%（有争议）", "effective": "现行",
+         "impact": "装入境外信托资产是否视同财产转让征税，无明确文号；监管趋势加强境外所得申报",
+         "confidence": 50, "source": "个税法+监管动向（无20%预征文号）"},
         {"policy": "CRS信息交换", "rate": "申报", "effective": "2018年起",
          "impact": "中国已参与CRS，海外金融账户信息自动交换，逃税空间收窄",
          "confidence": 90, "source": "CRS多边公约"},
@@ -59,43 +69,44 @@ DESTINATION_TAX = [
     {"country": "新加坡", "iso3": "SGP", "cit": "17%", "wht_dividend": "0%", "incentive": "区域总部/先驱优惠",
      "note": "单层税制，无资本利得税", "score_adj": +3, "confidence": 90},
     {"country": "韩国", "iso3": "KOR", "cit": "24%", "wht_dividend": "15%", "incentive": "中韩FTA+区域总部",
-     "note": "2026对中投资新规关注", "score_adj": 0, "confidence": 80},
+     "note": "对中投资税务需关注中韩税收协定", "score_adj": 0, "confidence": 80},
     {"country": "美国", "iso3": "USA", "cit": "21%", "wht_dividend": "30%(条约降)", "incentive": "IRA清洁能源补贴",
      "note": "州税另计，转让定价严格", "score_adj": -1, "confidence": 90},
     {"country": "日本", "iso3": "JPN", "cit": "30%", "wht_dividend": "20%(条约降)", "incentive": "有限",
      "note": "全球最低税已立法", "score_adj": -1, "confidence": 90},
 ]
 
-# ── 税收事件流（政策变更，可扩展为抓取）──
+# ── 税收事件流（政策变更/监管动向，区分已落地与传闻）──
 TAX_EVENTS = [
-    {"date": "2026-08", "country": "中国", "event": "海外保险收益预扣2%个税", "impact": "海外保险配置税负上升",
-     "severity": "high", "confidence": 80},
-    {"date": "2026-08", "country": "中国", "event": "离岸信托设立预征20%个税", "impact": "信托架构成本大增，家族办公室策略需重估",
-     "severity": "high", "confidence": 80},
     {"date": "2026-01", "country": "全球", "event": "全球最低税15%落地(GloBE)", "impact": "大型跨国企业税负下限15%，税收优惠空间收窄",
-     "severity": "medium", "confidence": 90},
+     "severity": "medium", "confidence": 90, "confirmed": True},
     {"date": "2025-07", "country": "美国", "event": "IRA清洁能源补贴细则", "impact": "新能源出海美国可获补贴但需合规",
-     "severity": "medium", "confidence": 85},
+     "severity": "medium", "confidence": 85, "confirmed": True},
+    {"date": "2026-08", "country": "中国", "event": "【传闻】境外保单收益预扣2%个税", "impact": "未获官方文件证实，若落地将影响海外保险配置",
+     "severity": "low", "confidence": 20, "confirmed": False},
+    {"date": "2026-08", "country": "中国", "event": "【传闻】离岸信托设立预征20%个税", "impact": "未获官方文件证实，若落地将大幅提高信托架构成本",
+     "severity": "low", "confidence": 20, "confirmed": False},
 ]
 
 def assess(country_iso3: str | None = None) -> dict:
     """评估税收政策对出海操作盘子的影响"""
     now = time.strftime("%Y-%m-%d %H:%M")
-    # 1. 中国居民配置影响
-    china_high = [n for n in CHINA_TAX["notes"] if n.get("confidence", 0) >= 75]
+    # 1. 中国居民配置影响（按置信度排序，高置信在前）
+    china_notes = sorted(CHINA_TAX["notes"], key=lambda n: -n.get("confidence", 0))
     # 2. 目的地税收档案
     dest = DESTINATION_TAX
     if country_iso3:
         dest = [d for d in dest if d.get("iso3") == country_iso3] or dest[:1]
-    # 3. 政策事件
-    events = sorted(TAX_EVENTS, key=lambda e: e["date"], reverse=True)[:6]
+    # 3. 政策事件（已落地在前，传闻在后并低置信标注）
+    events = sorted(TAX_EVENTS, key=lambda e: (not e.get("confirmed", False), e["date"]), reverse=True)
     # 4. 操作建议
-    advice = []
-    advice.append("🇨🇳 中国税务新规：海外保险2%个税 + 离岸信托20%个税 → 配置成本上升，需重新测算净收益")
-    advice.append("🌐 全球最低税15%落地 → 跨国架构税收优惠收窄，低税国红利减少，注重实质经营")
-    advice.append("💡 建议：出海架构优先考虑与中国有税收协定国家 + 单层税制(新加坡/阿联酋) + 合规申报")
+    advice = [
+        "🇨🇳 中国个税要点：保险赔款免征（个税法§4）；境外保单收益/信托装入资产征管有争议，以自行申报为主",
+        "🌐 全球最低税15%落地 → 跨国架构税收优惠收窄，低税国红利减少，注重实质经营",
+        "💡 出海架构优先考虑与中国有税收协定国家 + 单层税制(新加坡/阿联酋) + 合规申报",
+    ]
     return {
-        "china_tax": CHINA_TAX,
+        "china_tax": {"country": CHINA_TAX["country"], "notes": china_notes},
         "destinations": dest,
         "events": events,
         "advice": advice,
@@ -108,12 +119,12 @@ def to_report(data: dict) -> str:
     L.append("")
     L.append("### 🇨🇳 中国居民配置（直接影响操作盘子）")
     L.append("")
-    L.append("| 政策 | 税率 | 影响 | 置信度 |")
+    L.append("| 政策 | 税率 | 状态 | 置信度 |")
     L.append("|:-----|:-----|:-----|:------|")
-    for n in data["china_tax"]["notes"][:5]:
-        L.append(f"| {n['policy']} | {n['rate']} | {n['impact']} | {n['confidence']}% |")
+    for n in data["china_tax"]["notes"][:6]:
+        L.append(f"| {n['policy']} | {n['rate']} | {n['effective']} | {n['confidence']}% |")
     L.append("")
-    L.append("### 🌍 出海目的地税负参考（企业所得税/预提税/优惠）")
+    L.append("### 🌍 出海目的地税负参考（企业所得税/股息预提税/优惠）")
     L.append("")
     L.append("| 国家 | 企业所得税 | 股息预提税 | 优惠 | 机会修正 |")
     L.append("|:-----|:----------|:----------|:-----|:--------|")
@@ -121,14 +132,17 @@ def to_report(data: dict) -> str:
         adj = f"+{d['score_adj']}" if d["score_adj"] > 0 else str(d["score_adj"])
         L.append(f"| {d['country']} | {d['cit']} | {d['wht_dividend']} | {d['incentive'][:22]} | {adj} |")
     L.append("")
-    L.append("### ⚡ 政策变更事件")
+    L.append("### ⚡ 政策变更/监管动向")
     L.append("")
     for e in data["events"][:4]:
         sev = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(e["severity"], "🟡")
-        L.append(f"- {sev} [{e['date']}] {e['country']} {e['event']} → {e['impact']}")
+        conf = f"(置信度{e['confidence']}%)"
+        L.append(f"- {sev} [{e['date']}] {e['country']} {e['event']} → {e['impact']} {conf}")
     L.append("")
     for a in data["advice"]:
         L.append(a)
+    L.append("")
+    L.append("*税收数据以官方文件为准，本板块为策略参考非税务意见*")
     L.append("")
     return "\n".join(L)
 
