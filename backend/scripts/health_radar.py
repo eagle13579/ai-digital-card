@@ -36,7 +36,7 @@ BACKEND = os.path.join(REPO, "backend")
 def run(cmd, timeout=15, cwd=None):
     """执行命令返回 (rc, stdout)"""
     try:
-        p = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+        p = subprocess.run(cmd, shell=True, capture_output=True, text=True, errors='replace',
                            timeout=timeout, cwd=cwd or REPO)
         return p.returncode, p.stdout.strip()
     except subprocess.TimeoutExpired:
@@ -88,7 +88,8 @@ def scan_services():
                      "ok": port_ok and http in (200, 302, 308)}
     # 链客宝（区分「未启动」与「异常」）
     port_ok = check_port(8001)
-    http = check_http(8001, "/api/health") if port_ok else 0
+    # 链客宝真实健康端点是 /health（/api/health 已废弃返回404，2026-08-08 实测）
+    http = check_http(8001, "/health") if port_ok else 0
     out["chainke(链客宝)"] = {"port": 8001, "listen": port_ok, "http": http,
                               "ok": port_ok and http in (200, 302, 308),
                               "note": "" if port_ok else "未启动(服务inactive)"}
@@ -172,7 +173,8 @@ def scan_cron():
 def scan_git_repo():
     """GIT: 仓库完整性"""
     out = {}
-    rc, head = run("git log --oneline master -1 | cut -c1-40", cwd=REPO)
+    # %h+%s 由 git 自己截断（不会切断 UTF-8 多字节），比 cut -c1-40 安全（2026-08-08 修复中文切断）
+    rc, head = run("git log --pretty='%h %s' master -1", cwd=REPO)
     out["master_head"] = head if head else "?"
     rc, tag = run("git describe --tags --abbrev=0 2>/dev/null", cwd=REPO)
     out["latest_tag"] = tag if tag else "none"
