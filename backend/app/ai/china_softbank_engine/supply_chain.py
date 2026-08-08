@@ -537,7 +537,9 @@ class SupplyChainEngine:
             node = self.graph[node_id]
             # 弹性放大（每跳最多一次，限制 ≤2.5 防爆炸）
             elasticity = min(node.get("elasticity", 1.0), 2.5)
-            score = cur_score * elasticity
+            # 全局距离衰减：每跳 ×0.6（路径越长影响越弱，5跳后 ≈0.078）
+            dist_decay = 0.6 ** hops
+            score = cur_score * elasticity * dist_decay
             # 国产替代逻辑：供给受限时国产化率低的环节 = 替代受益大（上限 +40%）
             if direction == "supply" and direction_flow == "down":
                 subst = min((1 - node.get("domestic_rate", 0.5)) * 0.5, 0.4)
@@ -588,8 +590,11 @@ class SupplyChainEngine:
         for nid, info in sorted(impact.items(), key=lambda x: -x[1]["score"]):
             node = self.graph[nid]
             direction_label = "受益" if info["direction"] != "origin" else "冲击源"
-            # 受损判定：供给受限且自身依赖进口且无替代 → 受损；需求爆发上游涨价 → 下游成本承压
-            if direction == "supply" and info["direction"] == "down" and info["hops"] >= 2:
+            # 受损判定：仅当冲击环节本身是科技设备类(芯片/设备/存储)时才触发国产替代受损逻辑
+            # 原材料冲击(铜/稀土/油)是成本传导，不该标"进口依赖受损"
+            impact_node_type = self.graph[impact_node].get("type", "")
+            is_tech_supply = (direction == "supply" and impact_node_type in ("device", "component", "service"))
+            if is_tech_supply and info["direction"] == "down" and info["hops"] >= 2:
                 if node.get("domestic_rate", 0.5) < 0.35:
                     direction_label = "受损(进口依赖)"
             if direction == "demand" and info["direction"] == "up" and info["hops"] >= 2:

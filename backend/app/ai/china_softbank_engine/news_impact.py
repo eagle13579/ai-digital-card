@@ -50,14 +50,16 @@ NEWS_RULES: List[Dict[str, Any]] = [
     {
         "event_type": "铜价/资源涨价", "impact_node": "copper", "direction": "supply",
         "strength": 0.7, "policy_weight_scale": 1.0, "window_months": 18,
-        "keywords": ["铜价", "铜矿", "铜供给", "铜库存", "copper", "铜需求", "电解铜", "铜箔涨价"],
+        "keywords": ["铜价", "铜矿", "铜供给", "铜库存", "copper", "铜需求", "电解铜", "铜箔涨价",
+                     "铜出口", "铜精矿"],
     },
     # ---- 稀土管制 ----
     {
         "event_type": "稀土/稀有金属管制", "impact_node": "rare_metal", "direction": "supply",
         "strength": 0.75, "policy_weight_scale": 1.2, "window_months": 12,
         "keywords": ["稀土", "稀有金属", "锂矿", "钴", "镍", "出口配额", "rare earth", "lithium",
-                     "锂价", "碳酸锂", "锂电材料", "资源管制"],
+                     "锂价", "碳酸锂", "锂电材料", "资源管制", "刚果金", "刚果", "钴矿", "铜钴",
+                     "cobalt", "刚果民主共和国"],
     },
     # ---- 新能源车 ----
     {
@@ -144,19 +146,40 @@ class NewsImpactEngine:
         self.sce = SupplyChainEngine()
         self.dle = DualLinkEngine()
 
-    # ---------- 1. 事件识别 ----------
+    # 1. 事件识别 ----------
     def detect_event(self, text: str) -> Dict[str, Any]:
-        """关键词匹配 → 事件类型 + 冲击环节 + 强度（多规则命中取最强）"""
+        """关键词匹配 → 事件类型 + 冲击环节 + 强度（多规则命中取最强）
+        语言感知：英文关键词只匹配英文文本（避免韩文/中文里的 'ai' 子串误命中）
+        """
         text_lower = text.lower()
+        # 语言检测：韩文（谚文）为主 → 只匹配中文关键词；否则含拉丁才匹配英文关键词
+        hangul_count = len(re.findall(r'[\uac00-\ud7af]', text))
+        has_hangul_dominant = hangul_count > 5
+        has_latin = bool(re.search(r'[a-zA-Z]{2,}', text)) and not has_hangul_dominant
         best = None
         best_score = 0
         for rule in NEWS_RULES:
-            hits = [kw for kw in rule["keywords"] if kw.lower() in text_lower]
+            kw_list = rule["keywords"]
+            if has_hangul_dominant:
+                # 韩文标题只匹配中文关键词（韩文里无中文词 → 自然落到兜底）
+                kw_list = [kw for kw in kw_list if re.match(r'^[\u4e00-\u9fff]', kw)]
+            elif not has_latin:
+                kw_list = [kw for kw in kw_list if re.match(r'^[\u4e00-\u9fff]', kw)]
+            hits = []
+            for kw in kw_list:
+                if re.match(r'^[\u4e00-\u9fff]', kw):
+                    # 中文关键词：子串匹配
+                    if kw.lower() in text_lower:
+                        hits.append(kw)
+                else:
+                    # 英文关键词：词边界匹配（避免 'ai' 撞进 'Ukraine'/'several'）
+                    if re.search(r'\b' + re.escape(kw.lower()) + r'\b', text_lower):
+                        hits.append(kw)
             if hits:
                 # 命中数 × 关键词权重 → 匹配置信
                 score = len(hits) * 0.5
                 # 核心词（前3个）额外加权
-                core_hits = [kw for kw in rule["keywords"][:3] if kw.lower() in text_lower]
+                core_hits = [kw for kw in kw_list[:3] if kw.lower() in text_lower]
                 score += len(core_hits) * 0.3
                 if score > best_score:
                     best_score = score
@@ -167,6 +190,14 @@ class NewsImpactEngine:
             best = dict(DEFAULT_RULE)
             best["matched_keywords"] = []
             best["confidence"] = 0.25
+        # 负面词检测：价格崩盘/暴跌/过剩 → 需求方向反转（demand→supply 代表需求恶化）
+        if best.get("direction") == "demand":
+            negative_kw = ["崩盘", "暴跌", "过剩", "价格下跌", "下滑", "萎缩", "亏损", "裁员",
+                           "collapse", "crash", "slump", "glut", "plunge", "surplus"]
+            if any(kw in text_lower for kw in negative_kw):
+                best["direction"] = "supply"  # 需求恶化 = 供给过剩冲击
+                best["event_type"] = f"{best['event_type']}(过剩/下行)"
+                best["confidence"] = min(best.get("confidence", 0.4) * 1.1, 0.95)
         return best
 
     # ---------- 2. 新闻 → 完整影响链推演 ----------
