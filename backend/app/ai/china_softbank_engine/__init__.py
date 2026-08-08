@@ -193,7 +193,16 @@ class ChinaSoftBankEngine:
         except Exception as e:
             result["wisdom"] = {"error": str(e)}
 
-        # 6. 出海时光机（模式复制机会 Top）—— 轻量：读最近报告，不跑全量 run()
+        # 6. 加密货币/黄金套利（2026-08-08 方向3：美元退潮另类资产）
+        try:
+            from time_machine_engine.crypto_metals import CryptoMetalsEngine
+            cme = CryptoMetalsEngine()
+            tide_stage = (result.get("tide") or {}).get("stage")
+            result["crypto_metals"] = cme.assess(dollar_stage=tide_stage)
+        except Exception as e:
+            result["crypto_metals"] = {"error": str(e)}
+
+        # 7. 出海时光机（模式复制机会 Top）—— 轻量：读最近报告，不跑全量 run()
         try:
             import glob
             tm_reports = sorted(
@@ -304,6 +313,15 @@ class ChinaSoftBankEngine:
             lines.append(f"- {tm.get('note')}")
         else:
             lines.append(f"- ⚠️ {tm.get('error')}")
+        lines.append("")
+
+        cm = data.get("crypto_metals") or {}
+        lines.append("## 💎 加密货币/黄金套利（另类资产）")
+        if cm.get("window"):
+            from time_machine_engine.crypto_metals import CryptoMetalsEngine
+            lines.append(CryptoMetalsEngine().to_report(cm))
+        else:
+            lines.append(f"- ⚠️ {cm.get('error')}")
         lines.append("")
 
         lines.append("---")
