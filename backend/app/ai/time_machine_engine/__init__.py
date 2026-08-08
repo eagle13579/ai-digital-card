@@ -274,6 +274,19 @@ class TimeMachineV3Engine:
         except Exception as e:
             logger.warning("全球系统论失败: %s", e)
 
+        # 12. 地缘政治实时预警（组合拳瞄准国家清单：新闻信号+载体异动）
+        geo_alert = None
+        try:
+            from .geopolitics import GeopoliticsAlertEngine
+            gae = GeopoliticsAlertEngine()
+            _regime = geo_regime if (geo_data and (geo_regime := geo_data.get("regime"))) else None
+            geo_alert = gae.run(geo_regime=_regime, top_n=8)
+            logger.info("地缘预警: 扫描%d条新闻, %d个承压国",
+                        geo_alert.get("articles_scanned", 0),
+                        len(geo_alert.get("alerts", [])))
+        except Exception as e:
+            logger.warning("地缘预警失败: %s", e)
+
         return {
             "mode": "env_migration_match",
             "engine_version": self.VERSION,
@@ -289,6 +302,7 @@ class TimeMachineV3Engine:
             "risk_warning": risk_data,
             "dollar_tide": dollar_data,
             "geo_system": geo_data,
+            "geopolitics_alert": geo_alert,
             "lingshu_synced": synced,
             "duration_s": duration,
         }
