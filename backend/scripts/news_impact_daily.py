@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.join(BACKEND, "app", "ai"))
 
 REPORT_DIR = os.path.join(BACKEND, "data", "time_machine_reports")
 STATE_FILE = os.path.join(REPORT_DIR, "news_impact_state.json")
+CACHE_FILE = os.path.join(REPORT_DIR, "news_network_raw_cache.json")
 
 # RSS 源（阿里云可达性已实测）
 RSS_FEEDS = [
@@ -121,99 +122,128 @@ def is_relevant(title: str, desc: str) -> bool:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--push", action="store_true", help="推送飞书")
-    parser.add_argument("--limit", type=int, default=25, help="最多采集条数")
+    parser.add_argument("--limit", type=int, default=200, help="最多推演条数")
+    parser.add_argument("--no-fetch", action="store_true", help="用缓存不重新采集")
     args = parser.parse_args()
-
-    from china_softbank_engine.news_impact import NewsImpactEngine
-    eng = NewsImpactEngine()
 
     os.makedirs(REPORT_DIR, exist_ok=True)
 
-    # 1. 采集
-    print("📡 采集新闻...")
-    raw = []
-    for feed in RSS_FEEDS:
-        items = fetch_rss(feed["url"])
-        print(f"  {feed['name']}: {len(items)} 条")
-        raw.extend(items)
+    # 1. 多源采集（国外 RSS + 国内 8 源 HTML/API）
+    print("📡 采集多源新闻（国外 + 国内）...")
+    try:
+        from news_sources import fetch_all_sources
+        if args.no_fetch and os.path.isfile(CACHE_FILE):
+            with open(CACHE_FILE, encoding="utf-8") as f:
+                raw = json.load(f)
+            print(f"  📦 使用缓存 {len(raw)} 条")
+        else:
+            raw = fetch_all_sources()
+            with open(CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(raw, f, ensure_ascii=False, indent=2)
+            print(f"  ✅ 采集 {len(raw)} 条（13 源）")
+    except Exception as e:
+        print(f"  ⚠️ 多源采集失败 {e}，回退 RSS")
+        raw = []
+        for feed in RSS_FEEDS:
+            raw.extend(fetch_rss(feed["url"]))
 
-    # 2. 过滤 + 去重
-    seen = set()
-    news = []
-    for item in raw:
-        h = hashlib.md5(item["title"][:60].encode()).hexdigest()[:10]
-        if h in seen:
-            continue
-        seen.add(h)
-        if is_relevant(item["title"], item.get("desc", "")):
-            news.append(item)
-    print(f"✅ 过滤后: {len(news)} 条相关新闻（共 {len(raw)} 条原始）")
+    # 2. 立体网络推演（纵轴事件链 + 横轴产业链 + 宏观背景层）
+    print("🕸️ 构建立体事件网络...")
+    from news_network import NewsNetworkBuilder
+    builder = NewsNetworkBuilder()
+    data = builder.build(raw, max_analyze=args.limit)
+    builder.save(data)
 
-    # 3. 每条推演（韩文先翻译成中文再识别）
-    print("🧠 推演影响链...")
-    results = []
-    for item in news[:args.limit]:
-        try:
-            title = item["title"]
-            desc = (item.get("desc") or "")[:200]
-            # 韩文 → 中文翻译（复用 DeepSeek）
-            if re.search(r'[\uac00-\ud7af]', title):
-                title_zh = translate_ko_zh(title)
-                if title_zh and title_zh != title:
-                    title = title_zh
-            r = eng.analyze(title, desc)
-            det = r.get("detected") or {}
-            if det.get("confidence", 0) >= 0.35:  # 低置信不入选
-                results.append({
-                    "title": item["title"],
-                    "title_zh": title if title != item["title"] else "",
-                    "desc": desc,
-                    "link": item.get("link", ""),
-                    "event_type": det.get("event_type"),
-                    "impact_node": det.get("impact_node"),
-                    "direction": det.get("direction"),
-                    "confidence": det.get("confidence"),
-                    "matched_keywords": det.get("matched_keywords", []),
-                    "opportunities": r.get("opportunities", [])[:5],
-                    "swarm_top": (r.get("swarm") or {}).get("results", [])[:5],
-                })
-        except Exception as e:
-            print(f"  ⚠️ 推演失败: {e}")
+    stats = data["stats"]
+    print(f"✅ 立体网络: 推演{stats['analyzed']}条 | 宏观{stats['macro_news']}条 | 活跃链{stats['active_chains']}条")
 
-    # 排序：置信度 × 机会数
-    results.sort(key=lambda x: x["confidence"] * (1 + len(x["opportunities"]) * 0.2), reverse=True)
-
-    # 4. 生成日报
+    # 3. 生成日报（立体温+时间线版）
     now = datetime.now().strftime("%Y%m%d_%H%M")
-    lines = [
-        "# 📰 产业链影响链日报（新闻推演）",
-        "",
-        f"- 生成: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        f"- 采集: {len(raw)} 条 → 相关 {len(news)} 条 → 推演 {len(results)} 条",
-        f"- 引擎: NewsImpactEngine + 51节点产业链图谱 + 群体智能预判",
-        "",
-    ]
-    for i, r in enumerate(results[:15], 1):
-        lines.append(f"## {i}. {r['title']}")
-        lines.append(f"- 识别: **{r['event_type']}** → 冲击 {r['impact_node']}（{r['direction']}）置信度 {r['confidence']*100:.0f}%")
-        if r.get("matched_keywords"):
-            lines.append(f"- 命中: {', '.join(r['matched_keywords'][:6])}")
-        lines.append("- **受益标的 Top5**:")
-        for o in r["opportunities"][:5]:
-            lines.append(f"  - 🎯 {o.get('company')}({o.get('ticker')}) — {o.get('node')} 冲击分{o.get('score')}")
-        lines.append("")
-    report = "\n".join(lines)
-    path = os.path.join(REPORT_DIR, f"news_impact_daily_{now}.md")
+    report = builder.to_report(data)
+    path = os.path.join(REPORT_DIR, f"news_network_daily_{now}.md")
     with open(path, "w", encoding="utf-8") as f:
         f.write(report)
     print(f"✅ 日报已生成: {path}")
-    print(report[:800])
 
-    # 5. 飞书推送（可选）
+    # 4. 飞书推送（高置信推演 + 热门事件链）
     if args.push:
-        push_feishu(results[:3], path)
+        push_feishu_network(data, path)
 
     return 0
+
+
+def push_feishu_network(data: dict, report_path: str):
+    """推送立体网络摘要到飞书（宏观水位 + 热门链 + Top推演）"""
+    import urllib.parse
+    app_id = "cli_a97803e1ba245bc9"
+    chat_id = "oc_92e570b914ebd7ec0a0bb96caade03e8"
+    # 从 .env 读 app_secret
+    secret = ""
+    env_path = "/var/www/ai-digital-card/backend/.env"
+    if os.path.isfile(env_path):
+        with open(env_path, encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("FEISHU_APP_SECRET="):
+                    secret = line.split("=", 1)[1].strip()
+    if not secret:
+        print("⚠️ 无 FEISHU_APP_SECRET，跳过推送")
+        return
+
+    # 获取 token
+    try:
+        req = urllib.request.Request(
+            "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+            data=json.dumps({"app_id": app_id, "app_secret": secret}).encode(),
+            headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            token = json.loads(r.read().decode()).get("tenant_access_token", "")
+    except Exception as e:
+        print(f"⚠️ 获取token失败: {e}")
+        return
+
+    # 组装消息
+    macro = data.get("macro_background", {})
+    stats = data.get("stats", {})
+    msg_lines = ["🌐 **立体事件网络日报（自动推演）**", ""]
+    msg_lines.append(f"📊 采集{stats.get('total_items',0)}条 → 推演{stats.get('analyzed',0)}条 | 活跃链{stats.get('active_chains',0)}条")
+    msg_lines.append(f"🌊 宏观水位: {macro.get('direction','')[:40]}")
+    msg_lines.append("")
+    hot = data.get("hot_chains", [])[:3]
+    if hot:
+        msg_lines.append("🔥 **热门事件链**")
+        for c in hot:
+            msg_lines.append(f"- {c.get('title','')[:40]}（{c.get('news_count')}条 · {c.get('status')}）")
+        msg_lines.append("")
+    # 高置信推演
+    msg_lines.append("🎯 **本期高置信推演**")
+    shown = 0
+    for a in data.get("recent_analyzed", [])[:15]:
+        det = a.get("detected", {})
+        if det.get("confidence", 0) < 0.45:
+            continue
+        if shown >= 4:
+            break
+        opp = ""
+        if a.get("opportunities"):
+            opp = a["opportunities"][0].get("company", "")
+        msg_lines.append(f"- {a.get('title','')[:34]} → {det.get('event_type','')} 置信{det.get('confidence',0)*100:.0f}% {opp}")
+        shown += 1
+    msg_lines.append("")
+    msg_lines.append("📄 完整日报见服务器: data/time_machine_reports/")
+    msg = "\n".join(msg_lines)
+
+    try:
+        req = urllib.request.Request(
+            "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id",
+            data=json.dumps({"receive_id": chat_id, "msg_type": "text",
+                             "content": json.dumps({"text": msg})}).encode(),
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {token}"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            resp = json.loads(r.read().decode())
+            print(f"✅ 飞书推送: {resp.get('code')} {resp.get('msg')}")
+    except Exception as e:
+        print(f"⚠️ 推送失败: {e}")
 
 
 def push_feishu(top3: list, report_path: str):
