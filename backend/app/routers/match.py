@@ -20,6 +20,31 @@ router = APIRouter(prefix="/api/match", tags=["匹配"])
 
 # ── 脱敏工具函数 ────────────────────────────────────────────────────────────
 
+def _mask_phone(user: User) -> str:
+    """生成脱敏手机号（如 138****5678）。
+
+    BUG-034 修复：任何 API 出口禁止直出明文 phone。
+    优先使用加密存储的 phone_last4；过渡期若未回填则从明文推导。
+    """
+    digits = "".join(c for c in (user.phone or "") if c.isdigit())
+    if user.phone_last4:
+        if len(digits) >= 7:
+            return digits[:3] + "****" + user.phone_last4
+        return "****" + user.phone_last4
+    if len(digits) >= 7:
+        return digits[:3] + "****" + digits[-4:]
+    return "****" + digits[-4:] if digits else ""
+
+
+def _mask_wechat(openid: str | None) -> str:
+    """微信 openid 脱敏：保留前2位 + **** + 后4位。"""
+    if not openid:
+        return ""
+    if len(openid) <= 8:
+        return openid[:2] + "****"
+    return openid[:2] + "****" + openid[-4:]
+
+
 def _desensitize_user(user: User, viewer_is_free: bool = True) -> dict:
     """对用户信息脱敏处理
 
@@ -29,12 +54,15 @@ def _desensitize_user(user: User, viewer_is_free: bool = True) -> dict:
     - 微信：完全隐藏
     - 头像：返回模糊版（附加 _blur 后缀）
     - 公司名：保留前2字+**
+
+    BUG-034 修复：付费会员同样只返回脱敏手机号，明文手机号仅存于
+    phone_enc 密文（需要时通过解密服务按权限二次授权获取）。
     """
     if not viewer_is_free:
-        # 付费用户看到完整信息
+        # 付费用户看到完整信息（手机号一律脱敏，见 BUG-034）
         return {
             "name": user.name,
-            "phone": user.phone,
+            "phone": _mask_phone(user),
             "company": user.company,
             "title": user.title,
             "avatar": user.avatar,
@@ -43,13 +71,7 @@ def _desensitize_user(user: User, viewer_is_free: bool = True) -> dict:
     # ── free 会员脱敏 ──
     name_masked = user.name[:1] + "**" if len(user.name) >= 1 else user.name
 
-    phone = user.phone or ""
-    if len(phone) >= 7:
-        phone_masked = phone[:3] + "****" + phone[-4:]
-    elif len(phone) >= 4:
-        phone_masked = phone[:3] + "****"
-    else:
-        phone_masked = "****"
+    phone_masked = _mask_phone(user)
 
     company = user.company or ""
     if len(company) >= 2:
@@ -495,11 +517,11 @@ async def unlock_contact(
         return UnlockResponse(
             unlocked=True,
             name=target_user.name,
-            phone=target_user.phone,
-            wechat=target_user.wechat_openid or "",
+            phone=_mask_phone(target_user),
+            wechat=_mask_wechat(target_user.wechat_openid),
             company=target_user.company,
             unlock_quota_remaining=current_user.unlock_quota,
-            message="已解锁，可直接查看联系方式",
+            message="已解锁，可直接查看联系方式（手机号已脱敏）",
         )
 
     # 8. 扣减配额
@@ -518,11 +540,11 @@ async def unlock_contact(
     return UnlockResponse(
         unlocked=True,
         name=target_user.name,
-        phone=target_user.phone,
-        wechat=target_user.wechat_openid or "",
+        phone=_mask_phone(target_user),
+        wechat=_mask_wechat(target_user.wechat_openid),
         company=target_user.company,
         unlock_quota_remaining=current_user.unlock_quota,
-        message="解锁成功",
+        message="解锁成功（手机号已脱敏）",
     )
 
 

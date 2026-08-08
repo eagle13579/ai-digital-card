@@ -36,9 +36,15 @@ class AlipayProvider(PaymentProvider):
         self.app_id: str = settings.ALIPAY_APP_ID or ""
         self.private_key: str = settings.ALIPAY_PRIVATE_KEY or ""
         self.alipay_public_key: str = settings.ALIPAY_PUBLIC_KEY or ""
-        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/payment/notify/alipay"
+        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/business-card/payment/notify/alipay"
         self.return_url: str = f"{settings.BASE_URL.rstrip('/')}/payment/callback"
-        self.gateway: str = "https://openapi.alipay.com/gateway.do"
+        # 沙箱网关: https://openapi.alipaydev.com/gateway.do （支付宝官方沙箱环境）
+        # 生产网关: https://openapi.alipay.com/gateway.do
+        self.gateway: str = (
+            "https://openapi.alipaydev.com/gateway.do"
+            if settings.PAYMENT_SANDBOX
+            else "https://openapi.alipay.com/gateway.do"
+        )
         self._client: Optional[httpx.AsyncClient] = None
 
     @property

@@ -89,6 +89,17 @@ class Settings(BaseSettings):
     ALIPAY_PUBLIC_KEY: str = ""
     """支付宝公钥"""
 
+    # ── 支付沙箱开关 ──────────────────────────────────────────────────────
+    PAYMENT_SANDBOX: bool = False
+    """支付沙箱总开关。
+    True  = 沙箱环境：
+        - 支付宝网关 → https://openapi.alipaydev.com/gateway.do
+        - 微信支付基地址 → https://api.mch.weixin.qq.com/sandboxnew
+    False = 生产环境：
+        - 支付宝网关 → https://openapi.alipay.com/gateway.do
+        - 微信支付基地址 → https://api.mch.weixin.qq.com
+    注意：沙箱也需要填写沙箱专用的 APP_ID / 密钥（沙箱应用与生产应用不通用）。"""
+
     # ── CSRF 保护 ─────────────────────────────────────────────────────────
     CSRF_ENABLED: bool = True
     """是否启用CSRF保护。纯API服务可设为False, 前端SPA推荐开启"""

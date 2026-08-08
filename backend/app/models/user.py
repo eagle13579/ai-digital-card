@@ -23,7 +23,20 @@ class User(TenantBase):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=True)
-    phone: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    # ── BUG-034 修复：手机号加密存储 ─────────────────────────────────────────
+    # phone 列过渡期保留（登录仍走 phone 唯一索引查询），第二阶段清理后删除；
+    # phone_hash 为 SHA-256 哈希 + 唯一索引，用于后续登录查询与去重；
+    # phone_enc 为 Fernet 加密密文；phone_last4 用于脱敏展示。
+    phone: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, comment="手机号（过渡期明文，迁移完成后清理）")
+    phone_hash: Mapped[str | None] = mapped_column(
+        String(64), unique=True, nullable=True, default=None, comment="手机号 SHA-256 哈希（登录查询唯一索引）"
+    )
+    phone_enc: Mapped[str | None] = mapped_column(
+        Text, nullable=True, default=None, comment="手机号 Fernet 加密密文"
+    )
+    phone_last4: Mapped[str] = mapped_column(
+        String(4), nullable=False, default="", comment="手机号后4位（脱敏展示用）"
+    )
     password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     wechat_openid: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(64), nullable=False)

@@ -76,13 +76,22 @@ class WeChatPayProvider(PaymentProvider):
         self.mch_id: str = settings.WECHAT_MCH_ID or ""
         self.api_key: str = settings.WECHAT_PAY_API_KEY or ""
         self.api_v3_key: str = settings.WECHAT_PAY_V3_KEY or ""
-        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/v1/payment/notify/wechat"
+        self.notify_url: str = f"{settings.BASE_URL.rstrip('/')}/api/business-card/payment/notify/wechat"
+        # 微信支付沙箱基地址（V2 沙箱环境）:
+        #   沙箱: https://api.mch.weixin.qq.com/sandboxnew
+        #   生产: https://api.mch.weixin.qq.com
+        # 注意: 微信沙箱密钥需通过 sandboxnew/pay/getsignkey 接口获取，与生产密钥不同。
+        self.base_url: str = (
+            "https://api.mch.weixin.qq.com/sandboxnew"
+            if settings.PAYMENT_SANDBOX
+            else "https://api.mch.weixin.qq.com"
+        )
         self._client: Optional[httpx.AsyncClient] = None
 
     @property
     def client(self) -> httpx.AsyncClient:
         if self._client is None:
-            self._client = httpx.AsyncClient(base_url="https://api.mch.weixin.qq.com", timeout=15)
+            self._client = httpx.AsyncClient(base_url=self.base_url, timeout=15)
         return self._client
 
     async def create_order(self, req: OrderRequest) -> OrderResponse:
