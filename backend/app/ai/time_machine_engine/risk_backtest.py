@@ -119,6 +119,50 @@ class RiskBacktestEngine:
         if r is None:
             return {"case": case, "error": "数据不足"}
 
+        # 美元潮汐因子：危机年若处于美元紧缩/退潮期，高外债+双赤字国风险放大
+        # （解释土耳其2018/俄罗斯2014等"外部冲击型"危机——被美元周期抽血击垮）
+        dollar_boost = 0.0
+        dollar_note = ""
+        try:
+            from .dollar_tide import DollarTideEngine
+            dte = DollarTideEngine()
+            # 用历史美元利率评估当年周期（联邦基金利率 1954 起全量）
+            ff = dte._cache.get("fed_funds", {})
+            ff = {int(y): v for y, v in ff.items()}
+            crisis_ff = ff.get(by)
+            peak = max(ff.get(y, 0) for y in range(by - 4, by + 1)) if ff else 0
+            # 加息趋势检测: 危机前3年利率连续上升（2015-2018加息周期中段，
+            # 2017年利率仅1%但已在紧缩通道 → 土耳其2018里拉危机）
+            rising = 0
+            for y in range(by - 2, by + 1):
+                if ff.get(y, 0) > ff.get(y - 1, 0):
+                    rising += 1
+            if crisis_ff is not None and peak:
+                # 美元退潮判定: 高利率 / 高位回落 / 加息趋势（连续2年以上上升）
+                if (crisis_ff >= 4.0
+                        or (peak - crisis_ff >= 1.0 and peak >= 4.0)
+                        or rising >= 2):
+                    dims = r.get("dims", {})
+                    debt_s = dims.get("debt", 0) or 0
+                    twindef_s = dims.get("twin_def", 0) or 0
+                    inf_s = dims.get("inflation", 0) or 0
+                    # 美元退潮放大器: 外债分+双赤字分+通胀分 直接加成
+                    dollar_boost = (debt_s + twindef_s + inf_s) / 2
+                    dollar_note = (f"美元退潮期(利率{crisis_ff}%, 峰值{peak}%, 加息{rising}年) "
+                                   f"→ 外债/双赤字/通胀放大 +{dollar_boost:.0f}分")
+                    r["total"] = round(min(100, r["total"] + dollar_boost), 1)
+                    # 加分后重算等级（否则 total 升了但 level 仍 old）
+                    new_level = self.rwe._level(r["total"])
+                    # 单维高危升级逻辑也要保留
+                    max_dim = r.get("max_dim", 0) or 0
+                    if max_dim >= 60:
+                        new_level = "high" if new_level in ("low", "medium") else new_level
+                    if max_dim >= 75:
+                        new_level = "extreme" if new_level in ("low", "medium", "high") else new_level
+                    r["level"] = new_level
+        except Exception as e:
+            dollar_note = f"美元因子失败: {e}"
+
         # 验证：评分是否达到预期风险等级
         level_order = {"low": 1, "medium": 2, "high": 3, "extreme": 4}
         expect_lvl = level_order.get(case.get("expect", "high"), 3)
@@ -132,6 +176,8 @@ class RiskBacktestEngine:
             "level": r["level"],
             "top_risks": r["top_risks"],
             "passed": passed,
+            "dollar_boost": round(dollar_boost, 1) if dollar_boost else 0,
+            "dollar_note": dollar_note,
             "expect": case.get("expect"),
         }
 

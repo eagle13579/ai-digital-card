@@ -229,6 +229,30 @@ class TimeMachineV3Engine:
         except Exception as e:
             logger.warning("风险预警失败: %s", e)
 
+        # 10. 美元潮汐（全球流动性周期雷达 → 风险加权 + 投资窗口）
+        dollar_data = None
+        try:
+            from .dollar_tide import DollarTideEngine
+            dte = DollarTideEngine()
+            dte.refresh(force=False)
+            dollar_stage = dte.cycle_stage()
+            dollar_window = dte.adjust_opportunity(dollar_stage.get("stage", "unknown"))
+            # 紧缩期附加脆弱国排名（美元退潮先崩者）
+            dollar_vulnerable = []
+            if dollar_stage.get("risk_mode") == "risk_off" and risk_data:
+                from .risk_warning import RiskWarningEngine
+                _rwe = RiskWarningEngine()
+                dollar_vulnerable = dte.vulnerable_countries(_rwe, top_n=10)
+            dollar_data = {
+                "stage": dollar_stage,
+                "window": dollar_window,
+                "vulnerable": dollar_vulnerable,
+            }
+            logger.info("美元潮汐: %s (%s)", dollar_stage.get("stage"),
+                        dollar_window.get("window"))
+        except Exception as e:
+            logger.warning("美元潮汐失败: %s", e)
+
         duration = round(time.time() - start, 2)
         return {
             "mode": "env_migration_match",
@@ -243,6 +267,7 @@ class TimeMachineV3Engine:
             "investment_view": invest_data,
             "crawler_enhance": enhance_data,
             "risk_warning": risk_data,
+            "dollar_tide": dollar_data,
             "lingshu_synced": synced,
             "duration_s": duration,
         }
