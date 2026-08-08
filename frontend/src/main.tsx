@@ -5,6 +5,10 @@ import './index.css';
 import './styles/global.css';
 import {initWebVitals} from './utils/performance.ts';
 import {registerSW} from './registerSW.ts';
+import {enableSilentDialogs} from './utils/silentFeedback.ts';
+
+// 全局静默弹窗：alert/confirm 不再阻断用户，全部后台记录（2026-08-04）
+enableSilentDialogs();
 
 // 启动 Web Vitals 性能监控
 initWebVitals();
