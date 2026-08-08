@@ -202,6 +202,33 @@ class ChinaSoftBankEngine:
         except Exception as e:
             result["crypto_metals"] = {"error": str(e)}
 
+        # 6.5 产业链双向链接（2026-08-08 海容方法论：事件沿产业链双向传导 → 机会+预测）
+        try:
+            from china_softbank_engine.supply_chain import SupplyChainEngine, EVENT_TEMPLATES, build_preset_scenarios
+            sc = SupplyChainEngine()
+            scenarios = {}
+            for eid, ev in EVENT_TEMPLATES.items():
+                scenarios[eid] = {
+                    "event_name": ev["name"],
+                    "impact_node": ev["impact_node"],
+                    "direction": ev["direction"],
+                    "strength": ev["strength"],
+                    "window_months": ev["window_months"],
+                    "report": sc.to_report(ev),
+                    "opportunities": sc.extract_opportunities(ev, top_n=6),
+                    "propagation": sc.propagate(ev),
+                    "forecast": sc.forecast(ev),
+                }
+            result["supply_chain"] = {
+                "engine": "产业链双向链接引擎 v1.0.0",
+                "method": "事件注入 → 沿产业链双向传导（上游供给冲击/下游需求爆发）→ 弹性+国产替代放大 → 预测时间轴",
+                "scenarios": scenarios,
+                "active_scenario": "us_chip_restriction",
+                "note": "海容方法论：用产业链双向链接思路找产业/公司/机会，并可预测传导节奏",
+            }
+        except Exception as e:
+            result["supply_chain"] = {"error": str(e)}
+
         # 7. 出海时光机（模式复制机会 Top）—— 轻量：读最近报告，不跑全量 run()
         try:
             import glob
@@ -322,6 +349,27 @@ class ChinaSoftBankEngine:
             lines.append(CryptoMetalsEngine().to_report(cm))
         else:
             lines.append(f"- ⚠️ {cm.get('error')}")
+        lines.append("")
+
+        sc = data.get("supply_chain") or {}
+        lines.append("## 🔗 产业链双向传导（海容方法论）")
+        if sc.get("scenarios"):
+            lines.append(f"- 引擎: {sc.get('engine')}")
+            lines.append(f"- 方法: {sc.get('method')}")
+            lines.append("")
+            for eid, s in sc.get("scenarios", {}).items():
+                lines.append(f"### 🔗 {s.get('event_name')}（冲击: {s.get('impact_node')} · {'供给冲击' if s.get('direction') == 'supply' else '需求爆发'} · {s.get('window_months')}个月窗口）")
+                opps = s.get("opportunities") or []
+                if opps:
+                    lines.append("**传导机会**（受益标的按冲击分排序）:")
+                    for o in opps[:5]:
+                        lines.append(f"- 🎯 {o.get('company')}({o.get('ticker')}) — {o.get('node')} 冲击分{o.get('score')} | {o.get('path')}")
+                fc = s.get("forecast") or {}
+                for ph in (fc.get("phases") or []):
+                    lines.append(f"  - ⏱️ {ph.get('phase')}: {ph.get('desc')}")
+                lines.append("")
+        else:
+            lines.append(f"- ⚠️ {sc.get('error')}")
         lines.append("")
 
         lines.append("---")
