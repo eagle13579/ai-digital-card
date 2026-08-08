@@ -126,7 +126,8 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.phone == data.phone))
     existing = result.scalars().first()
     if existing:
-        raise HTTPException(status_code=400, detail="手机号已注册")
+        # BUG-038 修复：注册/登录错误统一提示，防止手机号存在性枚举
+        raise HTTPException(status_code=400, detail="手机号或密码错误")
 
     # 密码强度验证
     validate_password_strength(data.password)

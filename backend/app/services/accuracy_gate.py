@@ -1008,12 +1008,39 @@ class AccuracyGate:
                 cal_record.delta,
             )
 
-            # 如果有webhook渠道，尝试发送
+            # BUG-018 修复：webhook 渠道真实发送（config.notification_channels 为
+            # JSON，支持 dict 形式 {"webhook": {"url": "https://..."}} 或字符串列表）
             channels = config.notification_channels if config else None
             if channels and "webhook" in channels:
-                # TODO: 接入webhook发送
-                logger.debug("校准通知webhook发送（待实现）")
-                pass
+                webhook_conf = channels["webhook"]
+                webhook_url = ""
+                if isinstance(webhook_conf, str):
+                    webhook_url = webhook_conf
+                elif isinstance(webhook_conf, dict):
+                    webhook_url = webhook_conf.get("url", "") or ""
+                if webhook_url:
+                    try:
+                        import httpx
+                        async with httpx.AsyncClient(timeout=10) as client:
+                            resp = await client.post(
+                                webhook_url,
+                                json=notification_data,
+                                headers={"Content-Type": "application/json"},
+                            )
+                        if resp.status_code < 400:
+                            logger.info("校准通知 webhook 发送成功: %s", webhook_url)
+                            cal_record.notification_sent = True
+                        else:
+                            logger.warning(
+                                "校准通知 webhook 发送失败 HTTP %s: %s",
+                                resp.status_code, webhook_url,
+                            )
+                    except Exception as e:  # noqa: BLE001
+                        logger.warning("校准通知 webhook 发送异常: %s", e)
+                else:
+                    logger.warning("校准通知 webhook 渠道已配置但缺少 url，跳过发送")
+            else:
+                logger.debug("校准通知未配置 webhook 渠道，仅记录日志")
 
             return True
 

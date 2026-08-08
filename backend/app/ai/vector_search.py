@@ -83,11 +83,50 @@ RERANK_WEIGHT = float(os.environ.get("RERANK_WEIGHT", "0.3"))
 
 
 class EmbeddingBackend:
-    """Embedding 后端抽象基类"""
+    """Embedding 后端抽象基类
+
+    BUG-018 修复: embed() 由「抛 NotImplementedError 占位」改为提供
+    确定性的 hashing-trick 默认实现（零外部依赖），未覆写的子类也能
+    正常返回固定维度向量，不再因抽象占位导致运行时崩溃。
+    各生产后端（numpy/m3e/openai/deepseek）仍覆写本方法提供真实语义向量。
+    """
 
     def embed(self, texts: list[str]) -> np.ndarray:
-        """将文本列表转为 embedding 矩阵 (n_texts, dim)"""
-        raise NotImplementedError
+        """将文本列表转为 embedding 矩阵 (n_texts, dim)
+
+        默认实现：基于字符 n-gram 的确定性 hashing-trick（词袋哈希投影），
+        相同文本得到相同向量，无需任何外部依赖。
+        """
+        dim = self.dimension
+        matrix = np.zeros((len(texts), dim), dtype=np.float32)
+        for i, text in enumerate(texts):
+            vec = np.zeros(dim, dtype=np.float32)
+            tokens = self._default_tokenize(text)
+            for token, weight in tokens.items():
+                h = int(hashlib.md5(token.encode("utf-8")).hexdigest(), 16)
+                idx = h % dim
+                # 有符号哈希：正负交替，降低碰撞偏差
+                sign = 1.0 if (h // dim) % 2 == 0 else -1.0
+                vec[idx] += sign * weight
+            norm = float(np.linalg.norm(vec))
+            if norm > 1e-8:
+                vec /= norm
+            matrix[i] = vec
+        return matrix
+
+    @staticmethod
+    def _default_tokenize(text: str) -> dict[str, float]:
+        """默认分词：小写化 + 提取字母数字词 + 字符二元组，返回 {token: 词频}。"""
+        tokens: dict[str, float] = {}
+        lowered = (text or "").lower()
+        for word in re.findall(r"[a-z0-9\u4e00-\u9fff]+", lowered):
+            tokens[word] = tokens.get(word, 0.0) + 1.0
+            # 中英文通用：补充字符二元组，增强短文本区分度
+            if len(word) >= 2:
+                for j in range(len(word) - 1):
+                    bigram = word[j : j + 2]
+                    tokens[bigram] = tokens.get(bigram, 0.0) + 0.5
+        return tokens
 
     @property
     def dimension(self) -> int:

@@ -243,6 +243,14 @@ class Settings(BaseSettings):
     DINGTALK_SECRET: str = ""
     """钉钉机器人加签密钥（v2.0 签名模式）。为空则不签名"""
 
+    # ── 钉钉工作通知（应用消息，BUG-018 对接真实 API）──────────────────
+    DINGTALK_APP_KEY: str = ""
+    """钉钉应用 AppKey（用于获取 access_token）。为空则钉钉适配器降级为日志输出"""
+    DINGTALK_APP_SECRET: str = ""
+    """钉钉应用 AppSecret（用于获取 access_token）"""
+    DINGTALK_AGENT_ID: str = ""
+    """钉钉应用 AgentId（工作通知消息接收方标识）。为空则无法发送工作通知"""
+
     # ── 企业 OIDC ──────────────────────────────────────────────────────────────
     SSO_OIDC_AUTHORIZE_URL: str = ""
     """企业 OIDC 授权地址"""

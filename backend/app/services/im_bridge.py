@@ -8,7 +8,7 @@ IM 桥接适配器 — 统一企微 (WeCom / 企业微信) + 钉钉 (DingTalk) �
 
 依赖配置项 (settings):
   - WECOM_CORP_ID / WECOM_AGENT_ID / WECOM_SECRET   — 企微
-  - DINGTALK_APP_KEY / DINGTALK_APP_SECRET             — 钉钉
+  - DINGTALK_APP_KEY / DINGTALK_APP_SECRET / DINGTALK_AGENT_ID — 钉钉（BUG-018 工作通知）
 """
 
 from __future__ import annotations
@@ -198,6 +198,7 @@ class DingTalkAdapter:
     配置项:
       - DINGTALK_APP_KEY     — 应用 AppKey
       - DINGTALK_APP_SECRET  — 应用 AppSecret
+      - DINGTALK_AGENT_ID    — 应用 AgentId（工作通知必填，BUG-018）
     """
 
     _platform = IMPlatform.DINGTALK
@@ -205,47 +206,162 @@ class DingTalkAdapter:
     def __init__(self) -> None:
         self._app_key = getattr(settings, "DINGTALK_APP_KEY", "") or ""
         self._app_secret = getattr(settings, "DINGTALK_APP_SECRET", "") or ""
-        self._enabled = bool(self._app_key)
+        self._agent_id = getattr(settings, "DINGTALK_AGENT_ID", "") or ""
+        self._enabled = bool(self._app_key and self._agent_id)
+        # access_token 进程内缓存（BUG-018，参考企微实现）
+        self._token: str = ""
+        self._token_expires_at: float = 0.0
         if self._enabled:
             key_preview = self._app_key[:6] if len(self._app_key) > 6 else self._app_key
-            logger.info("钉钉适配器已就绪 (app_key=%s...)", key_preview)
+            logger.info("钉钉适配器已就绪 (app_key=%s..., agent_id=%s)", key_preview, self._agent_id)
         else:
-            logger.warning("钉钉适配器未配置 (需 DINGTALK_APP_KEY), 降级为日志输出")
+            logger.warning(
+                "钉钉适配器未配置 (需 DINGTALK_APP_KEY + DINGTALK_AGENT_ID), 降级为日志输出"
+            )
 
     @property
     def enabled(self) -> bool:
         return self._enabled
 
+    # ── 钉钉 access_token 获取（带进程内缓存，BUG-018） ──────────────
+
+    async def _get_access_token(self) -> str:
+        """获取钉钉应用 access_token（缓存 100 分钟，官方有效期 7200s）。
+
+        使用新版 v1.0 oauth2/accessToken 接口；失败时降级尝试旧版 gettoken。
+        """
+        import time as _time
+
+        now = _time.time()
+        if self._token and self._token_expires_at > now + 120:
+            return self._token
+
+        import httpx
+
+        # 新版接口: POST https://api.dingtalk.com/v1.0/oauth2/accessToken
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    "https://api.dingtalk.com/v1.0/oauth2/accessToken",
+                    json={"appKey": self._app_key, "appSecret": self._app_secret},
+                )
+                data = resp.json()
+            token = data.get("accessToken") or data.get("access_token")
+            if token:
+                self._token = token
+                self._token_expires_at = now + int(data.get("expireIn", data.get("expires_in", 7200)))
+                return self._token
+            logger.warning("钉钉 v1.0 gettoken 失败: %s", data)
+        except Exception as e:  # noqa: BLE001
+            logger.warning("钉钉 v1.0 gettoken 异常: %s", e)
+
+        # 旧版接口降级: GET https://oapi.dingtalk.com/gettoken?appkey=&appsecret=
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.get(
+                    "https://oapi.dingtalk.com/gettoken",
+                    params={"appkey": self._app_key, "appsecret": self._app_secret},
+                )
+                data = resp.json()
+            if data.get("errcode") == 0 and data.get("access_token"):
+                self._token = data["access_token"]
+                self._token_expires_at = now + int(data.get("expires_in", 7200))
+                return self._token
+            logger.warning("钉钉旧版 gettoken 失败: %s", data)
+        except Exception as e:  # noqa: BLE001
+            logger.warning("钉钉旧版 gettoken 异常: %s", e)
+        return ""
+
     async def send_message(self, msg: IMMessage) -> dict[str, Any]:
-        """发送文本消息到钉钉"""
+        """发送文本消息到钉钉（BUG-018：对接真实 工作通知消息 API）"""
         if not self._enabled:
             logger.info("[钉钉降级] 发给 user=%s: %s", msg.user_id, msg.text)
             return {"platform": "dingtalk", "status": "degraded", "reason": "未配置"}
 
-        # TODO: 对接钉钉 工作通知消息 API
+        import httpx
+        token = await self._get_access_token()
+        if not token:
+            return {"platform": "dingtalk", "status": "failed", "error": "access_token 获取失败"}
+
         # POST https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2
-        logger.info("[钉钉] 发送文本消息 user=%s: %s", msg.user_id, msg.text)
-        return {
-            "platform": "dingtalk",
-            "status": "simulated",
-            "userid": msg.user_id,
-            "msgtype": "text",
-        }
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2",
+                    params={"access_token": token},
+                    json={
+                        "agent_id": int(self._agent_id) if str(self._agent_id).isdigit() else self._agent_id,
+                        "userid_list": msg.user_id,
+                        "msg": {"msgtype": "text", "text": {"content": msg.text}},
+                    },
+                )
+                data = resp.json()
+            if data.get("errcode") != 0:
+                logger.warning("[钉钉] 发送失败 user=%s: %s", msg.user_id, data)
+                return {"platform": "dingtalk", "status": "failed", "error": data}
+            logger.info("[钉钉] 发送文本消息 user=%s: %s", msg.user_id, msg.text)
+            return {
+                "platform": "dingtalk",
+                "status": "sent",
+                "userid": msg.user_id,
+                "msgtype": "text",
+                "task_id": data.get("task_id", ""),
+            }
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[钉钉] 发送文本消息异常: %s", e)
+            return {"platform": "dingtalk", "status": "failed", "error": str(e)}
 
     async def send_card(self, msg: IMMessage) -> dict[str, Any]:
-        """发送卡片消息到钉钉"""
+        """发送卡片消息到钉钉（BUG-018：对接真实 工作通知 markdown 卡片 API）"""
         if not self._enabled:
             logger.info("[钉钉降级] 卡片发给 user=%s: %s", msg.user_id, msg.title)
             return {"platform": "dingtalk", "status": "degraded", "reason": "未配置"}
 
-        # TODO: 对接钉钉 互动卡片消息 API
-        logger.info("[钉钉] 发送卡片消息 user=%s: %s", msg.user_id, msg.title)
-        return {
-            "platform": "dingtalk",
-            "status": "simulated",
-            "userid": msg.user_id,
-            "msgtype": "action_card",
-        }
+        import httpx
+        token = await self._get_access_token()
+        if not token:
+            return {"platform": "dingtalk", "status": "failed", "error": "access_token 获取失败"}
+
+        # 组装 markdown 卡片正文
+        title = msg.title or "通知"
+        content = msg.card_data.get("content") or msg.text or ""
+        lines = [f"### {title}", content]
+        for btn in msg.buttons:
+            label = btn.get("label", "")
+            url = btn.get("url", "")
+            if label and url:
+                lines.append(f"- [{label}]({url})")
+        markdown_text = "\n\n".join(lines)
+
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2",
+                    params={"access_token": token},
+                    json={
+                        "agent_id": int(self._agent_id) if str(self._agent_id).isdigit() else self._agent_id,
+                        "userid_list": msg.user_id,
+                        "msg": {
+                            "msgtype": "markdown",
+                            "markdown": {"title": title, "text": markdown_text},
+                        },
+                    },
+                )
+                data = resp.json()
+            if data.get("errcode") != 0:
+                logger.warning("[钉钉] 卡片发送失败 user=%s: %s", msg.user_id, data)
+                return {"platform": "dingtalk", "status": "failed", "error": data}
+            logger.info("[钉钉] 发送卡片消息 user=%s: %s", msg.user_id, msg.title)
+            return {
+                "platform": "dingtalk",
+                "status": "sent",
+                "userid": msg.user_id,
+                "msgtype": "markdown",
+                "task_id": data.get("task_id", ""),
+            }
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[钉钉] 发送卡片消息异常: %s", e)
+            return {"platform": "dingtalk", "status": "failed", "error": str(e)}
 
 
 # ── 统一桥接器 ──────────────────────────────────────────────────────────────

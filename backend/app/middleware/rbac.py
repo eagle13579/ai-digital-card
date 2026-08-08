@@ -33,13 +33,11 @@ RoleType = Union[str, "Role"]
 
 # ── FastAPI 依赖项 ────────────────────────────────────────────────────────────
 
-async def require_permission(
+def require_permission(
     permission: PermissionType,
-    current_user: User = Depends(_get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """
-    FastAPI 依赖项：验证当前用户拥有指定权限。
+    FastAPI 依赖工厂：验证当前用户拥有指定权限。
 
     用法：
         @router.get("/brochures")
@@ -49,28 +47,31 @@ async def require_permission(
         ):
             ...
     """
-    perm_str = permission.value if isinstance(permission, Permission) else permission
-    user_perms = await get_user_permissions(db, current_user.id)
+    async def _checker(
+        current_user: User = Depends(_get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        perm_str = permission.value if isinstance(permission, Permission) else permission
+        user_perms = await get_user_permissions(db, current_user.id)
 
-    if perm_str not in user_perms:
-        logger.warning(
-            "权限拒绝: user=%d, role=%s, required=%s, owned=%s",
-            current_user.id, current_user.role, perm_str, user_perms,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"权限不足：需要 '{perm_str}' 权限",
-        )
-    return True
+        if perm_str not in user_perms:
+            logger.warning(
+                "权限拒绝: user=%d, role=%s, required=%s, owned=%s",
+                current_user.id, current_user.role, perm_str, user_perms,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"权限不足：需要 '{perm_str}' 权限",
+            )
+        return True
+    return _checker
 
 
-async def require_role(
+def require_role(
     roles: Union[str, Sequence[str]],
-    current_user: User = Depends(_get_current_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """
-    FastAPI 依赖项：验证当前用户角色在指定列表中。
+    FastAPI 依赖工厂：验证当前用户角色在指定列表中。
 
     BUG-037：角色来源收敛到 rbac_user_roles 单一事实源（get_user_roles），
     无 rbac 关联记录时回退 User.role 字段，兼容存量用户。
@@ -83,18 +84,23 @@ async def require_role(
         ):
             ...
     """
-    allowed_roles = [roles] if isinstance(roles, str) else list(roles)
-    user_roles = await get_user_roles(db, current_user.id)
-    if not (set(user_roles) & set(allowed_roles)):
-        logger.warning(
-            "角色拒绝: user=%d, role=%s, rbac_roles=%s, required=%s",
-            current_user.id, current_user.role, user_roles, allowed_roles,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"权限不足：需要角色 {'/'.join(allowed_roles)}",
-        )
-    return True
+    async def _checker(
+        current_user: User = Depends(_get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ):
+        allowed_roles = [roles] if isinstance(roles, str) else list(roles)
+        user_roles = await get_user_roles(db, current_user.id)
+        if not (set(user_roles) & set(allowed_roles)):
+            logger.warning(
+                "角色拒绝: user=%d, role=%s, rbac_roles=%s, required=%s",
+                current_user.id, current_user.role, user_roles, allowed_roles,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"权限不足：需要角色 {'/'.join(allowed_roles)}",
+            )
+        return True
+    return _checker
 
 
 # ── 装饰器 ────────────────────────────────────────────────────────────────────

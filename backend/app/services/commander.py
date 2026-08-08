@@ -75,8 +75,22 @@ class WorkerExecutor:
             return None, str(e)
 
     async def _execute(self, node: TaskNode, worker: WorkerAgent) -> Any:
-        """子类实现此方法"""
-        raise NotImplementedError
+        """默认执行实现（BUG-018 修复）。
+
+        子类应覆写此方法提供具体能力；未覆写时返回通用降级结果，
+        不再抛出 NotImplementedError 导致整个 DAG 中断。
+        """
+        content = node.content or ""
+        logger.warning(
+            "Worker %s 未覆写 _execute，使用默认降级实现 (capability=%s)",
+            worker.worker_id, self.CAPABILITY,
+        )
+        return {
+            "degraded": True,
+            "capability": self.CAPABILITY,
+            "source_length": len(content),
+            "note": "Worker 未提供专用实现，由基类默认处理",
+        }
 
 
 class ExtractorWorker(WorkerExecutor):

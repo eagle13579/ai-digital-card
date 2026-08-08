@@ -20,16 +20,25 @@ from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select, delete, update
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, UnlockRecord
 from app.models.audit import AuditLog
 from app.models.brochure import Brochure, Page
 from app.models.tag import UserTag, MatchRecord
 from app.models.visitor import VisitorLog
 from app.models.trust import TrustNetwork
+from app.models.connection import Connection
+from app.models.contact import ImportedContact
+from app.models.organization import OrganizationMember
+from app.models.six_degrees import (
+    RelationEvent,
+    ReferralLink,
+    SixDegreePathCache,
+    UserRelation,
+)
 from app.routers.auth import get_current_user, pwd_context
 from app.middleware.audit import record_audit
 
@@ -84,6 +93,89 @@ def _mask_ip(ip: str) -> str:
     if len(parts) == 4:
         return f"{parts[0]}.{parts[1]}.{'.'.join(['*'] * 2)}"
     return ip[: len(ip) // 2] + "*" * (len(ip) - len(ip) // 2)
+
+
+# ── GDPR 关联表清理清单（BUG-036） ──────────────────────────────────────
+# 账户删除后，以下所有含 user 引用的关联表必须同步清理，否则残留引用。
+# 每一项为 (模型, [(列, 用户ID条件), ...])，任一条件命中即删除该行。
+# 审计日志（AuditLog）按 BUG-012 保留策略不物理删除，仅 user_id 置 NULL。
+
+GDPR_RELATED_TABLE_CLEANUPS: list[tuple[object, list[tuple]]] = [
+    # 用户标签
+    (UserTag, [("user_id", "user_id")]),
+    # 匹配记录（双向引用）
+    (MatchRecord, [("user_a_id", "user_id"), ("user_b_id", "user_id")]),
+    # 解锁记录（解锁方 + 被解锁方）
+    (UnlockRecord, [("user_id", "user_id"), ("target_user_id", "user_id")]),
+    # 信任网络（双向引用）
+    (TrustNetwork, [("user_id", "user_id"), ("trusted_user_id", "user_id")]),
+    # 社交连接（视角用户 + 关系对象）
+    (Connection, [("user_id", "user_id"), ("contact_id", "user_id")]),
+    # 通讯录（归属用户 + 匹配到的平台用户）
+    (ImportedContact, [("user_id", "user_id"), ("matched_user_id", "user_id")]),
+    # 六度人脉关系边（双向引用）
+    (UserRelation, [("from_user_id", "user_id"), ("to_user_id", "user_id")]),
+    # 关系事件日志（双向引用）
+    (RelationEvent, [("from_user_id", "user_id"), ("to_user_id", "user_id")]),
+    # 六度路径缓存（双向引用）
+    (SixDegreePathCache, [("from_user_id", "user_id"), ("to_user_id", "user_id")]),
+    # 邀请链接（归属用户）
+    (ReferralLink, [("owner_user_id", "user_id")]),
+    # 组织成员关系
+    (OrganizationMember, [("user_id", "user_id")]),
+]
+
+
+def _build_user_filters(model: object, user_id: int) -> list:
+    """根据清理清单条目构建 OR 条件列表（任一列命中即命中）。"""
+    from sqlalchemy.sql import or_
+
+    filters = []
+    for entry in GDPR_RELATED_TABLE_CLEANUPS:
+        if entry[0] is model:
+            for col_name, _ in entry[1]:
+                filters.append(getattr(model, col_name) == user_id)
+            break
+    return filters
+
+
+async def _cleanup_related_tables(db: AsyncSession, user_id: int) -> dict[str, int]:
+    """按 GDPR 关联表清理清单删除所有残留引用（BUG-036）。
+
+    Returns:
+        {表名: 删除行数} 字典，仅包含实际有删除的表。
+    """
+    from sqlalchemy.sql import or_
+
+    cleaned: dict[str, int] = {}
+    for model, _ in GDPR_RELATED_TABLE_CLEANUPS:
+        filters = _build_user_filters(model, user_id)
+        if not filters:
+            continue
+        result = await db.execute(delete(model).where(or_(*filters)))
+        if result.rowcount:
+            cleaned[model.__tablename__] = result.rowcount
+    return cleaned
+
+
+async def _residual_scan(db: AsyncSession, user_id: int) -> dict[str, int]:
+    """删除后残留巡检：逐表统计仍残留 user 引用的行数（BUG-036）。
+
+    正常删除后应为空；若非空说明存在未覆盖的关联表，需补充清理清单。
+    """
+    from sqlalchemy.sql import or_
+
+    residuals: dict[str, int] = {}
+    for model, _ in GDPR_RELATED_TABLE_CLEANUPS:
+        filters = _build_user_filters(model, user_id)
+        if not filters:
+            continue
+        count = (
+            await db.execute(select(func.count()).select_from(model).where(or_(*filters)))
+        ).scalar_one()
+        if count:
+            residuals[model.__tablename__] = count
+    return residuals
 
 
 # ── 辅助函数 ──────────────────────────────────────────────────────────
@@ -509,22 +601,16 @@ async def delete_my_account(
         b.purpose = ""
         b.status = "deleted"
 
-    # ── 4. 删除标签 ────────────────────────────────────────────────
-    await db.execute(delete(UserTag).where(UserTag.user_id == user_id))
-
-    # ── 5. 删除匹配记录 ────────────────────────────────────────────
-    await db.execute(
-        delete(MatchRecord).where(
-            (MatchRecord.user_a_id == user_id) | (MatchRecord.user_b_id == user_id)
+    # ── 4-6. 关联表全量清理（BUG-036：清单化清理） ──────────────────
+    # 覆盖: user_tags / match_records / unlock_records / trust_network /
+    #       connections / contacts / user_relations / relation_events /
+    #       six_degree_path_cache / referral_links / organization_members
+    cleaned = await _cleanup_related_tables(db, user_id)
+    if cleaned:
+        logger.info(
+            "GDPR 关联清理 user=%d: %s", user_id,
+            ", ".join(f"{t}({n})" for t, n in cleaned.items()),
         )
-    )
-
-    # ── 6. 删除信任网络 ────────────────────────────────────────────
-    await db.execute(
-        delete(TrustNetwork).where(
-            (TrustNetwork.user_id == user_id) | (TrustNetwork.trusted_user_id == user_id)
-        )
-    )
 
     # ── 7. 审计日志留痕：user_id 置 NULL（保留记录内容，脱敏关联）──
     # BUG-012: 不再物理删除审计日志；user_id 置 NULL 保留平台安全审计能力。
@@ -535,6 +621,23 @@ async def delete_my_account(
     )
 
     await db.commit()
+
+    # ── 7.5 删除后残留巡检（BUG-036） ──────────────────────────────
+    # 使用独立 session 巡检，确保提交后的数据无残留引用。
+    try:
+        from app.database import AsyncSessionLocal
+        async with AsyncSessionLocal() as audit_db:
+            residuals = await _residual_scan(audit_db, user_id)
+            if residuals:
+                logger.warning(
+                    "GDPR 删除后残留引用 user=%d: %s", user_id,
+                    ", ".join(f"{t}({n})" for t, n in residuals.items()),
+                )
+            else:
+                logger.info("GDPR 残留巡检通过 user=%d: 无残留引用", user_id)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("GDPR 残留巡检失败: %s", e)
+        residuals = {}
 
     # 使用独立 session 记录删除完成审计（此时 user 已匿名化）
     try:
@@ -556,5 +659,7 @@ async def delete_my_account(
         "data": {
             "deletion_review_hours": 72,
             "note": "72 小时冷静期内请联系客服可撤回；审计日志已脱敏留痕。",
+            "cleaned_tables": cleaned,
+            "residual_refs": residuals,
         },
     }

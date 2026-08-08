@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.invitation_code import InvitationCode
 from app.models.user import User
+from app.middleware.rbac import require_permission
 from app.routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -84,8 +85,11 @@ async def redeem_code(
     return {"success": True, "code": code.upper()}
 
 @router.get("/stats")
-async def invite_stats(db: AsyncSession = Depends(get_db)):
-    """邀请码统计"""
+async def invite_stats(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
+):
+    """邀请码统计（BUG-030：仅 system:metrics 权限可读，禁止匿名访问）"""
     total = (await db.execute(select(func.count(InvitationCode.id)))).scalar()
     used = (await db.execute(
         select(func.count(InvitationCode.id)).where(InvitationCode.used_count > 0)
