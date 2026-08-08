@@ -208,6 +208,27 @@ class TimeMachineV3Engine:
         except Exception as e:
             logger.warning("爬虫增强失败: %s", e)
 
+        # 9. 风险预警（全球高风险国家 + 历史危机验证）
+        risk_data = None
+        try:
+            from .risk_warning import RiskWarningEngine
+            from .risk_backtest import RiskBacktestEngine
+            rwe = RiskWarningEngine()
+            risk_ranked = rwe.rank_world(top_n=25)
+            risk_bt = RiskBacktestEngine(rwe).run()
+            risk_data = {
+                "ranked": risk_ranked,
+                "backtest": risk_bt,
+                "china": rwe.assess("CHN"),
+            }
+            logger.info("风险预警: Top高风险%d国, 历史危机命中%d/%d (%.0f%%)",
+                        len(risk_ranked),
+                        risk_bt.get("passed_cases", 0),
+                        risk_bt.get("total_cases", 0),
+                        risk_bt.get("pass_rate", 0) * 100)
+        except Exception as e:
+            logger.warning("风险预警失败: %s", e)
+
         duration = round(time.time() - start, 2)
         return {
             "mode": "env_migration_match",
@@ -221,6 +242,7 @@ class TimeMachineV3Engine:
             "reverse_time_machine": reverse_data,
             "investment_view": invest_data,
             "crawler_enhance": enhance_data,
+            "risk_warning": risk_data,
             "lingshu_synced": synced,
             "duration_s": duration,
         }
