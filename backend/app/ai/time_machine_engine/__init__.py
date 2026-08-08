@@ -254,6 +254,26 @@ class TimeMachineV3Engine:
             logger.warning("美元潮汐失败: %s", e)
 
         duration = round(time.time() - start, 2)
+
+        # 11. 全球系统论（三层透视：本质层潮汐+地缘 → 载体层 → 现象层）
+        geo_data = None
+        try:
+            from .geo_system import GeoSystemEngine
+            gse = GeoSystemEngine()
+            geo_regime = gse.system_regime(dollar_stage if dollar_data else None)
+            geo_adjust = gse.adjust_opportunity(geo_regime)
+            geo_matches = gse.toolkit_match(geo_regime)
+            geo_data = {
+                "regime": geo_regime,
+                "adjust": geo_adjust,
+                "matches": geo_matches,
+            }
+            logger.info("全球系统论: %s (%s, VIX %.1f)",
+                        geo_regime.get("regime"), geo_adjust.get("strategy"),
+                        geo_regime.get("vix_current", 0))
+        except Exception as e:
+            logger.warning("全球系统论失败: %s", e)
+
         return {
             "mode": "env_migration_match",
             "engine_version": self.VERSION,
@@ -268,6 +288,7 @@ class TimeMachineV3Engine:
             "crawler_enhance": enhance_data,
             "risk_warning": risk_data,
             "dollar_tide": dollar_data,
+            "geo_system": geo_data,
             "lingshu_synced": synced,
             "duration_s": duration,
         }
