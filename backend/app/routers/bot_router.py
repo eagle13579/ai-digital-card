@@ -11,6 +11,9 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import logging
 from typing import Any
@@ -18,14 +21,82 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 
+from app.config import settings
 from app.services.bot_service import BotCommand, get_bot, list_bots
 from app.services.bot_slack import slack_bot
 from app.services.bot_feishu import feishu_bot
 from app.services.bot_dingtalk import dingtalk_bot
+from app.services.webhook_signer import verify as hmac_verify
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/bot", tags=["IM 机器人"])
+
+
+# ── Webhook 签名校验（BUG-022 修复） ─────────────────────────────────────────
+
+
+def _platform_webhook_secret(platform: str) -> str:
+    """获取各平台 Webhook 签名校验密钥（未配置返回空串）。"""
+    if platform == "slack":
+        return settings.SLACK_SIGNING_SECRET or ""
+    if platform == "feishu":
+        # 飞书事件订阅使用加密密钥（Encrypt Key），未单独配置时回退 APP_SECRET
+        return getattr(settings, "FEISHU_ENCRYPT_KEY", "") or settings.FEISHU_APP_SECRET or ""
+    if platform == "dingtalk":
+        return settings.DINGTALK_SECRET or ""
+    return ""
+
+
+def _verify_webhook_signature(platform: str, raw_body: bytes, request: Request) -> bool:
+    """校验平台 Webhook 回调签名（HMAC-SHA256，防伪造回调）。
+
+    统一接入 app.services.webhook_signer（HMAC-SHA256 hex 摘要）:
+      1. 通用 X-Webhook-Signature 头 — webhook_signer 标准签名，内部调用方统一使用；
+      2. 平台原生签名 — Slack v0 / 飞书 X-Lark-Signature / 钉钉 timestamp+sign。
+    任一通过即视为有效；签名密钥未配置时 fail-closed 拒绝（防止绕过）。
+    """
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    secret = _platform_webhook_secret(platform)
+    if not secret:
+        logger.warning("[%s] Webhook 签名密钥未配置，拒绝请求（fail-closed，防伪造回调）", platform)
+        return False
+
+    # 1) 通用签名：X-Webhook-Signature = HMAC-SHA256(raw_body, secret) hex
+    generic_sig = headers.get("x-webhook-signature", "")
+    if generic_sig and hmac_verify(raw_body, generic_sig, secret):
+        return True
+
+    # 2) 平台原生签名
+    if platform == "slack":
+        return slack_bot.verify_slack_signature(raw_body, dict(request.headers))
+
+    if platform == "feishu":
+        # 飞书: X-Lark-Signature = base64(hmac_sha256(timestamp + "\n" + body, secret))
+        signature = headers.get("x-lark-signature", "")
+        timestamp = headers.get("x-lark-request-timestamp", "")
+        if not signature or not timestamp:
+            return False
+        string_to_sign = f"{timestamp}\n".encode("utf-8") + raw_body
+        expected = base64.b64encode(
+            hmac.new(secret.encode("utf-8"), string_to_sign, hashlib.sha256).digest()
+        ).decode("utf-8")
+        return hmac.compare_digest(expected, signature)
+
+    if platform == "dingtalk":
+        # 钉钉: sign = base64(hmac_sha256(timestamp + "\n" + secret, secret))
+        query = dict(request.query_params)
+        timestamp = headers.get("x-dingtalk-timestamp", "") or query.get("timestamp", "")
+        signature = headers.get("x-dingtalk-signature", "") or query.get("sign", "")
+        if not signature or not timestamp:
+            return False
+        string_to_sign = f"{timestamp}\n{secret}"
+        expected = base64.urlsafe_b64encode(
+            hmac.new(secret.encode("utf-8"), string_to_sign.encode("utf-8"), hashlib.sha256).digest()
+        ).decode("utf-8")
+        return hmac.compare_digest(expected, signature)
+
+    return False
 
 
 # ── 工具函数 ─────────────────────────────────────────────────────────────────
@@ -141,6 +212,14 @@ async def _handle_slack_webhook(
     if not slack_bot._enabled:
         return JSONResponse({"ok": True, "degraded": True, "message": "Slack 机器人未配置"})
 
+    # BUG-022 修复: 签名校验（防伪造回调）
+    if not _verify_webhook_signature("slack", raw_body, request):
+        logger.warning("Slack webhook 签名校验失败，拒绝请求")
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"ok": False, "error": "签名校验失败"},
+        )
+
     body_str = raw_body.decode("utf-8")
 
     # ── url_verification ──────────────────────────────────────────────────
@@ -192,6 +271,14 @@ async def _handle_feishu_webhook(
     """处理飞书回调。"""
     if not feishu_bot._enabled:
         return JSONResponse({"ok": True, "degraded": True, "message": "飞书机器人未配置"})
+
+    # BUG-022 修复: 签名校验（防伪造回调）
+    if not _verify_webhook_signature("feishu", raw_body, request):
+        logger.warning("飞书 webhook 签名校验失败，拒绝请求")
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"ok": False, "error": "签名校验失败"},
+        )
 
     body_str = raw_body.decode("utf-8")
     try:
@@ -251,6 +338,14 @@ async def _handle_dingtalk_webhook(
     """处理钉钉回调。"""
     if not dingtalk_bot._enabled:
         return JSONResponse({"ok": True, "degraded": True, "message": "钉钉机器人未配置"})
+
+    # BUG-022 修复: 签名校验（防伪造回调）
+    if not _verify_webhook_signature("dingtalk", raw_body, request):
+        logger.warning("钉钉 webhook 签名校验失败，拒绝请求")
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"ok": False, "error": "签名校验失败"},
+        )
 
     body_str = raw_body.decode("utf-8")
     try:

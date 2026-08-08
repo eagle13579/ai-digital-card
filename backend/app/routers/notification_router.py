@@ -9,9 +9,11 @@ import logging
 from enum import Enum
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from app.models.user import User
+from app.routers.auth import get_current_user
 from notification.notification_service import (
     UnifiedPushService,
     PushMode,
@@ -21,6 +23,9 @@ from notification.notification_service import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/notification", tags=["行业动态推送"])
+
+# 推送触发白名单 — 仅白名单内角色可手动触发广播推送（修复 BUG-007）
+PUSH_TRIGGER_WHITELIST = {"admin"}
 
 
 # ── 请求 / 响应模型 ────────────────────────────────────────────────────
@@ -64,7 +69,10 @@ class PushResponse(BaseModel):
 
 
 @router.post("/push", response_model=PushResponse)
-async def push_notification(req: PushRequest):
+async def push_notification(
+    req: PushRequest,
+    current_user: User = Depends(get_current_user),
+):
     """手动触发行业动态推送。
 
     支持三种推送模式:
@@ -73,7 +81,15 @@ async def push_notification(req: PushRequest):
       - pull: 主动拉取（适合用户查看名片时触发）
 
     可通过 channels 参数覆盖配置中的渠道列表。
+
+    鉴权（修复 BUG-007）: 必须登录，且角色必须在推送触发白名单内。
     """
+    # BUG-007: 目标用户白名单校验 — 仅白名单内角色可触发广播推送
+    if current_user.role not in PUSH_TRIGGER_WHITELIST:
+        raise HTTPException(
+            status_code=403,
+            detail="无权触发推送：仅白名单角色可执行",
+        )
     svc = get_push_service()
 
     # 映射 API 参数到内部枚举

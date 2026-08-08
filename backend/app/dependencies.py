@@ -539,6 +539,81 @@ async def get_owned_brochure(
     return brochure
 
 
+async def _is_org_admin_of_user(
+    db: AsyncSession, actor_id: int, target_user_id: int
+) -> bool:
+    """判断 actor 是否为 target 所在组织的 owner 或管理员（企业管理员二次放行）。
+
+    规则：actor 与 target 同属任一组织，且 actor 在该组织内为 owner 或 admin。
+    """
+    from app.models.organization import Organization, OrganizationMember
+
+    # actor 的授权组织（owner 或 admin member）
+    actor_org_ids: set[int] = set()
+    org_rows = await db.execute(
+        select(Organization.id).where(Organization.owner_id == actor_id)
+    )
+    actor_org_ids.update(org_rows.scalars().all())
+    member_rows = await db.execute(
+        select(OrganizationMember.org_id).where(
+            OrganizationMember.user_id == actor_id,
+            OrganizationMember.role == "admin",
+        )
+    )
+    actor_org_ids.update(member_rows.scalars().all())
+    if not actor_org_ids:
+        return False
+
+    # target 所属组织（owner 或 成员）
+    target_org_ids: set[int] = set()
+    t_org_rows = await db.execute(
+        select(Organization.id).where(Organization.owner_id == target_user_id)
+    )
+    target_org_ids.update(t_org_rows.scalars().all())
+    t_member_rows = await db.execute(
+        select(OrganizationMember.org_id).where(
+            OrganizationMember.user_id == target_user_id
+        )
+    )
+    target_org_ids.update(t_member_rows.scalars().all())
+
+    return bool(actor_org_ids & target_org_ids)
+
+
+async def get_owned_brochure_for_write(
+    brochure_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Brochure:
+    """公共依赖：获取画册并校验写权限（修复 BUG-029 403 改 404 防枚举）。
+
+    权限规则（写操作：PUT/DELETE/PUBLISH/refresh-token 统一收敛）：
+        - 画册不存在 → 404
+        - 本人 → 放行
+        - 平台管理员（role=admin）→ 放行
+        - 企业管理员（与画册所有者同组织且为 owner/admin）→ 放行
+        - 其他 → 统一 404（不暴露资源存在性，防枚举）
+
+    同时使用 selectinload 预加载 pages，避免 MissingGreenlet。
+    """
+    result = await db.execute(
+        select(Brochure)
+        .options(selectinload(Brochure.pages))
+        .where(Brochure.id == brochure_id)
+    )
+    brochure = result.scalars().first()
+    if brochure is None:
+        raise HTTPException(status_code=404, detail="画册不存在")
+    if brochure.user_id == current_user.id:
+        return brochure
+    if current_user.role == "admin":
+        return brochure
+    if await _is_org_admin_of_user(db, current_user.id, brochure.user_id):
+        return brochure
+    # 非本人且非管理员：统一 404，避免枚举探测
+    raise HTTPException(status_code=404, detail="画册不存在")
+
+
 async def require_api_key(
     x_api_key: str = Header(default="", alias="X-API-Key"),
     db: AsyncSession = Depends(get_db),

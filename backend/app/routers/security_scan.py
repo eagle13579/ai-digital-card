@@ -14,8 +14,9 @@ import re
 import urllib.parse
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from app.middleware.rbac import require_role
 
 router = APIRouter(prefix="/api/mingpian/scan", tags=["安全扫描"])
 
@@ -358,7 +359,8 @@ def _flatten_content(content: str) -> str:
 
 
 @router.post("", response_model=ScanResponse)
-async def scan_business_card(req: ScanRequest):
+async def scan_business_card(req: ScanRequest,
+                             _admin: Any = Depends(require_role(["admin"]))):
     """扫描名片内容的安全风险
 
     检测名片文本中是否包含：

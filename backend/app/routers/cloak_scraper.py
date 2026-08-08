@@ -6,9 +6,10 @@ GET    /api/mingpian/scrape/health  — 爬虫服务状态
 """
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from app.middleware.rbac import require_role
 from app.services.cloak_scraper import SmartScraperService, health as scraper_health
 
 logger = logging.getLogger(__name__)
@@ -63,11 +64,16 @@ class SmartScrapeRequest(BaseModel):
 
 
 @router.post("/scrape", response_model=ScrapeResponse)
-async def scrape(request: ScrapeRequest):
+async def scrape(
+    request: ScrapeRequest,
+    _: bool = Depends(require_role(["admin"])),
+):
     """爬取名片客户的网站，获取企业信息。
 
     使用 CloakBrowser（无头浏览器）采集目标网站内容，
     自动降级为 HTTP 请求模式（当 CloakBrowser 未安装时）。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可触发外部抓取（全局限流中间件兜底）。
     """
     if not request.url or not request.url.startswith(("http://", "https://")):
         raise HTTPException(
@@ -91,8 +97,11 @@ async def scrape(request: ScrapeRequest):
 
 
 @router.get("/scrape/health", response_model=HealthResponse)
-async def scrape_health():
-    """爬虫服务健康状态 — 检查 CloakBrowser / Playwright 是否已安装。"""
+async def scrape_health(_: bool = Depends(require_role(["admin"]))):
+    """爬虫服务健康状态 — 检查 CloakBrowser / Playwright 是否已安装。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可查看。
+    """
     return HealthResponse(**scraper_health())
 
 
@@ -100,9 +109,14 @@ async def scrape_health():
 
 
 @router.post("/scrape/smart", summary="NL命令模式 — 自动解析自然语言指令并爬取")
-async def scrape_smart(body: SmartScrapeRequest):
+async def scrape_smart(
+    body: SmartScrapeRequest,
+    _: bool = Depends(require_role(["admin"])),
+):
     """
     接受自然语言指令，自动解析URL并执行爬取。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可触发外部抓取。
 
     示例请求:
         {"text": "帮我爬https://example.com"}
@@ -122,9 +136,14 @@ async def scrape_smart(body: SmartScrapeRequest):
 
 
 @router.get("/scrape/auto-detect", summary="探测指定URL的bot防护级别")
-async def auto_detect(url: str = ""):
+async def auto_detect(
+    url: str = "",
+    _: bool = Depends(require_role(["admin"])),
+):
     """
     探测指定URL的bot检测/防护级别。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可触发外部探测。
 
     使用 baize_libs.AutoDetect 检测：
     - Cloudflare 防护

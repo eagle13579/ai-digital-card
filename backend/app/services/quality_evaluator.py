@@ -1011,18 +1011,76 @@ class QualityEvaluator:
         """
         调用LLM执行LM-as-Judge评估。
 
-        当前实现使用模拟评分（基于启发式规则）。
-        生产环境中应替换为真实的LLM API调用。
-
-        TODO: 接入 LLM 网关 (app.ai.gateway) 实现真实评估
+        BUG-018：接入 AI 网关 (app.ai.gateway) 实现真实评估；
+        网关不可用或调用失败时回退到启发式评分，保证评估不中断。
         """
-        # ── 模拟评测逻辑：根据回答特征进行评分 ──
+        llm_scores = await self._try_llm_eval(input_text, agent_output, expected_output)
+        if llm_scores is not None:
+            return {
+                "scores": llm_scores,
+                "summary": "LLM 评估（AI 网关）",
+            }
+
+        # ── 回退：启发式评分（网关不可用/失败） ──
         scores = self._heuristic_eval(input_text, agent_output)
 
         return {
             "scores": scores,
-            "summary": "模拟评估 — 使用启发式规则",
+            "summary": "启发式评估（LLM 网关不可用，自动回退）",
         }
+
+    async def _try_llm_eval(
+        self,
+        input_text: str,
+        agent_output: str,
+        expected_output: str | None,
+    ) -> dict[str, dict[str, Any]] | None:
+        """调用 AI 网关执行 LM-as-Judge，失败返回 None。"""
+        try:
+            from app.ai.gateway.interfaces import AIRequest
+            from app.dependencies import get_ai_gateway
+
+            gateway = get_ai_gateway()
+            prompt = (
+                "你是一名严格的质量评估裁判。请对 AI 助手针对以下用户输入给出的回答进行评分。\n"
+                f"【用户输入】\n{input_text[:2000]}\n\n"
+                f"【AI 回答】\n{agent_output[:4000]}\n"
+                + (f"\n【参考答案】\n{expected_output[:2000]}\n" if expected_output else "")
+                + (
+                    "\n请仅输出 JSON 对象，格式: "
+                    '{"overall": 0-100, "relevance": 0-100, "accuracy": 0-100, '
+                    '"completeness": 0-100, "clarity": 0-100, "reason": "一句话理由"}'
+                )
+            )
+            resp = await gateway.chat(AIRequest(
+                model="deepseek-chat",
+                prompt=prompt,
+                temperature=0.2,
+                max_tokens=512,
+                response_format={"type": "json_object"},
+            ))
+            import json as _json
+            text = resp.content.strip()
+            # 兼容代码块包裹的 JSON
+            if text.startswith("```"):
+                text = text.strip("`")
+                if text.startswith("json"):
+                    text = text[4:]
+            data = _json.loads(text)
+            scores = data.get("scores") or data
+            dims = ("overall", "relevance", "accuracy", "completeness", "clarity")
+            normalized = {}
+            for dim in dims:
+                raw = scores.get(dim)
+                try:
+                    val = float(raw)
+                except (TypeError, ValueError):
+                    val = 0.0
+                normalized[dim] = max(0.0, min(100.0, val))
+            return {"llm": normalized}
+        except Exception as e:  # noqa: BLE001
+            logger.warning("LLM 评估调用失败，回退启发式: %s", e)
+            return None
 
     def _heuristic_eval(
         self,

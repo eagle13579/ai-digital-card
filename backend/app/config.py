@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     # 文件上传
     UPLOAD_DIR: str = "./uploads"
 
+    # ── 上传安全（BUG-033/001 修复） ──────────────────────────────────────
+    FILE_FREE_QUOTA: int = 1
+    """每用户免费资料文件配额（BUG-001：免费用户可上传文件数上限）"""
+    IM_SEND_ALLOWED_USERS: str = ""
+    """IM 桥接 /send 发送者白名单（BUG-023：逗号分隔的用户ID，空=不限制）"""
+
     # 视频上传
     VIDEO_MAX_SIZE: int = 100 * 1024 * 1024  # 100MB
     """视频文件最大大小（字节），默认 100MB"""

@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.middleware.rbac import require_permission
 from app.services.payment_analytics import get_payment_overview
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,10 @@ router = APIRouter(prefix="/api/v1/analytics", tags=["付款分析"])
 
 
 @router.get("/payment/overview")
-async def payment_overview(db: AsyncSession = Depends(get_db)):
+async def payment_overview(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
+):
     """获取付款转化指标总览
 
     返回以下指标:
@@ -47,7 +51,10 @@ async def payment_overview(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/funnel")
-async def get_funnel(db: AsyncSession = Depends(get_db)):
+async def get_funnel(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
+):
     """用户增长漏斗: 注册→名片→匹配→连接"""
     from sqlalchemy import text
     result = await db.execute(text("""

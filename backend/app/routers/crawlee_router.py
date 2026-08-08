@@ -9,9 +9,10 @@ GET    /api/crawlee/health     — 健康检查
 """
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from app.middleware.rbac import require_role
 from crawlee_service import crawl_service, CardResult, health_check as svc_health
 
 logger = logging.getLogger(__name__)
@@ -60,8 +61,13 @@ class HealthResponse(BaseModel):
 
 
 @router.post("/scrape", response_model=ScrapeResponse, summary="单名片爬取")
-async def api_scrape_card(request: ScrapeRequest):
+async def api_scrape_card(
+    request: ScrapeRequest,
+    _: bool = Depends(require_role(["admin"])),
+):
     """爬取并提取单张名片信息。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可触发外部抓取（全局限流中间件兜底）。
 
     输入一个名片网页 URL，返回结构化名片数据（姓名、公司、职位、电话等）。
     自动检测 JSON-LD / hCard / Meta 标签 / 正则提取等多种格式。
@@ -98,8 +104,13 @@ async def api_scrape_card(request: ScrapeRequest):
 
 
 @router.post("/batch", response_model=BatchScrapeResponse, summary="批量爬取")
-async def api_batch_scrape(request: BatchScrapeRequest):
+async def api_batch_scrape(
+    request: BatchScrapeRequest,
+    _: bool = Depends(require_role(["admin"])),
+):
     """批量爬取多张名片信息。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可触发外部抓取（全局限流中间件兜底）。
 
     并发爬取多个名片网页，返回结构化名片数据列表。
     最多支持 100 个 URL。
@@ -136,8 +147,10 @@ async def api_batch_scrape(request: BatchScrapeRequest):
 
 
 @router.get("/health", response_model=HealthResponse, summary="健康检查")
-async def api_health():
+async def api_health(_: bool = Depends(require_role(["admin"]))):
     """爬虫服务健康检查。
+
+    鉴权（修复 BUG-020）: 仅 admin 角色可查看。
 
     返回 crawlee_service 的运行状态、组件可用性和统计信息。
     """

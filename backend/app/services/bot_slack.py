@@ -123,31 +123,40 @@ class SlackBot(BotBase):
     # ── 命令处理器 ────────────────────────────────────────────────────────────
 
     async def _cmd_search_contact(self, cmd: BotCommand) -> str:
-        """搜索联系人。用法: /search-contact <姓名|电话|邮箱>"""
+        """搜索联系人。用法: /search-contact <姓名|电话|邮箱>
+
+        BUG-018：显式声明下线 — 不再返回模拟数据；真实搜索请使用 Web 端通讯录。
+        """
         if not cmd.args:
             return (
                 "❌ 请输入搜索关键词。示例: `/search-contact 张三`"
             )
         keyword = " ".join(cmd.args)
-        # TODO: 接入真实联系人搜索服务
         return (
             f"🔍 *搜索联系人*: `{keyword}`\n"
-            f"   (搜索服务待接入 — 返回模拟结果)\n"
-            f"   📇 张三 | 138****0000 | zhangsan@example.com\n"
-            f"   📇 张伟 | 139****1111 | zhangwei@example.com"
+            f"   ⛔ 该命令已下线（原为模拟数据桩）。\n"
+            f"   💡 请使用 Web 端「通讯录」进行真实联系人搜索。"
         )
 
     async def _cmd_add_note(self, cmd: BotCommand) -> str:
-        """添加备注。用法: /add-note <联系人> <备注内容>"""
+        """添加备注。用法: /add-note <联系人> <备注内容>
+
+        BUG-018：显式声明下线 — 原实现仅返回成功提示并未持久化，已下线。
+        """
         if len(cmd.args) < 2:
             return "❌ 用法: `/add-note <联系人姓名> <备注内容>`"
         contact = cmd.args[0]
         note = " ".join(cmd.args[1:])
-        # TODO: 接入真实备注存储
-        return f"✅ 已为 *{contact}* 添加备注: _{note}_"
+        return (
+            f"⛔ *添加备注命令已下线*（原实现未持久化存储）。\n"
+            f"   💡 请在 Web 端为 *{contact}* 添加备注，备注内容可包含: _{note}_"
+        )
 
     async def _cmd_recent_activity(self, cmd: BotCommand) -> str:
-        """最近活动。用法: /recent-activity [数量]"""
+        """最近活动。用法: /recent-activity [数量]
+
+        BUG-018：显式声明下线 — 原实现返回模拟活动记录，已下线。
+        """
         limit = 5
         if cmd.args:
             try:
@@ -155,12 +164,10 @@ class SlackBot(BotBase):
                 limit = max(1, min(20, limit))
             except ValueError:
                 pass
-        # TODO: 接入真实活动日志
         return (
             f"📊 *最近 {limit} 条活动*\n"
-            f"1. 张三 查看了您的名片 (2分钟前)\n"
-            f"2. 李四 交换了联系方式 (15分钟前)\n"
-            f"3. 王五 导出了联系人 (1小时前)"
+            f"   ⛔ 该命令已下线（原为模拟数据桩）。\n"
+            f"   💡 请使用 Web 端「动态/审计日志」查看真实活动记录。"
         )
 
     async def _cmd_unknown(self, cmd: BotCommand) -> str:

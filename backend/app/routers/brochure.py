@@ -4,13 +4,15 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api_standards import PaginatedResponse, paginate_cursor
 from app.database import get_db
-from app.dependencies import get_owned_brochure
+from app.dependencies import get_owned_brochure, get_owned_brochure_for_write
+from app.middleware.audit import record_audit
+from app.models.audit import AuditLog
 from app.models.brochure import Brochure, Page
 from app.models.user import User
 from app.models.tag import UserTag
@@ -279,18 +281,12 @@ async def get_brochure_by_share_token(
 
 @router.put("/{brochure_id}", response_model=BrochureResponse)
 async def update_brochure(
-    brochure_id: int,
     data: BrochureUpdate,
-    current_user: User = Depends(get_current_user),
+    brochure: Brochure = Depends(get_owned_brochure_for_write),
     db: AsyncSession = Depends(get_db),
 ):
-    """更新画册"""
-    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权修改此画册")
+    """更新画册（BUG-029：归属校验收敛到公共依赖，403 改 404 防枚举 + 企业管理员放行）"""
+    brochure_id = brochure.id
 
     update_data = data.model_dump(exclude_unset=True)
     pages_data = update_data.pop("pages", None)
@@ -328,18 +324,10 @@ async def update_brochure(
 
 @router.delete("/{brochure_id}")
 async def delete_brochure(
-    brochure_id: int,
-    current_user: User = Depends(get_current_user),
+    brochure: Brochure = Depends(get_owned_brochure_for_write),
     db: AsyncSession = Depends(get_db),
 ):
-    """删除画册"""
-    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权删除此画册")
-
+    """删除画册（BUG-029：403 改 404 防枚举 + 企业管理员放行）"""
     await db.delete(brochure)
     await db.commit()
     return {"detail": "画册已删除"}
@@ -347,18 +335,10 @@ async def delete_brochure(
 
 @router.post("/{brochure_id}/publish", response_model=BrochureResponse)
 async def publish_brochure(
-    brochure_id: int,
-    current_user: User = Depends(get_current_user),
+    brochure: Brochure = Depends(get_owned_brochure_for_write),
     db: AsyncSession = Depends(get_db),
 ):
-    """发布画册"""
-    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权发布此画册")
-
+    """发布画册（BUG-029：403 改 404 防枚举 + 企业管理员放行）"""
     brochure.status = "published"
     # 刷新分享token
     brochure.share_token = uuid.uuid4().hex[:16]
@@ -371,18 +351,10 @@ async def publish_brochure(
 
 @router.post("/{brochure_id}/refresh-token")
 async def refresh_share_token(
-    brochure_id: int,
-    current_user: User = Depends(get_current_user),
+    brochure: Brochure = Depends(get_owned_brochure_for_write),
     db: AsyncSession = Depends(get_db),
 ):
-    """刷新分享token"""
-    result = await db.execute(select(Brochure).options(selectinload(Brochure.pages)).where(Brochure.id == brochure_id))
-    brochure = result.scalars().first()
-    if brochure is None:
-        raise HTTPException(status_code=404, detail="画册不存在")
-    if brochure.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="无权操作此画册")
-
+    """刷新分享token（BUG-029：403 改 404 防枚举 + 企业管理员放行）"""
     brochure.share_token = uuid.uuid4().hex[:16]
     await db.commit()
     return {"share_token": brochure.share_token}
@@ -565,6 +537,15 @@ async def upload_cover(
             detail=f"图片文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {COVER_MAX_SIZE / 1024 / 1024:.0f}MB",
         )
 
+    # 3.1 魔数校验（BUG-033 修复：防改名 .png 的恶意文件绕过）
+    from app.services.file_magic import verify_image
+
+    if not verify_image(content, ext):
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件内容与扩展名不匹配（魔数校验失败）: {ext}，仅允许真实图片文件",
+        )
+
     # 4. 保存文件
     cover_dir = Path(settings.UPLOAD_DIR) / "covers"
     cover_dir.mkdir(parents=True, exist_ok=True)
@@ -600,12 +581,16 @@ class FileUploadResponse(BaseModel):
 
 FILE_ALLOWED_EXTENSIONS: set[str] = {".pdf", ".ppt", ".pptx", ".doc", ".docx", ".xls", ".xlsx", ".zip"}
 FILE_MAX_SIZE: int = 10 * 1024 * 1024  # 10MB
+# BUG-001/BUG-018: 免费文件配额（免费用户 1 个，付费用户 10 个）
+FREE_FILE_QUOTA: int = 1
+PAID_FILE_QUOTA: int = 10
 
 
 @router.post("/upload-file", response_model=FileUploadResponse)
 async def upload_file(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """上传资料文件（PDF/PPT/DOC/Excel/ZIP），返回可访问的 HTTPS URL
 
@@ -613,8 +598,21 @@ async def upload_file(
     大小限制: 10MB
     存储路径: uploads/files/{uuid}.{ext}
     返回URL:  {BASE_URL}/uploads/files/{filename}
-    免费限制: 每个用户1个免费文件（TODO: 待实现配额检查）
+    免费限制: 每个免费用户 1 个免费文件（BUG-018：已实现配额检查，基于审计日志计数）
     """
+    # 0. 配额检查（BUG-001/BUG-018 落地：免费用户 1 个 / 付费用户 10 个）
+    quota = FREE_FILE_QUOTA if (current_user.membership_tier or "free") == "free" else PAID_FILE_QUOTA
+    count_q = select(func.count()).select_from(AuditLog).where(
+        AuditLog.user_id == current_user.id,
+        AuditLog.action == "FILE_UPLOAD",
+    )
+    uploaded_count = (await db.execute(count_q)).scalar() or 0
+    if uploaded_count >= quota:
+        raise HTTPException(
+            status_code=400,
+            detail=f"当前套餐最多上传 {quota} 个资料文件，如需更多请升级套餐",
+        )
+
     # 1. 验证扩展名
     filename = file.filename or "file.bin"
     ext = Path(filename).suffix.lower()
@@ -632,6 +630,15 @@ async def upload_file(
             detail=f"文件过大（{len(content) / 1024 / 1024:.1f}MB），最大允许 {FILE_MAX_SIZE / 1024 / 1024:.0f}MB",
         )
 
+    # 2.1 魔数校验（BUG-033 修复：防改名 .pdf/.docx 的恶意文件绕过）
+    from app.services.file_magic import verify_file_magic
+
+    if not verify_file_magic(content, ext):
+        raise HTTPException(
+            status_code=400,
+            detail=f"文件内容与扩展名不匹配（魔数校验失败）: {ext}，仅允许真实文件",
+        )
+
     # 3. 保存文件
     file_dir = Path(settings.UPLOAD_DIR) / "files"
     file_dir.mkdir(parents=True, exist_ok=True)
@@ -644,7 +651,16 @@ async def upload_file(
     base = settings.BASE_URL.rstrip("/")
     url = f"{base}/uploads/files/{safe_name}"
 
-    # 5. 日志记录
+    # 5. 配额计数审计（FILE_UPLOAD 事件，供配额检查与审计追溯）
+    try:
+        await record_audit(
+            db, current_user.id, "FILE_UPLOAD", "/api/brochures/upload-file",
+            detail={"filename": safe_name, "size": len(content), "quota_used": uploaded_count + 1},
+        )
+    except Exception as e:  # noqa: BLE001
+        logger.warning("FILE_UPLOAD 审计记录失败: %s", e)
+
+    # 6. 日志记录
     logger.info(
         "资料文件已上传: orig=%s, saved=%s, size=%d, user_id=%d",
         file.filename, safe_name, len(content), current_user.id,

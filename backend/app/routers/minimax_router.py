@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Any
 from pydantic import BaseModel
+from app.middleware.rbac import require_permission
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,8 @@ async def health():
 
 
 @router.post("/image/generate")
-async def generate_image(req: ImageRequest):
+async def generate_image(req: ImageRequest,
+                         _perm: Any = Depends(require_permission("ai:generate"))):
     """生成图片"""
     from app.services.minimax_service import generate_image as _gen
     result = await _gen(prompt=req.prompt, aspect_ratio=req.aspect_ratio, n=req.n)
@@ -46,7 +49,8 @@ async def generate_image(req: ImageRequest):
 
 
 @router.post("/tts/synthesize")
-async def synthesize_speech(req: TTSRequest):
+async def synthesize_speech(req: TTSRequest,
+                            _perm: Any = Depends(require_permission("ai:generate"))):
     """文本转语音"""
     from app.services.minimax_service import synthesize_speech as _tts
     result = await _tts(text=req.text, voice_id=req.voice_id, speed=req.speed)

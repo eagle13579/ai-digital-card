@@ -9,13 +9,16 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
 from app.ai.online_learning import (
     get_online_learning_engine,
     trigger_learning,
     get_learning_status,
 )
+from app.middleware.rbac import require_role
+from app.models.user import User
+from app.routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +31,13 @@ router = APIRouter(prefix="/api/v1/ai/learning", tags=["在线学习引擎"])
 
 
 @router.post("/trigger")
-async def manual_trigger():
+async def manual_trigger(_: bool = Depends(require_role(["admin"]))):
     """手动触发一次在线学习
 
     从 FeedbackLoop 读取当前反馈统计，计算全局调整系数，
     更新 RecommendEngine 的权重，并记录学习日志。
+
+    鉴权（修复 BUG-019）: 仅 admin 角色可触发学习任务。
 
     Returns:
         学习结果报告，包含调整前后的权重变化
@@ -57,10 +62,12 @@ async def manual_trigger():
 
 
 @router.get("/status")
-async def get_status():
+async def get_status(current_user: User = Depends(get_current_user)):
     """获取在线学习引擎状态
 
     返回: 反馈统计、学习进度、上次学习时间、当前权重等。
+
+    鉴权（修复 BUG-019）: 需登录。
 
     Returns:
         dict: 引擎状态概览
@@ -81,8 +88,11 @@ async def get_status():
 @router.get("/logs")
 async def get_logs(
     limit: int = Query(50, ge=1, le=200, description="返回最新日志条数"),
+    current_user: User = Depends(get_current_user),
 ):
     """获取在线学习历史日志
+
+    鉴权（修复 BUG-019）: 需登录。
 
     Args:
         limit: 返回最新日志条数 (max: 200)

@@ -66,6 +66,9 @@ class WeComAdapter:
         self._agent_id = getattr(settings, "WECOM_AGENT_ID", "") or ""
         self._secret = getattr(settings, "WECOM_SECRET", "") or ""
         self._enabled = bool(self._corp_id and self._agent_id)
+        # access_token 进程内缓存（BUG-018）
+        self._token: str = ""
+        self._token_expires_at: float = 0.0
         if self._enabled:
             corp_preview = self._corp_id[:6] if len(self._corp_id) > 6 else self._corp_id
             logger.info("企微适配器已就绪 (corp_id=%s...)", corp_preview)
@@ -76,36 +79,114 @@ class WeComAdapter:
     def enabled(self) -> bool:
         return self._enabled
 
+    # ── 企微 access_token 获取（带进程内缓存） ──────────────────────────
+
+    async def _get_access_token(self) -> str:
+        """获取企微应用 access_token（缓存 100 分钟，官方有效期 7200s）。"""
+        import time as _time
+
+        now = _time.time()
+        if self._token and self._token_expires_at > now + 120:
+            return self._token
+
+        import httpx
+        url = (
+            "https://qyapi.weixin.qq.com/cgi-bin/gettoken"
+            f"?corpid={self._corp_id}&corpsecret={self._secret}"
+        )
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(url)
+            data = resp.json()
+        if data.get("errcode") != 0:
+            logger.warning("企微 gettoken 失败: %s", data)
+            return ""
+        self._token = data.get("access_token", "")
+        self._token_expires_at = now + int(data.get("expires_in", 7200))
+        return self._token
+
     async def send_message(self, msg: IMMessage) -> dict[str, Any]:
-        """发送文本消息到企微"""
+        """发送文本消息到企微（BUG-018：对接真实 应用消息推送 API）"""
         if not self._enabled:
             logger.info("[企微降级] 发给 user=%s: %s", msg.user_id, msg.text)
             return {"platform": "wecom", "status": "degraded", "reason": "未配置"}
 
-        # TODO: 对接企微 应用消息推送 API
+        import httpx
+        token = await self._get_access_token()
+        if not token:
+            return {"platform": "wecom", "status": "failed", "error": "access_token 获取失败"}
+
         # POST https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}
-        logger.info("[企微] 发送文本消息 user=%s: %s", msg.user_id, msg.text)
-        return {
-            "platform": "wecom",
-            "status": "simulated",
-            "touser": msg.user_id,
-            "msgtype": "text",
-        }
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    f"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}",
+                    json={
+                        "touser": msg.user_id,
+                        "msgtype": "text",
+                        "agentid": int(self._agent_id) if str(self._agent_id).isdigit() else self._agent_id,
+                        "text": {"content": msg.text},
+                        "safe": 0,
+                    },
+                )
+                data = resp.json()
+            if data.get("errcode") != 0:
+                logger.warning("[企微] 发送失败 user=%s: %s", msg.user_id, data)
+                return {"platform": "wecom", "status": "failed", "error": data}
+            logger.info("[企微] 发送文本消息 user=%s: %s", msg.user_id, msg.text)
+            return {
+                "platform": "wecom",
+                "status": "sent",
+                "touser": msg.user_id,
+                "msgtype": "text",
+                "msgid": data.get("msgid", ""),
+            }
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[企微] 发送文本消息异常: %s", e)
+            return {"platform": "wecom", "status": "failed", "error": str(e)}
 
     async def send_card(self, msg: IMMessage) -> dict[str, Any]:
-        """发送卡片消息到企微"""
+        """发送卡片消息到企微（BUG-018：对接真实 模板卡片消息 API）"""
         if not self._enabled:
             logger.info("[企微降级] 卡片发给 user=%s: %s", msg.user_id, msg.title)
             return {"platform": "wecom", "status": "degraded", "reason": "未配置"}
 
-        # TODO: 对接企微 模板卡片消息 API
-        logger.info("[企微] 发送卡片消息 user=%s: %s", msg.user_id, msg.title)
-        return {
-            "platform": "wecom",
-            "status": "simulated",
-            "touser": msg.user_id,
-            "msgtype": "template_card",
-        }
+        import httpx
+        token = await self._get_access_token()
+        if not token:
+            return {"platform": "wecom", "status": "failed", "error": "access_token 获取失败"}
+
+        # 企微 template_card（text_notice 类型）
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    f"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}",
+                    json={
+                        "touser": msg.user_id,
+                        "msgtype": "template_card",
+                        "agentid": int(self._agent_id) if str(self._agent_id).isdigit() else self._agent_id,
+                        "template_card": {
+                            "card_type": "text_notice",
+                            "main_title": {"title": msg.title},
+                            "sub_title_text": msg.card_data.get("content") or msg.text,
+                            "task_id": str(abs(hash(msg.title)) % 1000000),
+                        },
+                    },
+                )
+                data = resp.json()
+            if data.get("errcode") != 0:
+                logger.warning("[企微] 卡片发送失败 user=%s: %s", msg.user_id, data)
+                return {"platform": "wecom", "status": "failed", "error": data}
+            logger.info("[企微] 发送卡片消息 user=%s: %s", msg.user_id, msg.title)
+            return {
+                "platform": "wecom",
+                "status": "sent",
+                "touser": msg.user_id,
+                "msgtype": "template_card",
+                "msgid": data.get("msgid", ""),
+            }
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[企微] 发送卡片消息异常: %s", e)
+            return {"platform": "wecom", "status": "failed", "error": str(e)}
 
 
 # ── 钉钉适配器 ──────────────────────────────────────────────────────────────

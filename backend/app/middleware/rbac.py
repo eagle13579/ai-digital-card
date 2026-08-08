@@ -17,6 +17,7 @@ from app.models.rbac import (
     Permission,
     get_permissions_for_role,
     get_user_permissions,
+    get_user_roles,
     has_permission as _has_permission,
 )
 from app.models.user import User
@@ -66,9 +67,13 @@ async def require_permission(
 async def require_role(
     roles: Union[str, Sequence[str]],
     current_user: User = Depends(_get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     FastAPI 依赖项：验证当前用户角色在指定列表中。
+
+    BUG-037：角色来源收敛到 rbac_user_roles 单一事实源（get_user_roles），
+    无 rbac 关联记录时回退 User.role 字段，兼容存量用户。
 
     用法：
         @router.get("/admin/dashboard")
@@ -79,10 +84,11 @@ async def require_role(
             ...
     """
     allowed_roles = [roles] if isinstance(roles, str) else list(roles)
-    if current_user.role not in allowed_roles:
+    user_roles = await get_user_roles(db, current_user.id)
+    if not (set(user_roles) & set(allowed_roles)):
         logger.warning(
-            "角色拒绝: user=%d, role=%s, required=%s",
-            current_user.id, current_user.role, allowed_roles,
+            "角色拒绝: user=%d, role=%s, rbac_roles=%s, required=%s",
+            current_user.id, current_user.role, user_roles, allowed_roles,
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

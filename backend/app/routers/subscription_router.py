@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.routers.auth import get_current_user
+from app.middleware.rbac import require_role
 from app.services.subscription_service import (
     PLANS,
     PlanConfig,
@@ -40,6 +41,36 @@ from app.services.ab_pricing import (
 )
 
 router = APIRouter(prefix="/api/v1/subscription", tags=["订阅管理"])
+
+
+# ── 企业授权校验（BUG-015） ────────────────────────────────────────────────
+# upgrade/downgrade 携带 organization_id 时，校验当前用户为该组织 owner 或
+# 管理员（复用 organization_router 的 _require_org_owner / _require_org_admin）。
+# 校验通过返回组织对象；失败抛出 403。
+
+
+async def _ensure_org_authorized(
+    db: AsyncSession,
+    organization_id: int,
+    user: User,
+):
+    """校验用户对企业组织的授权（owner 或 admin），返回组织对象。"""
+    from app.routers.organization_router import (
+        _get_org_or_404,
+        _require_org_admin,
+        _require_org_owner,
+    )
+
+    # 先确认组织存在（404）
+    await _get_org_or_404(db, organization_id)
+    try:
+        return await _require_org_owner(db, organization_id, user)
+    except HTTPException as e:
+        if e.status_code != status.HTTP_403_FORBIDDEN:
+            raise
+        # 非 owner 时降级检查 admin 成员角色
+        await _require_org_admin(db, organization_id, user)
+        return None
 
 
 # ── 响应模型 ─────────────────────────────────────────────────────────────
@@ -90,10 +121,12 @@ class UpgradeRequest(BaseModel):
     target_tier: str = Field(..., description="目标套餐: standard / enterprise")
     company_name: str = Field(default="", description="企业名称（可选）")
     seats: int = Field(default=1, ge=1, le=100, description="席位数量")
+    organization_id: Optional[int] = Field(default=None, description="企业组织ID（企业套餐必填；填写时校验企业授权）")
 
 
 class DowngradeRequest(BaseModel):
     target_tier: str = Field(..., description="目标套餐: free / standard")
+    organization_id: Optional[int] = Field(default=None, description="企业组织ID（填写时校验企业授权）")
 
 
 class TrialStartRequest(BaseModel):
@@ -267,6 +300,10 @@ async def upgrade(
             detail="免费套餐无需升级",
         )
 
+    # BUG-015: 携带 organization_id 时校验企业授权（owner/admin）
+    if req.organization_id is not None:
+        await _ensure_org_authorized(db, req.organization_id, user)
+
     # 检查当前订阅状态
     current = await get_current_subscription(user, db)
     current_tier = current.tier if current else "free"
@@ -328,6 +365,10 @@ async def downgrade(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"不支持的套餐: {target}",
         )
+
+    # BUG-015: 携带 organization_id 时校验企业授权（owner/admin）
+    if req.organization_id is not None:
+        await _ensure_org_authorized(db, req.organization_id, user)
 
     current = await get_current_subscription(user, db)
     if not current:
@@ -439,6 +480,7 @@ async def trial_status(
 async def check_trial_notifications(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
+    _: bool = Depends(require_role(["admin", "superadmin"])),
 ):
     """手动触发试用到期检查，返回需要发送的通知列表。
     
@@ -446,14 +488,9 @@ async def check_trial_notifications(
       - 管理员/后台手动触发试用到期提醒
       - 返回所有即将到期的试用通知摘要
       - 通知会输出到日志（可对接站内信/邮件/短信通道）
-    """
-    # 仅允许管理员或特定角色触发
-    if user.role not in ("admin", "superadmin"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="仅管理员可执行到期检查",
-        )
 
+    BUG-037：角色校验收敛到 require_role（rbac_user_roles 单一事实源）。
+    """
     result = await check_and_notify(db)
     return NotifyCheckResponse(
         checked=result["checked"],

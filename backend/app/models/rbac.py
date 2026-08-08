@@ -208,6 +208,33 @@ class UserRole(Base):
 
 # ── 辅助函数 ──────────────────────────────────────────────────────────────────
 
+async def get_user_roles(db: AsyncSession, user_id: int) -> list[str]:
+    """
+    获取指定用户的角色列表（BUG-037：RBAC 单一事实源收敛）。
+
+    优先从 rbac_user_roles 读取（用户-角色关联表）；
+    无关联记录时回退到 User 表的 role 字段（兼容存量数据）。
+    角色权限判断统一基于该函数 + get_user_permissions，避免多套角色来源。
+    """
+    result = await db.execute(
+        sa_select(RoleDefinition.name)
+        .join(UserRole, UserRole.role_id == RoleDefinition.id)
+        .where(UserRole.user_id == user_id)
+    )
+    roles = list(result.scalars().all())
+
+    if not roles:
+        # Fallback: 从 User 表的 role 字段读取（存量用户兼容）
+        from app.models.user import User
+        user_result = await db.execute(sa_select(User.role).where(User.id == user_id))
+        role = user_result.scalar()
+        if role:
+            return [role]
+        return []
+
+    return roles
+
+
 async def get_user_permissions(db: AsyncSession, user_id: int) -> set[str]:
     """
     获取指定用户的所有权限（合并其所有角色的权限）。

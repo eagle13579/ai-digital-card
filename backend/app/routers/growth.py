@@ -9,9 +9,21 @@
   GET /api/v1/growth/trends     — 增长趋势 (7日/30日)
   GET /api/v1/growth/sources    — 获客来源分析
   GET /api/v1/growth/retention  — 留存分析
+  GET /api/v1/growth/overview   — 增长飞轮概览
 
 数据说明:
-  当前使用模拟数据返回。TODO: 接入真实数据源 (如 ClickHouse / 数仓)。
+  BUG-010 修复：已移除模拟数据桩，接入真实指标源：
+    - DAU/MAU   : audit_logs（按天/月 distinct user_id 活跃统计）
+    - 新用户     : users.created_at
+    - 名片创建数 : brochures.created_at
+    - 匹配数     : match_records.created_at
+    - 获客来源   : visitor_logs.source（direct/qrcode/share/scan）
+    - 留存       : users.created_at 注册 cohort + audit_logs 活跃回访
+  数据量不足时返回空序列并标注 data_status，不返回伪造数值。
+
+鉴权:
+  BUG-037 第一批落地：5 个端点统一收敛到 require_permission("system:metrics")
+  （RBAC 单一事实源 rbac_user_roles，顺带覆盖 BUG-011 无鉴权缺口）。
 
 规范:
   - 返回格式统一: { code, message, data, timestamp }
@@ -21,119 +33,121 @@
 from __future__ import annotations
 
 import logging
-import random
+from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database import get_db
+from app.middleware.rbac import require_permission
+from app.models.audit import AuditLog
+from app.models.brochure import Brochure
+from app.models.tag import MatchRecord
+from app.models.user import User
+from app.models.visitor import VisitorLog
 
 logger = logging.getLogger("chainke.growth")
 
 router = APIRouter(prefix="/api/v1/growth", tags=["增长分析"])
 
-# ── 模拟数据生成 ──────────────────────────────────────────────────────
+# ── 真实指标数据加载 ──────────────────────────────────────────────────
 
 
-def _mock_dau_series(days: int = 30) -> list[dict[str, Any]]:
-    """生成过去 N 天的模拟 DAU 数据。"""
-    base = 1200
-    series = []
-    for i in range(days - 1, -1, -1):
-        date = (datetime.utcnow() - timedelta(days=i)).strftime("%Y-%m-%d")
-        dow = (datetime.utcnow() - timedelta(days=i)).weekday()
-        multiplier = 1.1 if dow < 5 else 0.85
-        dau = int(base * multiplier + (i % 7) * 30)
-        series.append({"date": date, "dau": dau})
-    return series
+def _to_day(value: Any) -> str:
+    """将 DB 返回的时间值统一为 YYYY-MM-DD 字符串（兼容 SQLite str / 其它方言 datetime）。"""
+    if value is None:
+        return ""
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m-%d")
+    return str(value)[:10]
 
 
-def _mock_mau_series(months: int = 6) -> list[dict[str, Any]]:
-    """生成过去 N 个月的模拟 MAU 数据。"""
-    series = []
-    now = datetime.utcnow()
-    for i in range(months - 1, -1, -1):
-        month = (now.month - i) % 12 or 12
-        year = now.year - (1 if (now.month - i) <= 0 else 0)
-        mau = int(5000 + (i * 200) + random.randint(-200, 200))
-        series.append({
-            "month": f"{year}-{month:02d}",
-            "year": year,
-            "month_num": month,
-            "mau": mau,
-        })
-    return series
+def _to_month(value: Any) -> str:
+    """将 DB 返回的时间值统一为 YYYY-MM 字符串。"""
+    if value is None:
+        return ""
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m")
+    s = str(value)[:7]
+    return s
 
 
-def _mock_card_creation_series(days: int = 30) -> list[dict[str, Any]]:
-    """生成过去 N 天的模拟名片创建数。"""
-    series = []
-    for i in range(days - 1, -1, -1):
-        date = (datetime.utcnow() - timedelta(days=i)).strftime("%Y-%m-%d")
-        count = int(80 + random.randint(-20, 40) + (i % 5) * 10)
-        series.append({"date": date, "card_creations": count})
-    return series
+async def _load_metrics(db: AsyncSession) -> dict[str, Any]:
+    """一次性加载核心业务表并在 Python 侧聚合（兼容 SQLite/MySQL/PostgreSQL）。"""
+    audit_rows = (await db.execute(select(AuditLog.user_id, AuditLog.timestamp))).all()
+    user_rows = (await db.execute(select(User.id, User.created_at))).all()
+    brochure_rows = (await db.execute(select(Brochure.id, Brochure.created_at))).all()
+    match_rows = (await db.execute(select(MatchRecord.id, MatchRecord.created_at))).all()
+    visitor_rows = (await db.execute(select(VisitorLog.source))).all()
 
+    # DAU: 每天 distinct 活跃 user_id（基于审计日志）
+    dau_by_day: dict[str, set[int]] = defaultdict(set)
+    # MAU: 每月 distinct 活跃 user_id
+    mau_by_month: dict[str, set[int]] = defaultdict(set)
+    # 用户活跃日映射（留存计算用）
+    active_days_by_user: dict[int, set[str]] = defaultdict(set)
+    for uid, ts in audit_rows:
+        if uid is None:
+            continue
+        day = _to_day(ts)
+        if day:
+            dau_by_day[day].add(uid)
+            active_days_by_user[uid].add(day)
+        month = _to_month(ts)
+        if month:
+            mau_by_month[month].add(uid)
 
-def _mock_match_series(days: int = 30) -> list[dict[str, Any]]:
-    """生成过去 N 天的模拟匹配数。"""
-    series = []
-    for i in range(days - 1, -1, -1):
-        date = (datetime.utcnow() - timedelta(days=i)).strftime("%Y-%m-%d")
-        count = int(200 + random.randint(-40, 60) + (i % 4) * 15)
-        series.append({"date": date, "matches": count})
-    return series
+    # 新注册用户 / 名片创建 / 匹配：按天计数
+    reg_by_day: dict[str, int] = defaultdict(int)
+    reg_day_by_user: dict[int, str] = {}
+    for uid, ts in user_rows:
+        day = _to_day(ts)
+        if day:
+            reg_by_day[day] += 1
+            reg_day_by_user[uid] = day
 
+    card_by_day: dict[str, int] = defaultdict(int)
+    for _, ts in brochure_rows:
+        day = _to_day(ts)
+        if day:
+            card_by_day[day] += 1
 
-def _mock_source_analysis() -> list[dict[str, Any]]:
-    """生成模拟获客来源分析。"""
-    return [
-        {"source": "自然搜索", "channel": "organic", "users": 3200, "percentage": 32.0, "trend": "up"},
-        {"source": "直接访问", "channel": "direct", "users": 2100, "percentage": 21.0, "trend": "stable"},
-        {"source": "社交媒体", "channel": "social", "users": 1800, "percentage": 18.0, "trend": "up"},
-        {"source": "推荐邀请", "channel": "referral", "users": 1500, "percentage": 15.0, "trend": "up"},
-        {"source": "付费广告", "channel": "paid", "users": 800, "percentage": 8.0, "trend": "down"},
-        {"source": "邮件营销", "channel": "email", "users": 400, "percentage": 4.0, "trend": "stable"},
-        {"source": "其他", "channel": "other", "users": 200, "percentage": 2.0, "trend": "stable"},
-    ]
+    match_by_day: dict[str, int] = defaultdict(int)
+    for _, ts in match_rows:
+        day = _to_day(ts)
+        if day:
+            match_by_day[day] += 1
 
+    # 获客来源（访客来源近似）
+    source_counter: dict[str, int] = defaultdict(int)
+    for (source,) in visitor_rows:
+        source_counter[source or "direct"] += 1
 
-def _mock_retention_data() -> dict[str, Any]:
-    """生成模拟留存分析数据。"""
-    cohorts = []
-    now = datetime.utcnow()
-    for i in range(6):
-        month = (now.month - i) % 12 or 12
-        year = now.year - (1 if (now.month - i) <= 0 else 0)
-        cohort_id = f"{year}-{month:02d}"
-        # 模拟留存率: D1 ~ D30 递减
-        base_users = random.randint(800, 1500)
-        day1 = round(random.uniform(0.35, 0.55), 3)
-        day3 = round(day1 * random.uniform(0.55, 0.75), 3)
-        day7 = round(day3 * random.uniform(0.50, 0.70), 3)
-        day14 = round(day7 * random.uniform(0.45, 0.60), 3)
-        day30 = round(day14 * random.uniform(0.30, 0.50), 3)
-        cohorts.append({
-            "cohort": cohort_id,
-            "new_users": base_users,
-            "retention": {
-                "day_1": day1,
-                "day_3": day3,
-                "day_7": day7,
-                "day_14": day14,
-                "day_30": day30,
-            },
-        })
     return {
-        "cohorts": sorted(cohorts, key=lambda c: c["cohort"], reverse=True),
-        "average_retention": {
-            "day_1": round(sum(c["retention"]["day_1"] for c in cohorts) / len(cohorts), 3),
-            "day_3": round(sum(c["retention"]["day_3"] for c in cohorts) / len(cohorts), 3),
-            "day_7": round(sum(c["retention"]["day_7"] for c in cohorts) / len(cohorts), 3),
-            "day_14": round(sum(c["retention"]["day_14"] for c in cohorts) / len(cohorts), 3),
-            "day_30": round(sum(c["retention"]["day_30"] for c in cohorts) / len(cohorts), 3),
-        },
-        "period": "monthly_cohort",
+        "dau_by_day": {k: len(v) for k, v in dau_by_day.items()},
+        "mau_by_month": {k: len(v) for k, v in mau_by_month.items()},
+        "active_days_by_user": active_days_by_user,
+        "reg_by_day": reg_by_day,
+        "reg_day_by_user": reg_day_by_user,
+        "card_by_day": card_by_day,
+        "match_by_day": match_by_day,
+        "source_counter": source_counter,
     }
+
+
+def _fill_daily_series(
+    data: dict[str, int], days: int, key: str
+) -> list[dict[str, Any]]:
+    """将按天字典补零展开为最近 N 天序列。"""
+    series: list[dict[str, Any]] = []
+    today = datetime.utcnow().date()
+    for i in range(days - 1, -1, -1):
+        date_str = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+        series.append({"date": date_str, key: data.get(date_str, 0)})
+    return series
 
 
 def _compute_growth_rate(series: list[dict[str, Any]], key: str) -> float:
@@ -147,13 +161,112 @@ def _compute_growth_rate(series: list[dict[str, Any]], key: str) -> float:
     return round((latest - prev) / prev * 100, 2)
 
 
+def _source_analysis(counter: dict[str, int]) -> list[dict[str, Any]]:
+    """基于访客来源统计获客来源分析。"""
+    total = sum(counter.values()) or 1
+    labels = {
+        "direct": ("直接访问", "direct"),
+        "qrcode": ("二维码", "qrcode"),
+        "share": ("分享链接", "share"),
+        "scan": ("扫码", "scan"),
+        "wechat": ("微信", "wechat"),
+        "other": ("其他", "other"),
+    }
+    sources = []
+    for key, cnt in sorted(counter.items(), key=lambda kv: kv[1], reverse=True):
+        cn_name, channel = labels.get(key, (key, key))
+        sources.append({
+            "source": cn_name,
+            "channel": channel,
+            "users": cnt,
+            "percentage": round(cnt / total * 100, 2),
+            "trend": "stable",
+        })
+    return sources
+
+
+def _retention_data(metrics: dict[str, Any]) -> dict[str, Any]:
+    """月度注册 Cohort 留存（D1/D3/D7/D14/D30，基于 audit_logs 活跃回访）。
+
+    数据量不足（无注册用户）时返回空 cohort 并标注 data_status=no_data。
+    """
+    reg_day_by_user = metrics.get("reg_day_by_user", {})
+    active_days_by_user = metrics.get("active_days_by_user", {})
+
+    if not reg_day_by_user:
+        return {
+            "cohorts": [],
+            "average_retention": {
+                "day_1": 0.0, "day_3": 0.0, "day_7": 0.0,
+                "day_14": 0.0, "day_30": 0.0,
+            },
+            "period": "monthly_cohort",
+            "data_status": "no_data",
+        }
+
+    cohorts: dict[str, list[int]] = defaultdict(list)
+    for uid, day in reg_day_by_user.items():
+        if day:
+            cohorts[day[:7]].append(uid)
+
+    def _retention(users: list[int], offset_days: int) -> float:
+        if not users:
+            return 0.0
+        hit = 0
+        for uid in users:
+            reg_day = reg_day_by_user.get(uid)
+            if not reg_day:
+                continue
+            try:
+                target = (
+                    datetime.strptime(reg_day, "%Y-%m-%d") + timedelta(days=offset_days)
+                ).strftime("%Y-%m-%d")
+            except ValueError:
+                continue
+            if target in active_days_by_user.get(uid, set()):
+                hit += 1
+        return round(hit / len(users), 3)
+
+    cohort_list = []
+    for month, users in cohorts.items():
+        cohort_list.append({
+            "cohort": month,
+            "new_users": len(users),
+            "retention": {
+                "day_1": _retention(users, 1),
+                "day_3": _retention(users, 3),
+                "day_7": _retention(users, 7),
+                "day_14": _retention(users, 14),
+                "day_30": _retention(users, 30),
+            },
+        })
+
+    cohort_list.sort(key=lambda c: c["cohort"], reverse=True)
+    n = len(cohort_list) or 1
+    avg = {
+        "day_1": round(sum(c["retention"]["day_1"] for c in cohort_list) / n, 3),
+        "day_3": round(sum(c["retention"]["day_3"] for c in cohort_list) / n, 3),
+        "day_7": round(sum(c["retention"]["day_7"] for c in cohort_list) / n, 3),
+        "day_14": round(sum(c["retention"]["day_14"] for c in cohort_list) / n, 3),
+        "day_30": round(sum(c["retention"]["day_30"] for c in cohort_list) / n, 3),
+    }
+    return {
+        "cohorts": cohort_list,
+        "average_retention": avg,
+        "period": "monthly_cohort",
+        "data_status": "ok" if cohort_list else "no_data",
+    }
+
+
 # ── API 端点 ──────────────────────────────────────────────────────────
 
 
 @router.get("/metrics", summary="核心增长指标 — DAU/MAU/名片创建数/匹配数")
-async def growth_metrics():
-    """返回增长飞轮核心指标的最新值及变化率。
-    """
+async def growth_metrics(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
+):
+    """返回增长飞轮核心指标的最新值及变化率（真实数据）。"""
     from key_manager import SecretManager
     _env = SecretManager().get("ENV", "development").lower()
     _docs_disabled = SecretManager().get("DISABLE_DOCS", "").lower() in ("1", "true", "yes")
@@ -161,18 +274,30 @@ async def growth_metrics():
         from fastapi.responses import JSONResponse
         return JSONResponse({"error": "metrics endpoint disabled in production"}, status_code=404)
 
-    # ── 正式指标逻辑 ──
-    dau_series = _mock_dau_series(30)
-    mau_series = _mock_mau_series(6)
-    card_series = _mock_card_creation_series(30)
-    match_series = _mock_match_series(30)
+    # ── 真实指标逻辑 ──
+    metrics = await _load_metrics(db)
+
+    dau_series = _fill_daily_series(metrics["dau_by_day"], 30, "dau")
+    card_series = _fill_daily_series(metrics["card_by_day"], 30, "card_creations")
+    match_series = _fill_daily_series(metrics["match_by_day"], 30, "matches")
+    reg_series = _fill_daily_series(metrics["reg_by_day"], 30, "new_users")
+
+    # MAU: 最近 6 个月按月展开
+    mau_series = []
+    now = datetime.utcnow()
+    for i in range(5, -1, -1):
+        year, month = (now.year, now.month - i)
+        while month <= 0:
+            year -= 1
+            month += 12
+        month_key = f"{year}-{month:02d}"
+        mau_series.append({"month": month_key, "year": year, "month_num": month,
+                           "mau": metrics["mau_by_month"].get(month_key, 0)})
 
     latest_dau = dau_series[-1]["dau"]
     latest_mau = mau_series[-1]["mau"]
     latest_cards = card_series[-1]["card_creations"]
     latest_matches = match_series[-1]["matches"]
-
-    # 累计值
     total_cards = sum(c["card_creations"] for c in card_series)
     total_matches = sum(m["matches"] for m in match_series)
 
@@ -201,6 +326,8 @@ async def growth_metrics():
                 "today": latest_matches,
                 "change_rate": _compute_growth_rate(match_series, "matches"),
             },
+            "new_users_today": reg_series[-1]["new_users"],
+            "data_status": "ok",
             "timestamp": datetime.utcnow().isoformat(),
         },
     }
@@ -209,22 +336,21 @@ async def growth_metrics():
 @router.get("/trends", summary="增长趋势 — 7日/30日DAU及名片匹配趋势")
 async def growth_trends(
     days: int = Query(30, ge=7, le=90, description="查询天数 (7~90)"),
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
 ):
-    """返回指定天数的增长趋势数据。
+    """返回指定天数的增长趋势数据（真实数据）。"""
+    metrics = await _load_metrics(db)
 
-    包括:
-      - dau: 日活跃用户趋势
-      - card_creations: 每日名片创建数
-      - matches: 每日匹配数
-      - summary: 汇总统计（总值、日均值、峰值）
-    """
-    dau_series = _mock_dau_series(days)
-    card_series = _mock_card_creation_series(days)
-    match_series = _mock_match_series(days)
+    dau_series = _fill_daily_series(metrics["dau_by_day"], days, "dau")
+    card_series = _fill_daily_series(metrics["card_by_day"], days, "card_creations")
+    match_series = _fill_daily_series(metrics["match_by_day"], days, "matches")
+    reg_series = _fill_daily_series(metrics["reg_by_day"], days, "new_users")
 
     all_dau = [d["dau"] for d in dau_series]
     all_cards = [c["card_creations"] for c in card_series]
     all_matches = [m["matches"] for m in match_series]
+    all_reg = [r["new_users"] for r in reg_series]
 
     return {
         "code": 0,
@@ -233,6 +359,7 @@ async def growth_trends(
             "dau": dau_series,
             "card_creations": card_series,
             "matches": match_series,
+            "new_users": reg_series,
             "summary": {
                 "total_dau": sum(all_dau),
                 "avg_dau": round(sum(all_dau) / len(all_dau), 1),
@@ -241,8 +368,10 @@ async def growth_trends(
                 "avg_daily_cards": round(sum(all_cards) / len(all_cards), 1),
                 "total_matches": sum(all_matches),
                 "avg_daily_matches": round(sum(all_matches) / len(all_matches), 1),
+                "total_new_users": sum(all_reg),
             },
             "days": days,
+            "data_status": "ok",
             "timestamp": datetime.utcnow().isoformat(),
         },
     }
@@ -251,19 +380,12 @@ async def growth_trends(
 @router.get("/sources", summary="获客来源分析 — 各渠道用户获取分布")
 async def growth_sources(
     days: int = Query(30, ge=1, le=90, description="分析周期天数"),
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
 ):
-    """返回获客来源分析数据。
-
-    渠道包括:
-      - organic: 自然搜索
-      - direct: 直接访问
-      - social: 社交媒体
-      - referral: 推荐邀请
-      - paid: 付费广告
-      - email: 邮件营销
-      - other: 其他
-    """
-    sources = _mock_source_analysis()
+    """返回获客来源分析数据（基于 visitor_logs.source 真实统计）。"""
+    metrics = await _load_metrics(db)
+    sources = _source_analysis(metrics["source_counter"])
 
     return {
         "code": 0,
@@ -272,6 +394,7 @@ async def growth_sources(
             "sources": sources,
             "total_users": sum(s["users"] for s in sources),
             "period_days": days,
+            "data_status": "ok" if sources else "no_data",
             "timestamp": datetime.utcnow().isoformat(),
         },
     }
@@ -280,19 +403,12 @@ async def growth_sources(
 @router.get("/retention", summary="留存分析 — 月度 Cohort 留存率")
 async def growth_retention(
     months: int = Query(6, ge=3, le=24, description="Cohort 月数 (3~24)"),
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
 ):
-    """返回月度 Cohort 留存分析。
-
-    留存率指标:
-      - day_1: 次日留存
-      - day_3: 3日留存
-      - day_7: 7日留存
-      - day_14: 14日留存
-      - day_30: 30日留存
-
-    同时返回所有 Cohort 的平均留存率。
-    """
-    retention_data = _mock_retention_data()
+    """返回月度 Cohort 留存分析（注册 cohort + audit_logs 活跃回访）。"""
+    metrics = await _load_metrics(db)
+    retention_data = _retention_data(metrics)
 
     return {
         "code": 0,
@@ -305,17 +421,23 @@ async def growth_retention(
 
 
 @router.get("/overview", summary="增长飞轮概览 — 综合看板数据")
-async def growth_overview():
-    """返回增长飞轮综合概览，聚合 metrics + trends + sources 的核心信息。"""
-    dau_series = _mock_dau_series(30)
-    mau_series = _mock_mau_series(6)
-    card_series = _mock_card_creation_series(30)
-    match_series = _mock_match_series(30)
-    sources = _mock_source_analysis()
-    retention = _mock_retention_data()
+async def growth_overview(
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(require_permission("system:metrics")),
+):
+    """返回增长飞轮综合概览，聚合 metrics + trends + sources 的核心信息（真实数据）。"""
+    metrics = await _load_metrics(db)
+
+    dau_series = _fill_daily_series(metrics["dau_by_day"], 30, "dau")
+    card_series = _fill_daily_series(metrics["card_by_day"], 30, "card_creations")
+    match_series = _fill_daily_series(metrics["match_by_day"], 30, "matches")
+    sources = _source_analysis(metrics["source_counter"])
+    retention = _retention_data(metrics)
 
     latest_dau = dau_series[-1]["dau"]
-    latest_mau = mau_series[-1]["mau"]
+    now = datetime.utcnow()
+    month_key = f"{now.year}-{now.month:02d}"
+    latest_mau = metrics["mau_by_month"].get(month_key, 0)
 
     return {
         "code": 0,
@@ -330,6 +452,7 @@ async def growth_overview():
             },
             "top_sources": sorted(sources, key=lambda s: s["users"], reverse=True)[:3],
             "avg_retention": retention["average_retention"],
+            "data_status": "ok",
             "timestamp": datetime.utcnow().isoformat(),
         },
     }
