@@ -45,30 +45,35 @@ REVERSE_PLAYBOOKS = [
                 "phase_label": "泡沫前期（上涨加速）",
                 "gdp_pc": 11330, "gdp_growth": 6.2, "urbanization": 76.7,
                 "working_age": 68.4, "inequality": 0.30,
+                "price_income": 10.0,  # 房价收入比（历史估算，Numbeo口径）
             },
             {
                 "phase_year": 1989,
                 "phase_label": "泡沫顶点（全民炒房）",
                 "gdp_pc": 24590, "gdp_growth": 5.4, "urbanization": 77.3,
                 "working_age": 69.0, "inequality": 0.33,
+                "price_income": 18.0,
             },
             {
                 "phase_year": 1992,
                 "phase_label": "崩盘初期（价格崩塌）",
                 "gdp_pc": 31000, "gdp_growth": 0.8, "urbanization": 77.6,
                 "working_age": 69.5, "inequality": 0.34,
+                "price_income": 15.0,
             },
             {
                 "phase_year": 1998,
                 "phase_label": "资产负债表衰退（深度调整）",
                 "gdp_pc": 31680, "gdp_growth": -1.3, "urbanization": 78.1,
                 "working_age": 68.8, "inequality": 0.38,
+                "price_income": 10.0,
             },
             {
                 "phase_year": 2003,
                 "phase_label": "长期停滞（通缩+老龄化）",
                 "gdp_pc": 33760, "gdp_growth": 0.5, "urbanization": 78.8,
                 "working_age": 66.0, "inequality": 0.38,
+                "price_income": 8.0,
             },
         ],
         "targets": ["CHN", "VNM", "IND"],  # 可对比的后发市场
@@ -87,24 +92,28 @@ REVERSE_PLAYBOOKS = [
                 "phase_label": "泡沫启动（低利率+杠杆）",
                 "gdp_pc": 39680, "gdp_growth": 2.8, "urbanization": 80.3,
                 "working_age": 66.8, "inequality": 0.47,
+                "price_income": 5.0,
             },
             {
                 "phase_year": 2006,
                 "phase_label": "泡沫顶点（次级贷泛滥）",
                 "gdp_pc": 44760, "gdp_growth": 2.7, "urbanization": 80.7,
                 "working_age": 66.6, "inequality": 0.47,
+                "price_income": 7.2,
             },
             {
                 "phase_year": 2009,
                 "phase_label": "崩盘（金融危机）",
                 "gdp_pc": 47000, "gdp_growth": -2.6, "urbanization": 81.3,
                 "working_age": 66.7, "inequality": 0.48,
+                "price_income": 5.5,
             },
             {
                 "phase_year": 2012,
                 "phase_label": "触底复苏（去杠杆完成）",
                 "gdp_pc": 51740, "gdp_growth": 2.3, "urbanization": 81.6,
                 "working_age": 66.2, "inequality": 0.47,
+                "price_income": 3.5,
             },
         ],
         "targets": ["CHN", "BRA", "TUR", "SAU"],
@@ -123,24 +132,28 @@ REVERSE_PLAYBOOKS = [
                 "phase_label": "泡沫顶点（回归前狂潮）",
                 "gdp_pc": 25000, "gdp_growth": 5.1, "urbanization": 100.0,
                 "working_age": 71.0, "inequality": 0.43,
+                "price_income": 18.0,
             },
             {
                 "phase_year": 2003,
                 "phase_label": "崩盘触底（SARS+通缩）",
                 "gdp_pc": 23500, "gdp_growth": 3.1, "urbanization": 100.0,
                 "working_age": 70.5, "inequality": 0.43,
+                "price_income": 8.0,
             },
             {
                 "phase_year": 2010,
                 "phase_label": "复苏暴涨（内地资金涌入）",
                 "gdp_pc": 32400, "gdp_growth": 6.8, "urbanization": 100.0,
                 "working_age": 70.0, "inequality": 0.44,
+                "price_income": 12.0,
             },
             {
                 "phase_year": 2019,
                 "phase_label": "高位震荡（需求见顶）",
                 "gdp_pc": 48300, "gdp_growth": -1.7, "urbanization": 100.0,
                 "working_age": 69.0, "inequality": 0.45,
+                "price_income": 20.0,
             },
         ],
         "targets": ["CHN", "SGP", "KOR"],
@@ -193,6 +206,32 @@ class ReverseTimeMachine:
 
     def __init__(self, collector: WorldBankCollector | None = None):
         self.collector = collector or WorldBankCollector()
+        self._numbeo = self._load_numbeo()
+
+    # ── Numbeo 房价收入比（实时抓取缓存）──────────────
+
+    def _load_numbeo(self) -> dict:
+        """加载 Numbeo 房价收入比缓存（93国）"""
+        try:
+            import os
+            import json
+            path = os.path.join(
+                "/var/www/ai-digital-card/backend/data/time_machine_engine",
+                "numbeo_price_income.json")
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    data = json.load(f)
+                values = data.get("values", {})
+                logger.info("Numbeo 房价收入比已加载: %d 国 (%s)",
+                            len(values), data.get("fetched_at", "?"))
+                return values
+        except Exception as e:
+            logger.warning("Numbeo 加载失败: %s", e)
+        return {}
+
+    def _target_price_income(self, iso3: str) -> float | None:
+        """目标国当前房价收入比（Numbeo）"""
+        return self._numbeo.get(iso3)
 
     # ── 匹配目标国当前 ≈ 基准国哪一年 ────────────────────
 
@@ -209,10 +248,15 @@ class ReverseTimeMachine:
             v = self.collector.get_country_avg(target_iso3, dim, years)
             if v is not None:
                 target[dim] = v
+        # 房价收入比（房地产类档案加维度，Numbeo 当前值）
+        is_property = "房地产" in playbook.get("category", "")
+        price_income = self._target_price_income(target_iso3) if is_property else None
+        if price_income is not None:
+            target["price_income"] = price_income
         if len(target) < 3:
             return None
 
-        # 与各阶段比对（归一化相对距离）
+        # 与各阶段比对（归一化相对距离；房价维度权重翻倍=周期核心指标）
         results = []
         for phase in playbook["phases"]:
             common = [d for d in phase if d in target and d not in ("phase_year", "phase_label")]
@@ -221,8 +265,9 @@ class ReverseTimeMachine:
             diffs = []
             for d in common:
                 base = max(abs(phase[d]), 1.0)
-                diffs.append(((target[d] - phase[d]) / base) ** 2)
-            dist = (sum(diffs) / len(diffs)) ** 0.5
+                weight = 2.0 if d == "price_income" else 1.0
+                diffs.append(((target[d] - phase[d]) / base) ** 2 * weight)
+            dist = (sum(diffs) / sum(1 for d in common if d != "price_income" or is_property)) ** 0.5
             sim = 1.0 / (1.0 + dist * 2.0)
             results.append({
                 "phase_year": phase["phase_year"],
@@ -230,6 +275,7 @@ class ReverseTimeMachine:
                 "distance": round(dist, 4),
                 "similarity": round(sim, 4),
                 "matched_dims": len(common),
+                "price_income": phase.get("price_income"),
             })
 
         if not results:
@@ -282,9 +328,17 @@ class ReverseTimeMachine:
             lines.append("")
             for r in items:
                 best = r["matched_phase"]
+                price_line = ""
+                target_pi = r.get("target_snapshot", {}).get("price_income")
+                if best.get("price_income") is not None:
+                    price_line = (f"  → 房价收入比: 目标国当前 **{target_pi}** "
+                                  f"vs 基准国{best['phase_year']}年 **{best['price_income']}** "
+                                  f"(Numbeo实时, 房产周期核心指标)\n")
                 lines.append(f"- **{r['playbook_name']}**")
                 lines.append(f"  → 当前环境 ≈ 基准国 **{best['phase_year']}年**（{best['phase_label']}），"
                              f"相似度 {best['similarity']:.0%}")
+                if price_line:
+                    lines.append(price_line.rstrip("\n"))
                 nexts = "、".join(
                     f"{p['phase_year']}年({p['phase_label']})" for p in r["next_phases"])
                 lines.append(f"  → 后续阶段参考: {nexts}")

@@ -513,7 +513,7 @@ KNOWN_CASES = [
     {
         "id": "aliexpress_brazil",
         "model_id": "ecommerce_marketplace",
-        "model_type": "env",
+        "model_type": "platform",
         "name": "速卖通进入巴西",
         "entry_year": 2016,
         "entry_countries": ["BRA"],
@@ -542,6 +542,7 @@ KNOWN_CASES = [
         "model_id": "fintech_lending",
         "model_type": "env",
         "name": "蚂蚁进入印度",
+        "skip": "investment",
         "entry_year": 2015,
         "entry_countries": ["IND"],
         "note": "蚂蚁2015年投资Paytm，消费金融出海印度",
@@ -549,7 +550,7 @@ KNOWN_CASES = [
     {
         "id": "kuaishou_brazil",
         "model_id": "short_video_social",
-        "model_type": "env",
+        "model_type": "platform",
         "name": "快手进入巴西",
         "entry_year": 2018,
         "entry_countries": ["BRA"],
@@ -1095,6 +1096,10 @@ class BacktestEngine:
             from .global_model import GlobalExportModel
             gm = GlobalExportModel(self.collector)
             return gm.backtest_case(case, top_n=top_n)
+        if model_type == "platform":
+            from .platform_model import PlatformExportModel
+            pm = PlatformExportModel(self.collector)
+            return pm.backtest_case(case, top_n=top_n)
 
         # ── env 型：环境相似匹配（分位数） ──────────────
         model_id = case["model_id"]
