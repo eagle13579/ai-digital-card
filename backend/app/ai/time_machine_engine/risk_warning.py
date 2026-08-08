@@ -270,7 +270,95 @@ class RiskWarningEngine:
         return {
             "housing": "🏠房产", "debt": "💸外债", "inflation": "📈通胀",
             "twin_def": "💱双赤字", "sovereign": "🏛️主权债", "buffer": "🛟储蓄",
+            "offshore": "🏝️离岸", "audit": "📋审计", "structure": "🏗️架构",
         }.get(dim, dim)
+
+    # ── 离岸架构风险因子（2026-08-08 套利模式库融合）──
+    # 源自「黑盒调查局」帕玛拉特离岸函证盲区套利模式：
+    # 离岸子公司占比高 + 审计函证集中 + 注册代理人模式 = 财务舞弊红旗
+
+    def offshore_risk(self, target: dict | None = None) -> dict:
+        """标的企业离岸架构风险评分（0-100）
+
+        target: {
+            "offshore_ratio": 0.35,      # 离岸子公司占比（0-1）
+            "structure": "offshore",     # offshore/trust/shell/normal
+            "audit": "concentrated",     # concentrated/scattered/unknown
+            "agent_model": "registered", # registered(注册代理人)/direct
+            "related_party": 0.5,        # 关联交易占比（0-1）
+        }
+        返回: {score, level, flags, patterns}
+        """
+        t = target or {}
+        score = 0.0
+        flags = []
+
+        # 1. 离岸子公司占比（核心）
+        ratio = t.get("offshore_ratio", 0)
+        if ratio > 0.5:
+            score += 40
+            flags.append(f"离岸子公司占比 {ratio:.0%}（极高）")
+        elif ratio > 0.3:
+            score += 25
+            flags.append(f"离岸子公司占比 {ratio:.0%}（偏高）")
+        elif ratio > 0.15:
+            score += 12
+            flags.append(f"离岸子公司占比 {ratio:.0%}（需关注）")
+
+        # 2. 离岸架构类型
+        structure = t.get("structure", "")
+        if structure in ("shell", "trust"):
+            score += 20
+            flags.append(f"离岸架构类型: {structure}（空壳/信托，信息不透明）")
+        elif structure == "offshore":
+            score += 10
+            flags.append("离岸架构（信息披露弱）")
+
+        # 3. 审计函证集中度
+        audit = t.get("audit", "")
+        if audit == "concentrated":
+            score += 15
+            flags.append("审计函证集中（单点造假风险，ISA 505 警示）")
+        elif audit == "scattered":
+            score += 5
+
+        # 4. 注册代理人模式
+        if t.get("agent_model") == "registered":
+            score += 10
+            flags.append("注册代理人模式（不承担实质核验义务）")
+
+        # 5. 关联交易占比
+        rp = t.get("related_party", 0)
+        if rp > 0.4:
+            score += 15
+            flags.append(f"关联交易占比 {rp:.0%}（资金腾挪风险）")
+        elif rp > 0.2:
+            score += 8
+            flags.append(f"关联交易占比 {rp:.0%}（偏高）")
+
+        score = min(100, round(score, 1))
+        if score >= 70:
+            level = "extreme"
+        elif score >= 45:
+            level = "high"
+        elif score >= 25:
+            level = "medium"
+        else:
+            level = "low"
+
+        return {
+            "score": score,
+            "level": level,
+            "flags": flags,
+            "patterns": ["离岸函证盲区套利"] if score >= 25 else [],
+            "advice": (
+                "🚨 离岸架构风险高：独立第三方核实离岸实体财务，不依赖注册代理人回函"
+                if score >= 45 else
+                "⚠️ 离岸架构需关注：核查审计函证独立性与离岸子公司实质经营"
+                if score >= 25 else
+                "✅ 离岸架构风险低"
+            ),
+        }
 
 
 if __name__ == "__main__":

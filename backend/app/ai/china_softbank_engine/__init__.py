@@ -149,6 +149,37 @@ class ChinaSoftBankEngine:
         except Exception as e:
             result["watchlist"] = {"error": str(e)}
 
+        # 4.5 套利模式匹配（2026-08-08 融合：猎物池国家 → 适用套利模式警示）
+        try:
+            from china_softbank_engine.arbitrage_patterns import load_patterns
+            from time_machine_engine.risk_warning import RiskWarningEngine
+            all_patterns = load_patterns()
+            # 按猎物池国家匹配宏观/规则模式
+            prey = (result.get("watchlist") or {}).get("prey_pool") or []
+            matched = []
+            for p in all_patterns:
+                p_type = p.get("type", "")
+                if p_type in ("macro_harvest", "rule_gap"):
+                    # 宏观模式对脆弱国普遍适用，记录适用提示
+                    matched.append({"id": p["id"], "name": p["name"],
+                                    "type": p_type,
+                                    "apply_hint": f"猎物池{len(prey)}国可走此路径",
+                                    "insight": p.get("arbitrage_insight", [])[:2]})
+            # 离岸风险因子（对标的做尽调时用）
+            rwe = RiskWarningEngine()
+            offshore_demo = rwe.offshore_risk({
+                "offshore_ratio": 0.35, "structure": "offshore",
+                "audit": "concentrated", "agent_model": "registered",
+                "related_party": 0.3})
+            result["arbitrage_patterns"] = {
+                "total": len(all_patterns),
+                "matched": matched,
+                "offshore_risk_demo": offshore_demo,
+                "offshore_note": "对具体标的尽调时用 offshore_risk() 评估（离岸占比/函证集中度/注册代理人）",
+            }
+        except Exception as e:
+            result["arbitrage_patterns"] = {"error": str(e)}
+
         # 5. 五千年智慧（心法）
         try:
             from time_machine_engine.wisdom_layer import WisdomLayer
@@ -238,6 +269,17 @@ class ChinaSoftBankEngine:
                 lines.append(f"- 抄底触发器: VIX>{trig.get('vix_threshold')} / 美元转强 / 地缘打击 / 贵金属异动")
         else:
             lines.append(f"- ⚠️ {wl.get('error')}")
+        lines.append("")
+
+        ap = data.get("arbitrage_patterns") or {}
+        lines.append("## 🧩 套利模式（融合警示）")
+        if ap.get("matched"):
+            lines.append(f"- 模式库: {ap.get('total')} 个模式，{len(ap.get('matched', []))} 个适用于当前猎物池")
+            for m in ap.get("matched", []):
+                ins = "；".join(m.get("insight", []))
+                lines.append(f"  - **{m.get('name')}** — {ins}")
+        else:
+            lines.append(f"- ⚠️ {ap.get('error')}")
         lines.append("")
 
         wd = data.get("wisdom") or {}
