@@ -18,6 +18,7 @@ from app.database import get_db
 from app.models.ab_test import ABTest, ABTestVariant, ABTestEvent, ABTestDecisionLog
 from app.models.user import User
 from app.routers.auth import get_current_user
+from app.middleware.rbac import require_permission
 from app.ai.ab_testing import (
     ABTestingEngine,
     get_ab_testing_engine,
@@ -75,10 +76,11 @@ class ResultsQuery(BaseModel):
 @router.post("/experiments")
 async def create_experiment(
     data: ExperimentCreate,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """创建 A/B 测试实验。"""
+    """创建 A/B 测试实验（BUG-025：管理类端点需 system:settings 权限）。"""
     # 创建实验
     experiment = ABTest(
         user_id=current_user.id,
@@ -181,10 +183,11 @@ async def get_experiment(
 async def update_experiment(
     experiment_id: int,
     data: ExperimentUpdate,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """更新实验配置（仅 draft 状态可修改）。"""
+    """更新实验配置（仅 draft 状态可修改）（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -203,10 +206,11 @@ async def update_experiment(
 @router.delete("/experiments/{experiment_id}")
 async def delete_experiment(
     experiment_id: int,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """删除实验。"""
+    """删除实验（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -226,10 +230,11 @@ async def delete_experiment(
 @router.post("/experiments/{experiment_id}/start")
 async def start_experiment(
     experiment_id: int,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """启动实验（将状态从 draft 改为 running）。"""
+    """启动实验（将状态从 draft 改为 running）（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -259,10 +264,11 @@ async def start_experiment(
 @router.post("/experiments/{experiment_id}/pause")
 async def pause_experiment(
     experiment_id: int,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """暂停正在运行的实验。"""
+    """暂停正在运行的实验（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -282,10 +288,11 @@ async def pause_experiment(
 @router.post("/experiments/{experiment_id}/resume")
 async def resume_experiment(
     experiment_id: int,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """恢复暂停的实验。"""
+    """恢复暂停的实验（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -305,10 +312,11 @@ async def resume_experiment(
 @router.post("/experiments/{experiment_id}/stop")
 async def stop_experiment(
     experiment_id: int,
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """停止实验并计算结果。"""
+    """停止实验并计算结果（BUG-025：管理类端点需 system:settings 权限）。"""
     experiment = await _get_owned_experiment(experiment_id, current_user.id, db)
     if not experiment:
         raise HTTPException(status_code=404, detail="实验不存在")
@@ -474,6 +482,7 @@ async def list_events(
 async def trigger_auto_decision(
     experiment_id: int,
     method: str = Query("chi_square", regex="^(chi_square|bayesian)$"),
+    _: bool = Depends(require_permission("system:settings")),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

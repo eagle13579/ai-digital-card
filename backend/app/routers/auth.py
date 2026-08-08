@@ -113,8 +113,14 @@ async def get_optional_user(
 
 
 async def authenticate_user(db: AsyncSession, phone: str, password: str) -> User | None:
-    result = await db.execute(select(User).where(User.phone == phone))
+    # P2: 优先用 phone_hash 查询（唯一索引，防明文依赖）；旧数据无hash时回退明文
+    phone_hash = hashlib.sha256(phone.encode()).hexdigest()
+    result = await db.execute(select(User).where(User.phone_hash == phone_hash))
     user = result.scalars().first()
+    if user is None:
+        # 兼容存量无 hash 数据（BUG-034 迁移前的旧行）
+        result = await db.execute(select(User).where(User.phone == phone))
+        user = result.scalars().first()
     if user is None or not pwd_context.verify(password, user.password_hash):
         return None
     return user
@@ -123,7 +129,9 @@ async def authenticate_user(db: AsyncSession, phone: str, password: str) -> User
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     """手机号注册"""
-    result = await db.execute(select(User).where(User.phone == data.phone))
+    # P2: 注册查重用 phone_hash（唯一索引），防止明文依赖
+    phone_hash = hashlib.sha256(data.phone.encode()).hexdigest()
+    result = await db.execute(select(User).where(User.phone_hash == phone_hash))
     existing = result.scalars().first()
     if existing:
         # BUG-038 修复：注册/登录错误统一提示，防止手机号存在性枚举
@@ -142,6 +150,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
 
     user = User(
         phone=data.phone,
+        phone_hash=hashlib.sha256(data.phone.encode()).hexdigest(),
         name=data.name,
         username=data.username,
         company=data.company,
@@ -245,6 +254,7 @@ async def wx_login(data: WeChatLogin, db: AsyncSession = Depends(get_db)):
 
 # ── 微信小程序登录（真实场景） ────────────────────────────────────────────
 
+import hashlib
 import logging
 import httpx as _httpx
 
